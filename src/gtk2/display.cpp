@@ -7,6 +7,8 @@
 #include <gdkmm/pixbuf.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/radiobutton.h>
+#include <gdk/gdkkeysyms.h>
+
 
 namespace cvisual {
 using boost::thread;
@@ -58,7 +60,6 @@ using boost::thread;
  * invisible, the owning window is hidden and destoyed.  It is recreated as needed.
  */
 	
-// A singlton that represents the background thread.
 
 shared_ptr<display> display::selected;
 
@@ -72,6 +73,7 @@ display::display()
 	height( 256),
 	exit(false),
 	visible(true),
+	fullscreen(false),
 	title( "VPython")
 {
 }
@@ -144,9 +146,11 @@ void
 display::set_visible( bool vis)
 {
 	if (vis && !active) {
+		VPYTHON_NOTE( "Opening a window from Python.");
 		gui_main::add_display( this);
 	}
 	else if (!vis && active) {
+		VPYTHON_NOTE( "Closing a window from Python.");
 		gui_main::remove_display(this);
 	}
 	visible = vis;
@@ -203,7 +207,20 @@ display::get_selected()
 	return selected;
 }
 
-// Glib::RefPtr<Gdk::GL::Context> display::share_list;
+bool
+display::is_fullscreen()
+{
+	return fullscreen;
+}
+
+void
+display::set_fullscreen( bool fs)
+{
+	if (active)
+		throw std::runtime_error( 
+			"Cannot change the window's state after initialization.");
+	fullscreen = fs;
+}
 
 void
 display::create()
@@ -214,7 +231,9 @@ display::create()
 		area->set_size_request( (int)(width * 2.0), (int)height);
 	else
 		area->set_size_request( (int)width, (int)height);
-		
+	area->signal_key_press_event().connect(
+		SigC::slot( *this, &display::on_key_pressed));
+	
 	Glib::RefPtr<Gdk::Pixbuf> fs_img = Gdk::Pixbuf::create_from_file( 
 		VPYTHON_PREFIX "/data/galeon-fullscreen.png");
 	
@@ -254,7 +273,11 @@ display::create()
 	window->show_all();
 	if (x > 0 && y > 0)
 		window->move( (int)x, (int)y);
+	if (fullscreen)
+		window->fullscreen();
 	active = true;
+	area->grab_focus();
+	assert( area->can_focus());
 }
 
 void
@@ -265,6 +288,17 @@ display::destroy()
 	active = false;
 	window.reset();
 	area.reset();
+}
+
+atomic_queue<std::string>& 
+display::get_kb()
+{
+#if 0
+	// TODO: Figure out exactly how this should work...
+	if (!active && visible)
+		gui_main::add_display(this);
+#endif
+	return keys;
 }
 
 void
@@ -296,6 +330,7 @@ display::on_rotate_clicked()
 bool
 display::on_window_delete(GdkEventAny*)
 {
+	VPYTHON_NOTE( "Closing a window from the GUI.");
 	timer.disconnect();
 	active = false;
 	window.reset();
@@ -310,8 +345,123 @@ display::on_window_delete(GdkEventAny*)
 void
 display::on_quit_clicked()
 {
+	VPYTHON_NOTE( "Initiating shutdown from the GUI.");
 	gui_main::quit();
 }
+
+bool
+display::on_key_pressed( GdkEventKey* key)
+{
+	// Note that this algorithm will proably fail if the user is using anything 
+	// other than a US keyboard.
+	std::string ctrl_str;
+	// First trap for shift, ctrl, and alt.
+	if ((key->state & GDK_SHIFT_MASK) || (key->state & GDK_LOCK_MASK)) {
+		ctrl_str += "shift+";
+	}
+	else if (key->state & GDK_CONTROL_MASK) {
+		ctrl_str += "ctrl+";
+	}
+	else if (key->state & GDK_MOD1_MASK) {
+		ctrl_str += "alt+";
+	}
+	
+	// Specials, try to match those in wgl.cpp
+	guint k = key->keyval;
+	std::string key_str;
+	switch (k) {
+		case GDK_F1:
+		case GDK_F2:
+		case GDK_F3:
+		case GDK_F4:
+		case GDK_F5:
+		case GDK_F6:
+		case GDK_F7:
+		case GDK_F8:
+		case GDK_F9:
+		case GDK_F10:
+		case GDK_F11:
+		case GDK_F12: {
+			// Use braces to destroy s.
+			std::ostringstream s;
+			s << key_str << 'f' << k-GDK_F1 + 1;
+			key_str = s.str();
+		}   break;
+		case GDK_Page_Up:
+			key_str += "page up";
+			break;
+		case GDK_Page_Down:
+			key_str += "page down";
+			break;
+		case GDK_End:
+			key_str += "end";
+			break;
+		case GDK_Home:
+			key_str += "home";
+			break;
+		case GDK_Left:
+			key_str += "left";
+			break;
+		case GDK_Up:
+			key_str += "up";
+			break;
+		case GDK_Right:
+			key_str += "right";
+			break;
+		case GDK_Down:
+			key_str += "down";
+			break;	
+		case GDK_Print:
+			key_str += "print screen";
+			break;
+		case GDK_Insert:
+			key_str += "insert";
+			break;
+		case GDK_Delete:
+			key_str += "delete";
+			break;
+		case GDK_Num_Lock:
+			key_str += "numlock";
+			break;
+		case GDK_Scroll_Lock:
+			key_str += "scrlock";
+			break;
+		case GDK_BackSpace:
+			key_str += "backspace";
+			break;
+		case GDK_Tab:
+			key_str += "\t";
+			break;
+		case GDK_Return:
+			key_str += "\n";
+			break;
+		case GDK_Escape:
+			// Allow the user to delete a fullscreen window this way
+			destroy();
+			gui_main::report_window_delete(this);
+			if (exit)
+				gui_main::quit();
+			return false;
+	}
+  
+	if (!key_str.empty()) {
+		// A special key.
+		ctrl_str += key_str;
+		keys.push( ctrl_str);
+	}
+	else if ( isprint(k) && !ctrl_str.empty()) {
+		// A control character
+		ctrl_str += static_cast<char>( k);
+		keys.push(ctrl_str);
+	}
+	else if ( strlen(key->string) && isprint( key->string[0])) {
+		// Anything else.
+		keys.push( std::string( key->string));
+	}
+	
+	return true;
+}
+
 
 ////////////////////////////////// gui_main implementation ////////////////////
 gui_main* gui_main::self = 0;
@@ -358,12 +508,14 @@ gui_main::thread_proc(void)
 {
 	self = new gui_main();
 	self->run();
+	VPYTHON_NOTE( "Terminating GUI thread.");
 }
 
 void
 gui_main::init_thread(void)
 {
 	if (!self) {
+		VPYTHON_NOTE( "Starting GUI thread.");
 		thread gtk( &gui_main::thread_proc);
 		while (!self) {
 		}
@@ -400,6 +552,7 @@ gui_main::add_display( display* d)
 {
 	init_thread();
 	lock L(self->call_lock);
+	VPYTHON_NOTE( "Adding new display object.");
 	self->caller = d;
 	self->returned = false;
 	self->signal_add_display();
@@ -447,6 +600,7 @@ gui_main::shutdown()
 	if (!self)
 		return;
 	lock L(self->call_lock);
+	VPYTHON_NOTE( "Initiating shutdown from Python.");
 	if (self->thread_exited)
 		return;
 	self->returned = false;

@@ -8,6 +8,7 @@
 
 #include "display_kernel.hpp"
 #include "gtk2/render_surface.hpp"
+#include "util/atomic_queue.hpp"
 
 #include <boost/scoped_ptr.hpp>
 
@@ -45,11 +46,15 @@ class display : public display_kernel,
 	float height;
 	bool exit;
 	bool visible; // True when the user has requested this window to be visible.
+	bool fullscreen; // True when the display is in fullscreen mode.
 	std::string title;
  
 	// The 'selected' display.
 	static shared_ptr<display> selected;
 	// static Glib::RefPtr<Gdk::GL::Context> share_list;
+	
+	// The interface for reading keyboard presses from this display in Python.
+	atomic_queue<std::string> keys;
 	
  public:
 	display();
@@ -72,6 +77,9 @@ class display : public display_kernel,
 
 	void set_title( std::string n_title);
 	std::string get_title();
+ 
+	bool is_fullscreen();
+	void set_fullscreen( bool);
 
 	virtual void add_renderable( shared_ptr<renderable>);
 	virtual void add_renderable_screen( shared_ptr<renderable>);
@@ -83,13 +91,16 @@ class display : public display_kernel,
 	void create();
 	void destroy();
 	
+	atomic_queue<std::string>& get_kb();
+	
  private:
 	// Signal handlers for the various widgets.
 	void on_fullscreen_clicked();
 	void on_pan_clicked();
 	void on_rotate_clicked();
-	bool on_window_delete(GdkEventAny*);
+	bool on_window_delete( GdkEventAny*);
 	void on_quit_clicked();
+	bool on_key_pressed( GdkEventKey*);
 };
 
 // A singlton.  This class provides all of the abstraction from the Gtk::Main
