@@ -17,25 +17,21 @@ render_core::enable_lights()
 {
 	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, &ambient.red);
 	// Note that this cascades.
-	switch (lights.size()) {
-		case 8:
-			lights[7]->gl_begin( GL_LIGHT7, gcf);
-		case 7:
-			lights[6]->gl_begin( GL_LIGHT6, gcf);
-		case 6:
-			lights[5]->gl_begin( GL_LIGHT5, gcf);
-		case 5:
-			lights[4]->gl_begin( GL_LIGHT4, gcf);
-		case 4:
-			lights[3]->gl_begin( GL_LIGHT3, gcf);
-		case 3:
-			lights[2]->gl_begin( GL_LIGHT2, gcf);
-		case 2:
-			lights[1]->gl_begin( GL_LIGHT1, gcf);
-		case 1:
-			lights[0]->gl_begin( GL_LIGHT0, gcf);
-		default:
-			return;
+	GLenum light_ids[] = {
+		GL_LIGHT0,
+		GL_LIGHT1,
+		GL_LIGHT2,
+		GL_LIGHT3,
+		GL_LIGHT4,
+		GL_LIGHT5,
+		GL_LIGHT6,
+		GL_LIGHT7		
+	};
+	GLenum* light_id = light_ids;
+	GLenum* light_end = light_id + 8;
+	for (light_iterator i = lights.begin(); 
+		i != lights.end() && light_id != light_end; ++i) {
+		i->gl_begin( *light_id, gcf);
 	}
 	check_gl_error();
 }
@@ -43,25 +39,21 @@ render_core::enable_lights()
 void
 render_core::disable_lights()
 {
-	switch (lights.size()) {
-		case 8:
-			lights[7]->gl_end( GL_LIGHT7);
-		case 7:
-			lights[6]->gl_end( GL_LIGHT6);
-		case 6:
-			lights[5]->gl_end( GL_LIGHT5);
-		case 5:
-			lights[4]->gl_end( GL_LIGHT4);
-		case 4:
-			lights[3]->gl_end( GL_LIGHT3);
-		case 3:
-			lights[2]->gl_end( GL_LIGHT2);
-		case 2:
-			lights[1]->gl_end( GL_LIGHT1);
-		case 1:
-			lights[0]->gl_end( GL_LIGHT0);
-		default:
-			return;		
+	GLenum light_ids[] = {
+		GL_LIGHT0,
+		GL_LIGHT1,
+		GL_LIGHT2,
+		GL_LIGHT3,
+		GL_LIGHT4,
+		GL_LIGHT5,
+		GL_LIGHT6,
+		GL_LIGHT7		
+	};
+	GLenum* light_id = light_ids;
+	GLenum* light_end = light_id + 8;
+	for (light_iterator i = lights.begin(); 
+		i != lights.end() && light_id != light_end; ++i) {
+		i->gl_end( *light_id);
 	}
 	check_gl_error();
 }	
@@ -78,12 +70,15 @@ render_core::add_light( shared_ptr<light> n_light)
 void 
 render_core::remove_light( shared_ptr<light> old_light)
 {
-	std::remove( lights.begin(), lights.end(), old_light);
+	lights.remove( old_light);
+	// std::remove( lights.begin(), lights.end(), old_light);
 }
 
 void 
 render_core::illuminate_default()
 {
+	lights.clear();
+	ambient = rgba( 0.2, 0.2, 0.2);
 	add_light( shared_ptr<light>( 
 		new light( vector(0.25, 0.5, 1.0).norm(), rgba( 0.8, 0.8, 0.8))));
 	add_light( shared_ptr<light>(
@@ -106,11 +101,8 @@ render_core::render_core()
 	world_scale(10.0),
 	gcf(1.0),
 	gcf_changed(false),
-	last_mousepos_x(0),
-	last_mousepos_y(0),
-	ambient( 0.4, 0.4, 0.4),
+	ambient( 0.2, 0.2, 0.2),
 	fps( 3e-3), // Ambitiously initialize to 3 ms per cycle.
-	cycles_since_fps(0),
 	mouse_mode( ZOOM_ROTATE),
 	stereo_mode( NO_STEREO),
 	lod_adjust(0),
@@ -401,7 +393,6 @@ render_core::recalc_extent(void)
 	}
 }
 
-#if 1
 
 bool
 render_core::draw( 
@@ -484,14 +475,12 @@ render_core::draw(
 	return true;
 }
 
-#endif
 
 // Renders the entire scene.
 bool
 render_core::render_scene(void)
 {
 	try {
-#if 1
 		fps.start();
 		view scene_geometry( forward, center, window_width, window_height, 
 			forward_changed, gcf, gcf_changed);
@@ -610,78 +599,6 @@ render_core::render_scene(void)
 			// std::cout << "cycle time: " << fps.read() << "\n";
 			cycles_since_fps = 0;
 		}
-#else
-		
-		fps.start();
-		view scene_geometry( forward, center, window_width, window_height, 
-			forward_changed, gcf, gcf_changed);
-		scene_geometry.lod_adjust = lod_adjust;
-		gl_begin();
-		clear_gl_error();
-		// Setup
-		// Set up the base modelview and projection matricies
-		world_to_view_transform( scene_geometry);
-		glViewport( 0, 0, static_cast<int>(window_width), 
-			static_cast<int>(window_height));
-		// Establish the proper background.
-		glClearColor( background.red, background.green, background.blue, 0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		// Render all opaque objects in the world space layer
-		lights.gl_begin();
-		world_iterator i( layer_world.begin());
-		world_iterator i_end( layer_world.end());
-		while (i != i_end) {
-			i->refresh_cache( scene_geometry);
-			i->gl_render( scene_geometry);
-			++i;
-		}
-		
-		// Perform a depth sort of the transparent world from forward to backward.
-		if (layer_world_transparent.size() > 1)
-			std::stable_sort( layer_world_transparent.begin(), layer_world_transparent.end(),
-				z_comparator( forward));
-		
-		// Render translucent objects in world space.
-		world_trans_iterator j( layer_world_transparent.begin());
-		world_trans_iterator j_end( layer_world_transparent.end());
-		while (j != j_end) {
-			j->refresh_cache( scene_geometry);
-			j->gl_render( scene_geometry);
-			++j;
-		}
-		lights.gl_end();
-		
-		
-		// Render objects in the screen layer.
-		glLoadIdentity();
-		glMatrixMode( GL_PROJECTION);
-		glLoadIdentity();
-		glMatrixMode( GL_MODELVIEW);
-		screen_iterator k( layer_screen.begin());
-		screen_iterator k_end( layer_screen.end());
-		while (k != k_end) {
-			k->refresh_cache( scene_geometry);
-			k->gl_render( scene_geometry);
-			++k;
-		}
-		
-		// Cleanup
-		gl_swap_buffers();
-		// get_gl_window()->swap_buffers();
-		check_gl_error();
-		// get_gl_window()->gl_end();
-		gl_end();
-		cycles_since_extent++;
-		fps.stop();
-		cycles_since_fps++;
-		gcf_changed = false;
-		forward_changed = false;
-		if (cycles_since_fps >= 20) {
-			std::cout << "cycle time: " << fps.read() << "\n";
-			cycles_since_fps = 0;
-		}
-#endif
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;
@@ -690,4 +607,57 @@ render_core::render_scene(void)
 		std::exit(1);
 	}
 	return true;
+}
+
+shared_ptr<renderable> 
+render_core::pick( float x, float y, float d_pixels)
+{
+	// Allocate a selection buffer of uints.  Format for returned hits is:
+	// [uint32: n_names][uint32: minimunm depth][uint32: maximum depth]
+	// [unit32(n_names): name_stack]
+	// n_names is the depth of the name stack at the time of the hit.
+	// minimum and maximum depth are the minimum and maximum values in the 
+	// depth buffer scaled between 0 and 2^32-1. (source is [0,1])
+	// name_stack is the full contents of the name stack at the time of the hit.
+	size_t hit_buffer_size = layer_world.size()+layer_world_transparent.size()*4;
+	unsigned int hit_buffer[hit_buffer_size];
+	
+	// Allocate a std::map< uint, shared_ptr<renderable> > to lookup names
+	std::map< unsigned int, shared_ptr<renderable> > name_table;
+	unsigned int name_counter = 0;
+	// as they are rendered.
+	// Pass the name stack to OpenGL with glSelectBuffer.
+	glSelectBuffer( hit_buffer_size, hit_buffer);
+	// Enter selection mode with glRenderMode
+	glRenderMode( GL_SELECT);
+	// Clear the name stack with glInitNames(), raise the height of the name
+	// stack with glPushName() exactly once.
+	glInitNames();
+	glPushName(0);
+	
+	// Initialize the picking matrix with gluPickMatrix().
+	int viewport_bounds[4] = { 
+		0, 0, static_cast<int>(window_width), static_cast<int>(window_height)
+	};
+	gluPickMatrix( x, y, d_pixels, d_pixels, viewport_bounds);
+	// Set up the world_to_view_transform().
+	view scene_geometry( forward, center, window_width, window_height, 
+		forward_changed, gcf, gcf_changed);
+	scene_geometry.lod_adjust = lod_adjust;
+	world_to_view_transform( scene_geometry);
+	// Loop:
+		// call glLoadName() with some identifier for the object being rendered.
+		// render the body.
+		// TODO: Should we use gl{Push,Pop}Name() in relation to frames?
+	// Return the name stack to the bottom with glPopName() exactly once.
+	glPopName();
+	// Exit selection mode, return to rendering with glRenderMode. (collects
+	// the number of hits at this time).
+	size_t n_hits = glRenderMode( GL_RENDER);
+	// Lookup the name to get the shared_ptr<renderable> associated with it.
+	
+	
+	// Notes:
+	// culled polygons don't count.  glRasterPos() does count.
+	return shared_ptr<renderable>();
 }
