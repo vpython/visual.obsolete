@@ -90,7 +90,7 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 		| Gdk::BUTTON_PRESS_MASK
 		| Gdk::BUTTON_RELEASE_MASK
 		| Gdk::POINTER_MOTION_MASK 
-		| Gdk::ENTER_NOTIFY_MASK 
+		// | Gdk::ENTER_NOTIFY_MASK //< TODO: Find out why this doesn't work.
 		| Gdk::BUTTON2_MOTION_MASK
 		| Gdk::BUTTON3_MOTION_MASK);
 	set_size_request( 384, 256);
