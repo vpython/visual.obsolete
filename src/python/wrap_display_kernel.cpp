@@ -1,4 +1,6 @@
 #include "display_kernel.hpp"
+#include "display.hpp"
+
 #include <boost/python/class.hpp>
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/overloads.hpp>
@@ -96,6 +98,20 @@ wrap_display_kernel(void)
 			&display_kernel::set_autocenter)
 		.add_property( "stereo", &display_kernel::get_stereomode,
 			&display_kernel::set_stereomode)
+		;
+	
+	py::class_<display, boost::noncopyable>( "display")
+		.add_property( "x", &display::get_x, &display::set_x)
+		.add_property( "y", &display::get_y, &display::set_y)
+		.add_property( "width", &display::get_width, &display::set_width)
+		.add_property( "height", &display::get_height, &display::set_height)
+		.add_property( "title", &display::get_title, &display::set_title)
+		// .add_property( "fullscreen", &display::is_fullscreen, &display::set_fullscreen)
+		.def( "set_selected", &display::set_selected)
+		.staticmethod( "set_selected")
+		.def( "get_selected", &display::get_selected)
+		.staticmethod( "get_selected")
+		.add_property( "visible", &display::get_visible, &display::set_visible)
 		;
 	
 	py::to_python_converter<
