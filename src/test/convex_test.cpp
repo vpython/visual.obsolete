@@ -46,9 +46,9 @@ realmain( std::vector<std::string>&)
 		//	std::cout << x0 << " " << x1 << " " << x2 << std::endl;
 	}
 	
-	app.scene.add_renderable( triangle);
-	app.scene.add_renderable( circle);
-	app.scene.add_renderable( sphere);
+	app.scene.core.add_renderable( triangle);
+	app.scene.core.add_renderable( circle);
+	app.scene.core.add_renderable( sphere);
 	
 	app.run();
 	return 0;

@@ -16,7 +16,7 @@ realmain( std::vector<std::string>&)
 	x->set_color( rgba( 1, 0, 0));
 	x->set_axis( vector(1e11, 0, 0));
 	
-	main_window.scene.add_renderable( x);
+	main_window.scene.core.add_renderable( x);
 	
 	main_window.run();
 	return 0;

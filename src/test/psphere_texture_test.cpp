@@ -52,9 +52,9 @@ realmain( std::vector<std::string>&)
 	arr->set_axis( axis);
 	arr->set_color( rgba( 1, 1, 1, 0.60));
 	
-	main_window.scene.add_renderable( sph);
-	main_window.scene.add_renderable( arr);
-	main_window.scene.add_renderable( stars);
+	main_window.scene.core.add_renderable( sph);
+	main_window.scene.core.add_renderable( arr);
+	main_window.scene.core.add_renderable( stars);
 	
 	main_window.run();
 	return 0;

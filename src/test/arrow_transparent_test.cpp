@@ -46,11 +46,11 @@ realmain( std::vector<std::string>&)
 	repeated->add_child( y);
 	repeated->add_child( z);
 	
-	main_window.scene.add_renderable( y);
-	main_window.scene.add_renderable( x);
-	main_window.scene.add_renderable( z);
-	main_window.scene.add_renderable( net);
-	main_window.scene.add_renderable( repeated);
+	main_window.scene.core.add_renderable( y);
+	main_window.scene.core.add_renderable( x);
+	main_window.scene.core.add_renderable( z);
+	main_window.scene.core.add_renderable( net);
+	main_window.scene.core.add_renderable( repeated);
 
 	std::cout << "You should see four arrow objects.  A red one along +x,"
 		" a green one along +y, a blue one along +z, and a translucent one"

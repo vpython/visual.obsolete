@@ -32,17 +32,17 @@ realmain( std::vector<std::string>&)
 	longer->set_shininess( 0.8);
 	
 	shared_ptr<ellipsoid> green( new ellipsoid());
-	green->set_color( trans_green);
 	green->set_pos( vector(0, 2, 0));
 	green->set_axis( vector( -1, -1, 0));
 	green->set_width( 0.75);
 	green->set_height( 0.6);
 	green->set_shininess( 0.99);
+	green->set_color( trans_green);
 	
-	app.scene.add_renderable( x);
-	app.scene.add_renderable( simple);
-	app.scene.add_renderable( longer);
-	app.scene.add_renderable( green);
+	app.scene.core.add_renderable( x);
+	app.scene.core.add_renderable( simple);
+	app.scene.core.add_renderable( longer);
+	app.scene.core.add_renderable( green);
 
 	std::cout << "You should see three ellipsoids and an arrow.  The arrow is a "
 		"measure of one unit length.  The cone on the right is built with "

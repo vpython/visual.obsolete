@@ -24,8 +24,8 @@ realmain( std::vector<std::string>&)
 	simple->set_color( yellow);
 	simple->set_shininess( 0.5);
 	
-	app.scene.add_renderable( x);
-	app.scene.add_renderable( simple);
+	app.scene.core.add_renderable( x);
+	app.scene.core.add_renderable( simple);
 
 	// std::cout << "";
 	app.run();

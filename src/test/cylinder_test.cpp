@@ -37,10 +37,10 @@ realmain( std::vector<std::string>&)
 	green->set_radius( 0.75);
 	green->set_shininess( 0.8);
 	
-	app.scene.add_renderable( x);
-	app.scene.add_renderable( simple);
-	app.scene.add_renderable( longer);
-	app.scene.add_renderable( green);
+	app.scene.core.add_renderable( x);
+	app.scene.core.add_renderable( simple);
+	app.scene.core.add_renderable( longer);
+	app.scene.core.add_renderable( green);
 
 	std::cout << "You should see three cylinders and an arrow.  The arrow is a "
 		"measure of one unit length.  The cone on the right is built with "

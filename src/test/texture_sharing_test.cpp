@@ -29,8 +29,8 @@ realmain( std::vector<std::string>&)
 	sph2->set_axis( vector(-1,0,0));
 	sph2->set_texture( earth);
 
-	main_window.scene.add_renderable( sph);
-	main_window.scene.add_renderable( sph2);
+	main_window.scene.core.add_renderable( sph);
+	main_window.scene.core.add_renderable( sph2);
 
 	main_window.run();
 	return 0;

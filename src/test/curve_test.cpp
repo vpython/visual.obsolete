@@ -52,10 +52,10 @@ realmain( std::vector<std::string>&)
 	shared_ptr<arrow> x( new arrow());
 	x->set_color( rgba( 1, 0, 0));
 	
-	main_window.scene.add_renderable( x);
-	main_window.scene.add_renderable( thin);
-	main_window.scene.add_renderable( thick);
-	main_window.scene.add_renderable( box);
+	main_window.scene.core.add_renderable( x);
+	main_window.scene.core.add_renderable( thin);
+	main_window.scene.core.add_renderable( thick);
+	main_window.scene.core.add_renderable( box);
 	
 	main_window.run();
 	return 0;

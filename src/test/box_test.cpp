@@ -46,13 +46,13 @@ realmain( std::vector<std::string>&)
 	hidden_sphere->set_pos( vector( 0, -2, 0));
 	hidden_sphere->set_radius( 0.4);
 	
-	app.scene.add_renderable( x);
-	app.scene.add_renderable( simple);
-	app.scene.add_renderable( trans);
-	app.scene.add_renderable( texed);
-	app.scene.add_renderable( trans_texed);
-	app.scene.add_renderable( hidden_sphere);
-	app.scene.core.background = rgba();
+	app.scene.core.add_renderable( x);
+	app.scene.core.add_renderable( simple);
+	app.scene.core.add_renderable( trans);
+	app.scene.core.add_renderable( texed);
+	app.scene.core.add_renderable( trans_texed);
+	app.scene.core.add_renderable( hidden_sphere);
+	app.scene.core.set_background( rgba());
 
 	std::cout << "You should see four boxes and an arrow.  The box on the right "
 		"should be opaque and have the same length, width, and height, all "

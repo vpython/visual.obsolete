@@ -70,10 +70,10 @@ realmain( std::vector<std::string>&)
 	main_window.scene.core.set_ambient( rgba( 0.1, 0.1, 0.1));
 	main_window.scene.core.set_up( up);
 	
-	main_window.scene.add_renderable( stars);
-	main_window.scene.add_renderable( sph);
+	main_window.scene.core.add_renderable( stars);
+	main_window.scene.core.add_renderable( sph);
 	// main_window.scene.add_renderable( arr);
-	main_window.scene.add_renderable( ear_night);
+	main_window.scene.core.add_renderable( ear_night);
 	
 	main_window.run();
 	return 0;

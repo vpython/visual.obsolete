@@ -7,6 +7,8 @@
 
 using namespace cvisual;
 
+// TODO: Modify this test to make a variable number of spheres and test the
+// rendering overhead for the set.
 int 
 realmain( std::vector<std::string>&)
 {
@@ -36,12 +38,12 @@ realmain( std::vector<std::string>&)
 	sph6->set_pos( vector(-1, -1, 0) * 6);
 	sph6->set_color( rgba(1, 1, 0));
 	
-	main_window.scene.add_renderable( sph6);
-	main_window.scene.add_renderable( sph2);
-	main_window.scene.add_renderable( sph3);
-	main_window.scene.add_renderable( sph4);
-	main_window.scene.add_renderable( sph5);
-	main_window.scene.add_renderable( sph);
+	main_window.scene.core.add_renderable( sph6);
+	main_window.scene.core.add_renderable( sph2);
+	main_window.scene.core.add_renderable( sph3);
+	main_window.scene.core.add_renderable( sph4);
+	main_window.scene.core.add_renderable( sph5);
+	main_window.scene.core.add_renderable( sph);
 	
 	main_window.run();
 	return 0;

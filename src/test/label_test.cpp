@@ -35,10 +35,10 @@ realmain( std::vector<std::string>&)
 	midp->set_yoffset( -20);
 	midp->set_pos( vector(.5, 0, 0));
 	
-	main_window.scene.add_renderable( x);
-	main_window.scene.add_renderable( tail);
-	main_window.scene.add_renderable( tip);
-	main_window.scene.add_renderable( midp);
+	main_window.scene.core.add_renderable( x);
+	main_window.scene.core.add_renderable_screen( tail);
+	main_window.scene.core.add_renderable_screen( tip);
+	main_window.scene.core.add_renderable_screen( midp);
 	
 	std::cout << "You should see a single arrow with three labels attached to it.\n"
 		"Each label is translucent.  The one at the tip should be centered at \n"
