@@ -1,0 +1,8 @@
+#ifndef OPENCFD_PLATFORM_CONFIG_HPP
+#define OPENCFD_PLATFORM_CONFIG_HPP
+
+#ifndef M_PI
+#define M_PI 3.14159265359
+#endif
+
+#endif

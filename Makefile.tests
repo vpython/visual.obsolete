@@ -1,0 +1,50 @@
+# Makefile fragment for building test programs.
+
+test_CPPFLAGS = $(shell PKG_CONFIG_PATH=./lib/pkgconfig/ \
+	pkg-config --cflags vpython-3.0)
+
+test_LIBS = $(shell PKG_CONFIG_PATH=./lib/pkgconfig/ \
+	pkg-config --libs vpython-3.0)
+
+bins += bin/sphere_lod_test \
+	bin/arrow_transparent_test \
+	bin/object_zsort_bench \
+	bin/model_zsort_bench \
+	bin/sincos_matrix_bench \
+	bin/sphere_texture_test \
+	bin/arrow_scaling_test \
+	bin/sphere_transparent_test \
+	bin/texture_sharing_test \
+	bin/box_test \
+	bin/cone_test \
+	bin/cylinder_test \
+	bin/ring_test \
+	bin/pyramid_test \
+	bin/ellipsoid_test
+
+test_OBJS = src/test/sphere_lod_test.o \
+	src/test/arrow_transparent_test.o \
+	src/test/object_zsort_bench.o \
+	src/test/model_zsort_bench.o \
+	src/test/sincos_matrix_bench.o \
+	src/test/sphere_texture_test.o \
+	src/test/arrow_scaling_test.o \
+	src/test/sphere_transparent_test.o \
+	src/test/texture_sharing_test.o \
+	src/test/box_test.o \
+	src/test/cone_test.o \
+	src/test/cylinder_test.o \
+	src/test/ring_test.o \
+	src/test/pyramid_test.o \
+	src/test/ellipsoid_test.o
+
+clean_files += $(bins) $(test_OBJS)
+distclean_files += $(subst .o,.d,$(test_OBJS))
+
+bin/%: src/test/%.o
+	$(CXX) -o $@ $< $(test_LIBS) $(LIBS)
+
+src/test/%.o: src/test/%.cpp
+	$(CXX) -c -o $@ $(test_CPPFLAGS) $(CPPFLAGS) -MMD -MF src/test/$*.d  $(CXXFLAGS) $<
+
+-include $(subst .o,.d,$(test_OBJS))
