@@ -79,6 +79,7 @@ else:
 	srcs.append( 'src/gtk2/timer.cpp')
 	srcs.append( 'src/gtk2/random_device.cpp')
 	srcs.append( 'src/gtk2/display.cpp')
+	srcs.append( 'src/gtk2/rate.cpp')
 	
 	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl '
 		+ 'fontconfig gthread-2.0')
