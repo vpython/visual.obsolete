@@ -366,6 +366,8 @@ render_core::world_to_view_transform(view& geometry, int whicheye, bool forpick)
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
 // as required.
+// TODO: Add a computation to calculate the number of objects in the universe
+// as well. (to use for the pick() function.)
 void
 render_core::recalc_extent(void)
 {
@@ -614,9 +616,7 @@ render_core::render_scene(void)
 		
 		// Cleanup
 		gl_swap_buffers();
-		// get_gl_window()->swap_buffers();
 		check_gl_error();
-		// get_gl_window()->gl_end();
 		gl_end();
 		fps.stop();
 		cycles_since_extent++;
