@@ -46,15 +46,15 @@ class render_surface : public SigC::Object
 	// Callbacks provided to the render_core object.
 	void gl_begin();
 	void gl_end();
-	void swap_buffers();
- 
+	void gl_swap_buffers();
+	
+	void CreateWindow( HWND);
+	
  public:
 	render_surface();
 	~render_surface();
 	render_core core;
-	
-	void CreateWindow( HWND parent);
-	
+		
 	// Signal fired by button down + button up
 	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
 };
@@ -76,6 +76,8 @@ class basic_app
 	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_create( WPARAM, LPARAM);
 	LRESULT on_command( WPARAM, LPARAM);
+	
+	void CreateWindow();
 	
  public:
 	render_surface scene;

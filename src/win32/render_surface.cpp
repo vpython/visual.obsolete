@@ -6,6 +6,7 @@
 
 /**************************** Utilities ************************************/
 // Extracts and decodes a Win32 error message.
+namespace {
 static void
 decode_win32_error()
 {
@@ -24,11 +25,12 @@ decode_win32_error()
 	LocalFree(message);
 	std::exit(1);
 }
+} // !namespace (unnamed)
 
 /**************** render_surface implementation  *****************/
 
-// A lookup-table for the default window procedure to use to find the actual
-// window that should handle a particular callback message.
+// A lookup-table for the default widget procedure to use to find the actual
+// widget that should handle a particular callback message.
 std::map<HWND, render_surface*> render_surface::widgets;
 
 void
@@ -39,7 +41,7 @@ render_surface::register_win32_class()
 		return;
 	else {
 		memset( &win32_class, 0, sizeof(win32_class));
-		// TODO: Add extended styles WS_VISIBLE WS_CHILD
+		
 		win32_class.lpszClassName = "vpython_win32_render_surface";
 		win32_class.lpfnWndProc = &dispatch_messages;
 		win32_class.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
@@ -72,8 +74,6 @@ render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 		case WM_CREATE:
 			// Handle creation of the window.
 			return This->on_create( wParam, lParam);
-		case WM_ACTIVATE:
-			// When the window is min/maximized.
 		default:
 			return DefWindowProc( hwnd, uMsg, wParam, lParam);
 	}
@@ -83,7 +83,7 @@ VOID CALLBACK
 render_surface::timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 	render_surface* This = widgets[hwnd];
-	This->do_paint();
+	This->on_paint();
 }
 
 LRESULT 
@@ -132,6 +132,8 @@ render_surface::on_create( WPARAM wParam, LPARAM lParam)
 	// Initialize the timer routine
 	UINT id = 0;
 	SetTimer( widget_handle, &id, 28, &render_surface::dispatch_messages);
+	
+	// Connect signal handlers to the render_core object.	
 	return 0;
 }
 
@@ -201,7 +203,7 @@ render_surface::gl_end()
 }
 
 void 
-render_surface::swap_buffers()
+render_surface::gl_swap_buffers()
 {
 	SwapBuffers( dev_context);
 }
@@ -211,20 +213,29 @@ render_surface::render_surface()
 	// Initialize data
 	// Initialize the win32_class
 	register_win32_class();
+	
+	// Connect callbacks from the render_core to this object.  These will not
+	// be called until report_realize is called.
+	core.gl_begin.connect( SigC::slot( *this, &render_surface::gl_begin));
+	core.gl_end.connect( SigC::slot( *this, &render_surface::gl_end));
+	core.gl_swap_buffers.connect( 
+		SigC::slot( *this, &render_surface::gl_swap_buffers));
 }
 
+// TODO: Add extended styles WS_VISIBLE WS_CHILD
 void
-render_surface::complete_init( HWND parent)
+render_surface::CreateWindow( HWND parent)
 {
 	CreateWindow(
 		win32_class.lpszClassName,
 		0, // No window title for this surface.
+		WS_CHILD,
 		CW_USEDEFAULT, // x TODO: Implement window resizing for this child.
 		CW_USEDEFAULT, // y
 		CW_USEDEFAULT, // width
 		CW_USEDEFAULT, // height
 		parent,
-		1, // A unique index for to identify this widget by the parent
+		1, // A unique index to identify this widget by the parent
 		GetModuleHandle(0),
 		0
 	); // No data passed to the WM_CREATE function.
@@ -286,6 +297,7 @@ basic_app::on_size( WPARAM wParam, LPARAM lParam)
 }
 
 // The string table for the toolbar.
+namespace {
 enum str_idx {
 	PAN,
 	ROTATE_ZOOM,
@@ -295,6 +307,7 @@ enum str_idx {
 	QUIT_TT,
 	SEPARATOR
 };
+
 const char** toolbar_strs = {
 	"Pan",
 	"Rotate/Zoom",
@@ -303,6 +316,7 @@ const char** toolbar_strs = {
 	"Toggle fullscreen mode on/off",
 	"Exit this VPython program"
 };
+} // !namespace (unnamed)
 
 // Called only once in response to WM_CREATE.  This function allocates size and
 // creates its children.
@@ -362,7 +376,10 @@ basic_app::on_create( WPARAM wParam, LPARAM lParam)
 	// Add the buttons to the toolbar widget.
 	
 	// Create the render_surface widget
-	scene.complete_init();
+	scene.CreateWindow( window_handle);
+	// Size the widget tree
+	this->on_size( 0, 0);
+	
 	return 0;
 	
 }
@@ -410,10 +427,9 @@ WNDCLASS* basic_app::win32_class = 0;
 
 basic_app::basic_app()
 {
-	// Register (if needed) the window class for this structure.
+	register_win32_class();
 	// Create a hidden top-level window
-	// Compose and initialize the toolbar
-	
+	this->CreateWindow();	
 }
 
 basic_app::~basic_app()
