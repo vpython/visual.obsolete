@@ -134,10 +134,9 @@ render_surface::on_realize()
 	Gtk::GL::DrawingArea::on_realize();
 	core.report_realize();
 	if (!share_list) {
-		share_list = get_gl_context()->get_share_list();
-		// TODO: Fix this, it isn't working.  Find out why.
+		share_list = get_gl_context();
 	}
-	// assert( share_list);
+	assert( share_list);
 	
 	Glib::signal_timeout().connect( 
 		SigC::slot( *this, &render_surface::forward_render_scene),
@@ -219,6 +218,7 @@ basic_app::basic_app( const char* title)
 	using namespace Gtk::Toolbar_Helpers;
 
 	window.set_title( title);
+	window.set_icon_from_file( VPYTHON_PREFIX "/data/logo_t.gif");
 	// Quit button	
 	tb.tools().push_back( StockElem( 
 		Gtk::Stock::QUIT,  
