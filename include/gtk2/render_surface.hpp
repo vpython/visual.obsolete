@@ -25,19 +25,19 @@ class render_surface : public Gtk::GL::DrawingArea
 	float last_mousepos_x;
 	float last_mousepos_y;
 
- 	float last_mouseclick_x;
- 	float last_mouseclick_y;
- 	// States of the mouse button.
- 	bool left_button_down;
- 	bool middle_button_down;
- 	bool right_button_down;
- 	bool dragging;
- 	shared_ptr<renderable> last_pick;
- 	mouse_t mouse;
- 	// The length of the Glib::signal_timout, in milliseconds.
- 	long cycle_time;
- 	// Used to disconnect the timer when resetting the time.
- 	SigC::Connection timer;
+	float last_mouseclick_x;
+	float last_mouseclick_y;
+	// States of the mouse button.
+	bool left_button_down;
+	bool middle_button_down;
+	bool right_button_down;
+	bool dragging;
+	shared_ptr<renderable> last_pick;
+	mouse_t mouse;
+	// The length of the Glib::signal_timout, in milliseconds.
+	long cycle_time;
+	// Used to disconnect the timer when resetting the time.
+	SigC::Connection timer;
  	
  public:
 	render_surface( display_kernel& _core, bool activestereo = false);
