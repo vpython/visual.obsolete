@@ -10,7 +10,7 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: random_device.cpp,v 1.1 2004/07/31 19:09:40 jbrandmeyer Exp $
+ * $Id: random_device.cpp,v 1.2 2004/08/02 15:30:03 jbrandmeyer Exp $
  *
  */
  
@@ -24,6 +24,7 @@
 #include <boost/nondet_random.hpp>
 #include <string>
 #include <cassert>
+#include <stdexcept>
 
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
@@ -37,13 +38,15 @@ const boost::random_device::result_type boost::random_device::max_value;
 #include <windows.h>
 #include <wincrypt.h>
 
+const char* const boost::random_device::default_token = "";
+
 class boost::random_device::impl
 {
  public:
 	impl()
 		: handle(0)
 	{
-		if (!CryptAquireContext( &handle, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
+		if (!CryptAcquireContext( &handle, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
 			error();
 	}
 	
@@ -55,14 +58,15 @@ class boost::random_device::impl
 	unsigned int next()
 	{
 		unsigned int ret = 0;
-		CryptGenRandom( handle, sizeof unsigned int, (BYTE*) *ret);
+		CryptGenRandom( handle, sizeof(unsigned int), (BYTE*)&ret);
 		assert(ret != 0);
 		return ret;
 	}
 
  private:
 	HCRYPTPROV handle;
-	error()
+	
+	void error()
 	{
 		throw std::runtime_error( "CryptAquireContext() failed");
 	}
