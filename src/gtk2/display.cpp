@@ -478,13 +478,7 @@ gui_main::gui_main()
 	signal_shutdown.connect( SigC::slot( *this, &gui_main::shutdown_impl));
 }
 
-#if 0
-static void
-py_quit( void*)
-{
-	std::exit(0);
-}
-#endif
+
 
 void
 gui_main::run()
@@ -496,11 +490,6 @@ gui_main::run()
 		call_complete.notify_all();
 	}
 	thread_exited = true;
-#if 0
-	else {
-		Py_AddPendingCall( &py_quit);
-	}
-#endif
 }
 
 void 
@@ -509,6 +498,7 @@ gui_main::thread_proc(void)
 	self = new gui_main();
 	self->run();
 	VPYTHON_NOTE( "Terminating GUI thread.");
+	gui_main::on_shutdown();
 }
 
 void
@@ -647,5 +637,7 @@ gui_main::quit()
 	self->displays.clear();
 	self->kit.quit();
 }
+
+SigC::Signal0<void> gui_main::on_shutdown;
 
 } // !namespace cvisual

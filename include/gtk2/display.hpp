@@ -152,6 +152,9 @@ class gui_main : public SigC::Object
 	// Called by a display from within the Gtk loop when closed by the user.
 	static void report_window_delete( display*);
 	static void quit();
+	// wrap_display_kernel() connects a signal handler that forces Python to
+	// exit upon shutdown of the render loop.
+	static SigC::Signal0<void> on_shutdown;
 };
 
 } // !namespace cvisual
