@@ -78,7 +78,7 @@ display::display()
 	y(-1),
 	width( 384),
 	height( 256),
-	exit(false),
+	exit(true),
 	visible(true),
 	fullscreen(false),
 	title( "VPython")
@@ -368,6 +368,7 @@ display::on_window_delete(GdkEventAny*)
 	gui_main::report_window_delete( this);
 	if (exit)
 		gui_main::quit();
+	
 	return true;
 }
 
