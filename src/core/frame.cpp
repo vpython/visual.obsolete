@@ -1,9 +1,12 @@
 #include "frame.hpp"
 #include <GL/gl.h>
 
+#include <algorithm>
+
 frame::frame()
 	: scale( 1.0, 1.0, 1.0)
 {
+	model_damage();
 }
 
 void 
@@ -44,12 +47,74 @@ frame::frame_world_transform( const double gcf) const
 	
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
-	ret.x_column( x_axis * scale.x);
-	ret.y_column( y_axis * scale.y);
-	ret.z_column( z_axis * scale.z);
+	
+	ret.x_column( x_axis * scale.x * gcf);
+	ret.y_column( y_axis * scale.y * gcf);
+	ret.z_column( z_axis * scale.z * gcf);
 	ret.w_column( pos * gcf);
 	ret.w_row();
 	return ret;
+}
+
+tmatrix
+frame::world_frame_transform( const double gcf) const
+{
+	// Performs a reorientation transform.
+	// ret = translation o reorientation o scale
+	// ret = iscale o ireorientation o itranslation.
+	tmatrix ret;
+	
+	// A unit vector along the z_axis.
+	vector z_axis = vector(0,0,1);
+	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
+		if (std::fabs(axis.norm().dot( vector(-1,0,0))) > 0.98)
+			z_axis = axis.cross( vector(0,0,1)).norm();
+		else
+			z_axis = axis.cross( vector(-1,0,0)).norm();
+	}
+	else {
+		z_axis = axis.cross( up).norm();
+	}
+	
+	vector y_axis = z_axis.cross(axis).norm();
+	vector x_axis = axis.norm();
+	x_axis /= scale.x;
+	y_axis /= scale.y;
+	z_axis /= scale.z;
+	
+	ret(0,0) = x_axis.x;
+	ret(0,1) = x_axis.y;
+	ret(0,2) = x_axis.z;
+	ret(0,3) = (pos * x_axis).sum();
+	ret(1,0) = y_axis.x;
+	ret(1,1) = y_axis.y;
+	ret(1,2) = y_axis.z;
+	ret(1,3) = (pos * y_axis).sum();
+	ret(2,0) = z_axis.x;
+	ret(2,1) = z_axis.y;
+	ret(2,2) = z_axis.z;
+	ret(2,3) = (pos * z_axis).sum();
+	
+	return ret;
+}
+
+void 
+frame::add_child( shared_ptr<renderable> obj)
+{
+	if (obj->color.alpha == 1.0)
+		children.push_back( obj);
+	else
+		trans_children.push_back( obj);
+}
+	
+void 
+frame::remove_child( shared_ptr<renderable> obj)
+{
+	if (obj->color.alpha != 1.0) {
+		std::remove( trans_children.begin(), trans_children.end(), obj);
+	}
+	else
+		std::remove( children.begin(), children.end(), obj);
 }
 
 shared_ptr<renderable> 
@@ -104,14 +169,6 @@ frame::get_center() const
 void 
 frame::update_cache( const view& v)
 {
-	for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
-		i->refresh_cache(v);
-	}
-	for (trans_child_iterator i = children.begin(); 
-		i != trans_child_iterator(children.end()); 
-		++i) {
-		i->refresh_cache(v);
-	}
 }
 
 void 
@@ -123,10 +180,17 @@ void
 frame::gl_render( const view& v)
 {
 	// Ensure that we always get our cache updated to update our children.
+	tmatrix wft = world_frame_transform(v.gcf);
+	view local = v;
+	local.camera = wft * v.camera;
+	local.forward = -local.camera.norm();
+	local.center = wft * v.center;
 	model_damage();
 	{
 		gl_matrix_stackguard guard( frame_world_transform(v.gcf));
+		
 		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
+			i->refresh_cache(local);
 			rgba actual_color = i->color;
 			if (v.anaglyph) {
 				if (v.coloranaglyph) {
@@ -136,7 +200,7 @@ frame::gl_render( const view& v)
 					i->color = actual_color.grayscale();
 				}
 			}
-			i->gl_render( v);
+			i->gl_render( local);
 			if (v.anaglyph)
 				i->color = actual_color;
 		}
@@ -149,6 +213,7 @@ frame::gl_render( const view& v)
 		for (trans_child_iterator i = trans_children.begin(); 
 			i != trans_child_iterator(trans_children.end());
 			++i) {
+			i->refresh_cache( local);
 			rgba actual_color = i->color;
 			if (v.anaglyph) {
 				if (v.coloranaglyph) {
@@ -158,7 +223,7 @@ frame::gl_render( const view& v)
 					i->color = actual_color.grayscale();
 				}
 			}
-			i->gl_render( v);
+			i->gl_render( local);
 			if (v.anaglyph)
 				i->color = actual_color;			
 		}
