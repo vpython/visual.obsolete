@@ -1,5 +1,5 @@
-#ifndef VISUAL_NUM_UTIL_H
-#define VISUAL_NUM_UTIL_H
+#ifndef VPYTHON_PYTHON_NUM_UTIL_HPP
+#define VPYTHON_PYTHON_NUM_UTIL_HPP
 
 // num_util.h and num_util.cpp were obtained from: 
 // http://www.eos.ubc.ca/research/clouds/num_util.html on 2003-12-17 under the 
@@ -66,7 +66,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 #include <map>
 
-namespace cvisual {
+namespace cvisual { namespace python {
 	
   using boost::python::numeric::array;
   //!
@@ -392,6 +392,6 @@ namespace cvisual {
    */
   inline void check_size_match(std::vector<int> dims, int n);
 
-} //  namespace visual
+} } //  namespace cvisual::python
 
-#endif // !defined VISUAL_NUM_UTIL_H
+#endif // !defined VPYTHON_PYTHON_NUM_UTIL_HPP
