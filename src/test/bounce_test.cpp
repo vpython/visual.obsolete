@@ -31,7 +31,7 @@ realmain( std::vector<std::string>&)
 	
 	vector velocity(0, -1, 0);
 	double dt = 0.000001;
-	while (!gtk2_main::allclosed()) {
+	while (!gui_main::allclosed()) {
 	    ball->get_pos() += velocity*dt;
 	    if (ball->get_y() < 1)
 	        velocity.y = -velocity.y;
