@@ -85,6 +85,22 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 	// core.stereo_mode = display_kernel::REDCYAN_STEREO;
 }
 
+void
+render_surface::gl_free()
+{
+	gl_begin();
+	try {
+		clear_gl_error();
+		on_gl_free();
+		check_gl_error();
+	}
+	catch (gl_error& error) {
+		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: " + std::string(error.what()));
+		std::cerr << "Continuing with the shutdown." << std::endl;
+	}
+	gl_end();
+}
+
 bool 
 render_surface::on_motion_notify_event( GdkEventMotion* event)
 {
@@ -286,18 +302,8 @@ basic_app::on_rotate_clicked()
 bool
 basic_app::on_delete( GdkEventAny*)
 {
-	scene.get_gl_window()->gl_begin(scene.get_gl_context());
-	try {
-		clear_gl_error();
-		on_gl_free();
-		check_gl_error();
-	}
-	catch (gl_error& error) {
-		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: " + std::string(error.what()));
-		std::cerr << "Continuing with the shutdown." << std::endl;
-	}
-	scene.get_gl_window()->gl_end();
-	return false;
+	scene.gl_free();
+	return true;
 }
 
 } // !namespace cvisual

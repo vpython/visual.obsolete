@@ -32,6 +32,10 @@ class render_surface : public Gtk::GL::DrawingArea
 	
 	// Signal fired by button down + button up
 	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
+	
+	// Makes this rendering context active and calls on_gl_free().  This should
+	// generally be done only by the last window to shut down.
+	void gl_free();
  
  protected:
 	// Low-level signal handlers
