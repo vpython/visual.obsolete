@@ -55,7 +55,9 @@ realmain( std::vector<std::string>& args)
 		sincos_times.lap_start();
 		while (test_turns) {
 			angle += delta_angle;
-			sincosf( angle, &val_sin, &val_cos);
+			// sincosf( angle, &val_sin, &val_cos);
+			val_sin = sin(angle);
+			val_cos = cos(angle);
 			i = vector( val_cos, val_sin);
 			--test_turns;
 		}
