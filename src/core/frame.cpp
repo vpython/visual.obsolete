@@ -311,14 +311,11 @@ frame::update_z_sort( const view&)
 void 
 frame::gl_render( const view& v)
 {
-    
-	tmatrix wft = world_frame_transform(v.gcf);
-	view local( v, wft.times_v( v.forward));
-	local.camera = wft * v.camera;
-	local.center = wft * v.center;
+	view local( v, world_frame_transform(v.gcf));
+    tmatrix fwt = frame_world_transform(v.gcf);
 	model_damage();
 	{
-		gl_matrix_stackguard guard( frame_world_transform(v.gcf));
+		gl_matrix_stackguard guard( fwt);
 		
 		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
 			if (i->color.alpha != 1.0) {
@@ -372,7 +369,7 @@ frame::gl_render( const view& v)
 	screen_iterator i( local.screen_objects.begin());
 	screen_iterator i_end( local.screen_objects.end());
 	while (i != i_end) {
-		v.screen_objects.insert( std::make_pair( wft*i->first, i->second));
+		v.screen_objects.insert( std::make_pair( fwt*i->first, i->second));
 		++i;
 	}
 }

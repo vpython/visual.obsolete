@@ -97,7 +97,11 @@ struct view
 		float& n_height, bool n_forward_changed, double& n_gcf, 
 		bool n_gcf_changed);
 	
-	view( const view& other, const vector& fore);
+    /** Create a new view object in the coordinate system of a (sub-)frame.
+     * @param other  The view of the parent coordinate system.
+     * @param wft  The transform from world space to frame space.
+     */
+	view( const view& other, const tmatrix& wft);
 	
 	// Compute the apparent diameter, in pixels, of a circle that is parallel
 	// to the screen, with a center at pos, and some radius.  If pos is behind

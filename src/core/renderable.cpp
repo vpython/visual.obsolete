@@ -17,11 +17,11 @@ view::view( const vector& n_forward, vector& n_center, float& n_width,
 {
 }
 
-view::view( const view& other, const vector& forward)
+view::view( const view& other, const tmatrix& wft)
 	: camera( other.camera),
-	forward( forward),
-	center( other.center),
-	up( other.up),
+	forward( wft.times_v(forward)),
+	center( wft * other.center),
+	up( wft.times_v(other.up)),
 	window_width( other.window_width),
 	window_height( other.window_height),
 	forward_changed( true),
