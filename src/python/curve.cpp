@@ -461,9 +461,9 @@ eq_frac( double lhs, double rhs, double frac)
 {
 	if (lhs == rhs)
 		return true;
+	double diff = fabs(lhs - rhs);
 	lhs = fabs(lhs);
 	rhs = fabs(rhs);
-	double diff = fabs(lhs - rhs);
 	return lhs*frac > diff && rhs*frac > diff;
 }
 } // !namespace (unnamed)
