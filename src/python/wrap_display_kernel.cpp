@@ -24,6 +24,7 @@ namespace cvisual {
 static int
 py_quit( void*)
 {
+	VPYTHON_NOTE("Exiting");
 	std::exit(0);
 	return 0;
 }
