@@ -36,6 +36,8 @@ class rgba
 	/** Allocate a new color. */
 	inline rgba( float r, float g, float b, float a = 1.0)
 		: red(r), green(g), blue(b), alpha(a) {}
+	inline rgba( float bw)
+		: red(bw), green(bw), blue(bw), alpha(1) {}
 			
 	/** Convert to HSVA, lower saturation by 50%, convert back to RGBA. 
 		@return The desaturated color.
@@ -71,8 +73,14 @@ class rgb
 		};
 	};
 	
-	inline rgb( float r=1.0f, float g=1.0f, float b=1.0f)
+	inline rgb() : red(1.0f), green(1.0f), blue(1.0f) {}
+	
+	inline rgb( float r, float g, float b)
 		: red(r), green(g), blue(b)
+	{}
+	
+	inline rgb( float bw)
+		: red(bw), green(bw), blue(bw)
 	{}
 	
 	inline operator rgba() const { return rgba( red, green, blue, 1.0f); }
