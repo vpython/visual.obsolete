@@ -127,7 +127,6 @@ display_kernel::display_kernel()
 	stereo_mode( NO_STEREO),
 	lod_adjust(0)
 {
-	illuminate_default();
 }
 
 display_kernel::~display_kernel()
@@ -445,13 +444,6 @@ display_kernel::add_renderable( shared_ptr<renderable> obj)
 	else
 		layer_world_transparent.push_back( obj);
 }
-
-void 
-display_kernel::add_renderable_screen( shared_ptr<renderable> obj)
-{
-	lock L(mtx);
-	layer_screen.push_back( obj);
-}
 	
 void 
 display_kernel::remove_renderable( shared_ptr<renderable> obj)
@@ -466,7 +458,6 @@ display_kernel::remove_renderable( shared_ptr<renderable> obj)
 	else
 		std::remove( layer_world_transparent.begin(), 
 			layer_world_transparent.end(), obj);
-	std::remove( layer_screen.begin(), layer_screen.end(), obj);
 }
 
 bool
@@ -535,29 +526,17 @@ display_kernel::draw(
 	// Render all objects in screen space.
 	disable_lights();
 	glDisable( GL_DEPTH_TEST);
-	// Perform a depth sort of the screen from back to front.
-	if (layer_screen.size() > 1)
-		std::stable_sort( layer_screen.begin(), layer_screen.end(),
-			z_comparator( forward));
-	screen_iterator k( layer_screen.begin());
-	screen_iterator k_end( layer_screen.end());
-	while (k != k_end) {
-		k->refresh_cache( scene_geometry);
-		rgba actual_color = k->color;
-		if (anaglyph) {
-			if (coloranaglyph) {
-				k->color = actual_color.desaturate();
-			}
-			else {
-				k->color = actual_color.grayscale();
-			}
-		}
-		k->gl_render( scene_geometry);
-		if (anaglyph)
-			k->color = actual_color;
+	typedef std::multimap<vector, displaylist, z_comparator>::iterator
+		screen_iterator;
+	screen_iterator k( scene_geometry.screen_objects.begin());
+	screen_iterator k_end( scene_geometry.screen_objects.end());
+	while ( k != k_end) {
+		k->second.gl_render();
 		++k;
 	}
+	scene_geometry.screen_objects.clear();
 	glEnable( GL_DEPTH_TEST);
+	
 	return true;
 }
 
@@ -921,6 +900,12 @@ display_kernel::get_autoscale()
 	return autoscale;
 }
 
+bool
+display_kernel::get_autocenter()
+{
+	return autocenter;
+}
+
 void
 display_kernel::set_autocenter( bool n_autocenter)
 {
@@ -979,7 +964,6 @@ display_kernel::get_objects() const
 	lock L(mtx);
 	std::list<shared_ptr<renderable> > ret = layer_world;
 	ret.insert( ret.end(), layer_world_transparent.begin(), layer_world_transparent.end());
-	ret.insert( ret.end(), layer_screen.begin(), layer_screen.end());
 	return ret;
 }
 
