@@ -377,8 +377,13 @@ faces::gl_render( const view& scene)
 	}
 	else
 		glColorPointer( 3, GL_FLOAT, 0, findex( color, 0));
-		
-	glDrawArrays( GL_TRIANGLES, 0, count);
+	
+	glEnable( GL_CULL_FACE);
+	for (int drawn = 0; drawn < count - count%3; drawn += 54) {
+		glDrawArrays( GL_TRIANGLES, drawn, 
+			std::min( count - count%3 - drawn, (int)54));
+	}
+	glDisable( GL_CULL_FACE);
 	
 	glDisableClientState( GL_COLOR_ARRAY);
 	glDisableClientState( GL_NORMAL_ARRAY);
