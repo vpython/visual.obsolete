@@ -42,6 +42,11 @@ realmain( std::vector<std::string>&)
 	trans_texed->set_color( rgba( 1, 1, 1, 0.5));
 	trans_texed->set_texture( crate);
 	
+	shared_ptr<box> flat( new box());
+	flat->set_pos( vector( 0, 0, 2));
+	flat->set_width( 0.001);
+	flat->set_color( rgba( 0.5, 0, 1));
+	
 	shared_ptr<sphere> hidden_sphere( new sphere());
 	hidden_sphere->set_pos( vector( 0, -2, 0));
 	hidden_sphere->set_radius( 0.4);
@@ -52,6 +57,7 @@ realmain( std::vector<std::string>&)
 	app.scene.core.add_renderable( texed);
 	app.scene.core.add_renderable( trans_texed);
 	app.scene.core.add_renderable( hidden_sphere);
+	app.scene.core.add_renderable( flat);
 	app.scene.core.set_background( rgba());
 
 	std::cout << "You should see four boxes and an arrow.  The box on the right "
