@@ -53,7 +53,7 @@ class rgba
 	
 	/** Make this the active OpenGL color using glColor(). */
 	inline void gl_set() const
-	{ glColor4f( red, green, blue, alpha); }
+	{ glColor4fv( data); }
 	
 	/** Make this the active OpenGL material property for front and back ambient
 		and diffuse color.
@@ -85,13 +85,17 @@ class rgb
 		: red(bw), green(bw), blue(bw)
 	{}
 	
+	inline rgb( const rgba& other)
+		: red( other.red), green( other.green), blue(other.blue)
+	{}
+	
 	inline operator rgba() const { return rgba( red, green, blue, 1.0f); }
 	
 	rgb desaturate() const;
 	rgb grayscale() const;
 	
 	inline void gl_set() const
-	{ glColor3f( red, green, blue); }
+	{ glColor3fv( data); }
 };
 
 } // !namespace cvisual
