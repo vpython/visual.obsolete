@@ -234,7 +234,8 @@ basic_app::basic_app( const char* title)
 	scene( _core)
 {
 	using namespace Gtk::Toolbar_Helpers;
-
+	_core.illuminate_default();
+	
 	window.set_title( title);
 	window.set_icon_from_file( VPYTHON_PREFIX "/data/logo_t.gif");
 	// Quit button	
