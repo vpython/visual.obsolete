@@ -5,7 +5,8 @@
 #include <cassert>
 #include <algorithm>
 #include <sstream>
-#include <iostream>
+// #include <iostream>
+#include <map>
 
 #include <boost/lexical_cast.hpp>
 
@@ -29,9 +30,11 @@ render_core::enable_lights()
 	};
 	GLenum* light_id = light_ids;
 	GLenum* light_end = light_id + 8;
-	for (light_iterator i = lights.begin(); 
-		i != lights.end() && light_id != light_end; ++i) {
+	light_iterator i = lights.begin();
+	while (i != light_iterator(lights.end()) && light_id != light_end) {
 		i->gl_begin( *light_id, gcf);
+		++i;
+		++light_id;
 	}
 	check_gl_error();
 }
@@ -51,9 +54,11 @@ render_core::disable_lights()
 	};
 	GLenum* light_id = light_ids;
 	GLenum* light_end = light_id + 8;
-	for (light_iterator i = lights.begin(); 
-		i != lights.end() && light_id != light_end; ++i) {
+	light_iterator i = lights.begin();
+	while (i != light_iterator(lights.end()) && light_id != light_end) {
 		i->gl_end( *light_id);
+		++i;
+		++light_id;
 	}
 	check_gl_error();
 }	
@@ -494,7 +499,7 @@ render_core::render_scene(void)
 				glViewport( 0, 0, static_cast<int>(window_width), 
 					static_cast<int>(window_height));
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				draw(scene_geometry, CENTERED);
+				draw(scene_geometry, 0);
 				break;
 			case ACTIVE_STEREO:
 				glViewport( 0, 0, static_cast<int>(window_width), 
@@ -592,13 +597,8 @@ render_core::render_scene(void)
 		gl_end();
 		fps.stop();
 		cycles_since_extent++;
-		cycles_since_fps++;
 		gcf_changed = false;
 		forward_changed = false;
-		if (cycles_since_fps >= 20) {
-			// std::cout << "cycle time: " << fps.read() << "\n";
-			cycles_since_fps = 0;
-		}
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;
