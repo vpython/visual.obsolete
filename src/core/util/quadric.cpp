@@ -1,6 +1,12 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 
 #include "wrap_gl.hpp"
 #include "util/quadric.hpp"
+
+namespace cvisual {
 
 quadric::quadric()
 	: q(0)
@@ -118,3 +124,5 @@ quadric::render_disk( double radius, int slices, int rings)
 	gluDisk( q, 0.0, radius, slices, rings);
 	glPopMatrix();
 }
+
+} // !namespace cvisual

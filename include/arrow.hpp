@@ -1,11 +1,19 @@
 #ifndef VPYTHON_ARROW_HPP
 #define VPYTHON_ARROW_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "simple_displayobject.hpp"
 #include "util/displaylist.hpp"
 #include "util/sorted_model.hpp"
 
 #include <boost/scoped_ptr.hpp>
+
+namespace cvisual {
+
 using boost::scoped_ptr;
 
 /** A 3D 4-sided arrow, with adjustable head and shaft.  TODO: revisit the cache
@@ -87,5 +95,7 @@ class arrow : public simple_displayobject
 		double& headwidth, double& shaftwidth, double& length, 
 		double& headlength, double gcf);
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_ARROW_HPP

@@ -1,6 +1,12 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "render_surface.hpp"
 #include "arrow.hpp"
 #include "curve.hpp"
+
+using namespace cvisual;
 
 int 
 realmain( std::vector<std::string>&)

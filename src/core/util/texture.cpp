@@ -1,5 +1,11 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "wrap_gl.hpp"
 #include "util/texture.hpp"
+
+namespace cvisual {
 
 texture::texture()
 	: damaged(false), handle(0)
@@ -43,3 +49,5 @@ texture::damage()
 {
 	damaged = false;
 }
+
+} // !namespace cvisual

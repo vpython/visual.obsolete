@@ -1,7 +1,13 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "wrap_gl.hpp"
 
 #include "util/displaylist.hpp"
 #include <cassert>
+
+namespace cvisual {
 
 void 
 displaylist::deleter( unsigned int* handle)
@@ -42,3 +48,5 @@ displaylist::gl_render() const
 	assert( handle);
 	glCallList( *handle);
 }
+
+} // !namespace cvisual

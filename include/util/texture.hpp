@@ -1,8 +1,15 @@
 #ifndef VPYTHON_UTIL_TEXTURE_HPP
 #define VPYTHON_UTIL_TEXTURE_HPP
 
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include <string>
 #include <boost/shared_ptr.hpp>
+
+namespace cvisual {
+
 using boost::shared_ptr;
 
 /** A class to assist in managing OpenGL texture resources.
@@ -68,4 +75,6 @@ class texture
 	void damage();
 };
 
-#endif
+} // !namespace cvisual
+
+#endif // !defined VPYTHON_UTIL_TEXTURE_HPP

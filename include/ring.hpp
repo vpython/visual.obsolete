@@ -1,7 +1,14 @@
 #ifndef VPYTHON_RING_HPP
 #define VPYTHON_RING_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "simple_displayobject.hpp"
+
+namespace cvisual {
 
 class ring : public simple_displayobject
 {
@@ -25,5 +32,7 @@ class ring : public simple_displayobject
 	
 	void do_render_opaque( const view&, size_t rings, size_t bands);
 };
+
+} // !namespace cvisual
 
 #endif

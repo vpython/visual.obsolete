@@ -1,9 +1,15 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "render_surface.hpp"
 #include "arrow.hpp"
 #include "ring.hpp"
 #include "file_texture.hpp"
 
 #include <iostream>
+
+using namespace cvisual;
 
 int 
 realmain( std::vector<std::string>&)
@@ -22,11 +28,7 @@ realmain( std::vector<std::string>&)
 	app.scene.add_renderable( x);
 	app.scene.add_renderable( simple);
 
-	std::cout << "You should see three cones and an arrow.  The arrow is a "
-		"measure of one unit length.  The cone on the right is built with "
-		"default length and radius, with a shininess of 0.5.  The one on the "
-		"left has twice the length and half the radius.  The one on top is "
-		"greenish blue, transparent, and points down and to the left.\n";
+	// std::cout << "";
 	app.run();
 	return 0;
 }

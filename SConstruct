@@ -20,6 +20,7 @@ core.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 	'-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS'] )
 
 # Add compiler flags for threading support.
+core.Append( LIBS='boost_thread')
 if sys.platform == 'win32':
 	core.Append( CCFLAGS='-mthreads')
 else:

@@ -1,15 +1,20 @@
 #ifndef VPYTHON_FRAME_HPP
 #define VPYTHON_FRAME_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "renderable.hpp"
 #include "util/tmatrix.hpp"
 
-#include <boost/shared_ptr.hpp>
 #include <boost/iterator/indirect_iterator.hpp>
-using boost::shared_ptr;
-using boost::indirect_iterator;
-
 #include <vector>
+
+namespace cvisual {
+	
+using boost::indirect_iterator;
 
 /*
 Operations on frame objects include:
@@ -83,5 +88,7 @@ class frame : public renderable
 	virtual void gl_pick_render( const view&);
 	virtual void grow_extent( extent&);
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_FRAME_HPP

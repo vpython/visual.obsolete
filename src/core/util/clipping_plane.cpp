@@ -1,3 +1,7 @@
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/clipping_plane.hpp"
 
 #include "util/tmatrix.hpp"
@@ -5,8 +9,7 @@
 #include "util/errors.hpp"
 
 #include <utility>
-
-namespace {
+namespace cvisual { namespace {
 
 // A singleton class used to manage the six available OpenGL clipping planes.
 class c_planes
@@ -87,3 +90,5 @@ clipping_plane::gl_disable()
 {
 	glDisable( planes[id]);
 }
+
+} // !namespace cvisual

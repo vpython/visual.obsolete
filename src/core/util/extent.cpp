@@ -1,3 +1,8 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/extent.hpp"
 #include <algorithm>
 
@@ -7,7 +12,9 @@
 #else
 #define EXPECT(boolean_expression, boolean_constant) \
 	boolean_expression
-#endif		
+#endif	
+
+namespace cvisual {	
 
 extent::extent()
 	: first(true), buffer_depth(0), frame_depth(0)
@@ -130,3 +137,4 @@ extent::get_select_buffer_depth()
 	return buffer_depth;
 }
 
+} // !namespace cvisual

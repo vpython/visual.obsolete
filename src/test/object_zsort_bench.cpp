@@ -1,3 +1,7 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 
 #include <boost/nondet_random.hpp>
 #include <boost/lexical_cast.hpp>
@@ -13,6 +17,8 @@
 #include "sphere.hpp"
 #include "util/timer.hpp"
 #include "util/vector.hpp"
+
+using namespace cvisual;
 
 using namespace boost;
 

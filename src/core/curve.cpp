@@ -1,3 +1,8 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "curve.hpp"
 #include "util/errors.hpp"
 #include "util/checksum.hpp"
@@ -5,6 +10,8 @@
 #include <iostream>
 
 #include <GL/gle.h>
+
+namespace cvisual {
 
 bool
 curve::degenerate() const
@@ -47,7 +54,7 @@ curve::closed_path() const
 long
 curve::checksum( size_t begin, size_t end)
 {
-	using ::checksum;
+	using cvisual::checksum;
 	long ret = 0;
 	
 	checksum( ret, &radius);
@@ -312,3 +319,5 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			used_color, radius * scene.gcf);
 	}
 }
+
+} // !namespace cvisual

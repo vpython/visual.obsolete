@@ -1,11 +1,18 @@
 #ifndef VPYTHON_WIN32_FONT_HPP
 #define VPYTHON_WIN32_FONT_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "wrap_gl.hpp"
 
 #include <map>
 #include <string>
 #include <utility>
+
+namespace cvisual {
 
 class bitmap_font
 {
@@ -33,5 +40,7 @@ class bitmap_font
 	virtual void gl_render( const std::string& text) const;
 	virtual double width( const std::string& text) const;
 };
+
+} // !namespace cvisual;
 
 #endif // !defined VPYTHON_WIN32_FONT_HPP

@@ -1,6 +1,13 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "sphere.hpp"
 #include "util/quadric.hpp"
 #include "util/errors.hpp"
+
+namespace cvisual {
 
 bool sphere::first = true;
 // The first four cached descriptions are used for non-textured spheres, and the
@@ -305,3 +312,5 @@ sphere::degenerate()
 }
 
 SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(sphere)
+
+} // !namespace cvisual

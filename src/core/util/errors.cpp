@@ -1,8 +1,14 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/errors.hpp"
 
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+
+namespace cvisual {
 
 void
 write_critical( 
@@ -82,3 +88,5 @@ gl_error::gl_error( const char* msg)
 	: std::runtime_error(msg), error( GL_NO_ERROR)
 {
 }
+
+} // !namespace cvisual

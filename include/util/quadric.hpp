@@ -1,7 +1,13 @@
 #ifndef VPYTHON_UTIL_QUADRIC_HPP
 #define VPYTHON_UTIL_QUADRIC_HPP
 
+// Copyright (c) 2004 by Jonathan Brandmeyer and others
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 struct GLUquadric;
+
+namespace cvisual {
 
 /** A thin wrapper around GLU quadric objects.  This may be used as a factory
 	to render some predefined quadrics.
@@ -82,5 +88,7 @@ class quadric
 	*/
 	void render_disk( double radius, int slices, int rings);
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_UTIL_QUADRIC_HPP

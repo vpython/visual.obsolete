@@ -1,7 +1,14 @@
 #ifndef VPYTHON_UTIL_RGBA_HPP
 #define VPYTHON_UTIL_RGBA_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "wrap_gl.hpp"
+
+namespace cvisual {
 
 /** A helper class to manage OpenGL color attributes.  The data is layout
 	compatable with OpenGL's needs for the various vector forms of commands,
@@ -76,5 +83,7 @@ class rgb
 	inline void gl_set() const
 	{ glColor3f( red, green, blue); }
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_UTIL_RGBA_HPP

@@ -1,9 +1,16 @@
 #ifndef VPYTHON_LABEL_HPP
 #define VPYTHON_LABEL_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "renderable.hpp"
 #include <string>
 #include <vector>
+
+namespace cvisual {
 
 class bitmap_font;
 
@@ -50,5 +57,7 @@ class label : public renderable
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_LABEL_HPP

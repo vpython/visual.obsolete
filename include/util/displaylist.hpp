@@ -1,7 +1,14 @@
 #ifndef VPYTHON_UTIL_DISPLAYLIST_HPP
 #define VPYTHON_UTIL_DISPLAYLIST_HPP
 
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include <boost/shared_ptr.hpp>
+
+namespace cvisual {
+
 using boost::shared_ptr;
 
 /** A manager for OpenGL displaylists */
@@ -28,5 +35,7 @@ class displaylist
 	/** @return true iff this object contains a compiled OpenGL program. */
 	inline operator bool() const { return handle; }
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_UTIL_DISPLAYLIST_HPP

@@ -1,3 +1,8 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "cone.hpp"
 #include "util/errors.hpp"
 #include "util/displaylist.hpp"
@@ -5,8 +10,14 @@
 
 #include <vector>
 
+#if 0
 #include <boost/scoped_array.hpp>
-using boost::scoped_array;
+namespace cvisual {
+	using boost::scoped_array;
+}
+#endif
+
+namespace cvisual {
 
 bool
 cone::degenerate()
@@ -211,3 +222,5 @@ cone::get_center() const
 }
 
 SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(cone)
+
+} // !namespace cvisual

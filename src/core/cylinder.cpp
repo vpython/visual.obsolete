@@ -1,7 +1,14 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "cylinder.hpp"
 #include "util/errors.hpp"
 #include "util/displaylist.hpp"
 #include "util/quadric.hpp"
+
+namespace cvisual {
 
 bool
 cylinder::degenerate()
@@ -170,3 +177,5 @@ cylinder::get_center() const
 }
 
 SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(cylinder)
+
+} // !namespace cvisual

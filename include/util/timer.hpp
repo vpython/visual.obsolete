@@ -1,8 +1,14 @@
 #ifndef VPYTHON_UTIL_TIMER_HPP
 #define VPYTHON_UTIL_TIMER_HPP
 
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include <vector>
 #include <utility>
+
+namespace cvisual {
 
 /** A lap timer that maintains all of its lap data for statistical analysis. 
 	It uses gettimeofday() on POSIX-ish platforms.
@@ -59,5 +65,7 @@ class hist_timer
 	*/
 	double read() const;	
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_UTIL_TIMER_HPP

@@ -1,6 +1,11 @@
 #ifndef VPYTHON_WIN32_RENDER_SURFACE_HPP
 #define VPYTHON_WIN32_RENDER_SURFACE_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
 #define _WIN32_IE 0x400
@@ -10,6 +15,8 @@
 #include <map>
 #include <string>
 #include <sigc++/object.h>
+
+namespace cvisual {
 
 // NOTE: This implementation might require Windows 98 (For the timer callback).
 
@@ -110,6 +117,6 @@ class basic_app
 	void run();
 };
 
-
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_WIN32_RENDER_SURFACE_HPP

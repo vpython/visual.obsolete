@@ -1,8 +1,15 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/rgba.hpp"
 
 #include <cmath>
 
-static rgb
+namespace cvisual { namespace {
+
+rgb
 desaturate( const rgb& c)
 {
 	const float saturation = 0.5; // cut the saturation by this factor
@@ -103,7 +110,7 @@ desaturate( const rgb& c)
 	return ret;
 }
 
-static rgb
+rgb
 grayscale( const rgb& c)
 {
 	// The constants 0.299, 0.587, and 0.114 are intended to account for the 
@@ -116,28 +123,32 @@ grayscale( const rgb& c)
 	return rgb( black, black, black);
 }
 
+} // !namespace (unnamed)
+
 rgba
 rgba::desaturate() const
 {
-	rgb ret = ::desaturate( rgb(red, green, blue));
+	rgb ret = cvisual::desaturate( rgb(red, green, blue));
 	return rgba( ret.red, ret.green, ret.blue, alpha);
 }
 
 rgba
 rgba::grayscale() const
 {
-	rgb ret = ::grayscale( rgb(red, blue, green));
+	rgb ret = cvisual::grayscale( rgb(red, blue, green));
 	return rgba( ret.red, ret.green, ret.blue, alpha);
 }
 
 rgb
 rgb::desaturate() const
 {
-	return ::desaturate( *this);
+	return cvisual::desaturate( *this);
 }
 
 rgb
 rgb::grayscale() const
 {
-	return ::grayscale( *this);
+	return cvisual::grayscale( *this);
 }
+
+} // !namespace cvisual

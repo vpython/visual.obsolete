@@ -1,5 +1,12 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "pyramid.hpp"
 #include "util/errors.hpp"
+
+namespace cvisual {
 
 displaylist pyramid::simple_model;
 scoped_ptr< z_sorted_model<triangle, 6> > pyramid::sorted_model;
@@ -168,3 +175,5 @@ pyramid::get_center() const
 {
 	return pos + axis * 0.33333333333333;
 }
+
+} // !namespace cvisual

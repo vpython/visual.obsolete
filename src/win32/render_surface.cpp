@@ -1,3 +1,7 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
 
 #include "win32/render_surface.hpp"
 #include "util/errors.hpp"
@@ -9,6 +13,8 @@
 #include <cstring>
 #include <cassert>
 #include <iostream>
+
+namespace cvisual {
 
 /**************************** Utilities ************************************/
 // Extracts and decodes a Win32 error message.
@@ -657,3 +663,5 @@ basic_app::run()
 			WIN32_CRITICAL_ERROR( "WaitMessage()");
 	}
 }
+
+} // !namespace cvisual;

@@ -1,6 +1,10 @@
 #ifndef VPYTHON_WRAP_GL_HPP
 #define VPYTHON_WRAP_GL_HPP
 
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 /* A header file to wrap around GL/gl.h on *nix and Windows.
  */ 
  

@@ -1,3 +1,7 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "gtk2/render_surface.hpp"
 #include "arrow.hpp"
 #include "sphere.hpp"
@@ -9,6 +13,8 @@
 #include "cone.hpp"
 
 #include <iostream>
+
+using namespace cvisual;
 
 void
 on_object_clicked( shared_ptr<renderable> body)

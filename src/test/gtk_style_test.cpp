@@ -1,3 +1,7 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include <gtkmm.h>
 #include <iostream>
 #include <boost/shared_ptr.hpp>

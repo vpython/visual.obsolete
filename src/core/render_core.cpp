@@ -1,3 +1,8 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "render_core.hpp"
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
@@ -13,6 +18,8 @@
 #include <iostream>
 
 #include <boost/lexical_cast.hpp>
+
+namespace cvisual {
 
 void 
 render_core::enable_lights()
@@ -772,3 +779,5 @@ render_core::set_up( const vector& n_up)
 {
 	up = n_up;
 }
+
+} // !namespace cvisual

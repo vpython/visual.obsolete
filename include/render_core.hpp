@@ -1,6 +1,11 @@
 #ifndef VPYTHON_RENDER_CORE_HPP
 #define VPYTHON_RENDER_CORE_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "renderable.hpp"
 #include "util/vector.hpp"
 #include "util/rgba.hpp"
@@ -13,6 +18,9 @@
 #include <vector>
 
 #include <boost/iterator/indirect_iterator.hpp>
+
+namespace cvisual {
+
 using boost::indirect_iterator;
 
 /** A class that manages all OpenGL aspects of a given scene.  This class
@@ -180,5 +188,6 @@ public: // Public Data.
 	SigC::Signal0<void> gl_swap_buffers;
 };
 
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_RENDER_SURFACE_HPP

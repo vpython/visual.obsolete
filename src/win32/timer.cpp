@@ -1,9 +1,15 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/timer.hpp"
 
 #include <windows.h>
 
 #include <cmath>
 #include <numeric>
+
+namespace cvisual {
 
 // The inverse of the tick count provided by QueryPerformanceFrequency()
 static double inv_tick_count = 0;
@@ -121,3 +127,5 @@ hist_timer::read() const
 {
 	return cumulative;
 }
+
+} // !namespace cvisual

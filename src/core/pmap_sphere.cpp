@@ -1,9 +1,16 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "pmap_sphere.hpp"
 #include "util/quadric.hpp"
 #include "util/errors.hpp"
 #include "util/clipping_plane.hpp"
 #include <iostream>
 #include <GL/glu.h>
+
+namespace cvisual {
 
 bool pmap_sphere::first = true;
 // The first six cached descriptions are used for non-textured spheres, and the
@@ -243,3 +250,5 @@ pmap_sphere::get_scale()
 }
 
 SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(pmap_sphere)
+
+} // !namespace cvisual

@@ -1,13 +1,18 @@
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "gtk2/font.hpp"
 
 #include <FTGLPixmapFont.h>
-#include <FTGLTextureFont.h>
 #include <fontconfig/fontconfig.h>
 
 #include <pangomm/fontdescription.h>
 #include <gtkmm/style.h>
 #include <gtkmm/settings.h>
 #include <gdkmm/screen.h>
+
+namespace cvisual {
 
 bitmap_font::_init* bitmap_font::init = 0;
 
@@ -200,3 +205,5 @@ bitmap_font::get_size() const
 {
 	return font_height;
 }
+
+} // !namespace cvisual

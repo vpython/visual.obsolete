@@ -1,7 +1,13 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "render_surface.hpp"
 #include "sphere.hpp"
 #include "file_texture.hpp"
 #include "vpython-config.h"
+
+using namespace cvisual;
 
 int 
 realmain( std::vector<std::string>&)

@@ -1,9 +1,14 @@
 #ifndef VPYTHON_UTIL_LIGHTING_HPP
 #define VPYTHON_UTIL_LIGHTING_HPP
 
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/tmatrix.hpp"
 #include "util/rgba.hpp"
-
+namespace cvisual {
+	
 class light
 {
  private:
@@ -30,5 +35,7 @@ class light
 	void gl_begin( GLenum id, double gcf) const;
 	void gl_end( GLenum id) const;
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_UTIL_LIGHTING_HPP

@@ -1,9 +1,16 @@
 #ifndef VPYTHON_RENDERABLE_HPP
 #define VPYTHON_RENDERABLE_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/rgba.hpp"
 #include "util/extent.hpp"
 #include <boost/shared_ptr.hpp>
+
+namespace cvisual {
 
 using boost::shared_ptr;
 class z_comparator;
@@ -179,5 +186,7 @@ T clamp( T const& lower, T const& value, T const& upper)
 		return upper;
 	return value;
 }
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_RENDERABLE_HPP

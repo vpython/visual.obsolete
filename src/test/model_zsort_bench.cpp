@@ -1,5 +1,11 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/sorted_model.hpp"
 #include "util/timer.hpp"
+
+using namespace cvisual;
 
 #include <boost/nondet_random.hpp>
 #include <boost/lexical_cast.hpp>

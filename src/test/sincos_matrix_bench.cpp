@@ -1,3 +1,7 @@
+// Copyright (c) 2004 by Jonathan Brandmeyer.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include <iostream>
 #include <math.h>
 
@@ -6,6 +10,7 @@
 
 #include <boost/lexical_cast.hpp>
 using boost::lexical_cast;
+using namespace cvisual;
 
 // The purpose of this bench test is to determine the relative speed of 
 // performing a vector rotation by computing sin and cos or by computing a 

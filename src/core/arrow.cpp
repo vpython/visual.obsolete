@@ -1,5 +1,12 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "arrow.hpp"
 #include "util/errors.hpp"
+
+namespace cvisual {
 
 // This model can be resorted in about 22 usec on my PIII 800 MHz machine.
 void
@@ -341,3 +348,5 @@ arrow::effective_geometry(
 		}
 	}
 }
+
+} // !namespace cvisual

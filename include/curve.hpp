@@ -1,10 +1,17 @@
 #ifndef VPYTHON_CURVE_HPP
 #define VPYTHON_CURVE_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "renderable.hpp"
 #include "util/displaylist.hpp"
 
 #include <vector>
+
+namespace cvisual {
 
 class curve : public renderable
 {
@@ -43,5 +50,6 @@ class curve : public renderable
 	void thickline( const view&, size_t begin, size_t end);
 };
 
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_CURVE_HPP

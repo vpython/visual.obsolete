@@ -1,10 +1,16 @@
 #ifndef VPYTHON_UTIL_ERRORS_HPP
 #define VPYTHON_UTIL_ERRORS_HPP
 
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "wrap_gl.hpp"
 
 #include <string>
 #include <stdexcept>
+
+namespace cvisual {
 
 /** Report the existance of a critical error to cerr. */
 #define VPYTHON_CRITICAL_ERROR(msg) write_critical( __FILE__, __LINE__, \
@@ -73,5 +79,7 @@ class gl_error : public std::runtime_error
 		*/
 	gl_error( const char* msg);
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_UTIL_ERRORS_HPP

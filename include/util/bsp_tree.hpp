@@ -1,12 +1,18 @@
 #ifndef VPYTHON_UTIL_BSP_TREE_HPP
 #define VPYTHON_UTIL_BSP_TREE_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include <list>
 #include <allocator>
 
 #include "util/vector.hpp"
 
-/** A helper object to define a 2D flat plane in R3. */
+/** A helper object to define a 2D flat plane in R3.  WARNING: UNFINISHED. (and
+ * currently unused) */
 class plane_equation
 {
  private:

@@ -10,12 +10,11 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: random_device.cpp,v 1.2 2004/08/02 15:30:03 jbrandmeyer Exp $
+ * $Id: random_device.cpp,v 1.3 2004/08/05 17:51:31 jbrandmeyer Exp $
  *
  */
  
 /* Changes:
- *    modify check for the availability of /dev/urandom to include OSX. -JDB
  *    Replace impl with a version that uses the MS Crypto API to generate random
  *       numbers for use on MS Windows. -JDB
  * 

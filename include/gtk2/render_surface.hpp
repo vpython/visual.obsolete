@@ -1,6 +1,11 @@
 #ifndef VPYTHON_GTK2_RENDER_SURFACE_HPP
 #define VPYTHON_GTK2_RENDER_SURFACE_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "render_core.hpp"
 
 #include <gtkmm/gl/drawingarea.h>
@@ -9,6 +14,8 @@
 #include <gtkmm/image.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/box.h>
+
+namespace cvisual {
 
 class render_surface : public Gtk::GL::DrawingArea
 {
@@ -82,5 +89,7 @@ class basic_app : public SigC::Object
 	basic_app( const char* title);
 	void run();	
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_GTK2_RENDER_SURFACE_HPP

@@ -1,10 +1,16 @@
 #ifndef VPYTHON_UTIL_TMATRIX_HPP
 #define VPYTHON_UTIL_TMATRIX_HPP
 
-// tmatrix - double-precision 3D transformation matrices
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/vector.hpp"
 #include <cstring>
-	
+
+namespace cvisual {
+
 struct vertex 
 {
 	double x;
@@ -25,7 +31,7 @@ struct vertex
 	{ glVertex4d( x, y, z, w); }
 };
 	
-
+/** A double-precision 3D affine transformation matrix. */
 class tmatrix 
 {
 private:
@@ -226,5 +232,7 @@ class gl_matrix_stackguard
 	gl_matrix_stackguard( const tmatrix&);
 	~gl_matrix_stackguard();
 };
+
+} // !namespace cvisual
 
 #endif // !VPYTHON_UTIL_TMATRIX_HPP
