@@ -59,6 +59,7 @@ class primitive : public renderable
 	void py_rotate1( double angle);
 	void py_rotate2( double angle, vector axis);
 	void py_rotate3( double angle, vector axis, vector origin);
+    void py_rotate4( double angle, vector origin);
 
 	void set_pos( const vector& n_pos);
 	shared_vector& get_pos();

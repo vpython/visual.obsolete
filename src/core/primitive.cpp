@@ -122,10 +122,12 @@ primitive::rotate( double angle, const vector& _axis, const vector& origin)
 		if (!axis.cross( fake_up))
 			fake_up = vector( 0,1,0);
 	}
-
-	pos = R * pos;
-	axis = R.times_v( axis);
-	up = R.times_v( fake_up);
+    {
+        lock L(mtx);
+    	pos.assign_locked( R * pos);
+    	axis.assign_locked( R.times_v( axis));
+    	up.assign_locked( R.times_v( fake_up));
+    }
 }
 
 void 
@@ -144,6 +146,12 @@ void
 primitive::py_rotate3( double angle, vector _axis, vector origin)
 {
 	rotate( angle, _axis, origin);
+}
+
+void
+primitive::py_rotate4( double angle, vector origin)
+{
+    rotate( angle, axis, origin);
 }
 
 
