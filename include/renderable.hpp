@@ -129,6 +129,8 @@ protected:
 	
 	/** True if the object should be rendered on the screen. */
 	bool visible;
+	/** True if the object should be rendered with lighting enabled */
+	bool lit;
 	friend class z_comparator;
 	/** A function that must be overridden if a subclass wants to cache its state
 		for rendering optimization.
@@ -165,7 +167,8 @@ class z_comparator
 	operator()( const shared_ptr<renderable> lhs, const shared_ptr<renderable> rhs) const
 	{ return forward.dot( lhs->get_center()) > forward.dot( rhs->get_center()); }
 
-	/** Apply the sorting criteria.
+	/** Apply the sorting criteria.  This version is faster than the shared_ptr
+		version above, by an amount that varies from OS to OS.
 		@return true if lhs is farther away than rhs. 
 	*/
 	inline bool 

@@ -24,12 +24,12 @@ view::pixel_coverage( const vector& pos, double radius) const
 }
 
 renderable::renderable()
-	: model_damaged(true), z_damaged(true), visible(true)
+	: model_damaged(true), z_damaged(true), visible(true), lit(true)
 {
 }
 
 renderable::renderable( const renderable& other)
-	: model_damaged(true), z_damaged(true), visible(true)
+	: model_damaged(true), z_damaged(true), visible(true), lit(other.lit)
 {
 }
 
