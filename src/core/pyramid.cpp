@@ -11,7 +11,7 @@ namespace cvisual {
 displaylist pyramid::simple_model;
 scoped_ptr< z_sorted_model<triangle, 6> > pyramid::sorted_model;
 
-PRIMITIVE_TYPEINFO_IMPL(pyramid);
+PRIMITIVE_TYPEINFO_IMPL(pyramid)
 
 bool
 pyramid::degenerate()

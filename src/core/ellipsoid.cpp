@@ -90,6 +90,6 @@ ellipsoid::grow_extent( extent& world)
 	world.add_sphere( pos, std::max( width, std::max( height, axis.mag())));
 }
 
-PRIMITIVE_TYPEINFO_IMPL(ellipsoid);
+PRIMITIVE_TYPEINFO_IMPL(ellipsoid)
 
 } // !namespace cvisual
