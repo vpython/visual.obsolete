@@ -1,9 +1,17 @@
 
 #include "util/timer.hpp"
-#include <sys/time.h>
-#include <time.h>
+#ifdef _WIN32
+# include <windows.h>
+#else
+# include <sys/time.h>
+# include <time.h>
+#endif
 #include <cmath>
 #include <numeric>
+
+#ifdef _WIN32
+static double inv_tick_count = 0;
+#endif
 
 timer::timer()
 	: last_start(0)
@@ -13,22 +21,39 @@ timer::timer()
 void
 timer::lap_start()
 {
+#ifndef _WIN32
 	timeval t;
 	timerclear(&t);
 	gettimeofday( &t, NULL);
 	last_start = static_cast<double>(t.tv_sec) 
-		+ static_cast<double>(t.tv_usec) * 1.0e-6;	
+		+ static_cast<double>(t.tv_usec) * 1.0e-6;
+#else
+	LARGE_INTEGER count;
+	if (!inv_tick_count) {
+		QueryPerformanceFrequency(&count);
+		inv_tick_count = 1.0 / static_cast<double>( count.QuadPart);
+	}
+	QueryPerformanceCounter( &count);
+	last_start = static_cast<double>(count.QuadPart) * inv_tick_count;
+#endif
 }
 
 void
 timer::lap_stop()
 {
+#ifndef _WIN32
 	timeval t;
 	timerclear(&t);
 	gettimeofday( &t, NULL);
 	double delta_time = static_cast<double>(t.tv_sec) 
 		+ static_cast<double>(t.tv_usec) * 1.0e-6
 		- last_start;
+#else
+	LARGE_INTEGER count;
+	QueryPerformanceCounter( &count);
+	double delta_time = static_cast<double>(count.QuadPart)*inv_tick_count 
+		- last_start;
+#endif
 	times.push_back( delta_time);
 }
 
@@ -94,22 +119,39 @@ hist_timer::hist_timer( double init)
 void
 hist_timer::start()
 {
+#ifndef _WIN32
 	timeval t;
 	timerclear(&t);
 	gettimeofday( &t, NULL);
 	last_start = static_cast<double>(t.tv_sec) 
 		+ static_cast<double>(t.tv_usec) * 1e-6;
+#else
+	LARGE_INTEGER count;
+	if (!inv_tick_count) {
+		QueryPerformanceFrequency(&count);
+		inv_tick_count = 1.0 / static_cast<double>( count.QuadPart);
+	}
+	QueryPerformanceCounter( &count);
+	last_start = static_cast<double>(count.QuadPart) * inv_tick_count;
+#endif
 }
 
 void
 hist_timer::stop()
 {
+#ifndef _WIN32
 	timeval t;
 	timerclear(&t);
 	gettimeofday( &t, NULL);
 	double delta_time = static_cast<double>(t.tv_sec) 
 		+ static_cast<double>(t.tv_usec) * 1e-6
 		- last_start;
+#else
+	LARGE_INTEGER count;
+	QueryPerformanceCounter( &count);
+	double delta_time = static_cast<double>(count.QuadPart)*inv_tick_count 
+		- last_start;
+#endif
 	cumulative = cumulative * old_fraction + delta_time * (1.0 - old_fraction);
 }
 
