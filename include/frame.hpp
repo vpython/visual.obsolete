@@ -44,6 +44,7 @@ class frame : public renderable
  		@param gcf: the global correction factor, propogated from gl_render(). 
  	*/
 	tmatrix frame_world_transform( const double gcf) const;
+	tmatrix world_frame_transform( const double gcf) const;
 	
 	std::vector<shared_ptr<renderable> > children;
 	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::iterator> 
@@ -67,6 +68,7 @@ class frame : public renderable
 	void set_pos( const vector& n_pos);
 	void set_axis( const vector& n_axis);
 	void set_up( const vector& n_up);
+	void set_scale( const vector& n_scale) { scale = n_scale; }
 	
 	// Lookup the target that belongs to this name.
 	shared_ptr<renderable> lookup_name( 
