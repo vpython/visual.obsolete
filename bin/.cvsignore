@@ -15,3 +15,5 @@ sphere_lod_test
 sphere_texture_test
 sphere_transparent_test
 texture_sharing_test
+gtk_style_test
+label_test
