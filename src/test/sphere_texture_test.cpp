@@ -2,6 +2,7 @@
 #include "sphere.hpp"
 #include "arrow.hpp"
 #include "gtk2/file_texture.hpp"
+#include "vpython-config.h"
 
 int 
 main( int, char** )
@@ -20,8 +21,8 @@ main( int, char** )
 	axis = -axis * 0.2;
 	
 	// Load up a map of the earth.
-	shared_ptr<texture> earth = file_texture::create( "/home/jdbrandm/workspace/"
-		"vpython-core2/data/land_ocean_ice_2048.tif");
+	shared_ptr<texture> earth = file_texture::create( VPYTHON_PREFIX
+		"/data/land_ocean_ice_2048.tif");
 	
 	// Draw one sphere with a map of the earth.
 	shared_ptr<sphere> sph( new sphere());

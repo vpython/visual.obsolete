@@ -3,6 +3,7 @@
 #include "pmap_sphere.hpp"
 #include "arrow.hpp"
 #include "gtk2/file_texture.hpp"
+#include "vpython-config.h"
 
 int 
 main( void)
@@ -21,12 +22,12 @@ main( void)
 	axis = -axis * 0.2;
 	
 	// Load up a map of the earth.
-	shared_ptr<texture> earth = file_texture::create( "/home/jonathan/Projects/"
-		"vpython_basic_gtkmm/data/land_ocean_ice_2048.tif");
+	shared_ptr<texture> earth = file_texture::create( VPYTHON_PREFIX
+		"/data/land_ocean_ice_2048.tif");
 	
 	// Load up a map of the sky.
-	shared_ptr<texture> sky = file_texture::create( "/home/jonathan/Projects/"
-		"vpython_basic_gtkmm/data/stars_polar.jpg");
+	shared_ptr<texture> sky = file_texture::create( VPYTHON_PREFIX
+		"/data/stars_polar.jpg");
 	
 	// Draw one sphere with a map of the earth.
 	shared_ptr<sphere> sph( new sphere());

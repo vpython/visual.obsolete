@@ -3,6 +3,7 @@
 #include "box.hpp"
 #include "sphere.hpp"
 #include "gtk2/file_texture.hpp"
+#include "vpython-config.h"
 
 #include <iostream>
 
@@ -10,9 +11,9 @@ int
 main( void)
 {
 	basic_app app( "Box test");
-	
-	shared_ptr<texture> crate = file_texture::create( "/home/jonathan/Projects/"
-		"vpython_basic_gtkmm/data/crate.bmp");
+
+	shared_ptr<texture> crate = file_texture::create( VPYTHON_PREFIX
+		"/data/crate.bmp");
 	
 	shared_ptr<arrow> x( new arrow());
 	x->set_color( rgba( 0.7, 0.7, 0.7));
@@ -54,5 +55,6 @@ main( void)
 		"  The box on the top should look like a wooden crate.  The one on the"
 		" bottom should look like a translucent wooden crate.\n";
 	
-	app.run();	
+	app.run();
+	return 0;
 }
