@@ -10,6 +10,7 @@ bin/
 lib/
 	Target libraries are built in-place here.
 include/
+	Header files for the basic objects.
 include/util/
 	Header files for utility classes, like tmatrix, and vector.
 include/gtk1/
@@ -29,23 +30,31 @@ src/test/
 	parts of this library.
 	
 
-TODO:
-Port to Win32/wGL.
-Investigate port to native Mac/Carbon.
-Transparency for the ring object.
-Textures for rings?
-Complete implementation of frame.
-Write new implementations of:
-	curve,
-	convex,
-	faces,
-	label
+TODO (*-ed items are must-do, w/l items are wishlist items):
+	Use a proper toolbar for the default view widget.
+	* Port to Win32/wGL. 
+	Investigate port to native Mac/Carbon (or even Mac/Cocoa).
+	* Transparency for rings.
+	Textures for rings?
+	* omplete implementation of frame.
+	* Write new implementations of:
+		curve,
+		convex,
+		faces,
+		label (blocking on text research, below).
+	Snapshot/screenshot support for the display object.
 
-Possible new objects:
-	face_strip
+	Possible new objects:
+		face_strip
+		* a texture loader that reads from a Numeric array.
 
-More research: FTGL.  In particular texture-mapped text, UTF-8.
+	More research: 
+		* FTGL.  In particular texture-mapped text and UTF-8 
+			(or other i18n) support.
+		
+		w/l Figure out how the 'bumps' program in xscreensavers-gl does 
+			textured bump-mapping.
+		w/l Semi-automatic algorithmic texture generation.
 
-
-Final:
-Fold back into VPython.
+	* Final:
+		Fold back into VPython.
