@@ -51,19 +51,22 @@ class render_surface : public Gtk::GL::DrawingArea
 class basic_app : public SigC::Object
 {
  private:
+	/** Initialize Gtkmm */
 	Gtk::Main kit;
+	/** Helper class used to initialize Gtk::GL at the right time. */
 	struct _init
 	{
 		_init();
 	} init;
 	
+	/** The parent window. */
 	Gtk::Window window;
+	/** An image widget for one of the toolbars.  It loads the fullscreen
+	 * toggle image, shamelessly ripped from Galeon.
+	 */
+	Gtk::Image fs_img;
+	Gtk::Toolbar tb;
 	Gtk::VBox frame;
-	Gtk::HButtonBox buttons;
-	Gtk::ToggleButton fs;
-	Gtk::Button pan;
-	Gtk::Button rotate_zoom;
-	Gtk::Button quit;
 	
  private:
 	void on_fullscreen_clicked();

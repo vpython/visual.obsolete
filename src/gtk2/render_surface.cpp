@@ -1,5 +1,6 @@
 #include "gtk2/render_surface.hpp"
 #include "util/errors.hpp"
+#include "vpython-config.h"
 #include <gtkmm/gl/init.h>
 #include <algorithm>
 #include <iostream>
@@ -205,29 +206,40 @@ basic_app::_init::_init()
 }
 
 basic_app::basic_app( const char* title)
-	: kit( NULL, NULL), fs("fullscreen"), pan("pan"), rotate_zoom("rotate/zoom")
+	: kit( NULL, NULL)
+	, fs_img( Gdk::Pixbuf::create_from_file( 
+			VPYTHON_PREFIX "/data/galeon-fullscreen.png"))
 	, quit( Gtk::Stock::QUIT)
 {
+	using namespace Gtk::Toolbar_Helpers;
+
 	window.set_title( title);
-	
-	// Compose the widgets.
-	buttons.pack_start( fs);
-	buttons.pack_start( pan);
-	buttons.pack_start( rotate_zoom);
-	buttons.pack_start( quit);
-	frame.pack_start( buttons, Gtk::PACK_SHRINK, 0);
+	// Quit button	
+	tb.tools().push_back( StockElem( 
+		Gtk::Stock::QUIT,  
+		SigC::slot( &Gtk::Main::quit),
+		"Exit this program"));
+	// Fullscreen toggle button.
+	tb.tools().push_back( ToggleElem( 
+		"Fullscreen",
+		fs_img,
+		SigC::slot( *this, &basic_app::on_fullscreen_clicked),
+		"Toggle fullscreen on/off"));
+	// The mouse control button group.
+	Gtk::RadioButton::Group mouse_ctl;
+	tb.tools().push_back( Space());
+	tb.tools().push_back( RadioElem(
+		mouse_ctl,
+		"Rotate/Zoom",
+		SigC::slot( *this, &basic_app::on_rotate_clicked)));
+	tb.tools().push_back( RadioElem(
+		mouse_ctl,
+		"Pan",
+		SigC::slot( *this, &basic_app::on_pan_clicked)));
+	// Compose the frame and scen widgets.
+	frame.pack_start( tb, Gtk::PACK_SHRINK, 0);
 	frame.pack_start( scene);
 	window.add( frame);
-	
-	// Connect signal handlers.
-	quit.signal_clicked().connect( SigC::slot(&Gtk::Main::quit));
-	fs.signal_toggled().connect( 
-		SigC::slot( *this, &basic_app::on_fullscreen_clicked));
-	pan.signal_clicked().connect( 
-		SigC::slot( *this, &basic_app::on_pan_clicked));
-	rotate_zoom.signal_clicked().connect( 
-		SigC::slot( *this, &basic_app::on_rotate_clicked));
-	scene.core.lod_adjust = 0;
 }
 
 void
