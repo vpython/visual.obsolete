@@ -2,6 +2,9 @@ import os
 
 SetOption( "implicit_cache", 1)
 
+# TODO: Add support to build a gch for wrap_gl.hpp, render_surface.hpp,
+# and simple_displayobject.hpp
+
 # Options common to all targets go in opt
 opt = Environment( CCFLAGS=['-pipe', '-g'],
 	ENV = os.environ)
