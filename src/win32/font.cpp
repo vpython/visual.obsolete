@@ -36,7 +36,7 @@ bitmap_font::bitmap_font()
 		);
 		
 		if (!result) {
-			throw gl_error( "Failed to allocate a GL Font.");
+			WIN32_CRITICAL_ERROR("wglUseFontOutlines()");
 		}
 		cache[std::make_pair(font_family, font_size)] 
 			= std::make_pair(font, listbase);
@@ -76,6 +76,8 @@ bitmap_font::bitmap_font( const std::string& name, int size)
 			VARIABLE_PITCH | FF_SWISS, 
 			font_family.c_str()
 		);
+		if (!font)
+			WIN32_CRITICAL_ERROR("CreateFont()");
 		SelectObject( dev_context, font);
 		listbase = glGenLists(256);
 		BOOL result = wglUseFontOutlines(
