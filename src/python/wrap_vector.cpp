@@ -280,7 +280,10 @@ struct vector_from_seq
 				new (storage) vector( 
 					py::extract<double>( obj[0]),
 					py::extract<double>( obj[1]));
-			case 3:
+					break;
+			case 3: default:
+				// Will probably trigger an exception if it is the default
+				// case.
 				new (storage) vector( 
 					py::extract<double>( obj[0]),
 					py::extract<double>( obj[1]),
