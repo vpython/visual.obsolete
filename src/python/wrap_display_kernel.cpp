@@ -1,4 +1,8 @@
-// This file requires 124 MB to compile (optimizing).
+// This file requires 133 MB to compile (optimizing).
+
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
 #include "display.hpp"
@@ -9,6 +13,7 @@
 #include <boost/python/args.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/make_function.hpp>
+#include <boost/python/def.hpp>
  
 namespace cvisual {
 namespace py = boost::python;
@@ -68,7 +73,6 @@ wrap_display_kernel(void)
 		.def( "report_realise", &display_kernel::report_realize)
 		.def( "report_resize", &display_kernel::report_resize, py::args( "width", "height"))
 		.def( "pick", &display_kernel::pick, pick_overloads( py::args( "x", "y", "pixels")))
-		.def( "illuminate_default", &display_kernel::illuminate_default)
 		.add_property( "ambient", &display_kernel::get_ambient, 
 			&display_kernel::set_ambient)
 		.add_property( "up",
@@ -131,6 +135,15 @@ wrap_display_kernel(void)
 	py::to_python_converter<
 		std::list<shared_ptr<light> >,
 		lights_to_py_list>();
+		
+	// Free functions for exiting the system.  These are undocumented at the moment.
+	def( "shutdown", gui_main::shutdown, 
+		"Close all Displays and shutdown visual.");
+	def( "allclosed", gui_main::allclosed, 
+		"Returns true if all of the Displays are closed.");
+	def( "waitclose", gui_main::waitclosed, 
+		"Blocks until all of the Displays are closed by the user.");
+
 };
 
 } // !namespace cvisual;
