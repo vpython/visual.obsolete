@@ -36,6 +36,7 @@ class sphere : public simple_displayobject
 	virtual void grow_extent( extent&);
 	virtual void update_cache( const view&);
 	virtual vector get_scale();
+	virtual bool degenerate();
 	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
 };
 

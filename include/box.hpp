@@ -30,6 +30,9 @@ class box : public simple_displayobject
 	// Calculates the textured_sorted_model (only done once, hopefully).
 	void calc_textured_sorted_model();
 	
+	// True if the box should not be rendered.
+	bool degenerate();
+	
  public:
 	box();
 	void set_width( const double&);

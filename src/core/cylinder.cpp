@@ -8,6 +8,12 @@
 #include <boost/scoped_array.hpp>
 using boost::scoped_array;
 
+bool
+cylinder::degenerate()
+{
+	return !visible || radius == 0.0 || axis.mag() == 0.0;
+}
+
 // TODO: This model currently uses three-deep glPushMatrix() to run.  It should
 // be reduced.
 static void
@@ -56,6 +62,8 @@ cylinder::set_radius( double r)
 void 
 cylinder::gl_pick_render( const view& scene)
 {
+	if (degenerate())
+		return;
 	size_t lod = 2;
 	gl_matrix_stackguard guard;
 	vector view_pos = pos * scene.gcf;
@@ -70,6 +78,8 @@ cylinder::gl_pick_render( const view& scene)
 void 
 cylinder::gl_render( const view& scene)
 {
+	if (degenerate())
+		return;
 	clear_gl_error();
 
 	// See sphere::gl_render() for a description of the level of detail calc.

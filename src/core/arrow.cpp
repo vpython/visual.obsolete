@@ -126,14 +126,14 @@ arrow::get_center() const
 void 
 arrow::gl_pick_render( const view&)
 {
-	if (visible)
+	if (visible && axis.mag() != 0.0)
 		model.gl_render();
 }
 
 void
 arrow::gl_render( const view&)
 {
-	if (visible) {
+	if (visible && axis.mag() != 0.0) {
 		// Uncomment the following and comment out the respecitive lines in
 		// refresh_cache() if you need to see the transforms at runtime.
 		// gl_matrix_stackguard guard( model_world_transform());

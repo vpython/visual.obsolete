@@ -7,6 +7,12 @@ z_sorted_model<quad, 6> box::sorted_model;
 z_sorted_model<tquad, 6> box::textured_sorted_model;
 bool box::first = true;
 
+bool
+box::degenerate()
+{
+	return !visible || axis.mag() == 0.0 || width == 0.0 || height == 0.0;
+}
+
 box::box()
 	: width(1.0), height(1.0)
 {	
@@ -33,6 +39,8 @@ box::set_height( const double& n_height)
 void 
 box::gl_pick_render( const view& scene)
 {
+	if (degenerate())
+		return;
 	double gcf = scene.gcf;
 	gl_matrix_stackguard guard;
 	vector view_pos = pos * scene.gcf;
@@ -73,7 +81,7 @@ box::update_cache( const view&)
 void 
 box::gl_render( const view& scene)
 {
-	if (!visible)
+	if (degenerate())
 		return;
 	
 	clear_gl_error();

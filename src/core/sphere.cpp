@@ -53,6 +53,8 @@ sphere::get_texture()
 void
 sphere::gl_pick_render( const view& geometry)
 {
+	if (degenerate())
+		return;
 	size_t lod = 2;
 	gl_matrix_stackguard guard;
 	const vector view_pos = pos * geometry.gcf;
@@ -66,6 +68,8 @@ sphere::gl_pick_render( const view& geometry)
 void
 sphere::gl_render( const view& geometry)
 {
+	if (degenerate())
+		return;
 	clear_gl_error();
 	
 	// All of the models are slightly different when shininess is specified.
@@ -299,6 +303,12 @@ vector
 sphere::get_scale()
 {
 	return vector( radius, radius, radius);
+}
+
+bool
+sphere::degenerate()
+{
+	return !visible || axis.mag() == 0.0 || radius == 0.0;
 }
 
 SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(sphere)

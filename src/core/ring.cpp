@@ -1,5 +1,6 @@
 #include "ring.hpp"
 #include "util/displaylist.hpp"
+#include "util/errors.hpp"
 #include <utility>
 
 namespace {
@@ -50,8 +51,6 @@ ring::gl_render( const view& scene)
 	// the ring as a triangle strip.  Each successive band is created with 
 	// sequential calls to glRotate() using the same vertex array, thereby 
 	// taking advantage of OpenGL's hardware for the bulk of the transform labor.
-	if (radius == 0.0)
-		return;
 	double scaled_radius = radius * scene.gcf;
 	double scaled_thickness = scaled_radius * 0.1;
 	if (thickness != 0.0)
@@ -143,7 +142,7 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	// the ring as a triangle strip.  Each successive band is created with 
 	// sequential calls to glRotate() using the same vertex array, thereby 
 	// taking advantage of OpenGL's hardware for the bulk of the transform labor.
-	if (radius == 0.0)
+	if (radius == 0.0 || !visible)
 		return;
 		
 	double scaled_radius = radius * scene.gcf;
@@ -181,12 +180,12 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	normals[bands*2+1] = normals[1];
 	
 	// Point OpenGL at the vertex data for the first triangle strip.
+	clear_gl_error();
 	glEnableClientState( GL_VERTEX_ARRAY);
 	glEnableClientState( GL_NORMAL_ARRAY);
 	glVertexPointer( 3, GL_DOUBLE, 0, vertexes);
 	glNormalPointer( GL_DOUBLE, 0, normals);
 	color.gl_set();
-
 	{	
 		gl_matrix_stackguard guard;
 		vector scaled_pos = pos * scene.gcf;
@@ -204,5 +203,6 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	
 	glDisableClientState( GL_VERTEX_ARRAY);
 	glDisableClientState( GL_NORMAL_ARRAY);
+	check_gl_error();
 	return;
 }

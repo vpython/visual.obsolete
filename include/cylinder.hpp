@@ -9,6 +9,7 @@ class cylinder : public simple_displayobject
 	// The radius of the base of the cone.
 	double radius;
 	static bool first;
+	bool degenerate();
 	
  public:
 	cylinder();
