@@ -1,11 +1,8 @@
-#include <iostream>
-#include <limits>
-
 #include "gtk2/render_surface.hpp"
 #include "arrow.hpp"
 
 int 
-main( int, char**)
+main( void)
 {
 	basic_app main_window( "Arrow scaling test");
 	

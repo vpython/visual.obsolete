@@ -1,13 +1,9 @@
-#include <gtkmm/main.h>
-#include <gtkmm/window.h>
-#include <gtkmm/gl/init.h>
-
 #include "gtk2/render_surface.hpp"
 #include "sphere.hpp"
 #include "gtk2/file_texture.hpp"
 
 int 
-main( int, char**)
+main( void)
 {
 	basic_app main_window( "Texture sharing test");
 	

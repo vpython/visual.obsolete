@@ -1,13 +1,12 @@
-#include <iostream>
-#include <limits>
-
 #include "gtk2/render_surface.hpp"
 #include "arrow.hpp"
 #include "box.hpp"
 #include "gtk2/file_texture.hpp"
 
+#include <iostream>
+
 int 
-main( int, char**)
+main( void)
 {
 	basic_app app( "Box test");
 	

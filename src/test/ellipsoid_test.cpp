@@ -1,13 +1,11 @@
-#include <iostream>
-#include <limits>
-
 #include "gtk2/render_surface.hpp"
 #include "arrow.hpp"
 #include "ellipsoid.hpp"
-#include "gtk2/file_texture.hpp"
+
+#include <iostream>
 
 int 
-main( int argc, char* argv[])
+main( void)
 {
 	basic_app app( "Ellipsoid test");
 	rgba yellow( 1, 1, 0);

@@ -1,11 +1,10 @@
-#include <iostream>
-#include <limits>
-
 #include "gtk2/render_surface.hpp"
 #include "arrow.hpp"
 
+#include <iostream>
+
 int 
-main( int, char**)
+main( void)
 {
 	basic_app main_window( "Transparent arrow test");
 	
