@@ -68,7 +68,7 @@ class rgb
 		: red(r), green(g), blue(b)
 	{}
 	
-	inline operator rgba() { return rgba( red, green, blue, 1.0f); }
+	inline operator rgba() const { return rgba( red, green, blue, 1.0f); }
 	
 	rgb desaturate() const;
 	rgb grayscale() const;
