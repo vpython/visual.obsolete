@@ -201,7 +201,10 @@ public: // Public Data.
 			a hit.
 		@return  the nearest selected object.  May be NULL if nothing was hit.
 	*/
-	shared_ptr<renderable> pick( float x, float y, float d_pixels = 2.0);
+	shared_ptr<renderable>
+	pick( float x, float y, float d_pixels = 2.0);
+	// TODO: Modify the above to return a pair<shared_ptr<renderable>, vector>,
+	// where the vector is the nearest position on the body that was picked.
 	
 	/** Recenters the scene.  Call this function exactly once to move the visual
 	 * center of the scene to the true center of the scene.  This will work
