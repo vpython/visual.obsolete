@@ -9,6 +9,7 @@
 #include "display_kernel.hpp"
 #include "gtk2/render_surface.hpp"
 #include "util/atomic_queue.hpp"
+#include "mouseobject.hpp"
 
 #include <boost/scoped_ptr.hpp>
 
@@ -29,32 +30,29 @@ class display : public display_kernel,
 	public SigC::Object
 {
  private:
-	// scoped_ptr<Gtk::GL::DrawingArea> area;
 	scoped_ptr<render_surface> area;
 	scoped_ptr<Gtk::Window> window;
 	SigC::Connection timer;
 
 	mutex mtx;
-	float last_mousepos_x;
-	float last_mousepos_y;
-	bool active; // True when the display is actually visible
+	bool active; ///< True when the display is actually visible
  
 	// Properties of the main window.
 	float x;
 	float y;
 	float width;
 	float height;
-	bool exit;
-	bool visible; // True when the user has requested this window to be visible.
-	bool fullscreen; // True when the display is in fullscreen mode.
+	bool exit; ///< True when Visual should shutdown on exit.
+	bool visible; ///< True when the user has requested this window to be visible.
+	bool fullscreen; ///< True when the display is in fullscreen mode.
 	std::string title;
  
 	// The 'selected' display.
 	static shared_ptr<display> selected;
-	// static Glib::RefPtr<Gdk::GL::Context> share_list;
 	
 	// The interface for reading keyboard presses from this display in Python.
 	atomic_queue<std::string> keys;
+	mouse_t mouse;
 	
  public:
 	display();

@@ -71,9 +71,7 @@ using boost::thread;
 shared_ptr<display> display::selected;
 
 display::display()
-	: last_mousepos_x(0.0f),
-	last_mousepos_y(0.0f),
-	active( false),
+	: active( false),
 	x( -1),
 	y(-1),
 	width( 384),
