@@ -25,7 +25,9 @@ using boost::lexical_cast;
 // single-precision floating point results in no change in performance.  Using
 // mfpmath=sse does not change performance.
 
-// TODO: Perform tests on a P4 with double-precision SSE2 support.
+// On a 3.0 GHz Pentium 4, sin/cos rotation is performed in .09 usec and matrix
+// multiply in .025 usec.  -mfpmath and -msse2 slightly reduced the matrix multiply
+// speed to .023 usec.
 int
 main( int argc, char** argv)
 {
