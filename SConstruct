@@ -1,4 +1,5 @@
 import os
+import sys
 
 SetOption( "implicit_cache", 1)
 
@@ -8,18 +9,18 @@ SetOption( "implicit_cache", 1)
 # Options common to all targets go in opt
 opt = Environment( CCFLAGS=['-pipe', '-g'],
 	ENV = os.environ)
+# CPPPATH='include')
+opt.Append( CPPPATH='include')
+if 'linux' in sys.platform:
+	opt.Append( CPPPATH=['/usr/include/FTGL'])
 
-opt.Append( CPPPATH=['include', '/usr/include/FTGL'])
 opt.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 	'-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS'] )
 
-# Options specific to libvpython-core.so
 core = opt.Copy()
 core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2')
-core.Append( LIBS=["GL", "GLU"])
-vpython_core = core.SharedLibrary( 
-	target = 'lib/vpython-core', 
-	source = [ "src/core/arrow.cpp", 
+
+srcs = [ "src/core/arrow.cpp", 
 	"src/core/util/displaylist.cpp",
 	"src/core/util/errors.cpp",
 	"src/core/util/extent.cpp",
@@ -44,26 +45,36 @@ vpython_core = core.SharedLibrary(
 	"src/core/sphere.cpp",
 	"src/core/pmap_sphere.cpp",
 	"src/core/frame.cpp",
-	"src/core/label.cpp" ] )
+	"src/core/label.cpp" ]
+if sys.platform == 'win32':
+	srcs.remove( 'src/core/label.cpp')
+	srcs.remove( 'src/core/util/random_device.cpp')
+	srcs.append( 'src/win32/render_surface.cpp')
+	core.Append( LIBS=['opengl32', 'gdi32', 'glu32', 'comctl32'])
+	core.Append( CCFLAGS='-mwindows')
+	core.Append( LDFLAGS='-mwindows')
+else:
+	srcs.append( 'src/gtk2/render_surface.cpp')
+	srcs.append( 'src/gtk2/font.cpp')
+	srcs.append( 'src/gtk2/file_texture.cpp')
+	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl fontconfig')
+	core.Append( LIBS=["GL", "GLU"])
 
-gtk2 = opt.Copy()
-gtk2.Append( LIBPATH='lib', LIBS='vpython-core')
-gtk2.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl fontconfig')
-vpython_gtk2 = gtk2.SharedLibrary( 
-	target = 'lib/vpython-gtk2',
-	source = ['src/gtk2/file_texture.cpp', 
-	'src/gtk2/render_surface.cpp',
-	'src/gtk2/font.cpp' ])
+# Options specific to libvpython-core.so
+vpython_core = core.SharedLibrary( 
+	target = 'lib/vpython-core', 
+	source = srcs )
 
 
 ################################################################################
 # Build the test programs.
-tests = opt.Copy()
+tests = core.Copy()
 # TODO: Find out why ParseConfig doesn't honor PKG_CONFIG_PATH.
 tests['ENV']['PKG_CONFIG_PATH'] = './lib/pkgconfig/'
 # tests.ParseConfig( 'pkg-config --cflags --libs vpython-3.0')
-tests.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0')
-tests.Append( LIBPATH='lib', LIBS=['vpython-core', 'vpython-gtk2'])
+# tests.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0')
+tests.Append( LIBPATH='lib', LIBS=['vpython-core'])
+
 tests.Program( target='bin/sphere_lod_test', source='src/test/sphere_lod_test.cpp')
 tests.Program( target='bin/arrow_transparent_test', source='src/test/arrow_transparent_test.cpp')
 tests.Program( target='bin/object_zsort_bench', source='src/test/object_zsort_bench.cpp')
@@ -81,6 +92,7 @@ tests.Program( target='bin/pyramid_test', source='src/test/pyramid_test.cpp')
 tests.Program( target='bin/ellipsoid_test', source='src/test/ellipsoid_test.cpp')
 tests.Program( target='bin/psphere_texture_test', source='src/test/psphere_texture_test.cpp')
 tests.Program( target='bin/selection_test', source='src/test/selection_test.cpp')
-tests.Program( target='bin/gtk_style_test', source='src/test/gtk_style_test.cpp')
-tests.Program( target='bin/label_test', source='src/test/label_test.cpp')
+if sys.platform != 'win32':
+	tests.Program( target='bin/label_test', source='src/test/label_test.cpp')
+	tests.Program( target='bin/gtk_style_test', source='src/test/gtk_style_test.cpp')
 
