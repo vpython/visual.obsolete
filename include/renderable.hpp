@@ -31,6 +31,8 @@ struct view
 	double& gcf;
 	bool gcf_changed;
 	int lod_adjust;
+	bool anaglyph;
+	bool coloranaglyph;
 	
 	inline view( vector& n_forward, vector& n_center, float& n_width, 
 		float& n_height, bool n_forward_changed, double& n_gcf, 
