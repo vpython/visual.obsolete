@@ -15,10 +15,10 @@ realmain( std::vector<std::string>&)
 	thick->set_radius(0.05);
 	
 	tmatrix rotator = rotation( delta_angle, vector( 0, 1, 0));
-	for (int i = 0; i < 200; ++i) {
+	for (int i = 0; i < 300; ++i) {
 		v_0 = rotator * v_0;
 		thin->append( v_0 + v_gain*i, rgba(0,1,0));
-		thick->append( v_0 - v_gain*i, rgba(0,0,1, 0.5));
+		thick->append( v_0 - v_gain*i, rgba(0,0,1));
 	}
 	
 	shared_ptr<arrow> x( new arrow());
