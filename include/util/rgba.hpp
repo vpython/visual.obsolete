@@ -51,4 +51,30 @@ class rgba
 	{ glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &red); }
 };
 
+
+class rgb
+{
+ public:
+	union {
+		float data[3];
+		struct {
+			float red;
+			float green;
+			float blue;
+		};
+	};
+	
+	inline rgb( float r=1.0f, float g=1.0f, float b=1.0f)
+		: red(r), green(g), blue(b)
+	{}
+	
+	inline operator rgba() { return rgba( red, green, blue, 1.0f); }
+	
+	rgb desaturate() const;
+	rgb grayscale() const;
+	
+	inline void gl_set() const
+	{ glColor3f( red, green, blue); }
+};
+
 #endif // !defined VPYTHON_UTIL_RGBA_HPP

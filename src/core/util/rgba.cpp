@@ -2,12 +2,12 @@
 
 #include <cmath>
 
-rgba
-rgba::desaturate() const
+static rgb
+desaturate( const rgb& c)
 {
 	const float saturation = 0.5; // cut the saturation by this factor
 	float h, s, v;
-	rgba ret; ret.alpha = alpha;
+	rgb ret;
 	float cmin, cmax, delta;
 	int i;
 	float f, p, q, t;
@@ -16,20 +16,20 @@ rgba::desaturate() const
 	// h = [0,360], s = [0,1], v = [0,1]
 	//		if s == 0, then arbitrarily set h = 0
 
-	cmin = red;
-	if (green < cmin) {
-		cmin = green;
+	cmin = c.red;
+	if (c.green < cmin) {
+		cmin = c.green;
 	}
-	if (blue < cmin) {
-		cmin = blue;
+	if (c.blue < cmin) {
+		cmin = c.blue;
 	}
 
-	cmax = red;
-	if (green > cmax) {
-		cmax = green;
+	cmax = c.red;
+	if (c.green > cmax) {
+		cmax = c.green;
 	}
-	if (blue > cmax) {
-		cmax = blue;
+	if (c.blue > cmax) {
+		cmax = c.blue;
 	}
 	v = cmax;				// v
 
@@ -42,12 +42,12 @@ rgba::desaturate() const
 	} 
 	else {
 		s = delta / cmax;		// s
-		if (red == cmax)
-			h = ( green - blue ) / delta;		// between yellow & magenta
-		else if (green == cmax)
-			h = 2.0 + ( blue - red ) / delta;	// between cyan & yellow
+		if (c.red == cmax)
+			h = ( c.green - c.blue ) / delta;		// between yellow & magenta
+		else if (c.green == cmax)
+			h = 2.0 + ( c.blue - c.red ) / delta;	// between cyan & yellow
 		else
-			h = 4.0 + ( red - green ) / delta;	// between magenta & cyan
+			h = 4.0 + ( c.red - c.green ) / delta;	// between magenta & cyan
 
 		if (h < 0.0)
 			h += 6.0;  // make it 0 <= h < 6
@@ -103,15 +103,41 @@ rgba::desaturate() const
 	return ret;
 }
 
-rgba
-rgba::grayscale() const
+static rgb
+grayscale( const rgb& c)
 {
 	// The constants 0.299, 0.587, and 0.114 are intended to account for the 
 	// relative intensity of each color to the human eye.
 	static const float GAMMA = 2.5;
-	const float black = std::pow( 0.299 * std::pow( red, GAMMA) 
-		+ 0.587* std::pow( green, GAMMA) 
-		+ 0.114* std::pow( blue, GAMMA)
+	const float black = std::pow( 0.299 * std::pow( c.red, GAMMA) 
+		+ 0.587* std::pow( c.green, GAMMA) 
+		+ 0.114* std::pow( c.blue, GAMMA)
 		, 1.0/GAMMA);
-	return rgba( black, black, black, alpha);
+	return rgb( black, black, black);
+}
+
+rgba
+rgba::desaturate() const
+{
+	rgb ret = ::desaturate( rgb(red, green, blue));
+	return rgba( ret.red, ret.green, ret.blue, alpha);
+}
+
+rgba
+rgba::grayscale() const
+{
+	rgb ret = ::grayscale( rgb(red, blue, green));
+	return rgba( ret.red, ret.green, ret.blue, alpha);
+}
+
+rgb
+rgb::desaturate() const
+{
+	return ::desaturate( *this);
+}
+
+rgb
+rgb::grayscale() const
+{
+	return ::grayscale( *this);
 }
