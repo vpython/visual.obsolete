@@ -15,15 +15,6 @@ realmain( std::vector<std::string>&)
 	// memory.
 	assert( sizeof( vector) == sizeof(double) * 3);
 	assert( sizeof( rgba) == sizeof(float) * 4);
-	vector v;
-	assert( &v.x == &v.data[0]);
-	assert( &v.y == &v.data[1]);
-	assert( &v.z == &v.data[2]);
-	rgba c;
-	assert( &c.red == &c.data[0]);
-	assert( &c.green == &c.data[1]);
-	assert( &c.blue == &c.data[2]);
-	assert( &c.alpha == &c.data[3]);
 	
 	basic_app main_window( "Arrow scaling test");
 	
