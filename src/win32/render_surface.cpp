@@ -518,8 +518,11 @@ basic_app::on_command( WPARAM wParam, LPARAM lParam)
 LRESULT 
 basic_app::on_getminmaxinfo( WPARAM, LPARAM lParam)
 {
+	// TODO: Make this configurable.
+	// TODO: Do not allow shrinking below the size of the toolbar.
 	MINMAXINFO* info = (MINMAXINFO*)lParam;
-	info->ptMinTrackSize = { 96, 64 };
+	info->ptMinTrackSize.x = 384;
+	info->ptMinTrackSize.y = 256;
 	return 0;
 }
 
