@@ -61,6 +61,8 @@ sphere::gl_render( const view& geometry)
 	if (degenerate())
 		return;
 	clear_gl_error();
+	if (!lit)
+		glDisable( GL_LIGHTING);
 	
 	// All of the models are slightly different when shininess is specified.
 	const bool shiny = shininess != 1.0;
@@ -110,7 +112,7 @@ sphere::gl_render( const view& geometry)
 	
 	color.gl_set();
 	// Mode specific rendering code follows
-	if (tex && color.alpha != 1.0) {
+	if (tex && (color.alpha != 1.0 || tex->has_alpha())) {
 		// Setup for blending
 		glEnable( GL_BLEND);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -200,6 +202,8 @@ sphere::gl_render( const view& geometry)
 		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
 		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( 0, 0, 0).red);
 	}
+	if (!lit)
+		glEnable( GL_LIGHTING);
 	check_gl_error();
 }
 
