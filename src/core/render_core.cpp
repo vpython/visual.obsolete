@@ -620,77 +620,90 @@ render_core::render_scene(void)
 shared_ptr<renderable> 
 render_core::pick( float x, float y, float d_pixels)
 {
-	// Notes:
-	// culled polygons don't count.  glRasterPos() does count.
-
-	// Allocate a selection buffer of uints.  Format for returned hits is:
-	// {uint32: n_names}{uint32: minimunm depth}{uint32: maximum depth}
-	// {unit32[n_names]: name_stack}
-	// n_names is the depth of the name stack at the time of the hit.
-	// minimum and maximum depth are the minimum and maximum values in the 
-	// depth buffer scaled between 0 and 2^32-1. (source is [0,1])
-	// name_stack is the full contents of the name stack at the time of the hit.
-	size_t hit_buffer_size = layer_world.size()+layer_world_transparent.size()*4;
-	unsigned int hit_buffer[hit_buffer_size];
-	
-	// Allocate a std::map< uint, shared_ptr<renderable> > to lookup names
-	// as they are rendered.
-	std::vector<shared_ptr<renderable> > name_table;
-	// Pass the name stack to OpenGL with glSelectBuffer.
-	glSelectBuffer( hit_buffer_size, hit_buffer);
-	// Enter selection mode with glRenderMode
-	glRenderMode( GL_SELECT);
-	// Clear the name stack with glInitNames(), raise the height of the name
-	// stack with glPushName() exactly once.
-	glInitNames();
-	glPushName(0);
-	
-	// Initialize the picking matrix.
-	int viewport_bounds[4] = { 
-		0, 0, static_cast<int>(window_width), static_cast<int>(window_height)
-	};
-	gluPickMatrix( x, y, d_pixels, d_pixels, viewport_bounds);
-	view scene_geometry( forward, center, window_width, window_height, 
-		forward_changed, gcf, gcf_changed);
-	scene_geometry.lod_adjust = lod_adjust;
-	world_to_view_transform( scene_geometry);
-
-	// Iterate across the world, rendering each body for picking.
-	std::list<shared_ptr<renderable> >::iterator i = layer_world.begin();
-	std::list<shared_ptr<renderable> >::iterator i_end = layer_world.end();
-	while (i != i_end) {
-		glLoadName( name_table.size());
-		name_table.push_back( *i);
-		(*i)->gl_pick_render( scene_geometry);
-	}
-	std::vector<shared_ptr<renderable> >::iterator j = layer_world_transparent.begin();
-	std::vector<shared_ptr<renderable> >::iterator j_end = layer_world_transparent.end();
-	while (j != j_end) {
-		glLoadName( name_table.size());
-		name_table.push_back( *j);
-		(*j)->gl_pick_render( scene_geometry);
-	}
-	// Return the name stack to the bottom with glPopName() exactly once.
-	glPopName();
-
-	// Exit selection mode, return to normal rendering rendering. (collects
-	// the number of hits at this time).
-	size_t n_hits = glRenderMode( GL_RENDER);
-	
-	// Lookup the name to get the shared_ptr<renderable> associated with it.
 	shared_ptr<renderable> best_pick;
-	double best_pick_depth = 1.0; // The farthest point away in the depth buffer.
-	unsigned int* hit_record = hit_buffer;
-	while (n_hits > 0) {
-		unsigned int n_names = hit_record[0];
-		double min_hit_depth = static_cast<double>(hit_record[1]) / 0xffffffffu;
-		if (min_hit_depth < best_pick_depth) {
-			unsigned int name = hit_record[3];
-			best_pick_depth = min_hit_depth;
-			best_pick = name_table[name];
+	try {
+		clear_gl_error();
+		// Notes:
+		// culled polygons don't count.  glRasterPos() does count.
+	
+		// Allocate a selection buffer of uints.  Format for returned hits is:
+		// {uint32: n_names}{uint32: minimunm depth}{uint32: maximum depth}
+		// {unit32[n_names]: name_stack}
+		// n_names is the depth of the name stack at the time of the hit.
+		// minimum and maximum depth are the minimum and maximum values in the 
+		// depth buffer scaled between 0 and 2^32-1. (source is [0,1])
+		// name_stack is the full contents of the name stack at the time of the hit.
+		size_t hit_buffer_size = layer_world.size()+layer_world_transparent.size()*4;
+		unsigned int hit_buffer[hit_buffer_size];
+		
+		// Allocate a std::map< uint, shared_ptr<renderable> > to lookup names
+		// as they are rendered.
+		std::vector<shared_ptr<renderable> > name_table;
+		// Pass the name stack to OpenGL with glSelectBuffer.
+		glSelectBuffer( hit_buffer_size, hit_buffer);
+		// Enter selection mode with glRenderMode
+		glRenderMode( GL_SELECT);
+		// Clear the name stack with glInitNames(), raise the height of the name
+		// stack with glPushName() exactly once.
+		glInitNames();
+		glPushName(0);
+		
+		// Initialize the picking matrix.
+		int viewport_bounds[4] = { 
+			0, 0, static_cast<int>(window_width), static_cast<int>(window_height)
+		};
+		gluPickMatrix( x, y, d_pixels, d_pixels, viewport_bounds);
+		view scene_geometry( forward, center, window_width, window_height, 
+			forward_changed, gcf, gcf_changed);
+		scene_geometry.lod_adjust = lod_adjust;
+		world_to_view_transform( scene_geometry);
+	
+		// Iterate across the world, rendering each body for picking.
+		std::list<shared_ptr<renderable> >::iterator i = layer_world.begin();
+		std::list<shared_ptr<renderable> >::iterator i_end = layer_world.end();
+		while (i != i_end) {
+			glLoadName( name_table.size());
+			name_table.push_back( *i);
+			(*i)->gl_pick_render( scene_geometry);
 		}
-		hit_record += 3 + n_names;
-		n_hits--;
+		std::vector<shared_ptr<renderable> >::iterator j = layer_world_transparent.begin();
+		std::vector<shared_ptr<renderable> >::iterator j_end = layer_world_transparent.end();
+		while (j != j_end) {
+			glLoadName( name_table.size());
+			name_table.push_back( *j);
+			(*j)->gl_pick_render( scene_geometry);
+		}
+		// Return the name stack to the bottom with glPopName() exactly once.
+		glPopName();
+	
+		// Exit selection mode, return to normal rendering rendering. (collects
+		// the number of hits at this time).
+		size_t n_hits = glRenderMode( GL_RENDER);
+		check_gl_error();
+		
+		// Lookup the name to get the shared_ptr<renderable> associated with it.
+		double best_pick_depth = 1.0; // The farthest point away in the depth buffer.
+		unsigned int* hit_record = hit_buffer;
+		unsigned int* const hit_buffer_end = hit_buffer + hit_buffer_size;
+		while (n_hits > 0 && hit_record < hit_buffer_end) {
+			unsigned int n_names = hit_record[0];
+			if (hit_record + 3 + n_names > hit_buffer_end)
+				break;
+			double min_hit_depth = static_cast<double>(hit_record[1]) / 0xffffffffu;
+			if (min_hit_depth < best_pick_depth) {
+				unsigned int name = hit_record[3];
+				best_pick_depth = min_hit_depth;
+				best_pick = name_table[name];
+			}
+			hit_record += 3 + n_names;
+			n_hits--;
+		}
+	}
+	catch (gl_error e) {
+		std::ostringstream msg;
+		msg << "OpenGL error: " << e.what() << ", aborting.\n";
+		VPYTHON_CRITICAL_ERROR( msg.str());
+		std::exit(1);
 	}
 	return best_pick;
 }
