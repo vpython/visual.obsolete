@@ -6,18 +6,19 @@ SetOption( "implicit_cache", 1)
 # TODO: Add support to build a gch for wrap_gl.hpp, render_surface.hpp,
 # and simple_displayobject.hpp
 
-# Options common to all targets go in opt
-opt = Environment( CCFLAGS=['-pipe', '-g'],
-	ENV = os.environ)
-# CPPPATH='include')
-opt.Append( CPPPATH='include')
-if 'linux' in sys.platform:
-	opt.Append( CPPPATH=['/usr/include/FTGL'])
 
-opt.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
+core = Environment( CCFLAGS=['-pipe', '-g'],
+	ENV = os.environ,
+	CPPPATH='include')
+
+# Workaround brain-dead behavior in FTGL's header file layout
+if 'linux' in sys.platform:
+	core.Append( CPPPATH=['/usr/include/FTGL'])
+
+# Crank up the warnings
+core.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 	'-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS'] )
 
-core = opt.Copy()
 core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2')
 
 srcs = [ "src/core/arrow.cpp", 
@@ -26,10 +27,8 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/util/extent.cpp",
 	"src/core/util/lighting.cpp",
 	"src/core/util/quadric.cpp",
-	"src/core/util/random_device.cpp",
 	"src/core/util/rgba.cpp",
 	"src/core/util/texture.cpp",
-	"src/core/util/timer.cpp",
 	"src/core/util/vector.cpp",
 	"src/core/util/clipping_plane.cpp",
 	"src/core/util/tmatrix.cpp",
@@ -46,19 +45,25 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/pmap_sphere.cpp",
 	"src/core/frame.cpp",
 	"src/core/label.cpp" ]
+
 if sys.platform == 'win32':
 	srcs.remove( 'src/core/label.cpp')
-	srcs.remove( 'src/core/util/random_device.cpp')
 	srcs.append( 'src/win32/render_surface.cpp')
+	srcs.append( 'src/win32/timer.cpp')
+	
 	core.Append( LIBS=['opengl32', 'gdi32', 'glu32', 'comctl32'])
-	core.Append( CCFLAGS='-mwindows')
+	core.Append( CPPPATH='include/win32')
 	core.Append( LDFLAGS='-mwindows')
 else:
 	srcs.append( 'src/gtk2/render_surface.cpp')
 	srcs.append( 'src/gtk2/font.cpp')
 	srcs.append( 'src/gtk2/file_texture.cpp')
+	srcs.append( 'src/gtk2/timer.cpp')
+	srcs.append( 'src/gtk2/random_device.cpp')
+	
 	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl fontconfig')
 	core.Append( LIBS=["GL", "GLU"])
+	core.Append( CPPPATH='include/gtk2')
 
 # Options specific to libvpython-core.so
 vpython_core = core.SharedLibrary( 
@@ -92,7 +97,7 @@ tests.Program( target='bin/pyramid_test', source='src/test/pyramid_test.cpp')
 tests.Program( target='bin/ellipsoid_test', source='src/test/ellipsoid_test.cpp')
 tests.Program( target='bin/psphere_texture_test', source='src/test/psphere_texture_test.cpp')
 tests.Program( target='bin/selection_test', source='src/test/selection_test.cpp')
+tests.Program( target='bin/conference_demo', source='src/test/conference_demo.cpp')
 if sys.platform != 'win32':
 	tests.Program( target='bin/label_test', source='src/test/label_test.cpp')
 	tests.Program( target='bin/gtk_style_test', source='src/test/gtk_style_test.cpp')
-
