@@ -1,5 +1,9 @@
 // This file uses 195 MB to compile (optimizing)
 
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "primitive.hpp"
 #include "arrow.hpp"
 #include "sphere.hpp"
@@ -23,7 +27,7 @@ void
 wrap_primitive()
 {
 	class_<renderable, boost::noncopyable>( "renderable", no_init);
-	
+
 	class_<primitive, bases<renderable>, noncopyable>( 
 			"primitive", no_init)
 		.add_property( "pos", 
