@@ -2,7 +2,7 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "gtk2/render_surface.hpp"
+#include "render_surface.hpp"
 #include "arrow.hpp"
 #include "sphere.hpp"
 #include "cylinder.hpp"
@@ -11,6 +11,8 @@
 #include "box.hpp"
 #include "ellipsoid.hpp"
 #include "cone.hpp"
+#include "curve.hpp"
+#include "convex.hpp"
 
 #include <iostream>
 
@@ -73,14 +75,38 @@ realmain( std::vector<std::string>&)
 	ell->set_pos( vector( 0, 0, -4));
 	ell->set_color( trans_green);
 	
-	app.scene.add_renderable( arr);
-	app.scene.add_renderable( cyl);
-	app.scene.add_renderable( sph);
-	app.scene.add_renderable( con);
-	app.scene.add_renderable( pyr);
-	app.scene.add_renderable( rin);
-	app.scene.add_renderable( b);
-	app.scene.add_renderable( ell);
+	shared_ptr<curve> thin( new curve());
+	shared_ptr<curve> thick( new curve());
+	thick->set_radius(0.05);
+	vector v_base( -10, 0, 0);
+	vector v_gain(0, 0.02, 0);
+	vector v_0( 2, 0, 0);
+	double delta_angle = .1;
+	
+	tmatrix rotator = rotation( delta_angle, vector( 0, 1, 0));
+	for (int i = 0; i < 258; ++i) {
+		v_0 = rotator * v_0;
+		thin->append( v_base + v_0 + v_gain*i, rgb(0,1,0));
+		thick->append( v_base + v_0 - v_gain*i, rgb(0,0,1));
+	}
+	
+	shared_ptr<convex> triangle( new convex());
+	triangle->append( vector(15+-4, 2.5));
+	triangle->append( vector( 15+-5, 2.5));
+	triangle->append( vector( 15+-4.5, 3.25));
+	triangle->set_color( rgba( 0, 0.75, 0.75));
+	
+	app.scene.core.add_renderable( arr);
+	app.scene.core.add_renderable( cyl);
+	app.scene.core.add_renderable( sph);
+	app.scene.core.add_renderable( con);
+	app.scene.core.add_renderable( pyr);
+	app.scene.core.add_renderable( rin);
+	app.scene.core.add_renderable( b);
+	app.scene.core.add_renderable( ell);
+	app.scene.core.add_renderable( thin);
+	app.scene.core.add_renderable( thick);
+	app.scene.core.add_renderable( triangle);
 	app.scene.object_clicked.connect( SigC::slot( on_object_clicked));
 
 	app.run();
