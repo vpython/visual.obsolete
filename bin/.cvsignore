@@ -1,0 +1,17 @@
+arrow_scaling_test
+arrow_transparent_test
+box_test
+cone_test
+cylinder_test
+ellipsoid_test
+model_zsort_bench
+object_zsort_bench
+psphere_texture_test
+pyramid_test
+ring_test
+selection_test
+sincos_matrix_bench
+sphere_lod_test
+sphere_texture_test
+sphere_transparent_test
+texture_sharing_test
