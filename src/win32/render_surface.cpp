@@ -37,6 +37,7 @@ decode_win32_error()
 // A lookup-table for the default widget procedure to use to find the actual
 // widget that should handle a particular callback message.
 std::map<HWND, render_surface*> render_surface::widgets;
+render_surface* render_surface::current = 0;
 
 void
 render_surface::register_win32_class()
@@ -202,6 +203,8 @@ render_surface::on_size( WPARAM, LPARAM)
 {
 	RECT dims;
 	GetClientRect( widget_handle, &dims);
+	window_width = dims.right - dims.left;
+	window_height = dims.bottom - dims.top;
 	core.report_resize( dims.right - dims.left, dims.bottom - dims.top);
 	return 0;
 }
@@ -233,11 +236,13 @@ void
 render_surface::gl_begin()
 {
 	wglMakeCurrent( dev_context, gl_context);
+	current = this;
 }
 
 void 
 render_surface::gl_end()
 {
+	current = 0;
 }
 
 void 
@@ -247,6 +252,8 @@ render_surface::gl_swap_buffers()
 }
 
 render_surface::render_surface()
+	: last_mousepos_x(0), last_mousepos_y(0), window_width(0), window_height(0),
+	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0)
 {
 	// Initialize data
 	// Initialize the win32_class

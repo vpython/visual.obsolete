@@ -14,14 +14,20 @@
 // NOTE: This implementation might require Windows 98 (For the timer callback).
 
 class basic_app;
+class bitmap_font;
 
 class render_surface : public SigC::Object
 {
  private:
 	friend class basic_app;
+	friend class bitmap_font;
 
  	float last_mousepos_x;
- 	float last_mousepos_y; 	
+ 	float last_mousepos_y;
+	
+	// For the benefit of win32::bitmap_font.
+	float window_width;
+	float window_height;
 	
  	HWND widget_handle;
  	UINT_PTR timer_handle;
@@ -67,6 +73,7 @@ class render_surface : public SigC::Object
 
 	// Signal fired by button down + button up
 	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
+	static render_surface* current;
 };
 
 class basic_app

@@ -1,5 +1,5 @@
 #include "label.hpp"
-#include "gtk2/font.hpp"
+#include "font.hpp"
 #include "util/errors.hpp"
 #include <sstream>
 
@@ -191,7 +191,7 @@ label::gl_render( const view& scene)
 		// appearance is as if, for the first line, glRasterPos was far away in
 		// the depth direction.  I have only observed this issue with the ATI
 		// proprietary fglrx driver at this time - MESA's software renderer is
-		// fine.
+		// fine.  So is NVIDIA's Linux GLX driver.
 		glRasterPos3d( 0, 0, 0);
 		glPushAttrib( GL_ENABLE_BIT);
 		glPopAttrib();

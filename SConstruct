@@ -47,12 +47,11 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/label.cpp" ]
 
 if sys.platform == 'win32':
-	srcs.remove( 'src/core/label.cpp')
 	srcs.append( 'src/win32/render_surface.cpp')
 	srcs.append( 'src/win32/timer.cpp')
 	srcs.append( 'src/win32/random_device.cpp')
+	srcs.append( 'src/win32/font.cpp')
 	# TODO: Write a file_texture.cpp implementation for Windows,
-	# Write a font.cpp implementation for Windows.
 	
 	core.Append( LIBS=['opengl32', 'gdi32', 'glu32', 'comctl32', 'crypt32'])
 	core.Append( CPPPATH='include/win32')
