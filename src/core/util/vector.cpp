@@ -1,3 +1,8 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 
 // Most functions are inlined in the parent header.
 
@@ -6,6 +11,8 @@
 #include <istream>
 #include <ostream>
 #include <sstream>
+
+namespace cvisual {
 	
 vector 
 vector::cross( const vector& v) const throw()
@@ -145,3 +152,104 @@ vector::stl_cmp( const vector& v) const
 	}
 	else return this->z < v.z;
 }
+
+void
+shared_vector::set_x( const double& x)
+{
+	lock L(owner);
+	this->x = x;
+}
+
+void
+shared_vector::set_y( const double& y)
+{
+	lock L(owner);
+	this->y = y;
+}
+
+void
+shared_vector::set_z( const double& z)
+{
+	lock L( owner);
+	this->z = z;   	
+}
+	
+
+const shared_vector&
+shared_vector::operator=( const vector& v)
+{
+	lock L(owner);
+	this->x = v.x;
+	this->y = v.y;
+	this->z = v.z;
+	return *this;
+}
+
+#if 0
+const shared_vector&
+shared_vector::operator=( boost::python::tuple t)
+{
+	write_lock L(*owner);
+	vector v(t);
+	this->x = v.x;
+	this->y = v.y;
+	this->z = v.z;
+	return *this;
+}
+#endif
+
+const shared_vector&
+shared_vector::operator+=( const vector& v)
+{
+	lock L(owner);
+	this->x += v.x;
+	this->y += v.y;
+	this->z += v.z;
+	return *this;
+}
+
+const shared_vector&
+shared_vector::operator-=( const vector& v)
+{
+	lock L(owner);
+	this->x -= v.x;
+	this->y -= v.y;
+	this->z -= v.z;
+	return *this;
+}
+    
+const shared_vector&
+shared_vector::operator*=( const double& s)
+{
+	lock L(owner);
+	this->x *= s;
+	this->y *= s;
+	this->z *= s;
+	return *this;
+}
+    
+const shared_vector&
+shared_vector::operator/=( const double& s)
+{
+	lock L(owner);
+	this->x /= s;
+	this->y /= s;
+	this->z /= s;
+	return *this;
+}
+
+#if 0
+void
+shared_vector::py_setitem(int index, double value)
+{
+	if (owner) {
+		write_lock L(*owner);
+		vector::py_setitem(index, value);
+	}
+	else {
+		vector::py_setitem(index, value);
+	}
+}
+#endif
+
+} // !namespace cvisual
