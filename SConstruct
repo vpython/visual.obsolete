@@ -150,4 +150,7 @@ py.SharedLibrary( target='site-packages/cvisual',
 		'src/python/wrap_rgba.cpp',
 		'src/python/wrap_primitive.cpp',
 		'src/python/num_util.cpp',
-		'src/python/cvisualmodule.cpp'] )
+		'src/python/slice.cpp',
+		'src/python/curve.cpp',
+		'src/python/cvisualmodule.cpp',
+		'src/python/wrap_arrayobjects.cpp' ] )
