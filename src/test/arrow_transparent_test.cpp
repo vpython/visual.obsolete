@@ -49,5 +49,6 @@ realmain( std::vector<std::string>&)
 	std::cout << "You should see four arrow objects.  A red one along +x,"
 		" a green one along +y, a blue one along +z, and a translucent one"
 		" pointing along <1,1,1>.\n";
-	main_window.run();	
+	main_window.run();
+	return 0;
 }
