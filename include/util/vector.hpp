@@ -11,9 +11,14 @@
 class vector
 {
 public:
-	double x;
-	double y;
-	double z;
+	union {
+		double data[3];
+		struct {
+			double x;
+			double y;
+			double z;
+		};
+	};
 
 public:
 	vector( double a = 0.0, double b = 0.0, double c = 0.0) throw()
