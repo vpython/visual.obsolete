@@ -10,10 +10,6 @@
 #include <cassert>
 #include <iostream>
 
-#define WIN32_CRITICAL_ERROR(msg) win32_write_critical( __FILE__, __LINE__, \
-	__PRETTY_FUNCTION__, msg)
-
-
 /**************************** Utilities ************************************/
 // Extracts and decodes a Win32 error message.
 void
@@ -65,6 +61,8 @@ render_surface::register_win32_class()
 	}
 }
 
+// TODO: Change mouse movement handling to lock the mouse in place and continue
+// to process events.
 // This function dispatches incoming messages to the particular message-handler.
 LRESULT CALLBACK 
 render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -81,7 +79,6 @@ render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 		case WM_SIZE:
 			return This->on_size( wParam, lParam);
 		case WM_PAINT:
-			// Cause the widget to be repainted.
 			return This->on_paint( wParam, lParam);
 		case WM_MOUSEMOVE:
 			// Handle mouse cursor movement.
@@ -162,13 +159,12 @@ render_surface::on_create( WPARAM, LPARAM)
 LRESULT 
 render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 {
-	UINT id = 0;
+	UINT id = 1;
 	switch (lParam) {
 		case 0:
 			// Opening for the first time.
 			core.report_realize();
-			core.render_scene();
-			SetTimer( widget_handle, id, 28, &render_surface::timer_callback);
+			SetTimer( widget_handle, id, 20, &render_surface::timer_callback);
 			break;
 		case SW_PARENTCLOSING:
 			// Stop rendering when the window is minimized.
@@ -176,7 +172,7 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 			break;
 		case SW_PARENTOPENING:
 			// restart rendering when the window is restored.
-			SetTimer( widget_handle, id, 28, &render_surface::timer_callback);
+			SetTimer( widget_handle, id, 20, &render_surface::timer_callback);
 			break;
 		default:
 			return DefWindowProc( widget_handle, WM_SHOWWINDOW, wParam, lParam);
@@ -187,6 +183,8 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 LRESULT  
 render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 {
+	// TODO: Modify this implementation to make the mouse dissappear and lock
+	// it to a particular position during mouse right-clicks.
 	// bool left_down = wParam & MK_LBUTTON;
 	bool middle_down = wParam & MK_MBUTTON;
 	bool right_down = wParam & MK_RBUTTON;
@@ -221,6 +219,11 @@ LRESULT
 render_surface::on_paint( WPARAM, LPARAM)
 {
 	core.render_scene();
+	RECT dims;
+	// The following calls report the fact that the widget area has been 
+	// repainted to the windowing system.
+	GetClientRect( widget_handle, &dims);
+	ValidateRect( widget_handle, &dims);
 	return 0;
 }
 
@@ -228,7 +231,7 @@ LRESULT
 render_surface::on_destroy( WPARAM, LPARAM)
 {
 	// Perform cleanup actions.
-	UINT id = 0;
+	UINT id = 1;
 	KillTimer( widget_handle, id);
 	wglDeleteContext( gl_context);
 	ReleaseDC( widget_handle, dev_context);
@@ -250,6 +253,7 @@ render_surface::gl_begin()
 void 
 render_surface::gl_end()
 {
+	wglMakeCurrent( 0, 0);
 	current = 0;
 }
 
@@ -418,7 +422,6 @@ const char* toolbar_strs[] = {
 LRESULT
 basic_app::on_create( WPARAM, LPARAM)
 {
-
 	TBBUTTON buttons[5];
 	// The Quit button.
 	buttons[0].iBitmap = tb_imlist_idx[0];
@@ -428,6 +431,7 @@ basic_app::on_create( WPARAM, LPARAM)
 	buttons[0].dwData = 0;
 	buttons[0].iString = (int)toolbar_strs[QUIT];
 	
+	// The fullscreen toggle button
 	buttons[1].iBitmap = tb_imlist_idx[1];
 	buttons[1].idCommand = FULLSCREEN;
 	buttons[1].fsState = TBSTATE_ENABLED;
@@ -435,20 +439,24 @@ basic_app::on_create( WPARAM, LPARAM)
 	buttons[1].dwData = 0;
 	buttons[1].iString = (int)toolbar_strs[FULLSCREEN];
 	
-	buttons[2].iBitmap = 10;
+	// A separator
+	// TODO: Figure out why this looks wrong.
+	buttons[2].iBitmap = 5;
 	buttons[2].idCommand = SEPARATOR;
 	buttons[2].fsState = TBSTATE_ENABLED;
 	buttons[2].fsStyle = TBSTYLE_AUTOSIZE | TBSTYLE_SEP;
 	buttons[2].dwData = 0;
 	buttons[2].iString = 0;
 
+	// Rotate/zoom button
 	buttons[3].iBitmap = tb_imlist_idx[2];
 	buttons[3].idCommand = ROTATE_ZOOM;
-	buttons[3].fsState = TBSTATE_ENABLED;
+	buttons[3].fsState = TBSTATE_ENABLED | TBSTATE_PRESSED;
 	buttons[3].fsStyle = TBSTYLE_AUTOSIZE | TBSTYLE_CHECKGROUP;
 	buttons[3].dwData = 0;
 	buttons[3].iString = (int)toolbar_strs[ROTATE_ZOOM];
 
+	// Pan button
 	buttons[4].iBitmap = tb_imlist_idx[3];
 	buttons[4].idCommand = PAN;
 	buttons[4].fsState = TBSTATE_ENABLED;
@@ -459,7 +467,7 @@ basic_app::on_create( WPARAM, LPARAM)
 	toolbar = CreateWindow(
 		TOOLBARCLASSNAME,
 		0,
-		WS_CHILD | CCS_ADJUSTABLE, 0, 0, 0, 0, 
+		WS_CHILD | CCS_ADJUSTABLE | TBSTYLE_LIST, 0, 0, 0, 0, 
 		window_handle, 
 		0, 
 		GetModuleHandle(0), 
@@ -605,7 +613,7 @@ basic_app::basic_app( std::string _title)
 	window_handle = CreateWindow(
 		win32_class.lpszClassName,
 		title.c_str(),
-		WS_OVERLAPPED,
+		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, // x
 		CW_USEDEFAULT, // y
 		384, // width
@@ -637,11 +645,14 @@ basic_app::run()
 	
 	// Enter the message loop
 	MSG message;
-	BOOL msg_err = 0;
-	while ((msg_err = GetMessage( &message, 0, 0, 0)) != 0) {
-		if (msg_err == -1)
-			WIN32_CRITICAL_ERROR("GetMessage()");
-		TranslateMessage( &message);
-		DispatchMessage( &message);
+	while (true) {
+		while (PeekMessage(&message, 0, 0, 0, PM_REMOVE)) {
+			if (message.message == WM_QUIT)
+				return;
+			TranslateMessage( &message);
+			DispatchMessage( &message);
+		}
+		if (!WaitMessage())
+			WIN32_CRITICAL_ERROR( "WaitMessage()");
 	}
 }
