@@ -48,6 +48,12 @@ texture::gl_activate()
 	this->gl_transform();
 }
 
+bool
+texture::has_alpha() const
+{
+	return have_alpha;
+}
+
 void
 texture::gl_free()
 {
