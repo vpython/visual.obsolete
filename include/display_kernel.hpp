@@ -121,8 +121,6 @@ class display_kernel
 	// true fields-of-view.
 	void tan_hfov( double* x, double* y);
 	
-	// Compute the location of the camera based on the current geometry.
-	vector calc_camera();
 
 public: // Public Data.
 	enum mouse_mode_t { ZOOM_ROTATE, ZOOM_ROLL, PAN, FIXED } mouse_mode;
@@ -165,6 +163,9 @@ public: // Public Data.
 	virtual void remove_renderable( shared_ptr<renderable>);
 
  public: // Public functions
+	// Compute the location of the camera based on the current geometry.
+	vector calc_camera();
+	
 	display_kernel();
 	virtual ~display_kernel();
 
