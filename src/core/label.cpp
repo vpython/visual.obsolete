@@ -88,7 +88,8 @@ label::gl_render( const view& scene)
 	// Compute the width of the text box.
 	double box_width = 0.0;
 	color.gl_set();
-	bitmap_font font( font_description);
+	// bitmap_font font( font_description);
+	bitmap_font font;
 	for (std::vector<std::string>::iterator i = text.begin(); i != text.end(); ++i) {
 		double str_width = font.width(*i);
 		if (str_width > box_width)
