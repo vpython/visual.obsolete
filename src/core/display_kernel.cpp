@@ -508,7 +508,7 @@ display_kernel::recalc_extent(void)
 			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
 				" an extent greater than about 1e154 units.");
         // We should NEVER deliberately set range to zero on any axis.
-		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0); {
+		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
 	}
 	// TODO: There should be a faster way to do this comparison.
 	if (std::fabs(std::log( world_scale * gcf)) >= std::log( 1e10)) {
