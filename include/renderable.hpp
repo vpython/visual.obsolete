@@ -18,9 +18,9 @@ struct view
 	// The position of the camera in world space.
 	vector camera;
 	// The direction the camera is pointing - a unit vector.
-	vector& forward;
+	vector forward;
 	// The center of the scene in world space.
-	vector& center;
+	vector center;
 	// The width of the window in pixels.
 	float window_width;
 	// The height of the window in pixels.
