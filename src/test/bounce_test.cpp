@@ -15,7 +15,9 @@ int
 realmain( std::vector<std::string>&)
 {
 	display app;
+	app.illuminate_default();
 	display app2;
+	app2.illuminate_default();
 	app.set_title( "Ellipsoid test");
 	rgba red( 1, 0, 0);
 	rgba blue( 0, 0, 1);
@@ -34,7 +36,7 @@ realmain( std::vector<std::string>&)
 	app2.add_renderable( shared_ptr<sphere>( new sphere()));
 	
 	vector velocity(0, -1, 0);
-	double dt = 0.04;
+	double dt = 0.0099;
 	while (!gui_main::allclosed()) {
 		rate( 1/dt);
 	    ball->get_pos() += velocity*dt;
