@@ -22,21 +22,45 @@ namespace {
 	Glib::RefPtr<Gdk::GL::Context> share_list;
 }
 
-render_surface::render_surface()
+render_surface::render_surface( display_kernel& _core, bool activestereo)
+	: core( _core)
 {
-	Glib::RefPtr<Gdk::GL::Config> config = Gdk::GL::Config::create( 
-		Gdk::GL::MODE_RGBA
-		| Gdk::GL::MODE_DOUBLE
-		| Gdk::GL::MODE_DEPTH
-		| Gdk::GL::MODE_MULTISAMPLE );
-	if (!config) {
-		// Try again without the multisample extension.
-		config = Gdk::GL::Config::create( Gdk::GL::MODE_RGB
+	Glib::RefPtr<Gdk::GL::Config> config;
+
+	if (activestereo) {
+		config = Gdk::GL::Config::create( 
+			Gdk::GL::MODE_RGBA
 			| Gdk::GL::MODE_DOUBLE
-			| Gdk::GL::MODE_DEPTH );
+			| Gdk::GL::MODE_DEPTH
+			| Gdk::GL::MODE_MULTISAMPLE
+			| Gdk::GL::MODE_STEREO );
 		if (!config) {
-			VPYTHON_CRITICAL_ERROR("failed to initialize an OpenGL configuration.");
-			std::exit(1);
+			// Try again without the multisample extension.
+			config = Gdk::GL::Config::create( Gdk::GL::MODE_RGB
+				| Gdk::GL::MODE_DOUBLE
+				| Gdk::GL::MODE_DEPTH
+				| Gdk::GL::MODE_STEREO );
+			if (!config) {
+				VPYTHON_WARNING("'active' stereo requested, but not available."
+					"  Falling back to: 'nostereo'.");
+			}
+		}
+	}
+	else if (!activestereo || !config) {	
+		config = Gdk::GL::Config::create( 
+			Gdk::GL::MODE_RGBA
+			| Gdk::GL::MODE_DOUBLE
+			| Gdk::GL::MODE_DEPTH
+			| Gdk::GL::MODE_MULTISAMPLE );
+		if (!config) {
+			// Try again without the multisample extension.
+			config = Gdk::GL::Config::create( Gdk::GL::MODE_RGB
+				| Gdk::GL::MODE_DOUBLE
+				| Gdk::GL::MODE_DEPTH );
+			if (!config) {
+				VPYTHON_CRITICAL_ERROR("failed to initialize any OpenGL configuration, Aborting.");
+				std::exit(1);
+			}
 		}
 	}
 	if (share_list) {
@@ -187,9 +211,10 @@ basic_app::_init::_init()
 }
 
 basic_app::basic_app( const char* title)
-	: kit( NULL, NULL)
-	, fs_img( Gdk::Pixbuf::create_from_file( 
-			VPYTHON_PREFIX "/data/galeon-fullscreen.png"))
+	: kit( NULL, NULL), 
+	fs_img( Gdk::Pixbuf::create_from_file( 
+			VPYTHON_PREFIX "/data/galeon-fullscreen.png")),
+	scene( _core)
 {
 	using namespace Gtk::Toolbar_Helpers;
 
@@ -268,8 +293,8 @@ basic_app::on_delete( GdkEventAny*)
 		check_gl_error();
 	}
 	catch (gl_error& error) {
-		std::cerr << "Caught OpenGL error during shutdown: " << error.what() 
-			<< "\nContinuing with the shutdown." << std::endl;
+		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: " + std::string(error.what()));
+		std::cerr << "Continuing with the shutdown." << std::endl;
 	}
 	scene.get_gl_window()->gl_end();
 	return false;

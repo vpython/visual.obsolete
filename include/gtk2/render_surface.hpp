@@ -27,8 +27,8 @@ class render_surface : public Gtk::GL::DrawingArea
  	float last_mouseclick_y;
  	
  public:
-	render_surface();
-	display_kernel core;
+	render_surface( display_kernel& _core, bool activestereo = false);
+	display_kernel& core;
 	
 	// Signal fired by button down + button up
 	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
@@ -74,6 +74,7 @@ class basic_app : public SigC::Object
 	Gtk::Image fs_img;
 	Gtk::Toolbar tb;
 	Gtk::VBox frame;
+	display_kernel _core;
 	
  private:
 	void on_fullscreen_clicked();
