@@ -68,10 +68,9 @@ LRESULT CALLBACK
 render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	render_surface* This = widgets[hwnd];
-	if (This == 0) {
+	if (This == 0)
 		return DefWindowProc( hwnd, uMsg, wParam, lParam);
-	}
-	assert( This != 0);
+
 	switch (uMsg) {
 		// Handle the cases for the kinds of messages that we are listening for.
 		case WM_DESTROY:
@@ -347,14 +346,15 @@ LRESULT CALLBACK
 basic_app::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	basic_app* This = windows[hwnd];
-	if (This == 0) {
+	if (This == 0)
 		return DefWindowProc( hwnd, uMsg, wParam, lParam);
-	}
 
 	switch (uMsg) {
 		case WM_COMMAND:
 			// A Command from a particular button.
 			return This->on_command( wParam, lParam);
+		case WM_GETMINMAXINFO:
+			return This->on_getminmaxinfo( wParam, lParam);
 		case WM_SIZE:
 			return This->on_size( wParam, lParam);
 		// case WM_CREATE:
@@ -509,6 +509,15 @@ basic_app::on_command( WPARAM wParam, LPARAM lParam)
 	return 0;	
 };
 
+LRESULT 
+basic_app::on_getminmaxinfo( WPARAM, LPARAM lParam)
+{
+	MINMAXINFO* info = (MINMAXINFO*)lParam;
+	info->ptMinTrackSize = { 96, 64 };
+	return 0;
+}
+
+
 void
 basic_app::register_win32_class()
 {
@@ -516,15 +525,7 @@ basic_app::register_win32_class()
 	if (done)
 		return;
 	else {
-#if 0
-		INITCOMMONCONTROLSEX comctl_init = {
-			sizeof (INITCOMMONCONTROLSEX),
-			ICC_BAR_CLASSES
-		};
-		InitCommonControlsEx( &comctl_init);
-#else
 		InitCommonControls();
-#endif
 		
 		// Regsiter the top-level window class.
 		std::memset( &win32_class, 0, sizeof(win32_class));

@@ -97,6 +97,7 @@ class basic_app
 	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_create( WPARAM, LPARAM);
 	LRESULT on_command( WPARAM, LPARAM);
+	LRESULT on_getminmaxinfo( WPARAM, LPARAM);
 	
 	std::string title;
 	
