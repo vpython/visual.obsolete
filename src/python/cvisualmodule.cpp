@@ -63,6 +63,9 @@ BOOST_PYTHON_MODULE( cvisual)
 	// Force the use of Numeric.ArrayType for Boost's array backend.
 	numeric::array::set_module_and_type( "Numeric", "ArrayType");
 	
+	// Initialize the Python thread system.
+	PyEval_InitThreads();
+	
 	// A subset of the python standard exceptions may be thrown from visual
 	register_exception_translator<std::out_of_range>( 
 		&translate_std_out_of_range);
