@@ -17,7 +17,7 @@ write_critical(
 	std::string function, 
 	std::string message)
 {
-	std::cerr << "VPython ***CRITICAL ERROR***: " << file << ": " << line << ": " 
+	std::cerr << "VPython ***CRITICAL ERROR***: " << file << ":" << line << ": " 
 	<< function << ": " << message << "\n";
 	return;
 }
@@ -29,7 +29,7 @@ write_warning(
 	std::string function, 
 	std::string message)
 {
-	std::cerr << "VPython WARNING: " << file << ": " << line << ": " 
+	std::cerr << "VPython WARNING: " << file << ":" << line << ": " 
 	<< function << ": " << message << "\n";
 	return;
 }
