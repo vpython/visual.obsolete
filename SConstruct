@@ -208,7 +208,9 @@ cvisual = PythonPlugin( env=py,
 		'src/python/faces.cpp',
 		'src/python/convex.cpp',
 		'src/python/cvisualmodule.cpp',
-		'src/python/wrap_arrayobjects.cpp' ] )
+		'src/python/wrap_arrayobjects.cpp',
+		'src/python/scalar_array.cpp',
+		'src/python/vector_array.cpp' ])
 
 # Establish the default target.
 Default(cvisual)
