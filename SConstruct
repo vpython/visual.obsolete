@@ -1,6 +1,34 @@
 import os
 import sys
 
+################################################################################
+# A set of helper functions that are used later on for various tasks.
+
+def AddDebugFlags(env):
+	if ARGUMENTS.has_key("with-debug"):
+		if ARGUMENTS['with-debug'] == "none":
+			env.Append( DEFINES='NDEBUG', CCFLAGS='-O2')
+		elif ARGUMENTS['with-debug'] == "standard":
+			env.Append( CCFLAGS=['-O2', '-malign-double'])
+		elif ARGUMENTS['with-debug'] == "full":
+			env.Append( CCFLAGS='-g', DEFINES="_GLIBCXX_DEBUG")
+	elif release:
+		env.Append( CCFLAGS=['-O2', '-g0', '-malign-double'])
+	else:
+		env.Append( CCFLAGS=['-O0', '-g'])
+
+def AddThreadingFlags(env):
+	env.Append( LIBS='boost_thread')
+	if sys.platform == 'win32' and env['CC'] == 'gcc':
+		env.Append( CCFLAGS='-mthreads')
+	else:
+		env.Append( CCFLAGS='-pthread')
+
+################################################################################
+
+# When packaging a release, set this value to true.
+release = 1
+
 SetOption( "implicit_cache", 1)
 EnsurePythonVersion( 2, 2)
 
@@ -17,27 +45,25 @@ EnsurePythonVersion( 2, 2)
 # The prefix.
 
 # Build a configuration header file.
-
-core = Environment( CCFLAGS=['-pipe', '-g'],
+base = Environment( CCFLAGS=['-pipe'],
+	LINKFLAGS=['-Wl,--warn-once'],
 	ENV = os.environ,
 	CPPPATH='include')
-
-# Workaround brain-dead behavior in FTGL's header file layout
-if sys.platform.find('linux') >= 0:
-	core.Append( CPPPATH=['/usr/include/FTGL'])
-
+# Add flags for debugging symbols and optimization.
+AddDebugFlags( base)
+# Crank up the warnings
 # Crank up the warnings.  Note that I am disabling the warning WRT use of long long,
 # since it really is needed in src/gtk2/rate.cpp.
-core.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
+base.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 	'-std=c++98', '-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS',
 	'-pedantic', '-Wno-long-long'] )
 
+core = base.Copy()
+# Workaround brain-dead behavior in FTGL's header file layout
+if sys.platform.find('linux') >= 0:
+	core.Append( CPPPATH=['/usr/include/FTGL'])
 # Add compiler flags for threading support.
-core.Append( LIBS='boost_thread')
-if sys.platform == 'win32':
-	core.Append( CCFLAGS='-mthreads')
-else:
-	core.Append( CCFLAGS='-pthread')
+AddThreadingFlags( core)
 
 core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2')
 core.Append( LIBS='gle')
@@ -68,7 +94,6 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/primitive.cpp",
 	"src/core/rectangular.cpp",
 	"src/core/sphere.cpp",
-#	"src/core/pmap_sphere.cpp",
 	"src/core/frame.cpp",
 	"src/core/label.cpp",
 	"src/core/curve.cpp",
@@ -82,8 +107,7 @@ if sys.platform == 'win32':
 	srcs.append( 'src/win32/font.cpp')
 	# TODO: Write a file_texture.cpp implementation for Windows,
 	
-	core.Append( LIBS=['vpython-core', 'opengl32', 'gdi32', 'glu32', 
-		'comctl32', 'crypt32'])
+	core.Append( LIBS=['opengl32', 'gdi32', 'glu32', 'comctl32', 'crypt32'])
 	core.Append( CPPPATH='include/win32')
 	libname = 'bin/vpython-core'
 else:
@@ -97,27 +121,33 @@ else:
 	
 	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl '
 		+ 'fontconfig gthread-2.0')
-	core.Append( LIBS=["GL", "GLU"])
+	core.Append( LIBS=["GL", "GLU"], LINKFLAGS="-Wl,--no-undefined")
 	core.Append( CPPPATH='include/gtk2')
 	libname='lib/vpython-core'
 
+# Build libvpython-core.dylib
+if sys.platform == 'darwin':
+	core.SharedLibrary(
+		target=target,
+		source=source,
+		SHLIBSUFFIX = '.dylib',
+		SHLINKFLAGS = '$LINKFLAGS -dynamic' )
 # Build libvpython-core.{so,dll}
-vpython_core = core.SharedLibrary( 
-	target = libname, 
-	source = srcs )
+else:
+	core.SharedLibrary( 
+		target = libname,
+		source = srcs )
 
 
 ################################################################################
 # Build the test programs.
 tests = core.Copy()
-# TODO: Find out why ParseConfig doesn't honor PKG_CONFIG_PATH.
-tests['ENV']['PKG_CONFIG_PATH'] = './lib/pkgconfig/'
-# tests.ParseConfig( 'pkg-config --cflags --libs vpython-3.0')
-tests.Append( LIBPATH='lib', LIBS=['vpython-core'] )
+tests.Append( LIBS=['vpython-core'] )
 if sys.platform == 'win32':
-	tests.Append( LINKFLAGS='-mwindows')
+	tests.Append( LINKFLAGS='-mwindows', LIBPATH='bin')
 	main = 'src/win32/winmain.cpp'
 else:
+	tests.Append( LIBPATH='lib')
 	main = 'src/gtk2/main.cpp'
 
 def Test( name):
@@ -151,17 +181,22 @@ tests.Replace( LINKFLAGS="")
 Test('object_zsort_bench')
 Test('model_zsort_bench')
 Test('sincos_matrix_bench')
+base.Program( target='bin/sleep_test', source='src/test/sleep_test.cpp')
 
 ################################################################################
 # Build the extension module.
+from vpython_config_helpers import PythonPlugin, SetupPythonConfVars
+
 py = core.Copy()
+SetupPythonConfVars(py)
 py.Append( CPPPATH='/usr/include/python2.3', 
-	LIBS=['boost_python', 'vpython-core'],
+	LIBS=['vpython-core'],
 	LIBPATH='lib',
 	# Boost.Python's headers produce prodigious amounts of warnings WRT unused
 	#   parameters.
 	CPPFLAGS='-Wno-unused')
-py.SharedLibrary( 
+
+cvisual = PythonPlugin( env=py,
 	target='site-packages/cvisual',
 	source=['src/python/wrap_display_kernel.cpp',
 		'src/python/wrap_vector.cpp',
@@ -173,5 +208,7 @@ py.SharedLibrary(
 		'src/python/faces.cpp',
 		'src/python/convex.cpp',
 		'src/python/cvisualmodule.cpp',
-		'src/python/wrap_arrayobjects.cpp' ],
-	SHLIBPREFIX="" )
+		'src/python/wrap_arrayobjects.cpp' ] )
+
+# Establish the default target.
+Default(cvisual)
