@@ -83,12 +83,6 @@ class extent
 	 * @return a scalar.  If the scene is a point, this returns 1.0. */
 	double widest_offset( const vector& forward, const vector& center) const;
 	
-	/** Determine the magnitude of the size of the world. 
-		@return the length along the three-axis diagonal of the bounding box, in
-			world space.
-	*/
-	double scale() const;
-	
 	/** Determines the range that the axes need to be to include the bounding
 	 * box.
 	 */
