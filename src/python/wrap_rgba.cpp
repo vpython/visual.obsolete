@@ -7,7 +7,6 @@
 #include "util/lighting.hpp"
 
 #include <boost/python/to_python_converter.hpp>
-#include <boost/python/implicit.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/proxy.hpp>
