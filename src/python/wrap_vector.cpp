@@ -296,6 +296,12 @@ vector_as_tuple( const vector& v)
 	return py::make_tuple( v.x, v.y, v.z);
 }
 
+vector
+vector_pos( const vector& v)
+{
+	return v;
+}
+
 
 void
 wrap_vector()
@@ -338,8 +344,8 @@ wrap_vector()
 		.add_property( "y", &vector::get_y, &vector::set_y)
 		.add_property( "z", &vector::get_z, &vector::set_z)
 		// Member functions masquerading as properties.
-		.add_property( "mag", &vector::mag)
-		.add_property( "mag2", &vector::mag2)
+		.add_property( "mag", &vector::mag, &vector::set_mag)
+		.add_property( "mag2", &vector::mag2, &vector::set_mag2)
 		// Member functions
 		.def( "dot", &vector::dot, "The dot product of this vector and another.")
 		.def( "cross", &vector::cross, "The cross product of this vector and another.")
@@ -353,7 +359,8 @@ wrap_vector()
 		.def( "rotate", &vector::rotate, vector_rotate( "Rotate this vector about "
 			"the specified axis through the specified angle, in radians", 
 			args( "angle", "axis")))
-		.def( "abs", &vector::fabs, "Return the absolute value of this vector.")
+		.def( "__abs__", &vector::mag, "Return the magnitude of this vector.")
+		.def( "__pos__", vector_pos, "Return an unmodified copy of this vector.")
 		// Some support for the sequence protocol.
 		.def( "__len__", &vector::py_len)
 		.def( "__getitem__", &vector::py_getitem)

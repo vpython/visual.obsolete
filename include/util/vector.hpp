@@ -102,7 +102,7 @@ public:
 	inline double 
 	mag( void) const throw()
 	{ return std::sqrt( x*x + y*y + z*z); }
-	
+		
 	// This is a magnitude algorithm that is intended to be stable at values
 	// greater than 1e154 (or so).  It is much slower since it uses sin, cos,
 	// and atan to get the result.
@@ -118,6 +118,13 @@ public:
 	vector
 	norm( void) const throw();
     
+	inline void
+	set_mag( double m) throw()
+	{ *this = norm()*m; }
+	
+	inline void
+	set_mag2( double m2) throw()
+	{ *this = norm()*std::sqrt(m2); }
 	// Pythonic function to provide a "representation" of this object.
 	// object.__repr__() should return a string that, were it executed as python
 	// code, should regenerate the object.
@@ -207,6 +214,8 @@ public:
 				return y;
 			case 2:
 				return z;
+			default:
+				assert( true == false);
 		}
 	}
 	
