@@ -21,11 +21,11 @@ class convex : public renderable
  private:
 	array pos;
 	// The actual amount of storage allocated in the array.
-	int preallocated_size;
+	size_t preallocated_size;
 	// The number of elements actually used in the array.
-	int count;
+	size_t count;
 	// Optionally grows the pos array to the required size.
-	void set_length( int);
+	void set_length( size_t);
 	
 	struct face : triangle
 	{

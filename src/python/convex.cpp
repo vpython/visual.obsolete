@@ -38,6 +38,7 @@ convex::checksum() const
 		checksum( ret, pos_i);
 		checksum( ret, pos_i+1);
 		checksum( ret, pos_i+2);
+		++pos_i;
 	}
 	return ret;
 }
@@ -59,7 +60,7 @@ convex::recalc()
 	// The reverse face from the first, third, and second vectors.
 	hull.push_back( face( vector(pos_i), vector(pos_i+3*2), vector(pos_i+3)));
 	// The remainder of the possible faces.
-	for (int i = 3; i < count; ++i) {
+	for (size_t i = 3; i < count; ++i) {
 		add_point( i, vector(pos_i + i*3));
 	}
 
@@ -199,7 +200,7 @@ convex::get_color()
 }
 
 void
-convex::set_length( int length)
+convex::set_length( size_t length)
 {
 	size_t npoints = count;
 	if (npoints > length) // A shrink operation - never done by VPython.
