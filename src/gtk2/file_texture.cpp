@@ -7,6 +7,7 @@
 #include "util/errors.hpp"
 
 #include <iostream>
+#include <boost/lexical_cast.hpp>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
@@ -64,6 +65,7 @@ file_texture::gl_init()
 {
 	glEnable( GL_TEXTURE_2D);
 	glGenTextures(1, &handle);
+	VPYTHON_NOTE( "Allocated texture number " + boost::lexical_cast<std::string>(handle));
 	glBindTexture(GL_TEXTURE_2D, handle);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
