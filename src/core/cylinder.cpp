@@ -54,6 +54,20 @@ cylinder::set_radius( double r)
 }
 
 void 
+cylinder::gl_pick_render( const view& scene)
+{
+	size_t lod = 2;
+	gl_matrix_stackguard guard;
+	vector view_pos = pos * scene.gcf;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);
+	model_world_transform().gl_mult();
+	const double radial_scale = radius * scene.gcf;
+	const double axial_scale = axis.mag() * scene.gcf;
+	glScaled( axial_scale, radial_scale, radial_scale);
+	cylinder_simple_model[lod].gl_render();
+}
+
+void 
 cylinder::gl_render( const view& scene)
 {
 	clear_gl_error();
@@ -85,7 +99,8 @@ cylinder::gl_render( const view& scene)
 	}
 	
 	gl_matrix_stackguard guard;
-	glTranslated( pos.x, pos.y, pos.z);
+	vector view_pos = pos * scene.gcf;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);
 	model_world_transform().gl_mult();
 	const double radial_scale = radius * scene.gcf;
 	const double axial_scale = axis.mag() * scene.gcf;
