@@ -104,7 +104,8 @@ class display : public display_kernel,
 };
 
 // A singlton.  This class provides all of the abstraction from the Gtk::Main
-// object.
+// object, in addition to providing asynchronous communication channels between
+// threads.
 class gui_main : public SigC::Object
 {
  private:
@@ -119,20 +120,26 @@ class gui_main : public SigC::Object
 	Glib::Dispatcher signal_shutdown;
 	void shutdown_impl();
 	
-	// Static storage initialized by the caller (itself) to be called with
-	// the appropriate functions to add itself.
+	// Storage used for communication, initialized by the caller, filled by the
+	// callee.  Some of them are marked volitile to inhibit optimizations that
+	// could prevent a read operation from observing the change in state.
 	mutex call_lock;
 	condition call_complete;
 	display* caller;
-	bool returned;
-	bool waiting_allclosed;
-	bool thread_exited;
+	volatile bool returned;
+	volatile bool waiting_allclosed;
+	volatile bool thread_exited;
 	
 	std::list<display*> displays;
 	
+	// Componants of the startup sequence.
 	gui_main();
 	void run();
-	static gui_main* self;
+	static gui_main* self; //< Always initialized by the thread after it starts
+	// up.
+	// init_{signal,lock} are always initialized by the Python thread.
+	static mutex* init_lock;
+	static condition* init_signal;
 	static void thread_proc(void);
 	static void init_thread(void);
 
@@ -152,6 +159,7 @@ class gui_main : public SigC::Object
 	// Called by a display from within the Gtk loop when closed by the user.
 	static void report_window_delete( display*);
 	static void quit();
+	// This signal is invoked when the gui thread exits on shutdown.
 	// wrap_display_kernel() connects a signal handler that forces Python to
 	// exit upon shutdown of the render loop.
 	static SigC::Signal0<void> on_shutdown;

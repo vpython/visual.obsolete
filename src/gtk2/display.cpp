@@ -3,6 +3,9 @@
 #include "util/errors.hpp"
 
 #include <boost/thread/thread.hpp>
+#include <boost/lexical_cast.hpp>
+using boost::lexical_cast;
+
 #include <gtkmm/gl/init.h>
 #include <gdkmm/pixbuf.h>
 #include <gtkmm/stock.h>
@@ -491,6 +494,8 @@ display::on_key_pressed( GdkEventKey* key)
 
 ////////////////////////////////// gui_main implementation ////////////////////
 gui_main* gui_main::self = 0;
+mutex* gui_main::init_lock = 0;
+condition* gui_main::init_signal = 0;
 
 
 gui_main::gui_main()
@@ -521,7 +526,14 @@ gui_main::run()
 void 
 gui_main::thread_proc(void)
 {
-	self = new gui_main();
+	assert( init_lock);
+	assert( init_signal);
+	assert( !self);
+	{
+		lock L(*init_lock);
+		self = new gui_main();
+		init_signal->notify_all();
+	}
 	self->run();
 	VPYTHON_NOTE( "Terminating GUI thread.");
 	gui_main::on_shutdown();
@@ -530,15 +542,19 @@ gui_main::thread_proc(void)
 void
 gui_main::init_thread(void)
 {
-	if (!self) {
+	if (!init_lock) {
+		init_lock = new mutex;
+		init_signal = new condition;
 		VPYTHON_NOTE( "Starting GUI thread.");
+		lock L(*init_lock);
 		thread gtk( &gui_main::thread_proc);
-		while (!self) {
-		}
+		while (!self)
+			init_signal->wait(L);
 	}
 }
 
-// TODO: This may not be safe.
+// TODO: This may not be safe.  In fact, it might be easier to get notification
+// of shutdown via a truly joinable GUI thread.
 bool
 gui_main::allclosed()
 {
@@ -568,7 +584,8 @@ gui_main::add_display( display* d)
 {
 	init_thread();
 	lock L(self->call_lock);
-	VPYTHON_NOTE( "Adding new display object.");
+	VPYTHON_NOTE( std::string("Adding new display object at address ") 
+		+ lexical_cast<std::string>(d));
 	self->caller = d;
 	self->returned = false;
 	self->signal_add_display();
@@ -591,6 +608,9 @@ void
 gui_main::remove_display( display* d)
 {
 	assert( self);
+	VPYTHON_NOTE( std::string("Removing existing display object at address ") 
+		+ lexical_cast<std::string>(d));
+	
 	lock L(self->call_lock);
 	self->caller = d;
 	self->returned = false;
