@@ -19,6 +19,7 @@
  
 namespace cvisual {
 
+// The function that is passed to Python to break out of an infinate loop.
 static int
 py_quit( void*)
 {
@@ -26,6 +27,8 @@ py_quit( void*)
 	return 0;
 }
 
+// The callback function that is invoked from the display class when 
+// shutting-down.
 static void
 force_py_exit(void)
 {
@@ -66,22 +69,113 @@ struct lights_to_py_list
 	}
 };
 
+// The purpose of this class is to expose the signal-handling methods to Python.
+class py_display_kernel : public display_kernel, public SigC::Object
+{
+ private:
+	py::object gl_begin_cb;
+	py::object gl_end_cb;
+	py::object gl_swap_buffers_cb;
+
+	void on_gl_begin()
+	{
+		if (gl_begin_cb.ptr() == Py_None) {
+			PySys_WriteStderr( "***VPython CRITICAL ERROR***: "
+				"No callback function registered for call to gl_begin().");
+			return;
+		}
+		gl_begin_cb();
+	}
+
+	void on_gl_end()
+	{
+		if (gl_end_cb.ptr() == Py_None) {
+			PySys_WriteStderr( "***VPython CRITICAL ERROR***: "
+				"No callback function registered for call to gl_end().");
+			return;
+		}
+		gl_end_cb();
+	}
+	void on_gl_swap_buffers()
+	{
+		if (gl_swap_buffers_cb.ptr() == Py_None) {
+			PySys_WriteStderr( "***VPython CRITICAL ERROR***: "
+				"No callback function registered for call to gl_swap_buffers().");
+			return;
+		}
+		gl_swap_buffers_cb();
+	}
+
+	void verify_callable( py::object obj)
+	{
+		if (!PyCallable_Check( obj.ptr())) {
+			PyErr_SetString( PyExc_TypeError, "Did not pass a callable object.");
+			py::throw_error_already_set();
+		}
+	}
+
+ public:
+	py_display_kernel() 
+		: display_kernel() 
+	{
+		gl_begin.connect( 
+			SigC::slot( *this, &py_display_kernel::on_gl_begin));
+		gl_end.connect( 
+			SigC::slot( *this, &py_display_kernel::on_gl_end));
+		gl_swap_buffers.connect( 
+			SigC::slot( *this, &py_display_kernel::on_gl_swap_buffers));
+	}
+	
+	void set_gl_begin_cb( py::object obj)
+	{
+		verify_callable( obj);
+		gl_begin_cb = obj;
+	}
+	
+	void set_gl_end_cb( py::object obj)
+	{
+		verify_callable( obj);
+		gl_end_cb = obj;
+	}
+	
+	void set_gl_swap_buffers_cb( py::object obj)
+	{
+		verify_callable( obj);
+		gl_swap_buffers_cb = obj;
+	}
+	
+	void report_mouse_motion( float dx, float dy, std::string button)
+	{
+		if (button.empty())
+			return;
+		switch (button.at(0)) {
+			case 'l':
+				display_kernel::report_mouse_motion( dx, dy, display_kernel::LEFT);
+				break;
+			case 'r':
+				display_kernel::report_mouse_motion( dx, dy, display_kernel::LEFT);
+				break;
+			case 'm':
+				display_kernel::report_mouse_motion( dx, dy, display_kernel::LEFT);
+				break;
+		}
+	}
+};
+
 namespace {
 using namespace boost::python;
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( pick_overloads, display_kernel::pick, 
 	2, 3)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( mousebase_project_partial_overloads, 
 	mousebase::project2, 1, 2)
-
-}
+} // !namespace (unnamed)
 
 void
 wrap_display_kernel(void)
 {
-	// TODO: Wrap around SigC::Signal0<void>  The final design will likely
-	// expose this base class, and a special base class that exports the extra
-	// functions needed for creating a new type in Python.
-	py::class_<display_kernel, boost::noncopyable>( "display_kernel")
+	using boost::noncopyable;
+
+	py::class_<display_kernel, noncopyable>( "_display_kernel", no_init)
 		// Functions for the internal use of renderable and light classes.
 		.def( "add_renderable", &display_kernel::add_renderable)
 		.def( "remove_renderable", &display_kernel::remove_renderable)
@@ -89,12 +183,6 @@ wrap_display_kernel(void)
 		.def( "add_light", &display_kernel::add_light)
 		.def( "remove_light", &display_kernel::remove_light)
 		.add_property( "lights", &display_kernel::get_lights)
-		// Functions for extending this type in Python.
-		.def( "render_scene", &display_kernel::render_scene)
-		.def( "report_realise", &display_kernel::report_realize)
-		.def( "report_resize", &display_kernel::report_resize, py::args( "width", "height"))
-		// .def( "report_mouse_motion", &display_kernel::report_mouse_motion)
-		.def( "pick", &display_kernel::pick, pick_overloads( py::args( "x", "y", "pixels")))
 		.add_property( "ambient", &display_kernel::get_ambient, 
 			&display_kernel::set_ambient)
 		.add_property( "up",
@@ -124,21 +212,38 @@ wrap_display_kernel(void)
 			&display_kernel::set_autocenter)
 		.add_property( "stereo", &display_kernel::get_stereomode,
 			&display_kernel::set_stereomode)
-		.add_property( "show_renderspeed", &display_kernel::is_showing_renderspeed,
+		.add_property( "show_renderspeed", 
+			&display_kernel::is_showing_renderspeed,
 			&display_kernel::set_show_renderspeed)
 		.add_property( "renderspeed", &display_kernel::get_renderspeed) 
-		.def( "set_range", &display_kernel::set_range_d)
-		.def( "set_range", &display_kernel::set_range)
-		.def( "get_range", &display_kernel::get_range)
+		.def( "_set_range", &display_kernel::set_range_d)
+		.def( "_set_range", &display_kernel::set_range)
+		.def( "_get_range", &display_kernel::get_range)
+		;
+		
+	class_<py_display_kernel, bases<display_kernel>, noncopyable>
+			( "display_kernel")
+		.def( "set_gl_begin_cb", &py_display_kernel::set_gl_begin_cb)
+		.def( "set_gl_end_cb", &py_display_kernel::set_gl_end_cb)
+		.def( "set_gl_swap_buffers_cb", 
+			&py_display_kernel::set_gl_swap_buffers_cb)
+		// Functions for extending this type in Python.
+		.def( "render_scene", &display_kernel::render_scene)
+		.def( "report_realise", &display_kernel::report_realize)
+		.def( "report_resize", &display_kernel::report_resize, 
+			py::args( "width", "height"))
+		.def( "report_mouse_motion", &py_display_kernel::report_mouse_motion)
+		.def( "pick", &display_kernel::pick, pick_overloads( 
+			py::args( "x", "y", "pixels")))
 		;
 	
 	typedef atomic_queue<std::string> kb_object;
-	py::class_< kb_object, boost::noncopyable>( "kb_object", no_init)
+	py::class_< kb_object, noncopyable>( "kb_object", no_init)
 		.def( "getkey", &kb_object::pop, "Returns the next key press value.")
 		.add_property( "keys", &kb_object::size) 
 		;
 	
-	py::class_<display, bases<display_kernel>, boost::noncopyable>( "display")
+	py::class_<display, bases<display_kernel>, noncopyable>( "display")
 		.add_property( "x", &display::get_x, &display::set_x)
 		.add_property( "y", &display::get_y, &display::set_y)
 		.add_property( "width", &display::get_width, &display::set_width)
@@ -163,7 +268,8 @@ wrap_display_kernel(void)
 		std::list<shared_ptr<light> >,
 		lights_to_py_list>();
 		
-	// Free functions for exiting the system.  These are undocumented at the moment.
+	// Free functions for exiting the system.  
+	// These are undocumented at the moment, and are only used internally.
 	def( "shutdown", gui_main::shutdown, 
 		"Close all Displays and shutdown visual.");
 	def( "allclosed", gui_main::allclosed, 
@@ -203,13 +309,14 @@ wrap_display_kernel(void)
 		.add_property( "alt", &mousebase::is_alt)
 		.add_property( "ctrl", &mousebase::is_ctrl)
 		;
-		
-	class_< event, boost::shared_ptr<event>, bases<mousebase>, boost::noncopyable>( "click_object"
-		, "This class provides access to a specific mouse event.", no_init)
+	
+	
+	class_< event, boost::shared_ptr<event>, bases<mousebase>, noncopyable>
+		( "click_object", "An event generated from mouse actions.", no_init)
 		;
 	
-	class_< mouse, boost::shared_ptr<mouse>, bases<mousebase>, boost::noncopyable>( "mouse_object"
-		, "This class provides access to the mouse.", no_init)
+	class_< mouse, boost::shared_ptr<mouse>, bases<mousebase>, noncopyable>
+		( "mouse_object", "This class provides access to the mouse.", no_init)
 		.def( "getclick", &mouse::pop_click)
 		.add_property( "clicked", &mouse::num_clicks)
 		.def( "getevent", &mouse::pop_event)
