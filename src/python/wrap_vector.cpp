@@ -17,10 +17,11 @@
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/extract.hpp>
-#include "num_util.h"
+#include "python/num_util.hpp"
 
 namespace cvisual {
 namespace py = boost::python;
+using namespace cvisual::python;
 
 using py::numeric::array;
 using py::object;
