@@ -27,7 +27,7 @@ def AddThreadingFlags(env):
 ################################################################################
 
 # When packaging a release, set this value to true.
-release = 1
+release = False
 
 SetOption( "implicit_cache", 1)
 EnsurePythonVersion( 2, 2)
