@@ -400,6 +400,8 @@ wrap_vector()
 		.add_property( "x", &shared_vector::get_x, &shared_vector::set_x)
 		.add_property( "y", &shared_vector::get_y, &shared_vector::set_y)
 		.add_property( "z", &shared_vector::get_z, &shared_vector::set_z)
+		.add_property( "mag", &shared_vector::mag, &shared_vector::py_scale)
+		.add_property( "mag2", &shared_vector::mag2, &shared_vector::py_scale2)
 		;
 
 	// Allow automagic conversions from shared_vector to vector.

@@ -293,4 +293,19 @@ shared_vector::py_setitem(int index, double value)
 	vector::py_setitem(index, value);
 }
 
+void
+shared_vector::py_scale( double s)
+{
+	lock L(owner);
+	vector::set_mag(s);
+}
+
+void
+shared_vector::py_scale2( double s)
+{
+	lock L(owner);
+	vector::set_mag2(s);
+}
+
+
 } // !namespace cvisual

@@ -394,6 +394,8 @@ class shared_vector : public vector
 	
 	void py_setitem(int i, double value);
 
+	void py_scale( double);
+	void py_scale2( double);
 }; // !class shared_vector
 
 } // !namespace cvisual
