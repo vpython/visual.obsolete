@@ -92,6 +92,10 @@ class extent
 		frame::grow_extent() 
 	*/
 	double scale( const vector& scale) const;
+	
+	/** Print the state of the extent out to stderr.  Only useful for internal debuggin.
+	 */
+	void dump_extent() const;
 };
 
 } // !namespace cvisual

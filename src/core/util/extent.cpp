@@ -5,6 +5,7 @@
 
 #include "util/extent.hpp"
 #include <algorithm>
+#include <iostream>
 
 #ifdef __GNUC__
 #define EXPECT(boolean_expression, boolean_constant) \
@@ -208,6 +209,12 @@ size_t
 extent::get_select_buffer_depth()
 {
 	return buffer_depth;
+}
+
+void
+extent::dump_extent() const
+{
+	std::cerr << " extent.mins: " << mins << " extent.maxs: " << maxs;
 }
 
 } // !namespace cvisual
