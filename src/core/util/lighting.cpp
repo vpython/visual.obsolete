@@ -196,10 +196,11 @@ light::gl_begin( GLenum id, double gcf) const
 		glLightf( id, GL_SPOT_CUTOFF, spot_cutoff);
 		glLightf( id, GL_SPOT_EXPONENT, spot_exponent);
 		if (spot_cutoff != 180) {
+			vector _spot_direction = spot_direction.norm();
 			float spot_dir[] = { 
-				spot_direction.x * gcf,
-				spot_direction.y * gcf,
-				spot_direction.z * gcf,
+				_spot_direction.x * gcf,
+				_spot_direction.y * gcf,
+				_spot_direction.z * gcf,
 				1.0f
 			};
 			glLightfv( id, GL_SPOT_DIRECTION, spot_dir);
