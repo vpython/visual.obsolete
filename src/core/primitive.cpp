@@ -24,17 +24,6 @@ primitive::model_world_transform() const
 	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
 		// Then axis and up are in (nearly) the same direction: therefore,
 		// try two other possible directions for the up vector.
-		// But first, display an error message telling you of your mistake.
-		std::ostringstream msg;
-		msg << "axis and up are colinear for displayobject of type `";
-		// Temporary variable to store the status code of the demangling routine.
-		int status = 0;
-		char* realname = abi::__cxa_demangle( this->get_typeid().name(), NULL, NULL, &status);
-		msg << realname;
-		free(realname);
-		msg << "` at position " << pos << ".";
-		VPYTHON_WARNING(msg.str());
-		
 		if (std::fabs(axis.norm().dot( vector(-1,0,0))) > 0.98)
 			z_axis = axis.cross( vector(0,0,1)).norm();
 		else
