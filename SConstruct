@@ -76,8 +76,9 @@ else:
 	srcs.append( 'src/gtk2/file_texture.cpp')
 	srcs.append( 'src/gtk2/timer.cpp')
 	srcs.append( 'src/gtk2/random_device.cpp')
+	srcs.append( 'src/gtk2/display.cpp')
 	
-	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl fontconfig')
+	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl fontconfig gthread-2.0')
 	core.Append( LIBS=["GL", "GLU"])
 	core.Append( CPPPATH='include/gtk2')
 	libname='lib/vpython-core'
@@ -123,6 +124,7 @@ Test('selection_test')
 Test('curve_test')
 Test('label_test')
 Test('convex_test')
+Test('bounce_test')
 if sys.platform != 'win32':
 	Test('gtk_style_test')
 	
