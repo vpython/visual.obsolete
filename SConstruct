@@ -41,6 +41,7 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/util/clipping_plane.cpp",
 	"src/core/util/tmatrix.cpp",
 	"src/core/util/checksum.cpp",
+	"src/core/util/gl_free.cpp",
 	"src/core/axial.cpp",
 	"src/core/box.cpp",
 	"src/core/cone.cpp",
@@ -67,7 +68,8 @@ if sys.platform == 'win32':
 	srcs.append( 'src/win32/font.cpp')
 	# TODO: Write a file_texture.cpp implementation for Windows,
 	
-	core.Append( LIBS=['vpython-core', 'opengl32', 'gdi32', 'glu32', 'comctl32', 'crypt32'])
+	core.Append( LIBS=['vpython-core', 'opengl32', 'gdi32', 'glu32', 
+		'comctl32', 'crypt32'])
 	core.Append( CPPPATH='include/win32')
 	libname = 'bin/vpython-core'
 else:
@@ -78,7 +80,8 @@ else:
 	srcs.append( 'src/gtk2/random_device.cpp')
 	srcs.append( 'src/gtk2/display.cpp')
 	
-	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl fontconfig gthread-2.0')
+	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl '
+		+ 'fontconfig gthread-2.0')
 	core.Append( LIBS=["GL", "GLU"])
 	core.Append( CPPPATH='include/gtk2')
 	libname='lib/vpython-core'
@@ -136,7 +139,8 @@ Test('sincos_matrix_bench')
 ################################################################################
 # Build the extension module.
 py = core.Copy()
-py.Append( CPPPATH='/usr/include/python2.3', LIBS='boost_python', CPPFLAGS='-Wno-unused')
+py.Append( CPPPATH='/usr/include/python2.3', LIBS='boost_python', 
+	CPPFLAGS='-Wno-unused')
 py.SharedLibrary( target='lib/cvisualmodule',
 	source=['src/python/wrap_display_kernel.cpp',
 		'src/python/wrap_vector.cpp',
