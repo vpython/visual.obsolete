@@ -55,8 +55,9 @@ if sys.platform == 'win32':
 	srcs.append( 'src/win32/font.cpp')
 	# TODO: Write a file_texture.cpp implementation for Windows,
 	
-	core.Append( LIBS=['opengl32', 'gdi32', 'glu32', 'comctl32', 'crypt32'])
+	core.Append( LIBS=['vpython-core', 'opengl32', 'gdi32', 'glu32', 'comctl32', 'crypt32'])
 	core.Append( CPPPATH='include/win32')
+	libname = 'bin/vpython-core'
 else:
 	srcs.append( 'src/gtk2/render_surface.cpp')
 	srcs.append( 'src/gtk2/font.cpp')
@@ -67,10 +68,11 @@ else:
 	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl fontconfig')
 	core.Append( LIBS=["GL", "GLU"])
 	core.Append( CPPPATH='include/gtk2')
+	libname='lib/vpython-core'
 
 # Options specific to libvpython-core.so
 vpython_core = core.SharedLibrary( 
-	target = 'lib/vpython-core', 
+	target = libname, 
 	source = srcs )
 
 
@@ -80,7 +82,6 @@ tests = core.Copy()
 # TODO: Find out why ParseConfig doesn't honor PKG_CONFIG_PATH.
 tests['ENV']['PKG_CONFIG_PATH'] = './lib/pkgconfig/'
 # tests.ParseConfig( 'pkg-config --cflags --libs vpython-3.0')
-# tests.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0')
 tests.Append( LIBPATH='lib', LIBS=['vpython-core'])
 if sys.platform == 'win32':
 	tests.Append( LDFLAGS='-mwindows')
@@ -94,9 +95,6 @@ def Test( name):
 
 Test('sphere_lod_test')
 Test('arrow_transparent_test')
-Test('object_zsort_bench')
-Test('model_zsort_bench')
-Test('sincos_matrix_bench')
 Test('sphere_texture_test')
 Test('arrow_scaling_test')
 Test('sphere_transparent_test')
@@ -111,6 +109,12 @@ Test('psphere_texture_test')
 Test('selection_test')
 Test('conference_demo')
 Test('curve_test')
+Test('label_test')
 if sys.platform != 'win32':
-	Test('label_test')
 	Test('gtk_style_test')
+	
+main = "src/gtk2/main.cpp"
+Test('object_zsort_bench')
+Test('model_zsort_bench')
+Test('sincos_matrix_bench')
+
