@@ -43,8 +43,8 @@ cylinder::update_cache( const view&)
 	if (first) {
 		first = false;
 		// The number of faces corrisponding to each level of detail.
-		size_t n_faces[] = { 7, 11, 19, 29, 37, 69 };
-		size_t n_stacks[] = {1, 1, 2, 3, 5, 10 };
+		size_t n_faces[] = { 8, 16, 32, 64, 96, 188 };
+		size_t n_stacks[] = {1, 1, 3, 6, 10, 20 };
 		for (size_t i = 0; i < 6; ++i) {
 			cylinder_simple_model[i].gl_compile_begin();
 			render_cylinder_model( n_faces[i], n_stacks[i]);
@@ -83,22 +83,27 @@ cylinder::gl_render( const view& scene)
 	clear_gl_error();
 
 	// See sphere::gl_render() for a description of the level of detail calc.
-	double camera_dist = ((pos - scene.camera) * scene.gcf).mag();
-	double lod_determinant = radius * scene.gcf / camera_dist;
-	size_t lod = 0;
-	if (lod_determinant > .3)
+	double coverage = scene.pixel_coverage( pos, radius);
+	int lod = 0;
+	if (coverage < 0)
 		lod = 5;
-	else if (lod_determinant > .12)
-		lod = 4;
-	else if (lod_determinant > .035)
-		lod = 3;
-	else if (lod_determinant > .02)
-		lod = 2;
-	else if (lod_determinant > .01)
+	else if (coverage < 10)
+		lod = 0;
+	else if (coverage < 25)
 		lod = 1;
-	if (lod >= -scene.lod_adjust)
-		lod += scene.lod_adjust;
-	assert( lod <= 5);
+	else if (coverage < 50)
+		lod = 2;
+	else if (coverage < 196)
+		lod = 3;
+	else if (coverage < 400)
+		lod = 4;
+	else
+		lod = 5;
+	lod += scene.lod_adjust;
+	if (lod < 0)
+		lod = 0;
+	else if (lod > 5)
+		lod = 5;
 	
 	const bool shiny = shininess != 1.0;
 	if (shiny) {

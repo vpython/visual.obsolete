@@ -1,6 +1,22 @@
 #include "renderable.hpp"
 #include <iostream>
 
+double
+view::pixel_coverage( const vector& pos, double radius) const
+{
+	// The distance from the camera to this position, in the direction of the
+	// camera.  This is the distance to the viewing plane that the coverage 
+	// circle lies in.
+	double dist = (pos - camera).dot(forward);
+	// Half of the width of the viewing plane at this distance.
+	double apparent_hwidth = tan_hfov_x * dist;
+	// The fraction of the apparent width covered by the coverage circle.
+	double coverage_fraction = radius / apparent_hwidth;
+	// Convert from fraction to pixels.
+	return coverage_fraction * window_width;
+	
+}
+
 renderable::renderable()
 	: model_damaged(true), z_damaged(true), visible(true)
 {

@@ -15,24 +15,29 @@ class z_comparator;
 */
 struct view
 {
-	// The position of the camera in world space.
+	/// The position of the camera in world space.
 	vector camera;
-	// The direction the camera is pointing - a unit vector.
+	/// The direction the camera is pointing - a unit vector.
 	vector forward;
-	// The center of the scene in world space.
+	/// The center of the scene in world space.
 	vector center;
-	// The width of the window in pixels.
+	/// The width of the window in pixels.
 	float window_width;
-	// The height of the window in pixels.
+	/// The height of the window in pixels.
 	float& window_height;
-	// True if the forward vector changed since the last rending operation.
+	/// True if the forward vector changed since the last rending operation.
 	bool forward_changed;
-	// The Global Scaling Factor
+	/// The Global Scaling Factor
 	double& gcf;
+	/// True if gcf changed since the last render cycle.
 	bool gcf_changed;
+	/// The user adjustment to the level-of-detail.
 	int lod_adjust;
+	/// True in anaglyph stereo rendering modes.
 	bool anaglyph;
+	/// True in coloranaglyph stereo rendering modes.
 	bool coloranaglyph;
+	double tan_hfov_x; ///< The tangent of half the horzontal field of view.
 	
 	inline view( vector& n_forward, vector& n_center, float& n_width, 
 		float& n_height, bool n_forward_changed, double& n_gcf, 
@@ -42,6 +47,11 @@ struct view
 		gcf( n_gcf), gcf_changed( n_gcf_changed), lod_adjust(0)
 	{
 	}
+	
+	// Compute the apparent diameter, in pixels, of a circle that is parallel
+	// to the screen, with a center at pos, and some radius.  If pos is behind
+	// the camera, it will return negative.
+	double pixel_coverage( const vector& pos, double radius) const;
 };
 
 /** Virtual base class for all renderable objects and composites.
@@ -150,5 +160,21 @@ class z_comparator
 	{ return forward.dot( lhs->get_center()) > forward.dot( rhs->get_center()); }
 	
 };
+
+/** A utility function that clamps a value to within a specified range.
+ * @param lower The lower bound for the value.
+ * @param value The value to be clamped.
+ * @param upper The upper bound for the value.
+ * @return value if it is between lower and upper, otherwise one of the bounds.
+ */
+template <typename T>
+T clamp( T const& lower, T const& value, T const& upper)
+{
+	if (lower > value)
+		return lower;
+	if (upper < value)
+		return upper;
+	return value;
+}
 
 #endif // !defined VPYTHON_RENDERABLE_HPP

@@ -70,32 +70,32 @@ sphere::gl_render( const view& geometry)
 	// All of the models are slightly different when shininess is specified.
 	const bool shiny = shininess != 1.0;
 	
-	// The level of detail determinant captures the idea that objects farther
-	// away appear to be smaller in the view.  It is a very rough idea of 
-	// "apparent size" and is used to determine what value of lod should be 
-	// used.  Each of the cutoff values below were determined experimentally
+	// Each of the cutoff values below were determined experimentally
 	// based on looking at the terminator between the most and least illuminated
 	// parts of a set of yellow spheres.  This boundary was the least forgiving
 	// due to the sharp contrast on the curved surface.
-	double camera_dist = ((pos - geometry.camera) * geometry.gcf).mag();
-	double lod_determinant = radius * geometry.gcf / camera_dist;
+	double coverage = geometry.pixel_coverage( pos, radius);
 	int lod = 0;
-	if (lod_determinant > .3)
+	if (coverage < 0) // Behind the camera, but still visible.
 		lod = 5;
-	else if (lod_determinant > .12)
-		lod = 4;
-	else if (lod_determinant > .035)
-		lod = 3;
-	else if (lod_determinant > .02)
-		lod = 2;
-	else if (lod_determinant > .01)
+	else if (coverage < 10)
+		lod = 0;
+	else if (coverage < 20)
 		lod = 1;
+	else if (coverage < 60)
+		lod = 2;
+	else if (coverage < 135)
+		lod = 3;
+	else if (coverage < 300)
+		lod = 4;
+	else
+		lod = 5;
 	lod += geometry.lod_adjust;
 	if (lod > 5)
 		lod = 5;
-	if (lod < 0)
+	else if (lod < 0)
 		lod = 0;
-	
+  
 	// Apply transforms.
 	gl_matrix_stackguard guard;
 	// Position of the body in view space.

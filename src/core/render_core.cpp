@@ -305,6 +305,7 @@ render_core::world_to_view_transform(view& geometry, int whicheye, bool forpick)
 		tan_hfov_x = tan_hfov;
 		tan_hfov_y = tan_hfov_x * aspect_ratio;
 	}
+	geometry.tan_hfov_x = tan_hfov_x;
 	// The scaled distance between the camera and the visual center of the scene.
 	double eye_length = user_scale * world_scale * gcf / tan_hfov;
 	// The position of the camera.

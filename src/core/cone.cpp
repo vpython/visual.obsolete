@@ -81,8 +81,8 @@ cone::update_cache( const view&)
 	if (first) {
 		first = false;
 		// The number of faces corrisponding to each level of detail.
-		size_t n_faces[] = { 7, 11, 19, 29, 37, 69 };
-		size_t n_stacks[] = {1, 1, 2, 3, 5, 10 };
+		size_t n_faces[] = { 8, 16, 32, 46, 68, 90 };
+		size_t n_stacks[] = { 1, 2, 4, 7, 10, 14 };
 		for (size_t i = 0; i < 6; ++i) {
 			cone_simple_model[i].gl_compile_begin();
 			render_cone_model( n_faces[i], n_stacks[i]);
@@ -119,25 +119,28 @@ cone::gl_render( const view& scene)
 		return;
 	clear_gl_error();
 
-	// See sphere::gl_render() for a description of this code.
-	// TODO: Take into account the polygon-pushing power available on the host
-	// system.
-	double camera_dist = ((pos - scene.camera) * scene.gcf).mag();
-	double lod_determinant = radius * scene.gcf / camera_dist;
-	size_t lod = 0;
-	if (lod_determinant > .3)
+	// See sphere::gl_render() for a description of the level of detail calc.
+	double coverage = scene.pixel_coverage( pos, radius);
+	int lod = 0;
+	if (coverage < 0)
 		lod = 5;
-	else if (lod_determinant > .12)
-		lod = 4;
-	else if (lod_determinant > .035)
-		lod = 3;
-	else if (lod_determinant > .02)
-		lod = 2;
-	else if (lod_determinant > .01)
+	else if (coverage < 10)
+		lod = 0;
+	else if (coverage < 30)
 		lod = 1;
-	if (lod >= -scene.lod_adjust)
-		lod += scene.lod_adjust;
-	assert( lod <= 5);
+	else if (coverage < 90)
+		lod = 2;
+	else if (coverage < 250)
+		lod = 3;
+	else if (coverage < 450)
+		lod = 4;
+	else
+		lod = 5;
+	lod += scene.lod_adjust;
+	if (lod < 0)
+		lod = 0;
+	else if (lod > 5)
+		lod = 5;
 	
 	const bool shiny = shininess != 1.0;
 	if (shiny) {

@@ -5,20 +5,6 @@
 #include "util/errors.hpp"
 #include "simple_displayobject.hpp"
 
-namespace {
-template <typename T>
-inline T
-clamp( T const& lower, T const& value, T const& upper)
-{
-	assert( lower < upper);
-	if (value < lower)
-		return lower;
-	if (value > upper)
-		return upper;
-	return value;
-}
-} // !namespace (unnamed)
-
 tmatrix 
 simple_displayobject::model_world_transform() const
 {
