@@ -7,15 +7,12 @@ main( void)
 {
 	basic_app main_window( "Sphere transparency test");
 	
-	shared_ptr<texture> universe = file_texture::create( 
-		"/home/jonathan/Projects/vpython-core2/data/2mass_allskyatlas.gif");
-	// Draw two yellow spheres, one transparent.
-	shared_ptr<sphere> sph( new sphere(4));
+	// Draw two spheres, one translucent.
+	shared_ptr<sphere> sph( new sphere());
 	sph->set_pos( vector(1, -1, 0) * 2);
 	sph->set_color( rgba( 1, 1, 1, 0.3));
-	sph->set_texture( universe);
 	
-	shared_ptr<sphere> sph2( new sphere(4));
+	shared_ptr<sphere> sph2( new sphere());
 	sph2->set_pos( vector(1, 1, 0) * 2);
 	sph2->set_radius( 0.95);
 	sph2->set_color( rgba( 0.2, 0.2, 1));
