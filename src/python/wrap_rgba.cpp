@@ -7,6 +7,7 @@
 #include "util/lighting.hpp"
 
 #include <boost/python/to_python_converter.hpp>
+#include <boost/python/implicit.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/proxy.hpp>
@@ -42,7 +43,7 @@ struct rgb_from_seq
 			PyErr_Clear();
 			return 0;
 		}
-		if (obj_size != 3)
+		if (obj_size != 3 && obj_size != 4)
 			return 0;
 		return obj;
 	}
@@ -106,7 +107,7 @@ struct rgba_from_seq
 	{
 		py::object obj = py::object(py::handle<>(py::borrowed(_obj)));
 		void* storage = (
-			(py::converter::rvalue_from_python_storage<rgb>*)
+			(py::converter::rvalue_from_python_storage<rgba>*)
 			data)->storage.bytes;
 		if (PyFloat_Check(_obj) || PyInt_Check(_obj)) {
 			new (storage) rgba( py::extract<float>(obj));
@@ -156,7 +157,7 @@ wrap_rgba()
 	rgb_from_seq();
 	rgba_from_seq();
 	py::to_python_converter< rgb, rgb_to_tuple>();
-	py::to_python_converter< rgba, rgba_to_tuple>();	
+	py::to_python_converter< rgba, rgba_to_tuple>();
 }
 
 void
