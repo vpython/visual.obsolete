@@ -7,6 +7,7 @@
 
 #include "python/curve.hpp"
 #include "python/faces.hpp"
+#include "python/convex.hpp"
 
 #include <boost/python/class.hpp>
 #include <boost/python/args.hpp>
@@ -87,6 +88,17 @@ wrap_arrayobjects()
 		.def( "smooth_shade", &faces::smooth_shade, 
 			faces_smooth_shade( args("doublesided"),
 			"Average normal vectors at coincident vertexes."))
+		;
+	
+	using python::convex;
+	class_<convex, bases<renderable> >( "convex")
+		.def( init<const convex&>())
+		.def( "append", &convex::append, args("pos"),
+		 	"Append a point to the surface in O(n) time.")
+		.add_property( "color", &convex::get_color, &convex::set_color)
+		.def( "set_pos", &convex::set_pos)
+		.def( "set_pos", &convex::set_pos_l)
+		.def( "get_pos", &convex::get_pos)
 		;
 }
 

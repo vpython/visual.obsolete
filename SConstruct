@@ -166,6 +166,7 @@ py.SharedLibrary(
 		'src/python/slice.cpp',
 		'src/python/curve.cpp',
 		'src/python/faces.cpp',
+		'src/python/convex.cpp',
 		'src/python/cvisualmodule.cpp',
 		'src/python/wrap_arrayobjects.cpp' ],
 	SHLIBPREFIX="" )
