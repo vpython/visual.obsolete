@@ -84,7 +84,6 @@ module.include.files=\
 	include/util/tmatrix.hpp\
 	include/util/vector.hpp\
 	include/util/extent.hpp\
-	include/util/config.hpp\
 	include/util/quadric.hpp\
 	include/util/lighting.hpp\
 	include/util/timer.hpp\
@@ -93,12 +92,25 @@ module.include.files=\
 	include/util/clipping_plane.hpp\
 	include/util/bsp_tree.hpp\
 	include/arrow.hpp\
-	include/simple_displayobject.hpp\
 	include/cylinder.hpp\
 	include/ring.hpp\
 	include/pyramid.hpp\
 	include/ellipsoid.hpp\
-	include/pmap_sphere.hpp
+	include/pmap_sphere.hpp\
+	include/frame.hpp\
+	include/vpython-config.h\
+	include/wrap_gl.hpp\
+	include/win32/render_surface.hpp\
+	include/win32/font.hpp\
+	include/curve.hpp\
+	include/axial.hpp\
+	include/display_kernel.hpp\
+	include/num_util.h\
+	include/primitive.hpp\
+	include/rectangular.hpp\
+	include/label.hpp\
+	include/util/thread.hpp\
+	include/gtk2/display.hpp
 
 module.source.name=.
 module.source.type=
@@ -126,7 +138,6 @@ module.source.files=\
 	src/core/arrow.cpp\
 	src/core/renderable.cpp\
 	src/core/render_core.cpp\
-	src/core/simple_displayobject.cpp\
 	src/core/sphere.cpp\
 	src/core/util/displaylist.cpp\
 	src/core/util/rgba.cpp\
@@ -136,8 +147,6 @@ module.source.files=\
 	src/core/util/extent.cpp\
 	src/core/util/lighting.cpp\
 	src/core/util/quadric.cpp\
-	src/core/util/timer.cpp\
-	src/core/util/random_device.cpp\
 	src/core/util/texture.cpp\
 	src/core/util/clipping_plane.cpp\
 	src/core/box.cpp\
@@ -148,7 +157,35 @@ module.source.files=\
 	src/core/ellipsoid.cpp\
 	src/core/pmap_sphere.cpp\
 	src/gtk2/file_texture.cpp\
-	src/gtk2/render_surface.cpp
+	src/gtk2/render_surface.cpp\
+	src/core/frame.cpp\
+	src/win32/timer.cpp\
+	src/gtk2/timer.cpp\
+	src/test/conference_demo.cpp\
+	src/gtk2/random_device.cpp\
+	src/win32/random_device.cpp\
+	src/test/gtk_style_test.cpp\
+	src/test/label_test.cpp\
+	src/test/selection_test.cpp\
+	src/gtk2/font.cpp\
+	src/gtk2/main.cpp\
+	src/win32/winmain.cpp\
+	src/win32/font.cpp\
+	src/core/label.cpp\
+	src/core/curve.cpp\
+	src/core/axial.cpp\
+	src/core/rectangular.cpp\
+	src/core/display_kernel.cpp\
+	src/python/num_util.cpp\
+	src/python/wrap_display_kernel.cpp\
+	src/python/wrap_primitive.cpp\
+	src/python/wrap_rgba.cpp\
+	src/python/wrap_vector.cpp\
+	src/core/primitive.cpp\
+	src/gtk2/display.cpp\
+	src/gtk2/rate.cpp\
+	src/test/bounce_test.cpp\
+	src/test/sleep_test.cpp
 
 module.pixmap.name=.
 module.pixmap.type=
