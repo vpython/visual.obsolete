@@ -181,6 +181,7 @@ tests.Replace( LINKFLAGS="")
 Test('object_zsort_bench')
 Test('model_zsort_bench')
 Test('sincos_matrix_bench')
+Test('matrix_inverse_bench')
 base.Program( target='bin/sleep_test', source='src/test/sleep_test.cpp')
 
 ################################################################################
