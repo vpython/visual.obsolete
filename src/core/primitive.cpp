@@ -131,31 +131,6 @@ primitive::rotate( double angle, const vector& _axis, const vector& origin)
 }
 
 void 
-primitive::py_rotate1( double angle)
-{
-	rotate( angle, axis, pos);
-}
-
-void
-primitive::py_rotate2( double angle, vector _axis)
-{
-	rotate( angle, _axis, pos);
-}
-
-void
-primitive::py_rotate3( double angle, vector _axis, vector origin)
-{
-	rotate( angle, _axis, origin);
-}
-
-void
-primitive::py_rotate4( double angle, vector origin)
-{
-    rotate( angle, axis, origin);
-}
-
-
-void 
 primitive::set_pos( const vector& n_pos)
 {
 	model_damage();

@@ -1,6 +1,6 @@
-// This file uses 195 MB to compile (optimizing)
+// This file uses 152 MB to compile (optimizing)
 
-// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// Copyright (c) 2003, 2004, 2005 by Jonathan Brandmeyer and others.
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
@@ -17,11 +17,54 @@
 #include "label.hpp"
 #include "frame.hpp"
 
+#include "python/wrap_vector.hpp"
+
 #include <boost/python/class.hpp>
+#include <boost/python/tuple.hpp>
+#include <boost/python/dict.hpp>
+#include <boost/python/extract.hpp>
+#include <boost/python/raw_function.hpp>
 
 namespace cvisual {
 using namespace boost::python;
 using boost::noncopyable;
+
+/* Unfortunately the signatures of the functions primitive.rotate( "angle", "axis")
+ * and primitive.rotate( "angle", "origin") are identical to Boost.Python.  To 
+ * differentiate them, I am using this raw function to interpret the arguments.
+ * Ick.
+ */
+template <typename Prim>
+object
+py_rotate( tuple args, dict kwargs)
+{
+    Prim* This = extract<Prim*>( args[0]);
+ 
+    if (!kwargs.has_key("angle")) {
+        // This exception is more useful than the keyerror exception below.
+        throw std::invalid_argument( 
+            "primitive.rotate(): angle of rotation must be specified.");
+    }
+  
+    double angle = extract<double>(kwargs["angle"]);
+   
+    // The rotation axis, which defaults to the body axis.
+    vector r_axis;
+    if (kwargs.has_key("axis"))
+        r_axis = tovector(kwargs["axis"]);
+    else
+        r_axis = This->get_axis();
+ 
+    // The rotation origin, which defaults to the body position.
+    vector origin;
+    if (kwargs.has_key("origin"))
+        origin = tovector(kwargs["origin"]);
+    else
+        origin = This->get_pos();
+  
+    This->rotate( angle, r_axis, origin);
+    return object();
+}
 
 void
 wrap_primitive()
@@ -50,9 +93,7 @@ wrap_primitive()
 		.add_property( "alpha", &primitive::get_alpha, &primitive::set_alpha)		
 		.add_property( "shininess", &primitive::get_shininess, &primitive::set_shininess)
 		.add_property( "lit", &primitive::is_lit, &primitive::set_lit)
-		.def( "rotate", &primitive::py_rotate1, args( "angle"))
-		.def( "rotate", &primitive::py_rotate2, args( "angle", "axis"))
-		.def( "rotate", &primitive::py_rotate3, args( "angle", "axis", "origin"))
+        .def( "rotate", raw_function( &py_rotate<primitive>))
 		;
 		
 	class_<axial, bases<primitive>, noncopyable>( "axial", no_init)
@@ -157,9 +198,7 @@ wrap_primitive()
          .add_property( "scale",
             make_function(&frame::get_scale, return_internal_reference<>()),
             &frame::set_scale)
-		.def( "rotate", &frame::py_rotate1, args( "angle"))
-		.def( "rotate", &frame::py_rotate2, args( "angle", "axis"))
-		.def( "rotate", &frame::py_rotate3, args( "angle", "axis", "origin"))
+        .def( "rotate", raw_function( &py_rotate<frame>))
 		.def( "add_renderable", &frame::add_renderable)
 		.def( "remove_renderable", &frame::remove_renderable)
 		;

@@ -128,24 +128,6 @@ frame::rotate( double angle, const vector& _axis, const vector& origin)
 	up = R.times_v( fake_up);
 }
 
-void 
-frame::py_rotate1( double angle)
-{
-	rotate( angle, axis, pos);
-}
-
-void
-frame::py_rotate2( double angle, vector _axis)
-{
-	rotate( angle, _axis, pos);
-}
-
-void
-frame::py_rotate3( double angle, vector _axis, vector origin)
-{
-	rotate( angle, _axis, origin);
-}
-
 tmatrix 
 frame::frame_world_transform( const double gcf) const
 {

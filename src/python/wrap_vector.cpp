@@ -1,4 +1,4 @@
-// This file currently requires 196 MB to compile (optimizing).
+// This file currently requires 137 MB to compile (optimizing).
 
 // Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
 // See the file license.txt for complete license terms.
@@ -64,16 +64,25 @@ length(boost::python::object seq)
 	return ret;
 }
 
+} // !namespace anonymous
+
 vector
 tovector( py::object arr)
 {
-	return vector( 
-		extract<double>(arr[0]), 
-		extract<double>(arr[1]), 
-		extract<double>(arr[2]));
+	switch (length(arr)) {
+		case 2:
+			return vector(
+				extract<double>(arr[0]),
+				extract<double>(arr[1]));
+		case 3:
+			return vector(
+				extract<double>(arr[0]),
+				extract<double>(arr[1]),
+				extract<double>(arr[2]));
+		default:
+			throw std::invalid_argument("Vectors must have length 2 or 3");
+	}
 }
-
-} // !namespace anonymous
 
 object
 mag_a( const array& arr)

@@ -66,15 +66,10 @@ class frame : public renderable
 	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::const_iterator> 
 		const_trans_child_iterator;
 
-	void rotate( double angle, const vector& axis, const vector& origin);
-
  public:
 	frame();
 	frame( const frame& other);
-	
-	void py_rotate1( double angle);
-	void py_rotate2( double angle, vector axis);
-	void py_rotate3( double angle, vector axis, vector origin);
+    void rotate( double angle, const vector& axis, const vector& origin);
 
 	void add_renderable( shared_ptr<renderable> child);
 	void remove_renderable( shared_ptr<renderable> child);
