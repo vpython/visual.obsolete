@@ -57,7 +57,7 @@ frame::frame_world_transform( const double gcf) const
 }
 
 tmatrix
-frame::world_frame_transform( const double gcf) const
+frame::world_frame_transform( const double) const
 {
 	// Performs a reorientation transform.
 	// ret = translation o reorientation o scale
@@ -167,7 +167,7 @@ frame::get_center() const
 }
 	
 void 
-frame::update_cache( const view& v)
+frame::update_cache( const view&)
 {
 }
 
