@@ -91,10 +91,15 @@ display_kernel::illuminate_default()
 {
 	lights.clear();
 	ambient = rgba( 0.2, 0.2, 0.2);
-	add_light( shared_ptr<light>( 
-		new light( vector(0.25, 0.5, 1.0).norm(), rgba( 0.8, 0.8, 0.8))));
-	add_light( shared_ptr<light>(
-		new light( vector( -1.0, -0.25, -0).norm(), rgba( 0.3, 0.3, 0.3))));
+	shared_ptr<light> n_light( new 
+		light( vector(0.25, 0.5, 1.0).norm(), rgba( 0.8, 0.8, 0.8)));
+	n_light->set_local( false);
+	add_light( n_light);
+	
+	n_light =  shared_ptr<light>(
+		new light( vector( -1.0, -0.25, -0).norm(), rgba( 0.3, 0.3, 0.3)));
+	n_light->set_local( false);
+	add_light( n_light);
 }
 
 
@@ -121,6 +126,10 @@ display_kernel::display_kernel()
 	lod_adjust(0)
 {
 	illuminate_default();
+}
+
+display_kernel::~display_kernel()
+{
 }
 
 void
@@ -837,6 +846,12 @@ display_kernel::set_forward( const vector& n_forward)
 	lock L(mtx);
 	forward = n_forward;
 	forward_changed = true;
+}
+
+vector&
+display_kernel::get_forward()
+{
+	return forward;
 }
 
 void
