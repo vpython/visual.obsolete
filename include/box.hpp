@@ -46,6 +46,7 @@ class box : public simple_displayobject
 	virtual void update_cache( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
+	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
 };
 
 #endif // !defined VPYTHON_BOX_HPP
