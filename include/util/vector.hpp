@@ -296,13 +296,8 @@ rotate( vector v, double angle, const vector axis = vector( 0,0,1))
 { return v.rotate( angle, axis); }
 
 
-// Definitions of the global functions for operators *, and /, 
-//   with a vector on the RHS, and scalar on the LHS.
-inline vector
-operator/( const double& s, const vector& v)
-{ 
-  return vector( s/v.x, s/v.y, s/v.z); 
-}
+// Definitions of the global functions for operator *, with a vector on the RHS,
+// and scalar on the LHS.
 
 inline vector
 operator*( const double& s, const vector& v)
