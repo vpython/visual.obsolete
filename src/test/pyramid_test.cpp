@@ -6,7 +6,7 @@
 #include <iostream>
 
 int 
-main( void)
+realmain( std::vector<std::string>&)
 {
 	basic_app app( "Pyramid test");
 	rgba yellow( 1, 1, 0);

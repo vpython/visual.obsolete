@@ -14,16 +14,16 @@ using namespace boost;
 // On average, on a PIII 800, it takes 23 usec to sort each arrow.
 // A 1.43 GHz PowerPC G4 takes 14 usec per arrow model.
 int
-main( int argc, char* argv[])
+realmain( std::vector<std::string>& args)
 {
 	size_t test_iterations = 20;
-	if (argc >= 2)
-		test_iterations = lexical_cast<size_t>( argv[1]);
+	if (args.size() >= 1)
+		test_iterations = lexical_cast<size_t>( args[0]);
 	// At this size, the bench test essentially reports the time to sort per 
 	// arrow in milliseconds
 	size_t n_arrows = 1000;
-	if (argc >= 3)
-		n_arrows = lexical_cast<size_t>( argv[2]);
+	if (args.size() >= 2)
+		n_arrows = lexical_cast<size_t>( args[1]);
 	
 	std::cout << "Performing " << test_iterations << " re-sorts each with " 
 		<< n_arrows << " arrows\n";

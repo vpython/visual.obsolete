@@ -2,7 +2,7 @@
 #include "arrow.hpp"
 
 int 
-main( void)
+realmain( std::vector<std::string>&)
 {
 	basic_app main_window( "Arrow scaling test");
 	

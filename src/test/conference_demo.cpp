@@ -6,7 +6,7 @@
 #include "vpython-config.h"
 
 int 
-main( void)
+realmain( std::vector<std::string>&)
 {
 	basic_app main_window( "VPython Rendering Core #2 Demonstration.");
 	

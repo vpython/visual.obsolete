@@ -67,14 +67,14 @@ using namespace boost;
 
 
 int
-main( int argc, char* argv[])
+realmain( std::vector<std::string>& args)
 {
 	size_t test_size = 100;
 	size_t test_iterations = 200;
-	if (argc >= 2)
-		test_size = lexical_cast<size_t>( argv[1]);
-	if (argc >= 3)
-		test_iterations = lexical_cast<size_t>( argv[2]);
+	if (args.size() >= 1)
+		test_size = lexical_cast<size_t>( args[0]);
+	if (args.size() >= 2)
+		test_iterations = lexical_cast<size_t>( args[1]);
 	
 	std::cout << "Performing " << test_iterations << " resorts each with " 
 		<< test_size << " elements\n";

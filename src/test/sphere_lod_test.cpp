@@ -2,7 +2,7 @@
 #include "sphere.hpp"
 
 int 
-main( void)
+realmain( std::vector<std::string>&)
 {
 	basic_app main_window( "Sphere level of detail test");
 	

@@ -17,7 +17,7 @@ on_object_clicked( shared_ptr<renderable> body)
 }
 
 int 
-main( void)
+realmain( std::vector<std::string>&)
 {
 	basic_app app( "Object selection test");
 	rgba yellow( 1, 1, 0);
@@ -77,5 +77,6 @@ main( void)
 	app.scene.add_renderable( ell);
 	app.scene.object_clicked.connect( SigC::slot( on_object_clicked));
 
-	app.run();	
+	app.run();
+	return 0;
 }

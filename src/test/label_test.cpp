@@ -3,7 +3,7 @@
 #include "label.hpp"
 
 int 
-main( void)
+realmain( std::vector<std::string>&)
 {
 	basic_app main_window( "Basic label test");
 	

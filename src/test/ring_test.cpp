@@ -6,7 +6,7 @@
 #include <iostream>
 
 int 
-main( void)
+realmain( std::vector<std::string>&)
 {
 	basic_app app( "Ring test");
 	rgba yellow( 1, 1, 0);
@@ -27,5 +27,6 @@ main( void)
 		"default length and radius, with a shininess of 0.5.  The one on the "
 		"left has twice the length and half the radius.  The one on top is "
 		"greenish blue, transparent, and points down and to the left.\n";
-	app.run();	
+	app.run();
+	return 0;
 }

@@ -8,7 +8,7 @@
 #include <iostream>
 
 int 
-main( void)
+realmain( std::vector<std::string>&)
 {
 	basic_app app( "Box test");
 

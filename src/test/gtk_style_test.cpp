@@ -7,9 +7,9 @@ using boost::shared_ptr;
 // A demo that was used to figure out how I could get a font filename (for FTGL)
 // from a Pango::FontDescription.
 int
-main( int argc, char** argv)
+realmain( std::vector<std::string>&)
 {
-	Gtk::Main kit( &argc, &argv);
+	Gtk::Main kit( 0, 0);
 	
 	// Load up info about the font description.
 	Pango::FontDescription font_desc = Glib::wrap(gtk_style_new())->get_font();

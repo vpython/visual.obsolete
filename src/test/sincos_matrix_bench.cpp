@@ -28,16 +28,16 @@ using boost::lexical_cast;
 // On a 3.0 GHz Pentium 4, sin/cos rotation is performed in .09 usec and matrix
 // multiply in .025 usec.  -mfpmath and -msse2 slightly reduced the matrix multiply
 // speed to .023 usec.
-int
-main( int argc, char** argv)
+int 
+realmain( std::vector<std::string>& args)
 {
 	// Extract iteration and repeat times.
 	size_t iterations = 100;
 	size_t n_turns = 1000;
-	if (argc >= 2)
-		iterations = lexical_cast<size_t>( argv[1]);
-	if (argc >= 3)
-		n_turns = lexical_cast<size_t>( argv[2]);
+	if (args.size() >= 1)
+		iterations = lexical_cast<size_t>( args[0]);
+	if (args.size() >= 2)
+		n_turns = lexical_cast<size_t>( args[1]);
 	std::cout << "Performing " << iterations << " test runs of " << n_turns
 		<< " vector rotations each.\n";
 

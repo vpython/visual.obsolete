@@ -51,6 +51,8 @@ if sys.platform == 'win32':
 	srcs.append( 'src/win32/render_surface.cpp')
 	srcs.append( 'src/win32/timer.cpp')
 	srcs.append( 'src/win32/random_device.cpp')
+	# TODO: Write a file_texture.cpp implementation for Windows,
+	# Write a font.cpp implementation for Windows.
 	
 	core.Append( LIBS=['opengl32', 'gdi32', 'glu32', 'comctl32', 'crypt32'])
 	core.Append( CPPPATH='include/win32')
@@ -78,26 +80,35 @@ tests = core.Copy()
 tests['ENV']['PKG_CONFIG_PATH'] = './lib/pkgconfig/'
 # tests.ParseConfig( 'pkg-config --cflags --libs vpython-3.0')
 # tests.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0')
-tests.Append( LIBPATH='lib', LIBS=['vpython-core'], LDFLAGS='-mwindows')
+tests.Append( LIBPATH='lib', LIBS=['vpython-core'])
+if sys.platform == 'win32':
+	tests.Append( LDFLAGS='-mwindows')
+	main = 'src/win32/winmain.cpp'
+else:
+	main = 'src/gtk2/main.cpp'
 
-tests.Program( target='bin/sphere_lod_test', source='src/test/sphere_lod_test.cpp')
-tests.Program( target='bin/arrow_transparent_test', source='src/test/arrow_transparent_test.cpp')
-tests.Program( target='bin/object_zsort_bench', source='src/test/object_zsort_bench.cpp')
-tests.Program( target='bin/model_zsort_bench',  source='src/test/model_zsort_bench.cpp')
-tests.Program( target='bin/sincos_matrix_bench', source='src/test/sincos_matrix_bench.cpp')
-tests.Program( target='bin/sphere_texture_test', source='src/test/sphere_texture_test.cpp')
-tests.Program( target='bin/arrow_scaling_test', source='src/test/arrow_scaling_test.cpp')
-tests.Program( target='bin/sphere_transparent_test', source='src/test/sphere_transparent_test.cpp')
-tests.Program( target='bin/texture_sharing_test', source='src/test/texture_sharing_test.cpp')
-tests.Program( target='bin/box_test', source='src/test/box_test.cpp')
-tests.Program( target='bin/cone_test', source='src/test/cone_test.cpp')
-tests.Program( target='bin/cylinder_test', source='src/test/cylinder_test.cpp')
-tests.Program( target='bin/ring_test', source='src/test/ring_test.cpp')
-tests.Program( target='bin/pyramid_test', source='src/test/pyramid_test.cpp')
-tests.Program( target='bin/ellipsoid_test', source='src/test/ellipsoid_test.cpp')
-tests.Program( target='bin/psphere_texture_test', source='src/test/psphere_texture_test.cpp')
-tests.Program( target='bin/selection_test', source='src/test/selection_test.cpp')
-tests.Program( target='bin/conference_demo', source='src/test/conference_demo.cpp')
+def Test( name):
+	tests.Program( target='bin/' + name, 
+		source=['src/test/' + name + '.cpp', main])
+
+Test('sphere_lod_test')
+Test('arrow_transparent_test')
+Test('object_zsort_bench')
+Test('model_zsort_bench')
+Test('sincos_matrix_bench')
+Test('sphere_texture_test')
+Test('arrow_scaling_test')
+Test('sphere_transparent_test')
+Test('texture_sharing_test')
+Test('box_test')
+Test('cone_test')
+Test('cylinder_test')
+Test('ring_test')
+Test('pyramid_test')
+Test('ellipsoid_test')
+Test('psphere_texture_test')
+Test('selection_test')
+Test('conference_demo')
 if sys.platform != 'win32':
-	tests.Program( target='bin/label_test', source='src/test/label_test.cpp')
-	tests.Program( target='bin/gtk_style_test', source='src/test/gtk_style_test.cpp')
+	Test('label_test')
+	Test('gtk_style_test')
