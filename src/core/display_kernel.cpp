@@ -908,6 +908,49 @@ display_kernel::set_autocenter( bool n_autocenter)
 	autocenter = n_autocenter;
 }
 
+void
+display_kernel::set_stereomode( std::string mode)
+{
+	if (mode == "nostereo")
+		stereo_mode = NO_STEREO;
+	else if (mode == "active")
+		stereo_mode = ACTIVE_STEREO;
+	else if (mode == "passive")
+		stereo_mode = PASSIVE_STEREO;
+	else if (mode == "redblue")
+		stereo_mode = REDBLUE_STEREO;
+	else if (mode == "redcyan")
+		stereo_mode = REDCYAN_STEREO;
+	else if (mode == "yellowblue")
+		stereo_mode = YELLOWBLUE_STEREO;
+	else if (mode == "greenmagenta")
+		stereo_mode = GREENMAGENTA_STEREO;
+	else throw std::invalid_argument( "Unimplemented or invalid stereo mode");
+}
 
+std::string
+display_kernel::get_stereomode()
+{
+	switch (stereo_mode) {
+		case NO_STEREO:
+			return "nostereo";
+		case ACTIVE_STEREO:
+			return "active";
+		case PASSIVE_STEREO:
+			return "passive";
+		case REDBLUE_STEREO:
+			return "redblue";
+		case REDCYAN_STEREO:
+			return "redcyan";
+		case YELLOWBLUE_STEREO:
+			return "yellowblue";
+		case GREENMAGENTA_STEREO:
+			return "greenmagenta";
+		default:
+			// Not strictly required, this just silences a warning about control
+			// reaching the end of a non-void funciton.
+			return "nostereo";
+	}
+}
 
 } // !namespace cvisual

@@ -238,6 +238,13 @@ public: // Public Data.
 	// appear to work right when moving the scene into the page.
 	void set_stereodepth( double);
 	double get_stereodepth();
+	
+	// The only mode that cannot be changed after initialization is active, 
+	// which will result in a gl_error exception when rendered.  The completing
+	// display class will have to perform some filtering on this parameter.  This
+	// properties setter will not change the mode if the new one is invalid.
+	void set_stereomode( std::string mode);
+	std::string get_stereomode();
 
 	/** A signal that makes the wrapping widget's rendering context 
 		active.  The wrapping object must connect to it.
