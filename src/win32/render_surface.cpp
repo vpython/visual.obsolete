@@ -567,7 +567,7 @@ std::map<HWND, basic_app*> basic_app::windows;
  */
 basic_app::basic_app( std::string _title)
 	: title( _title)
-{
+{ 
 	// Load the images for the toolbar from files.
 	tb_image[0] = LoadImage( 
 		0, VPYTHON_PREFIX "/data/no.bmp", IMAGE_BITMAP, 32, 32, LR_LOADFROMFILE);

@@ -1,7 +1,7 @@
 #ifndef VPYTHON_WIN32_FONT_HPP
 #define VPYTHON_WIN32_FONT_HPP
 
-#include "wrap_gl.h"
+#include "wrap_gl.hpp"
 
 #include <map>
 #include <string>
@@ -12,7 +12,8 @@ class bitmap_font
  private:		
 	// A mapping from a font description+size pair to a Windows font.
 	static std::map<std::pair<std::string, int>, std::pair<HFONT, int> > cache;
-	typedef std::map<std::pair<std::string, int>, std::pair<HFONT, int> > cache_iterator;
+	typedef std::map<std::pair<std::string, int>, 
+		std::pair<HFONT, int> >::iterator cache_iterator;
 	
 	std::string font_family;
 	int font_size;
@@ -23,7 +24,7 @@ class bitmap_font
 
  public:
 	// TODO: Perhaps these constructors should take a view reference?
-	bitmap_font( int size=10);
+	bitmap_font();
 	bitmap_font( const std::string& name, int size=10);
 	virtual ~bitmap_font();
 
