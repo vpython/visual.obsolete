@@ -12,7 +12,7 @@ opt.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 
 # Options specific to libvpython-core.so
 core = opt.Copy()
-core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2 ftgl')
+core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2')
 core.Append( LIBS=["GL", "GLU"])
 vpython_core = core.SharedLibrary( 
 	target = 'lib/vpython-core', 
@@ -45,7 +45,7 @@ vpython_core = core.SharedLibrary(
 
 gtk2 = opt.Copy()
 gtk2.Append( LIBPATH='lib', LIBS='vpython-core')
-gtk2.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0')
+gtk2.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl fontconfig')
 vpython_gtk2 = gtk2.SharedLibrary( 
 	target = 'lib/vpython-gtk2',
 	source = ['src/gtk2/file_texture.cpp', 
@@ -79,4 +79,5 @@ tests.Program( target='bin/ellipsoid_test', source='src/test/ellipsoid_test.cpp'
 tests.Program( target='bin/psphere_texture_test', source='src/test/psphere_texture_test.cpp')
 tests.Program( target='bin/selection_test', source='src/test/selection_test.cpp')
 tests.Program( target='bin/gtk_style_test', source='src/test/gtk_style_test.cpp')
+tests.Program( target='bin/label_test', source='src/test/label_test.cpp')
 

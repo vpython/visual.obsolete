@@ -8,7 +8,7 @@
 #include "util/lighting.hpp"
 #include "util/timer.hpp"
 
-#include <FTGLPixmapFont.h>
+// #include <FTGLPixmapFont.h>
 #include <sigc++/signal.h>
 #include <list>
 #include <vector>
@@ -69,7 +69,7 @@ class render_core
 	/** A historesis timer to calculate the time to render each frame. */
 	hist_timer fps;
 	/** Experimental support for rendering text using FTGL. */
-	shared_ptr<FTGLPixmapFont> fps_font;
+	// shared_ptr<FTGLPixmapFont> fps_font;
  
 private:
 	/** Set up the OpenGL transforms from world space to view space. */

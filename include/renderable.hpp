@@ -21,6 +21,8 @@ struct view
 	vector forward;
 	/// The center of the scene in world space.
 	vector center;
+	/// The true up direction of the scene in world space.
+	vector up;
 	/// The width of the window in pixels.
 	float window_width;
 	/// The height of the window in pixels.
@@ -38,6 +40,7 @@ struct view
 	/// True in coloranaglyph stereo rendering modes.
 	bool coloranaglyph;
 	double tan_hfov_x; ///< The tangent of half the horzontal field of view.
+	double tan_hfov_y; ///< The tangent of half the vertical field of view.
 	
 	inline view( vector& n_forward, vector& n_center, float& n_width, 
 		float& n_height, bool n_forward_changed, double& n_gcf, 

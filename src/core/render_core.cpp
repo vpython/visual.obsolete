@@ -2,10 +2,12 @@
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
 #include "frame.hpp"
+#include "gtk2/font.hpp"
 
 #include <cassert>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 #include <map>
 
 #include <boost/lexical_cast.hpp>
@@ -228,10 +230,10 @@ render_core::report_realize()
 	
 	// FSAA.  Doesn't seem to have much of an effect on my TNT2 card.  Grrr.
 	glEnable( GL_MULTISAMPLE_ARB);
-	fps_font = shared_ptr<FTGLPixmapFont>( new FTGLPixmapFont( 
-		"/usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf"));
-	fps_font->FaceSize( 12, 100);
-	assert( !fps_font->Error());
+	// fps_font = shared_ptr<FTGLPixmapFont>( new FTGLPixmapFont( 
+	// 	"/usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf"));
+	// fps_font->FaceSize( 12, 100);
+	// assert( !fps_font->Error());
 	check_gl_error();
 	gl_end();
 }
@@ -305,7 +307,6 @@ render_core::world_to_view_transform(view& geometry, int whicheye, bool forpick)
 		tan_hfov_x = tan_hfov;
 		tan_hfov_y = tan_hfov_x * aspect_ratio;
 	}
-	geometry.tan_hfov_x = tan_hfov_x;
 	// The scaled distance between the camera and the visual center of the scene.
 	double eye_length = user_scale * world_scale * gcf / tan_hfov;
 	// The position of the camera.
@@ -363,6 +364,9 @@ render_core::world_to_view_transform(view& geometry, int whicheye, bool forpick)
 	
 	// Finish initializing the view object.
 	geometry.camera = camera / gcf;
+	geometry.tan_hfov_x = tan_hfov_x;
+	geometry.tan_hfov_y = tan_hfov_y;
+	geometry.up = forward.cross(up).cross(forward).norm();
 }
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
@@ -609,11 +613,32 @@ render_core::render_scene(void)
 				break;
 			}
 		}
-		glRasterPos2f( -1.0f, -0.96f);
-		glColor3f( 1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
+		// glRasterPos2f( -1.0f, -0.96f);
 		std::string fps_msg( "Cycle time: ");
 		fps_msg += boost::lexical_cast<std::string>(fps.read());
-		fps_font->Render( fps_msg.c_str());
+		glEnable( GL_TEXTURE_2D);
+		glColor3f( 1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
+		bitmap_font font;
+#if 1
+		glMatrixMode( GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		gluOrtho2D( 0, window_width, 0, window_height);
+		glMatrixMode( GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslated( 0, -font.descent(), 0);
+#endif
+		// glRasterPos2d( 0, -font.descent());
+		glRasterPos2d( 0, 0);
+		font.gl_render( fps_msg);
+#if 1
+		glPopMatrix();
+		glMatrixMode( GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode( GL_MODELVIEW);
+		glDisable( GL_TEXTURE_2D);
+#endif
 		
 		// Cleanup
 		gl_swap_buffers();
