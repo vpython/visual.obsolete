@@ -30,11 +30,14 @@ public:
 	};
 
 public:
-	vector( double a = 0.0, double b = 0.0, double c = 0.0) throw()
+	explicit vector( double a = 0.0, double b = 0.0, double c = 0.0) throw()
 		:x(a), y(b), z(c) {}
         
     inline vector( const vector& v) throw() 
 		: x(v.x), y(v.y), z(v.z) {}
+		
+	inline explicit vector( const double* v)
+		: x( v[0]), y(v[1]), z(v[2]) {}
        
 	// Overloaded binary +, -, *, and /
 	inline vector
@@ -164,6 +167,9 @@ public:
 	scale( const vector& v) const throw()
 	{ return vector( this->x*v.x, this->y*v.y, this->z*v.z); }
 	
+	vector
+	rotate( double angle, vector axis = vector(0,0,1)) throw();
+
 	// Last ditch direct read/write access to the private variables
 	inline double
 	get_x( void) const throw() { return x; }
@@ -186,6 +192,13 @@ public:
 	// zero the state of the vector. Potentially useful for reusing a temporary.
 	inline void
 	clear( void) { x=0.0; y=0.0; z=0.0; }
+	
+    inline int
+	py_len() { return 3; }
+	
+	double py_getitem( int i) const;
+	
+	void py_setitem(int i, double value);
     
 		
 	inline double&
@@ -282,6 +295,10 @@ orthogonal( const vector& v1, const vector& v2)
 inline double
 diff_angle( const vector& v1, const vector& v2)
 { return v1.diff_angle( v2); }
+
+inline vector
+rotate( vector v, double angle, const vector axis = vector( 0,0,1))
+{ return v.rotate( angle, axis); }
 
 
 // Definitions of the global functions for operators *, and /, 

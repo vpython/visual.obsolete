@@ -6,24 +6,23 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "primitive.hpp"
+#include "axial.hpp"
 
 namespace cvisual {
 
-class ring : public primitive
+class ring : public axial
 {
  private:
 	// The radius of the ring's body.  If not specified, it is set to 1/10 of
 	// the radius of the body.
 	double thickness;
-	// The radius of the ring's hoop.
-	double radius;
 	PRIMITIVE_TYPEINFO_DECL;
 
  public:
 	ring();
-	void set_radius( double r);
+	ring( const ring& other);
 	void set_thickness( double t);
+	double get_thickness();
 	
  protected:
 	virtual void gl_pick_render( const view&);

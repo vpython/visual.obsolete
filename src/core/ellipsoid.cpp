@@ -8,26 +8,66 @@
 namespace cvisual {
 
 ellipsoid::ellipsoid()
-	: width( 1.0), height( 1.0)
+	: height(1.0), width(1.0)
 {
 }
 
-void
-ellipsoid::set_width( double w)
+ellipsoid::ellipsoid( const ellipsoid& other)
+	: sphere( other), height(other.height), width( other.width)
 {
-	width = w;
 }
 
-void
+void 
 ellipsoid::set_length( double l)
 {
 	axis = axis.norm() * l;
 }
 
-void
+double 
+ellipsoid::get_length()
+{
+	return axis.mag();
+}
+	
+void 
 ellipsoid::set_height( double h)
 {
+	lock L(mtx);
 	height = h;
+}
+
+double 
+ellipsoid::get_height()
+{
+	return height;
+}
+	
+void 
+ellipsoid::set_width( double w)
+{
+	lock L(mtx);
+	width = w;
+}
+
+double 
+ellipsoid::get_width()
+{
+	return width;
+}
+	
+vector 
+ellipsoid::get_size()
+{
+	return vector(axis.mag(), height, width);
+}
+
+void 
+ellipsoid::set_size( const vector& s)
+{
+	axis = axis.norm() * s.x;
+	lock L(mtx);
+	height = s.y;
+	width = s.z;
 }
 
 vector

@@ -6,7 +6,7 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "primitive.hpp"
+#include "axial.hpp"
 #include "util/displaylist.hpp"
 #include "util/texture.hpp"
 
@@ -14,11 +14,9 @@ namespace cvisual {
 
 /** A simple monochrome sphere. 
  */
-class sphere : public primitive
+class sphere : public axial
 {
  private:
-	/// The radius of the sphere.
-	double radius;
 	/// A texture map to be applied to the sphere.  A Mercator projection is 
 	/// performed from the image to the sphere's surface.
 	shared_ptr<texture> tex;
@@ -34,10 +32,9 @@ class sphere : public primitive
  public:
 	/** Construct a unit sphere at the origin. */
 	sphere();
+	sphere( const sphere& other);
 	virtual ~sphere();
 	
-	void set_radius(const double& r);
-	double get_radius() const;
 	void set_texture( shared_ptr<texture>);
 	shared_ptr<texture> get_texture();
  

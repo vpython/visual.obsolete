@@ -140,6 +140,59 @@ vector::repr( void) const
 	ret << "vector(" << x << ", " << y << ", " << z << ")";
 	return ret.str();
 }
+
+double
+vector::py_getitem( int index) const
+{
+	switch (index) {
+		case -3:
+			return x;
+		case -2:
+			return y;
+		case -1:
+			return z;
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+		default:
+			std::ostringstream s;
+			s << "vector index out of bounds: " << index;
+			throw std::out_of_range( s.str() );
+	}
+}
+
+void
+vector::py_setitem(int index, double value)
+{
+	switch (index) {
+		case -3:
+			x = value;
+			break;
+		case -2:
+			y = value;
+			break;
+		case -1:
+			z = value;
+			break;
+		case 0:
+			x = value;
+			break;
+		case 1:
+			y = value;
+			break;
+		case 2:
+			z = value;
+			break;
+		default:
+			std::ostringstream s;
+			s << "vector index out of bounds: " << index;
+			throw std::out_of_range( s.str() );
+	}    	
+}
+
         
 bool 
 vector::stl_cmp( const vector& v) const
@@ -185,19 +238,6 @@ shared_vector::operator=( const vector& v)
 	return *this;
 }
 
-#if 0
-const shared_vector&
-shared_vector::operator=( boost::python::tuple t)
-{
-	write_lock L(*owner);
-	vector v(t);
-	this->x = v.x;
-	this->y = v.y;
-	this->z = v.z;
-	return *this;
-}
-#endif
-
 const shared_vector&
 shared_vector::operator+=( const vector& v)
 {
@@ -238,18 +278,11 @@ shared_vector::operator/=( const double& s)
 	return *this;
 }
 
-#if 0
 void
 shared_vector::py_setitem(int index, double value)
 {
-	if (owner) {
-		write_lock L(*owner);
-		vector::py_setitem(index, value);
-	}
-	else {
-		vector::py_setitem(index, value);
-	}
+	lock L(owner);
+	vector::py_setitem(index, value);
 }
-#endif
 
 } // !namespace cvisual

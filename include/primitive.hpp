@@ -25,10 +25,11 @@ class primitive : public renderable
 {
  protected:
 	// The position and orientation of the body in World space.
-	vector axis;
-	vector up;
-	vector pos;
+	shared_vector axis;
+	shared_vector up;
+	shared_vector pos;
 	float shininess;
+	bool lit;
 
 	// Returns a tmatrix that performs reorientation of the object from model
 	// orientation to world (and view) orientation.
@@ -41,6 +42,8 @@ class primitive : public renderable
 	// an axis = vector(1, 0, 0).
 	primitive();
 	primitive( const vector& pos, const vector& axis, const vector& up);
+	primitive( const primitive& other);
+	
 	// See above for PRIMITIVE_TYPEINFO_DECL/IMPL.
 	virtual const std::type_info& get_typeid() const;
 	
@@ -50,10 +53,43 @@ class primitive : public renderable
  public:
 	virtual ~primitive();
 	void set_pos( const vector& n_pos);
+	shared_vector& get_pos();
+	
+	void set_x( double x);
+	double get_x();
+	
+	void set_y( double y);
+	double get_y();
+	
+	void set_z( double z);
+	double get_z();
+	
 	void set_axis( const vector& n_axis);
+	shared_vector& get_axis();
+	
 	void set_up( const vector& n_up);
+	shared_vector& get_up();
+	
 	void set_color( const rgba& n_color);
+	rgba get_color();
+	
+	void set_red( double x);
+	double get_red();
+	
+	void set_green( double x);
+	double get_green();
+	
+	void set_blue( double x);
+	double get_blue();
+	
+	void set_alpha( double x);
+	double get_alpha();
+	
 	void set_shininess( float);
+	float get_shininess();
+	
+	void set_lit(bool);
+	bool is_lit();
 };
 
 } // !namespace cvisual

@@ -120,6 +120,75 @@ arrow::arrow()
 {
 }
 
+void
+arrow::set_headwidth( double hw)
+{
+	lock L(mtx);
+	model_damage();
+	headwidth = hw;
+}
+
+double
+arrow::get_headwidth()
+{
+	return headwidth;
+}
+	
+void
+arrow::set_headlength( double hl)
+{
+	lock L(mtx);
+	model_damage();
+	headlength = hl;
+}
+
+
+double
+arrow::get_headlength()
+{
+	return headlength;
+}
+	
+void
+arrow::set_shaftwidth( double sw)
+{
+	lock L(mtx);
+	model_damage();
+	shaftwidth = sw;
+}
+
+double
+arrow::get_shaftwidth()
+{
+	return shaftwidth;
+}
+	
+void
+arrow::set_fixedwidth( bool fixed)
+{
+	lock L(mtx);
+	model_damage();
+	fixedwidth = fixed;
+}
+
+bool
+arrow::is_fixedwidth()
+{
+	return fixedwidth;
+}
+	
+void
+arrow::set_length( double l)
+{
+	axis = axis.norm() * l;
+}
+
+double
+arrow::get_length()
+{
+	return axis.mag();
+}
+
 vector
 arrow::get_center() const
 {

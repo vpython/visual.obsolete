@@ -21,26 +21,29 @@ box::degenerate()
 }
 
 box::box()
-	: width(1.0), height(1.0)
 {	
 }
 
-void
-box::set_width( const double& n_width)
+box::box( const box& other)
+	: rectangular( other), tex( other.tex)
 {
-	width = n_width;
+}
+
+box::~box()
+{
 }
 
 void
-box::set_length( const double& n_length)
+box::set_texture( shared_ptr<texture> t)
 {
-	axis = axis.norm() * n_length;
+	lock L(mtx);
+	tex = t;
 }
 
-void
-box::set_height( const double& n_height)
+shared_ptr<texture>
+box::get_texture()
 {
-	height = n_height;
+	return tex;
 }
 
 void 

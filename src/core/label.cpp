@@ -194,10 +194,10 @@ label::gl_render( const view& scene)
 		
 		// The following three lines work around a wierd problem.  Without them,
 		// the first line of text below will not be rendered properly.  The physical
-		// appearance is as if, for the first line, glRasterPos was far away in
-		// the depth direction.  I have only observed this issue with the ATI
-		// proprietary fglrx driver at this time - MESA's software renderer is
-		// fine.  So is NVIDIA's Linux GLX driver.
+		// appearance is as if, for the first line of text, glRasterPos was far 
+		// away in the visual depth direction.  I have only observed this issue 
+		// with the ATI proprietary fglrx driver at this time - MESA's software
+		// renderer is fine.  So is NVIDIA's Linux GLX driver.
 		glRasterPos3d( 0, 0, 0);
 		glPushAttrib( GL_ENABLE_BIT);
 		glPopAttrib();

@@ -35,7 +35,11 @@ static displaylist cylinder_simple_model[6];
 bool cylinder::first = true;
 
 cylinder::cylinder()
-	: radius(1.0)
+{
+}
+
+cylinder::cylinder( const cylinder& other)
+	: axial( other)
 {
 }
 
@@ -56,9 +60,15 @@ cylinder::update_cache( const view&)
 }
 
 void
-cylinder::set_radius( double r)
+cylinder::set_length( double l)
 {
-	radius = r;
+	axis = axis.norm() * l;
+}
+
+double
+cylinder::get_length()
+{
+	return axis.mag();
 }
 
 void 

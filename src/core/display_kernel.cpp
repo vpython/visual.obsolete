@@ -126,6 +126,7 @@ display_kernel::display_kernel()
 void
 display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 {
+	lock L(mtx);
 	// This stuff handles automatic movement of the camera in responce to user
 	// input.  See also view_to_world_transform for how the affected variables 
 	// are used to actually position the camera.
@@ -551,6 +552,7 @@ display_kernel::draw(
 bool
 display_kernel::render_scene(void)
 {
+	lock L(mtx);
 	try {
 		fps.start();
 		view scene_geometry( forward, center, window_width, window_height, 
@@ -712,6 +714,7 @@ display_kernel::render_scene(void)
 shared_ptr<renderable> 
 display_kernel::pick( float x, float y, float d_pixels)
 {
+	lock L(mtx);
 	shared_ptr<renderable> best_pick;
 	try {
 		clear_gl_error();
@@ -869,7 +872,7 @@ display_kernel::set_background( const rgba& n_background)
 	background = n_background;
 }
 
-rgba&
+rgba
 display_kernel::get_background()
 {
 	return background;
@@ -882,7 +885,7 @@ display_kernel::set_forground( const rgba& n_forground)
 	forground = n_forground;
 }
 
-rgba&
+rgba
 display_kernel::get_forground()
 {
 	return forground;
@@ -951,6 +954,16 @@ display_kernel::get_stereomode()
 			// reaching the end of a non-void funciton.
 			return "nostereo";
 	}
+}
+
+std::list<shared_ptr<renderable> > 
+display_kernel::get_objects() const
+{
+	lock L(mtx);
+	std::list<shared_ptr<renderable> > ret = layer_world;
+	ret.insert( ret.end(), layer_world_transparent.begin(), layer_world_transparent.end());
+	ret.insert( ret.end(), layer_screen.begin(), layer_screen.end());
+	return ret;
 }
 
 } // !namespace cvisual

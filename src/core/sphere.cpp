@@ -16,25 +16,16 @@ displaylist sphere::lod_cache[12];
 
 
 sphere::sphere()
-	: radius( 1.0)
+{
+}
+
+sphere::sphere( const sphere& other)
+	: axial(other), tex(other.tex)
 {
 }
 
 sphere::~sphere()
 {
-}
-
-void
-sphere::set_radius( const double& r)
-{
-	model_damage();
-	radius = r;
-}
-
-double
-sphere::get_radius() const
-{
-	return radius;
 }
 
 void

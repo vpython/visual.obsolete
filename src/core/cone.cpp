@@ -82,8 +82,24 @@ static displaylist cone_simple_model[6];
 bool cone::first = true;
 
 cone::cone()
-	: radius(1.0)
 {
+}
+
+cone::cone( const cone& other)
+	: axial(other)
+{
+}
+
+void
+cone::set_length( double l)
+{
+	axis = axis.norm() * l;
+}
+
+double
+cone::get_length()
+{
+	return axis.mag();
 }
 
 void
@@ -100,12 +116,6 @@ cone::update_cache( const view&)
 			cone_simple_model[i].gl_compile_end();
 		}
 	}
-}
-
-void
-cone::set_radius( double r)
-{
-	radius = r;
 }
 
 void 

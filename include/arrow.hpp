@@ -61,9 +61,19 @@ class arrow : public primitive
 	 */
 	arrow();
 	void set_headwidth( double hw);
+	double get_headwidth();
+	
 	void set_headlength( double hl);
+	double get_headlength();
+	
 	void set_shaftwidth( double sw);
+	double get_shaftwidth();
+	
 	void set_fixedwidth( bool fixed);
+	bool is_fixedwidth();
+	
+	void set_length( double l);
+	double get_length();
 	
  protected:
 	/** Renderes the last cached state without checking its validity. */

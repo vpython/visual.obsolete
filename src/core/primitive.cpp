@@ -102,13 +102,20 @@ primitive::get_center() const
 }
 
 primitive::primitive()
-	: axis(1,0,0), up(0,1,0), pos(0,0,0), shininess(1.0)
+	: axis(mtx, 1,0,0), up(mtx, 0,1,0), pos(mtx, 0,0,0), shininess(1.0), 
+		lit(true)
+{
+}
+
+primitive::primitive( const primitive& other)
+	: renderable( other), axis(mtx, other.axis), up( mtx, other.up), 
+		pos(mtx, other.pos), shininess( other.shininess), lit( other.lit)
 {
 }
 
 primitive::primitive( 
 	const vector& n_pos, const vector& n_axis, const vector& n_up)
-	: axis(n_axis), up(n_up), pos(n_pos), shininess( 1.0)
+	: axis(mtx, n_axis), up(mtx, n_up), pos(mtx, n_pos), shininess( 1.0), lit(true)
 {
 }
 
@@ -123,6 +130,48 @@ primitive::set_pos( const vector& n_pos)
 	pos = n_pos;
 }
 
+shared_vector&
+primitive::get_pos()
+{
+	return pos;
+}
+
+void
+primitive::set_x( double x)
+{
+	pos.set_x( x);
+}
+
+double
+primitive::get_x()
+{
+	return pos.x;
+}
+
+void
+primitive::set_y( double y)
+{
+	pos.set_y( y);
+}
+
+double
+primitive::get_y()
+{
+	return pos.y;
+}
+
+void
+primitive::set_z( double z)
+{
+	pos.set_z( z);
+}
+
+double
+primitive::get_z()
+{
+	return pos.z;
+}
+
 void 
 primitive::set_axis( const vector& n_axis)
 {
@@ -132,6 +181,12 @@ primitive::set_axis( const vector& n_axis)
 			z_damage();
 		}
 	axis = n_axis;
+}
+
+shared_vector&
+primitive::get_axis()
+{
+	return axis;
 }
 
 void 
@@ -144,18 +199,103 @@ primitive::set_up( const vector& n_up)
 	up = n_up;
 }
 
+shared_vector&
+primitive::get_up()
+{
+	return up;
+}
+
 void 
 primitive::set_color( const rgba& n_color)
 {
+	lock L(mtx);
 	model_damage();
 	color = n_color;
 }
 
 void
+primitive::set_red( double r)
+{
+	lock L(mtx);
+	color.red = r;
+}
+
+double
+primitive::get_red()
+{
+	return color.red;
+}
+
+void
+primitive::set_green( double g)
+{
+	lock L(mtx);
+	color.green = g;
+}
+
+double
+primitive::get_green()
+{
+	return color.green;
+}
+
+void
+primitive::set_blue( double b)
+{
+	lock L(mtx);
+	color.blue = b;
+}
+
+double
+primitive::get_blue()
+{
+	return color.blue;
+}
+
+void
+primitive::set_alpha( double a)
+{
+	lock L(mtx);
+	color.alpha = a;
+}
+
+double
+primitive::get_alpha()
+{
+	return color.alpha;
+}
+
+rgba
+primitive::get_color()
+{
+	return color;
+}
+
+void
 primitive::set_shininess( const float s)
 {
+	lock L(mtx);
 	model_damage();
 	shininess = clamp( 0.0f, s, 1.0f);
+}
+
+float
+primitive::get_shininess()
+{
+	return shininess;
+}
+
+void
+primitive::set_lit(bool l)
+{
+	lock L(mtx);
+	lit = l;
+}
+
+bool
+primitive::is_lit()
+{
+	return lit;
 }
 
 PRIMITIVE_TYPEINFO_IMPL(primitive)

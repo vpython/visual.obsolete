@@ -28,6 +28,11 @@ renderable::renderable()
 {
 }
 
+renderable::renderable( const renderable& other)
+	: model_damaged(true), z_damaged(true), visible(true)
+{
+}
+
 renderable::~renderable()
 {
 }

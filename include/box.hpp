@@ -6,18 +6,16 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "primitive.hpp"
+#include "rectangular.hpp"
 #include "util/sorted_model.hpp"
 #include "util/texture.hpp"
 #include "util/displaylist.hpp"
 
 namespace cvisual {
 
-class box : public primitive
+class box : public rectangular
 {
  private:
-	double width;
-	double height;
 	// This object may be textured.
 	shared_ptr<texture> tex;
 
@@ -42,11 +40,11 @@ class box : public primitive
 	
  public:
 	box();
-	void set_width( const double&);
-	void set_height( const double&);
-	void set_length( const double&);
-	inline void set_texture( shared_ptr<texture> t)
-	{ tex = t; }
+	box( const box& other);
+	virtual ~box();
+	
+	void set_texture( shared_ptr<texture> t);
+	shared_ptr<texture> get_texture();
 	
  protected:
 	virtual void gl_pick_render( const view&);

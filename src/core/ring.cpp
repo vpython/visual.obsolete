@@ -11,20 +11,26 @@
 namespace cvisual {
 
 ring::ring()
-	: thickness( 0.0), radius( 1.0)
+	: thickness( 0.0)
 {
 }
 
-void
-ring::set_radius( double r)
-{
-	radius = r;
+ring::ring( const ring& other)
+	: axial( other), thickness( other.thickness)
+{	
 }
 
 void
 ring::set_thickness( double t)
 {
+	lock L(mtx);
 	thickness = t;
+}
+
+double
+ring::get_thickness()
+{
+	return thickness;
 }
 
 void

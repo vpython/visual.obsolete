@@ -8,6 +8,7 @@
 
 #include "util/rgba.hpp"
 #include "util/extent.hpp"
+#include "util/thread.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace cvisual {
@@ -84,7 +85,6 @@ public:
 	 */
 	rgba color;
 	/** Default base constructor.  Creates a white, model_damaged object. */
-	renderable();
 	virtual ~renderable();
 	
 	/** Called by the render cycle when drawing to the screen.  The default
@@ -114,6 +114,9 @@ public:
 	void refresh_cache( const view&);
 
 protected:
+	renderable();
+	renderable( const renderable& other);
+	mutex mtx;
 	/** If a subclass changes a property that affects its cached state, it must
 		call this function to ensure that its cache is updated on the next render
 		pass.

@@ -31,7 +31,7 @@ using boost::indirect_iterator;
 class display_kernel
 {
  private: // Private data
-	mutex mtx;
+	mutable mutex mtx;
 	
 	float window_width; ///< The last reported width of the window.
 	float window_height; ///< The last reported height of the window.
@@ -111,6 +111,7 @@ class display_kernel
 	std::vector<shared_ptr<renderable> > layer_screen;
 	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::iterator> screen_iterator;
 	
+	void recalc_extent();
 
 public: // Public Data.
 	enum mouse_mode_t { ZOOM_ROTATE, ZOOM_ROLL, PAN, FIXED } mouse_mode;
@@ -128,12 +129,12 @@ public: // Public Data.
 	/** Add an additional light source. */
 	void add_light( shared_ptr<light> n_light);
 	/** Change the background ambient lighting. */
-	void set_ambient( const rgba& color) { ambient = color; }
-	rgba& get_ambient() { return ambient; }
+	void set_ambient( const rgba& color) { lock L(mtx); ambient = color; }
+	rgba get_ambient() { return ambient; }
 	/** Remove an existing light source. */
 	void remove_light( shared_ptr<light> old_light);
 	/** Get the list of lights for this window. */
-	const std::list< shared_ptr<light> >& 
+	std::list< shared_ptr<light> >
 	get_lights() const
 	{ return lights; }
 	/** Clears the set of existing lights, and creates a pair of default lights. 
@@ -159,7 +160,6 @@ public: // Public Data.
 
  public: // Public functions
 	display_kernel();
-	void recalc_extent();
 
 	/** Renders the scene once.  The enveloping widget is resposible for calling
 		 this function appropriately.
@@ -218,10 +218,10 @@ public: // Public Data.
 	bool is_uniform();
 
 	void set_background( const rgba&);
-	rgba& get_background();
+	rgba get_background();
 
 	void set_forground( const rgba&);
-	rgba& get_forground();
+	rgba get_forground();
 
 	void set_autoscale( bool);
 	bool get_autoscale();
@@ -245,6 +245,10 @@ public: // Public Data.
 	// properties setter will not change the mode if the new one is invalid.
 	void set_stereomode( std::string mode);
 	std::string get_stereomode();
+	
+	// A list of all objects rendered into this display_kernel.  Modifying it
+	// does not propogate to the owner.
+	std::list<shared_ptr<renderable> > get_objects() const;
 
 	/** A signal that makes the wrapping widget's rendering context 
 		active.  The wrapping object must connect to it.

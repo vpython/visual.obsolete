@@ -6,21 +6,22 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "primitive.hpp"
+#include "axial.hpp"
 
 namespace cvisual {
 
-class cone : public primitive
+class cone : public axial
 {
  private:
-	// The radius of the base of the cone.
-	double radius;
 	static bool first;
 	bool degenerate();
 	
  public:
 	cone();
-	void set_radius( double r);
+	cone( const cone& other);
+	
+	void set_length( double l);
+	double get_length();
 	
  protected:
 	virtual void gl_pick_render( const view&);

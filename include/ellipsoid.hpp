@@ -13,14 +13,24 @@ namespace cvisual {
 class ellipsoid : public sphere
 {
  private:
-	double width;
 	double height;
+	double width;
 	
  public:
 	ellipsoid();
-	void set_width( double width);
-	void set_height( double height);
-	void set_length( double length);
+	ellipsoid( const ellipsoid& other);
+	
+	void set_length( double l);
+	double get_length();
+	
+	void set_height( double h);
+	double get_height();
+	
+	void set_width( double w);
+	double get_width();
+	
+	vector get_size();
+	void set_size( const vector&);	
 	
  protected:
 	virtual vector get_scale();

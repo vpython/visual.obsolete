@@ -14,27 +14,12 @@ scoped_ptr< z_sorted_model<triangle, 6> > pyramid::sorted_model;
 PRIMITIVE_TYPEINFO_IMPL(pyramid);
 
 pyramid::pyramid()
-	: width( 1.0), height(1.0)
 {
 }
 
-
-void
-pyramid::set_width( double w)
+pyramid::pyramid( const pyramid& other)
+	: rectangular( other)
 {
-	width = w;
-}
-
-void
-pyramid::set_height( double h)
-{
-	height = h;
-}
-
-void
-pyramid::set_length( double l)
-{
-	axis = axis.norm() * l;
 }
 
 void 
