@@ -1,6 +1,7 @@
 #include "gtk2/render_surface.hpp"
 #include "util/errors.hpp"
 #include "vpython-config.h"
+
 #include <gtkmm/gl/init.h>
 #include <algorithm>
 #include <iostream>
@@ -169,8 +170,13 @@ render_surface::on_button_press_event( GdkEventButton* event)
 bool 
 render_surface::on_button_release_event( GdkEventButton* event)
 {
-	if (event->button == 1 
-		&& fabs(last_mouseclick_x - event->x) < 4 
+	// Only handles the signal if:
+	// 	- something has connected to object_picked.
+	//  - the left mouse button is the source.
+	//  - there are less than 4 pixels of mouse drag in the event.
+	if (!object_clicked.empty()
+		&& event->button == 1
+		&& fabs(last_mouseclick_x - event->x) < 4
 		&& fabs(last_mouseclick_y - event->y) < 4) {
 		shared_ptr<renderable> pick = core.pick( event->x, event->y);
 		if (pick)
@@ -209,7 +215,6 @@ basic_app::basic_app( const char* title)
 	: kit( NULL, NULL)
 	, fs_img( Gdk::Pixbuf::create_from_file( 
 			VPYTHON_PREFIX "/data/galeon-fullscreen.png"))
-	, quit( Gtk::Stock::QUIT)
 {
 	using namespace Gtk::Toolbar_Helpers;
 
