@@ -148,6 +148,7 @@ box::grow_extent( extent& e)
 {
 	e.add_point( pos);
 	e.add_point( pos + axis);
+	e.add_body();
 }
 
 void

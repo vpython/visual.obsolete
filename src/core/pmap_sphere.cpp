@@ -202,6 +202,7 @@ void
 pmap_sphere::grow_extent( extent& e)
 {
 	e.add_sphere( pos, radius);
+	e.add_body();
 }
 
 void

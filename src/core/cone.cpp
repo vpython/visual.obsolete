@@ -201,6 +201,7 @@ cone::grow_extent( extent& e)
 		// A sphere centered roughly at the centroid of the body.
 		e.add_sphere( pos + axis / 3, radius);
 	}
+	e.add_body();
 }
 	
 vector 

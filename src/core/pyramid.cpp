@@ -162,6 +162,7 @@ pyramid::grow_extent( extent& world_extent)
 	world_extent.add_point( pos - vwidth + vheight);
 	world_extent.add_point( pos + vwidth - vheight);
 	world_extent.add_point( pos - vwidth - vheight);
+	world_extent.add_body();
 }
 
 vector

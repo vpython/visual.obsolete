@@ -268,12 +268,16 @@ frame::gl_pick_render( const view& scene)
 void 
 frame::grow_extent( extent& world)
 {
+	world.push_frame();
 	extent local;
 	for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
 		i->grow_extent( local);
+		world.add_body();
 	}
 	for (trans_child_iterator i = children.begin(); i != trans_child_iterator(children.end()); ++i) {
 		i->grow_extent( local);
+		world.add_body();
 	}
 	world.add_sphere( local.center() + pos, local.scale(scale) * 0.5);
+	world.pop_frame();
 }

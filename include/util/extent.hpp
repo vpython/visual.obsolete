@@ -14,6 +14,8 @@ class extent
 	vector maxs; ///< The lower left rear corner or the bounding box
 	vector mins; ///< The upper right forward corner of the bounding box
 	bool first;  ///< True if the first element in the box has not been set.
+	size_t buffer_depth; ///< The required depth of the selection buffer.
+	int frame_depth;
  
  public:
 	/** Construct a new extent object.  Defaults to a point at (0,0,0). */
@@ -29,6 +31,14 @@ class extent
  		@param radius The radius of the bounding sphere.
  	*/
 	void add_sphere( vector center, double radius);
+	
+	/** Report the number of bodies that this object represents.  This is used
+	 *  for the calculation of the hit buffer size.
+	 */
+	void add_body();
+	void push_frame();
+	void pop_frame();
+	size_t get_select_buffer_depth();
 
 	/** Zeros out the extent to be a single point at the origin. */
 	void reset();

@@ -148,6 +148,7 @@ arrow::grow_extent( extent& world)
 {
 	world.add_point( pos);
 	world.add_point( pos + axis);
+	world.add_body();
 }
 
 void 

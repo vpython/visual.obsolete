@@ -651,7 +651,9 @@ render_core::pick( float x, float y, float d_pixels)
 		// name_stack is the full contents of the name stack at the time of the hit.
 		
 		// TODO: The hit_buffer_size does not properly take into account frames.
-		size_t hit_buffer_size = (layer_world.size()+layer_world_transparent.size())*4;
+		size_t hit_buffer_size = std::max(
+				(layer_world.size()+layer_world_transparent.size())*4,
+				world_extent.get_select_buffer_depth());
 		// TODO: And this is a GNU extension...
 		unsigned int hit_buffer[hit_buffer_size];
 		

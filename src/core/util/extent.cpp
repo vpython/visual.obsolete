@@ -7,11 +7,10 @@
 #else
 #define EXPECT(boolean_expression, boolean_constant) \
 	boolean_expression
-#endif
-		
+#endif		
 
 extent::extent()
-	: first(true)
+	: first(true), buffer_depth(0), frame_depth(0)
 {
 }
 
@@ -22,6 +21,8 @@ extent::reset()
 	first = true;
 	mins = vector();
 	maxs = vector();
+	buffer_depth = 0;
+	frame_depth = 0;
 }
 
 void
@@ -102,4 +103,30 @@ extent::scale( const vector& s) const
 	if (first)
 		return 0;
 	return ((maxs - mins) * s).mag();
+}	
+
+void 
+extent::add_body()
+{
+	buffer_depth += 4 + frame_depth;
 }
+	
+void 
+extent::push_frame()
+{
+	frame_depth++;
+}
+
+void 
+extent::pop_frame()
+{
+	frame_depth--;
+	assert( frame_depth >= 0);
+}
+
+size_t 
+extent::get_select_buffer_depth()
+{
+	return buffer_depth;
+}
+

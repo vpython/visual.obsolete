@@ -63,6 +63,7 @@ void
 ring::grow_extent( extent& world)
 {
 	world.add_sphere( pos, radius + thickness ? thickness : (radius * 0.1));
+	world.add_body();
 }
 
 void 
