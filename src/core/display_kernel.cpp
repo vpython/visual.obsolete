@@ -529,6 +529,7 @@ display_kernel::draw(
 	world_iterator i( layer_world.begin());
 	world_iterator i_end( layer_world.end());
 	while (i != i_end) {
+		lock L(i->mtx);
 		if (i->color.alpha != 1.0) {
 			// The color of the object has become transparent when it was not
 			// initially.  Move it to the transparent layer.  The penalty for
@@ -565,6 +566,7 @@ display_kernel::draw(
 	world_trans_iterator j( layer_world_transparent.begin());
 	world_trans_iterator j_end( layer_world_transparent.end());
 	while (j != j_end) {
+		lock L(j->mtx);
 		j->refresh_cache( scene_geometry);
 		rgba actual_color = j->color;
 		if (anaglyph) {
@@ -825,7 +827,10 @@ display_kernel::pick( float x, float y, float d_pixels)
 		while (i != i_end) {
 			glLoadName( name_table.size());
 			name_table.push_back( *i);
-			(*i)->gl_pick_render( scene_geometry);
+			{
+				lock L((*i)->mtx);
+				(*i)->gl_pick_render( scene_geometry);
+			}
 			++i;
 		}
 		std::vector<shared_ptr<renderable> >::iterator j 
@@ -835,7 +840,10 @@ display_kernel::pick( float x, float y, float d_pixels)
 		while (j != j_end) {
 			glLoadName( name_table.size());
 			name_table.push_back( *j);
-			(*j)->gl_pick_render( scene_geometry);
+			{
+				lock L((*j)->mtx);
+				(*j)->gl_pick_render( scene_geometry);
+			}
 			++j;
 		}
 		// Return the name stack to the bottom with glPopName() exactly once.
