@@ -7,6 +7,7 @@
 #include "display_kernel.hpp"
 #include "display.hpp"
 #include "mouseobject.hpp"
+#include "util/errors.hpp"
 
 #include <boost/python/class.hpp>
 #include <boost/python/to_python_converter.hpp>
@@ -32,7 +33,27 @@ py_quit( void*)
 static void
 force_py_exit(void)
 {
+	VPYTHON_NOTE("Inserting the pending shutdown call...");
+	PyGILState_STATE state = PyGILState_Ensure();
 	Py_AddPendingCall( &py_quit, 0);
+	PyGILState_Release(state);
+	VPYTHON_NOTE( "The pending shutdown call has been entered.");
+}
+
+static void
+wrap_shutdown(void)
+{
+	Py_BEGIN_ALLOW_THREADS
+	gui_main::shutdown();
+	Py_END_ALLOW_THREADS
+}
+
+static void
+wrap_waitclosed(void)
+{
+	Py_BEGIN_ALLOW_THREADS
+	gui_main::waitclosed();
+	Py_END_ALLOW_THREADS
 }
 
 namespace py = boost::python;
@@ -270,11 +291,11 @@ wrap_display_kernel(void)
 		
 	// Free functions for exiting the system.  
 	// These are undocumented at the moment, and are only used internally.
-	def( "shutdown", gui_main::shutdown, 
+	def( "shutdown", wrap_shutdown, 
 		"Close all Displays and shutdown visual.");
 	def( "allclosed", gui_main::allclosed, 
 		"Returns true if all of the Displays are closed.");
-	def( "waitclose", gui_main::waitclosed, 
+	def( "waitclose", wrap_waitclosed, 
 		"Blocks until all of the Displays are closed by the user.");
 		
 	gui_main::on_shutdown.connect( SigC::slot( &force_py_exit));
