@@ -4,3 +4,48 @@ RunInTerminal=true
 
 [Project State]
 clean before build=false
+
+[filenumbers]
+0=9
+1=20
+2=236
+3=1
+4=312
+5=100
+6=58
+7=967
+8=144
+9=1
+10=58
+
+[filemarkers]
+0=
+1=
+2=
+3=
+4=
+5=
+6=
+7=
+8=
+9=
+10=
+
+[File View]
+filter.file.unmatch=*.so *.o *.a *.la
+filter.file.ignore.hidden=0
+filter.dir.ignore.hidden=0
+
+[filelist]
+0=/home/jonathan/Projects/vpython-core2/include/gtk2/render_surface.hpp
+1=/home/jonathan/Projects/vpython-core2/src/test/bounce_test.cpp
+2=/home/jonathan/Projects/vpython-core2/src/gtk2/render_surface.cpp
+3=/home/jonathan/Projects/vpython-core2/src/test/arrow_scaling_test.cpp
+
+[Project Tree]
+0=0
+1=0:0
+2=0:1
+
+[File Tree]
+0=0
