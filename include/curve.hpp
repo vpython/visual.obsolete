@@ -14,7 +14,8 @@ class curve : public renderable
 	double radius;
 	bool monochrome;
  
- 	bool degenerate();
+ 	bool degenerate() const;
+ 	bool closed_path() const;
 	long checksum( size_t begin, size_t end);
 	
 	struct c_cache 
@@ -30,7 +31,7 @@ class curve : public renderable
 	curve();
 	void append( vector pos, rgba color);
 	void append( vector pos);
-	void set_radius( double r) { radius = r; }
+	void set_radius( double r);
  
  protected:
 	virtual void gl_render( const view&);
