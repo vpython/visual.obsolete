@@ -35,7 +35,8 @@ vpython_core = core.SharedLibrary(
 	"src/core/ring.cpp",
 	"src/core/simple_displayobject.cpp",
 	"src/core/sphere.cpp",
-	"src/core/pmap_sphere.cpp" ] )
+	"src/core/pmap_sphere.cpp",
+	"src/core/frame.cpp" ] )
 
 gtk2 = opt.Copy()
 gtk2.Append( LIBPATH='lib', LIBS='vpython-core')
