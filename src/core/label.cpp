@@ -11,15 +11,34 @@
 namespace cvisual {
 
 label::label()
-	: space(0),
+	: pos(mtx, 0, 0, 0),
+	space(0),
 	xoffset(0),
 	yoffset(0),
 	border(5),
 	font_description("default"),
+	font_size(0),
 	box_enabled(true),
 	line_enabled(true),
 	linecolor( color),
 	opacity(0.66)
+{
+}
+
+label::label( const label& other)
+	: renderable( other),
+	pos( mtx, other.pos.x, other.pos.y, other.pos.z),
+	space( other.space),
+	xoffset( other.xoffset),
+	yoffset( other.yoffset),
+	border( other.border),
+	font_description( other.font_description),
+	font_size( other.font_size),
+	box_enabled( other.box_enabled),
+	line_enabled( other.line_enabled),
+	linecolor( other.linecolor),
+	opacity( other.opacity),
+	text( other.text)
 {
 }
 
@@ -29,9 +48,130 @@ label::set_pos( const vector& n_pos)
 	pos = n_pos;
 }
 
+shared_vector&
+label::get_pos()
+{
+	return pos;
+}
+
+void
+label::set_x( double x)
+{
+	pos.set_x( x);
+}
+
+double
+label::get_x()
+{
+	return pos.x;
+}
+
+void
+label::set_y( double y)
+{
+	pos.set_y( y);
+}
+
+double
+label::get_y()
+{
+	return pos.y;
+}
+
+void
+label::set_z( double z)
+{
+	pos.set_z( z);
+}
+
+double
+label::get_z()
+{
+	return pos.z;
+}
+
+void 
+label::set_color( const rgba& n_color)
+{
+	lock L(mtx);
+	color = n_color;
+}
+
+rgba
+label::get_color()
+{
+	return color;
+}
+
+void
+label::set_red( double r)
+{
+	lock L(mtx);
+	color.red = r;
+}
+
+double
+label::get_red()
+{
+	return color.red;
+}
+
+void
+label::set_green( double g)
+{
+	lock L(mtx);
+	color.green = g;
+}
+
+double
+label::get_green()
+{
+	return color.green;
+}
+
+void
+label::set_blue( double b)
+{
+	lock L(mtx);
+	color.blue = b;
+}
+
+double
+label::get_blue()
+{
+	return color.blue;
+}
+
+void
+label::set_alpha( double a)
+{
+	lock L(mtx);
+	color.alpha = a;
+}
+
+double
+label::get_alpha()
+{
+	return color.alpha;
+}
+
+void
+label::set_opacity( double o)
+{
+	lock L(mtx);
+	opacity = o;
+}
+
+double
+label::get_opacity()
+{
+	return opacity;
+}
+
 void
 label::set_text( std::string t)
 {
+	lock L(mtx);
 	text.clear();
 	std::istringstream buf( t);
 	std::string line;
@@ -40,46 +180,135 @@ label::set_text( std::string t)
 	}
 }
 
+std::string
+label::get_text()
+{
+	std::string ret;
+	if (text.empty())
+		return ret;
+	ret += text.front();
+	for (text_iterator i = text.begin()+1; i != text.end(); ++i) {
+		ret += '\n';
+		ret += *i;
+	}
+	return ret;
+}
+
 void 
 label::set_space( double n_space)
 {
+	lock L(mtx);
 	space = n_space;
+}
+
+double
+label::get_space()
+{
+	return space;
 }
 
 void 
 label::set_xoffset( double n_xoffset)
 {
+	lock L(mtx);
 	xoffset = n_xoffset;
+}
+
+double
+label::get_xoffset()
+{
+	return xoffset;
 }
 
 void 
 label::set_yoffset( double n_yoffset)
 {
+	lock L(mtx);
 	yoffset = n_yoffset;
+}
+
+double
+label::get_yoffset()
+{
+	return yoffset;
 }
 
 void 
 label::set_border( double n_border)
 {
+	lock L(mtx);
 	border = n_border;
+}
+
+double
+label::get_border()
+{
+	return border;
 }
 
 void 
 label::set_font_family( std::string name)
 {
+	lock L(mtx);
 	font_description = name;
+}
+
+std::string
+label::get_font_family()
+{
+	return font_description;
+}
+
+void
+label::set_font_size( double n_size)
+{
+	lock L(mtx);
+	font_size = n_size;
+}
+
+double
+label::get_font_size()
+{
+	return font_size;
 }
 
 void 
 label::render_box( bool enable)
 {
+	lock L(mtx);
 	box_enabled = enable;
+}
+
+bool
+label::has_box()
+{
+	return box_enabled;
 }
 
 void 
 label::render_line( bool enable)
 {
+	lock L(mtx);
 	line_enabled = enable;
+}
+
+bool
+label::has_line()
+{
+	return line_enabled;
+}
+
+void
+label::set_linecolor( const rgba& n_color)
+{
+	lock L(mtx);
+	linecolor = n_color;
+}
+
+rgba
+label::get_linecolor()
+{
+	return linecolor;
 }
 
 void
@@ -90,7 +319,7 @@ label::gl_render( const view& scene)
 	color.gl_set();
 	// bitmap_font font( font_description);
 	bitmap_font font;
-	for (std::vector<std::string>::iterator i = text.begin(); i != text.end(); ++i) {
+	for (text_iterator i = text.begin(); i != text.end(); ++i) {
 		double str_width = font.width(*i);
 		if (str_width > box_width)
 			box_width = str_width;
@@ -204,8 +433,8 @@ label::gl_render( const view& scene)
 
 		// Render the text iteself.
 		tpos_i = text_pos;		
-		std::vector<std::string>::iterator text_i = text.begin();
-		std::vector<std::string>::iterator text_end = text.end();
+		text_iterator text_i = text.begin();
+		text_iterator text_end = text.end();
 		while (tpos_i != tpos_end && text_i != text_end) {
 			glRasterPos3dv( &tpos_i->x);
 			// float raster_pos[3];

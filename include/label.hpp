@@ -18,19 +18,71 @@ class label : public renderable
 {
  public:
 	label();
-	void set_pos( const vector& n_pos);
-	void set_text( std::string t);
-	void set_space( double space);
-	void set_xoffset( double xoffset);
-	void set_yoffset( double yoffset);
-	void set_border( double border);
-	void set_font_family( std::string name);
-	void render_box( bool);
-	void render_line( bool);
+	label( const label& other);
 
+	void set_pos( const vector& n_pos);
+	shared_vector& get_pos();
+
+	void set_x( double x);
+	double get_x();
+	
+	void set_y( double y);
+	double get_y();
+	
+	void set_z( double z);
+	double get_z();
+
+	void set_color( const rgba& n_color);
+	rgba get_color();
+	
+	void set_red( double x);
+	double get_red();
+	
+	void set_green( double x);
+	double get_green();
+	
+	void set_blue( double x);
+	double get_blue();
+	
+	void set_alpha( double x);
+	double get_alpha();
+	
+	void set_opacity( double);
+	double get_opacity();
+
+	void set_text( std::string t);
+	std::string get_text();
+
+	void set_space( double space);
+	double get_space();
+
+	void set_xoffset( double xoffset);
+	double get_xoffset();
+
+	void set_yoffset( double yoffset);
+	double get_yoffset();
+
+	void set_border( double border);
+	double get_border();
+
+	void set_font_family( std::string name);
+	std::string get_font_family();
+
+	void set_font_size(double);
+	double get_font_size();
+
+	void render_box( bool);
+	bool has_box();
+
+	void render_line( bool);
+	bool has_line();
+	
+	void set_linecolor( const rgba& color);
+	rgba get_linecolor();
+	
  protected:
 	// In world space:
-	vector pos;
+	shared_vector pos;
 	double space;
 	
 	// In pixels:
@@ -38,8 +90,10 @@ class label : public renderable
 	double yoffset;
 	double border;    // space between text and box
 	
-	// A common name for the font.
+	/// A common name for the font.
 	std::string font_description;
+	/// The nominal size of the font, in pixels.
+	double font_size;
 	
 	bool box_enabled; ///< True to draw a box around the text
 	bool line_enabled; ///< True to draw a line to the text.
@@ -53,6 +107,7 @@ class label : public renderable
 	//   Each element of this container contains a single continuous line for 
 	//   the displayed text.
 	std::vector<std::string> text;
+	typedef std::vector<std::string>::const_iterator text_iterator;
     
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;
