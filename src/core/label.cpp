@@ -114,8 +114,6 @@ label::gl_render( const view& scene)
 	}
 
 	clear_gl_error();
-	glDisable( GL_DEPTH_TEST);
-	glDisable( GL_LIGHTING);
 	{
 		gl_matrix_stackguard guard;
 		vector label_pos = pos * scene.gcf;
@@ -219,8 +217,6 @@ label::gl_render( const view& scene)
 			++text_i;
 		}
 	}
-	glEnable( GL_LIGHTING);
-	glEnable( GL_DEPTH_TEST);
 	check_gl_error();
 }
 
