@@ -1,4 +1,4 @@
-// This file uses 175 MB to compile (optimizing)
+// This file uses 181 MB to compile (optimizing)
 
 #include "primitive.hpp"
 #include "arrow.hpp"
@@ -47,6 +47,9 @@ wrap_primitive()
 		.add_property( "alpha", &primitive::get_alpha, &primitive::set_alpha)		
 		.add_property( "shininess", &primitive::get_shininess, &primitive::set_shininess)
 		.add_property( "lit", &primitive::is_lit, &primitive::set_lit)
+		.def( "rotate", &primitive::py_rotate1, args( "angle"))
+		.def( "rotate", &primitive::py_rotate2, args( "angle", "axis"))
+		.def( "rotate", &primitive::py_rotate3, args( "angle", "axis", "origin"))
 		;
 		
 	class_<axial, bases<primitive>, noncopyable>( "axial", no_init)

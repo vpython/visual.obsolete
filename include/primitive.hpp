@@ -49,9 +49,17 @@ class primitive : public renderable
 	
 	// Used when obtaining the center of the body.
 	virtual vector get_center() const;
+	
+	void rotate( double angle, const vector& axis, const vector& origin);
 
  public:
 	virtual ~primitive();
+
+	// Manually overload this member since the default arguments are variables.
+	void py_rotate1( double angle);
+	void py_rotate2( double angle, vector axis);
+	void py_rotate3( double angle, vector axis, vector origin);
+
 	void set_pos( const vector& n_pos);
 	shared_vector& get_pos();
 	

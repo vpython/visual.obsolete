@@ -123,6 +123,41 @@ primitive::~primitive()
 {
 }
 
+void
+primitive::rotate( double angle, const vector& _axis, const vector& origin)
+{
+	tmatrix R = rotation( angle, _axis, origin);
+	vector fake_up = up;
+	if (!axis.cross( fake_up)) {
+		fake_up = vector( 1,0,0);
+		if (!axis.cross( fake_up))
+			fake_up = vector( 0,1,0);
+	}
+
+	pos = R * pos;
+	axis = R.times_v( axis);
+	up = R.times_v( fake_up);
+}
+
+void 
+primitive::py_rotate1( double angle)
+{
+	rotate( angle, axis, pos);
+}
+
+void
+primitive::py_rotate2( double angle, vector _axis)
+{
+	rotate( angle, _axis, pos);
+}
+
+void
+primitive::py_rotate3( double angle, vector _axis, vector origin)
+{
+	rotate( angle, _axis, origin);
+}
+
+
 void 
 primitive::set_pos( const vector& n_pos)
 {
