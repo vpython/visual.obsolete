@@ -1,4 +1,33 @@
-This directory is a kind of sandbox that I'm using to build and test and build a new OpenGL rendering engine for VPython.
+This directory is a kind of sandbox that I'm using to build 
+and test a new OpenGL rendering engine for VPython.
+
+Directory layout
+SConstruct
+	A scons build file for this project.  Run `scons` to build the
+	application. (not tested with OSX/gtk1, yet).
+bin/  
+	Programs are built in-place here.
+lib/
+	Target libraries are built in-place here.
+include/
+include/util/
+	Header files for utility classes, like tmatrix, and vector.
+include/gtk1/
+	Classes for Gtk 1.2 + gtkglarea
+include/gtk2/
+	Classes for Gtkmm + GtkGLExtmm
+src/core/
+	Implementations of classes defined in include/
+src/core/util/
+	same, for include/util/
+src/gtk1/
+	same, for include/gtk1
+src/gtk2/
+	same, for include/gtk2
+src/test/
+	A series of test programs used to excersize the individiual
+	parts of this library.
+	
 
 TODO:
 Port to Win32/wGL.
@@ -14,6 +43,8 @@ Write new implementations of:
 
 Possible new objects:
 	face_strip
+
+More research: FTGL.  In particular texture-mapped text, UTF-8.
 
 
 Final:
