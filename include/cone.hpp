@@ -15,6 +15,7 @@ class cone : public simple_displayobject
 	void set_radius( double r);
 	
  protected:
+	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
 	virtual void update_cache( const view&);
 	virtual void grow_extent( extent&);

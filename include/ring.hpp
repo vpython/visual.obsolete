@@ -18,8 +18,11 @@ class ring : public simple_displayobject
 	void set_thickness( double t);
 	
  protected:
+	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
+	
+	void do_render_opaque( const view&, size_t rings, size_t bands);
 };
 
 #endif

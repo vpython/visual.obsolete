@@ -163,8 +163,9 @@ public: // Public Data.
 	/** Determine which object (if any) was picked by the cursor.
  	    @param x the x-position of the mouse cursor, in pixels.
 		@param y the y-position of the mouse cursor, in pixels.
-		@param d_pixels: the allowable variation in pixels to successfully score a hit.
-		@return  the nearest selected object.
+		@param d_pixels: the allowable variation in pixels to successfully score
+			a hit.
+		@return  the nearest selected object.  May be NULL if nothing was hit.
 	*/
 	shared_ptr<renderable> pick( float x, float y, float d_pixels = 2.0);
 

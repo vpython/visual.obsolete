@@ -123,6 +123,13 @@ arrow::get_center() const
 	return (pos + axis)/2.0;
 }
 
+void 
+arrow::gl_pick_render( const view&)
+{
+	if (visible)
+		model.gl_render();
+}
+
 void
 arrow::gl_render( const view&)
 {

@@ -31,6 +31,7 @@ class sphere : public simple_displayobject
 	shared_ptr<texture> get_texture();
  
  protected:
+	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
 	virtual void update_cache( const view&);

@@ -39,6 +39,7 @@ class box : public simple_displayobject
 	{ tex = t; }
 	
  protected:
+	virtual void gl_pick_render( const view&);
 	virtual void update_cache( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);

@@ -33,6 +33,19 @@ pyramid::set_length( double l)
 }
 
 void 
+pyramid::gl_pick_render( const view& scene)
+{
+	if (axis.mag() == 0.0 || width == 0.0 || height == 0.0)
+		return;
+	vector view_pos = pos * scene.gcf;
+	gl_matrix_stackguard guard;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);
+	model_world_transform().gl_mult();
+	glScaled( axis.mag() * scene.gcf, height * scene.gcf, width * scene.gcf);
+	simple_model.gl_render();
+}
+
+void 
 pyramid::update_cache( const view&)
 {
 	// This object follows a very simple caching strategy.  A displaylist is

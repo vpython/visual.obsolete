@@ -17,6 +17,11 @@ renderable::gl_render( const view&)
 }
 
 void
+renderable::gl_pick_render( const view&)
+{
+}
+
+void
 renderable::grow_extent( extent&)
 {
 	return;

@@ -51,6 +51,19 @@ sphere::get_texture()
 }
 
 void
+sphere::gl_pick_render( const view& geometry)
+{
+	size_t lod = 2;
+	gl_matrix_stackguard guard;
+	const vector view_pos = pos * geometry.gcf;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);
+	model_world_transform().gl_mult();
+	const vector scale = get_scale() * geometry.gcf;
+	glScaled( scale.x, scale.y, scale.z);
+	lod_cache[lod].gl_render();
+}
+
+void
 sphere::gl_render( const view& geometry)
 {
 	clear_gl_error();

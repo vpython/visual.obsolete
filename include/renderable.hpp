@@ -58,6 +58,10 @@ public:
 	
 	// Renders itself.
 	virtual void gl_render(const view&);
+	
+	// Renders itself for picking.  Since it is not visible, the object should
+	// not worry about things like transparency or texture mapping.
+	virtual void gl_pick_render( const view&);
 		
 	// Report the total extent of the object.
 	virtual void grow_extent( extent&);

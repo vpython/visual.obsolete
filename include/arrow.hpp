@@ -32,6 +32,7 @@ class arrow : public simple_displayobject
 	void set_fixedwidth( bool fixed);
 	
  protected:
+	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
 	virtual void update_cache( const view&);

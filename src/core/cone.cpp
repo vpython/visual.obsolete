@@ -92,6 +92,19 @@ cone::set_radius( double r)
 }
 
 void 
+cone::gl_pick_render( const view& scene)
+{
+	size_t lod = 2;
+	gl_matrix_stackguard guard;
+	glTranslated( pos.x, pos.y, pos.z);
+	model_world_transform().gl_mult();
+	const double radial_scale = radius * scene.gcf;
+	const double axial_scale = axis.mag() * scene.gcf;
+	glScaled( axial_scale, radial_scale, radial_scale);
+	cone_simple_model[lod].gl_render();
+}
+
+void 
 cone::gl_render( const view& scene)
 {
 	clear_gl_error();

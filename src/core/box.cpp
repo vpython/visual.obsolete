@@ -31,6 +31,18 @@ box::set_height( const double& n_height)
 }
 
 void 
+box::gl_pick_render( const view& scene)
+{
+	double gcf = scene.gcf;
+	gl_matrix_stackguard guard;
+	vector view_pos = pos * scene.gcf;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);
+	model_world_transform().gl_mult();
+	glScaled( axis.mag() * gcf, width * gcf, height * gcf);
+	simple_model.gl_render();
+}
+
+void 
 box::update_cache( const view&)
 {
 	if (first) {
