@@ -31,16 +31,8 @@ bitmap_font::bitmap_font()
 		font = (HFONT)GetStockObject( SYSTEM_FONT);
 		listbase = glGenLists(256);
 		SelectObject( dev_context, font);
-		BOOL result = wglUseFontOutlines(
-			dev_context,
-			0,
-			256,
-			listbase,
-			0.0f,
-			0.0f,
-			WGL_FONT_POLYGONS,
-			0
-		);
+		BOOL result = wglUseFontBitmaps( dev_context, 0, 256, listbase);
+
 		
 		if (!result) {
 			WIN32_CRITICAL_ERROR("wglUseFontOutlines()");
@@ -51,8 +43,8 @@ bitmap_font::bitmap_font()
 	
 	TEXTMETRIC metrics;
 	GetTextMetrics( dev_context, &metrics);
-	m_ascent = metrics.tmAscent * 2.0 / render_surface::current->window_width;
-	m_descent = metrics.tmDescent * 2.0 / render_surface::current->window_width;
+	m_ascent = metrics.tmAscent; //* 2.0 / render_surface::current->window_width;
+	m_descent = -metrics.tmDescent; // * 2.0 / render_surface::current->window_width;
 }
 
 bitmap_font::bitmap_font( const std::string& name, int size)
@@ -70,8 +62,9 @@ bitmap_font::bitmap_font( const std::string& name, int size)
 	}
 	else {
 		font = (HFONT)CreateFont(
-			static_cast<int>(-72.0 * size 
-				/ GetDeviceCaps(dev_context, LOGPIXELSY)),
+			// static_cast<int>(-72.0 * size 
+			// 	/ GetDeviceCaps(dev_context, LOGPIXELSY)),
+			-size,
 			0,
 			0,0,
 			0,
@@ -87,16 +80,8 @@ bitmap_font::bitmap_font( const std::string& name, int size)
 			WIN32_CRITICAL_ERROR("CreateFont()");
 		SelectObject( dev_context, font);
 		listbase = glGenLists(256);
-		BOOL result = wglUseFontOutlines(
-			dev_context,
-			0,
-			256,
-			listbase,
-			0.0f,
-			0.0f,
-			WGL_FONT_POLYGONS,
-			0
-		);
+
+		BOOL result = wglUseFontBitmaps( dev_context, 0, 256, listbase);
 		
 		if (!result) {
 			WIN32_CRITICAL_ERROR("wglUseFontOutlines()");
@@ -107,9 +92,9 @@ bitmap_font::bitmap_font( const std::string& name, int size)
 	
 	TEXTMETRIC metrics;
 	GetTextMetrics( dev_context, &metrics);
-	m_ascent = metrics.tmAscent * 2.0 / render_surface::current->window_height;
-	m_descent = metrics.tmDescent * 2.0 
-		/ render_surface::current->window_height;
+	m_ascent = metrics.tmAscent * 2.0; //  / render_surface::current->window_height;
+	m_descent = -metrics.tmDescent * 2.0; 
+		// / render_surface::current->window_height;
 }
 
 bitmap_font::~bitmap_font()
@@ -144,8 +129,8 @@ bitmap_font::width( const std::string& text) const
 	SIZE size;
 	GetTextExtentPoint32(
 		render_surface::current->dev_context, text.c_str(), text.size(), &size);
-	return static_cast<double>(size.cx * 2) 
-		/ render_surface::current->window_width;
+	return static_cast<double>(size.cx); //  * 2) 
+		// / render_surface::current->window_width;
 }
 
 } // !namespace cvisual
