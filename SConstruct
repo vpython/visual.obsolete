@@ -41,6 +41,7 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/util/clipping_plane.cpp",
 	"src/core/util/tmatrix.cpp",
 	"src/core/util/checksum.cpp",
+	"src/core/axial.cpp",
 	"src/core/box.cpp",
 	"src/core/cone.cpp",
 	"src/core/cylinder.cpp",
@@ -50,6 +51,7 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/display_kernel.cpp",
 	"src/core/ring.cpp",
 	"src/core/primitive.cpp",
+	"src/core/rectangular.cpp",
 	"src/core/sphere.cpp",
 	"src/core/pmap_sphere.cpp",
 	"src/core/frame.cpp",
@@ -128,3 +130,14 @@ main = "src/gtk2/main.cpp"
 Test('object_zsort_bench')
 Test('model_zsort_bench')
 Test('sincos_matrix_bench')
+
+################################################################################
+# Build the extension module.
+py = core.Copy()
+py.Append( CPPPATH='/usr/include/python2.3', LIBS='boost_python', CPPFLAGS='-Wno-unused')
+py.SharedLibrary( target='lib/cvisualmodule',
+	source=['src/python/wrap_display_kernel.cpp',
+		'src/python/wrap_vector.cpp',
+		'src/python/wrap_rgba.cpp',
+		'src/python/wrap_primitive.cpp',
+		'src/python/num_util.cpp' ])
