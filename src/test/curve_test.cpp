@@ -17,8 +17,8 @@ realmain( std::vector<std::string>&)
 	tmatrix rotator = rotation( delta_angle, vector( 0, 1, 0));
 	for (int i = 0; i < 258; ++i) {
 		v_0 = rotator * v_0;
-		thin->append( v_0 + v_gain*i, rgba(0,1,0));
-		thick->append( v_0 - v_gain*i, rgba(0,0,1));
+		thin->append( v_0 + v_gain*i, rgb(0,1,0));
+		thick->append( v_0 - v_gain*i, rgb(0,0,1));
 #if 0 // Debugging code.
 		if (i == 0) {
 			shared_ptr<arrow> tmp(new arrow());
@@ -37,11 +37,11 @@ realmain( std::vector<std::string>&)
 	
 	shared_ptr<curve> box( new curve());
 	box->set_radius( 0.1);
-	box->append( vector( 2,-2), rgba(1, 0, 1));
-	box->append( vector( 2, 2), rgba(1, 0, 1));
-	box->append( vector(-2, 2), rgba(1, 0, 1));
-	box->append( vector(-2,-2), rgba(1, 0, 1));
-	box->append( vector(2,-2), rgba(1,0,1));
+	box->append( vector( 2,-2), rgb(1, 0, 1));
+	box->append( vector( 2, 2));
+	box->append( vector(-2, 2));
+	box->append( vector(-2,-2));
+	box->append( vector(2,-2) );
 	
 	shared_ptr<arrow> x( new arrow());
 	x->set_color( rgba( 1, 0, 0));
