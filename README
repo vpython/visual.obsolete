@@ -1,5 +1,11 @@
 This directory is a kind of sandbox that I'm using to build 
 and test a new OpenGL rendering engine for VPython.
+Dependancies (in Debian):
+libboost-python-dev
+libboost-thread-dev
+ftgl-dev
+libgle3-dev
+libgtkglextmm1-dev
 
 Directory layout
 SConstruct
