@@ -18,6 +18,8 @@ namespace cvisual {
 /** Report a warning to the user that can probably be corrected, through cerr. */
 #define VPYTHON_WARNING(msg) write_warning( __FILE__, __LINE__, \
 	__PRETTY_FUNCTION__, msg)
+	
+#define VPYTHON_NOTE(msg) write_note( __FILE__, __LINE__, msg)
 
 // This should only be used within Win32-specific code.
 #define WIN32_CRITICAL_ERROR(msg) win32_write_critical( __FILE__, __LINE__, \
@@ -34,6 +36,9 @@ write_critical(
 void
 write_warning(
 	std::string file, int line, std::string function, std::string message);
+
+void
+write_note( std::string file, int line, std::string message);
 
 /** Obtains the active OpenGL transformation matrix and dumps it to stderr. */
 void

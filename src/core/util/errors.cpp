@@ -35,6 +35,14 @@ write_warning(
 }
 
 void
+write_note( std::string file, int line, std::string message)
+{
+	if (getenv( "VPYTHON_DEBUG"))
+		std::cerr << "VPython: " << file << ":" << line << ": " << message 
+			<< "\n";
+}
+
+void
 dump_glmatrix()
 {
 	// TODO: set this up to write out a matrix with the same format for all of
