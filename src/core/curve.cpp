@@ -51,12 +51,11 @@ curve::checksum( size_t begin, size_t end)
 	long ret = 0;
 	
 	checksum( ret, &radius);
-	for (std::vector<rgba>::const_iterator i = color.begin()+1+begin; 
+	for (std::vector<rgb>::const_iterator i = color.begin()+1+begin; 
 			i < color.begin()+1+end; ++i) {
 		checksum( ret, &i->red);
 		checksum( ret, &i->green);
 		checksum( ret, &i->blue);
-		checksum( ret, &i->alpha);
 	}
 	for (std::vector<vector>::const_iterator i = pos.begin()+begin; 
 			i < pos.begin()+end+2; ++i) {
@@ -74,7 +73,7 @@ curve::curve()
 }
 
 void
-curve::append( vector n_pos, rgba n_color)
+curve::append( vector n_pos, rgb n_color)
 {
 	monochrome = false;
 	if (color.size()%256 == 1)
@@ -212,7 +211,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 	// The following may be empty, but they are kept at this scope to ensure
 	// that their memory will be valid when rendering the body below.
 	std::vector<vector> spos;
-	std::vector<rgba> tcolor;
+	std::vector<rgb> tcolor;
 	
 	if (scene.gcf != 1.0) {
 		// Must scale the pos data.
@@ -242,19 +241,19 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 	else {
 		if (scene.anaglyph) {
 			// Must desaturate or grayscale the color.
-			std::vector<rgba> _tmp(color.begin()+begin+1, color.begin()+1+end);
+			std::vector<rgb> _tmp(color.begin()+begin+1, color.begin()+1+end);
 			tcolor.swap( _tmp);
-			for (std::vector<rgba>::iterator i = tcolor.begin(); 
+			for (std::vector<rgb>::iterator i = tcolor.begin(); 
 					i < tcolor.end(); ++i) {
 				if (scene.coloranaglyph)
 					*i = i->desaturate();
 				else
 					*i = i->grayscale();
 			}
-			glColorPointer( 4, GL_FLOAT, 0, &*tcolor.begin());
+			glColorPointer( 3, GL_FLOAT, 0, &*tcolor.begin());
 		}
 		else
-			glColorPointer( 4, GL_FLOAT, 0, &*(color.begin()+begin+1));
+			glColorPointer( 3, GL_FLOAT, 0, &*(color.begin()+begin+1));
 	}
 	glDrawArrays( GL_LINE_STRIP, 0, end-begin);
 }
@@ -262,9 +261,9 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 void
 curve::thickline( const view& scene, size_t begin, size_t end)
 {
-	std::vector<rgba> tcolor;
+	std::vector<rgb> tcolor;
 	std::vector<vector> spos;
-	float (*used_color)[4] = &((color.begin()+begin)->data);
+	float (*used_color)[3] = &((color.begin()+begin)->data);
 	double (*used_pos)[3] = &((pos.begin()+begin)->data);
 	
 	
@@ -296,9 +295,9 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	else {
 		if (scene.anaglyph) {
 			// Must desaturate or grayscale the color.
-			std::vector<rgba> tmp( color.begin()+begin, color.end()+end+2);
+			std::vector<rgb> tmp( color.begin()+begin, color.end()+end+2);
 			tcolor.swap(tmp);
-			for (std::vector<rgba>::iterator i = tcolor.begin(); 
+			for (std::vector<rgb>::iterator i = tcolor.begin(); 
 					i < tcolor.end(); ++i) {
 				if (scene.coloranaglyph)
 					*i = i->desaturate();
@@ -308,7 +307,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			used_color = &tcolor.begin()->data;
 		}
 		
-		glePolyCylinder_c4f( 
+		glePolyCylinder( 
 			end-begin+2, used_pos,
 			used_color, radius * scene.gcf);
 	}

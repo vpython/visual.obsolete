@@ -10,7 +10,7 @@ class curve : public renderable
 {
  private:
 	std::vector<vector> pos;
-	std::vector<rgba> color;
+	std::vector<rgb> color;
 	double radius;
 	bool monochrome;
  
@@ -29,7 +29,7 @@ class curve : public renderable
 
  public:
 	curve();
-	void append( vector pos, rgba color);
+	void append( vector pos, rgb color);
 	void append( vector pos);
 	void set_radius( double r);
  
