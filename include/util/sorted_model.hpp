@@ -9,7 +9,7 @@ struct tcoord
 {
 	float s;
 	float t;
-	inline tcoord() : s(0), t(0) {}
+	inline tcoord( float s_ = 0, float t_ = 0) : s(s_), t(t_) {}
 	inline explicit tcoord( const vector& v)
 	 : s(v.x), t(v.y) {}
 	inline void gl_render() const
@@ -92,14 +92,16 @@ quad::gl_render() const
 	corner[3].gl_render();
 }
 
-// A quadrilateral object that also uses texture coordinates.
+/** A quadrilateral object that also uses texture coordinates. */
 struct tquad : public quad
 {
-	tcoord tex[4];
+	tcoord tex[4]; ///< The texture coordinates.
+	tquad() {}
 	tquad( const vector& v1, const tcoord& t1, 
 		const vector& v2, const tcoord& t2, 
 		const vector& v3, const tcoord& t3,
 		const vector& v4, const tcoord& t4);
+
 	void gl_render() const;
 };
 
@@ -119,7 +121,7 @@ tquad::tquad( const vector& v1, const tcoord& t1,
 inline void
 tquad::gl_render() const
 {
-	normal.gl_render();
+	normal.gl_normal();
 	tex[0].gl_render();
 	corner[0].gl_render();
 	tex[1].gl_render();
