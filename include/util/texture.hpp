@@ -7,6 +7,7 @@
 
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include "util/gl_free.hpp"
 
 namespace cvisual {
 
@@ -28,7 +29,7 @@ using boost::shared_ptr;
 	well as be immutable.  It is possible that the base class is so abstract as
 	to be non-constructable from Python (simmilar to cvisual.displayobject now).
 */
-class texture
+class texture : public SigC::Object
 {
  private:
 	bool damaged;
@@ -48,6 +49,7 @@ class texture
 		must be active.
 	*/
 	void gl_activate();
+	void gl_free();
  
  protected:
 	// A unique identifier for the texture, to be obtained from glGenTextures().

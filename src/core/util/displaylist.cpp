@@ -5,14 +5,23 @@
 #include "wrap_gl.hpp"
 
 #include "util/displaylist.hpp"
+#include "util/errors.hpp"
 #include <cassert>
+#include <sigc++/object_slot.h>
+#include <boost/lexical_cast.hpp>
+using boost::lexical_cast;
 
 namespace cvisual {
 
 void 
 displaylist::deleter( unsigned int* handle)
 {
-	glDeleteLists(*handle, 1);
+	if (*handle) {
+		VPYTHON_NOTE( "Deleting displaylist number " 
+			+ lexical_cast<std::string>(*handle));
+		glDeleteLists(*handle, 1);
+		*handle = 0;
+	}
 	delete handle;
 }
 
@@ -32,6 +41,9 @@ displaylist::gl_compile_begin()
 		handle = shared_ptr<unsigned int>( 
 			new unsigned int, &displaylist::deleter);
 		*handle = glGenLists(1);
+		VPYTHON_NOTE( "Allocated displaylist number " 
+			+ lexical_cast<std::string>(*handle));
+		on_gl_free.connect( SigC::slot(*this, &displaylist::gl_free));
 	}
 	glNewList( *handle, GL_COMPILE);
 }
@@ -47,6 +59,17 @@ displaylist::gl_render() const
 {
 	assert( handle);
 	glCallList( *handle);
+}
+
+void
+displaylist::gl_free()
+{
+	if (handle && *handle) {
+		VPYTHON_NOTE( "Deleting displaylist number " 
+			+ lexical_cast<std::string>(handle));
+		glDeleteLists( *handle, 1);
+	}
+	*handle = 0;
 }
 
 } // !namespace cvisual

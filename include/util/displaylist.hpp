@@ -6,13 +6,14 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include <boost/shared_ptr.hpp>
+#include "util/gl_free.hpp"
 
 namespace cvisual {
 
 using boost::shared_ptr;
 
 /** A manager for OpenGL displaylists */
-class displaylist
+class displaylist : public SigC::Object
 {
  private:
 	/// A unique identifier for objects of this type
@@ -22,18 +23,27 @@ class displaylist
  public:
 	displaylist();
 	~displaylist();
+	
 	/** Begin compiling a new displaylist.  Nothing is drawn to the screen
  		when rendering commands into the displaylist.  Be sure to call 
  		gl_compile_end() when you are done.
  		*/
 	void gl_compile_begin();
+	
 	/** Completes compiling the displaylist. */
 	void gl_compile_end();
+	
 	/** Perform the OpenGL commands cached with gl_compile_begin() and 
 		gl_compile_end(). */
 	void gl_render() const;
+	
+	/** Release any OpenGL resources associated with this object, even though
+	 * it has not been deleted.  Postcondition: operator bool() returns false.
+	 */
+	void gl_free();
+	
 	/** @return true iff this object contains a compiled OpenGL program. */
-	inline operator bool() const { return handle; }
+	inline operator bool() const { return (handle && *handle);  }
 };
 
 } // !namespace cvisual
