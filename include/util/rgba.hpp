@@ -17,6 +17,8 @@ namespace cvisual {
 class rgba
 {
  public:
+	// Eeek!  Use the 'data' member when you really need to refer to this data as
+	// an array.  Like with gle.
 	union {
 		float data[4];
 		struct {
@@ -27,7 +29,7 @@ class rgba
 			/** Blue channel intensity, clamped to [0,1] */
 			float blue;
 			/** Alpha channel intensity, clamped to [0,1] */
-		    float alpha;
+			float alpha;
 		};
 	};
 

@@ -20,6 +20,8 @@ namespace cvisual {
 class vector
 {
 public:
+	// Eeek!  Use the 'data' term when you really need to refer to this data as
+	// an array.  Like with gle.
 	union {
 		double data[3];
 		struct {
