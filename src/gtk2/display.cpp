@@ -75,12 +75,6 @@ display::display()
 	visible(true),
 	title( "VPython")
 {
-	display_kernel::gl_begin.connect( 
-		SigC::slot( *this, &display::gl_begin));
-	display_kernel::gl_end.connect( 
-		SigC::slot( *this, &display::gl_end));
-	display_kernel::gl_swap_buffers.connect( 
-		SigC::slot( *this, &display::gl_swap_buffers));
 }
 
 display::~display()
@@ -151,10 +145,10 @@ void
 display::set_visible( bool vis)
 {
 	if (vis && !active) {
-		gtk2_main::add_display( this);
+		gui_main::add_display( this);
 	}
 	else if (!vis && active) {
-		gtk2_main::remove_display(this);
+		gui_main::remove_display(this);
 	}
 	visible = vis;
 }
@@ -186,7 +180,7 @@ display::add_renderable( shared_ptr<renderable> obj)
 {
 	display_kernel::add_renderable( obj);
 	if (!active && visible) {
-		gtk2_main::add_display(this);
+		gui_main::add_display(this);
 	}
 }
 
@@ -195,7 +189,7 @@ display::add_renderable_screen( shared_ptr<renderable> obj)
 {
 	display_kernel::add_renderable( obj);
 	if (!active && visible)
-		gtk2_main::add_display(this);
+		gui_main::add_display(this);
 }
 
 void 
@@ -210,60 +204,17 @@ display::get_selected()
 	return selected;
 }
 
-Glib::RefPtr<Gdk::GL::Context> display::share_list;
+// Glib::RefPtr<Gdk::GL::Context> display::share_list;
 
 void
 display::create()
 {
-	Glib::RefPtr<Gdk::GL::Config> config;
-	// Create the DrawingArea widget first.
-	switch (stereo_mode) {
-		case ACTIVE_STEREO:
-			config = Gdk::GL::Config::create( Gdk::GL::MODE_RGB
-				| Gdk::GL::MODE_DOUBLE
-				| Gdk::GL::MODE_STEREO
-				| Gdk::GL::MODE_DEPTH );
-			if (config)
-				break;
-			VPYTHON_WARNING( "'active' stereo mode not available, falling back"
-				" to :'nostereo'");
-		default:
-			config = Gdk::GL::Config::create( Gdk::GL::MODE_RGB
-				| Gdk::GL::MODE_DOUBLE
-				| Gdk::GL::MODE_DEPTH );
-	}
-	if (!config) {
-		VPYTHON_CRITICAL_ERROR( "Failed to create any OpenGL context.");
-		std::exit(1);
-	}
+	area.reset( new render_surface(*this, stereo_mode == ACTIVE_STEREO));
 	
-	if (share_list) {
-		area.reset( new Gtk::GL::DrawingArea( config, share_list, true));
-	}
-	else {
-		area.reset( new Gtk::GL::DrawingArea( config));
-	}
-	
-	area->add_events( Gdk::EXPOSURE_MASK
-		| Gdk::BUTTON_PRESS_MASK
-		| Gdk::BUTTON_RELEASE_MASK
-		| Gdk::POINTER_MOTION_MASK 
-		| Gdk::ENTER_NOTIFY_MASK 
-		| Gdk::BUTTON2_MOTION_MASK
-		| Gdk::BUTTON3_MOTION_MASK);
 	if (stereo_mode == PASSIVE_STEREO)
 		area->set_size_request( (int)(width * 2.0), (int)height);
 	else
 		area->set_size_request( (int)width, (int)height);
-	area->signal_realize().connect( SigC::slot( *this, &display::on_realize));
-	area->signal_motion_notify_event().connect( 
-		SigC::slot( *this, &display::on_motion_notify));
-	area->signal_configure_event().connect( SigC::slot( *this, &display::on_configure));
-	area->signal_enter_notify_event().connect( 
-		SigC::slot( *this, &display::on_enter_notify));
-	area->signal_expose_event().connect(
-		SigC::slot( *this, &display::on_expose));
-		
 		
 	Glib::RefPtr<Gdk::Pixbuf> fs_img = Gdk::Pixbuf::create_from_file( 
 		VPYTHON_PREFIX "/data/galeon-fullscreen.png");
@@ -351,116 +302,31 @@ display::on_window_delete(GdkEventAny*)
 	window.reset();
 	area.reset();
 	
-	gtk2_main::report_window_delete( this);
+	gui_main::report_window_delete( this);
 	if (exit)
-		gtk2_main::quit();
+		gui_main::quit();
 	return false;
 }
 
 void
 display::on_quit_clicked()
 {
-	gtk2_main::quit();
+	gui_main::quit();
 }
 
-bool 
-display::on_motion_notify( GdkEventMotion* event)
-{
-	// Direct the core to perform rendering ops.
-	
-	// The vertical and horizontal changes of the mouse position since the last
-	// call.
-	float dy = static_cast<float>( event->y) - last_mousepos_y;
-	float dx = static_cast<float>( event->x) - last_mousepos_x;
-	bool buttondown = false;
-	
-	if (event->state & GDK_BUTTON2_MASK) {
-		report_mouse_motion( dx, dy, display_kernel::MIDDLE);
-		buttondown = true;
-	}
-	if (event->state & GDK_BUTTON3_MASK) {
-		report_mouse_motion( dx, dy, display_kernel::RIGHT);
-		buttondown = true;
-	}
-	else if (!buttondown) {
-		report_mouse_motion( dx, dy, display_kernel::NONE);
-	}
-	last_mousepos_x = static_cast<float>(event->x);
-	last_mousepos_y = static_cast<float>(event->y);
-	return true;
-}
-
-bool 
-display::on_configure( GdkEventConfigure* event)
-{
-	report_resize( 
-		static_cast<float>(event->width), 
-		static_cast<float>(event->height));
-	return true;
-}
-
-bool 
-display::on_enter_notify( GdkEventCrossing* event)
-{
-	last_mousepos_x = event->x;
-	last_mousepos_y = event->y;
-	return true;
-}
-
-void
-display::on_realize()
-{
-	report_realize();
-	if (!share_list) {
-		share_list = area->get_gl_context();
-	}
-	assert( share_list);
-	
-	timer = Glib::signal_timeout().connect( 
-		SigC::slot( *this, &display::render_scene),
-		28);
-}
-
-bool
-display::on_expose( GdkEventExpose*)
-{
-	render_scene();
-	return true;
-}
-
-void
-display::gl_begin()
-{
-	// TODO: Use the mouse motion signal hinting to poll its state at the end
-	// of a render cycle and pass a single mouse_motion event for it.
-	assert( area->get_gl_window()->gl_begin(area->get_gl_context()));
-}
-
-void
-display::gl_end()
-{
-	area->get_gl_window()->gl_end();
-}
-
-void
-display::gl_swap_buffers()
-{
-	area->get_gl_window()->swap_buffers();
-}
-
-////////////////////////////////// gtk2_main implementation ////////////////////
-gtk2_main* gtk2_main::self = 0;
+////////////////////////////////// gui_main implementation ////////////////////
+gui_main* gui_main::self = 0;
 
 
-gtk2_main::gtk2_main()
+gui_main::gui_main()
 	: kit( 0, 0), caller( 0), returned( false), waiting_allclosed(false)
 {
 	Gtk::GL::init( 0, 0);
 	if (!Glib::thread_supported())
 		Glib::thread_init();
-	signal_add_display.connect( SigC::slot( *this, &gtk2_main::add_display_impl));
-	signal_remove_display.connect( SigC::slot( *this, &gtk2_main::remove_display_impl));
-	signal_shutdown.connect( SigC::slot( *this, &gtk2_main::shutdown_impl));
+	signal_add_display.connect( SigC::slot( *this, &gui_main::add_display_impl));
+	signal_remove_display.connect( SigC::slot( *this, &gui_main::remove_display_impl));
+	signal_shutdown.connect( SigC::slot( *this, &gui_main::shutdown_impl));
 }
 
 #if 0
@@ -472,7 +338,7 @@ py_quit( void*)
 #endif
 
 void
-gtk2_main::run()
+gui_main::run()
 {
 	kit.run();
 	lock L(call_lock);
@@ -489,18 +355,18 @@ gtk2_main::run()
 }
 
 void 
-gtk2_main::thread_proc(void)
+gui_main::thread_proc(void)
 {
-	self = new gtk2_main();
+	self = new gui_main();
 	self->run();
 	self = 0;
 }
 
 void
-gtk2_main::init_thread(void)
+gui_main::init_thread(void)
 {
 	if (!self) {
-		thread gtk( &gtk2_main::thread_proc);
+		thread gtk( &gui_main::thread_proc);
 		while (!self) {
 		}
 	}
@@ -508,7 +374,7 @@ gtk2_main::init_thread(void)
 
 // TODO: This isn't safe.
 bool
-gtk2_main::allclosed()
+gui_main::allclosed()
 {
 	if (!self)
 		return true;
@@ -517,7 +383,7 @@ gtk2_main::allclosed()
 }
 
 void
-gtk2_main::waitclosed()
+gui_main::waitclosed()
 {
 	if (!self)
 		return;
@@ -530,7 +396,7 @@ gtk2_main::waitclosed()
 }
 
 void
-gtk2_main::add_display( display* d)
+gui_main::add_display( display* d)
 {
 	init_thread();
 	lock L(self->call_lock);
@@ -543,7 +409,7 @@ gtk2_main::add_display( display* d)
 }
 
 void
-gtk2_main::add_display_impl()
+gui_main::add_display_impl()
 {
 	lock L(call_lock);
 	caller->create();
@@ -553,7 +419,7 @@ gtk2_main::add_display_impl()
 }
 
 void
-gtk2_main::remove_display( display* d)
+gui_main::remove_display( display* d)
 {
 	assert( self);
 	lock L(self->call_lock);
@@ -566,7 +432,7 @@ gtk2_main::remove_display( display* d)
 }
 
 void
-gtk2_main::remove_display_impl()
+gui_main::remove_display_impl()
 {
 	lock L(call_lock);
 	caller->destroy();
@@ -576,7 +442,7 @@ gtk2_main::remove_display_impl()
 }
 
 void
-gtk2_main::shutdown()
+gui_main::shutdown()
 {
 	if (!self)
 		return;
@@ -588,7 +454,7 @@ gtk2_main::shutdown()
 }
 
 void
-gtk2_main::shutdown_impl()
+gui_main::shutdown_impl()
 {
 	lock L(call_lock);
 	for (std::list<display*>::iterator i = displays.begin(); i != displays.end(); ++i) {
@@ -600,7 +466,7 @@ gtk2_main::shutdown_impl()
 }
 
 void
-gtk2_main::report_window_delete( display* window)
+gui_main::report_window_delete( display* window)
 {
 	assert( self != 0);
 	bool display_empty = false;
@@ -610,11 +476,11 @@ gtk2_main::report_window_delete( display* window)
 		display_empty = self->displays.empty();
 	}
 	if (display_empty && self->waiting_allclosed)
-		gtk2_main::quit();
+		gui_main::quit();
 }
 
 void
-gtk2_main::quit()
+gui_main::quit()
 {
 	assert( self != 0);
 	for (std::list<display*>::iterator i = self->displays.begin(); 

@@ -7,6 +7,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
+#include "gtk2/render_surface.hpp"
 
 #include <boost/scoped_ptr.hpp>
 
@@ -21,13 +22,14 @@
 namespace cvisual {
 using boost::scoped_ptr;
 
-// TODO: Implement userzoom, userspin, show, hide, project??, keyboard, and
+// TODO: Implement userzoom, userspin, show, hide, keyboard, uniform, and
 // mouse events.
 class display : public display_kernel,
 	public SigC::Object
 {
  private:
-	scoped_ptr<Gtk::GL::DrawingArea> area;
+	// scoped_ptr<Gtk::GL::DrawingArea> area;
+	scoped_ptr<render_surface> area;
 	scoped_ptr<Gtk::Window> window;
 	SigC::Connection timer;
 
@@ -47,7 +49,7 @@ class display : public display_kernel,
  
 	// The 'selected' display.
 	static shared_ptr<display> selected;
-	static Glib::RefPtr<Gdk::GL::Context> share_list;
+	// static Glib::RefPtr<Gdk::GL::Context> share_list;
 	
  public:
 	display();
@@ -76,7 +78,7 @@ class display : public display_kernel,
 	static void set_selected( shared_ptr<display> d);
 	static shared_ptr<display> get_selected();
 	
-	// Called by the gtk2_main class below when this window needs to create
+	// Called by the gui_main class below when this window needs to create
 	// or destroy itself.
 	void create();
 	void destroy();
@@ -88,33 +90,11 @@ class display : public display_kernel,
 	void on_rotate_clicked();
 	bool on_window_delete(GdkEventAny*);
 	void on_quit_clicked();
- 
- 	// Low-level signal handlers for the underlying Gtk::GL::DrawingArea.
-	// Called when the user moves the mouse across the screen.
-	bool on_motion_notify( GdkEventMotion* event);
-	// Called when the window is resized.
-	bool on_configure( GdkEventConfigure* event);
-	// Called when the mouse enters the scene.
-	bool on_enter_notify( GdkEventCrossing* event);
-	// Called when the window is established for the first time.
- 	void on_realize();
-	// Called when the window has been exposed from the back, and should be 
-	// painted again.
-	bool on_expose( GdkEventExpose*);
-	// Called when one of the mouse buttons has been pressed.
-	// bool on_button_press( GdkEventButton*);
-	// bool on_button_release( GdkEventButton*);
-	// bool on_area_delete( GdkEventAny*);
-
-	// Functions to be used as callbacks for connections via SigC::slots.
-	void gl_begin();
-	void gl_end();
-	void gl_swap_buffers();
 };
 
 // A singlton.  This class provides all of the abstraction from the Gtk::Main
 // object.
-class gtk2_main : public SigC::Object
+class gui_main : public SigC::Object
 {
  private:
 	Gtk::Main kit;
@@ -138,9 +118,9 @@ class gtk2_main : public SigC::Object
 	
 	std::list<display*> displays;
 	
-	gtk2_main();
+	gui_main();
 	void run();
-	static gtk2_main* self;
+	static gui_main* self;
 	static void thread_proc(void);
 	static void init_thread(void);
 
