@@ -9,6 +9,32 @@
 namespace cvisual {
 namespace {
 
+struct timeval : ::timeval
+{
+	// Convert to straight usec.
+	operator long long() const
+	{
+		return tv_sec * 1000000 + tv_usec;
+	}
+};
+	
+
+struct timespec : ::timespec
+{
+	timespec()
+	{
+		tv_sec = 0;
+		tv_nsec = 0;
+	}
+	
+	// Convert from usec.
+	timespec( long long t)
+	{
+		tv_sec = t / 1000000;
+		tv_nsec = t % 1000000 * 1000;
+	}
+};
+
 // Parts of the rate_timer common to both the OSX and Linux implementations.
 class rate_timer
 {
@@ -22,7 +48,8 @@ class rate_timer
 		gettimeofday( &origin, 0);
 	}
 	
-	void delay( double);
+	// Force the loop to run in 'sec' seconds by inserting the appropriate delay.
+	void delay( double sec);
 };
 
 void
@@ -32,46 +59,41 @@ rate_timer::delay( double _delay)
 	timerclear(&now);
 	gettimeofday( &now, 0);
 	
-	// Convert the requested delay into units of the clock.
-	timeval delay = {
-		(long)_delay,
-		(long)((_delay - (long)_delay) * 1e6)
-	};
+	// Convert the requested delay into integer units of usec.
+	const long long delay = (long long)(_delay * 1e6);
+	long long origin = this->origin;
 	
 	// The amount of time to wait.
-	timespec wait = { 
-		delay.tv_sec - (now.tv_sec - origin.tv_sec),
-		(delay.tv_usec - (now.tv_usec - origin.tv_usec)) * 1000
-	};
-	if (wait.tv_sec < 0 || wait.tv_nsec < 0) {
-		gettimeofday( &origin, 0);
+	long long wait = delay - ((long long)now - origin);
+	if (wait < 0) {
+		gettimeofday( &this->origin, 0);
 		return;
 	}
 	// The amout of time remaining when nanosleep returns
-	timespec remaining = { 0, 0};
+	timespec remaining;
 #ifdef __APPLE__ // OSX.
 	// OSX's nanosleep() is very accurate :)
-	nanosleep( &wait, &remaining);
+	timespec sleep_wait( wait);
+	nanosleep( &sleep_wait, &remaining);
 #else
 	// Computation of the requested delay is the same, but the execution differs
 	// from OSX.  This is to provide somewhat more accurate timing on Linux, 
 	// whose timing is abominable.
-	wait.tv_nsec -= 10000000;
-	if (wait.tv_nsec > 0) {
-		nanosleep( &wait, &remaining);
+	wait -= 10000; // Subtract off 10 ms.
+	if (wait > 0) {
+		timespec sleep_wait(wait);
+		nanosleep( &sleep_wait, &remaining);
 	}
 
 	// Busy wait out the remainder of the time.
 	gettimeofday( &now, 0);
-	wait.tv_sec = delay.tv_sec - (now.tv_sec - origin.tv_sec);
-	wait.tv_nsec = (delay.tv_usec - (now.tv_usec - origin.tv_usec));
-	while (wait.tv_sec >= 0 && wait.tv_nsec > 0) {
+	wait = delay - ((long long)now - origin);
+	while (wait > 0) {
 		gettimeofday( &now, 0);
-		wait.tv_sec = delay.tv_sec - (now.tv_sec - origin.tv_sec);
-		wait.tv_nsec = (delay.tv_usec - (now.tv_usec - origin.tv_usec));
+		wait = delay - ((long long)now - origin);
 	}
 #endif
-	gettimeofday( &origin, 0);
+	gettimeofday( &this->origin, 0);
 }
 
 } // !namespace (unnamed)
