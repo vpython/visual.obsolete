@@ -39,6 +39,13 @@ class extent
  	*/
 	void add_sphere( vector center, double radius);
 	
+    /** Merge a local extent with this one.
+    * @param fwt   The transform from the frame coordinates to the parent's
+    *     coordinate space.
+    * @param local   The extent of the objects rendered within frame.
+    */    
+    void merge_local( const tmatrix& fwt, const extent& local);
+    
 	/** Report the number of bodies that this object represents.  This is used
 	 *  for the calculation of the hit buffer size.
 	 */
@@ -88,11 +95,6 @@ class extent
 	vector range( vector center) const;
 	double uniform_range( vector center) const;
  
-	/** Determine the magnitude of a scaled subworld.  See also 
-		frame::grow_extent() 
-	*/
-	double scale( const vector& scale) const;
-	
 	/** Print the state of the extent out to stderr.  Only useful for internal debuggin.
 	 */
 	void dump_extent() const;

@@ -77,6 +77,19 @@ extent::add_sphere( vector center, double radius)
 	}	
 }
 
+void
+extent::merge_local( const tmatrix& fwt, const extent& local)
+{
+    if (local.first)
+        return;
+    
+    vector min_corner = fwt*local.mins;
+    vector max_corner = fwt*local.maxs;
+    vector local_center = (min_corner + max_corner) * 0.5;
+    double radius = (min_corner - max_corner).mag();
+    add_sphere( local_center, radius);
+}
+
 vector
 extent::center() const
 {
@@ -190,14 +203,6 @@ extent::uniform_range( vector center) const
 	ret = std::max( fabs( center.z - maxs.z), ret);
 	return ret;
 }
-
-double
-extent::scale( const vector& s) const
-{
-	if (maxs == mins)
-		return 0;
-	return ((maxs - mins) * s).mag();
-}	
 
 void 
 extent::add_body()

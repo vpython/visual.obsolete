@@ -311,11 +311,10 @@ frame::update_z_sort( const view&)
 void 
 frame::gl_render( const view& v)
 {
-	// Ensure that we always get our cache updated to update our children.
+    
 	tmatrix wft = world_frame_transform(v.gcf);
-	vector camera = wft * v.camera;
-	view local( v, -camera.norm());
-	local.camera = camera;
+	view local( v, wft.times_v( v.forward));
+	local.camera = wft * v.camera;
 	local.center = wft * v.center;
 	model_damage();
 	{
@@ -426,7 +425,7 @@ frame::grow_extent( extent& world)
 		j->grow_extent( local);
 		world.add_body();
 	}
-	world.add_sphere( local.center() + pos, local.scale(scale) * 0.5);
+	world.merge_local( frame_world_transform( 1.0), local);
 	world.pop_frame();
 }
 
