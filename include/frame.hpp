@@ -76,8 +76,8 @@ class frame : public renderable
 	void py_rotate2( double angle, vector axis);
 	void py_rotate3( double angle, vector axis, vector origin);
 
-	void add_child( shared_ptr<renderable> child);
-	void remove_child( shared_ptr<renderable> child);
+	void add_renderable( shared_ptr<renderable> child);
+	void remove_renderable( shared_ptr<renderable> child);
 	std::list<shared_ptr<renderable> > get_objects();
  
 	void set_pos( const vector& n_pos);

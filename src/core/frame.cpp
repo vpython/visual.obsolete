@@ -218,7 +218,7 @@ frame::world_frame_transform( const double) const
 }
 
 void 
-frame::add_child( shared_ptr<renderable> obj)
+frame::add_renderable( shared_ptr<renderable> obj)
 {
 	if (obj->color.alpha == 1.0)
 		children.push_back( obj);
@@ -227,7 +227,7 @@ frame::add_child( shared_ptr<renderable> obj)
 }
 	
 void 
-frame::remove_child( shared_ptr<renderable> obj)
+frame::remove_renderable( shared_ptr<renderable> obj)
 {
 	if (obj->color.alpha != 1.0) {
 		std::remove( trans_children.begin(), trans_children.end(), obj);

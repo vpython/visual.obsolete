@@ -42,9 +42,9 @@ realmain( std::vector<std::string>&)
 	repeated->set_pos( vector( 1, 1, 1));
 	repeated->set_scale( vector( 1, 1, -1));
 	// repeated->add_child( net2);
-	repeated->add_child( x);
-	repeated->add_child( y);
-	repeated->add_child( z);
+	repeated->add_renderable( x);
+	repeated->add_renderable( y);
+	repeated->add_renderable( z);
 	
 	main_window.scene.core.add_renderable( y);
 	main_window.scene.core.add_renderable( x);

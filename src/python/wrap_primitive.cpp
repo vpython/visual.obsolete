@@ -163,6 +163,8 @@ wrap_primitive()
 		.def( "rotate", &frame::py_rotate1, args( "angle"))
 		.def( "rotate", &frame::py_rotate2, args( "angle", "axis"))
 		.def( "rotate", &frame::py_rotate3, args( "angle", "axis", "origin"))
+		.def( "add_renderable", &frame::add_renderable)
+		.def( "remove_renderable", &frame::remove_renderable)
 		;
 }	
 	
