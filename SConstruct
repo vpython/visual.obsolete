@@ -2,10 +2,21 @@ import os
 import sys
 
 SetOption( "implicit_cache", 1)
+EnsurePythonVersion( 2, 2)
 
-# TODO: Add support to build a gch for wrap_gl.hpp, render_surface.hpp,
-# and simple_displayobject.hpp
+# TODO: Add support to build a gch for wrap_gl.hpp, display_kernel.hpp,
+# and renderable.hpp
+# TODO: Make a configuration section for the following tests:
+# existence and suitability of FTGL.
+# The FTGL header file problem
+# The existence and suitability of Boost.Python
+# The existence of gtkmm
+# The existence of gtkglextmm
+# The existence and suitability of gle
+# The particular version of Python to install against.
+# The prefix.
 
+# Build a configuration header file.
 
 core = Environment( CCFLAGS=['-pipe', '-g'],
 	ENV = os.environ,
@@ -101,7 +112,7 @@ tests['ENV']['PKG_CONFIG_PATH'] = './lib/pkgconfig/'
 # tests.ParseConfig( 'pkg-config --cflags --libs vpython-3.0')
 tests.Append( LIBPATH='lib', LIBS=['vpython-core'] )
 if sys.platform == 'win32':
-	tests.Append( LDFLAGS='-mwindows')
+	tests.Append( LINKFLAGS='-mwindows')
 	main = 'src/win32/winmain.cpp'
 else:
 	main = 'src/gtk2/main.cpp'
@@ -133,6 +144,7 @@ if sys.platform != 'win32':
 	Test('gtk_style_test')
 	
 main = "src/gtk2/main.cpp"
+tests.Replace( LINKFLAGS="")
 Test('object_zsort_bench')
 Test('model_zsort_bench')
 Test('sincos_matrix_bench')
@@ -144,7 +156,8 @@ py.Append( CPPPATH='/usr/include/python2.3',
 	LIBS=['boost_python', 'vpython-core'],
 	LIBPATH='lib',
 	CPPFLAGS='-Wno-unused')
-py.SharedLibrary( target='site-packages/cvisual',
+py.SharedLibrary( 
+	target='site-packages/cvisual',
 	source=['src/python/wrap_display_kernel.cpp',
 		'src/python/wrap_vector.cpp',
 		'src/python/wrap_rgba.cpp',
@@ -152,5 +165,7 @@ py.SharedLibrary( target='site-packages/cvisual',
 		'src/python/num_util.cpp',
 		'src/python/slice.cpp',
 		'src/python/curve.cpp',
+		'src/python/faces.cpp',
 		'src/python/cvisualmodule.cpp',
-		'src/python/wrap_arrayobjects.cpp' ] )
+		'src/python/wrap_arrayobjects.cpp' ],
+	SHLIBPREFIX="" )
