@@ -3,7 +3,7 @@
 
 #include <string>
 #include <stdexcept>
-#include <GL/gl.h>
+#include "wrap_gl.hpp"
 
 /** Report the existance of a critical error to cerr. */
 #define VPYTHON_CRITICAL_ERROR(msg) write_critical( __FILE__, __LINE__, \

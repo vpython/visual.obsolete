@@ -3,7 +3,7 @@
 
 #include "util/tmatrix.hpp"
 #include "util/rgba.hpp"
-#include <GL/gl.h>
+#include "wrap_gl.hpp"
 
 class light
 {

@@ -1,7 +1,7 @@
 #ifndef VPYTHON_UTIL_RGBA_HPP
 #define VPYTHON_UTIL_RGBA_HPP
 
-#include <GL/gl.h>
+#include "wrap_gl.hpp"
 
 /** A helper class to manage OpenGL color attributes.  The data is layout
 	compatable with OpenGL's needs for the various vector forms of commands,

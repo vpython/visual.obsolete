@@ -6,7 +6,7 @@
 #include <cassert>
 #include <sstream>
 
-#include <GL/gl.h>
+#include "wrap_gl.hpp"
 
 class vector
 {
