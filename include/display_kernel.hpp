@@ -36,9 +36,9 @@ class display_kernel
 	float window_width; ///< The last reported width of the window.
 	float window_height; ///< The last reported height of the window.
  
-	vector center; ///< The observed center of the display, in world space.
-	vector forward; ///< The direction of the camera, in world space.
-	vector up; ///< The vertical orientation of the scene, in world space.
+	shared_vector center; ///< The observed center of the display, in world space.
+	shared_vector forward; ///< The direction of the camera, in world space.
+	shared_vector up; ///< The vertical orientation of the scene, in world space.
 	
 	/** True initally and whenever the camera direction changes.  Set to false
 	 * after every render cycle. 
@@ -147,19 +147,20 @@ public: // Public Data.
 	/** Add a normal renderable object to the list of objects to be rendered into
 	 *  world space.
 	 */
-	void add_renderable( shared_ptr<renderable>);
+	virtual void add_renderable( shared_ptr<renderable>);
 	
 	/** Add a normal renderable object to the list of objects to be rendered into
 	 *  screen space.  At this time, only label objects have this requirement.
 	 */
-	void add_renderable_screen( shared_ptr<renderable>);
+	virtual void add_renderable_screen( shared_ptr<renderable>);
 	
 	/**  Remove a renderable object from this display, regardless of which layer
 	 *   it resides in.  */
-	void remove_renderable( shared_ptr<renderable>);
+	virtual void remove_renderable( shared_ptr<renderable>);
 
  public: // Public functions
 	display_kernel();
+	virtual ~display_kernel();
 
 	/** Renders the scene once.  The enveloping widget is resposible for calling
 		 this function appropriately.
@@ -197,17 +198,17 @@ public: // Public Data.
 	
 	// Python properties
 	void set_up( const vector& n_up);
-	vector& get_up();
+	shared_vector& get_up();
 
 	void set_forward( const vector& n_forward);
-	vector& get_forward();
+	shared_vector& get_forward();
 
 	// TODO: Implement me.
 	void set_scale( const vector& n_scale);
 	vector& get_scale();
 	
 	void set_center( const vector& n_center);
-	vector& get_center();
+	shared_vector& get_center();
 
 	void set_fov( double);
 	double get_fov();

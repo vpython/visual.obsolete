@@ -74,6 +74,7 @@ display_kernel::disable_lights()
 void 
 display_kernel::add_light( shared_ptr<light> n_light)
 {
+	lock L(mtx);
 	if (lights.size() >= 8)
 		throw std::invalid_argument( "There may be no more than 8 lights.");
 	lights.push_back( n_light);
@@ -82,6 +83,7 @@ display_kernel::add_light( shared_ptr<light> n_light)
 void 
 display_kernel::remove_light( shared_ptr<light> old_light)
 {
+	lock L(mtx);
 	lights.remove( old_light);
 	// std::remove( lights.begin(), lights.end(), old_light);
 }
@@ -106,9 +108,9 @@ display_kernel::illuminate_default()
 display_kernel::display_kernel()
 	: window_width(384),
 	window_height(256),
-	center(0, 0, 0),
-	forward(0, 0, -1),
-	up(0, 1, 0),
+	center(mtx, 0, 0, 0),
+	forward(mtx, 0, 0, -1),
+	up(mtx, 0, 1, 0),
 	forward_changed(true),
 	cycles_since_extent(4),
 	fov( 60 * M_PI / 180.0),
@@ -135,7 +137,6 @@ display_kernel::~display_kernel()
 void
 display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 {
-	lock L(mtx);
 	// This stuff handles automatic movement of the camera in responce to user
 	// input.  See also view_to_world_transform for how the affected variables 
 	// are used to actually position the camera.
@@ -170,9 +171,11 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 					// Pan front/back.
 					center += pan_rate * vfrac * forward;
 					break;
-				case ZOOM_ROLL: case ZOOM_ROTATE:
+				case ZOOM_ROLL: case ZOOM_ROTATE: {
 					// Zoom in/out.
-					user_scale *= std::pow( 10.0f, vfrac);
+						lock L(mtx);
+						user_scale *= std::pow( 10.0f, vfrac);
+					}
 					break;
 			}
 			break;
@@ -218,6 +221,7 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 void
 display_kernel::report_resize( float new_width, float new_height)
 {
+	lock L(mtx);
 	window_height = new_height;
 	window_width = new_width;
 }
@@ -225,6 +229,7 @@ display_kernel::report_resize( float new_width, float new_height)
 void
 display_kernel::report_realize()
 {
+	lock L(mtx);
 	gl_begin();
 	clear_gl_error();
 	
@@ -830,11 +835,10 @@ display_kernel::pick( float x, float y, float d_pixels)
 void
 display_kernel::set_up( const vector& n_up)
 {
-	lock L(mtx);
 	up = n_up;
 }
 
-vector&
+shared_vector&
 display_kernel::get_up()
 {
 	return up;
@@ -843,12 +847,11 @@ display_kernel::get_up()
 void
 display_kernel::set_forward( const vector& n_forward)
 {
-	lock L(mtx);
 	forward = n_forward;
 	forward_changed = true;
 }
 
-vector&
+shared_vector&
 display_kernel::get_forward()
 {
 	return forward;
@@ -857,11 +860,10 @@ display_kernel::get_forward()
 void
 display_kernel::set_center( const vector& n_center)
 {
-	lock L(mtx);
 	center = n_center;
 }
 
-vector&
+shared_vector&
 display_kernel::get_center()
 {
 	return center;
