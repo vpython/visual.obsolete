@@ -40,7 +40,8 @@ vpython_core = core.SharedLibrary(
 	"src/core/simple_displayobject.cpp",
 	"src/core/sphere.cpp",
 	"src/core/pmap_sphere.cpp",
-	"src/core/frame.cpp" ] )
+	"src/core/frame.cpp",
+	"src/core/label.cpp" ] )
 
 gtk2 = opt.Copy()
 gtk2.Append( LIBPATH='lib', LIBS='vpython-core')
@@ -48,7 +49,8 @@ gtk2.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0')
 vpython_gtk2 = gtk2.SharedLibrary( 
 	target = 'lib/vpython-gtk2',
 	source = ['src/gtk2/file_texture.cpp', 
-	'src/gtk2/render_surface.cpp' ])
+	'src/gtk2/render_surface.cpp',
+	'src/gtk2/font.cpp' ])
 
 
 ################################################################################
