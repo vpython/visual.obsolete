@@ -1,12 +1,19 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "convex.hpp"
 #include "util/checksum.hpp"
+
+namespace cvisual {
 
 convex::jitter_table convex::jitter;
 
 long
 convex::checksum() const
 {
-	using ::checksum;
+	using cvisual::checksum;
 	long ret = 0;
 	for (std::vector<vector>::const_iterator i = pos.begin(); i != pos.end(); ++i) {
 		checksum( ret, &i->x);
@@ -39,7 +46,7 @@ convex::recalc()
 #else
 	hull.push_back( face( pos[0], pos[1], pos[2]));
 	hull.push_back( face( pos[0], pos[2], pos[1]));
-	for (int i = 3; i < pos.size(); ++i) {
+	for (size_t i = 3; i < pos.size(); ++i) {
 		add_point( i, pos[i]);
 	}
 
@@ -49,7 +56,7 @@ convex::recalc()
 }
 
 void
-convex::add_point( int n, vector pv)
+convex::add_point( size_t n, vector pv)
 {
 	double m = pv.mag();
 	pv.x += m * jitter.v[(n  ) & jitter.mask];
@@ -180,3 +187,4 @@ convex::grow_extent( extent& world)
 	}
 }
 
+} // !namespace cvisual

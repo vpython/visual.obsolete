@@ -1,10 +1,17 @@
 #ifndef VPYTHON_CONVEX_HPP
 #define VPYTHON_CONVEX_HPP
 
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "renderable.hpp"
 #include "util/sorted_model.hpp"
 
 #include <vector>
+
+namespace cvisual {
 
 class convex : public renderable
 {
@@ -62,7 +69,7 @@ class convex : public renderable
 	
 	// Hull construction routines.
 	void recalc();
-	void add_point( int, vector);
+	void add_point( size_t, vector);
 	std::vector<face> hull;
 	
  public:
@@ -76,5 +83,7 @@ class convex : public renderable
 	virtual void gl_pick_render( const view&);
 	virtual void grow_extent( extent&);
 };
+
+} // !namespace cvisual
 
 #endif // !defined VPYTHON_CONVEX_HPP
