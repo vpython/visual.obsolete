@@ -47,7 +47,8 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/pmap_sphere.cpp",
 	"src/core/frame.cpp",
 	"src/core/label.cpp",
-	"src/core/curve.cpp" ]
+	"src/core/curve.cpp",
+	"src/core/convex.cpp" ]
 
 if sys.platform == 'win32':
 	srcs.append( 'src/win32/render_surface.cpp')
@@ -111,6 +112,7 @@ Test('selection_test')
 # Test('conference_demo')
 Test('curve_test')
 Test('label_test')
+Test('convex_test')
 if sys.platform != 'win32':
 	Test('gtk_style_test')
 	
