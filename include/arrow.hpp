@@ -55,6 +55,8 @@ class arrow : public primitive
 	double headwidth;
 	double headlength;
 	double shaftwidth;
+	
+	bool degenerate();
  
  public:
 	/** Default arrow.  Pointing along +x, unit length, 

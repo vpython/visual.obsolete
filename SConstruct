@@ -26,9 +26,11 @@ core = Environment( CCFLAGS=['-pipe', '-g'],
 if sys.platform.find('linux') >= 0:
 	core.Append( CPPPATH=['/usr/include/FTGL'])
 
-# Crank up the warnings
+# Crank up the warnings.  Note that I am disabling the warning WRT use of long long,
+# since it really is needed in src/gtk2/rate.cpp.
 core.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
-	'-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS'] )
+	'-std=c++98', '-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS',
+	'-pedantic', '-Wno-long-long'] )
 
 # Add compiler flags for threading support.
 core.Append( LIBS='boost_thread')
@@ -65,7 +67,7 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/primitive.cpp",
 	"src/core/rectangular.cpp",
 	"src/core/sphere.cpp",
-	"src/core/pmap_sphere.cpp",
+#	"src/core/pmap_sphere.cpp",
 	"src/core/frame.cpp",
 	"src/core/label.cpp",
 	"src/core/curve.cpp",
@@ -133,7 +135,7 @@ Test('cylinder_test')
 Test('ring_test')
 Test('pyramid_test')
 Test('ellipsoid_test')
-Test('psphere_texture_test')
+# Test('psphere_texture_test')
 Test('selection_test')
 # Test('conference_demo')
 Test('curve_test')
@@ -155,6 +157,8 @@ py = core.Copy()
 py.Append( CPPPATH='/usr/include/python2.3', 
 	LIBS=['boost_python', 'vpython-core'],
 	LIBPATH='lib',
+	# Boost.Python's headers produce prodigious amounts of warnings WRT unused
+	#   parameters.
 	CPPFLAGS='-Wno-unused')
 py.SharedLibrary( 
 	target='site-packages/cvisual',
