@@ -348,9 +348,7 @@ display_kernel::world_to_view_transform(
 	// Objects must be within a reasonable size on the screen.
 	assert( std::fabs(std::log( world_scale * gcf)) < std::log( 1e12));
 	
-	// TODO: adjust camera distance calculation based on the scene center's
-	// offset from the extent's center.
-	vector scene_center = center * gcf;
+	vector scene_center = (center * gcf).scale_inv(range);
 	vector scene_up = up.norm();
     vector scene_forward = forward.norm();
 
@@ -363,7 +361,7 @@ display_kernel::world_to_view_transform(
 	double cot_hfov = 1 / std::min(tan_hfov_x, tan_hfov_y);
 	// The camera position used for gluLookAt
 	vector scene_camera = -scene_forward*cot_hfov*user_scale
-		+ scene_center * gcf;
+		+ scene_center;
 	// The true camera position, in world space. 
 	vector camera = (-scene_forward * cot_hfov*user_scale).scale(range) 
 		+ center;
@@ -377,12 +375,9 @@ display_kernel::world_to_view_transform(
     nearclip /= std::fabs( scene_forward.scale(range).mag());
 	double farclip = world_extent.farclip( camera, scene_forward);
     farclip /= std::fabs( scene_forward.scale(range).mag());
-    // Also prevents loosing too much precision in the depth buffer
+    // Prevent loosing too much precision in the depth buffer
     if (nearclip < .01 * farclip)
         nearclip = .01 * farclip;
-    // Final safety.
-    if (nearclip < .07)
-        nearclip = .07;
     
 	// Translate camera left/right 2% of the viewable width of the scene at
 	// the distance of its center.
@@ -420,11 +415,11 @@ display_kernel::world_to_view_transform(
 		else // Wide
 			glScaled( width / window_height, 1.0, 1.0);
 	}
-	#if 0
+	#if 1
 	// Enable this to peek at the actual scene geometry.
 	std::cerr << "scene_geometry: camera:" << scene_camera 
         << " true camera:" << camera
-		<< " center:" << scene_center 
+		<< " center:" << scene_center << " true center:" << center
 		<< " up:" << scene_up << " range:" << range*gcf 
 		<< " gcf:" << gcf << " nearclip:" << nearclip 
 		<< " farclip:" << farclip << " user_scale:" << user_scale
