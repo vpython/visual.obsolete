@@ -12,12 +12,18 @@ core = Environment( CCFLAGS=['-pipe', '-g'],
 	CPPPATH='include')
 
 # Workaround brain-dead behavior in FTGL's header file layout
-if sys.platform.rfind('linux') > 0:
+if sys.platform.find('linux') >= 0:
 	core.Append( CPPPATH=['/usr/include/FTGL'])
 
 # Crank up the warnings
 core.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 	'-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS'] )
+
+# Add compiler flags for threading support.
+if sys.platform == 'win32':
+	core.Append( CCFLAGS='-mthreads')
+else:
+	core.Append( CCFLAGS='-pthread')
 
 core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2')
 core.Append( LIBS='gle')
