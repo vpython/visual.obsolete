@@ -138,3 +138,5 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	check_gl_error();
 	return;
 }
+
+SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(ring)

@@ -11,6 +11,7 @@ class ring : public simple_displayobject
 	double thickness;
 	// The radius of the ring's hoop.
 	double radius;
+	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
 
  public:
 	ring();
