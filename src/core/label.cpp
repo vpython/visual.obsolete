@@ -7,6 +7,8 @@
 #include "font.hpp"
 #include "util/errors.hpp"
 #include <sstream>
+#include <boost/scoped_array.hpp>
+using boost::scoped_array;
 
 namespace cvisual {
 
@@ -332,9 +334,10 @@ label::gl_render( const view& scene)
 	double box_height = border * 2.0 
 		+ ((text.empty()) ? 1 : text.size()) *( -font.descent() + font.ascent());
 	
-	vector text_pos[text.size()];
-	vector* tpos_i = text_pos;
-	vector* tpos_end = text_pos + text.size();
+	scoped_array<vector> text_pos( new vector[text.size()]);
+	// vector text_pos[text.size()];
+	vector* tpos_i = text_pos.get();
+	vector* tpos_end = text_pos.get() + text.size();
 	vector next_tpos( border, box_height - border - font.ascent());
 	while (tpos_i != tpos_end) {
 		*tpos_i = next_tpos; // (tpos_i - 1) - vector(0, font.ascent() - font.descent());
@@ -434,7 +437,7 @@ label::gl_render( const view& scene)
 		glPopAttrib();
 
 		// Render the text iteself.
-		tpos_i = text_pos;		
+		tpos_i = text_pos.get();		
 		text_iterator text_i = text.begin();
 		text_iterator text_end = text.end();
 		while (tpos_i != tpos_end && text_i != text_end) {

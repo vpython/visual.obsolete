@@ -265,13 +265,21 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 	glDrawArrays( GL_LINE_STRIP, 0, end-begin);
 }
 
+namespace {
+template <typename T>
+struct converter
+{
+	T data[3];
+};
+} // !namespace (anonymous)
+
 void
 curve::thickline( const view& scene, size_t begin, size_t end)
 {
 	std::vector<rgb> tcolor;
 	std::vector<vector> spos;
-	float (*used_color)[3] = &((color.begin()+begin)->data);
-	double (*used_pos)[3] = &((pos.begin()+begin)->data);
+	float (*used_color)[3] = &((converter<float>*)&*(color.begin()+begin))->data;
+	double (*used_pos)[3] = &((converter<double>*)&*(pos.begin()+begin))->data;
 	
 	
 	if (scene.gcf != 1.0) {
@@ -282,7 +290,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 				i < spos.end(); ++i) {
 			*i *= scene.gcf;
 		}
-		used_pos = &(spos.begin()->data);
+		used_pos = &((converter<double>*)&*spos.begin())->data;
 	}
 	if (monochrome) {
 		// Can get away without using a color array.
@@ -311,7 +319,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 				else
 					*i = i->grayscale();
 			}
-			used_color = &tcolor.begin()->data;
+			used_color = &((converter<float>*)&*tcolor.begin())->data;
 		}
 		
 		glePolyCylinder( 

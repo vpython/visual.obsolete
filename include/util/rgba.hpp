@@ -17,21 +17,15 @@ namespace cvisual {
 class rgba
 {
  public:
-	// Eeek!  Use the 'data' member when you really need to refer to this data as
-	// an array.  Like with gle.
-	union {
-		float data[4];
-		struct {
-			/** Red channel intensity, clamped to [0,1] */
-			float red;
-			/** Green channel intensity, clamped to [0,1] */
-			float green;
-			/** Blue channel intensity, clamped to [0,1] */
-			float blue;
-			/** Alpha channel intensity, clamped to [0,1] */
-			float alpha;
-		};
-	};
+	/** Red channel intensity, clamped to [0,1] */
+	float red;
+	/** Green channel intensity, clamped to [0,1] */
+	float green;
+	/** Blue channel intensity, clamped to [0,1] */
+	float blue;
+	/** Alpha channel intensity, clamped to [0,1] */
+	float alpha;
+
 
 	/** Defaults to opaque white. */
 	inline rgba() : red(1.0), green(1.0), blue(1.0), alpha(1.0) {}
@@ -53,7 +47,7 @@ class rgba
 	
 	/** Make this the active OpenGL color using glColor(). */
 	inline void gl_set() const
-	{ glColor4fv( data); }
+	{ glColor4fv( &red); }
 	
 	/** Make this the active OpenGL material property for front and back ambient
 		and diffuse color.
@@ -66,14 +60,9 @@ class rgba
 class rgb
 {
  public:
-	union {
-		float data[3];
-		struct {
-			float red;
-			float green;
-			float blue;
-		};
-	};
+	float red;
+	float green;
+	float blue;
 	
 	inline rgb() : red(1.0f), green(1.0f), blue(1.0f) {}
 	
@@ -95,7 +84,7 @@ class rgb
 	rgb grayscale() const;
 	
 	inline void gl_set() const
-	{ glColor3fv( data); }
+	{ glColor3fv( &red); }
 };
 
 } // !namespace cvisual

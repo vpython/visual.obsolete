@@ -7,6 +7,8 @@
 #include "util/displaylist.hpp"
 #include "util/errors.hpp"
 #include <utility>
+#include <boost/scoped_array.hpp>
+using boost::scoped_array;
 
 namespace cvisual {
 
@@ -100,8 +102,8 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	// and normals is to form a closed loop.  The format is of a pair of
 	// interleaved rings, the first (in the xz plane) is stored at the even indexes;
 	// the second (rotated slightly above the first) is stored at the odd indexes.
-	vector vertexes[bands * 2 + 2];
-	vector normals[bands * 2 + 2];
+	scoped_array<vector> vertexes( new vector[bands*2+2]);
+	scoped_array<vector> normals( new vector[bands*2+2]);
 	vertexes[0] = vertexes[ bands * 2] = 
 		vector( 0, 0, scaled_radius + scaled_thickness);
 	normals[0] = normals[bands * 2] = vertexes[0].norm();
@@ -128,8 +130,8 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	clear_gl_error();
 	glEnableClientState( GL_VERTEX_ARRAY);
 	glEnableClientState( GL_NORMAL_ARRAY);
-	glVertexPointer( 3, GL_DOUBLE, 0, vertexes);
-	glNormalPointer( GL_DOUBLE, 0, normals);
+	glVertexPointer( 3, GL_DOUBLE, 0, vertexes.get());
+	glNormalPointer( GL_DOUBLE, 0, normals.get());
 	color.gl_set();
 	{	
 		gl_matrix_stackguard guard;

@@ -20,16 +20,9 @@ namespace cvisual {
 class vector
 {
 public:
-	// Eeek!  Use the 'data' term when you really need to refer to this data as
-	// an array.  Like with gle.
-	union {
-		double data[3];
-		struct {
-			double x;
-			double y;
-			double z;
-		};
-	};
+	double x;
+	double y;
+	double z;
 
 public:
 	explicit vector( double a = 0.0, double b = 0.0, double c = 0.0) throw()

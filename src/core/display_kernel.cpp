@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iostream>
+#include <boost/scoped_array.hpp>
 
 #include <boost/lexical_cast.hpp>
 
@@ -412,9 +413,6 @@ display_kernel::recalc_extent(void)
 	if (autocenter) {
 		// Move the camera to accomodate the new center of the scene
 		center = world_extent.center();
-		// Ensure that subsequent usage of the scene extent is correct
-		// in the new camera space.
-		world_extent.recenter();
 	}
 	if (autoscale) {
 		world_scale = world_extent.scale();
@@ -702,6 +700,8 @@ display_kernel::render_scene(void)
 shared_ptr<renderable> 
 display_kernel::pick( float x, float y, float d_pixels)
 {
+	using boost::scoped_array;
+	
 	lock L(mtx);
 	shared_ptr<renderable> best_pick;
 	try {
@@ -720,14 +720,15 @@ display_kernel::pick( float x, float y, float d_pixels)
 		size_t hit_buffer_size = std::max(
 				(layer_world.size()+layer_world_transparent.size())*4,
 				world_extent.get_select_buffer_depth());
-		// TODO: And this is a GNU extension...
-		unsigned int hit_buffer[hit_buffer_size];
+		// Allocate an exception-safe buffer for the GL to talk back to us.
+		scoped_array<unsigned int> hit_buffer( new unsigned int[hit_buffer_size]);
+		// unsigned int hit_buffer[hit_buffer_size];
 		
 		// Allocate a std::vector<shared_ptr<renderable> > to lookup names
 		// as they are rendered.
 		std::vector<shared_ptr<renderable> > name_table;
 		// Pass the name stack to OpenGL with glSelectBuffer.
-		glSelectBuffer( hit_buffer_size, hit_buffer);
+		glSelectBuffer( hit_buffer_size, hit_buffer.get());
 		// Enter selection mode with glRenderMode
 		glRenderMode( GL_SELECT);
 		glClear( GL_DEPTH_BUFFER_BIT);
@@ -775,8 +776,8 @@ display_kernel::pick( float x, float y, float d_pixels)
 		
 		// Lookup the name to get the shared_ptr<renderable> associated with it.
 		double best_pick_depth = 1.0; // The farthest point away in the depth buffer.
-		unsigned int* hit_record = hit_buffer;
-		unsigned int* const hit_buffer_end = hit_buffer + hit_buffer_size;
+		unsigned int* hit_record = hit_buffer.get();
+		unsigned int* const hit_buffer_end = hit_buffer.get() + hit_buffer_size;
 		while (n_hits > 0 && hit_record < hit_buffer_end) {
 			unsigned int n_names = hit_record[0];
 			if (hit_record + 3 + n_names > hit_buffer_end)
@@ -796,6 +797,10 @@ display_kernel::pick( float x, float y, float d_pixels)
 			hit_record += 3 + n_names;
 			n_hits--;
 		}
+		if (hit_record > hit_buffer_end)
+			VPYTHON_CRITICAL_ERROR( 
+				"More objects were picked than could be reported by the GL."
+				"  The hit buffer size was too small.");
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;

@@ -646,7 +646,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			i->y = pos_i[1] * scene.gcf;
 			i->z = pos_i[2] * scene.gcf;
 		}
-		used_pos = &(spos.begin()->data);
+		used_pos = &((converter<double>*)&*spos.begin())->data;
 	}
 	if (monochrome( begin, end)) {
 		// Can get away without using a color array.
@@ -681,7 +681,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 				else
 					*i = scolor.grayscale();
 			}
-			used_color = &tcolor.begin()->data;
+			used_color = &((converter<float>*)&*tcolor.begin())->data;
 		}
 		
 		glePolyCylinder( 
