@@ -289,10 +289,11 @@ faces::get_normal()
 
 
 void  
-faces::set_color( const array& n_color)
+faces::set_color( array n_color)
 {
 	using namespace boost::python;
 	using cvisual::python::slice;
+	
 	std::vector<int> n_dims = shape(n_color);
 
 	if (n_dims.size() != 2 && n_dims[1] != 3)
@@ -300,6 +301,9 @@ faces::set_color( const array& n_color)
 	if (n_dims[0] != count)
 		throw std::invalid_argument( "color must be the same size as pos.");
 
+	if (type(n_color) != PyArray_FLOAT) {
+		n_color = astype( n_color, PyArray_FLOAT);
+	}
 	lock L(mtx);
 	color[slice(0, count)] = n_color;
 }

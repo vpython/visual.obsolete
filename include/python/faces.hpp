@@ -53,7 +53,7 @@ class faces : public renderable
 	
 	void set_pos( const array& pos);
 	void set_pos_l( boost::python::list pos);
-	void set_color( const array& color);
+	void set_color( array color);
 	void set_color_t( rgb color);
 	void set_color_l( boost::python::list color);
 	void set_normal( const array& normal);
