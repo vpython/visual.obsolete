@@ -58,11 +58,12 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( pick_overloads, display_kernel::pick, 2,
 void
 wrap_display_kernel(void)
 {
-	// TODO: Wrap around SigC::Signal0<void>
+	// TODO: Wrap around SigC::Signal0<void>  The final design will likely
+	// expose this base class, and a special base class that exports the extra
+	// functions needed for creating a new type in Python.
 	py::class_<display_kernel, boost::noncopyable>( "display_kernel")
 		// Functions for the internal use of renderable and light classes.
 		.def( "add_renderable", &display_kernel::add_renderable)
-		.def( "add_renderable_screen", &display_kernel::add_renderable_screen)
 		.def( "remove_renderable", &display_kernel::remove_renderable)
 		.add_property( "objects", &display_kernel::get_objects)
 		.def( "add_light", &display_kernel::add_light)
@@ -83,20 +84,20 @@ wrap_display_kernel(void)
 			py::make_function( &display_kernel::get_forward, 
 				py::return_internal_reference<>()),
 			&display_kernel::set_forward)
-		.add_property( "scale",
-			py::make_function( &display_kernel::get_scale, 
-				py::return_internal_reference<>()),
-			&display_kernel::set_scale)
+		// .add_property( "scale",
+		//	py::make_function( &display_kernel::get_scale, 
+		//		py::return_internal_reference<>()),
+		//	&display_kernel::set_scale)
 		.add_property( "center",
 			py::make_function( &display_kernel::get_center, 
 				py::return_internal_reference<>()),
 			&display_kernel::set_center)
 		.add_property( "fov", &display_kernel::get_fov, &display_kernel::set_fov)
-		.add_property( "uniform", &display_kernel::is_uniform, 
-			&display_kernel::set_uniform)
+		// .add_property( "uniform", &display_kernel::is_uniform, 
+		// 	&display_kernel::set_uniform)
 		.add_property( "background", &display_kernel::get_background,
 			&display_kernel::set_background)
-		.add_property( "forground", &display_kernel::get_forground,
+		.add_property( "foreground", &display_kernel::get_forground,
 			&display_kernel::set_forground)
 		.add_property( "autoscale", &display_kernel::get_autoscale, 
 			&display_kernel::set_autoscale)
@@ -112,13 +113,14 @@ wrap_display_kernel(void)
 		.add_property( "keys", &kb_object::size) 
 		;
 	
-	py::class_<display, boost::noncopyable>( "display")
+	py::class_<display, bases<display_kernel>, boost::noncopyable>( "display")
 		.add_property( "x", &display::get_x, &display::set_x)
 		.add_property( "y", &display::get_y, &display::set_y)
 		.add_property( "width", &display::get_width, &display::set_width)
 		.add_property( "height", &display::get_height, &display::set_height)
 		.add_property( "title", &display::get_title, &display::set_title)
-		.add_property( "fullscreen", &display::is_fullscreen, &display::set_fullscreen)
+		.add_property( "fullscreen", &display::is_fullscreen, 
+			&display::set_fullscreen)
 		.def( "set_selected", &display::set_selected)
 		.staticmethod( "set_selected")
 		.def( "get_selected", &display::get_selected)
@@ -143,7 +145,6 @@ wrap_display_kernel(void)
 		"Returns true if all of the Displays are closed.");
 	def( "waitclose", gui_main::waitclosed, 
 		"Blocks until all of the Displays are closed by the user.");
-
 };
 
 } // !namespace cvisual;
