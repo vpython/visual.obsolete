@@ -169,8 +169,8 @@ box::gl_render( const view& scene)
 void 
 box::grow_extent( extent& e)
 {
-	e.add_point( pos);
-	e.add_point( pos + axis);
+    e.add_sphere( pos, 
+        1.415*std::max( height*0.5, std::max(axis.mag()*0.5, width*0.5)));
 	e.add_body();
 }
 
