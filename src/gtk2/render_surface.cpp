@@ -5,6 +5,7 @@
 
 #include "gtk2/render_surface.hpp"
 #include "util/errors.hpp"
+#include "util/gl_free.hpp"
 #include "vpython-config.h"
 
 #include <gtkmm/gl/init.h>
@@ -160,7 +161,6 @@ render_surface::on_button_release_event( GdkEventButton* event)
 	return true;
 }
 
-
 void
 render_surface::gl_begin()
 {
@@ -226,6 +226,8 @@ basic_app::basic_app( const char* title)
 void
 basic_app::run()
 {
+	scene.signal_delete_event().connect( 
+		SigC::slot( *this, &basic_app::on_delete));
 	window.show_all();
 	kit.run(window);
 }
@@ -254,6 +256,23 @@ void
 basic_app::on_rotate_clicked()
 {
 	scene.core.mouse_mode = display_kernel::ZOOM_ROTATE;
+}
+
+bool
+basic_app::on_delete( GdkEventAny*)
+{
+	scene.get_gl_window()->gl_begin(scene.get_gl_context());
+	try {
+		clear_gl_error();
+		on_gl_free();
+		check_gl_error();
+	}
+	catch (gl_error& error) {
+		std::cerr << "Caught OpenGL error during shutdown: " << error.what() 
+			<< "\nContinuing with the shutdown." << std::endl;
+	}
+	scene.get_gl_window()->gl_end();
+	return false;
 }
 
 } // !namespace cvisual

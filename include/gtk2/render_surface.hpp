@@ -79,6 +79,7 @@ class basic_app : public SigC::Object
 	void on_fullscreen_clicked();
 	void on_pan_clicked();
 	void on_rotate_clicked();
+	bool on_delete(GdkEventAny*);
  
  public:
 	render_surface scene;
