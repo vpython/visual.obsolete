@@ -8,12 +8,17 @@
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
+#include <iostream>
+
+#define WIN32_CRITICAL_ERROR(msg) win32_write_critical( __FILE__, __LINE__, \
+	__PRETTY_FUNCTION__, msg)
+
 
 /**************************** Utilities ************************************/
 // Extracts and decodes a Win32 error message.
-namespace {
-static void
-decode_win32_error()
+void
+win32_write_critical( 
+	std::string file, int line, std::string func, std::string msg)
 {
 	DWORD code = GetLastError();
 	char* message = 0;
@@ -22,15 +27,15 @@ decode_win32_error()
 		0, // Ignored parameter
 		code, // Error code to be decoded.
 		0, // Use the default language
-		message, // The output buffer to fill the message
-		1, // Allocate at least one byte in order to free something below.
+		(char*)&message, // The output buffer to fill the message
+		512, // Allocate at least one byte in order to free something below.
 		0); // No additional arguments.
 	
-	VPYTHON_CRITICAL_ERROR(message);
+	std::cerr << "VPython ***Critical Error*** " << file << ":" << line << ": "
+		<< func << ": " << msg << ": " << message;
 	LocalFree(message);
 	std::exit(1);
 }
-} // !namespace (unnamed)
 
 /**************** render_surface implementation  *****************/
 
@@ -55,7 +60,7 @@ render_surface::register_win32_class()
 		win32_class.hIcon = LoadIcon( NULL, IDI_APPLICATION );
 		win32_class.hCursor = LoadCursor( NULL, IDC_ARROW );
 		if (!RegisterClass( &win32_class))
-			decode_win32_error();
+			WIN32_CRITICAL_ERROR("RegisterClass()");
 		done = true;
 	}
 }
@@ -65,6 +70,9 @@ LRESULT CALLBACK
 render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	render_surface* This = widgets[hwnd];
+	if (This == 0) {
+		return DefWindowProc( hwnd, uMsg, wParam, lParam);
+	}
 	assert( This != 0);
 	switch (uMsg) {
 		// Handle the cases for the kinds of messages that we are listening for.
@@ -78,9 +86,9 @@ render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 		case WM_MOUSEMOVE:
 			// Handle mouse cursor movement.
 			return This->on_mousemove( wParam, lParam);
-		case WM_CREATE:
+		// case WM_CREATE:
 			// Handle creation of the window.
-			return This->on_create( wParam, lParam);
+		//	return This->on_create( wParam, lParam);
 		case WM_SHOWWINDOW:
 			return This->on_showwindow( wParam, lParam);
 		default:
@@ -104,7 +112,7 @@ render_surface::on_create( WPARAM, LPARAM)
 	
 	dev_context = GetDC(widget_handle);
 	if (!dev_context)
-		decode_win32_error();
+		WIN32_CRITICAL_ERROR( "GetDC()");
 	
 	PIXELFORMATDESCRIPTOR pfd = { 
 		sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd 
@@ -134,7 +142,7 @@ render_surface::on_create( WPARAM, LPARAM)
 	
 	gl_context = wglCreateContext( dev_context);
 	if (!gl_context)
-		decode_win32_error();
+		WIN32_CRITICAL_ERROR("wglCreateContext()");
 	
 	if (!root_glrc) 
 		root_glrc = gl_context;
@@ -270,7 +278,7 @@ render_surface::render_surface()
 void
 render_surface::create_window( HWND parent)
 {
-	CreateWindow(
+	widget_handle = CreateWindow(
 		win32_class.lpszClassName,
 		0, // No window title for this surface.
 		WS_CHILD,
@@ -282,7 +290,9 @@ render_surface::create_window( HWND parent)
 		0, // A unique index to identify this widget by the parent
 		GetModuleHandle(0),
 		0 // No data passed to the WM_CREATE function.
-	); 
+	);
+	widgets[widget_handle] = this;
+	on_create(0,0);
 }
 
 render_surface::~render_surface()
@@ -333,15 +343,18 @@ LRESULT CALLBACK
 basic_app::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	basic_app* This = windows[hwnd];
-	assert( This != 0);
+	if (This == 0) {
+		return DefWindowProc( hwnd, uMsg, wParam, lParam);
+	}
+
 	switch (uMsg) {
 		case WM_COMMAND:
 			// A Command from a particular button.
 			return This->on_command( wParam, lParam);
 		case WM_SIZE:
 			return This->on_size( wParam, lParam);
-		case WM_CREATE:
-			return This->on_create( wParam, lParam);
+		// case WM_CREATE:
+		// 	return This->on_create( wParam, lParam);
 		case WM_CLOSE:
 			DestroyWindow( This->window_handle);
 			return 0;
@@ -465,7 +478,6 @@ basic_app::on_create( WPARAM, LPARAM)
 	this->on_size( 0, 0);
 	
 	return 0;
-	
 }
 
 LRESULT
@@ -515,7 +527,7 @@ basic_app::register_win32_class()
 		win32_class.hIcon = LoadIcon( NULL, IDI_APPLICATION );
 		win32_class.hCursor = LoadCursor( NULL, IDC_ARROW );
 		if (!RegisterClass( &win32_class))
-			decode_win32_error();
+			WIN32_CRITICAL_ERROR("RegisterClass()");
 		done = true;
 	}
 }
@@ -580,7 +592,7 @@ basic_app::basic_app( std::string _title)
 		0, VPYTHON_PREFIX "/data/no.bmp", IMAGE_BITMAP, 32, 32, LR_LOADFROMFILE);
 	for (int i = 0; i < 4; ++i) {
 		if (tb_image[i] == 0)
-			decode_win32_error();
+			WIN32_CRITICAL_ERROR("LoadImage()");
 	}
 	tb_imlist = ImageList_Create( 32, 32, ILC_COLOR24, 4, 0);
 	for (int i = 0; i < 4; ++i) {
@@ -590,7 +602,7 @@ basic_app::basic_app( std::string _title)
 	basic_app::register_win32_class();
 	
 	// Create a hidden top-level window
-	CreateWindow(
+	window_handle = CreateWindow(
 		win32_class.lpszClassName,
 		title.c_str(),
 		WS_OVERLAPPED,
@@ -602,7 +614,9 @@ basic_app::basic_app( std::string _title)
 		0,
 		GetModuleHandle(0),
 		0 // No data passed to the WM_CREATE function.
-	); 	
+	);
+	windows[window_handle] = this;
+	on_create(0,0);
 }
 
 basic_app::~basic_app()
@@ -626,7 +640,7 @@ basic_app::run()
 	BOOL msg_err = 0;
 	while ((msg_err = GetMessage( &message, 0, 0, 0)) != 0) {
 		if (msg_err == -1)
-			decode_win32_error();
+			WIN32_CRITICAL_ERROR("GetMessage()");
 		TranslateMessage( &message);
 		DispatchMessage( &message);
 	}
