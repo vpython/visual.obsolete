@@ -199,10 +199,10 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 	float dx = mouse_x - last_mousepos_x;
 	float dy = mouse_y - last_mousepos_y;
 	if (middle_down) {
-		core.report_mouse_motion( dx, dy, render_core::MIDDLE);
+		core.report_mouse_motion( dx, dy, display_kernel::MIDDLE);
 	}
 	if (right_down) {
-		core.report_mouse_motion( dx, dy, render_core::RIGHT);
+		core.report_mouse_motion( dx, dy, display_kernel::RIGHT);
 	}
 	last_mousepos_x = mouse_x;
 	last_mousepos_y = mouse_y;
@@ -247,7 +247,7 @@ render_surface::on_destroy( WPARAM, LPARAM)
 
 WNDCLASS render_surface::win32_class;
 
-// Callbacks provided to the render_core object.
+// Callbacks provided to the display_kernel object.
 void 
 render_surface::gl_begin()
 {
@@ -276,7 +276,7 @@ render_surface::render_surface()
 	// Initialize the win32_class
 	render_surface::register_win32_class();
 	
-	// Connect callbacks from the render_core to this object.  These will not
+	// Connect callbacks from the display_kernel to this object.  These will not
 	// be called back from the core until report_realize is called.
 	core.gl_begin.connect( SigC::slot( *this, &render_surface::gl_begin));
 	core.gl_end.connect( SigC::slot( *this, &render_surface::gl_end));
@@ -307,42 +307,6 @@ render_surface::create_window( HWND parent)
 render_surface::~render_surface()
 {
 }
-
-void 
-render_surface::add_renderable( shared_ptr<renderable> obj)
-{
-	if (obj->color.alpha == 1.0)
-		core.layer_world.push_back( obj);
-	else
-		core.layer_world_transparent.push_back( obj);
-}
-
-void 
-render_surface::add_renderable_screen( shared_ptr<renderable> obj)
-{
-	core.layer_screen.push_back( obj);
-}
-	
-void 
-render_surface::remove_renderable( shared_ptr<renderable> obj)
-{
-	// Choice of removal algorithms:  For containers that support thier own
-	// removal methods (list, set), use the member function.  Else, use 
-	// std::remove.
-	if (obj->color.alpha != 1.0) {
-		core.layer_world.remove( obj);
-	}
-	else
-		std::remove( core.layer_world_transparent.begin(), 
-			core.layer_world_transparent.end(), obj);
-}
-	
-void 
-render_surface::remove_renderable_screen( shared_ptr<renderable> obj)
-{
-	core.layer_screen.remove(obj);
-}
-
 
 /******************************* basic_app implementation ****************/
 
@@ -502,13 +466,13 @@ basic_app::on_command( WPARAM wParam, LPARAM lParam)
 			DestroyWindow(window_handle);
 			break;
 		case ROTATE_ZOOM:
-			scene.core.mouse_mode = render_core::ZOOM_ROTATE;
+			scene.core.mouse_mode = display_kernel::ZOOM_ROTATE;
 			break;
 		case FULLSCREEN:
 			// Toggle the window fullscreen, somehow.
 			break;
 		case PAN:
-			scene.core.mouse_mode = render_core::PAN;
+			scene.core.mouse_mode = display_kernel::PAN;
 		default:
 			return DefWindowProc( window_handle, WM_COMMAND, wParam, lParam);
 	}
@@ -573,7 +537,7 @@ std::map<HWND, basic_app*> basic_app::windows;
  * Shows the toolbar.
  * Shows the render_surface:
  *   render_surface recieves SW_SHOWWINDOW and it:
- *      Reports realization to the render_core.
+ *      Reports realization to the display_kernel.
  *      Renders the first window.
  *      Starts the timer for further rendering.
  * Enters the message pumping loop.  Program control is exclusively 

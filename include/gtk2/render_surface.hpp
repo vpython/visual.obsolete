@@ -6,7 +6,7 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "render_core.hpp"
+#include "display_kernel.hpp"
 
 #include <gtkmm/gl/drawingarea.h>
 #include <gtkmm/main.h>
@@ -28,11 +28,7 @@ class render_surface : public Gtk::GL::DrawingArea
  	
  public:
 	render_surface();
-	void add_renderable( shared_ptr<renderable>);
-	void add_renderable_screen( shared_ptr<renderable>);
-	void remove_renderable( shared_ptr<renderable>);
-	void remove_renderable_screen( shared_ptr<renderable>);
-	render_core core;
+	display_kernel core;
 	
 	// Signal fired by button down + button up
 	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;

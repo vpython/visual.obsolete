@@ -57,42 +57,7 @@ render_surface::render_surface()
 	core.gl_end.connect( SigC::slot( *this, &render_surface::gl_end));
 	core.gl_swap_buffers.connect( 
 		SigC::slot( *this, &render_surface::gl_swap_buffers));
-	// core.stereo_mode = render_core::REDCYAN_STEREO;
-}
-
-void 
-render_surface::add_renderable( shared_ptr<renderable> obj)
-{
-	if (obj->color.alpha == 1.0)
-		core.layer_world.push_back( obj);
-	else
-		core.layer_world_transparent.push_back( obj);
-}
-
-void 
-render_surface::add_renderable_screen( shared_ptr<renderable> obj)
-{
-	core.layer_screen.push_back( obj);
-}
-	
-void 
-render_surface::remove_renderable( shared_ptr<renderable> obj)
-{
-	// Choice of removal algorithms:  For containers that support thier own
-	// removal methods (list, set), use the member function.  Else, use 
-	// std::remove.
-	if (obj->color.alpha != 1.0) {
-		core.layer_world.remove( obj);
-	}
-	else
-		std::remove( core.layer_world_transparent.begin(), 
-			core.layer_world_transparent.end(), obj);
-}
-	
-void 
-render_surface::remove_renderable_screen( shared_ptr<renderable> obj)
-{
-	core.layer_screen.remove(obj);
+	// core.stereo_mode = display_kernel::REDCYAN_STEREO;
 }
 
 bool 
@@ -107,15 +72,15 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 	bool buttondown = false;
 	
 	if (event->state & GDK_BUTTON2_MASK) {
-		core.report_mouse_motion( dx, dy, render_core::MIDDLE);
+		core.report_mouse_motion( dx, dy, display_kernel::MIDDLE);
 		buttondown = true;
 	}
 	if (event->state & GDK_BUTTON3_MASK) {
-		core.report_mouse_motion( dx, dy, render_core::RIGHT);
+		core.report_mouse_motion( dx, dy, display_kernel::RIGHT);
 		buttondown = true;
 	}
 	else if (!buttondown) {
-		core.report_mouse_motion( dx, dy, render_core::NONE);
+		core.report_mouse_motion( dx, dy, display_kernel::NONE);
 	}
 	last_mousepos_x = static_cast<float>(event->x);
 	last_mousepos_y = static_cast<float>(event->y);
@@ -282,13 +247,13 @@ basic_app::on_fullscreen_clicked()
 void
 basic_app::on_pan_clicked()
 {
-	scene.core.mouse_mode = render_core::PAN;
+	scene.core.mouse_mode = display_kernel::PAN;
 }
 
 void
 basic_app::on_rotate_clicked()
 {
-	scene.core.mouse_mode = render_core::ZOOM_ROTATE;
+	scene.core.mouse_mode = display_kernel::ZOOM_ROTATE;
 }
 
 } // !namespace cvisual

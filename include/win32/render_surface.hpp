@@ -11,7 +11,7 @@
 #define _WIN32_IE 0x400
 #include <commctrl.h>
 
-#include "render_core.hpp"
+#include "display_kernel.hpp"
 #include <map>
 #include <string>
 #include <sigc++/object.h>
@@ -61,7 +61,7 @@ class render_surface : public SigC::Object
 	LRESULT on_paint( WPARAM, LPARAM);
 	LRESULT on_destroy( WPARAM, LPARAM);
 	
-	// Callbacks provided to the render_core object.
+	// Callbacks provided to the display_kernel object.
 	void gl_begin();
 	void gl_end();
 	void gl_swap_buffers();
@@ -71,12 +71,7 @@ class render_surface : public SigC::Object
  public:
 	render_surface();
 	~render_surface();
-	render_core core;
-	
-	void add_renderable( shared_ptr<renderable>);
-	void add_renderable_screen( shared_ptr<renderable>);
-	void remove_renderable( shared_ptr<renderable>);
-	void remove_renderable_screen( shared_ptr<renderable>);
+	display_kernel core;
 
 	// Signal fired by button down + button up
 	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
