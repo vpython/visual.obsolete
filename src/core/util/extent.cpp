@@ -85,14 +85,64 @@ extent::center() const
 	return (mins + maxs) * 0.5;
 }
 
-
-void
-extent::recenter()
+double
+extent::farclip( const vector& camera, const vector& forward) const
 {
-	if (first)
-		return;
-	mins += center();
-	maxs += center();
+	if (vector() == mins && mins == maxs)
+		return 10.0;
+	
+	vector corners[] = {
+		maxs,
+		vector( mins.x, mins.y, maxs.z),
+		vector( mins.x, maxs.y, mins.z),
+		vector( mins.x, maxs.y, maxs.z),
+		vector( maxs.x, mins.y, mins.z),
+		vector( maxs.x, maxs.y, mins.z),
+		vector( maxs.x, mins.y, maxs.z)		
+	};
+	vector farthest = mins;
+	for (size_t i = 0; i < 7; ++i) {
+		if (corners[i].dot( forward) > farthest.dot( forward))
+			farthest = corners[i];
+	}
+	return (farthest - camera).mag();
+}
+
+double
+extent::nearclip( const vector&, const vector&) const
+{
+	return 0.015;
+}
+
+double
+extent::widest_offset( const vector& forward, const vector& center) const
+{
+	double farthest_dist = 0.0;
+	
+	// Find the corner of the extent that is the farthest away from the
+	// line passing through center, in the forward direction.
+	vector corners[] = {
+		mins,
+		maxs,
+		vector( mins.x, mins.y, maxs.z),
+		vector( mins.x, maxs.y, mins.z),
+		vector( mins.x, maxs.y, maxs.z),
+		vector( maxs.x, mins.y, mins.z),
+		vector( maxs.x, maxs.y, mins.z),
+		vector( maxs.x, mins.y, maxs.z)		
+	};
+	for (size_t i = 0; i < 8; ++i) {
+		// The closes point which lies on the line of sight to the corner in
+		// question.
+		vector closest_point_on_los = 
+			(corners[i] - center).dot( forward)*forward + center;
+		// The distance from that point to the corner.
+		double dist = (corners[i] - closest_point_on_los).mag();
+		if (dist > farthest_dist) {
+			farthest_dist = dist;
+		}
+	}
+	return farthest_dist;
 }
 
 double
@@ -104,10 +154,16 @@ extent::scale() const
 	// return (maxs - mins).stable_mag();
 }
 
+vector
+extent::scope() const
+{
+	return maxs - mins;
+}
+
 double
 extent::scale( const vector& s) const
 {
-	if (first)
+	if (maxs == mins)
 		return 0;
 	return ((maxs - mins) * s).mag();
 }	

@@ -43,8 +43,12 @@ class extent
 	 *  for the calculation of the hit buffer size.
 	 */
 	void add_body();
+	/** See implementation of frame::grow_extent()
+	 */
 	void push_frame();
 	void pop_frame();
+	/** Returns the size for the select buffer when rendering in select mode,
+	 * after having traversed the world. */
 	size_t get_select_buffer_depth();
 
 	/** Zeros out the extent to be a single point at the origin. */
@@ -53,16 +57,36 @@ class extent
 	// The following functions represent the interface for render_surface objects.
 	/** Returns the center position of the scene in world space. */
 	vector center() const;
+
+
+	/** Returns a distance from the camera that minimizes forward encroachment into the scene. */
+	double nearclip( const vector& camera, const vector& forward) const;
 	
-	// TODO: WTF is this still for??
-	// Adjust the bounds of the scene to accomodate a new centerpoint.
-	void recenter();
+	/** Returns the distance to the point that is farthest forward from the 
+	 * camera. 
+	 * @param camera  The location of the camera in world space.
+	 * @parm forward  The direction of the camera (should be a unit vector). 
+	 */
+	double farclip( const vector& camera, const vector& forward) const;
+	
+	/** Compute the maximum perpenduclar distance from the line defined by
+	 * forward and center and the corners of the bounding box. 
+	 * @param forward  The direction the camera is facing.
+	 * @param center  A point that the camera is pointing towards.
+	 * @return a scalar.  If the scene is a point, this returns 1.0. */
+	double widest_offset( const vector& forward, const vector& center) const;
 	
 	/** Determine the magnitude of the size of the world. 
 		@return the length along the three-axis diagonal of the bounding box, in
 			world space.
 	*/
 	double scale() const;
+	
+	/** Determines the magnitude of the size of the world.
+	 * @return a vector whose x, y, and z values contain the three-axis diagonal
+	 * of the bounding box, in world space.
+	 */
+	vector scope() const;
  
 	/** Determine the magnitude of a scaled subworld.  See also 
 		frame::grow_extent() 
