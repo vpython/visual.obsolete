@@ -1,4 +1,4 @@
-// This file requires 133 MB to compile (optimizing).
+// This file requires 182 MB to compile (optimizing).
 
 // Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
 // See the file license.txt for complete license terms.
@@ -6,6 +6,7 @@
 
 #include "display_kernel.hpp"
 #include "display.hpp"
+#include "mouseobject.hpp"
 
 #include <boost/python/class.hpp>
 #include <boost/python/to_python_converter.hpp>
@@ -14,6 +15,7 @@
 #include <boost/python/list.hpp>
 #include <boost/python/make_function.hpp>
 #include <boost/python/def.hpp>
+#include <boost/python/manage_new_object.hpp>
  
 namespace cvisual {
 
@@ -66,7 +68,11 @@ struct lights_to_py_list
 
 namespace {
 using namespace boost::python;
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( pick_overloads, display_kernel::pick, 2,3)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( pick_overloads, display_kernel::pick, 
+	2, 3)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( mousebase_project_partial_overloads, 
+	mousebase::project2, 1, 2)
+
 }
 
 void
@@ -120,9 +126,7 @@ wrap_display_kernel(void)
 			&display_kernel::set_stereomode)
 		.add_property( "show_renderspeed", &display_kernel::is_showing_renderspeed,
 			&display_kernel::set_show_renderspeed)
-		.add_property( "renderspeed", &display_kernel::get_renderspeed,
-			"The time it takes to render one frame, in seconds.  "
-			"It is histeresis filtered.")
+		.add_property( "renderspeed", &display_kernel::get_renderspeed) 
 		.def( "set_range", &display_kernel::set_range_d)
 		.def( "set_range", &display_kernel::set_range)
 		.def( "get_range", &display_kernel::get_range)
@@ -168,6 +172,50 @@ wrap_display_kernel(void)
 		"Blocks until all of the Displays are closed by the user.");
 		
 	gui_main::on_shutdown.connect( SigC::slot( &force_py_exit));
-};
+	
+	class_<mousebase>( "clickbase", no_init)
+		.def( "project", &mousebase::project2, 
+			mousebase_project_partial_overloads( args("normal", "point")))
+		.def( "project", &mousebase::project1, args("normal", "d"), 
+			"project the mouse pointer to the plane specified by the normal "
+			"vector 'normal' that is either:\n-'d' distance away from the origin"
+			" ( click.project( normal=vector, d=scalar)), or\n-includes the "
+			"point 'point' ( click.project( normal=vector, point=vector))\n"
+			"or passes through the origin ( click.project( normal=vector)).")
+		.add_property( "pos", &mousebase::get_pos)
+		.add_property( "pick", &mousebase::get_pick)
+		.add_property( "pickpos", &mousebase::get_pickpos)
+		.add_property( "camera", &mousebase::get_camera)
+		.add_property( "ray", &mousebase::get_ray)
+		.add_property( "button", make_function(
+			&mousebase::get_buttons, return_value_policy<manage_new_object>()))
+		.add_property( "press",  make_function(
+			&mousebase::get_press, return_value_policy<manage_new_object>()))
+		.add_property( "release",  make_function(
+			&mousebase::get_release, return_value_policy<manage_new_object>()))
+		.add_property( "click",  make_function(
+			&mousebase::get_click, return_value_policy<manage_new_object>()))
+		.add_property( "drag",  make_function(
+			&mousebase::get_drag, return_value_policy<manage_new_object>()))
+		.add_property( "drop",  make_function(
+			&mousebase::get_drop, return_value_policy<manage_new_object>()))
+		.add_property( "shift", &mousebase::is_shift)
+		.add_property( "alt", &mousebase::is_alt)
+		.add_property( "ctrl", &mousebase::is_ctrl)
+		;
+		
+	class_< event, boost::shared_ptr<event>, bases<mousebase>, boost::noncopyable>( "click_object"
+		, "This class provides access to a specific mouse event.", no_init)
+		;
+	
+	class_< mouse, boost::shared_ptr<mouse>, bases<mousebase>, boost::noncopyable>( "mouse_object"
+		, "This class provides access to the mouse.", no_init)
+		.def( "getclick", &mouse::pop_click)
+		.add_property( "clicked", &mouse::num_clicks)
+		.def( "getevent", &mouse::pop_event)
+		.add_property( "events", &mouse::num_events, &mouse::clear_events)
+		;
+	
+}
 
 } // !namespace cvisual;
