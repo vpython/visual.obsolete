@@ -17,3 +17,8 @@ sphere_transparent_test
 texture_sharing_test
 gtk_style_test
 label_test
+.sconsign
+bounce_test
+convex_test
+curve_test
+sleep_test
