@@ -1,14 +1,16 @@
 #ifndef VPYTHON_UTIL_DISPLAYLIST_HPP
 #define VPYTHON_UTIL_DISPLAYLIST_HPP
 
-#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
 
 /** A manager for OpenGL displaylists */
-class displaylist : boost::noncopyable
+class displaylist
 {
  private:
 	/// A unique identifier for objects of this type
-	unsigned int handle;
+	shared_ptr<unsigned int> handle;
+	static void deleter( unsigned int*);
  
  public:
 	displaylist();
@@ -24,7 +26,7 @@ class displaylist : boost::noncopyable
 		gl_compile_end(). */
 	void gl_render() const;
 	/** @return true iff this object contains a compiled OpenGL program. */
-	inline operator bool() const { return handle != 0; }
+	inline operator bool() const { return handle; }
 };
 
 #endif // !defined VPYTHON_UTIL_DISPLAYLIST_HPP

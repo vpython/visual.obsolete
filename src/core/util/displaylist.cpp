@@ -3,28 +3,31 @@
 #include "util/displaylist.hpp"
 #include <cassert>
 
+void 
+displaylist::deleter( unsigned int* handle)
+{
+	glDeleteLists(*handle, 1);
+	delete handle;
+}
+
 // Don't draw a number until it is time to compile the thing.
 displaylist::displaylist()
-	: handle(0)
 {
 }
 
 displaylist::~displaylist()
 {
-	if (handle != 0) {
-		// Deallocate OpenGL resources associated with this handle, save the number
-		// for later use.
-		glDeleteLists(handle, 1);
-	}
 }
 
 void 
 displaylist::gl_compile_begin()
 {
-	if (handle == 0) {
-		handle = glGenLists(1);
+	if (!handle) {
+		handle = shared_ptr<unsigned int>( 
+			new unsigned int, &displaylist::deleter);
+		*handle = glGenLists(1);
 	}
-	glNewList( handle, GL_COMPILE);
+	glNewList( *handle, GL_COMPILE);
 }
 	
 void 
@@ -36,6 +39,6 @@ displaylist::gl_compile_end()
 void
 displaylist::gl_render() const
 {
-	assert( handle != 0);
-	glCallList( handle);
+	assert( handle);
+	glCallList( *handle);
 }
