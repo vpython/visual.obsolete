@@ -16,11 +16,6 @@ sphere::sphere()
 {
 }
 
-sphere::sphere( int)
-	: radius(1.0)
-{
-}
-
 sphere::~sphere()
 {
 }
@@ -308,7 +303,7 @@ sphere::get_scale()
 bool
 sphere::degenerate()
 {
-	return !visible || axis.mag() == 0.0 || radius == 0.0;
+	return !visible || radius == 0.0;
 }
 
 SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(sphere)
