@@ -30,6 +30,7 @@ class curve : public renderable
 		static const size_t items = 256;
 		displaylist gl_cache;
 		long checksum;
+		c_cache() : checksum(0) {}
 	};
 	std::vector<c_cache> cache;
 	typedef std::vector<c_cache>::iterator cache_iterator;
