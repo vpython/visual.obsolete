@@ -46,7 +46,7 @@ translate_std_runtime_error( std::runtime_error e)
 	PyErr_SetString( PyExc_RuntimeError, e.what());
 }
 
-BOOST_PYTHON_MODULE( libcvisual)
+BOOST_PYTHON_MODULE( cvisual)
 {
 	VPYTHON_NOTE( "Importing cvisual from vpython-core2.");
 	using namespace boost::python;
