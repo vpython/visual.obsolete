@@ -1,5 +1,6 @@
 #include "win32/font.hpp"
 #include "win32/render_surface.hpp"
+#include "util/errors.hpp"
 
 #include <GL/glext.h>
 
@@ -43,7 +44,7 @@ bitmap_font::bitmap_font()
 	
 	TEXTMETRIC metrics;
 	GetTextMetrics( dev_context, &metrics);
-	m_ascent = metrics.tmAscent * 2.0 / render_surface::current->widow_width;
+	m_ascent = metrics.tmAscent * 2.0 / render_surface::current->window_width;
 	m_descent = metrics.tmDescent * 2.0 / render_surface::current->window_width;
 }
 
@@ -62,7 +63,8 @@ bitmap_font::bitmap_font( const std::string& name, int size)
 	}
 	else {
 		font = (HFONT)CreateFont(
-			-72.0 * size / GetDeviceCaps(dev_context, LOGPIXELSY)
+			static_cast<int>(-72.0 * size 
+				/ GetDeviceCaps(dev_context, LOGPIXELSY)),
 			0,
 			0,0,
 			0,
@@ -96,9 +98,13 @@ bitmap_font::bitmap_font( const std::string& name, int size)
 	
 	TEXTMETRIC metrics;
 	GetTextMetrics( dev_context, &metrics);
-	m_ascent = metrics.tmAscent * 2.0 / render_surface::current->widow_height;
+	m_ascent = metrics.tmAscent * 2.0 / render_surface::current->window_height;
 	m_descent = metrics.tmDescent * 2.0 
 		/ render_surface::current->window_height;
+}
+
+bitmap_font::~bitmap_font()
+{
 }
 
 double
@@ -130,5 +136,5 @@ bitmap_font::width( const std::string& text) const
 	GetTextExtentPoint32(
 		render_surface::current->dev_context, text.c_str(), text.size(), &size);
 	return static_cast<double>(size.cx * 2) 
-		/ render_surface::current->widow_width;
+		/ render_surface::current->window_width;
 }
