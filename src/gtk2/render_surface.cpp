@@ -199,10 +199,10 @@ render_surface::forward_render_scene()
 	 * Python thread some more CPU time.  If it is more than 5 ms less than the
 	 * timeout value, than the timeout is reduced by 5 ms, not to go below 30 ms.
 	 */
-	if (elapsed > double(cycle_time)/1000) {
+	if (elapsed > double(cycle_time + 5)/1000) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
-		cycle_time += 5;
+		cycle_time = int(elapsed * 1000);
 		timer = Glib::signal_timeout().connect( 
 			SigC::slot( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
@@ -215,7 +215,7 @@ render_surface::forward_render_scene()
 	if (elapsed < double(cycle_time-5)/1000 && cycle_time > 30) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
-		cycle_time -= 5;
+		cycle_time = int(elapsed * 1000);
 		timer = Glib::signal_timeout().connect( 
 			SigC::slot( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
