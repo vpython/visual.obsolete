@@ -156,6 +156,7 @@ public:
 	void refresh_cache( const view&);
 
 protected:
+	friend class display_kernel;
 	renderable();
 	renderable( const renderable& other);
 	mutex mtx;
