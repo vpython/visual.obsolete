@@ -10,7 +10,7 @@ main( int argc, char** argv)
 		argc = 1;
 	std::vector<std::string> args( argc-1);
 	for (int i = 1; i < argc; ++i) {
-		args[i] = std::string(argv[i]);
+		args[i-1] = std::string(argv[i]);
 	}
 	return realmain(args);
 }
