@@ -12,7 +12,15 @@
 /** Report a warning to the user that can probably be corrected, through cerr. */
 #define VPYTHON_WARNING(msg) write_warning( __FILE__, __LINE__, \
 	__PRETTY_FUNCTION__, msg)
-	
+
+// This should only be used within Win32-specific code.
+#define WIN32_CRITICAL_ERROR(msg) win32_write_critical( __FILE__, __LINE__, \
+	__PRETTY_FUNCTION__, msg)
+
+void
+win32_write_critical( 
+	std::string file, int line, std::string func, std::string msg);
+
 void
 write_critical( 
 	std::string file, int line, std::string function, std::string message);

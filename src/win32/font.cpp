@@ -90,7 +90,7 @@ bitmap_font::bitmap_font( const std::string& name, int size)
 		);
 		
 		if (!result) {
-			throw gl_error( "Failed to allocate a GL Font.");
+			WIN32_CRITICAL_ERROR("wglUseFontOutlines()");
 		}
 		cache[std::make_pair(font_family, font_size)] 
 			= std::make_pair(font, listbase);
