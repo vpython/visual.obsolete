@@ -38,12 +38,10 @@ wrap_primitive()
 		.add_property( "y", &primitive::get_y, &primitive::set_y)
 		.add_property( "z", &primitive::get_z, &primitive::set_z)
 		.add_property( "axis", 
-			make_function(&primitive::get_axis, 
-				return_internal_reference<>()),
+			make_function(&primitive::get_axis, return_internal_reference<>()),
 			&primitive::set_axis)
 		.add_property( "up", 
-			make_function(&primitive::get_up, 
-				return_internal_reference<>()),
+			make_function(&primitive::get_up, return_internal_reference<>()),
 			&primitive::set_up)
 		.add_property( "color", &primitive::get_color, &primitive::set_color)
 		.add_property( "red", &primitive::get_red, &primitive::set_red)
@@ -122,8 +120,7 @@ wrap_primitive()
 		.add_property( "blue", &label::get_blue, &label::set_blue)
 		.add_property( "alpha", &label::get_alpha, &label::set_alpha)
 		.add_property( "pos", 
-			make_function(&label::get_pos, 
-				return_internal_reference<>()), 
+			make_function(&label::get_pos, return_internal_reference<>()), 
 			&label::set_pos)
 		.add_property( "x", &label::get_x, &label::set_x)
 		.add_property( "y", &label::get_y, &label::set_y)
@@ -146,20 +143,20 @@ wrap_primitive()
 		.def( init<const frame&>())
 		.add_property( "objects", &frame::get_objects)
 		.add_property( "pos", 
-			make_function(&frame::get_pos, 
-				return_internal_reference<>()), 
+			make_function(&frame::get_pos, return_internal_reference<>()), 
 			&frame::set_pos)
 		.add_property( "x", &frame::get_x, &frame::set_x)
 		.add_property( "y", &frame::get_y, &frame::set_y)
 		.add_property( "z", &frame::get_z, &frame::set_z)
 		.add_property( "axis", 
-			make_function(&frame::get_axis, 
-				return_internal_reference<>()),
+			make_function(&frame::get_axis, return_internal_reference<>()),
 			&frame::set_axis)
 		.add_property( "up", 
-			make_function(&frame::get_up, 
-				return_internal_reference<>()),
+			make_function(&frame::get_up, return_internal_reference<>()),
 			&frame::set_up)
+         .add_property( "scale",
+            make_function(&frame::get_scale, return_internal_reference<>()),
+            &frame::set_scale)
 		.def( "rotate", &frame::py_rotate1, args( "angle"))
 		.def( "rotate", &frame::py_rotate2, args( "angle", "axis"))
 		.def( "rotate", &frame::py_rotate3, args( "angle", "axis", "origin"))
