@@ -6,6 +6,7 @@
 
 #include "render_core.hpp"
 #include <map>
+#include <string>
 
 // NOTE: This implementation might require Windows 98 (For the timer callback).
 
@@ -14,10 +15,10 @@ class basic_app;
 class render_surface : public SigC::Object
 {
  private:
- 	float last_mousepos_x;
- 	float last_mousepos_y;
- 	
 	friend basic_app;
+
+ 	float last_mousepos_x;
+ 	float last_mousepos_y; 	
 	
  	HWND widget_handle;
  	UINT_PTR timer_handle;
@@ -38,6 +39,7 @@ class render_surface : public SigC::Object
 	
 	// Procedures used to process messages.
 	LRESULT on_create( WPARAM, LPARAM);
+	LRESULT on_showwindow( WPARAM, LPARAM);
 	LRESULT on_mousemove( WPARAM, LPARAM);
 	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_paint( WPARAM, LPARAM);
@@ -62,8 +64,12 @@ class render_surface : public SigC::Object
 class basic_app
 {
  private:
+	// Handles to various Windows resources
  	HWND window_handle;
  	HWND toolbar;
+ 	HANDLE tb_image[4];
+ 	HIMAGELIST tb_imlist;
+ 	int tb_imlist_idx[4];
  	
 	static LRESULT CALLBACK 
 	dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -77,9 +83,11 @@ class basic_app
 	LRESULT on_create( WPARAM, LPARAM);
 	LRESULT on_command( WPARAM, LPARAM);
 	
-	void CreateWindow();
+	std::string title;
 	
  public:
+	scene( std::string title = std::string("VPython rendering core 2"));
+	~scene();
 	render_surface scene;
  
 	// Shows the main window and enters the message loop, returning when done.
