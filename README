@@ -31,21 +31,19 @@ src/test/
 	
 
 TODO (*-ed items are must-do, w/l items are wishlist items):
-	Use a proper toolbar for the default view widget.
-	* Port to Win32/wGL. 
-	Investigate port to native Mac/Carbon (or even Mac/Cocoa).
+	* Port to Win32/wGL.
+	Investigate port to native Mac/Carbon (alternatively, Mac/Cocoa).
 	* Transparency for rings.
 	Textures for rings?
-	* omplete implementation of frame.
 	* Write new implementations of:
 		curve,
 		convex,
 		faces,
 		label (blocking on text research, below).
-	Snapshot/screenshot support for the display object.
+	w/l Snapshot/screenshot support for the display object.
 
 	Possible new objects:
-		face_strip
+		w/l face_strip
 		* a texture loader that reads from a Numeric array.
 
 	More research: 
