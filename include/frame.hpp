@@ -11,6 +11,7 @@
 
 #include <boost/iterator/indirect_iterator.hpp>
 #include <vector>
+#include <list>
 
 namespace cvisual {
 	
@@ -42,9 +43,10 @@ another oolie: A transparent object that intersects a frame containing other
 class frame : public renderable
 {
  private:
-	vector pos;
-	vector axis;
-	vector up;
+	shared_vector pos;
+	shared_vector axis;
+	shared_vector up;
+	shared_vector scale;
 	/** Establishes the coordinate system into which this object's children
  		are rendered.
  		@param gcf: the global correction factor, propogated from gl_render(). 
@@ -52,10 +54,10 @@ class frame : public renderable
 	tmatrix frame_world_transform( const double gcf) const;
 	tmatrix world_frame_transform( const double gcf) const;
 	
-	std::vector<shared_ptr<renderable> > children;
-	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::iterator> 
+	std::list<shared_ptr<renderable> > children;
+	typedef indirect_iterator<std::list<shared_ptr<renderable> >::iterator> 
 		child_iterator;
-	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::const_iterator> 
+	typedef indirect_iterator<std::list<shared_ptr<renderable> >::const_iterator> 
 		const_child_iterator;
 	
 	std::vector<shared_ptr<renderable> > trans_children;
@@ -64,17 +66,40 @@ class frame : public renderable
 	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::const_iterator> 
 		const_trans_child_iterator;
 
+	void rotate( double angle, const vector& axis, const vector& origin);
+
  public:
 	frame();
-	vector scale;
+	frame( const frame& other);
 	
+	void py_rotate1( double angle);
+	void py_rotate2( double angle, vector axis);
+	void py_rotate3( double angle, vector axis, vector origin);
+
 	void add_child( shared_ptr<renderable> child);
 	void remove_child( shared_ptr<renderable> child);
+	std::list<shared_ptr<renderable> > get_objects();
  
 	void set_pos( const vector& n_pos);
+	shared_vector& get_pos();
+	
+	void set_x( double x);
+	double get_x();
+	
+	void set_y( double y);
+	double get_y();
+	
+	void set_z( double z);
+	double get_z();
+	
 	void set_axis( const vector& n_axis);
+	shared_vector& get_axis();
+	
 	void set_up( const vector& n_up);
-	void set_scale( const vector& n_scale) { scale = n_scale; }
+	shared_vector& get_up();
+	
+	void set_scale( const vector& n_scale);
+	shared_vector& get_scale();
 	
 	// Lookup the target that belongs to this name.
 	shared_ptr<renderable> lookup_name( 

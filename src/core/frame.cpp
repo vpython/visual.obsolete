@@ -10,7 +10,20 @@
 namespace cvisual {
 
 frame::frame()
-	: scale( 1.0, 1.0, 1.0)
+	: pos( mtx, 0, 0, 0),
+	axis( mtx, 1, 0, 0),
+	up( mtx, 0, 1, 0),
+	scale( mtx, 1.0, 1.0, 1.0)
+{
+	model_damage();
+}
+
+frame::frame( const frame& other)
+	: renderable( other),
+	pos( mtx, other.pos.x, other.pos.y, other.pos.z),
+	axis( mtx, other.axis.x, other.axis.y, other.axis.z),
+	up( mtx, other.up.x, other.up.y, other.up.z),
+	scale( mtx, other.scale.x, other.scale.y, other.scale.z)
 {
 	model_damage();
 }
@@ -21,16 +34,116 @@ frame::set_pos( const vector& n_pos)
 	pos = n_pos;
 }
 
+shared_vector&
+frame::get_pos()
+{
+	return pos;
+}
+
+void
+frame::set_x( double x)
+{
+	pos.set_x( x);
+}
+
+double
+frame::get_x()
+{
+	return pos.x;
+}
+
+void
+frame::set_y( double y)
+{
+	pos.set_y( y);
+}
+
+double
+frame::get_y()
+{
+	return pos.y;
+}
+
+void
+frame::set_z( double z)
+{
+	pos.set_z( z);
+}
+
+double
+frame::get_z()
+{
+	return pos.z;
+}
+
 void 
 frame::set_axis( const vector& n_axis)
 {
 	axis = n_axis;
 }
 
+shared_vector&
+frame::get_axis()
+{
+	return axis;
+}
+
 void 
 frame::set_up( const vector& n_up)
 {
 	up = n_up;
+}
+
+shared_vector&
+frame::get_up()
+{
+	return up;
+}
+
+void 
+frame::set_scale( const vector& n_scale)
+{
+	scale = n_scale;
+}
+
+shared_vector& 
+frame::get_scale()
+{
+	return scale;
+}
+
+void
+frame::rotate( double angle, const vector& _axis, const vector& origin)
+{
+	tmatrix R = rotation( angle, _axis, origin);
+	vector fake_up = up;
+	if (!axis.cross( fake_up)) {
+		fake_up = vector( 1,0,0);
+		if (!axis.cross( fake_up))
+			fake_up = vector( 0,1,0);
+	}
+
+	pos = R * pos;
+	axis = R.times_v( axis);
+	up = R.times_v( fake_up);
+}
+
+void 
+frame::py_rotate1( double angle)
+{
+	rotate( angle, axis, pos);
+}
+
+void
+frame::py_rotate2( double angle, vector _axis)
+{
+	rotate( angle, _axis, pos);
+}
+
+void
+frame::py_rotate3( double angle, vector _axis, vector origin)
+{
+	rotate( angle, _axis, origin);
 }
 
 tmatrix 
@@ -123,6 +236,15 @@ frame::remove_child( shared_ptr<renderable> obj)
 		std::remove( children.begin(), children.end(), obj);
 }
 
+std::list<shared_ptr<renderable> >
+frame::get_objects()
+{
+	lock L(mtx);
+	std::list<shared_ptr<renderable> > ret = children;
+	ret.insert( ret.end(), trans_children.begin(), trans_children.end());
+	return ret;
+}
+
 shared_ptr<renderable> 
 frame::lookup_name( 
 	const unsigned int* name_top,
@@ -133,11 +255,19 @@ frame::lookup_name(
 	using boost::dynamic_pointer_cast;
 	
 	shared_ptr<renderable> ret;
-	if (*name_top < children.size()) {
-		ret = children[*name_top];
+	unsigned int size = 0;
+	const_child_iterator i( children.begin());
+	const_child_iterator i_end( children.end());
+	while (i != i_end) {
+		if (*name_top == size) {
+			ret = *i.base();
+			break;
+		}
+		size++;
+		++i;
 	}
-	else
-		ret = trans_children[*(name_top - children.size())];
+	if (!ret)
+		ret = trans_children[*(name_top) - size];
 	
 	if (name_end - name_top > 1) {
 		frame* ref_frame = dynamic_cast<frame*>(ret.get());
@@ -148,27 +278,23 @@ frame::lookup_name(
 		return ret;
 }
 
+// TODO: Run some bench tests here.  The simplest solution may be to just use
+// pos as the 'center' of the frame, and warn that intersecting frames may not
+// be rendered in the right z-order.
 vector 
 frame::get_center() const
 {
+	if (trans_children.empty())
+		return pos;
+	tmatrix fwt = frame_world_transform( 1.0);
 	vector ret;
-	int ctr = 0;
-	const_child_iterator i = children.begin();
-	const_child_iterator i_end = children.end();
-	while (i != i_end) {
-		ret += i->get_center();
-		ctr++;
-		++i;
-	}
 	const_trans_child_iterator j = trans_children.begin();
 	const_trans_child_iterator j_end = trans_children.end();
 	while (j != j_end) {
-		ret += j->get_center();
-		ctr++;
+		ret += fwt * j->get_center();
 		++j;
 	}
-	if (ctr)
-		ret /= ctr;
+	ret /= trans_children.size();
 	return ret;
 }
 	
@@ -196,6 +322,12 @@ frame::gl_render( const view& v)
 		gl_matrix_stackguard guard( frame_world_transform(v.gcf));
 		
 		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
+			if (i->color.alpha != 1.0) {
+				// See display_kernel::draw().
+				trans_children.push_back( *i.base());
+				i = children.erase(i.base());
+				continue;
+			}
 			i->refresh_cache(local);
 			rgba actual_color = i->color;
 			if (v.anaglyph) {
@@ -212,6 +344,9 @@ frame::gl_render( const view& v)
 		}
 		
 		// Perform a depth sort of the transparent children from forward to backward.
+		if (!trans_children.empty()) {
+			color.alpha = 0.5;
+		}
 		if (trans_children.size() > 1)
 			std::stable_sort( trans_children.begin(), trans_children.end(),
 				z_comparator( (pos*v.gcf - v.camera).norm()));
@@ -243,27 +378,23 @@ frame::gl_pick_render( const view& scene)
 	glPushName(0);
 	{
 		gl_matrix_stackguard guard( frame_world_transform(scene.gcf));
-		std::vector<shared_ptr<renderable> >::iterator i = children.begin();
-		std::vector<shared_ptr<renderable> >::iterator i_end = children.end();
+		child_iterator i( children.begin());
+		child_iterator i_end( children.end());
 		// The unique integer to pass to OpenGL.
 		unsigned int name = 0;
 		while (i != i_end) {
 			glLoadName(name);
-			(*i)->gl_pick_render( scene);
+			i->gl_pick_render( scene);
 			++i;
 			++name;
 		}
 		
-		if (trans_children.size() > 1)
-			std::stable_sort( trans_children.begin(), trans_children.end(),
-				z_comparator( (pos*scene.gcf - scene.camera).norm()));
-		
-		i = trans_children.begin();
-		i_end = trans_children.end();
-		while (i != i_end) {
+		trans_child_iterator j( trans_children.begin());
+		trans_child_iterator j_end( trans_children.end());
+		while (j != j_end) {
 			glLoadName(name);
-			(*i)->gl_pick_render(scene);
-			++i;
+			j->gl_pick_render(scene);
+			++j;
 			++name;
 		}
 	}
@@ -276,12 +407,16 @@ frame::grow_extent( extent& world)
 {
 	world.push_frame();
 	extent local;
-	for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
+	child_iterator i( children.begin());
+	child_iterator i_end( children.end());
+	for (; i != i_end; ++i) {
 		i->grow_extent( local);
 		world.add_body();
 	}
-	for (trans_child_iterator i = children.begin(); i != trans_child_iterator(children.end()); ++i) {
-		i->grow_extent( local);
+	trans_child_iterator j( trans_children.begin());
+	trans_child_iterator j_end( trans_children.end());
+	for ( ; j != j_end; ++j) {
+		j->grow_extent( local);
 		world.add_body();
 	}
 	world.add_sphere( local.center() + pos, local.scale(scale) * 0.5);
