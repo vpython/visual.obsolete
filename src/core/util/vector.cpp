@@ -7,6 +7,7 @@
 // Most functions are inlined in the parent header.
 
 #include "util/vector.hpp"
+#include "util/tmatrix.hpp"
 
 #include <istream>
 #include <ostream>
@@ -139,6 +140,13 @@ vector::repr( void) const
 	// rebuild this object, we use the full precision of the data type here.
 	ret << "vector(" << x << ", " << y << ", " << z << ")";
 	return ret.str();
+}
+
+vector
+vector::rotate( double angle, vector axis) throw()
+{
+	tmatrix R = rotation( angle, axis);
+	return R * *this;
 }
 
 double
