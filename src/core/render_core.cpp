@@ -1,6 +1,7 @@
 #include "render_core.hpp"
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
+#include "frame.hpp"
 
 #include <cassert>
 #include <algorithm>
@@ -504,12 +505,16 @@ render_core::render_scene(void)
 		// Control which type of stereo to perform.
 		switch (stereo_mode) {
 			case NO_STEREO:
+				scene_geometry.anaglyph = false;
+				scene_geometry.coloranaglyph = false;
 				glViewport( 0, 0, static_cast<int>(window_width), 
 					static_cast<int>(window_height));
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				draw(scene_geometry, 0);
 				break;
 			case ACTIVE_STEREO:
+				scene_geometry.anaglyph = false;
+				scene_geometry.coloranaglyph = false;
 				glViewport( 0, 0, static_cast<int>(window_width), 
 					static_cast<int>(window_height));
 				glDrawBuffer( GL_BACK_LEFT);
@@ -521,6 +526,8 @@ render_core::render_scene(void)
 				break;
 			case REDBLUE_STEREO:
 				// Red channel
+				scene_geometry.anaglyph = true;
+				scene_geometry.coloranaglyph = false;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 				glViewport( 0, 0, static_cast<int>(window_width), 
 					static_cast<int>(window_height));
@@ -535,6 +542,8 @@ render_core::render_scene(void)
 				break;
 			case REDCYAN_STEREO:
 				// Red channel
+				scene_geometry.anaglyph = true;
+				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 				glViewport( 0, 0, static_cast<int>(window_width), 
 					static_cast<int>(window_height));
@@ -549,6 +558,8 @@ render_core::render_scene(void)
 				break;
 			case YELLOWBLUE_STEREO:
 				// Yellow channel
+				scene_geometry.anaglyph = true;
+				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 				glViewport( 0, 0, static_cast<int>(window_width), 
 					static_cast<int>(window_height));
@@ -563,6 +574,8 @@ render_core::render_scene(void)
 				break;
 			case GREENMAGENTA_STEREO:
 				// Green channel
+				scene_geometry.anaglyph = true;
+				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 				glViewport( 0, 0, static_cast<int>(window_width), 
 					static_cast<int>(window_height));
@@ -578,6 +591,8 @@ render_core::render_scene(void)
 			case PASSIVE_STEREO: {
 				// Also handle viewport modifications.
 				scene_geometry.window_width = window_width * 0.5;
+				scene_geometry.anaglyph = false;
+				scene_geometry.coloranaglyph = false;
 				int stereo_width = int(scene_geometry.window_width);
 				// Left eye
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -633,7 +648,10 @@ render_core::pick( float x, float y, float d_pixels)
 		// minimum and maximum depth are the minimum and maximum values in the 
 		// depth buffer scaled between 0 and 2^32-1. (source is [0,1])
 		// name_stack is the full contents of the name stack at the time of the hit.
+		
+		// TODO: The hit_buffer_size does not properly take into account frames.
 		size_t hit_buffer_size = (layer_world.size()+layer_world_transparent.size())*4;
+		// TODO: And this is a GNU extension...
 		unsigned int hit_buffer[hit_buffer_size];
 		
 		// Allocate a std::map< uint, shared_ptr<renderable> > to lookup names
@@ -696,9 +714,15 @@ render_core::pick( float x, float y, float d_pixels)
 				break;
 			double min_hit_depth = static_cast<double>(hit_record[1]) / 0xffffffffu;
 			if (min_hit_depth < best_pick_depth) {
-				unsigned int name = hit_record[3];
 				best_pick_depth = min_hit_depth;
-				best_pick = name_table[name];
+				best_pick = name_table[*(hit_record+3)];
+				if (n_names > 1) {
+					// Then the picked object is the child of a frame.
+					frame* ref_frame = dynamic_cast<frame*>(best_pick.get());
+					assert(ref_frame != NULL);
+					best_pick = ref_frame->lookup_name(
+						hit_record + 4, hit_record + 3 + n_names);
+				}
 			}
 			hit_record += 3 + n_names;
 			n_hits--;
