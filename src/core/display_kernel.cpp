@@ -410,7 +410,17 @@ display_kernel::world_to_view_transform(
 		else // Wide
 			glScaled( width / window_height, 1.0, 1.0);
 	}
-
+	#if 0
+	// Enable this to peek at the actual scene geometry.
+	std::cerr << "scene_geometry: camera:" << scene_camera 
+		<< " center:" << scene_center 
+		<< " up:" << scene_up << " range:" << range*gcf 
+		<< " gcf:" << gcf << " nearclip:" << nearclip 
+		<< " farclip:" << farclip;
+	world_extent.dump_extent();
+	std::cerr << std::endl;
+	#endif
+	
 	gluLookAt( 
 		scene_camera.x, scene_camera.y, scene_camera.z,
 		scene_center.x, scene_center.y, scene_center.z,
@@ -1015,6 +1025,8 @@ void
 display_kernel::set_autoscale( bool n_autoscale)
 {
 	lock L(mtx);
+	if (!n_autoscale && autoscale)
+		recalc_extent();
 	autoscale = n_autoscale;
 }
 
