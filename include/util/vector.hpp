@@ -396,6 +396,13 @@ class shared_vector : public vector
 
 	void py_scale( double);
 	void py_scale2( double);
+  
+    // Use this function to assign to this vector when the parent mutex is
+    // already locked.
+    inline void assign_locked( const vector& v)
+    {
+        vector::operator=(v);
+    }
 }; // !class shared_vector
 
 } // !namespace cvisual
