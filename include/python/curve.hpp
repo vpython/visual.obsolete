@@ -31,6 +31,12 @@ class curve : public renderable
 	// the space allocated for storage so far
 	size_t preallocated_size;
 	// the number of vectors currently occupying the allocated storage.
+	// index( , count+1) is the last element in the arrays.
+	// index( , 1) is the first element in the array
+	// index( , 0) is used as the before-the-first element when rendering with
+	//   gle.
+	// index( , count+2) is used as the after-the-last point when rendering with
+	//    gle.
 	size_t count;
 
 	// A type used to cache (in OpenGL memory) a displaylist for a chunk of the
@@ -40,6 +46,7 @@ class curve : public renderable
 		static const size_t items = 256;
 		displaylist gl_cache;
 		long checksum;
+		c_cache() : checksum(0) {}
 	};
 	std::vector<c_cache> cache;
 	typedef std::vector<c_cache>::iterator cache_iterator;

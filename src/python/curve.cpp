@@ -21,6 +21,8 @@ using boost::python::object;
 
 namespace cvisual { namespace python {
 
+const size_t curve::c_cache::items;
+
 namespace {
 	
 // returns a pointer to the ith vector in the array.
@@ -86,6 +88,7 @@ curve::get_color()
 void
 curve::set_length( size_t length)
 {
+	// The number of points that are valid.
 	size_t npoints = count;
 	if (npoints > length) // A shrink operation - never done by VPython.
 		npoints = length;
@@ -93,10 +96,10 @@ curve::set_length( size_t length)
 		// The first allocation.
 		npoints = 1;
 		
-	if (length > preallocated_size-1) {
+	if (length > preallocated_size-2) {
 		VPYTHON_NOTE( "Reallocating buffers for a curve object.");
 		std::vector<int> dims(2);
-		dims[0] = 2*length + 1;
+		dims[0] = 2*length + 2;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
 		array n_color = makeNum( dims, PyArray_FLOAT);
@@ -129,7 +132,7 @@ curve::set_length( size_t length)
 		}
 	}
 	count = length;
-	int cache_length = (count+256)/256 - cache.size();
+	int cache_length = (count+c_cache::items)/(c_cache::items-1) - cache.size();
 	while (cache_length > 0) {
 		cache.push_back( c_cache());
 		cache_length--;
@@ -549,7 +552,7 @@ curve::grow_extent( extent& world)
 void
 curve::thinline( const view& scene, size_t begin, size_t end)
 {
-	assert( end >= begin);
+	assert( end > begin);
 	// The following may be empty, but they are kept at this scope to ensure
 	// that their memory will be valid when rendering the body below.
 	double (*spos)[3] = NULL;
@@ -628,6 +631,7 @@ struct converter
 void
 curve::thickline( const view& scene, size_t begin, size_t end)
 {
+	assert( end > begin);
 	std::vector<rgb> tcolor;
 	std::vector<vector> spos;
 	float (*used_color)[3] = &((converter<float>*)index( color, begin-1))->data;
@@ -701,7 +705,6 @@ curve::gl_render( const view& scene)
 	// perpendicular to the path at the last segment.  When the path appears
 	// to be closed, it should be rendered that way on-screen.
 	bool closed = closed_path();
-	set_length( count+1);
 	if (closed) {
 		// Make the 0th element == last element.
 		// Make the true_size+1 element == first element.
@@ -722,13 +725,11 @@ curve::gl_render( const view& scene)
 		pos_begin[1] = pos_begin[1+3] - (pos_begin[1+6]-pos_begin[1+3]);
 		pos_begin[2] = pos_begin[2+3] - (pos_begin[2+6]-pos_begin[2+3]);
 		
-		// Since the set_length() function copies over the last element, we
-		// add in a vector pointing from the penultimate element to the ultimate
-		// element.
-		double* pos_end = index( pos, count-1);
-		pos_end[0] += pos_end[0-3] - pos_end[0-6];
-		pos_end[1] += pos_end[1-3] - pos_end[1-6];
-		pos_end[2] += pos_end[2-3] - pos_end[2-6];	
+		double* pos_end = index( pos, true_size);
+		double* pos_last = index( pos, true_size-1);
+		pos_end[0] = pos_last[0] + (pos_last[0] - pos_last[0-3]);
+		pos_end[1] = pos_last[1] + (pos_last[1] - pos_last[1-3]);
+		pos_end[2] = pos_last[2] + (pos_last[2] - pos_last[2-3]);
 	}
 
 	clear_gl_error();
@@ -739,9 +740,10 @@ curve::gl_render( const view& scene)
 		first = false;
 	}
 	
-	size_t size = std::min(256u, true_size);
+	size_t size = std::min(c_cache::items, true_size);
 	size_t begin = 0;
 	cache_iterator c = cache.begin();
+	cache_iterator c_end = cache.end();
 	const bool do_thinline = (radius == 0.0);
 	if (do_thinline) {
 		glEnableClientState( GL_VERTEX_ARRAY);
@@ -752,6 +754,7 @@ curve::gl_render( const view& scene)
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE);	
 	}
 	while (size > 1) {
+		assert( c != c_end);
 		long check = checksum( begin, begin+size);
 		if (check == c->checksum)
 			c->gl_cache.gl_render();
@@ -778,8 +781,7 @@ curve::gl_render( const view& scene)
 		glDisable( GL_LINE_SMOOTH);
 	}
 	check_gl_error();
-	
-	set_length( count-1);
+
 }
 
 } } // !namespace cvisual::python
