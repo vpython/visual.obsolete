@@ -1,3 +1,5 @@
+// This file requires 124 MB to compile (optimizing).
+
 #include "display_kernel.hpp"
 #include "display.hpp"
 
@@ -7,7 +9,7 @@
 #include <boost/python/args.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/make_function.hpp>
-
+ 
 namespace cvisual {
 namespace py = boost::python;
 
@@ -27,7 +29,7 @@ struct renderable_objects_to_py_list
 	}
 };
 
-// This function automatically converts the std::list of renderable objects to a
+// This function automatically converts the std::list of light objects to a
 // Python list.
 struct lights_to_py_list
 {
@@ -100,18 +102,26 @@ wrap_display_kernel(void)
 			&display_kernel::set_stereomode)
 		;
 	
+	typedef atomic_queue<std::string> kb_object;
+	py::class_< kb_object, boost::noncopyable>( "kb_object", no_init)
+		.def( "getkey", &kb_object::pop, "Returns the next key press value.")
+		.add_property( "keys", &kb_object::size) 
+		;
+	
 	py::class_<display, boost::noncopyable>( "display")
 		.add_property( "x", &display::get_x, &display::set_x)
 		.add_property( "y", &display::get_y, &display::set_y)
 		.add_property( "width", &display::get_width, &display::set_width)
 		.add_property( "height", &display::get_height, &display::set_height)
 		.add_property( "title", &display::get_title, &display::set_title)
-		// .add_property( "fullscreen", &display::is_fullscreen, &display::set_fullscreen)
+		.add_property( "fullscreen", &display::is_fullscreen, &display::set_fullscreen)
 		.def( "set_selected", &display::set_selected)
 		.staticmethod( "set_selected")
 		.def( "get_selected", &display::get_selected)
 		.staticmethod( "get_selected")
 		.add_property( "visible", &display::get_visible, &display::set_visible)
+		.add_property( "kb", py::make_function(
+			&display::get_kb, py::return_internal_reference<>()))
 		;
 	
 	py::to_python_converter<
