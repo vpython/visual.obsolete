@@ -99,7 +99,7 @@ tests = core.Copy()
 # TODO: Find out why ParseConfig doesn't honor PKG_CONFIG_PATH.
 tests['ENV']['PKG_CONFIG_PATH'] = './lib/pkgconfig/'
 # tests.ParseConfig( 'pkg-config --cflags --libs vpython-3.0')
-tests.Append( LIBPATH='lib', LIBS=['vpython-core'])
+tests.Append( LIBPATH='lib', LIBS=['vpython-core'] )
 if sys.platform == 'win32':
 	tests.Append( LDFLAGS='-mwindows')
 	main = 'src/win32/winmain.cpp'
@@ -140,11 +140,14 @@ Test('sincos_matrix_bench')
 ################################################################################
 # Build the extension module.
 py = core.Copy()
-py.Append( CPPPATH='/usr/include/python2.3', LIBS='boost_python', 
+py.Append( CPPPATH='/usr/include/python2.3', 
+	LIBS=['boost_python', 'vpython-core'],
+	LIBPATH='lib',
 	CPPFLAGS='-Wno-unused')
-py.SharedLibrary( target='lib/cvisualmodule',
+py.SharedLibrary( target='site-packages/cvisual',
 	source=['src/python/wrap_display_kernel.cpp',
 		'src/python/wrap_vector.cpp',
 		'src/python/wrap_rgba.cpp',
 		'src/python/wrap_primitive.cpp',
-		'src/python/num_util.cpp' ])
+		'src/python/num_util.cpp',
+		'src/python/cvisualmodule.cpp'] )
