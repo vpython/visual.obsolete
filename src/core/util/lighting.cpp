@@ -184,7 +184,7 @@ light::gl_begin( GLenum id, double gcf) const
 	glLightfv( id, GL_SPECULAR, &specular.red);
 	
 	vector _pos = position;
-	if (local) {
+	if (!local) {
 		_pos = _pos.norm();
 	}
 	float pos[] = { _pos.x*gcf, _pos.y*gcf, _pos.z*gcf, 
