@@ -111,11 +111,24 @@ extent::farclip( const vector& camera, const vector& forward) const
 }
 
 double
-extent::nearclip( const vector&, const vector&) const
+extent::nearclip( const vector& camera, const vector& forward) const
 {
-	// This value is experimentally determined to be good in most cases.
-	// The failure case is when the scene is far away
-	return 0.07;
+    // Compute the distance from the camera to the nearest point
+    vector corners[] = {
+       maxs,
+       vector( mins.x, mins.y, maxs.z),
+       vector( mins.x, maxs.y, mins.z),
+       vector( mins.x, maxs.y, maxs.z),
+       vector( maxs.x, mins.y, mins.z),
+       vector( maxs.x, maxs.y, mins.z),
+       vector( maxs.x, mins.y, maxs.z)     
+    };
+    vector nearest = mins;
+    for (size_t i = 0; i < 7; ++i) {
+        if (corners[i].dot( forward) < nearest.dot( forward))
+            nearest = corners[i];
+    }
+    return (nearest - camera).dot( forward);
 }
 
 double

@@ -7,7 +7,7 @@
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
 #include "frame.hpp"
-# include "font.hpp"
+#include "font.hpp"
 
 #include <cassert>
 #include <algorithm>
@@ -352,6 +352,7 @@ display_kernel::world_to_view_transform(
 	// offset from the extent's center.
 	vector scene_center = center * gcf;
 	vector scene_up = up.norm();
+    vector scene_forward = forward.norm();
 
 	// the horizontal and vertical tangents of half the field of view.
 	double tan_hfov_x = 0.0;
@@ -361,19 +362,28 @@ display_kernel::world_to_view_transform(
 	// The cotangent of half of the narrower field of view.
 	double cot_hfov = 1 / std::min(tan_hfov_x, tan_hfov_y);
 	// The camera position used for gluLookAt
-	vector scene_camera = -forward.norm()*cot_hfov*user_scale
-		+ scene_center;
+	vector scene_camera = -scene_forward*cot_hfov*user_scale
+		+ scene_center * gcf;
 	// The true camera position, in world space. 
-	vector camera = (-forward.norm() * cot_hfov*user_scale).scale(range) 
+	vector camera = (-scene_forward * cot_hfov*user_scale).scale(range) 
 		+ center;
 	// The true distance between the camera and the visual center of the scene,
 	// in scaled world space.
 	double eye_length = (center-camera).mag() * gcf;
 
-	// Establish the distances to the clipping planes.
-	double nearclip = world_extent.nearclip( camera, forward) / gcf;
-	// TODO: revisit this in the face of user-driven camera panning.
-	double farclip = world_extent.farclip( camera, forward) * gcf;
+	// Establish the distances to the clipping planes.  The are specified
+    // in scene space and not world space.
+	double nearclip = world_extent.nearclip( camera, scene_forward);
+    nearclip /= std::fabs( scene_forward.scale(range).mag());
+	double farclip = world_extent.farclip( camera, scene_forward);
+    farclip /= std::fabs( scene_forward.scale(range).mag());
+    // Also prevents loosing too much precision in the depth buffer
+    if (nearclip < .01 * farclip)
+        nearclip = .01 * farclip;
+    // Final safety.
+    if (nearclip < .07)
+        nearclip = .07;
+    
 	// Translate camera left/right 2% of the viewable width of the scene at
 	// the distance of its center.
 	double camera_stereo_offset = tan_hfov_x * eye_length * 0.02;
@@ -413,10 +423,13 @@ display_kernel::world_to_view_transform(
 	#if 0
 	// Enable this to peek at the actual scene geometry.
 	std::cerr << "scene_geometry: camera:" << scene_camera 
+        << " true camera:" << camera
 		<< " center:" << scene_center 
 		<< " up:" << scene_up << " range:" << range*gcf 
 		<< " gcf:" << gcf << " nearclip:" << nearclip 
-		<< " farclip:" << farclip;
+		<< " farclip:" << farclip << " user_scale:" << user_scale
+        << " cot_hfov:" << cot_hfov << " tan_hfov_x:" << tan_hfov_x
+        << " tan_hfov_y: " << tan_hfov_y;
 	world_extent.dump_extent();
 	std::cerr << std::endl;
 	#endif
@@ -479,7 +492,8 @@ display_kernel::recalc_extent(void)
 	cycles_since_extent = 0;
 	if (autocenter) {
 		// Move the camera to accomodate the new center of the scene
-		center = world_extent.center();
+        // assert( mtx.locked()); // TODO: Implement this feature.
+		center.assign_locked( world_extent.center());
 	}
 	if (autoscale) {
 		if (uniform) {
