@@ -1,8 +1,10 @@
 SetOption( "implicit_cache", 1)
 
 # Options common to all targets go in opt
-opt = Environment( CCFLAGS=['-g', '-march=pentium3'])
+opt = Environment( CCFLAGS=['-pipe', '-g'])
 opt.Append( CPPPATH=['include', '/usr/include/FTGL'])
+opt.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
+	'-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS'] )
 
 # Options specific to libvpython-core.so
 core = opt.Copy()
