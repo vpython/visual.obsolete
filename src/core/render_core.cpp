@@ -375,6 +375,12 @@ render_core::recalc_extent(void)
 		i->grow_extent( world_extent);
 		++i;
 	}
+	world_trans_iterator j( layer_world_transparent.begin());
+	world_trans_iterator j_end( layer_world_transparent.end());
+	while (j != j_end) {
+		j->grow_extent( world_extent);
+		++j;
+	}
 	cycles_since_extent = 0;
 	if (autocenter) {
 		// Move the camera to accomodate the new center of the scene
@@ -385,6 +391,8 @@ render_core::recalc_extent(void)
 	}
 	if (autoscale) {
 		world_scale = world_extent.scale();
+		if (world_scale == 0.0)
+			world_scale = 10.0;
 		if (world_scale > 1e154) {
 			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
 				" an extent greater than about 1e154 units.");
@@ -584,7 +592,7 @@ render_core::render_scene(void)
 			}
 		}
 		glRasterPos2f( -1.0f, -0.96f);
-		glColor3f( 1.0f, 1.0f, 1.0f);
+		glColor3f( 1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 		std::string fps_msg( "Cycle time: ");
 		fps_msg += boost::lexical_cast<std::string>(fps.read());
 		fps_font->Render( fps_msg.c_str());
