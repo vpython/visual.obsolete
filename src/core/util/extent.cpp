@@ -95,3 +95,11 @@ extent::scale() const
 	return (maxs - mins).mag();
 	// return (maxs - mins).stable_mag();
 }
+
+double
+extent::scale( const vector& s) const
+{
+	if (first)
+		return 0;
+	return ((maxs - mins) * s).mag();
+}
