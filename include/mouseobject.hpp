@@ -95,7 +95,7 @@ class event: public mousebase
  * All of the python access for data within this class get the present value of
  * the data.
  */
-class mouse : public mousebase
+class mouse_t : public mousebase
 {
  private:
 	// The bool tells whether or not the click was a left click or not.

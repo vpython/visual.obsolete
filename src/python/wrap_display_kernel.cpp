@@ -315,12 +315,12 @@ wrap_display_kernel(void)
 		( "click_object", "An event generated from mouse actions.", no_init)
 		;
 	
-	class_< mouse, boost::shared_ptr<mouse>, bases<mousebase>, noncopyable>
+	class_< mouse_t, boost::shared_ptr<mouse_t>, bases<mousebase>, noncopyable>
 		( "mouse_object", "This class provides access to the mouse.", no_init)
-		.def( "getclick", &mouse::pop_click)
-		.add_property( "clicked", &mouse::num_clicks)
-		.def( "getevent", &mouse::pop_event)
-		.add_property( "events", &mouse::num_events, &mouse::clear_events)
+		.def( "getclick", &mouse_t::pop_click)
+		.add_property( "clicked", &mouse_t::num_clicks)
+		.def( "getevent", &mouse_t::pop_event)
+		.add_property( "events", &mouse_t::num_events, &mouse_t::clear_events)
 		;
 	
 }

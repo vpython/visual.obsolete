@@ -142,7 +142,7 @@ event::create_press(
 
 
 void 
-mouse::clear_events( int i)
+mouse_t::clear_events( int i)
 {
 	if (i != 0) {
 		throw std::invalid_argument( "mouse.events can only be set to zero");
@@ -152,19 +152,19 @@ mouse::clear_events( int i)
 }
 
 int
-mouse::num_events() const
+mouse_t::num_events() const
 {
 	return events.size();
 }
 
 int
-mouse::num_clicks() const
+mouse_t::num_clicks() const
 {
 	return click_count;
 }
 
 shared_ptr<event>
-mouse::pop_event()
+mouse_t::pop_event()
 {
 	shared_ptr<event> ret = events.pop();
 	if (ret->is_click())
@@ -173,7 +173,7 @@ mouse::pop_event()
 }
 
 shared_ptr<event>
-mouse::pop_click()
+mouse_t::pop_click()
 {
 	shared_ptr<event> ret = events.pop();
 	while (!ret->is_click()) {
@@ -184,7 +184,7 @@ mouse::pop_click()
 }
 
 void
-mouse::push_event( shared_ptr<event> e)
+mouse_t::push_event( shared_ptr<event> e)
 {
 	if (e->is_click())
 		click_count++;
