@@ -86,7 +86,6 @@ display_kernel::remove_light( shared_ptr<light> old_light)
 {
 	lock L(mtx);
 	lights.remove( old_light);
-	// std::remove( lights.begin(), lights.end(), old_light);
 }
 
 void 
@@ -126,23 +125,36 @@ display_kernel::tan_hfov( double* x, double* y)
 	}
 }
 
+vector
+display_kernel::calc_camera()
+{
+	double tan_hfov_x = 0.0;
+	double tan_hfov_y = 0.0;
+	tan_hfov( &tan_hfov_x, &tan_hfov_y);
+	double cot_hfov = 1 / std::min(tan_hfov_x, tan_hfov_y);
+	return (-forward.norm() * cot_hfov*user_scale).scale(range) + center;
+}
+
 display_kernel::display_kernel()
 	: window_width(384),
 	window_height(256),
 	center(mtx, 0, 0, 0),
 	forward(mtx, 0, 0, -1),
 	up(mtx, 0, 1, 0),
+	range(10, 10, 10),
 	forward_changed(true),
 	cycles_since_extent(4),
 	fov( 60 * M_PI / 180.0),
 	autoscale(true),
 	autocenter(false),
+	uniform(true),
 	user_scale(1.0),
 	world_scale(10.0),
 	gcf(1.0),
 	gcf_changed(false),
 	ambient( 0.2, 0.2, 0.2),
 	fps( 3e-3), // Ambitiously initialize to 3 ms per cycle.
+	show_renderspeed( true),
 	background(0, 0, 0, 0), //< Transparent black.
 	mouse_mode( ZOOM_ROTATE),
 	stereo_mode( NO_STEREO),
@@ -190,8 +202,8 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 	double tan_hfov_x = 0.0;
 	double tan_hfov_y = 0.0;
 	tan_hfov( &tan_hfov_x, &tan_hfov_y);
-	double pan_rate = user_scale * world_scale * gcf 
-		/ std::min(tan_hfov_x, tan_hfov_y);
+	double pan_rate = (center - calc_camera()).mag() 
+		* std::min( tan_hfov_x, tan_hfov_y);
 	
 	switch (button) {
 		case NONE: case LEFT:
@@ -276,8 +288,8 @@ display_kernel::report_realize()
 	
 	// Lighting model properties
 	glShadeModel( GL_SMOOTH);
-	// TODO: Figure out what the concrete costs/benefits of this command are.
-	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	// TODO: Figure out what the concrete costs/benefits of these commands are.
+	// glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	glHint( GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glHint( GL_POINT_SMOOTH_HINT, GL_NICEST);
@@ -287,10 +299,7 @@ display_kernel::report_realize()
 	
 	// FSAA.  Doesn't seem to have much of an effect on my TNT2 card.  Grrr.
 	glEnable( GL_MULTISAMPLE_ARB);
-	// fps_font = shared_ptr<FTGLPixmapFont>( new FTGLPixmapFont( 
-	// 	"/usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf"));
-	// fps_font->FaceSize( 12, 100);
-	// assert( !fps_font->Error());
+
 	check_gl_error();
 	gl_end();
 }
@@ -334,13 +343,7 @@ display_kernel::world_to_view_transform(
 	
 	// See http://www.stereographics.com/support/developers/pcsdk.htm for a
 	// discussion regarding the design basis for the frustum offset code.
-	
-	// Calculate the extent of the universe.  For speed, this is only performed
-	// once every four renders.
-	if (cycles_since_extent >= 4) {
-		recalc_extent();
-	}
-	
+		
 	// Verify a precondition:
 	// Objects must be within a reasonable size on the screen.
 	assert( std::fabs(std::log( world_scale * gcf)) < std::log( 1e12));
@@ -350,21 +353,29 @@ display_kernel::world_to_view_transform(
 	vector scene_center = center * gcf;
 	vector scene_up = up.norm();
 
-	// the vertical and horizontal tangents of half the field of view.
+	// the horizontal and vertical tangents of half the field of view.
 	double tan_hfov_x = 0.0;
 	double tan_hfov_y = 0.0;
 	tan_hfov( &tan_hfov_x, &tan_hfov_y);
-	
-	// The scaled distance between the camera and the visual center of the scene.
-	double eye_length = user_scale * world_scale * gcf 
-		/ std::min(tan_hfov_x, tan_hfov_y);
-	// The position of the camera.
-	vector camera = -forward.norm() * eye_length + scene_center;
+
+	// The cotangent of half of the narrower field of view.
+	double cot_hfov = 1 / std::min(tan_hfov_x, tan_hfov_y);
+	// The camera position used for gluLookAt
+	vector scene_camera = -forward.norm()*cot_hfov*user_scale
+		+ scene_center;
+	// The true camera position, in world space. 
+	vector camera = (-forward.norm() * cot_hfov*user_scale).scale(range) 
+		+ center;
+	// The true distance between the camera and the visual center of the scene,
+	// in scaled world space.
+	double eye_length = (center-camera).mag() * gcf;
+
 	// Establish the distances to the clipping planes.
-	double nearclip = world_extent.nearclip( camera, forward);
+	double nearclip = world_extent.nearclip( camera, forward) / gcf;
 	// TODO: revisit this in the face of user-driven camera panning.
 	double farclip = world_extent.farclip( camera, forward) * gcf;
-	// Translate camera left/right 2% of the viewable width of the scene
+	// Translate camera left/right 2% of the viewable width of the scene at
+	// the distance of its center.
 	double camera_stereo_offset = tan_hfov_x * eye_length * 0.02;
 	// TODO: This should be doable with a simple glTranslated() call, but I haven't
 	// found the magic formula for it.
@@ -378,19 +389,35 @@ display_kernel::world_to_view_transform(
 	// The distance from the camera to the zero-parallax plane.
 	double focallength = eye_length * stereodepth;
 	// The amount to translate the frustum to the left and right.
-	double frustum_stereo_offset = camera_stereo_offset * nearclip / focallength;
-	
+	double frustum_stereo_offset = camera_stereo_offset * nearclip 
+		/ focallength * whicheye;
+
 	// Finally, the OpenGL transforms based on the geometry just calculated.
 	clear_gl_error();
 	// Position the camera.
 	glMatrixMode( GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(
-		camera.x, camera.y, camera.z,
+
+	if (!uniform) {
+		// Since the scene is rendered into a unit cube, this "just works":
+		// TODO: Not if the client program specified it...
+		farclip = 3.5 * cot_hfov;
+		// A scale based on the aspect ratio.
+		double width = (stereo_mode == PASSIVE_STEREO) 
+			? window_width*0.5 : window_width;
+		if (window_height > width) // Tall
+			glScaled( 1.0, window_height / width, 1.0);
+		else // Wide
+			glScaled( width / window_height, 1.0, 1.0);
+	}
+
+	gluLookAt( 
+		scene_camera.x, scene_camera.y, scene_camera.z,
 		scene_center.x, scene_center.y, scene_center.z,
 		scene_up.x, scene_up.y, scene_up.z);
-
-	
+	vector scene_range = range * gcf;
+	glScaled( 1.0/scene_range.x, 1.0/scene_range.y, 1.0/scene_range.z);
+		
 	// Establish a parallel-axis asymmetric stereo projection frustum.
 	glMatrixMode( GL_PROJECTION);
 	if (!forpick)
@@ -407,7 +434,7 @@ display_kernel::world_to_view_transform(
 		-nearclip * tan_hfov_y, 
 		nearclip * tan_hfov_y,
 		nearclip,
-		farclip);
+		farclip );
 	
 	glMatrixMode( GL_MODELVIEW);
 	check_gl_error();
@@ -445,13 +472,20 @@ display_kernel::recalc_extent(void)
 		center = world_extent.center();
 	}
 	if (autoscale) {
-		world_scale = world_extent.scale();
-		if (world_scale == 0.0)
-			world_scale = 10.0;
-		if (world_scale > 1e154) {
+		if (uniform) {
+			// compute range such that a unit cube, with sides == .5 * range,
+			// centered at center, will contain the entire scene.
+			double _range = world_extent.uniform_range( center);
+			range = vector( _range, _range, _range);
+		}
+		else {
+			// Compute range such that the three axes, centered at center,
+			// will contain the entire scene.
+			range = world_extent.range( center);
+		}
+		if (range.mag() > 1e150)
 			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
 				" an extent greater than about 1e154 units.");
-		}
 	}
 	// TODO: There should be a faster way to do this comparison.
 	if (std::fabs(std::log( world_scale * gcf)) >= std::log( 1e10)) {
@@ -572,6 +606,7 @@ display_kernel::render_scene(void)
 	lock L(mtx);
 	try {
 		fps.start();
+		recalc_extent();
 		view scene_geometry( forward.norm(), center, window_width, 
 			window_height, forward_changed, gcf, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
@@ -625,7 +660,7 @@ display_kernel::render_scene(void)
 					static_cast<int>(window_height));
 				glColorMask( GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, true);
-				// Cyan channel
+				// Green and Blue channels
 				glColorMask( GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 				glClear( GL_DEPTH_BUFFER_BIT);
 				draw( scene_geometry, 1, true, true);
@@ -633,7 +668,7 @@ display_kernel::render_scene(void)
 				glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 				break;
 			case YELLOWBLUE_STEREO:
-				// Yellow channel
+				// Red and green channels
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -657,7 +692,7 @@ display_kernel::render_scene(void)
 					static_cast<int>(window_height));
 				glColorMask( GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, true);
-				// Magenta channel
+				// Red and blue channels
 				glColorMask( GL_TRUE, GL_FALSE, GL_TRUE, GL_TRUE);
 				glClear( GL_DEPTH_BUFFER_BIT);
 				draw( scene_geometry, 1, true, true);
@@ -682,33 +717,34 @@ display_kernel::render_scene(void)
 				break;
 			}
 		}
+		if (show_renderspeed) {
+			std::ostringstream fps_msg;
+			fps_msg << "Cycle time: ";
+			fps_msg.width(6);
+			fps_msg << fps.read();
+			glColor3f( 
+				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
+			bitmap_font font;
 
-		std::string fps_msg( "Cycle time: ");
-		fps_msg += boost::lexical_cast<std::string>(fps.read());
-		// glEnable( GL_TEXTURE_2D);
-		glColor3f( 
-			1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
-		bitmap_font font;
-#if 1
-		glMatrixMode( GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		gluOrtho2D( 0, window_width, 0, window_height);
-		glMatrixMode( GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity();
-		glTranslated( 0, -font.descent(), 0);
-#endif
-		// glRasterPos2d( 0, -font.descent());
-		glRasterPos2d( 0, 0);
-		font.gl_render( fps_msg);
-#if 1
-		glPopMatrix();
-		glMatrixMode( GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode( GL_MODELVIEW);
-		// glDisable( GL_TEXTURE_2D);
-#endif
+			glMatrixMode( GL_PROJECTION);
+			glPushMatrix();
+			glLoadIdentity();
+			gluOrtho2D( 0, window_width, 0, window_height);
+			glMatrixMode( GL_MODELVIEW);
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslated( 0, -font.descent(), 0);
+			
+			glDisable( GL_DEPTH_TEST);
+			glRasterPos2d( 0, 0);
+			font.gl_render( fps_msg.str());
+			glEnable( GL_DEPTH_TEST);
+			
+			glPopMatrix();
+			glMatrixMode( GL_PROJECTION);
+			glPopMatrix();
+			glMatrixMode( GL_MODELVIEW);
+		}
 
 		
 		// Cleanup
@@ -877,6 +913,26 @@ display_kernel::get_forward()
 }
 
 void
+display_kernel::set_scale( const vector& n_scale)
+{
+	if (n_scale.x == 0.0 || n_scale.y == 0.0 || n_scale.z == 0.0)
+		throw std::invalid_argument( 
+			"The scale of each axis must be non-zero.");
+
+	vector n_range = vector( 1.0/n_scale.x, 1.0/n_scale.y, 1.0/n_scale.z);
+	lock L(mtx);
+	autoscale = false;
+	range = n_range;
+}
+
+vector
+display_kernel::get_scale()
+{
+	lock L(mtx);
+	return vector( 1/range.x, 1/range.y, 1/range.z);
+}
+
+void
 display_kernel::set_center( const vector& n_center)
 {
 	center = n_center;
@@ -889,8 +945,14 @@ display_kernel::get_center()
 }
 
 void
-display_kernel::set_fov(double n_fov)
+display_kernel::set_fov( double n_fov)
 {
+	if (n_fov == 0.0)
+		throw std::invalid_argument( "Orthogonal projection is not supported.");
+	else if (n_fov < 0.0 || n_fov >= M_PI)
+		throw std::invalid_argument(
+			"attribute visual.display.fov must be between 0.0 and math.pi "
+			"(exclusive)");
 	lock L(mtx);
 	fov = n_fov;
 }
@@ -900,6 +962,20 @@ display_kernel::get_fov()
 {
 	return fov;
 }
+
+void 
+display_kernel::set_uniform( bool n_uniform)
+{
+	lock L(mtx);
+	uniform = n_uniform;
+}
+
+bool 
+display_kernel::is_uniform()
+{
+	return uniform;
+}
+
 
 void
 display_kernel::set_background( const rgba& n_background)
@@ -954,8 +1030,58 @@ display_kernel::set_autocenter( bool n_autocenter)
 }
 
 void
+display_kernel::set_show_renderspeed( bool show)
+{
+	lock L(mtx);
+	show_renderspeed = show;
+}
+
+bool
+display_kernel::is_showing_renderspeed()
+{
+	return show_renderspeed;	
+}
+
+double
+display_kernel::get_renderspeed()
+{
+	lock L(mtx);
+	return fps.read();
+}
+
+void 
+display_kernel::set_range_d( double r)
+{
+	if (r == 0.0)
+		throw std::invalid_argument( 
+			"attribute visual.display.range may not be zero.");
+	lock L(mtx);
+	autoscale = false;
+	range = vector( r, r, r);
+}
+
+void 
+display_kernel::set_range( const vector& n_range)
+{
+	if (n_range.x == 0.0 || n_range.y == 0.0 || n_range.z == 0.0)
+		throw std::invalid_argument( 
+			"attribute visual.display.range may not be zero.");
+	lock L(mtx);
+	autoscale = false;
+	range = n_range;
+}
+
+vector 
+display_kernel::get_range()
+{
+	lock L(mtx);
+	return range;
+}
+
+void
 display_kernel::set_stereomode( std::string mode)
 {
+	lock L(mtx);
 	if (mode == "nostereo")
 		stereo_mode = NO_STEREO;
 	else if (mode == "active")
@@ -970,7 +1096,8 @@ display_kernel::set_stereomode( std::string mode)
 		stereo_mode = YELLOWBLUE_STEREO;
 	else if (mode == "greenmagenta")
 		stereo_mode = GREENMAGENTA_STEREO;
-	else throw std::invalid_argument( "Unimplemented or invalid stereo mode");
+	else 
+		throw std::invalid_argument( "Unimplemented or invalid stereo mode");
 }
 
 std::string

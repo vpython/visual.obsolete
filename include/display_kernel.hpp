@@ -39,6 +39,7 @@ class display_kernel
 	shared_vector center; ///< The observed center of the display, in world space.
 	shared_vector forward; ///< The direction of the camera, in world space.
 	shared_vector up; ///< The vertical orientation of the scene, in world space.
+	vector range; ///< The range that each axis of the scene should cover in the view.
 	
 	/** True initally and whenever the camera direction changes.  Set to false
 	 * after every render cycle. 
@@ -53,6 +54,8 @@ class display_kernel
 	bool autoscale; ///< True if Visual should scale the camera's position automatically.
 	/** True if Visual should automatically center the center of the scene. */
 	bool autocenter;
+	/** True if the autoscaler should compute uniform axes. */
+	bool uniform;
 	/** A scaling factor determined by middle mouse button scrolling. */
 	double user_scale;
 	/** A scaling factor determined by the extent of the scene. */
@@ -78,6 +81,11 @@ class display_kernel
 	
 	/** A historesis timer to calculate the time to render each frame. */
 	hist_timer fps;
+
+	/** Whether or not we should display the speed of the renderer.  
+	 * Default: true. 
+	 */
+	bool show_renderspeed;
 	rgba background; ///< The background color of the scene.
 	rgba forground; ///< The default color for objects to be rendered into the scene.
  
@@ -112,6 +120,9 @@ class display_kernel
 	// Compute the tangents of half the vertical and half the horizontal
 	// true fields-of-view.
 	void tan_hfov( double* x, double* y);
+	
+	// Compute the location of the camera based on the current geometry.
+	vector calc_camera();
 
 public: // Public Data.
 	enum mouse_mode_t { ZOOM_ROTATE, ZOOM_ROLL, PAN, FIXED } mouse_mode;
@@ -191,6 +202,18 @@ public: // Public Data.
 	*/
 	shared_ptr<renderable> pick( float x, float y, float d_pixels = 2.0);
 	
+	/** Recenters the scene.  Call this function exactly once to move the visual
+	 * center of the scene to the true center of the scene.  This will work
+	 * regardless of the value of this->autocenter.
+	 */
+	void recenter();
+	
+	/** Rescales the scene.  Call this function exactly once to scale the scene
+	 * such that it fits within the entire window.  This will work
+	 * regardless of the value of this->autoscale.
+	 */
+	void rescale();
+	
 	// Python properties
 	void set_up( const vector& n_up);
 	shared_vector& get_up();
@@ -198,9 +221,8 @@ public: // Public Data.
 	void set_forward( const vector& n_forward);
 	shared_vector& get_forward();
 
-	// TODO: Implement me.
 	void set_scale( const vector& n_scale);
-	vector& get_scale();
+	vector get_scale();
 	
 	void set_center( const vector& n_center);
 	shared_vector& get_center();
@@ -208,8 +230,6 @@ public: // Public Data.
 	void set_fov( double);
 	double get_fov();
 
-	// TODO: Implement me.  Maybe not, since in current VPython the results are
-	// absolutely awful.
 	void set_uniform( bool);
 	bool is_uniform();
 
@@ -224,11 +244,14 @@ public: // Public Data.
 
 	void set_autocenter( bool);
 	bool get_autocenter();
+	
+	void set_show_renderspeed( bool);
+	bool is_showing_renderspeed();
+	double get_renderspeed();
 
-	// TODO: Implement me (as part of making scale work).
-	void set_range( double);
+	void set_range_d( double);
 	void set_range( const vector&);
-	vector& get_range();
+	vector get_range();
 
 	// TODO: Implement me too.  Right now it is fixed since changing it didn't
 	// appear to work right when moving the scene into the page.
@@ -243,7 +266,7 @@ public: // Public Data.
 	std::string get_stereomode();
 	
 	// A list of all objects rendered into this display_kernel.  Modifying it
-	// does not propogate to the owner.
+	// does not propogate to the owning display_kernel.
 	std::list<shared_ptr<renderable> > get_objects() const;
 
 	/** A signal that makes the wrapping widget's rendering context 

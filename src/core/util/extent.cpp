@@ -112,7 +112,9 @@ extent::farclip( const vector& camera, const vector& forward) const
 double
 extent::nearclip( const vector&, const vector&) const
 {
-	return 0.015;
+	// This value is experimentally determined to be good in most cases.
+	// The failure case is when the scene is far away
+	return 0.07;
 }
 
 double
@@ -155,10 +157,24 @@ extent::scale() const
 	// return (maxs - mins).stable_mag();
 }
 
-vector
-extent::scope() const
+vector 
+extent::range( vector center) const
 {
-	return maxs - mins;
+	return vector(
+		std::max( fabs( center.x - mins.x), fabs( center.x - maxs.x)),
+		std::max( fabs( center.y - mins.y), fabs( center.y - maxs.y)),
+		std::max( fabs( center.z - mins.z), fabs( center.z - maxs.z)));
+}
+
+double 
+extent::uniform_range( vector center) const
+{
+	double ret = std::max( fabs(center.x - mins.x), fabs(center.x - maxs.x));
+	ret = std::max( fabs( center.y - mins.y), ret);
+	ret = std::max( fabs( center.y - maxs.y), ret);
+	ret = std::max( fabs( center.z - mins.z), ret);
+	ret = std::max( fabs( center.z - maxs.z), ret);
+	return ret;
 }
 
 double

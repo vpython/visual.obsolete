@@ -87,6 +87,7 @@ wrap_display_kernel(void)
 		.def( "render_scene", &display_kernel::render_scene)
 		.def( "report_realise", &display_kernel::report_realize)
 		.def( "report_resize", &display_kernel::report_resize, py::args( "width", "height"))
+		// .def( "report_mouse_motion", &display_kernel::report_mouse_motion)
 		.def( "pick", &display_kernel::pick, pick_overloads( py::args( "x", "y", "pixels")))
 		.add_property( "ambient", &display_kernel::get_ambient, 
 			&display_kernel::set_ambient)
@@ -98,17 +99,15 @@ wrap_display_kernel(void)
 			py::make_function( &display_kernel::get_forward, 
 				py::return_internal_reference<>()),
 			&display_kernel::set_forward)
-		// .add_property( "scale",
-		//	py::make_function( &display_kernel::get_scale, 
-		//		py::return_internal_reference<>()),
-		//	&display_kernel::set_scale)
+		.add_property( "scale",	&display_kernel::get_scale, 
+			&display_kernel::set_scale)
 		.add_property( "center",
 			py::make_function( &display_kernel::get_center, 
 				py::return_internal_reference<>()),
 			&display_kernel::set_center)
 		.add_property( "fov", &display_kernel::get_fov, &display_kernel::set_fov)
-		// .add_property( "uniform", &display_kernel::is_uniform, 
-		// 	&display_kernel::set_uniform)
+		.add_property( "uniform", &display_kernel::is_uniform, 
+		 	&display_kernel::set_uniform)
 		.add_property( "background", &display_kernel::get_background,
 			&display_kernel::set_background)
 		.add_property( "foreground", &display_kernel::get_forground,
@@ -119,6 +118,14 @@ wrap_display_kernel(void)
 			&display_kernel::set_autocenter)
 		.add_property( "stereo", &display_kernel::get_stereomode,
 			&display_kernel::set_stereomode)
+		.add_property( "show_renderspeed", &display_kernel::is_showing_renderspeed,
+			&display_kernel::set_show_renderspeed)
+		.add_property( "renderspeed", &display_kernel::get_renderspeed,
+			"The time it takes to render one frame, in seconds.  "
+			"It is histeresis filtered.")
+		.def( "set_range", &display_kernel::set_range_d)
+		.def( "set_range", &display_kernel::set_range)
+		.def( "get_range", &display_kernel::get_range)
 		;
 	
 	typedef atomic_queue<std::string> kb_object;

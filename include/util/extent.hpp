@@ -82,11 +82,11 @@ class extent
 	*/
 	double scale() const;
 	
-	/** Determines the magnitude of the size of the world.
-	 * @return a vector whose x, y, and z values contain the three-axis diagonal
-	 * of the bounding box, in world space.
+	/** Determines the range that the axes need to be to include the bounding
+	 * box.
 	 */
-	vector scope() const;
+	vector range( vector center) const;
+	double uniform_range( vector center) const;
  
 	/** Determine the magnitude of a scaled subworld.  See also 
 		frame::grow_extent() 
