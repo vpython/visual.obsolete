@@ -47,6 +47,12 @@ class atomic_queue
 		lock L(barrier);
 		return data.size();
 	}
+	
+	void clear()
+	{
+		lock L(barrier);
+		data.clear();
+	}
 };
 
 } // !namespace cvisual
