@@ -3,14 +3,22 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-// This file currently requires 122 MB to compile (optimizing).
+// This file currently requires 144 MB to compile (optimizing).
 
 #include "python/curve.hpp"
+#include "python/faces.hpp"
 
 #include <boost/python/class.hpp>
 #include <boost/python/args.hpp>
+#include <boost/python/overloads.hpp>
 
 namespace cvisual {
+
+namespace {
+using namespace boost::python;
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( faces_smooth_shade, 
+	python::faces::smooth_shade, 0, 1);
+}
 
 void
 wrap_arrayobjects()
@@ -56,6 +64,30 @@ wrap_arrayobjects()
 			(args("pos"), args("r")=-1, args("g")=-1, args("b")=-1))
 		.def( "append", append_v, args("pos"))
 		;
+
+	using python::faces;
+
+	void (faces::* append_all_vectors)(vector, vector, rgb) = &faces::append;
+	void (faces::* append_default_color)( vector, vector) = &faces::append;
+
+	class_<faces, bases<renderable> >("faces")
+		.def( init<const faces&>())
+		.def( "append", append_default_color, args( "pos", "normal"))
+		.def( "append", append_all_vectors, args("pos", "normal", "color"))
+		.def( "get_pos", &faces::get_pos)
+		.def( "set_pos", &faces::set_pos)
+		.def( "set_pos", &faces::set_pos_l)
+		.def( "get_normal", &faces::get_normal)
+		.def( "set_normal", &faces::set_normal_l)
+		.def( "set_normal", &faces::set_normal)
+		.def( "get_color", &faces::get_color)
+		.def( "set_color", &faces::set_color_l)
+		.def( "set_color", &faces::set_color)
+		.def( "set_color", &faces::set_color_t)
+		.def( "smooth_shade", &faces::smooth_shade, 
+			faces_smooth_shade( args("doublesided"),
+			"Average normal vectors at coincident vertexes."))
+		;
 }
 
-}
+} // !namespace cvisual
