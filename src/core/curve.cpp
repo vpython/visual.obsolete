@@ -43,27 +43,34 @@ checksum_float( long& sum, const float* f)
 } // !namespace (unnamed)
 
 long
-curve::checksum()
+curve::checksum( size_t begin, size_t end)
 {
 	long ret = 0;
 	
 	checksum_double( ret, &radius);
-	for (std::vector<rgba>::const_iterator i = color.begin(); i < color.end(); ++i) {
+	for (std::vector<rgba>::const_iterator i = color.begin()+begin; 
+			i < color.begin()+end; ++i) {
 		checksum_float( ret, &i->red);
 		checksum_float( ret, &i->green);
 		checksum_float( ret, &i->blue);
 		checksum_float( ret, &i->alpha);
 	}
-	for (std::vector<vector>::const_iterator i = pos.begin(); i < pos.end(); ++i) {
+	for (std::vector<vector>::const_iterator i = pos.begin()+begin; 
+			i < pos.begin()+end+1; ++i) {
 		checksum_double( ret, &i->x);
 		checksum_double( ret, &i->y);
 		checksum_double( ret, &i->z);
+	}
+	if (end != pos.size()+1) {
+		checksum_double( ret, &(pos.begin()+end+2)->x);
+		checksum_double( ret, &(pos.begin()+end+2)->y);
+		checksum_double( ret, &(pos.begin()+end+2)->z);
 	}
 	return ret;
 }
 
 curve::curve()
-	: pos(1), radius(0), monochrome(true), last_checksum(0)
+	: pos(1), radius(0), monochrome(true)
 {
 }
 
@@ -71,6 +78,8 @@ void
 curve::append( vector n_pos, rgba n_color)
 {
 	monochrome = false;
+	if (color.size()%256 == 1)
+		cache.push_back( c_cache());
 	pos.push_back( n_pos);
 	color.push_back( n_color);
 }
@@ -78,39 +87,58 @@ curve::append( vector n_pos, rgba n_color)
 void
 curve::append( vector n_pos)
 {
+	if (color.size()%256 == 1)
+		cache.push_back( c_cache());
 	pos.push_back( n_pos);
-	color.push_back( *color.end());
+	color.push_back( color.back());
 }
-
-// TODO: Change gle to use per-vertex normals rather than per-face normals for
-// glePolyCylinder().
 
 void 
 curve::gl_render( const view& scene)
 {
+	clear_gl_error();
 	static bool first = true;
 	if (first) {
-		gleSetNumSides(7);
+		gleSetNumSides(6);
+		gleSetJoinStyle( TUBE_JN_ANGLE | TUBE_NORM_PATH_EDGE);
 		first = false;
 	}
 	if (degenerate())
 		return;
 	
-	clear_gl_error();
-	long check = checksum();
-	
-	if (check == last_checksum) {
-		cache.gl_render();
+	size_t next_size = std::min(257u, color.size());
+	size_t current_begin = 0;
+	cache_iterator c = cache.begin();
+	const bool do_thinline = (radius == 0.0);
+	if (do_thinline) {
+		glEnableClientState( GL_VERTEX_ARRAY);
+		glDisable( GL_LIGHTING);
+		if (!monochrome)
+			glEnableClientState( GL_COLOR_ARRAY);		
 	}
-	else {
-		cache.gl_compile_begin();
-		if (radius)
-			thickline(scene);
-		else
-			thinline(scene);
-		cache.gl_compile_end();
-		cache.gl_render();
-		last_checksum = check;
+	while (next_size > 1) {
+		long check = checksum( current_begin, current_begin+next_size);
+		if (check == c->checksum)
+			c->gl_cache.gl_render();
+		else {
+			c->gl_cache.gl_compile_begin();
+			if (do_thinline)
+				thinline( scene, current_begin, current_begin+next_size);
+			else
+				thickline( scene, current_begin, current_begin+next_size);
+			c->gl_cache.gl_compile_end();
+			c->checksum = check;
+			c->gl_cache.gl_render();
+		}
+		current_begin += next_size-1;
+		next_size = (current_begin + 256 < color.size()) 
+			? 256 : color.size()-current_begin;
+		++c;
+	}
+	if (do_thinline) {
+		glDisableClientState( GL_VERTEX_ARRAY);
+		glDisableClientState( GL_COLOR_ARRAY);
+		glEnable( GL_LIGHTING);
 	}
 	check_gl_error();
 }
@@ -119,7 +147,8 @@ vector
 curve::get_center() const
 {
 	vector ret;
-	for (std::vector<vector>::const_iterator i = pos.begin()+1; i != pos.end(); ++i) {
+	for (std::vector<vector>::const_iterator i = pos.begin()+1; 
+			i != pos.end(); ++i) {
 		ret += *i;
 	}
 	ret /= pos.empty() ? 1 : pos.size();
@@ -142,29 +171,29 @@ curve::grow_extent( extent& world)
 }
 
 void
-curve::thinline( const view& scene)
+curve::thinline( const view& scene, size_t begin, size_t end)
 {
 	// The following may be empty, but they are kept at this scope to ensure
 	// that their memory will be valid when rendering the body below.
 	std::vector<vector> spos;
 	std::vector<rgba> tcolor;
-	glEnableClientState( GL_VERTEX_ARRAY);
-	glDisable( GL_LIGHTING);
 	
 	if (scene.gcf != 1.0) {
 		// Must scale the pos data.
-		spos = pos;
-		for (std::vector<vector>::iterator i = spos.begin(); i < spos.end(); ++i) {
+		std::vector<vector> _tmp( pos.begin()+begin+1, pos.begin()+1+end);
+		spos.swap( _tmp);
+		for (std::vector<vector>::iterator i = spos.begin(); 
+				i < spos.end(); ++i) {
 			*i *= scene.gcf;
 		}
-		glVertexPointer( 3, GL_DOUBLE, 0, &*(spos.begin()+1));
+		glVertexPointer( 3, GL_DOUBLE, 0, &*(spos.begin()));
 	}
 	else {
-		glVertexPointer( 3, GL_DOUBLE, 0, &*(pos.begin()+1));
+		glVertexPointer( 3, GL_DOUBLE, 0, &*(pos.begin()+begin+1));
 	}
 	
 	if (monochrome) {
-		// Can get away without using a color array.
+		// Can get away without using a color array?
 		if (scene.anaglyph) {
 			if (scene.coloranaglyph)
 				color[0].desaturate().gl_set();
@@ -175,11 +204,12 @@ curve::thinline( const view& scene)
 			color[0].gl_set();
 	}
 	else {
-		glEnableClientState( GL_COLOR_ARRAY);
 		if (scene.anaglyph) {
 			// Must desaturate or grayscale the color.
-			tcolor = color;
-			for (std::vector<rgba>::iterator i = tcolor.begin(); i < tcolor.end(); ++i) {
+			std::vector<rgba> _tmp(color.begin()+begin, color.begin()+end);
+			tcolor.swap( _tmp);
+			for (std::vector<rgba>::iterator i = tcolor.begin(); 
+					i < tcolor.end(); ++i) {
 				if (scene.coloranaglyph)
 					*i = i->desaturate();
 				else
@@ -188,44 +218,36 @@ curve::thinline( const view& scene)
 			glColorPointer( 4, GL_FLOAT, 0, &*tcolor.begin());
 		}
 		else
-			glColorPointer( 4, GL_FLOAT, 0, &*color.begin());
+			glColorPointer( 4, GL_FLOAT, 0, &*(color.begin()+begin));
 	}
-	
-	size_t points = pos.size()-1;
-	size_t index = 0;
-	while (points > 1024) {
-		glDrawArrays( GL_LINE_STRIP, index, 1024);
-		index += 1024;
-		points -= 1024;
-	}
-	if (points)
-		glDrawArrays( GL_LINE_STRIP, index, points);
-	glDisableClientState( GL_VERTEX_ARRAY);
-	glDisableClientState( GL_COLOR_ARRAY);
-	glEnable( GL_LIGHTING);
+	glDrawArrays( GL_LINE_STRIP, 0, end-begin);
 }
 
 void
-curve::thickline( const view& scene)
+curve::thickline( const view& scene, size_t begin, size_t end)
 {
 	std::vector<rgba> tcolor;
 	std::vector<vector> spos;
-	std::vector<rgba>& used_color = color;
-	std::vector<vector>& used_pos = pos;
+	float (*used_color)[4] = &((color.begin()+begin)->data);
+	double (*used_pos)[3] = &((pos.begin()+begin)->data);
 	
 	// Set up the leading and trailing points for the joins.  See 
 	// glePolyCylinder() for details
-	pos[0] = pos[1] - (pos[2]-pos[1]);
-	size_t end = pos.size()-1;
-	pos.push_back( pos[end] + pos[end] - pos[end-1]);
+	if (begin == 0)
+		pos[0] = pos[1] - (pos[2]-pos[1]);
+	if (end == pos.size()) {
+		pos.push_back( pos.back() + pos.back() - pos[pos.size()-2]);
+	}
 	
 	if (scene.gcf != 1.0) {
 		// Must scale the pos data.
-		spos = pos;
-		for (std::vector<vector>::iterator i = spos.begin(); i < spos.end(); ++i) {
+		std::vector<vector> tmp(pos.begin()+begin, pos.begin()+end+2);
+		spos.swap( tmp);
+		for (std::vector<vector>::iterator i = spos.begin(); 
+				i < spos.end(); ++i) {
 			*i *= scene.gcf;
 		}
-		used_pos = spos;
+		used_pos = &(spos.begin()->data);
 	}
 	if (monochrome) {
 		// Can get away without using a color array.
@@ -239,26 +261,29 @@ curve::thickline( const view& scene)
 			color[0].gl_set();
 		
 		glePolyCylinder( 
-			used_pos.size(), &(used_pos.begin()->data),
+			end-begin+2, used_pos,
 			0, radius * scene.gcf);
 	}
 	else {
 		if (scene.anaglyph) {
 			// Must desaturate or grayscale the color.
-			tcolor = color;
-			for (std::vector<rgba>::iterator i = tcolor.begin(); i < tcolor.end(); ++i) {
+			std::vector<rgba> tmp( color.begin()+begin, color.end()+end);
+			tcolor.swap(tmp);
+			for (std::vector<rgba>::iterator i = tcolor.begin(); 
+					i < tcolor.end(); ++i) {
 				if (scene.coloranaglyph)
 					*i = i->desaturate();
 				else
 					*i = i->grayscale();
 			}
-			used_color = tcolor;
+			used_color = &tcolor.begin()->data;
 		}
 		
 		glePolyCylinder_c4f( 
-			used_pos.size(), &(used_pos.begin()->data),
-			&(used_color.begin()->data), radius * scene.gcf);
+			end-begin+2, used_pos,
+			used_color, radius * scene.gcf);
 		
 	}
-	pos.pop_back();
+	if (end == pos.size())
+		pos.pop_back();
 }

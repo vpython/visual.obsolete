@@ -15,9 +15,16 @@ class curve : public renderable
 	bool monochrome;
  
  	bool degenerate();
-	displaylist cache;
-	long checksum();
-	long last_checksum;
+	long checksum( size_t begin, size_t end);
+	
+	struct c_cache 
+	{
+		static const size_t items = 256;
+		displaylist gl_cache;
+		long checksum;
+	};
+	std::vector<c_cache> cache;
+	typedef std::vector<c_cache>::iterator cache_iterator;
 
  public:
 	curve();
@@ -31,8 +38,8 @@ class curve : public renderable
 	virtual void gl_pick_render( const view&);
 	virtual void grow_extent( extent&);
 	
-	void thinline( const view&);
-	void thickline( const view&);
+	void thinline( const view&, size_t begin, size_t end);
+	void thickline( const view&, size_t begin, size_t end);
 };
 
 
