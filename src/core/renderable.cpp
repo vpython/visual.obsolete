@@ -6,6 +6,35 @@
 #include "renderable.hpp"
 
 namespace cvisual {
+	
+view::view( vector& n_forward, vector& n_center, float& n_width, 
+	float& n_height, bool n_forward_changed, double& n_gcf, 
+	bool n_gcf_changed)
+	: forward( n_forward), center(n_center), window_width( n_width), 
+	window_height( n_height), forward_changed( n_forward_changed), 
+	gcf( n_gcf), gcf_changed( n_gcf_changed), lod_adjust(0),
+	screen_objects( z_comparator( forward))
+{
+}
+
+view::view( const view& other, vector forward)
+	: camera( other.camera),
+	forward( forward),
+	center( other.center),
+	up( other.up),
+	window_width( other.window_width),
+	window_height( other.window_height),
+	forward_changed( true),
+	gcf( other.gcf),
+	gcf_changed( other.gcf_changed),
+	lod_adjust( other.lod_adjust),
+	anaglyph( other.anaglyph),
+	coloranaglyph( other.coloranaglyph),
+	tan_hfov_x( other.tan_hfov_x),
+	tan_hfov_y( other.tan_hfov_y),
+	screen_objects( z_comparator( forward))
+{
+}
 
 double
 view::pixel_coverage( const vector& pos, double radius) const

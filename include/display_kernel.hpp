@@ -105,12 +105,6 @@ class display_kernel
 	std::vector<shared_ptr<renderable> > layer_world_transparent;
 	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::iterator> world_trans_iterator;
 	
-	/** Objects to be rendered after all others in screen space.  Only label
-	 * objects fit this catagory at present. 
-	 */
-	std::vector<shared_ptr<renderable> > layer_screen;
-	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::iterator> screen_iterator;
-	
 	void recalc_extent();
 
 public: // Public Data.
@@ -148,11 +142,6 @@ public: // Public Data.
 	 *  world space.
 	 */
 	virtual void add_renderable( shared_ptr<renderable>);
-	
-	/** Add a normal renderable object to the list of objects to be rendered into
-	 *  screen space.  At this time, only label objects have this requirement.
-	 */
-	virtual void add_renderable_screen( shared_ptr<renderable>);
 	
 	/**  Remove a renderable object from this display, regardless of which layer
 	 *   it resides in.  */

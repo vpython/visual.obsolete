@@ -343,6 +343,8 @@ label::gl_render( const view& scene)
 	}
 
 	clear_gl_error();
+	displaylist list;
+	list.gl_compile_begin();
 	{
 		gl_matrix_stackguard guard;
 		vector label_pos = pos * scene.gcf;
@@ -446,7 +448,9 @@ label::gl_render( const view& scene)
 			++text_i;
 		}
 	}
+	list.gl_compile_end();
 	check_gl_error();
+	scene.screen_objects.insert( std::make_pair(pos, list));
 }
 
 vector

@@ -313,9 +313,9 @@ frame::gl_render( const view& v)
 {
 	// Ensure that we always get our cache updated to update our children.
 	tmatrix wft = world_frame_transform(v.gcf);
-	view local = v;
-	local.camera = wft * v.camera;
-	local.forward = -local.camera.norm();
+	vector camera = wft * v.camera;
+	view local( v, -camera.norm());
+	local.camera = camera;
 	local.center = wft * v.center;
 	model_damage();
 	{
@@ -368,6 +368,13 @@ frame::gl_render( const view& v)
 			if (v.anaglyph)
 				i->color = actual_color;			
 		}
+	}
+	typedef std::multimap<vector, displaylist, z_comparator>::iterator screen_iterator;
+	screen_iterator i( local.screen_objects.begin());
+	screen_iterator i_end( local.screen_objects.end());
+	while (i != i_end) {
+		v.screen_objects.insert( std::make_pair( wft*i->first, i->second));
+		++i;
 	}
 }
 

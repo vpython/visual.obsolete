@@ -9,12 +9,55 @@
 #include "util/rgba.hpp"
 #include "util/extent.hpp"
 #include "util/thread.hpp"
+#include "util/displaylist.hpp"
 #include <boost/shared_ptr.hpp>
+
+#include <map>
 
 namespace cvisual {
 
 using boost::shared_ptr;
-class z_comparator;
+class renderable;
+	
+/** A depth sorting criterion for STL-compatable sorting algorithms.  This 
+   implementation only performs 4 adds, 6 multiplies, and one comparison.  It
+   could be made faster if the virtual function get_center() was somehow made
+   non-virtual, but that isn't possible right now since some bodies	
+   have such a different notion of the "center" of the body compared to the other
+   objects.
+ */
+class z_comparator
+{
+ private:
+	/** A unit vector along the visual depth axis.*/
+	vector forward;
+ public:
+	/** Create a new comparator based on the specified depth direction. 
+	 * @param fore A unit vector along the sorting axis.
+	 */
+	z_comparator( const vector& fore)
+		: forward( fore) {}
+	
+	/** Apply the sorting criteria.
+		@return true if lhs is farther away than rhs. 
+	*/
+	inline bool operator()( 
+		const shared_ptr<renderable> lhs, 
+		const shared_ptr<renderable> rhs) const;
+
+	/** Apply the sorting criteria.  This version is faster than the shared_ptr
+		version above, by an amount that varies from OS to OS.
+		@return true if lhs is farther away than rhs. 
+	*/
+	inline bool operator()( const renderable* lhs, const renderable* rhs) const;
+	
+	/** Apply the sorting criteria.  This version is used by view::scen_objects
+		to sort them in depth-order as they are added to it.
+		@return true if lhs is farther away than rhs. 
+	*/
+	inline bool operator()( const vector& lhs, const vector& rhs) const;
+	
+};
 
 /** This primarily serves as a means of communicating information down to the
 	various primitives that may or may not need it from the render_surface.  Most
@@ -50,19 +93,18 @@ struct view
 	double tan_hfov_x; ///< The tangent of half the horzontal field of view.
 	double tan_hfov_y; ///< The tangent of half the vertical field of view.
 	
-	inline view( vector& n_forward, vector& n_center, float& n_width, 
+	view( vector& n_forward, vector& n_center, float& n_width, 
 		float& n_height, bool n_forward_changed, double& n_gcf, 
-		bool n_gcf_changed)
-		: forward( n_forward), center(n_center), window_width( n_width), 
-		window_height( n_height), forward_changed( n_forward_changed), 
-		gcf( n_gcf), gcf_changed( n_gcf_changed), lod_adjust(0)
-	{
-	}
+		bool n_gcf_changed);
+	
+	view( const view& other, vector fore);
 	
 	// Compute the apparent diameter, in pixels, of a circle that is parallel
 	// to the screen, with a center at pos, and some radius.  If pos is behind
 	// the camera, it will return negative.
 	double pixel_coverage( const vector& pos, double radius) const;
+	
+	mutable std::multimap<vector, displaylist, z_comparator> screen_objects;
 };
 
 /** Virtual base class for all renderable objects and composites.
@@ -141,41 +183,25 @@ protected:
 	virtual void update_z_sort( const view& forward);
 };
 
-/** A depth sorting criterion for STL-compatable sorting algorithms.  This 
-   implementation only performs 4 adds, 6 multiplies, and one comparison.  It
-   could be made faster if the virtual function get_center() was somehow made
-   non-virtual, but that isn't possible right now since some bodies	
-   have such a different notion of the "center" of the body compared to the other
-   objects.
- */
-class z_comparator
-{
- private:
-	/** A unit vector along the visual depth axis.*/
-	vector forward;
- public:
-	/** Create a new comparator based on the specified depth direction. 
-	 * @param fore A unit vector along the sorting axis.
-	 */
-	z_comparator( const vector& fore)
-		: forward( fore) {}
-	
-	/** Apply the sorting criteria.
-		@return true if lhs is farther away than rhs. 
-	*/
-	inline bool 
-	operator()( const shared_ptr<renderable> lhs, const shared_ptr<renderable> rhs) const
-	{ return forward.dot( lhs->get_center()) > forward.dot( rhs->get_center()); }
+inline bool 
+z_comparator::operator()( 
+	const shared_ptr<renderable> lhs, const shared_ptr<renderable> rhs) const
+{ 
+	return forward.dot( lhs->get_center()) > forward.dot( rhs->get_center()); 
+}
 
-	/** Apply the sorting criteria.  This version is faster than the shared_ptr
-		version above, by an amount that varies from OS to OS.
-		@return true if lhs is farther away than rhs. 
-	*/
-	inline bool 
-	operator()( const renderable* lhs, const renderable* rhs) const
-	{ return forward.dot( lhs->get_center()) > forward.dot( rhs->get_center()); }
+inline bool 
+z_comparator::operator()( const renderable* lhs, const renderable* rhs) const
+{ 
+	return forward.dot( lhs->get_center()) > forward.dot( rhs->get_center()); 
+}
 	
-};
+inline bool
+z_comparator::operator()( const vector& lhs, const vector& rhs) const
+{ 
+	return forward.dot( lhs) > forward.dot( rhs); 
+}
+
 
 /** A utility function that clamps a value to within a specified range.
  * @param lower The lower bound for the value.
