@@ -15,9 +15,16 @@
 // functions on Linux, OSX, and Windows.
 // On Linux, nanosleep() and usleep() always wait for longer than requested,
 // usually by more than 10 ms.
+
 // On OSX, nanosleep() is very precise, consistantly overshooting the mark by 
-// about 30 usec.
-// MS Windows is not yet tested.
+// only about 30 usec.
+
+// On Windows XP, Sleep() usually waits for less than that requested, and
+// occasionally more than requested.  The Sleep time granularity on Windows appears
+// to be roughly 16 ms, with no fractions.  A request of 0 returns immediately.
+// A request between 1-15 causes a short delay of 300-900 usec.  A second call
+// immediately after the first introduces a full 16 ms wait.
+
 int
 main(int argc, char** argv) 
 {
@@ -34,15 +41,15 @@ main(int argc, char** argv)
 	long long end = 0;
 	QueryPerformanceCounter( (LARGE_INTEGER*)&begin);
 	QueryPerformanceCounter( (LARGE_INTEGER*)&end);
-	long long timer_delay = (end - begin) * 1000 / tics_per_second;
-	std::cout << "Clock latency: " << timer_delay << " msec.\n";
+	long long timer_delay = (end - begin) * 1000000 / tics_per_second;
+	std::cout << "Clock latency: " << timer_delay << " usec.\n";
 	std::cout << "Requested delay: " << ms << " msec.\n";
 	
 	QueryPerformanceCounter( (LARGE_INTEGER*)&begin);
 	Sleep( sleep_time);
 	QueryPerformanceCounter( (LARGE_INTEGER*)&end);
 	
-	std::cout << "Sleep delay: " << (end - begin) * 1000 / tics_per_second << " ms.\n";
+	std::cout << "Sleep delay: " << (end - begin) * 1000000 / tics_per_second << " usec.\n";
 
 #else
 	sched_param pri;
