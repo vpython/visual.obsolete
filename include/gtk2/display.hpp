@@ -115,6 +115,7 @@ class gui_main : public SigC::Object
 	display* caller;
 	bool returned;
 	bool waiting_allclosed;
+	bool thread_exited;
 	
 	std::list<display*> displays;
 	

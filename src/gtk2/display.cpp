@@ -8,7 +8,6 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/radiobutton.h>
 
-
 namespace cvisual {
 using boost::thread;
 	
@@ -305,7 +304,7 @@ display::on_window_delete(GdkEventAny*)
 	gui_main::report_window_delete( this);
 	if (exit)
 		gui_main::quit();
-	return false;
+	return true;
 }
 
 void
@@ -319,7 +318,7 @@ gui_main* gui_main::self = 0;
 
 
 gui_main::gui_main()
-	: kit( 0, 0), caller( 0), returned( false), waiting_allclosed(false)
+	: kit( 0, 0), caller( 0), returned( false), waiting_allclosed(false), thread_exited(false)
 {
 	Gtk::GL::init( 0, 0);
 	if (!Glib::thread_supported())
@@ -344,9 +343,9 @@ gui_main::run()
 	lock L(call_lock);
 	if (waiting_allclosed) {
 		returned = true;
-		self = 0;
 		call_complete.notify_all();
 	}
+	thread_exited = true;
 #if 0
 	else {
 		Py_AddPendingCall( &py_quit);
@@ -359,7 +358,6 @@ gui_main::thread_proc(void)
 {
 	self = new gui_main();
 	self->run();
-	self = 0;
 }
 
 void
@@ -372,7 +370,7 @@ gui_main::init_thread(void)
 	}
 }
 
-// TODO: This isn't safe.
+// TODO: This may not be safe.
 bool
 gui_main::allclosed()
 {
@@ -388,9 +386,11 @@ gui_main::waitclosed()
 	if (!self)
 		return;
 	lock L(self->call_lock);
+	if (self->thread_exited)
+		return;
 	self->waiting_allclosed = true;
 	self->returned = false;
-	while (self) {
+	while (!self->returned) {
 		self->call_complete.wait(L);
 	}
 }
@@ -447,6 +447,8 @@ gui_main::shutdown()
 	if (!self)
 		return;
 	lock L(self->call_lock);
+	if (self->thread_exited)
+		return;
 	self->returned = false;
 	self->signal_shutdown();
 	while (!self->returned)
@@ -483,10 +485,12 @@ void
 gui_main::quit()
 {
 	assert( self != 0);
+	lock L(self->call_lock);
 	for (std::list<display*>::iterator i = self->displays.begin(); 
 			i != self->displays.end(); ++i) {
 		(*i)->destroy();
 	}
+	self->displays.clear();
 	self->kit.quit();
 }
 
