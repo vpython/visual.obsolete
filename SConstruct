@@ -1,7 +1,11 @@
+import os
+
 SetOption( "implicit_cache", 1)
 
 # Options common to all targets go in opt
-opt = Environment( CCFLAGS=['-pipe', '-g'])
+opt = Environment( CCFLAGS=['-pipe', '-g'],
+	ENV = os.environ)
+
 opt.Append( CPPPATH=['include', '/usr/include/FTGL'])
 opt.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 	'-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS'] )
