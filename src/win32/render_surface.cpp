@@ -282,6 +282,42 @@ render_surface::~render_surface()
 {
 }
 
+void 
+render_surface::add_renderable( shared_ptr<renderable> obj)
+{
+	if (obj->color.alpha == 1.0)
+		core.layer_world.push_back( obj);
+	else
+		core.layer_world_transparent.push_back( obj);
+}
+
+void 
+render_surface::add_renderable_screen( shared_ptr<renderable> obj)
+{
+	core.layer_screen.push_back( obj);
+}
+	
+void 
+render_surface::remove_renderable( shared_ptr<renderable> obj)
+{
+	// Choice of removal algorithms:  For containers that support thier own
+	// removal methods (list, set), use the member function.  Else, use 
+	// std::remove.
+	if (obj->color.alpha != 1.0) {
+		core.layer_world.remove( obj);
+	}
+	else
+		std::remove( core.layer_world_transparent.begin(), 
+			core.layer_world_transparent.end(), obj);
+}
+	
+void 
+render_surface::remove_renderable_screen( shared_ptr<renderable> obj)
+{
+	core.layer_screen.remove(obj);
+}
+
+
 /******************************* basic_app implementation ****************/
 
 // The WindProc function for this class mostly just dispatches the message to
@@ -478,6 +514,7 @@ basic_app::register_win32_class()
 }
 
 WNDCLASS basic_app::win32_class;
+std::map<HWND, basic_app*> basic_app::windows;
 
 /* Startup sequence:
  * Register the Win32 class type for render_surface in render_surface::render_surface()

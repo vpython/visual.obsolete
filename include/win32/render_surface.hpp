@@ -59,7 +59,12 @@ class render_surface : public SigC::Object
 	render_surface();
 	~render_surface();
 	render_core core;
-		
+	
+	void add_renderable( shared_ptr<renderable>);
+	void add_renderable_screen( shared_ptr<renderable>);
+	void remove_renderable( shared_ptr<renderable>);
+	void remove_renderable_screen( shared_ptr<renderable>);
+
 	// Signal fired by button down + button up
 	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
 };
