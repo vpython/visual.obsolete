@@ -51,9 +51,15 @@ class texture : public SigC::Object
 	void gl_activate();
 	void gl_free();
  
+	/** Determine whether or not this texture has an alpha channel.
+		@returns True iff there is an alpha channel for this texture.
+	*/
+	bool has_alpha() const;
+ 
  protected:
 	// A unique identifier for the texture, to be obtained from glGenTextures().
 	unsigned int handle;
+	bool have_alpha;
  
 	// Perform zero initialization of POD members.
 	texture();

@@ -16,20 +16,21 @@
 namespace cvisual {
 
 shared_ptr<texture>
-file_texture::create( const std::string& filename)
+file_texture::create( const std::string& filename, bool ignorealpha)
 {
-	return shared_ptr<texture>( new file_texture( filename));
+	return shared_ptr<texture>( new file_texture( filename, ignorealpha));
 }
 
 file_texture::~file_texture()
 {
 }
 
-file_texture::file_texture( const std::string& file)
-	: filename(file)
+file_texture::file_texture( const std::string& file, bool _ignorealpha)
+	: filename(file), ignorealpha( _ignorealpha)
 {
 	try {
 		image = Gdk::Pixbuf::create_from_file(filename);
+		have_alpha = image->get_has_alpha();
 	
 #ifdef DEBUG
 		// Print out the properties of this image.
@@ -69,12 +70,19 @@ file_texture::gl_init()
 	glBindTexture(GL_TEXTURE_2D, handle);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	if (image->get_has_alpha()) {
+	if (!ignorealpha && image->get_has_alpha()) {
 		gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGBA, image->get_width(),
 			image->get_height(), GL_RGBA, GL_UNSIGNED_BYTE, 
 			image->get_pixels());
 	}
+	else if (image->get_has_alpha() ) {
+		// Load the image but strip out the alpha channel.
+		gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, image->get_width(),
+			image->get_height(), GL_RGBA, GL_UNSIGNED_BYTE, 
+			image->get_pixels());
+	}
 	else {
+		// The source image is simple RGB.
 		gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, image->get_width(),
 			image->get_height(), GL_RGB, GL_UNSIGNED_BYTE, 
 			image->get_pixels());

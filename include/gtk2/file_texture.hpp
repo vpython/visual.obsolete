@@ -18,14 +18,16 @@ class file_texture : public texture
  public:
 	const std::string filename;
 	// TODO: perhaps this should use Glib::ustring instead?
-	static shared_ptr<texture> create( const std::string& filename);
+	static shared_ptr<texture> create( 
+		const std::string& filename, bool ignorealpha = false);
 	virtual ~file_texture();
 	
  private:
-	file_texture( const std::string&);
+	file_texture( const std::string&, bool ignorealpha);
 	virtual void gl_init();
 	virtual void gl_transform();
 	Glib::RefPtr<Gdk::Pixbuf> image;
+	bool ignorealpha;
 };
 
 } // !namespace cvisual
