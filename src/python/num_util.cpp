@@ -1,6 +1,6 @@
 #include <boost/python/detail/wrap_python.hpp>
 
-#include "num_util.h"
+#include "python/num_util.hpp"
 
 #include <boost/python/extract.hpp>
 #include <sstream>
@@ -45,12 +45,12 @@ DEALINGS IN THE SOFTWARE.
 
 
 namespace { 
-	const char* rcsid = "$Id: num_util.cpp,v 1.1 2004/08/06 20:55:17 jbrandmeyer Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.2 2004/08/15 00:43:25 jbrandmeyer Exp $";
 }
 
 // Moved into the cvisual namespace to prevent clashes with other projects using
 // num_util --Jonathan Brandmeyer
-namespace cvisual {
+namespace cvisual { namespace python {
 
 
 typedef KindStringMap::value_type  KindStringMapEntry;
@@ -483,4 +483,4 @@ inline void check_size_match(std::vector<int> dims, int n)
   return;
 }
 
-} //namespace numarray_bpl
+} } // !namespace cvisual::python
