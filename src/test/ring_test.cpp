@@ -5,7 +5,6 @@
 #include "render_surface.hpp"
 #include "arrow.hpp"
 #include "ring.hpp"
-#include "file_texture.hpp"
 
 #include <iostream>
 
