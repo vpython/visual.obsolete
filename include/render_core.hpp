@@ -163,6 +163,8 @@ public: // Public Data.
 		@return  the nearest selected object.  May be NULL if nothing was hit.
 	*/
 	shared_ptr<renderable> pick( float x, float y, float d_pixels = 2.0);
+	
+	void set_up( const vector& n_up);
 
 	/** A signal that makes the wrapping widget's rendering context 
 		active.  The wrapping object must connect to it.

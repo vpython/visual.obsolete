@@ -120,8 +120,10 @@ render_core::render_core()
 void
 render_core::report_mouse_motion( float dx, float dy, mouse_button button)
 {
-	// The far more complicated code: this stuff handles twisting and zooming
-	// the camera around.
+	// This stuff handles automatic movement of the camera in responce to user
+	// input.  See also view_to_world_transform for how the affected variables 
+	// are used to actually position the camera.
+	
 	// Scaling conventions:
 	// the full width of the widget rotates the scene horizontally by 120 degrees.
 	// the full height of the widget rotates the scene vertically by 120 degrees.
@@ -132,11 +134,12 @@ render_core::report_mouse_motion( float dx, float dy, mouse_button button)
 	
 	// The vertical and horizontal fractions of the window's height that the 
 	// mouse has traveled for this event.
-	// TODO: Implement PAN and ZOOM_ROLL modes.
+	// TODO: Implement ZOOM_ROLL modes.
 	float vfrac = dy / window_height;
 	float hfrac = dx / window_width;
 	
-	// TODO: maintain synchronized with the eye_length calculation below.
+	// The amount by which the scene should be scaled left-to-right.
+	// TODO: This is flat wrong.  See label.cpp for proper screen-to-world scaling.
 	double pan_rate = user_scale * world_scale * gcf / std::tan( fov*0.5 * M_PI/180.0);
 	
 	switch (button) {
@@ -365,13 +368,13 @@ render_core::world_to_view_transform(view& geometry, int whicheye, bool forpick)
 	geometry.camera = camera / gcf;
 	geometry.tan_hfov_x = tan_hfov_x;
 	geometry.tan_hfov_y = tan_hfov_y;
+	// The true viewing vertical direction is not the same as what is needed for
+	// gluLookAt().
 	geometry.up = forward.cross(up).cross(forward).norm();
 }
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
 // as required.
-// TODO: Add a computation to calculate the number of objects in the universe
-// as well. (to use for the pick() function.)
 void
 render_core::recalc_extent(void)
 {
@@ -675,7 +678,6 @@ render_core::pick( float x, float y, float d_pixels)
 		// depth buffer scaled between 0 and 2^32-1. (source is [0,1])
 		// name_stack is the full contents of the name stack at the time of the hit.
 		
-		// TODO: The hit_buffer_size does not properly take into account frames.
 		size_t hit_buffer_size = std::max(
 				(layer_world.size()+layer_world_transparent.size())*4,
 				world_extent.get_select_buffer_depth());
@@ -763,4 +765,10 @@ render_core::pick( float x, float y, float d_pixels)
 		std::exit(1);
 	}
 	return best_pick;
+}
+
+void
+render_core::set_up( const vector& n_up)
+{
+	up = n_up;
 }
