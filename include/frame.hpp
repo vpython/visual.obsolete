@@ -27,6 +27,9 @@ gl_pick_render() : PushName() on to the Name Stack, and renders its children.
 oolie case: When the frame is scaled up to a superhuge universe and the
 	child is very small, the frame_world_transform may overflow OpenGL.  The
 	problem lies in the scale variable.
+	
+another oolie: A transparent object that intersects a frame containing other
+	transparent object's will not be rendered in the right order.
 */
 
 class frame : public renderable

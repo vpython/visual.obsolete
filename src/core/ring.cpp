@@ -33,6 +33,7 @@ ring::set_thickness( double t)
 	thickness = t;
 }
 
+// TODO: Figure out how to do transparency for this body.
 void
 ring::gl_render( const view& scene)
 {
