@@ -1,9 +1,16 @@
+// Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
+// Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #include "util/rgba.hpp"
+#include "util/lighting.hpp"
 
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/proxy.hpp>
+#include <boost/python/class.hpp>
 
 namespace cvisual {
 namespace py = boost::python;
@@ -144,12 +151,55 @@ struct rgba_to_tuple
 };
 
 void
-wrap_light()
+wrap_rgba()
 {
 	rgb_from_seq();
 	rgba_from_seq();
 	py::to_python_converter< rgb, rgb_to_tuple>();
 	py::to_python_converter< rgba, rgba_to_tuple>();	
+}
+
+void
+set_light_attenuation( light* This, py::object a)
+{
+	This->set_attenuation( 
+		py::extract<double>(a[0]),
+		py::extract<double>(a[1]),
+		py::extract<double>(a[2]));
+}
+
+py::tuple
+get_light_attenuation( light* This)
+{
+	vector ret = This->get_attentuation();
+	return py::make_tuple( ret.x, ret.y, ret.z);
+}
+
+void
+wrap_light()
+{
+	using namespace py;
+	
+	class_<light>( "light", init<const vector&>( args( "pos")))
+		.def( init<const light&>())
+		.add_property( "pos",
+			make_function( &light::get_pos, 
+				return_internal_reference<>()),
+			&light::set_pos)
+		.add_property( "local", &light::is_local, &light::set_local)
+		.add_property( "spot_direction", 
+			make_function( &light::get_spot_direction, 
+				return_internal_reference<>()),
+			&light::set_spot_direction)
+		.add_property( "spot_cutoff", 
+			&light::get_spot_cutoff, &light::set_spot_cutoff)
+		.add_property( "attenuation",
+			get_light_attenuation, set_light_attenuation)
+		.add_property( "diffuse_color",
+			&light::get_diffuse_color, &light::set_diffuse_color)
+		.add_property( "specular_color",
+			&light::get_specular_color, &light::set_specular_color)
+		;
 }
 
 } // !namespace cvisual
