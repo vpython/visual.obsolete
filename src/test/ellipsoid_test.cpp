@@ -1,4 +1,4 @@
-#include "gtk2/render_surface.hpp"
+#include "render_surface.hpp"
 #include "arrow.hpp"
 #include "ellipsoid.hpp"
 

@@ -1,5 +1,5 @@
-#include "gtk2/render_surface.hpp"
-#include "gtk2/file_texture.hpp"
+#include "render_surface.hpp"
+#include "file_texture.hpp"
 #include "sphere.hpp"
 
 int 

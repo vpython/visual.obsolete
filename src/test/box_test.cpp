@@ -1,8 +1,8 @@
-#include "gtk2/render_surface.hpp"
+#include "render_surface.hpp"
 #include "arrow.hpp"
 #include "box.hpp"
 #include "sphere.hpp"
-#include "gtk2/file_texture.hpp"
+#include "file_texture.hpp"
 #include "vpython-config.h"
 
 #include <iostream>

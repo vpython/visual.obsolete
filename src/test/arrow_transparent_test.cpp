@@ -1,4 +1,4 @@
-#include "gtk2/render_surface.hpp"
+#include "render_surface.hpp"
 #include "arrow.hpp"
 #include "frame.hpp"
 
@@ -35,7 +35,7 @@ main( void)
 	repeated->set_up( vector( 0, -1, 0));
 	repeated->set_pos( vector( 1, 1, 1));
 	repeated->set_scale( vector( 1, 1, -1));
-	repeated->add_child( net2);
+	// repeated->add_child( net2);
 	repeated->add_child( x);
 	repeated->add_child( y);
 	repeated->add_child( z);
