@@ -16,6 +16,20 @@
 #include <boost/python/def.hpp>
  
 namespace cvisual {
+
+static int
+py_quit( void*)
+{
+	std::exit(0);
+	return 0;
+}
+
+static void
+force_py_exit(void)
+{
+	Py_AddPendingCall( &py_quit, 0);
+}
+
 namespace py = boost::python;
 
 // This function automatically converts the list of renderable objects to a 
@@ -145,6 +159,8 @@ wrap_display_kernel(void)
 		"Returns true if all of the Displays are closed.");
 	def( "waitclose", gui_main::waitclosed, 
 		"Blocks until all of the Displays are closed by the user.");
+		
+	gui_main::on_shutdown.connect( SigC::slot( &force_py_exit));
 };
 
 } // !namespace cvisual;
