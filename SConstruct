@@ -12,7 +12,7 @@ core = Environment( CCFLAGS=['-pipe', '-g'],
 	CPPPATH='include')
 
 # Workaround brain-dead behavior in FTGL's header file layout
-if 'linux' in sys.platform:
+if sys.platform.rfind('linux') > 0:
 	core.Append( CPPPATH=['/usr/include/FTGL'])
 
 # Crank up the warnings
@@ -70,7 +70,7 @@ else:
 	core.Append( CPPPATH='include/gtk2')
 	libname='lib/vpython-core'
 
-# Options specific to libvpython-core.so
+# Build libvpython-core.{so,dll}
 vpython_core = core.SharedLibrary( 
 	target = libname, 
 	source = srcs )
@@ -117,4 +117,3 @@ main = "src/gtk2/main.cpp"
 Test('object_zsort_bench')
 Test('model_zsort_bench')
 Test('sincos_matrix_bench')
-
