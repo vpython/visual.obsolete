@@ -72,7 +72,7 @@ bitmap_font::bitmap_font()
 					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_LIGHT);
 					break;
 				case WEIGHT_NORMAL:
-					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_REGULAR);
+					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_MEDIUM);
 					break;
 				case WEIGHT_BOLD:
 					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_BOLD);
@@ -102,8 +102,11 @@ bitmap_font::bitmap_font()
 		
 		// Set the font size.
 		int dpi = -1;
+		Glib::RefPtr<Gdk::Screen> default_screen = Gdk::Screen::get_default();
+		Glib::RefPtr<Gtk::Settings> settings = Gtk::Settings::get_for_screen(
+			default_screen);
 		g_object_get( 
-			Gtk::Settings::get_for_screen( Gdk::Screen::get_default())->gobj(),
+			settings->gobj(),
 			"gtk-xft-dpi", &dpi, NULL);
 		font->FaceSize( font_height, 
 			(dpi > 0) ? (dpi / 1024) : 100);
