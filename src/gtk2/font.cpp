@@ -15,7 +15,7 @@
 namespace cvisual {
 
 bitmap_font::_init* bitmap_font::init = 0;
-
+ 
 std::map<std::string, std::pair<FTFont*, int> > bitmap_font::font_cache;
 
 bitmap_font::_init::_init()
@@ -66,22 +66,22 @@ bitmap_font::bitmap_font()
 		if (FONT_MASK_WEIGHT & set_properties) {
 			switch (font_desc.get_weight()) {
 				case WEIGHT_ULTRALIGHT:
-					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_ULTRALIGHT);
+					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_EXTRALIGHT);
 					break;
 				case WEIGHT_LIGHT:
 					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_LIGHT);
 					break;
 				case WEIGHT_NORMAL:
-					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_NORMAL);
+					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_REGULAR);
 					break;
 				case WEIGHT_BOLD:
 					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_BOLD);
 					break;
 				case WEIGHT_ULTRABOLD:
-					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_ULTRABOLD);
+					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_EXTRABOLD);
 					break;
 				case WEIGHT_HEAVY:
-					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_HEAVY);
+					FcPatternAddInteger( pattern, FC_WEIGHT, FC_WEIGHT_BLACK);
 					break;
 			}
 		}
