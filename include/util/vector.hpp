@@ -27,9 +27,6 @@ public:
 public:
 	explicit vector( double a = 0.0, double b = 0.0, double c = 0.0) throw()
 		:x(a), y(b), z(c) {}
-        
-    inline vector( const vector& v) throw() 
-		: x(v.x), y(v.y), z(v.z) {}
 		
 	inline explicit vector( const double* v)
 		: x( v[0]), y(v[1]), z(v[2]) {}
@@ -73,11 +70,7 @@ public:
 	operator!( void) const throw()
 	{ return !x && !y && !z; }
     
-    // Overloaded assignment: =, +=, -=, *=, /=
-	inline const vector&
-	operator=( const vector& v) throw()
-	{ x=v.x; y=v.y; z=v.z; return *this; }
-  
+    // Overloaded assignment: +=, -=, *=, /=  
 	inline const vector&
 	operator+=( const vector& v) throw()
 	{ x=x+v.x; y=y+v.y; z=z+v.z; return *this; }
