@@ -4,6 +4,9 @@
 
 #include <vector>
 #include <string>
+#include <cstdlib>
+#include <iostream>
+#include <stdexcept>
 
 int realmain( std::vector<std::string>& args);
 
@@ -16,5 +19,17 @@ main( int argc, char** argv)
 	for (int i = 1; i < argc; ++i) {
 		args[i-1] = std::string(argv[i]);
 	}
-	return realmain(args);
+	
+	try {
+		return realmain(args);
+	}
+	catch (std::exception& e) {
+		std::cout << "Found an uncaught exception: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+	catch (...) {
+		std::cout << "Found an uncaught exception not derived "
+			"from std::exception\n" << std::flush;
+		return EXIT_FAILURE;
+	}
 }
