@@ -1,0 +1,20 @@
+This directory is a kind of sandbox that I'm using to build and test and build a new OpenGL rendering engine for VPython.
+
+TODO:
+Port to Win32/wGL.
+Investigate port to native Mac/Carbon.
+Transparency for the ring object.
+Textures for rings?
+Complete implementation of frame.
+Write new implementations of:
+	curve,
+	convex,
+	faces,
+	label
+
+Possible new objects:
+	face_strip
+
+
+Final:
+Fold back into VPython.
