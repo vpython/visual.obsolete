@@ -82,6 +82,7 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 	core.gl_end.connect( SigC::slot( *this, &render_surface::gl_end));
 	core.gl_swap_buffers.connect( 
 		SigC::slot( *this, &render_surface::gl_swap_buffers));
+	set_flags( get_flags() | Gtk::CAN_FOCUS);
 	// core.stereo_mode = display_kernel::REDCYAN_STEREO;
 }
 
