@@ -1,7 +1,6 @@
 #include "util/rgba.hpp"
 
 #include <cmath>
-#include <GL/gl.h>
 
 rgba
 rgba::desaturate() const

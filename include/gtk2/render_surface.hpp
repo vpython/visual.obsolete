@@ -1,10 +1,14 @@
 #ifndef VPYTHON_GTK2_RENDER_SURFACE_HPP
 #define VPYTHON_GTK2_RENDER_SURFACE_HPP
 
-#include <gtkmm/gl/drawingarea.h>
-#include <gtkmm.h>
-
 #include "render_core.hpp"
+
+#include <gtkmm/gl/drawingarea.h>
+#include <gtkmm/main.h>
+#include <gtkmm/window.h>
+#include <gtkmm/image.h>
+#include <gtkmm/toolbar.h>
+#include <gtkmm/box.h>
 
 class render_surface : public Gtk::GL::DrawingArea
 {

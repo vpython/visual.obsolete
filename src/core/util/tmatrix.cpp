@@ -2,8 +2,6 @@
 #include "util/tmatrix.hpp"
 #include <cmath>
 
-#include <GL/gl.h>
-
 void 
 frustum( tmatrix& T, tmatrix& I, double l, double r, double b, double t, double n, double f ) throw()
 {

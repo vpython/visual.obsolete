@@ -8,12 +8,8 @@
 #include <algorithm>
 #include <sstream>
 #include <iostream>
-#include <map>
 
 #include <boost/lexical_cast.hpp>
-
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 void 
 render_core::enable_lights()
@@ -682,7 +678,7 @@ render_core::pick( float x, float y, float d_pixels)
 		// TODO: And this is a GNU extension...
 		unsigned int hit_buffer[hit_buffer_size];
 		
-		// Allocate a std::map< uint, shared_ptr<renderable> > to lookup names
+		// Allocate a std::vector<shared_ptr<renderable> > to lookup names
 		// as they are rendered.
 		std::vector<shared_ptr<renderable> > name_table;
 		// Pass the name stack to OpenGL with glSelectBuffer.

@@ -2,7 +2,7 @@
 #include "util/errors.hpp"
 #include "util/displaylist.hpp"
 #include "util/quadric.hpp"
-#include <GL/gl.h>
+
 #include <vector>
 
 #include <boost/scoped_array.hpp>

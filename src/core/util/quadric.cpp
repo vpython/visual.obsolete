@@ -1,7 +1,6 @@
 
+#include "wrap_gl.hpp"
 #include "util/quadric.hpp"
-
-#include <GL/glu.h>
 
 quadric::quadric()
 	: q(0)

@@ -4,8 +4,8 @@
 #include "simple_displayobject.hpp"
 #include "util/displaylist.hpp"
 #include "util/sorted_model.hpp"
-#include <boost/scoped_ptr.hpp>
 
+#include <boost/scoped_ptr.hpp>
 using boost::scoped_ptr;
 
 /** A 3D 4-sided arrow, with adjustable head and shaft.  TODO: revisit the cache

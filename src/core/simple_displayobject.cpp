@@ -1,9 +1,10 @@
+#include "simple_displayobject.hpp"
+#include "util/errors.hpp"
+
 #include <typeinfo>
 #include <cmath>
 #include <cxxabi.h>
 #include <sstream>
-#include "util/errors.hpp"
-#include "simple_displayobject.hpp"
 
 tmatrix 
 simple_displayobject::model_world_transform() const

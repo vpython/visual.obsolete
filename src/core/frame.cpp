@@ -1,5 +1,4 @@
 #include "frame.hpp"
-#include <GL/gl.h>
 
 #include <algorithm>
 

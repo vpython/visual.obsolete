@@ -1,8 +1,6 @@
 #include "pyramid.hpp"
 #include "util/errors.hpp"
 
-#include <GL/gl.h>
-
 displaylist pyramid::simple_model;
 scoped_ptr< z_sorted_model<triangle, 6> > pyramid::sorted_model;
 

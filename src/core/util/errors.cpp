@@ -3,8 +3,6 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 void
 write_critical( 

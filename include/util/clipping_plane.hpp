@@ -2,7 +2,6 @@
 #define VPYTHON_UTIL_CLIPPING_PLANE_HPP
 
 #include "util/vector.hpp"
-#include <bitset>
 
 class clipping_plane
 {

@@ -10,8 +10,13 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: random_device.cpp,v 1.1 2004/07/07 14:33:40 jbrandmeyer Exp $
+ * $Id: random_device.cpp,v 1.2 2004/07/30 17:25:29 jbrandmeyer Exp $
  *
+ */
+ 
+/* Changes:
+ *    modify check for the availability of /dev/urandom to include OSX. -JDB
+ * 
  */
 
 #include <boost/nondet_random.hpp>
@@ -42,7 +47,7 @@ const char * const boost::random_device::default_token = "/dev/urandom";
 
 #if defined(__GNUC__) && defined(_CXXRT_STD_NAME)
 // I have severe difficulty to get the POSIX includes to work with
-// -fhonor-std and Dietmar Kühl's standard C++ library.  Hack around that
+// -fhonor-std and Dietmar K?hl's standard C++ library.  Hack around that
 // problem for now.
 extern "C" {
 static const int O_RDONLY = 0;

@@ -1,12 +1,12 @@
 #ifndef VPYTHON_UTIL_VECTOR_HPP
 #define VPYTHON_UTIL_VECTOR_HPP
 
+#include "wrap_gl.hpp"
+
 #include <iosfwd>
 #include <cmath>
 #include <cassert>
 #include <sstream>
-
-#include "wrap_gl.hpp"
 
 class vector
 {

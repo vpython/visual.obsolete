@@ -1,7 +1,7 @@
-#include "util/displaylist.hpp"
+#include "wrap_gl.hpp"
 
+#include "util/displaylist.hpp"
 #include <cassert>
-#include <GL/gl.h>
 
 // Don't draw a number until it is time to compile the thing.
 displaylist::displaylist()

@@ -3,6 +3,10 @@
 #include "vpython-config.h"
 
 #include <gtkmm/gl/init.h>
+#include <gdkmm/pixbuf.h>
+#include <gtkmm/stock.h>
+#include <gtkmm/radiobutton.h>
+
 #include <algorithm>
 #include <iostream>
 

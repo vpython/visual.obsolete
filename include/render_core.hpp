@@ -12,9 +12,7 @@
 #include <list>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/iterator/indirect_iterator.hpp>
-using boost::shared_ptr;
 using boost::indirect_iterator;
 
 /** A class that manages all OpenGL aspects of a given scene.  This class

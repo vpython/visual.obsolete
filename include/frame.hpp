@@ -1,7 +1,8 @@
 #ifndef VPYTHON_FRAME_HPP
 #define VPYTHON_FRAME_HPP
 
-#include "simple_displayobject.hpp"
+#include "renderable.hpp"
+#include "util/tmatrix.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/iterator/indirect_iterator.hpp>

@@ -1,5 +1,5 @@
+#include "wrap_gl.hpp"
 #include "util/texture.hpp"
-#include <GL/gl.h>
 
 texture::texture()
 	: damaged(false), handle(0)

@@ -1,9 +1,10 @@
 #ifndef VPYTHON_UTIL_ERRORS_HPP
 #define VPYTHON_UTIL_ERRORS_HPP
 
+#include "wrap_gl.hpp"
+
 #include <string>
 #include <stdexcept>
-#include "wrap_gl.hpp"
 
 /** Report the existance of a critical error to cerr. */
 #define VPYTHON_CRITICAL_ERROR(msg) write_critical( __FILE__, __LINE__, \

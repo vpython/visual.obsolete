@@ -1,9 +1,5 @@
 #include "arrow.hpp"
-#include "util/vector.hpp"
 #include "util/errors.hpp"
-#include "util/sorted_model.hpp"
-
-#include <GL/gl.h>
 
 // This model can be resorted in about 22 usec on my PIII 800 MHz machine.
 void

@@ -1,8 +1,8 @@
 #ifndef VPYTHON_UTIL_SORTED_MODEL_HPP
 #define VPYTHON_UTIL_SORTED_MODEL_HPP
 
-#include <algorithm>
 #include "util/vector.hpp"
+#include <algorithm>
 
 /** A helper class for texture coordinates. */
 struct tcoord

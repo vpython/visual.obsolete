@@ -1,9 +1,6 @@
 #include "sphere.hpp"
 #include "util/quadric.hpp"
 #include "util/errors.hpp"
-#include "util/clipping_plane.hpp"
-#include <iostream>
-#include <GL/glu.h>
 
 bool sphere::first = true;
 // The first four cached descriptions are used for non-textured spheres, and the

@@ -1,5 +1,4 @@
 #include "util/clipping_plane.hpp"
-#include <GL/gl.h>
 
 #include "util/tmatrix.hpp"
 #include "util/rgba.hpp"
