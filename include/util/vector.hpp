@@ -168,6 +168,11 @@ public:
 	inline vector
 	scale( const vector& v) const throw()
 	{ return vector( this->x*v.x, this->y*v.y, this->z*v.z); }
+    
+    // Inversely scale this vector to another, by elementwise division
+    inline vector
+    scale_inv( const vector& v) const throw()
+    { return vector( x/v.x, y/v.y, z/v.z); }
 	
 	vector
 	rotate( double angle, vector axis = vector(0,0,1)) throw();
