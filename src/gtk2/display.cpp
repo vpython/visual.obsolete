@@ -300,8 +300,18 @@ display::create()
 	window->add( *frame);
 	window->signal_delete_event().connect( SigC::slot( *this, &display::on_window_delete));
 	window->show_all();
-	if (x > 0 && y > 0)
+	if (x > 0 || y > 0) {
+		// Accept the defaults allocated by the window manager when none
+		// was requested by the user.
+		int init_x = 0, init_y = 0;
+		window->get_position( init_x, init_y);
+		if (x < 0)
+			x = init_x;
+		if (y < 0)
+			y = init_y;
+		
 		window->move( (int)x, (int)y);
+	}
 	if (fullscreen)
 		window->fullscreen();
 	active = true;
