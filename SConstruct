@@ -78,4 +78,5 @@ tests.Program( target='bin/pyramid_test', source='src/test/pyramid_test.cpp')
 tests.Program( target='bin/ellipsoid_test', source='src/test/ellipsoid_test.cpp')
 tests.Program( target='bin/psphere_texture_test', source='src/test/psphere_texture_test.cpp')
 tests.Program( target='bin/selection_test', source='src/test/selection_test.cpp')
+tests.Program( target='bin/gtk_style_test', source='src/test/gtk_style_test.cpp')
 
