@@ -19,9 +19,10 @@
 using namespace cvisual;
 
 void
-on_object_clicked( shared_ptr<renderable> body)
+on_object_clicked( shared_ptr<renderable> body, vector pos)
 {
-	std::cout << "Body centered at " << body->get_center() << " was clicked.\n";
+	std::cout << "Body centered at " << body->get_center() << " was clicked"
+        << " at " << pos << std::endl;
 }
 
 int 

@@ -417,7 +417,7 @@ display_kernel::world_to_view_transform(
 		else // Wide
 			glScaled( width / window_height, 1.0, 1.0);
 	}
-	#if 1
+	#if 0
 	// Enable this to peek at the actual scene geometry.
 	std::cerr << "scene_geometry: camera:" << scene_camera 
         << " true camera:" << camera
@@ -465,7 +465,7 @@ display_kernel::world_to_view_transform(
 	geometry.tan_hfov_y = tan_hfov_y;
 	// The true viewing vertical direction is not the same as what is needed for
 	// gluLookAt().
-	geometry.up = forward.cross(up).cross(forward).norm();
+	geometry.up = forward.cross_b_cross_c(up, forward).norm();
 }
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
@@ -790,13 +790,14 @@ display_kernel::render_scene(void)
 	return true;
 }
 
-shared_ptr<renderable> 
+std::pair< shared_ptr<renderable>, vector>
 display_kernel::pick( float x, float y, float d_pixels)
 {
 	using boost::scoped_array;
 	
 	lock L(mtx);
 	shared_ptr<renderable> best_pick;
+    vector pickpos;
 	try {
 		clear_gl_error();
 		// Notes:
@@ -879,7 +880,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 		
 		// Lookup the name to get the shared_ptr<renderable> associated with it.
 		// The farthest point away in the depth buffer.
-		double best_pick_depth = 1.0; // The 
+		double best_pick_depth = 1.0;
 		unsigned int* hit_record = hit_buffer.get();
 		unsigned int* const hit_buffer_end = hit_buffer.get() + hit_buffer_size;
 		while (n_hits > 0 && hit_record < hit_buffer_end) {
@@ -906,6 +907,17 @@ display_kernel::pick( float x, float y, float d_pixels)
 			VPYTHON_CRITICAL_ERROR( 
 				"More objects were picked than could be reported by the GL."
 				"  The hit buffer size was too small.");
+        
+        tmatrix modelview;
+        modelview.gl_modelview_get();
+        tmatrix projection;
+        projection.gl_projection_get();
+        gluUnProject( 
+            x, window_height - y, best_pick_depth,
+            modelview.matrix_addr(),
+            projection.matrix_addr(),
+            viewport_bounds,
+            &pickpos.x, &pickpos.y, &pickpos.z);    
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;
@@ -913,7 +925,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
 	}
-	return best_pick;
+	return std::make_pair(best_pick, pickpos);
 }
 
 void
@@ -933,7 +945,7 @@ display_kernel::set_forward( const vector& n_forward)
 {
 	if (n_forward == vector())
 		throw std::invalid_argument( "Forward cannot be zero.");
-	forward = n_forward;
+	forward = n_forward.norm();
 	forward_changed = true;
 }
 

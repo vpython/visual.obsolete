@@ -257,10 +257,10 @@ render_surface::on_button_release_event( GdkEventButton* event)
 		&& event->button == 1
 		&& fabs(last_mouseclick_x - event->x) < 4
 		&& fabs(last_mouseclick_y - event->y) < 4) {
-		shared_ptr<renderable> pick 
+		std::pair< shared_ptr<renderable>, vector> pick
 			= core.pick( event->x, event->y);
-		if (pick)
-			object_clicked( pick);
+		if (pick.first)
+			object_clicked( pick.first, pick.second);
 	}
 	return true;
 }

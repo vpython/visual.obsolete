@@ -41,6 +41,7 @@ private:
 	*/
 	double M[4][4];
 public:
+    inline double* matrix_addr() { return M[0]; }
 
 	/** Create a new tmatrix, initialized to the identity matrix. */
 	inline tmatrix() throw() { ident(); }
