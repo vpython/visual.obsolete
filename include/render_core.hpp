@@ -1,14 +1,13 @@
 #ifndef VPYTHON_RENDER_CORE_HPP
 #define VPYTHON_RENDER_CORE_HPP
 
+#include "renderable.hpp"
 #include "util/vector.hpp"
 #include "util/rgba.hpp"
-#include "renderable.hpp"
 #include "util/extent.hpp"
 #include "util/lighting.hpp"
 #include "util/timer.hpp"
 
-// #include <FTGLPixmapFont.h>
 #include <sigc++/signal.h>
 #include <list>
 #include <vector>
@@ -68,8 +67,6 @@ class render_core
 	
 	/** A historesis timer to calculate the time to render each frame. */
 	hist_timer fps;
-	/** Experimental support for rendering text using FTGL. */
-	// shared_ptr<FTGLPixmapFont> fps_font;
  
 private:
 	/** Set up the OpenGL transforms from world space to view space. */
