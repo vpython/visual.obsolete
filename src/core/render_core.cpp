@@ -7,10 +7,7 @@
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
 #include "frame.hpp"
-
-#ifndef _WIN32
-# include "gtk2/font.hpp"
-#endif
+# include "font.hpp"
 
 #include <cassert>
 #include <algorithm>
@@ -622,13 +619,13 @@ render_core::render_scene(void)
 				break;
 			}
 		}
-#ifndef _WIN32
+
 		std::string fps_msg( "Cycle time: ");
 		fps_msg += boost::lexical_cast<std::string>(fps.read());
-		glEnable( GL_TEXTURE_2D);
+		// glEnable( GL_TEXTURE_2D);
 		glColor3f( 1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 		bitmap_font font;
-# if 1
+#if 1
 		glMatrixMode( GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
@@ -637,18 +634,18 @@ render_core::render_scene(void)
 		glPushMatrix();
 		glLoadIdentity();
 		glTranslated( 0, -font.descent(), 0);
-# endif
+#endif
 		// glRasterPos2d( 0, -font.descent());
 		glRasterPos2d( 0, 0);
 		font.gl_render( fps_msg);
-# if 1
+#if 1
 		glPopMatrix();
 		glMatrixMode( GL_PROJECTION);
 		glPopMatrix();
 		glMatrixMode( GL_MODELVIEW);
-		glDisable( GL_TEXTURE_2D);
-# endif
+		// glDisable( GL_TEXTURE_2D);
 #endif
+
 		
 		// Cleanup
 		gl_swap_buffers();
