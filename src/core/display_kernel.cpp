@@ -168,7 +168,7 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 					break;
 				case PAN:
 					// Pan front/back.
-					center += pan_rate * vfrac * forward;
+					center += pan_rate * vfrac * forward.norm();
 					break;
 				case ZOOM_ROLL: case ZOOM_ROTATE: {
 					// Zoom in/out.
@@ -200,7 +200,7 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 					
 					// Then perform rotation about an axis orthogonal to up and forward.
 					double vertical_angle = vfrac * 2.0;
-					double max_vertical_angle = up.diff_angle(-forward);
+					double max_vertical_angle = up.diff_angle(-forward.norm());
 					if (vertical_angle > max_vertical_angle - 0.02) {
 						vertical_angle = max_vertical_angle - 0.02;
 					}
@@ -304,9 +304,7 @@ display_kernel::world_to_view_transform(view& geometry, int whicheye, bool forpi
 		recalc_extent();
 	}
 	
-	// Verify some preconditions:
-	// forward must be a unit vector.
-	assert( std::fabs(1.0 - forward.mag()) < 0.001);
+	// Verify a precondition:
 	// Objects must be within a reasonable size on the screen.
 	assert( std::fabs(std::log( world_scale * gcf)) < std::log( 1e12));
 	
@@ -331,7 +329,7 @@ display_kernel::world_to_view_transform(view& geometry, int whicheye, bool forpi
 	// The scaled distance between the camera and the visual center of the scene.
 	double eye_length = user_scale * world_scale * gcf / tan_hfov;
 	// The position of the camera.
-	vector camera = -forward * eye_length + scene_center;
+	vector camera = -forward.norm() * eye_length + scene_center;
 	// Establish the distances to the clipping planes.
 	double nearclip = eye_length * 0.01;
 	// TODO: revisit this in the face of user-driven camera panning.
@@ -452,12 +450,9 @@ display_kernel::remove_renderable( shared_ptr<renderable> obj)
 	// Choice of removal algorithms:  For containers that support thier own
 	// removal methods (list, set), use the member function.  Else, use 
 	// std::remove.
-	if (obj->color.alpha != 1.0) {
-		layer_world.remove( obj);
-	}
-	else
-		std::remove( layer_world_transparent.begin(), 
-			layer_world_transparent.end(), obj);
+	layer_world.remove( obj);
+	std::remove( 
+		layer_world_transparent.begin(), layer_world_transparent.end(),	obj);
 }
 
 bool
@@ -501,7 +496,7 @@ display_kernel::draw(
 	// Perform a depth sort of the transparent world from back to front.
 	if (layer_world_transparent.size() > 1)
 		std::stable_sort( layer_world_transparent.begin(), layer_world_transparent.end(),
-			z_comparator( forward));
+			z_comparator( forward.norm()));
 	
 	// Render translucent objects in world space.
 	world_trans_iterator j( layer_world_transparent.begin());
@@ -548,7 +543,7 @@ display_kernel::render_scene(void)
 	lock L(mtx);
 	try {
 		fps.start();
-		view scene_geometry( forward, center, window_width, window_height, 
+		view scene_geometry( forward.norm(), center, window_width, window_height, 
 			forward_changed, gcf, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
 		gl_begin();
@@ -748,7 +743,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 		glMatrixMode( GL_PROJECTION);
 		glLoadIdentity();
 		gluPickMatrix( x, window_height - y, d_pixels, d_pixels, viewport_bounds);
-		view scene_geometry( forward, center, window_width, window_height, 
+		view scene_geometry( forward.norm(), center, window_width, window_height, 
 			forward_changed, gcf, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
 		world_to_view_transform( scene_geometry, 0, true);
@@ -826,6 +821,8 @@ display_kernel::get_up()
 void
 display_kernel::set_forward( const vector& n_forward)
 {
+	if (n_forward == vector())
+		throw std::invalid_argument( "Forward cannot be zero.");
 	forward = n_forward;
 	forward_changed = true;
 }
