@@ -33,6 +33,7 @@ class texture : public SigC::Object
 {
  private:
 	bool damaged;
+	void gl_free();
 
  public:
 	/** Release the handle to OpenGL.  Subclasses must not call 
@@ -49,7 +50,6 @@ class texture : public SigC::Object
 		must be active.
 	*/
 	void gl_activate();
-	void gl_free();
  
 	/** Determine whether or not this texture has an alpha channel.
 		@returns True iff there is an alpha channel for this texture.

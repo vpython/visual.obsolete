@@ -20,6 +20,11 @@ class displaylist : public SigC::Object
 	shared_ptr<unsigned int> handle;
 	static void deleter( unsigned int*);
  
+	/** Release any OpenGL resources associated with this object, even though
+	 * it has not been deleted.  Postcondition: operator bool() returns false.
+	 */
+	void gl_free();
+
  public:
 	displaylist();
 	~displaylist();
@@ -37,10 +42,6 @@ class displaylist : public SigC::Object
 		gl_compile_end(). */
 	void gl_render() const;
 	
-	/** Release any OpenGL resources associated with this object, even though
-	 * it has not been deleted.  Postcondition: operator bool() returns false.
-	 */
-	void gl_free();
 	
 	/** @return true iff this object contains a compiled OpenGL program. */
 	inline operator bool() const { return (handle && *handle);  }
