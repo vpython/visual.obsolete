@@ -7,7 +7,7 @@
 
 namespace cvisual {
 	
-view::view( vector& n_forward, vector& n_center, float& n_width, 
+view::view( const vector& n_forward, vector& n_center, float& n_width, 
 	float& n_height, bool n_forward_changed, double& n_gcf, 
 	bool n_gcf_changed)
 	: forward( n_forward), center(n_center), window_width( n_width), 
@@ -17,7 +17,7 @@ view::view( vector& n_forward, vector& n_center, float& n_width,
 {
 }
 
-view::view( const view& other, vector forward)
+view::view( const view& other, const vector& forward)
 	: camera( other.camera),
 	forward( forward),
 	center( other.center),

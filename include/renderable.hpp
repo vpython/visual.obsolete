@@ -93,11 +93,11 @@ struct view
 	double tan_hfov_x; ///< The tangent of half the horzontal field of view.
 	double tan_hfov_y; ///< The tangent of half the vertical field of view.
 	
-	view( vector& n_forward, vector& n_center, float& n_width, 
+	view( const vector& n_forward, vector& n_center, float& n_width, 
 		float& n_height, bool n_forward_changed, double& n_gcf, 
 		bool n_gcf_changed);
 	
-	view( const view& other, vector fore);
+	view( const view& other, const vector& fore);
 	
 	// Compute the apparent diameter, in pixels, of a circle that is parallel
 	// to the screen, with a center at pos, and some radius.  If pos is behind
