@@ -51,7 +51,8 @@ class atomic_queue
 	void clear()
 	{
 		lock L(barrier);
-		data.clear();
+		while (!data.empty())
+			data.pop();
 	}
 };
 
