@@ -3,6 +3,8 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include <gtkmm.h>
+#include <gtkmm/settings.h>
+
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <fontconfig/fontconfig.h>
@@ -19,7 +21,18 @@ realmain( std::vector<std::string>&)
 	Pango::FontDescription font_desc = Glib::wrap(gtk_style_new())->get_font();
 	Pango::FontMask set_properties = font_desc.get_set_fields();
 	std::cout << "Font name: " << font_desc.to_string() << std::endl;
-	
+    std::cout << "Font size: " << font_desc.get_size() / Pango::SCALE << std::endl;
+	int dpi = -1;
+    {
+        Glib::RefPtr<Gdk::Screen> default_screen = Gdk::Screen::get_default();
+        Glib::RefPtr<Gtk::Settings> settings = Gtk::Settings::get_for_screen(
+            default_screen);
+         g_object_get( 
+            settings->gobj(),
+            "gtk-xft-dpi", &dpi, NULL);
+    }
+    std::cout << "Screen dpi: " << dpi / 1024 << std::endl;
+    
 	FcInit();
 	
 	FcConfig* conf = FcConfigGetCurrent();
