@@ -105,6 +105,26 @@ display_kernel::illuminate_default()
 	add_light( n_light);
 }
 
+// Compute the horizontal and vertial tangents of half the field-of-view.
+void 
+display_kernel::tan_hfov( double* x, double* y)
+{
+	// tangent of half the field of view.
+	double tan_hfov = std::tan( fov*0.5);
+	double aspect_ratio = window_height / window_width;
+	if (stereo_mode == PASSIVE_STEREO)
+		aspect_ratio *= 2.0;
+	if (aspect_ratio > 1.0) {
+		// Tall window
+		*x = tan_hfov;
+		*y = tan_hfov * aspect_ratio;
+	}
+	else {
+		// Wide window
+		*y = tan_hfov;
+		*x = tan_hfov / aspect_ratio;;
+	}
+}
 
 display_kernel::display_kernel()
 	: window_width(384),
@@ -142,22 +162,36 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 	// are used to actually position the camera.
 	
 	// Scaling conventions:
-	// the full width of the widget rotates the scene horizontally by 120 degrees.
-	// the full height of the widget rotates the scene vertically by 120 degrees.
+	// the full width of the widget rotates the scene horizontally by 120 
+	//     degrees.
+	// the full height of the widget rotates the scene vertically by 120 
+	//     degrees.
 	// the full height of the widget zooms the scene by a factor of 10
 	
 	// Panning conventions:
-	// The full height or width of the widget pans the scene by the eye distance.
+	// The full height or width of the widget pans the scene by the eye 
+	//     distance.
+	
+	// Locking:
+	// center and forward are already synchronized.  The only variable that
+	// remains to be synchronized is user_scale.
 	
 	// The vertical and horizontal fractions of the window's height that the 
 	// mouse has traveled for this event.
 	// TODO: Implement ZOOM_ROLL modes.
 	float vfrac = dy / window_height;
-	float hfrac = dx / window_width;
+	float hfrac = dx 
+		/ ((stereo_mode == PASSIVE_STEREO) ? (window_width*0.5) : window_width);
 	
-	// The amount by which the scene should be scaled left-to-right.
-	// TODO: This is flat wrong.  See label.cpp for proper screen-to-world scaling.
-	double pan_rate = user_scale * world_scale * gcf / std::tan( fov*0.5);
+	// The amount by which the scene should be shifted in response to panning
+	// motion.
+	// TODO: Keep this synchronized with the eye_dist calc in 
+	// world_view_transform
+	double tan_hfov_x = 0.0;
+	double tan_hfov_y = 0.0;
+	tan_hfov( &tan_hfov_x, &tan_hfov_y);
+	double pan_rate = user_scale * world_scale * gcf 
+		/ std::min(tan_hfov_x, tan_hfov_y);
 	
 	switch (button) {
 		case NONE: case LEFT:
@@ -199,13 +233,14 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 					tmatrix R = rotation( -hfrac * 2.0, up.norm());
 					forward = R * forward;
 					
-					// Then perform rotation about an axis orthogonal to up and forward.
+					// Then perform rotation about an axis orthogonal to up and
+					// forward.
 					double vertical_angle = vfrac * 2.0;
 					double max_vertical_angle = up.diff_angle(-forward.norm());
 					if (vertical_angle > max_vertical_angle - 0.02) {
 						vertical_angle = max_vertical_angle - 0.02;
 					}
-					else if (vertical_angle < -M_PI + max_vertical_angle + 0.02) {
+					else if (vertical_angle < -M_PI + max_vertical_angle+0.02) {
 						vertical_angle = -M_PI + max_vertical_angle + 0.02;
 					}
 					R = rotation( -vertical_angle, forward.cross(up).norm());
@@ -268,7 +303,8 @@ display_kernel::report_realize()
 // is initialized.
 // whicheye: -1 for left, 0 for center, 1 for right.
 void
-display_kernel::world_to_view_transform(view& geometry, int whicheye, bool forpick)
+display_kernel::world_to_view_transform(
+	view& geometry, int whicheye, bool forpick)
 {
 	// Scaling the view.  Problem: objects in VPython are specified using
 	// double-precision floats, while OpenGL automatically truncates those
@@ -313,37 +349,31 @@ display_kernel::world_to_view_transform(view& geometry, int whicheye, bool forpi
 	// offset from the extent's center.
 	vector scene_center = center * gcf;
 	vector scene_up = up.norm();
-	// tangent of half the field of view.
-	double tan_hfov = std::tan( fov*0.5);
+
 	// the vertical and horizontal tangents of half the field of view.
-	double aspect_ratio = window_height / geometry.window_width;
 	double tan_hfov_x = 0.0;
 	double tan_hfov_y = 0.0;
-	if (aspect_ratio > 1.0) {
-		tan_hfov_y = tan_hfov;
-		tan_hfov_x = tan_hfov_y / aspect_ratio;
-	}
-	else {
-		tan_hfov_x = tan_hfov;
-		tan_hfov_y = tan_hfov_x * aspect_ratio;
-	}
+	tan_hfov( &tan_hfov_x, &tan_hfov_y);
+	
 	// The scaled distance between the camera and the visual center of the scene.
-	double eye_length = user_scale * world_scale * gcf / tan_hfov;
+	double eye_length = user_scale * world_scale * gcf 
+		/ std::min(tan_hfov_x, tan_hfov_y);
 	// The position of the camera.
 	vector camera = -forward.norm() * eye_length + scene_center;
 	// Establish the distances to the clipping planes.
-	double nearclip = eye_length * 0.01;
+	double nearclip = world_extent.nearclip( camera, forward);
 	// TODO: revisit this in the face of user-driven camera panning.
-	double farclip = (world_extent.center() - camera).mag()*2 + world_scale * gcf;
+	double farclip = world_extent.farclip( camera, forward) * gcf;
 	// Translate camera left/right 2% of the viewable width of the scene
-	double camera_stereo_offset = tan_hfov * eye_length * 0.02;
+	double camera_stereo_offset = tan_hfov_x * eye_length * 0.02;
 	// TODO: This should be doable with a simple glTranslated() call, but I haven't
 	// found the magic formula for it.
-	vector camera_stereo_delta = camera_stereo_offset * up.cross( camera).norm() * whicheye;
+	vector camera_stereo_delta = camera_stereo_offset 
+		* up.cross( camera).norm() * whicheye;
 	camera += camera_stereo_delta;
 	scene_center += camera_stereo_delta;
-	// A multiple of the number of eye_length's away from the camera to place the
-	// zero-parallax plane.
+	// A multiple of the number of eye_length's away from the camera to place
+	// the zero-parallax plane.
 	double stereodepth = 1.0; // TODO: make this value configurable.
 	// The distance from the camera to the zero-parallax plane.
 	double focallength = eye_length * stereodepth;
@@ -493,7 +523,8 @@ display_kernel::draw(
 	
 	// Perform a depth sort of the transparent world from back to front.
 	if (layer_world_transparent.size() > 1)
-		std::stable_sort( layer_world_transparent.begin(), layer_world_transparent.end(),
+		std::stable_sort( 
+			layer_world_transparent.begin(), layer_world_transparent.end(),
 			z_comparator( forward.norm()));
 	
 	// Render translucent objects in world space.
@@ -541,8 +572,8 @@ display_kernel::render_scene(void)
 	lock L(mtx);
 	try {
 		fps.start();
-		view scene_geometry( forward.norm(), center, window_width, window_height, 
-			forward_changed, gcf, gcf_changed);
+		view scene_geometry( forward.norm(), center, window_width, 
+			window_height, forward_changed, gcf, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
 		gl_begin();
 		clear_gl_error();
@@ -655,7 +686,8 @@ display_kernel::render_scene(void)
 		std::string fps_msg( "Cycle time: ");
 		fps_msg += boost::lexical_cast<std::string>(fps.read());
 		// glEnable( GL_TEXTURE_2D);
-		glColor3f( 1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
+		glColor3f( 
+			1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 		bitmap_font font;
 #if 1
 		glMatrixMode( GL_PROJECTION);
@@ -715,13 +747,15 @@ display_kernel::pick( float x, float y, float d_pixels)
 		// n_names is the depth of the name stack at the time of the hit.
 		// minimum and maximum depth are the minimum and maximum values in the 
 		// depth buffer scaled between 0 and 2^32-1. (source is [0,1])
-		// name_stack is the full contents of the name stack at the time of the hit.
+		// name_stack is the full contents of the name stack at the time of the
+		// hit.
 		
 		size_t hit_buffer_size = std::max(
 				(layer_world.size()+layer_world_transparent.size())*4,
 				world_extent.get_select_buffer_depth());
 		// Allocate an exception-safe buffer for the GL to talk back to us.
-		scoped_array<unsigned int> hit_buffer( new unsigned int[hit_buffer_size]);
+		scoped_array<unsigned int> hit_buffer( 
+			new unsigned int[hit_buffer_size]);
 		// unsigned int hit_buffer[hit_buffer_size];
 		
 		// Allocate a std::vector<shared_ptr<renderable> > to lookup names
@@ -758,8 +792,10 @@ display_kernel::pick( float x, float y, float d_pixels)
 			(*i)->gl_pick_render( scene_geometry);
 			++i;
 		}
-		std::vector<shared_ptr<renderable> >::iterator j = layer_world_transparent.begin();
-		std::vector<shared_ptr<renderable> >::iterator j_end = layer_world_transparent.end();
+		std::vector<shared_ptr<renderable> >::iterator j 
+			= layer_world_transparent.begin();
+		std::vector<shared_ptr<renderable> >::iterator j_end 
+			= layer_world_transparent.end();
 		while (j != j_end) {
 			glLoadName( name_table.size());
 			name_table.push_back( *j);
@@ -775,14 +811,16 @@ display_kernel::pick( float x, float y, float d_pixels)
 		check_gl_error();
 		
 		// Lookup the name to get the shared_ptr<renderable> associated with it.
-		double best_pick_depth = 1.0; // The farthest point away in the depth buffer.
+		// The farthest point away in the depth buffer.
+		double best_pick_depth = 1.0; // The 
 		unsigned int* hit_record = hit_buffer.get();
 		unsigned int* const hit_buffer_end = hit_buffer.get() + hit_buffer_size;
 		while (n_hits > 0 && hit_record < hit_buffer_end) {
 			unsigned int n_names = hit_record[0];
 			if (hit_record + 3 + n_names > hit_buffer_end)
 				break;
-			double min_hit_depth = static_cast<double>(hit_record[1]) / 0xffffffffu;
+			double min_hit_depth = static_cast<double>(hit_record[1]) 
+				/ 0xffffffffu;
 			if (min_hit_depth < best_pick_depth) {
 				best_pick_depth = min_hit_depth;
 				best_pick = name_table[*(hit_record+3)];
@@ -965,7 +1003,8 @@ display_kernel::get_objects() const
 {
 	lock L(mtx);
 	std::list<shared_ptr<renderable> > ret = layer_world;
-	ret.insert( ret.end(), layer_world_transparent.begin(), layer_world_transparent.end());
+	ret.insert( ret.end(), 
+		layer_world_transparent.begin(), layer_world_transparent.end());
 	return ret;
 }
 

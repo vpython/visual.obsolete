@@ -105,7 +105,13 @@ class display_kernel
 	std::vector<shared_ptr<renderable> > layer_world_transparent;
 	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::iterator> world_trans_iterator;
 	
+	// Computes the extent of the scene and takes action for autozoom and 
+	// autoscaling.
 	void recalc_extent();
+	
+	// Compute the tangents of half the vertical and half the horizontal
+	// true fields-of-view.
+	void tan_hfov( double* x, double* y);
 
 public: // Public Data.
 	enum mouse_mode_t { ZOOM_ROTATE, ZOOM_ROLL, PAN, FIXED } mouse_mode;
