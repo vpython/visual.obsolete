@@ -48,7 +48,8 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/frame.cpp",
 	"src/core/label.cpp",
 	"src/core/curve.cpp",
-	"src/core/convex.cpp" ]
+	"src/core/convex.cpp",
+	"src/core/faces.cpp" ]
 
 if sys.platform == 'win32':
 	srcs.append( 'src/win32/render_surface.cpp')
