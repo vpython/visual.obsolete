@@ -1,3 +1,5 @@
+// This file uses 175 MB to compile (optimizing)
+
 #include "primitive.hpp"
 #include "arrow.hpp"
 #include "sphere.hpp"
@@ -8,6 +10,7 @@
 #include "box.hpp"
 #include "ellipsoid.hpp"
 #include "pyramid.hpp"
+#include "label.hpp"
 
 #include <boost/python/class.hpp>
 
@@ -101,6 +104,34 @@ wrap_primitive()
 
 	class_< pyramid, bases<rectangular> >( "pyramid")
 		.def( init<const pyramid&>())
+		;
+		
+	class_< label, bases<renderable> >( "label")
+		.def( init<const label&>())
+		.add_property( "color", &label::get_color, &label::set_color)
+		.add_property( "red", &label::get_red, &label::set_red)
+		.add_property( "green", &label::get_green, &label::set_green)
+		.add_property( "blue", &label::get_blue, &label::set_blue)
+		.add_property( "alpha", &label::get_alpha, &label::set_alpha)
+		.add_property( "pos", 
+			make_function(&label::get_pos, 
+				return_internal_reference<>()), 
+			&label::set_pos)
+		.add_property( "x", &label::get_x, &label::set_x)
+		.add_property( "y", &label::get_y, &label::set_y)
+		.add_property( "z", &label::get_z, &label::set_z)
+		.add_property( "height", &label::get_font_size, &label::set_font_size)
+		.add_property( "xoffset", &label::get_xoffset, &label::set_xoffset)
+		.add_property( "yoffset", &label::get_yoffset, &label::set_yoffset)
+		.add_property( "opacity", &label::get_opacity, &label::set_opacity)
+		.add_property( "border", &label::get_border, &label::set_border)
+		.add_property( "box", &label::has_box, &label::render_box)
+		.add_property( "line", &label::has_line, &label::render_line)
+		.add_property( "linecolor", &label::get_linecolor, &label::set_linecolor)
+		.add_property( "font", &label::get_font_family, &label::set_font_family)
+		.add_property( "text", &label::get_text, &label::set_text)
+		.add_property( "space", &label::get_space, &label::set_space)
+		// .def( self_ns::str(self))
 		;
 }	
 	
