@@ -101,8 +101,40 @@ sphere::gl_render( const view& geometry)
 		glMateriali( GL_FRONT, GL_SHININESS, gl_shininess);
 	}
 	
+	color.gl_set();
 	// Mode specific rendering code follows
-	if (color.alpha != 1.0) { // Render a transparent sphere.
+	if (tex && color.alpha != 1.0) {
+		// Setup for blending
+		glEnable( GL_BLEND);
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable( GL_CULL_FACE);
+		
+		// Set up the texturing
+		glEnable( GL_TEXTURE_2D);
+		// I am limiting the maximum level of detail in this case because it can
+		// bring my poor system to a screaming halt.  It still looks good at
+		// this level of subdivision.
+		size_t tex_lod = std::max(lod + 6, 10);
+		tex->gl_activate();
+		if (shiny)
+			glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+		
+		// Render the back half.
+		glCullFace( GL_FRONT);
+		lod_cache[tex_lod].gl_render();
+		
+		// Render the front half.
+		glCullFace( GL_BACK);
+		lod_cache[tex_lod].gl_render();
+		
+		// Cleanup.
+		glDisable( GL_CULL_FACE);
+		glDisable( GL_TEXTURE_2D);
+		glDisable( GL_BLEND);		
+		if (shiny)
+			glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);			
+	}
+	else if (color.alpha != 1.0) { // Render a transparent sphere.
 		// Since spheres have identical symmetry
 		// along the view axis regardless of thier orientation, this code is
 		// easy (albeit somewhat slow) thanks to GL_CULL_FACE. 
@@ -110,8 +142,6 @@ sphere::gl_render( const view& geometry)
 		// Setup for blending
 		glEnable( GL_BLEND);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		color.gl_set();
-		
 		glEnable( GL_CULL_FACE);
 		
 		// Render the back half.
@@ -133,12 +163,10 @@ sphere::gl_render( const view& geometry)
 		// Set up the texturing
 		glEnable( GL_TEXTURE_2D);
 		tex->gl_activate();
-		// Use white lighting to modulate the texture.
 		rgba(1.0, 1.0, 1.0, 1.0).gl_set();
-		
 		// Use separate specular highlights, when requested.
 		if (shiny)
-			glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+			glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);		
 		
 		// Render the object, using culling of the backface if the camera is not
 		// within the space of the body.
@@ -159,14 +187,12 @@ sphere::gl_render( const view& geometry)
 	}
 	else {
 		// Render a simple sphere.
-		color.gl_set();
 		lod_cache[lod].gl_render();
 	}
 	if (shiny) {
 		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
 		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( 0, 0, 0).red);
 	}
-
 	check_gl_error();
 }
 
