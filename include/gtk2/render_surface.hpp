@@ -7,6 +7,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
+#include "mouseobject.hpp"
 
 #include <gtkmm/gl/drawingarea.h>
 #include <gtkmm/main.h>
@@ -20,22 +21,37 @@ namespace cvisual {
 class render_surface : public Gtk::GL::DrawingArea
 {
  private:
+	// Note that the upper-left corner of the window is the origin.
 	float last_mousepos_x;
 	float last_mousepos_y;
- 
+
  	float last_mouseclick_x;
  	float last_mouseclick_y;
+ 	// States of the mouse button.
+ 	bool left_button_down;
+ 	bool middle_button_down;
+ 	bool right_button_down;
+ 	bool dragging;
+ 	shared_ptr<renderable> last_pick;
+ 	mouse_t mouse;
+ 	// The length of the Glib::signal_timout, in milliseconds.
+ 	long cycle_time;
+ 	// Used to disconnect the timer when resetting the time.
+ 	SigC::Connection timer;
  	
  public:
 	render_surface( display_kernel& _core, bool activestereo = false);
 	display_kernel& core;
 	
-	// Signal fired by button down + button up
+	// Signal fired by button down + button up.
 	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
 	
 	// Makes this rendering context active and calls on_gl_free().  This should
 	// generally be done only by the last window to shut down.
 	void gl_free();
+	
+	// Returns the mouse object, and updates some of its parameters.
+	mouse_t& get_mouse();
  
  protected:
 	// Low-level signal handlers

@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include <boost/lexical_cast.hpp>
+
 namespace cvisual {
 
 namespace {
@@ -23,7 +25,16 @@ namespace {
 }
 
 render_surface::render_surface( display_kernel& _core, bool activestereo)
-	: core( _core)
+	: last_mousepos_x(0),
+	last_mousepos_y(0),
+	last_mouseclick_x(0),
+	last_mouseclick_y(0),
+	left_button_down(false),
+	middle_button_down(false),
+	right_button_down(false),
+	dragging(false),
+	cycle_time(30),
+	core( _core)
 {
 	Glib::RefPtr<Gdk::GL::Config> config;
 
@@ -83,7 +94,6 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 	core.gl_swap_buffers.connect( 
 		SigC::slot( *this, &render_surface::gl_swap_buffers));
 	set_flags( get_flags() | Gtk::CAN_FOCUS);
-	// core.stereo_mode = display_kernel::REDCYAN_STEREO;
 }
 
 void
@@ -124,8 +134,12 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 	else if (!buttondown) {
 		core.report_mouse_motion( dx, dy, display_kernel::NONE);
 	}
+	mouse.set_shift( event->state & GDK_SHIFT_MASK);
+	mouse.set_ctrl( event->state & GDK_CONTROL_MASK);
+	mouse.set_alt( event->state & GDK_MOD1_MASK);
 	last_mousepos_x = static_cast<float>(event->x);
 	last_mousepos_y = static_cast<float>(event->y);
+	mouse.cam = core.calc_camera();
 	return true;
 }
 
@@ -156,15 +170,58 @@ render_surface::on_realize()
 	}
 	assert( share_list);
 	
-	Glib::signal_timeout().connect( 
+	// Use PRIORITY_DEFAULT_IDLE to ensure that this signal does not get
+	// priority over user-initiated GUI events, like mouse clicks and such.
+	timer = Glib::signal_timeout().connect( 
 		SigC::slot( *this, &render_surface::forward_render_scene),
-		28);
+		cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
 }
 
 bool
 render_surface::forward_render_scene()
 {
-	return core.render_scene();
+	Glib::Timer time;
+	bool sat = core.render_scene();
+	double elapsed = time.elapsed();
+	
+	if (!sat)
+		return sat;
+	
+	/* Scheduling logic for the rendering pulse.  This code is intended to make
+	 * the rendering loop a better citizen with regard to sharing CPU time with
+	 * the Python working thread.  If the time for one render pulse is
+	 * greater than the timeout value, we raise the timeout by 5 ms to give the
+	 * Python thread some more CPU time.  If it is more than 5 ms less than the
+	 * timeout value, than the timeout is reduced by 5 ms, not to go below 30 ms.
+	 */
+	if (elapsed > double(cycle_time)/1000) {
+		timer.disconnect();
+		// Try to give the user process some minimal execution time.
+		cycle_time += 5;
+		timer = Glib::signal_timeout().connect( 
+			SigC::slot( *this, &render_surface::forward_render_scene),
+			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
+		
+		VPYTHON_NOTE( 
+			std::string("Changed rendering cycle time to ") 
+			+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
+		return false;
+	}
+	if (elapsed < double(cycle_time-5)/1000 && cycle_time > 30) {
+		timer.disconnect();
+		// Try to give the user process some minimal execution time.
+		cycle_time -= 5;
+		timer = Glib::signal_timeout().connect( 
+			SigC::slot( *this, &render_surface::forward_render_scene),
+			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
+		
+		VPYTHON_NOTE( 
+			std::string("Changed rendering cycle time to ") 
+			+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
+		return false;
+		
+	}
+	return sat;
 }
 
 bool
@@ -177,10 +234,10 @@ render_surface::on_expose_event( GdkEventExpose*)
 bool 
 render_surface::on_button_press_event( GdkEventButton* event)
 {
-	if (event->button == 1) {
-		last_mouseclick_x = event->x;
-		last_mouseclick_y = event->y;
-	}
+	last_mouseclick_x = event->x;
+	last_mouseclick_y = event->y;
+	
+	
 	return true;
 }
 
