@@ -22,7 +22,7 @@ realmain( std::vector<std::string>&)
 	
 	// Load up a map of the earth.
 	shared_ptr<texture> earth = file_texture::create( VPYTHON_PREFIX
-		"/data/land_ocean_ice_2048.tif", true);
+		"/data/land_ocean_ice_2048.tif"/*, true*/);
 	
 	// Draw one sphere with a map of the earth.
 	shared_ptr<sphere> sph( new sphere());

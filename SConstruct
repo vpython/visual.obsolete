@@ -107,7 +107,7 @@ Test('pyramid_test')
 Test('ellipsoid_test')
 Test('psphere_texture_test')
 Test('selection_test')
-Test('conference_demo')
+# Test('conference_demo')
 Test('curve_test')
 Test('label_test')
 if sys.platform != 'win32':

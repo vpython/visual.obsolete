@@ -38,4 +38,5 @@ realmain( std::vector<std::string>&)
 	main_window.scene.add_renderable( sph);
 	
 	main_window.run();
+	return 0;
 }
