@@ -3,10 +3,13 @@
 
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
+#define _WIN32_IE 0x400
+#include <commctrl.h>
 
 #include "render_core.hpp"
 #include <map>
 #include <string>
+#include <sigc++/object.h>
 
 // NOTE: This implementation might require Windows 98 (For the timer callback).
 
@@ -15,7 +18,7 @@ class basic_app;
 class render_surface : public SigC::Object
 {
  private:
-	friend basic_app;
+	friend class basic_app;
 
  	float last_mousepos_x;
  	float last_mousepos_y; 	
@@ -33,7 +36,7 @@ class render_surface : public SigC::Object
 	static VOID CALLBACK
 	timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 	
-	static void register_class();
+	static void register_win32_class();
 	static WNDCLASS win32_class;
 	static std::map<HWND, render_surface*> widgets;
 	
@@ -50,7 +53,7 @@ class render_surface : public SigC::Object
 	void gl_end();
 	void gl_swap_buffers();
 	
-	void CreateWindow( HWND);
+	void create_window( HWND);
 	
  public:
 	render_surface();
@@ -74,9 +77,9 @@ class basic_app
 	static LRESULT CALLBACK 
 	dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	
-	static void register_class();
+	static void register_win32_class();
 	static WNDCLASS win32_class;
-	static std::map<HWND, render_surface*> windows;
+	static std::map<HWND, basic_app*> windows;
 	
 	// Message handlers
 	LRESULT on_size( WPARAM, LPARAM);
@@ -86,8 +89,8 @@ class basic_app
 	std::string title;
 	
  public:
-	scene( std::string title = std::string("VPython rendering core 2"));
-	~scene();
+	basic_app( std::string title = std::string("VPython rendering core 2"));
+	~basic_app();
 	render_surface scene;
  
 	// Shows the main window and enters the message loop, returning when done.

@@ -1,8 +1,10 @@
 
 #include "win32/render_surface.hpp"
 #include "util/errors.hpp"
+#include "vpython-config.h"
 
-#include <commctrl.h>
+#include <sigc++/sigc++.h>
+
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
@@ -20,7 +22,7 @@ decode_win32_error()
 		0, // Ignored parameter
 		code, // Error code to be decoded.
 		0, // Use the default language
-		&message, // The output buffer to fill the message
+		message, // The output buffer to fill the message
 		1, // Allocate at least one byte in order to free something below.
 		0); // No additional arguments.
 	
@@ -86,15 +88,15 @@ render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 }
 
 VOID CALLBACK
-render_surface::timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+render_surface::timer_callback( HWND hwnd, UINT, UINT_PTR, DWORD)
 {
 	render_surface* This = widgets[hwnd];
-	This->on_paint();
+	This->on_paint(0, 0);
 }
 
 // TODO: Portions of the routine need to wait until the window is made visible.
 LRESULT 
-render_surface::on_create( WPARAM wParam, LPARAM lParam)
+render_surface::on_create( WPARAM, LPARAM)
 {
 	// The first OpenGL Rendering Context, used to share displaylists.
 	static HGLRC root_glrc = 0;
@@ -157,18 +159,18 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 			// Opening for the first time.
 			core.report_realize();
 			core.render_scene();
-			SetTimer( widget_handle, &id, 28, &render_surface::dispatch_messages);
+			SetTimer( widget_handle, id, 28, &render_surface::timer_callback);
 			break;
 		case SW_PARENTCLOSING:
 			// Stop rendering when the window is minimized.
-			KillTimer( widget_handle, &id);
+			KillTimer( widget_handle, id);
 			break;
 		case SW_PARENTOPENING:
 			// restart rendering when the window is restored.
-			SetTimer( widget_handle, &id, 28, &render_surface::dispatch_messages);
+			SetTimer( widget_handle, id, 28, &render_surface::timer_callback);
 			break;
 		default:
-			return DefWindowProc( widget_handle, SW_SHOWWINDOW, wParam, lParam);
+			return DefWindowProc( widget_handle, WM_SHOWWINDOW, wParam, lParam);
 	}
 	return 0;
 }
@@ -176,11 +178,11 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 LRESULT  
 render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 {
-	bool left_down = wParam & MK_LBUTTON;
+	// bool left_down = wParam & MK_LBUTTON;
 	bool middle_down = wParam & MK_MBUTTON;
 	bool right_down = wParam & MK_RBUTTON;
 	float mouse_x = LOWORD(lParam);
-	float mouse_y = HIGHWORD(lParam);
+	float mouse_y = HIWORD(lParam);
 	
 	float dx = mouse_x - last_mousepos_x;
 	float dy = mouse_y - last_mousepos_y;
@@ -196,30 +198,30 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 }
 
 LRESULT  
-render_surface::on_size( WPARAM wParam, LPARAM lParam)
+render_surface::on_size( WPARAM, LPARAM)
 {
 	RECT dims;
-	GetClientRect( window_handle, &dims);
+	GetClientRect( widget_handle, &dims);
 	core.report_resize( dims.right - dims.left, dims.bottom - dims.top);
 	return 0;
 }
 
 LRESULT  
-render_surface::on_paint( WPARAM wParam, LPARAM lParam)
+render_surface::on_paint( WPARAM, LPARAM)
 {
 	core.render_scene();
 	return 0;
 }
 
 LRESULT  
-render_surface::on_destroy( WPARAM wParam, LPARAM lParam)
+render_surface::on_destroy( WPARAM, LPARAM)
 {
 	// Perform cleanup actions.
 	UINT id = 0;
-	KillTimer( widget_handle, &id);
+	KillTimer( widget_handle, id);
 	wglDeleteContext( gl_context);
-	ReleaseDC( dev_context);
-	widgets.remove( widget_handle);
+	ReleaseDC( widget_handle, dev_context);
+	widgets.erase( widget_handle);
 	// DestroyWindow( widget_handle);
 	return 0;
 }
@@ -248,7 +250,7 @@ render_surface::render_surface()
 {
 	// Initialize data
 	// Initialize the win32_class
-	register_win32_class();
+	render_surface::register_win32_class();
 	
 	// Connect callbacks from the render_core to this object.  These will not
 	// be called back from the core until report_realize is called.
@@ -259,7 +261,7 @@ render_surface::render_surface()
 }
 
 void
-render_surface::CreateWindow( HWND parent)
+render_surface::create_window( HWND parent)
 {
 	CreateWindow(
 		win32_class.lpszClassName,
@@ -270,7 +272,7 @@ render_surface::CreateWindow( HWND parent)
 		CW_USEDEFAULT, // width
 		CW_USEDEFAULT, // height
 		parent,
-		1, // A unique index to identify this widget by the parent
+		0, // A unique index to identify this widget by the parent
 		GetModuleHandle(0),
 		0 // No data passed to the WM_CREATE function.
 	); 
@@ -292,16 +294,16 @@ basic_app::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	switch (uMsg) {
 		case WM_COMMAND:
 			// A Command from a particular button.
-			return This->on_command( wpara, lParam);
+			return This->on_command( wParam, lParam);
 		case WM_SIZE:
 			return This->on_size( wParam, lParam);
 		case WM_CREATE:
 			return This->on_create( wParam, lParam);
 		case WM_CLOSE:
-			DestroyWindow( window_handle);
+			DestroyWindow( This->window_handle);
 			return 0;
 		case WM_DESTROY:
-			windows.remove( hwnd);
+			windows.erase( hwnd);
 			PostQuitMessage(0);
 			return 0;
 		default:
@@ -311,7 +313,7 @@ basic_app::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 // Called in response to WM_RESIZE.
 LRESULT
-basic_app::on_size( WPARAM wParam, LPARAM lParam)
+basic_app::on_size( WPARAM, LPARAM)
 {
 	RECT n_dims;
 	GetClientRect( window_handle, &n_dims);
@@ -345,7 +347,7 @@ enum str_idx {
 	SEPARATOR
 };
 
-const char** toolbar_strs = {
+const char* toolbar_strs[] = {
 	"Pan",
 	"Rotate/Zoom",
 	"Fullscreen",
@@ -358,7 +360,7 @@ const char** toolbar_strs = {
 // Called only once in response to WM_CREATE.  This function allocates size and
 // creates its children.
 LRESULT
-basic_app::on_create( WPARAM wParam, LPARAM lParam)
+basic_app::on_create( WPARAM, LPARAM)
 {
 
 	TBBUTTON buttons[5];
@@ -368,14 +370,14 @@ basic_app::on_create( WPARAM wParam, LPARAM lParam)
 	buttons[0].fsState = TBSTATE_ENABLED;
 	buttons[0].fsStyle = TBSTYLE_AUTOSIZE | TBSTYLE_BUTTON;
 	buttons[0].dwData = 0;
-	buttons[0].iString = toolbar_strs[QUIT];
+	buttons[0].iString = (int)toolbar_strs[QUIT];
 	
 	buttons[1].iBitmap = tb_imlist_idx[1];
 	buttons[1].idCommand = FULLSCREEN;
 	buttons[1].fsState = TBSTATE_ENABLED;
 	buttons[1].fsStyle = TBSTYLE_AUTOSIZE | TBSTYLE_CHECK;
 	buttons[1].dwData = 0;
-	buttons[1].iString = toolbar_strs[FULLSCREEN];
+	buttons[1].iString = (int)toolbar_strs[FULLSCREEN];
 	
 	buttons[2].iBitmap = 10;
 	buttons[2].idCommand = SEPARATOR;
@@ -389,34 +391,33 @@ basic_app::on_create( WPARAM wParam, LPARAM lParam)
 	buttons[3].fsState = TBSTATE_ENABLED;
 	buttons[3].fsStyle = TBSTYLE_AUTOSIZE | TBSTYLE_CHECKGROUP;
 	buttons[3].dwData = 0;
-	buttons[3].iString = toolbar_strs[ROTATE_ZOOM];
+	buttons[3].iString = (int)toolbar_strs[ROTATE_ZOOM];
 
 	buttons[4].iBitmap = tb_imlist_idx[3];
 	buttons[4].idCommand = PAN;
 	buttons[4].fsState = TBSTATE_ENABLED;
 	buttons[4].fsStyle = TBSTYLE_AUTOSIZE | TBSTYLE_CHECKGROUP;
 	buttons[4].dwData = 0;
-	buttons[4].iString = toolbar_strs[PAN];
+	buttons[4].iString = (int)toolbar_strs[PAN];
 	
-	toolbar = CreateWindowEx(
-		0,
+	toolbar = CreateWindow(
 		TOOLBARCLASSNAME,
 		0,
 		WS_CHILD | CCS_ADJUSTABLE, 0, 0, 0, 0, 
 		window_handle, 
-		(HMENU) ID_TOOLBAR, 
+		0, 
 		GetModuleHandle(0), 
         0
 	);
 	// Report the size of the TBBUTTON struct to the toolbar
 	SendMessage( toolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);
 	// Add the image list to the toolbar.
-	SendMessage( toolbar, TB_SETIMAGELIST, 0, (LPARAM)tb_imglist);
+	SendMessage( toolbar, TB_SETIMAGELIST, 0, (LPARAM)tb_imlist);
 	// Add the buttons to the toolbar.
 	SendMessage( toolbar, TB_ADDBUTTONS, (WPARAM)5, (LPARAM) buttons);
 	
 	// Create the render_surface widget
-	scene.CreateWindow( window_handle);
+	scene.create_window( window_handle);
 	// Size the widget tree
 	this->on_size( 0, 0);
 	
@@ -427,7 +428,7 @@ basic_app::on_create( WPARAM wParam, LPARAM lParam)
 LRESULT
 basic_app::on_command( WPARAM wParam, LPARAM lParam)
 {
-	switch (LOWORD(wparam)) {
+	switch (LOWORD(wParam)) {
 		case QUIT:
 			DestroyWindow(window_handle);
 			break;
@@ -440,7 +441,7 @@ basic_app::on_command( WPARAM wParam, LPARAM lParam)
 		case PAN:
 			scene.core.mouse_mode = render_core::PAN;
 		default:
-			return DefWindowProc( window_handle, wParam, lParam);
+			return DefWindowProc( window_handle, WM_COMMAND, wParam, lParam);
 	}
 	return 0;	
 };
@@ -452,11 +453,15 @@ basic_app::register_win32_class()
 	if (done)
 		return;
 	else {
+#if 0
 		INITCOMMONCONTROLSEX comctl_init = {
 			sizeof (INITCOMMONCONTROLSEX),
 			ICC_BAR_CLASSES
 		};
 		InitCommonControlsEx( &comctl_init);
+#else
+		InitCommonControls();
+#endif
 		
 		// Regsiter the top-level window class.
 		std::memset( &win32_class, 0, sizeof(win32_class));
@@ -516,7 +521,7 @@ WNDCLASS basic_app::win32_class;
  * WM_QUIT causes basic_app::run() to recieve 0 from GetMessage(), and returns
  *    program control to main(), which returns 0 to the shell.
  */
-basic_app::basic_app( std::string title)
+basic_app::basic_app( std::string _title)
 	: title( _title)
 {
 	// Load the images for the toolbar from files.
@@ -535,10 +540,10 @@ basic_app::basic_app( std::string title)
 	}
 	tb_imlist = ImageList_Create( 32, 32, ILC_COLOR24, 4, 0);
 	for (int i = 0; i < 4; ++i) {
-		tb_imlist_idx[i] = ImageList_Add( tb_imlist, tb_image[i], 0);
+		tb_imlist_idx[i] = ImageList_Add( tb_imlist, (HBITMAP)tb_image[i], 0);
 	}
 	
-	register_win32_class();
+	basic_app::register_win32_class();
 	
 	// Create a hidden top-level window
 	CreateWindow(
@@ -558,7 +563,7 @@ basic_app::basic_app( std::string title)
 
 basic_app::~basic_app()
 {
-	ImageList_Destroy( tb_imglist);
+	ImageList_Destroy( tb_imlist);
 	for (int i = 0; i < 4; ++i) {
 		DeleteObject( tb_image[i]);
 	}
@@ -575,7 +580,7 @@ basic_app::run()
 	// Enter the message loop
 	MSG message;
 	BOOL msg_err = 0;
-	while (msg_err = GetMessage( &message, 0, 0, 0) != 0) {
+	while ((msg_err = GetMessage( &message, 0, 0, 0)) != 0) {
 		if (msg_err == -1)
 			decode_win32_error();
 		TranslateMessage( &message);
