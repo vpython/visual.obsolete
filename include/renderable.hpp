@@ -8,10 +8,11 @@
 using boost::shared_ptr;
 class z_comparator;
 
-// This primarily serves as a means of communicating information down to the
-// various primitives that may or may not need it from the render_surface.  Most
-// of the members are simply references to the real values in the owning 
-// render_surface.
+/** This primarily serves as a means of communicating information down to the
+	various primitives that may or may not need it from the render_surface.  Most
+	of the members are simply references to the real values in the owning 
+	render_surface.
+*/
 struct view
 {
 	// The position of the camera in world space.
@@ -41,74 +42,107 @@ struct view
 	}
 };
 
-// Virtual base class for all renderable objects and composites.
+/** Virtual base class for all renderable objects and composites.
+ */
 class renderable
 {
 private:
-	// The model geometry needs to be recalculated
+	/** True if the model geometry needs to be recalculated.  This will lead to
+	 * refresh_cache being called.
+	 */
 	bool model_damaged;	
-	// The z-axis damage needs to be recalculated (only done if color.alpha 
-	// != 1.0)
+	/** True if the model needs to be resorted.  update_z_sort() will be called
+	 * if this is true and color.alpha != 1.0 in the render cycle. 
+	 */
 	bool z_damaged;
 
 public:
+	/** The base color of this body.  Ignored by the variable-color composites
+	 * (curve, faces, frame).
+	 */
 	rgba color;
+	/** Default base constructor.  Creates a white, model_damaged object. */
 	renderable();
 	virtual ~renderable();
 	
-	// Renders itself.
+	/** Called by the render cycle when drawing to the screen.  The default
+	 * is to do nothing.
+	 */
 	virtual void gl_render(const view&);
 	
-	// Renders itself for picking.  Since it is not visible, the object should
-	// not worry about things like transparency or texture mapping.
+	/** Called when rendering for mouse hit testing.  Since the result is not
+	 *  visible, subclasses should not perform texture mapping or blending,
+	 * and should use the lowest-quality level of detail that covers the
+	 * geometry.
+	 */
 	virtual void gl_pick_render( const view&);
 		
-	// Report the total extent of the object.
+	/** Report the total extent of the object. */
 	virtual void grow_extent( extent&);
 
-	// Report the approximate center of the object.
+	/** Report the approximate center of the object.  This is used for depth
+	 * sorting of the transparent models.  */
 	virtual vector get_center() const = 0;
 	
-	// Called unconditionally by the render loop prior to rendering the object.
+	/** Called by the render loop to determine if an object needs to be updated.
+	 * It is called unconditionally by the owning render_surface and determines
+	 * whether or not to call update_cache() and/or update_z_sort() based on the
+	 * damage states.
+	 */
 	void refresh_cache( const view&);
 
 protected:
-	// If a subclass changes a property that affects its cached state, it must
-	// call this function to ensure that its cache is updated on the next render
-	// pass.
+	/** If a subclass changes a property that affects its cached state, it must
+		call this function to ensure that its cache is updated on the next render
+		pass.
+	*/
 	inline void model_damage() { model_damaged = true; }
+	/** If a subclass changes its state such that it is no longer sorted, but 
+	 * does not need to recalculate its entire geometry, it must call this
+	 * funciton. */
 	inline void z_damage() { z_damaged = true; }
 	
+	/** True if the object should be rendered on the screen. */
 	bool visible;
 	friend class z_comparator;
-	// A function that must be overridden if an object wants to cache its state
-	// for rendering optimization.
+	/** A function that must be overridden if a subclass wants to cache its state
+		for rendering optimization.
+	*/
 	virtual void update_cache( const view& v);
 	// This function is called if the only thing that was damaged was the z-order
 	// that the primitives are rendered in.
 	virtual void update_z_sort( const view& forward);
 };
 
-// A depth sorting criterion for STL-compatable sorting algorithms.  This 
-// implementation only performs 4 adds, 6 multiplies, and one comparison.  It
-// could be made faster if the virtual function get_center() was somehow made
-// non-virtual, but that isn't possible right now since curve, convex, and faces
-// have such a different notion of the "center" of the body compared to the other
-// objects.
+/** A depth sorting criterion for STL-compatable sorting algorithms.  This 
+   implementation only performs 4 adds, 6 multiplies, and one comparison.  It
+   could be made faster if the virtual function get_center() was somehow made
+   non-virtual, but that isn't possible right now since some bodies	
+   have such a different notion of the "center" of the body compared to the other
+   objects.
+ */
 class z_comparator
 {
  private:
+	/** A unit vector along the visual depth axis.*/
 	vector forward;
  public:
-	z_comparator( const vector& f)
-		: forward( f) {}
+	/** Create a new comparator based on the specified depth direction. 
+	 * @param fore A unit vector along the sorting axis.
+	 */
+	z_comparator( const vector& fore)
+		: forward( fore) {}
 	
-	// Multiple versions of this are provided to enable various implementations
-	// of the internal storage format for renderable objects.
+	/** Apply the sorting criteria.
+		@return true if lhs is farther away than rhs. 
+	*/
 	inline bool 
 	operator()( const shared_ptr<renderable> lhs, const shared_ptr<renderable> rhs) const
 	{ return forward.dot( lhs->get_center()) > forward.dot( rhs->get_center()); }
 
+	/** Apply the sorting criteria.
+		@return true if lhs is farther away than rhs. 
+	*/
 	inline bool 
 	operator()( const renderable* lhs, const renderable* rhs) const
 	{ return forward.dot( lhs->get_center()) > forward.dot( rhs->get_center()); }

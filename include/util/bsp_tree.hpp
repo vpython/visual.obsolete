@@ -6,7 +6,7 @@
 
 #include "util/vector.hpp"
 
-// A helper object to define a 2D flat plane in R3.
+/** A helper object to define a 2D flat plane in R3. */
 class plane_equation
 {
  private:
@@ -32,8 +32,9 @@ class plane_equation
 };
 
 
-// An implementation of a Binary Partition Tree for transparent models in 3D
-// space.
+/** An implementation of a Binary Partition Tree for transparent models in 3D
+space.  This class is not complete, and may not be used at all.
+*/
 template <typename Polygon>
 class bsp_tree
 {
