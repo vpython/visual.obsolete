@@ -13,6 +13,12 @@ scoped_ptr< z_sorted_model<triangle, 6> > pyramid::sorted_model;
 
 PRIMITIVE_TYPEINFO_IMPL(pyramid);
 
+bool
+pyramid::degenerate()
+{
+	return axis.mag() == 0.0 || width == 0.0 || height == 0.0;
+}
+
 pyramid::pyramid()
 {
 }
@@ -25,7 +31,7 @@ pyramid::pyramid( const pyramid& other)
 void 
 pyramid::gl_pick_render( const view& scene)
 {
-	if (axis.mag() == 0.0 || width == 0.0 || height == 0.0)
+	if (degenerate())
 		return;
 	vector view_pos = pos * scene.gcf;
 	gl_matrix_stackguard guard;
@@ -113,7 +119,7 @@ pyramid::update_cache( const view&)
 void 
 pyramid::gl_render( const view& scene)
 {
-	if (axis.mag() == 0.0 || width == 0.0 || height == 0.0)
+	if (degenerate())
 		return;
 	clear_gl_error();
 	{
@@ -144,6 +150,8 @@ pyramid::gl_render( const view& scene)
 void 
 pyramid::grow_extent( extent& world_extent)
 {
+	if (degenerate())
+		return;
 	tmatrix orient = model_world_transform();
 	vector vwidth = orient * vector( 0, 0, width * 0.5);
 	vector vheight = orient * vector( 0, height * 0.5, 0);

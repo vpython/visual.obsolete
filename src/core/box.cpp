@@ -17,7 +17,14 @@ bool box::first = true;
 bool
 box::degenerate()
 {
-	return !visible || axis.mag() == 0.0 || width == 0.0 || height == 0.0;
+	int num_equal_to_zero = 0;
+	if (axis.mag() == 0.0)
+		num_equal_to_zero++;
+	if (width == 0.0)
+		num_equal_to_zero++;
+	if (height == 0.0)
+		num_equal_to_zero++;
+	return num_equal_to_zero > 1;
 }
 
 box::box()
@@ -64,6 +71,7 @@ void
 box::update_cache( const view&)
 {
 	if (first) {
+		glPolygonOffset( 0, 2);
 		clear_gl_error();
 		first = false;
 		// First set up the non-textured model.
@@ -93,10 +101,13 @@ box::gl_render( const view& scene)
 {
 	if (degenerate())
 		return;
+	bool flat = axis.mag() == 0.0 || width == 0.0 || height == 0.0;
 	
 	clear_gl_error();
 	color.gl_set();
 	{
+		if (flat)
+			glEnable( GL_POLYGON_OFFSET_FILL);
 		double gcf = scene.gcf;
 		gl_matrix_stackguard guard;
 		vector view_pos = pos * scene.gcf;
@@ -149,6 +160,8 @@ box::gl_render( const view& scene)
 			// Render the simple opaque box		
 			simple_model.gl_render();
 		}
+		if (flat)
+			glDisable( GL_POLYGON_OFFSET_FILL);
 	}
 	check_gl_error();
 }

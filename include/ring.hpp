@@ -17,6 +17,7 @@ class ring : public axial
 	// the radius of the body.
 	double thickness;
 	PRIMITIVE_TYPEINFO_DECL;
+	bool degenerate();
 
  public:
 	ring();

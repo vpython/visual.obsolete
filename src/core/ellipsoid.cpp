@@ -82,6 +82,14 @@ ellipsoid::degenerate()
 	return !visible || height == 0.0 || width == 0.0 || axis.mag() == 0.0;
 }
 
+void
+ellipsoid::grow_extent( extent& world)
+{
+	if (degenerate())
+		return;
+	world.add_sphere( pos, std::max( width, std::max( height, axis.mag())));
+}
+
 PRIMITIVE_TYPEINFO_IMPL(ellipsoid);
 
 } // !namespace cvisual

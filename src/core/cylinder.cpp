@@ -168,15 +168,10 @@ cylinder::gl_render( const view& scene)
 void 
 cylinder::grow_extent( extent& e)
 {
-	if (radius < axis.mag() * 2) {
-		// Treat as a straight line.
-		e.add_point( pos);
-		e.add_point( pos + axis);
-	}
-	else {
-		// A sphere centered roughly at the centroid of the body.
-		e.add_sphere( pos + axis*0.5, std::max(radius, axis.mag() * 0.5));
-	}
+	if (degenerate())
+		return;
+	e.add_sphere( pos, radius);
+	e.add_sphere( pos + axis, radius);
 	e.add_body();
 }
 	

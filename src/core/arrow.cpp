@@ -7,6 +7,12 @@
 #include "util/errors.hpp"
 
 namespace cvisual {
+	
+bool
+arrow::degenerate()
+{
+	return axis.mag() == 0.0;
+}
 
 // This model can be resorted in about 22 usec on my PIII 800 MHz machine.
 void
@@ -198,27 +204,40 @@ arrow::get_center() const
 void 
 arrow::gl_pick_render( const view&)
 {
-	if (visible && axis.mag() != 0.0)
-		model.gl_render();
+	if (degenerate())
+		return;
+	model.gl_render();
 }
 
 void
 arrow::gl_render( const view&)
 {
-	if (visible && axis.mag() != 0.0) {
-		// Uncomment the following and comment out the respecitive lines in
-		// refresh_cache() if you need to see the transforms at runtime.
-		// gl_matrix_stackguard guard( model_world_transform());
-		// dump_glmatrix();
-		color.gl_set();
-		model.gl_render();
-	}
+	if (degenerate())
+		return;
+	color.gl_set();
+	model.gl_render();
 }
 
 void
 arrow::grow_extent( extent& world)
 {
+	if (degenerate())
+		return;
+#if 1
+	// Hmm.  A more accurate, but much slower calc of the extent of this body.
+	double hl;
+	double hw;
+	double len;
+	double sw;
+	effective_geometry( hw, sw, len, hl, 1.0);
+	// A sphere large enough to contain all four corners of the head.
+	world.add_sphere( pos + axis.norm()*(len-hl), hw * 1.414213562);
+	// A sphere large enough to contain all four corners of the base.
+	world.add_sphere( pos, sw * 1.414213562);
+#else
 	world.add_point( pos);
+#endif
+	// The tip.
 	world.add_point( pos + axis);
 	world.add_body();
 }

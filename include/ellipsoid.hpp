@@ -34,6 +34,7 @@ class ellipsoid : public sphere
 	
  protected:
 	virtual vector get_scale();
+	virtual void grow_extent( extent&);
 	virtual bool degenerate();
 	PRIMITIVE_TYPEINFO_DECL;
 };

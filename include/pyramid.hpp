@@ -22,6 +22,7 @@ class pyramid : public rectangular
 	static displaylist simple_model;
 	static scoped_ptr< z_sorted_model<triangle, 6> > sorted_model;
 	PRIMITIVE_TYPEINFO_DECL;
+	bool degenerate();
 	
  public:
 	pyramid();
