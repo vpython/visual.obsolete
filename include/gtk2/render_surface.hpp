@@ -16,6 +16,10 @@
 #include <gtkmm/toolbar.h>
 #include <gtkmm/box.h>
 
+#ifdef VPYTHON_USE_GTKMM_24
+# include <sigc++/compatibility.h>
+#endif
+
 namespace cvisual {
 
 class render_surface : public Gtk::GL::DrawingArea

@@ -12,6 +12,11 @@
 #include <gdkmm/pixbuf.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/radiobutton.h>
+#include <gtkmm/toolbar.h>
+#ifdef VPYTHON_USE_GTKMM_24
+# include <gtkmm/toggletoolbutton.h>
+# include <gtkmm/radiotoolbutton.h>
+#endif
 
 #include <algorithm>
 #include <iostream>
@@ -252,7 +257,8 @@ render_surface::on_button_release_event( GdkEventButton* event)
 		&& event->button == 1
 		&& fabs(last_mouseclick_x - event->x) < 4
 		&& fabs(last_mouseclick_y - event->y) < 4) {
-		shared_ptr<renderable> pick = core.pick( event->x, event->y);
+		shared_ptr<renderable> pick 
+			= core.pick( event->x, event->y);
 		if (pick)
 			object_clicked( pick);
 	}
@@ -290,11 +296,12 @@ basic_app::basic_app( const char* title)
 			VPYTHON_PREFIX "/data/galeon-fullscreen.png")),
 	scene( _core)
 {
-	using namespace Gtk::Toolbar_Helpers;
 	_core.illuminate_default();
 	
 	window.set_title( title);
 	window.set_icon_from_file( VPYTHON_PREFIX "/data/logo_t.gif");
+#ifndef VPYTHON_USE_GTKMM_24
+	using namespace Gtk::Toolbar_Helpers;
 	// Quit button	
 	tb.tools().push_back( StockElem( 
 		Gtk::Stock::QUIT,  
@@ -317,6 +324,26 @@ basic_app::basic_app( const char* title)
 		mouse_ctl,
 		"Pan",
 		SigC::slot( *this, &basic_app::on_pan_clicked)));
+#else
+	Gtk::ToolButton* button = 0;
+	button = Gtk::manage( new Gtk::ToolButton( Gtk::Stock::QUIT));
+	button->signal_clicked().connect( sigc::ptr_fun( &Gtk::Main::quit));
+	tb.append( *button);
+	button = Gtk::manage( new Gtk::ToggleToolButton( fs_img, "Fullscreen"));
+	button->signal_clicked().connect( 
+		sigc::mem_fun( *this, &basic_app::on_fullscreen_clicked));
+	tb.append( *button);
+	Gtk::RadioButtonGroup mouse_ctl;
+	button = Gtk::manage( new Gtk::RadioToolButton( mouse_ctl, "Rotate/Zoom"));
+	button->signal_clicked().connect(
+		sigc::mem_fun( *this, &basic_app::on_rotate_clicked));
+	tb.append( *button);
+	button = Gtk::manage( new Gtk::RadioToolButton( mouse_ctl, "Pan"));
+	button->signal_clicked().connect(
+		sigc::mem_fun( *this, &basic_app::on_pan_clicked));
+	tb.append( *button);
+	
+#endif
 	// Compose the frame and scen widgets.
 	frame.pack_start( tb, Gtk::PACK_SHRINK, 0);
 	frame.pack_start( scene);
