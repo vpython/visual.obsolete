@@ -1,5 +1,6 @@
 #include "curve.hpp"
 #include "util/errors.hpp"
+#include "util/checksum.hpp"
 
 #include <iostream>
 
@@ -42,57 +43,26 @@ curve::closed_path() const
 		&& eq_frac(begin.z, end.z, 1e-5);
 }
 
-namespace {
-
-inline void
-checksum_double( long& sum, const double* d)
-{
-	const unsigned char* p = (const unsigned char*)d;
-	for (unsigned int i = 0; i < sizeof(double); i++) {
-		sum ^= *p;
-		p++;
-		if (sum < 0)
-			sum = (sum << 1) | 1;
-		else
-			sum <<=  1;
-	}
-}
-
-inline void
-checksum_float( long& sum, const float* f)
-{
-	const unsigned char* p = (const unsigned char*)f;
-	for (unsigned int i = 0; i < sizeof(float); i++) {
-		sum ^= *p;
-		p++;
- 		if (sum < 0)
- 			sum = (sum << 1) | 1;
-		else
-			sum <<= 1;
-	}
-
-}
-
-} // !namespace (unnamed)
 
 long
 curve::checksum( size_t begin, size_t end)
 {
+	using ::checksum;
 	long ret = 0;
 	
-	checksum_double( ret, &radius);
+	checksum( ret, &radius);
 	for (std::vector<rgba>::const_iterator i = color.begin()+1+begin; 
 			i < color.begin()+1+end; ++i) {
-		checksum_float( ret, &i->red);
-		checksum_float( ret, &i->green);
-		checksum_float( ret, &i->blue);
-		checksum_float( ret, &i->alpha);
+		checksum( ret, &i->red);
+		checksum( ret, &i->green);
+		checksum( ret, &i->blue);
+		checksum( ret, &i->alpha);
 	}
 	for (std::vector<vector>::const_iterator i = pos.begin()+begin; 
 			i < pos.begin()+end+2; ++i) {
-		checksum_double( ret, &i->x);
-		checksum_double( ret, &i->y);
-		checksum_double( ret, &i->z);
+		checksum( ret, &i->x);
+		checksum( ret, &i->y);
+		checksum( ret, &i->z);
 	}
 	return ret;
 }
