@@ -77,7 +77,6 @@ module.include.files=\
 	include/gtk1/file_texture.hpp\
 	include/gtk1/render_surface.hpp\
 	include/cone.hpp\
-	include/render_core.hpp\
 	include/util/errors.hpp\
 	include/util/displaylist.hpp\
 	include/util/rgba.hpp\
@@ -105,12 +104,14 @@ module.include.files=\
 	include/curve.hpp\
 	include/axial.hpp\
 	include/display_kernel.hpp\
-	include/num_util.h\
 	include/primitive.hpp\
 	include/rectangular.hpp\
 	include/label.hpp\
 	include/util/thread.hpp\
-	include/gtk2/display.hpp
+	include/gtk2/display.hpp\
+	include/util/rate.hpp\
+	include/python/num_util.hpp\
+	include/python/slice.hpp
 
 module.source.name=.
 module.source.type=
@@ -137,7 +138,6 @@ module.source.files=\
 	src/gtk1/render_surface.cpp\
 	src/core/arrow.cpp\
 	src/core/renderable.cpp\
-	src/core/render_core.cpp\
 	src/core/sphere.cpp\
 	src/core/util/displaylist.cpp\
 	src/core/util/rgba.cpp\
@@ -185,7 +185,9 @@ module.source.files=\
 	src/gtk2/display.cpp\
 	src/gtk2/rate.cpp\
 	src/test/bounce_test.cpp\
-	src/test/sleep_test.cpp
+	src/test/sleep_test.cpp\
+	src/python/cvisualmodule.cpp\
+	src/python/slice.cpp
 
 module.pixmap.name=.
 module.pixmap.type=
