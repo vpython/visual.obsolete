@@ -20,6 +20,7 @@ core.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 	'-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS'] )
 
 core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2')
+core.Append( LIBS='gle')
 
 srcs = [ "src/core/arrow.cpp", 
 	"src/core/util/displaylist.cpp",
@@ -44,7 +45,8 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/sphere.cpp",
 	"src/core/pmap_sphere.cpp",
 	"src/core/frame.cpp",
-	"src/core/label.cpp" ]
+	"src/core/label.cpp",
+	"src/core/curve.cpp" ]
 
 if sys.platform == 'win32':
 	srcs.append( 'src/win32/render_surface.cpp')
@@ -108,6 +110,7 @@ Test('ellipsoid_test')
 Test('psphere_texture_test')
 Test('selection_test')
 Test('conference_demo')
+Test('curve_test')
 if sys.platform != 'win32':
 	Test('label_test')
 	Test('gtk_style_test')
