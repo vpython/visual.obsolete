@@ -10,7 +10,7 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: random_device.cpp,v 1.2 2004/07/30 17:25:29 jbrandmeyer Exp $
+ * $Id: random_device.cpp,v 1.1 2004/07/31 18:20:28 jbrandmeyer Exp $
  *
  */
  
