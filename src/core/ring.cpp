@@ -11,6 +11,12 @@
 using boost::scoped_array;
 
 namespace cvisual {
+	
+bool
+ring::degenerate()
+{
+	return radius == 0.0;
+}
 
 ring::ring()
 	: thickness( 0.0)
@@ -46,6 +52,8 @@ ring::gl_pick_render( const view& scene)
 void
 ring::gl_render( const view& scene)
 {
+	if (degenerate())
+		return;
 	// Level of detail estimation.  See sphere::gl_render().
 
 	// The number of subdivisions around the hoop's radial direction.
@@ -77,6 +85,8 @@ ring::gl_render( const view& scene)
 void
 ring::grow_extent( extent& world)
 {
+	if (degenerate())
+		return;
 	world.add_sphere( pos, radius + (thickness ? thickness : (radius * 0.1)));
 	world.add_body();
 }
@@ -89,8 +99,6 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	// the ring as a triangle strip.  Each successive band is created with 
 	// sequential calls to glRotate() using the same vertex array, thereby 
 	// taking advantage of OpenGL's hardware for the bulk of the transform labor.
-	if (radius == 0.0 || !visible)
-		return;
 		
 	double scaled_radius = radius * scene.gcf;
 	double scaled_thickness = scaled_radius * 0.1;
