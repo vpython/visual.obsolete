@@ -25,6 +25,81 @@ frustum( tmatrix& T, tmatrix& I, double l, double r, double b, double t, double 
 	I.w_row(0,0,(n-f)/(2*f*n),(f+n)/(2*f*n));
 }
 
+// A fully unrolled 4x4 matrix inverse.  This algorithm was generated with GiNaC
+// It is 30-60% faster than a loop based implementation (specifically, the one 
+// in SGI's libGLU), but only when run with full optimization.
+// (GCC 3.3, 800 MHz Crusoe processor)
+// Unoptimized: 14479 bytes, 25 usec
+// Optimized: 1843 bytes, 4 usec
+void inverse( tmatrix& dest, const tmatrix& src)
+{
+    // Pull out this common subexpression for GCC's aid.  This improves
+    // performance dramaticly.
+    double common = 1.0/(src(0,2)*src(3,0)*src(2,3)*src(1,1)-src(0,2)*src(3,0)
+        *src(1,3)*src(2,1)+src(0,2)*src(1,0)*src(3,3)*src(2,1)+src(0,3)*src(3,1)
+        *src(2,2)*src(1,0)+src(0,3)*src(1,1)*src(3,2)*src(2,0)+src(0,0)*src(2,2)
+        *src(1,1)*src(3,3)-src(1,3)*src(0,1)*src(3,2)*src(2,0)+src(0,3)*src(3,0)
+        *src(1,2)*src(2,1)+src(0,1)*src(2,3)*src(1,0)*src(3,2)-src(1,2)*src(0,0)
+        *src(3,3)*src(2,1)-src(0,3)*src(3,0)*src(2,2)*src(1,1)-src(3,0)*src(1,2)
+        *src(0,1)*src(2,3)-src(0,2)*src(3,1)*src(2,3)*src(1,0)-src(3,1)*src(1,3)
+        *src(0,0)*src(2,2)-src(0,3)*src(3,1)*src(1,2)*src(2,0)-src(0,2)*src(1,1)
+        *src(3,3)*src(2,0)-src(0,3)*src(1,0)*src(3,2)*src(2,1)+src(0,2)*src(3,1)
+        *src(1,3)*src(2,0)+src(3,1)*src(1,2)*src(0,0)*src(2,3)-src(0,0)*src(2,3)
+        *src(1,1)*src(3,2)+src(1,2)*src(0,1)*src(3,3)*src(2,0)+src(3,0)*src(1,3)
+        *src(0,1)*src(2,2)-src(0,1)*src(2,2)*src(1,0)*src(3,3)+src(1,3)*src(0,0)
+        *src(3,2)*src(2,1));
+        
+    dest(0,0) = common*(-src(1,2)*(src(3,3)*src(2,1)-src(3,1)*src(2,3))-src(2,3)
+        *src(1,1)*src(3,2)+src(1,3)*src(3,2)*src(2,1)-src(2,2)*(src(3,1)
+        *src(1,3)-src(1,1)*src(3,3)));
+    dest(0,1) = common*(src(0,2)*(src(3,3)*src(2,1)-src(3,1)*src(2,3))+src(0,3)
+        *(src(3,1)*src(2,2)-src(3,2)*src(2,1))+(src(2,3)*src(3,2)-src(2,2)
+        *src(3,3))*src(0,1));
+    dest(0,2) = common*(src(0,3)*(src(1,1)*src(3,2)-src(3,1)*src(1,2))+src(1,2)
+        *src(0,1)*src(3,3)-src(1,3)*src(0,1)*src(3,2)+src(0,2)*(src(3,1)
+        *src(1,3)-src(1,1)*src(3,3)));
+    dest(0,3) = common*(-src(1,2)*src(0,1)*src(2,3)-(src(0,2)*src(2,1)-src(0,1)
+        *src(2,2))*src(1,3)-src(0,3)*(src(2,2)*src(1,1)-src(1,2)*src(2,1))
+        +src(0,2)*src(2,3)*src(1,1));
+    dest(1,0) = common*(-src(1,3)*src(3,2)*src(2,0)+src(1,2)*(-src(3,0)*src(2,3)
+        +src(3,3)*src(2,0))+src(2,3)*src(1,0)*src(3,2)+(src(3,0)*src(1,3)
+        -src(1,0)*src(3,3))*src(2,2));
+    dest(1,1) = common*(-src(0,2)*(-src(3,0)*src(2,3)+src(3,3)*src(2,0))
+        -(src(2,3)*src(3,2)-src(2,2)*src(3,3))*src(0,0)-src(0,3)*(-src(3,2)
+        *src(2,0)+src(3,0)*src(2,2)));
+    dest(1,2) = common*(-src(0,3)*(src(1,0)*src(3,2)-src(3,0)*src(1,2))+src(1,3)
+        *src(0,0)*src(3,2)-src(0,2)*(src(3,0)*src(1,3)-src(1,0)*src(3,3))
+        -src(1,2)*src(0,0)*src(3,3));
+    dest(1,3) = common*(-src(1,3)*src(0,0)*src(2,2)+src(1,2)*src(0,0)*src(2,3)
+        +(src(2,2)*src(1,0)-src(1,2)*src(2,0))*src(0,3)+src(0,2)*(src(1,3)
+        *src(2,0)-src(2,3)*src(1,0)));
+    dest(2,0) = common*((src(1,0)*src(2,1)-src(1,1)*src(2,0))*src(3,3)+src(3,0)
+        *(src(2,3)*src(1,1)-src(1,3)*src(2,1))+src(3,1)*(src(1,3)*src(2,0)
+        -src(2,3)*src(1,0)));
+    dest(2,1) = common*(src(3,1)*src(0,0)*src(2,3)-src(0,0)*src(3,3)*src(2,1)
+        -src(0,3)*src(3,1)*src(2,0)-src(3,0)*src(0,1)*src(2,3)+src(0,3)*src(3,0)
+        *src(2,1)+src(0,1)*src(3,3)*src(2,0));
+    dest(2,2) = common*(-src(0,3)*src(3,0)*src(1,1)-src(0,1)*src(1,0)*src(3,3)
+        +src(3,0)*src(1,3)*src(0,1)-src(3,1)*src(1,3)*src(0,0)+src(0,3)*src(3,1)
+        *src(1,0)+src(0,0)*src(1,1)*src(3,3));
+    dest(2,3) = common*(src(0,1)*src(2,3)*src(1,0)+src(0,3)*src(1,1)*src(2,0)
+        -src(0,3)*src(1,0)*src(2,1)+src(1,3)*src(0,0)*src(2,1)-src(0,0)*src(2,3)
+        *src(1,1)-src(1,3)*src(0,1)*src(2,0));
+    dest(3,0) = common*(src(1,1)*src(3,2)*src(2,0)+src(3,1)*src(2,2)*src(1,0)
+        +src(3,0)*src(1,2)*src(2,1)-src(3,1)*src(1,2)*src(2,0)-src(3,0)*src(2,2)
+        *src(1,1)-src(1,0)*src(3,2)*src(2,1));
+    dest(3,1) = common*(src(3,0)*src(0,1)*src(2,2)-src(0,1)*src(3,2)*src(2,0)
+        -src(0,2)*src(3,0)*src(2,1)+src(0,0)*src(3,2)*src(2,1)-src(3,1)*src(0,0)
+        *src(2,2)+src(0,2)*src(3,1)*src(2,0));
+    dest(3,2) = common*(-src(0,0)*src(1,1)*src(3,2)-src(3,0)*src(1,2)*src(0,1)
+        -src(0,2)*src(3,1)*src(1,0)+src(3,1)*src(1,2)*src(0,0)+src(0,2)*src(3,0)
+        *src(1,1)+src(0,1)*src(1,0)*src(3,2));
+    dest(3,3) = common*(src(0,0)*src(2,2)*src(1,1)-src(0,2)*src(1,1)*src(2,0)
+        +src(1,2)*src(0,1)*src(2,0)+src(0,2)*src(1,0)*src(2,1)-src(1,2)*src(0,0)
+        *src(2,1)-src(0,1)*src(2,2)*src(1,0));
+    return;
+}
+
 const tmatrix& 
 tmatrix::identity() throw()
 { 

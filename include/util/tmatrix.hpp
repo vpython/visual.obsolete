@@ -204,9 +204,11 @@ public:
 	tmatrix& gl_texture_get();
 	tmatrix& gl_color_get();
 	tmatrix& gl_projection_get();
+    friend void inverse( tmatrix& ret, const tmatrix& arg);
 };
 
-void frustum( tmatrix& T, tmatrix& I, double l, double r, double b, double t, double n, double f ) throw();
+// Compute the inverse of arg, and store it in ret.
+void inverse( tmatrix& ret, const tmatrix& arg);
 
 // Returns a rotation matrix to perform rotations about an axis passing through
 // the origin through an angle in the direction specified by the Right Hand Rule.
