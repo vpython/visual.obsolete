@@ -244,7 +244,7 @@ render_core::report_realize()
 // is initialized.
 // whicheye: -1 for left, 0 for center, 1 for right.
 void
-render_core::world_to_view_transform(view& geometry, int whicheye)
+render_core::world_to_view_transform(view& geometry, int whicheye, bool forpick)
 {
 	// Scaling the view.  Problem: objects in VPython are specified using
 	// double-precision floats, while OpenGL automatically truncates those
@@ -341,7 +341,8 @@ render_core::world_to_view_transform(view& geometry, int whicheye)
 	
 	// Establish a parallel-axis asymmetric stereo projection frustum.
 	glMatrixMode( GL_PROJECTION);
-	glLoadIdentity();
+	if (!forpick)
+		glLoadIdentity();
 	if (whicheye == 1) {
 		frustum_stereo_offset = -frustum_stereo_offset;
 	}
@@ -633,7 +634,7 @@ render_core::pick( float x, float y, float d_pixels)
 		// minimum and maximum depth are the minimum and maximum values in the 
 		// depth buffer scaled between 0 and 2^32-1. (source is [0,1])
 		// name_stack is the full contents of the name stack at the time of the hit.
-		size_t hit_buffer_size = layer_world.size()+layer_world_transparent.size()*4;
+		size_t hit_buffer_size = (layer_world.size()+layer_world_transparent.size())*4;
 		unsigned int hit_buffer[hit_buffer_size];
 		
 		// Allocate a std::map< uint, shared_ptr<renderable> > to lookup names
@@ -643,6 +644,7 @@ render_core::pick( float x, float y, float d_pixels)
 		glSelectBuffer( hit_buffer_size, hit_buffer);
 		// Enter selection mode with glRenderMode
 		glRenderMode( GL_SELECT);
+		glClear( GL_DEPTH_BUFFER_BIT);
 		// Clear the name stack with glInitNames(), raise the height of the name
 		// stack with glPushName() exactly once.
 		glInitNames();
@@ -652,11 +654,13 @@ render_core::pick( float x, float y, float d_pixels)
 		int viewport_bounds[4] = { 
 			0, 0, static_cast<int>(window_width), static_cast<int>(window_height)
 		};
-		gluPickMatrix( x, y, d_pixels, d_pixels, viewport_bounds);
+		glMatrixMode( GL_PROJECTION);
+		glLoadIdentity();
+		gluPickMatrix( x, window_height - y, d_pixels, d_pixels, viewport_bounds);
 		view scene_geometry( forward, center, window_width, window_height, 
 			forward_changed, gcf, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
-		world_to_view_transform( scene_geometry);
+		world_to_view_transform( scene_geometry, 0, true);
 	
 		// Iterate across the world, rendering each body for picking.
 		std::list<shared_ptr<renderable> >::iterator i = layer_world.begin();
@@ -665,6 +669,7 @@ render_core::pick( float x, float y, float d_pixels)
 			glLoadName( name_table.size());
 			name_table.push_back( *i);
 			(*i)->gl_pick_render( scene_geometry);
+			++i;
 		}
 		std::vector<shared_ptr<renderable> >::iterator j = layer_world_transparent.begin();
 		std::vector<shared_ptr<renderable> >::iterator j_end = layer_world_transparent.end();
@@ -672,6 +677,7 @@ render_core::pick( float x, float y, float d_pixels)
 			glLoadName( name_table.size());
 			name_table.push_back( *j);
 			(*j)->gl_pick_render( scene_geometry);
+			++j;
 		}
 		// Return the name stack to the bottom with glPopName() exactly once.
 		glPopName();

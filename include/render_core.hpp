@@ -73,7 +73,7 @@ class render_core
  
 private:
 	/** Set up the OpenGL transforms from world space to view space. */
-	void world_to_view_transform( view&, int whicheye = 0);
+	void world_to_view_transform( view&, int whicheye = 0, bool forpick = false);
 	/** Renders the scene for one eye.
 		@param scene The dimensions of the scene, to be propogated to this 
 			render_core's children.

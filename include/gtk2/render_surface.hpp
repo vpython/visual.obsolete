@@ -12,6 +12,9 @@ class render_surface : public Gtk::GL::DrawingArea
 	float last_mousepos_x;
 	float last_mousepos_y;
  
+ 	float last_mouseclick_x;
+ 	float last_mouseclick_y;
+ 	
  public:
 	render_surface();
 	void add_renderable( shared_ptr<renderable>);
@@ -19,6 +22,9 @@ class render_surface : public Gtk::GL::DrawingArea
 	void remove_renderable( shared_ptr<renderable>);
 	void remove_renderable_screen( shared_ptr<renderable>);
 	render_core core;
+	
+	// Signal fired by button down + button up
+	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
  
  protected:
 	// Low-level signal handlers
@@ -31,6 +37,8 @@ class render_surface : public Gtk::GL::DrawingArea
 	// Called when the window is established for the first time.
  	virtual void on_realize();
 	virtual bool on_expose_event( GdkEventExpose*);
+	virtual bool on_button_press_event( GdkEventButton*);
+	virtual bool on_button_release_event( GdkEventButton*);
  
  private:
 	// Functions to be used as callbacks for connections via SigC::slots.

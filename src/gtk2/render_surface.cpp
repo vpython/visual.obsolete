@@ -125,6 +125,7 @@ render_surface::on_configure_event( GdkEventConfigure* event)
 		static_cast<float>(event->height));
 	return true;
 }
+
 void
 render_surface::on_realize()
 {
@@ -154,7 +155,29 @@ render_surface::on_expose_event( GdkEventExpose*)
 	return true;
 }
 
-// #include <iostream>
+bool 
+render_surface::on_button_press_event( GdkEventButton* event)
+{
+	if (event->button == 1) {
+		last_mouseclick_x = event->x;
+		last_mouseclick_y = event->y;
+	}
+	return true;
+}
+
+bool 
+render_surface::on_button_release_event( GdkEventButton* event)
+{
+	if (event->button == 1 
+		&& fabs(last_mouseclick_x - event->x) < 4 
+		&& fabs(last_mouseclick_y - event->y) < 4) {
+		shared_ptr<renderable> pick = core.pick( event->x, event->y);
+		if (pick)
+			object_clicked( pick);
+	}
+	return true;
+}
+
 
 void
 render_surface::gl_begin()
