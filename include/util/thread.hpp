@@ -8,11 +8,57 @@
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
+#include <cassert>
 
 namespace cvisual {
 
-using boost::mutex;
-typedef mutex::scoped_lock lock;
+#ifdef NDEBUG
+ using boost::mutex;
+ typedef mutex::scoped_lock lock;
+ 
+ inline void
+ assert_locked( const mutex&)
+ {
+     // Empty.
+ }
+ 
+ inline void
+ assert_unlocked( const mutex&)
+ {
+     // Empty.
+ }
+ 
+#else
+ typedef boost::try_mutex mutex;
+ typedef mutex::scoped_lock lock;
+ 
+ inline void
+ assert_locked( mutex& m)
+ {
+     try {
+         mutex::scoped_try_lock L(m);
+     }
+     catch (boost::lock_error&) {
+        return;
+     }
+     bool mutex_locked = false;
+     assert( mutex_locked == true);
+ }
+ 
+ inline void
+ assert_unlocked( mutex& m)
+ {
+     try {
+         mutex::scoped_try_lock L(m);
+     }
+     catch (boost::lock_error&) {
+        bool mutex_locked = true;
+        assert( mutex_locked == false);
+     }
+     return;
+ }
+#endif
+
 using boost::condition;
 
 } // !namesapce cvisual
