@@ -25,9 +25,9 @@ using boost::lexical_cast;
 // single-precision floating point results in no change in performance.  Using
 // mfpmath=sse does not change performance.
 
-// On a 3.0 GHz Pentium 4, sin/cos rotation is performed in .09 usec and matrix
-// multiply in .025 usec.  -mfpmath and -msse2 slightly reduced the matrix multiply
-// speed to .023 usec.
+// On a 3.0 GHz Pentium 4, sin/cos rotation is performed in 90 ns and matrix
+// multiply in 25 ns.  -mfpmath and -msse2 slightly reduced the matrix multiply
+// speed to 23 ns.
 int 
 realmain( std::vector<std::string>& args)
 {
