@@ -378,6 +378,11 @@ display_kernel::world_to_view_transform(
     // Prevent loosing too much precision in the depth buffer
     if (nearclip < .01 * farclip)
         nearclip = .01 * farclip;
+    // Prevent allowing the clipping planes to be at the same distance.
+    else if (std::fabs(1.0 - farclip / nearclip) < .01) {
+        nearclip *= .99;
+        farclip *= 1.01;
+    }
     
 	// Translate camera left/right 2% of the viewable width of the scene at
 	// the distance of its center.
@@ -404,9 +409,6 @@ display_kernel::world_to_view_transform(
 	glLoadIdentity();
 
 	if (!uniform) {
-		// Since the scene is rendered into a unit cube, this "just works":
-		// TODO: Not if the client program specified it...
-		farclip = 3.5 * cot_hfov;
 		// A scale based on the aspect ratio.
 		double width = (stereo_mode == PASSIVE_STEREO) 
 			? window_width*0.5 : window_width;
@@ -505,6 +507,8 @@ display_kernel::recalc_extent(void)
 		if (range.mag() > 1e150)
 			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
 				" an extent greater than about 1e154 units.");
+        // We should NEVER deliberately set range to zero on any axis.
+		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0); {
 	}
 	// TODO: There should be a faster way to do this comparison.
 	if (std::fabs(std::log( world_scale * gcf)) >= std::log( 1e10)) {
