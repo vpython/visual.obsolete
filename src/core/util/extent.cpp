@@ -88,7 +88,8 @@ extent::center() const
 double
 extent::farclip( const vector& camera, const vector& forward) const
 {
-	if (vector() == mins && mins == maxs)
+	if (mins == maxs)
+		// The only way that this should happen is if the scene is empty.
 		return 10.0;
 	
 	vector corners[] = {
