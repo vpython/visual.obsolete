@@ -42,6 +42,6 @@ ellipsoid::degenerate()
 	return !visible || height == 0.0 || width == 0.0 || axis.mag() == 0.0;
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(ellipsoid);
+PRIMITIVE_TYPEINFO_IMPL(ellipsoid);
 
 } // !namespace cvisual

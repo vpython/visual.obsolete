@@ -311,6 +311,6 @@ sphere::degenerate()
 	return !visible || radius == 0.0;
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(sphere)
+PRIMITIVE_TYPEINFO_IMPL(sphere)
 
 } // !namespace cvisual

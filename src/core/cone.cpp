@@ -221,6 +221,6 @@ cone::get_center() const
 	return pos + axis/2.0;
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(cone)
+PRIMITIVE_TYPEINFO_IMPL(cone)
 
 } // !namespace cvisual

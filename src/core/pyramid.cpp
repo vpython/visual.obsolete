@@ -11,7 +11,7 @@ namespace cvisual {
 displaylist pyramid::simple_model;
 scoped_ptr< z_sorted_model<triangle, 6> > pyramid::sorted_model;
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(pyramid);
+PRIMITIVE_TYPEINFO_IMPL(pyramid);
 
 pyramid::pyramid()
 	: width( 1.0), height(1.0)

@@ -6,7 +6,7 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "simple_displayobject.hpp"
+#include "primitive.hpp"
 #include "util/displaylist.hpp"
 #include "util/sorted_model.hpp"
 
@@ -20,7 +20,7 @@ using boost::scoped_ptr;
  * strategy for this object now that I have some more experience with the box
  * and pyramid models.
  */
-class arrow : public simple_displayobject
+class arrow : public primitive
 {
  private:
 	/** OpenGL storage for the model, per-object basis.  Since the arrow's 
@@ -84,7 +84,7 @@ class arrow : public simple_displayobject
 	 * base. 
 	 */
 	virtual vector get_center() const;
-	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
+	PRIMITIVE_TYPEINFO_DECL;
 
 	/** Initializes these four variables with the effective geometry for the
 		arrow.  The resulting geometry is scaled to view space, but oriented

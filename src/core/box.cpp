@@ -218,6 +218,6 @@ box::calc_textured_sorted_model()
 		vector( -0.5, 0.5, -0.5), tcoord( 1, 1));
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(box)
+PRIMITIVE_TYPEINFO_IMPL(box)
 
 } // !namespace cvisual

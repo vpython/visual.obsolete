@@ -6,14 +6,14 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "simple_displayobject.hpp"
+#include "primitive.hpp"
 #include "util/sorted_model.hpp"
 #include "util/texture.hpp"
 #include "util/displaylist.hpp"
 
 namespace cvisual {
 
-class box : public simple_displayobject
+class box : public primitive
 {
  private:
 	double width;
@@ -53,7 +53,7 @@ class box : public simple_displayobject
 	virtual void update_cache( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
-	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
+	PRIMITIVE_TYPEINFO_DECL;
 };
 
 } // !namespace cvisual

@@ -15,14 +15,13 @@ namespace cvisual {
 
 // All implementing base classes should use this pair of macros to help with standard
 // error messages.  This allows functions to use the exact name of a virtual class.
-#define SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL virtual const std::type_info& get_typeid() const
-#define SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(base) \
+#define PRIMITIVE_TYPEINFO_DECL virtual const std::type_info& get_typeid() const
+#define PRIMITIVE_TYPEINFO_IMPL(base) \
 	const std::type_info& \
 	base::get_typeid() const \
 	{ return typeid(*this); }
 
-// TODO: Rename me to "primitive"
-class simple_displayobject : public renderable
+class primitive : public renderable
 {
  protected:
 	// The position and orientation of the body in World space.
@@ -40,16 +39,16 @@ class simple_displayobject : public renderable
  
 	// Generate a displayobject at the origin, with up pointing along +y and
 	// an axis = vector(1, 0, 0).
-	simple_displayobject();
-	simple_displayobject( const vector& pos, const vector& axis, const vector& up);
-	// See above for SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL/IMPL.
+	primitive();
+	primitive( const vector& pos, const vector& axis, const vector& up);
+	// See above for PRIMITIVE_TYPEINFO_DECL/IMPL.
 	virtual const std::type_info& get_typeid() const;
 	
 	// Used when obtaining the center of the body.
 	virtual vector get_center() const;
 
  public:
-	virtual ~simple_displayobject();
+	virtual ~primitive();
 	void set_pos( const vector& n_pos);
 	void set_axis( const vector& n_axis);
 	void set_up( const vector& n_up);

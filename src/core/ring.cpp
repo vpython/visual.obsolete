@@ -146,6 +146,6 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	return;
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(ring)
+PRIMITIVE_TYPEINFO_IMPL(ring)
 
 } // !namespace cvisual

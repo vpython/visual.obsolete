@@ -176,6 +176,6 @@ cylinder::get_center() const
 	return pos + axis*0.5;
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(cylinder)
+PRIMITIVE_TYPEINFO_IMPL(cylinder)
 
 } // !namespace cvisual

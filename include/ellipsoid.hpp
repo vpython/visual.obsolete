@@ -25,7 +25,7 @@ class ellipsoid : public sphere
  protected:
 	virtual vector get_scale();
 	virtual bool degenerate();
-	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
+	PRIMITIVE_TYPEINFO_DECL;
 };
 
 } // !namespace cvisual

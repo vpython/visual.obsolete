@@ -249,6 +249,6 @@ pmap_sphere::get_scale()
 	return vector( radius, radius, radius);
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(pmap_sphere)
+PRIMITIVE_TYPEINFO_IMPL(pmap_sphere)
 
 } // !namespace cvisual

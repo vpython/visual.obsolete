@@ -3,7 +3,7 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "simple_displayobject.hpp"
+#include "primitive.hpp"
 #include "util/errors.hpp"
 
 #include <typeinfo>
@@ -14,7 +14,7 @@
 namespace cvisual {
 
 tmatrix 
-simple_displayobject::model_world_transform() const
+primitive::model_world_transform() const
 {
 	// Performs a scale, reorientation, and translation transform in that order.
 	// ret = translation o reorientation o scale
@@ -56,7 +56,7 @@ simple_displayobject::model_world_transform() const
 
 // TODO: reevaluate this function in the context of object selection code.
 tmatrix
-simple_displayobject::world_model_transform() const
+primitive::world_model_transform() const
 {
 	// this performs the inverse of the model_world_transform - 
 	// translate backwards, reorinetation, and inverse scale.
@@ -96,35 +96,35 @@ simple_displayobject::world_model_transform() const
 
 // For oblong objects whose center is not at "pos".
 vector
-simple_displayobject::get_center() const
+primitive::get_center() const
 {
 	return pos;
 }
 
-simple_displayobject::simple_displayobject()
+primitive::primitive()
 	: axis(1,0,0), up(0,1,0), pos(0,0,0), shininess(1.0)
 {
 }
 
-simple_displayobject::simple_displayobject( 
+primitive::primitive( 
 	const vector& n_pos, const vector& n_axis, const vector& n_up)
 	: axis(n_axis), up(n_up), pos(n_pos), shininess( 1.0)
 {
 }
 
-simple_displayobject::~simple_displayobject()
+primitive::~primitive()
 {
 }
 
 void 
-simple_displayobject::set_pos( const vector& n_pos)
+primitive::set_pos( const vector& n_pos)
 {
 	model_damage();
 	pos = n_pos;
 }
 
 void 
-simple_displayobject::set_axis( const vector& n_axis)
+primitive::set_axis( const vector& n_axis)
 {
 	model_damage();
 	if (color.alpha != 1.0)
@@ -135,7 +135,7 @@ simple_displayobject::set_axis( const vector& n_axis)
 }
 
 void 
-simple_displayobject::set_up( const vector& n_up)
+primitive::set_up( const vector& n_up)
 {
 	model_damage();
 	if (color.alpha != 1.0) {
@@ -145,19 +145,19 @@ simple_displayobject::set_up( const vector& n_up)
 }
 
 void 
-simple_displayobject::set_color( const rgba& n_color)
+primitive::set_color( const rgba& n_color)
 {
 	model_damage();
 	color = n_color;
 }
 
 void
-simple_displayobject::set_shininess( const float s)
+primitive::set_shininess( const float s)
 {
 	model_damage();
 	shininess = clamp( 0.0f, s, 1.0f);
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(simple_displayobject)
+PRIMITIVE_TYPEINFO_IMPL(primitive)
 
 } // !namespace cvisual

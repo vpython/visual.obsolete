@@ -6,11 +6,11 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "simple_displayobject.hpp"
+#include "primitive.hpp"
 
 namespace cvisual {
 
-class ring : public simple_displayobject
+class ring : public primitive
 {
  private:
 	// The radius of the ring's body.  If not specified, it is set to 1/10 of
@@ -18,7 +18,7 @@ class ring : public simple_displayobject
 	double thickness;
 	// The radius of the ring's hoop.
 	double radius;
-	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
+	PRIMITIVE_TYPEINFO_DECL;
 
  public:
 	ring();

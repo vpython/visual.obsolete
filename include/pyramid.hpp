@@ -6,7 +6,7 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "simple_displayobject.hpp"
+#include "primitive.hpp"
 #include "util/displaylist.hpp"
 #include "util/sorted_model.hpp"
 
@@ -16,14 +16,14 @@ namespace cvisual {
 
 using boost::scoped_ptr;
 
-class pyramid : public simple_displayobject
+class pyramid : public primitive
 {
  private:
 	double width; // size along the z axis
 	double height; // size along the y axis.
 	static displaylist simple_model;
 	static scoped_ptr< z_sorted_model<triangle, 6> > sorted_model;
-	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
+	PRIMITIVE_TYPEINFO_DECL;
 	
  public:
 	pyramid();

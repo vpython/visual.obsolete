@@ -6,7 +6,7 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "simple_displayobject.hpp"
+#include "primitive.hpp"
 #include "util/displaylist.hpp"
 #include "util/texture.hpp"
 
@@ -14,7 +14,7 @@ namespace cvisual {
 
 /** A simple monochrome sphere. 
  */
-class sphere : public simple_displayobject
+class sphere : public primitive
 {
  private:
 	/// The radius of the sphere.
@@ -61,7 +61,7 @@ class sphere : public simple_displayobject
 	 * zero radius, or visible is false.  (overridden by the ellipsoid class). 
 	 */
 	virtual bool degenerate();
-	SIMPLE_DISPLAYOBJECT_TYPEINFO_DECL;
+	PRIMITIVE_TYPEINFO_DECL;
 };
 
 } // !namespace cvisual

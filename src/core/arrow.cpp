@@ -296,7 +296,7 @@ arrow::update_cache( const view& scene)
 	}
 }
 
-SIMPLE_DISPLAYOBJECT_TYPEINFO_IMPL(arrow)
+PRIMITIVE_TYPEINFO_IMPL(arrow)
 
 void
 arrow::effective_geometry( 
