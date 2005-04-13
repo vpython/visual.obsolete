@@ -106,6 +106,7 @@ vector::cross_b_cross_c( const vector& b, const vector& c) const throw()
 	return (this->dot( c) * b - this->dot( b) * c);
 }
 
+// Vector projections
 double 
 vector::comp( const vector& v) const throw()
 {
@@ -116,12 +117,6 @@ vector
 vector::proj( const vector& v) const throw()
 {
 	return (this->dot( v)/v.mag2() * v);
-}
-
-bool 
-vector::orthogonal( const vector& v) const throw()
-{
-	return ( this->dot( v) == 0.0);
 }
 
 double 

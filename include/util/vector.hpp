@@ -149,10 +149,6 @@ public:
 	vector
 	proj( const vector& v) const throw();
 
-	// Returns true iff this->dot( v) == 0.  Probably always return false in floating point.
-	bool
-	orthogonal( const vector& v) const throw();
-
 	// Returns the angular difference between two vectors, in radians, between 0 and pi.
 	double
 	diff_angle( const vector& v) const throw();
@@ -287,11 +283,6 @@ comp( const vector& v1, const vector& v2)
 inline vector
 proj( const vector& v1, const vector& v2)
 { return v1.proj( v2); }
-
-// Returns true iff this->dot( v) == 0.  Probably always return false.
-inline bool
-orthogonal( const vector& v1, const vector& v2)
-{ return v1.orthogonal( v2); }
 
 // Returns the angular difference between two vectors, in radians, from 0 - pi.
 inline double
