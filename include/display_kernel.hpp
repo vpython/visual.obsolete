@@ -19,6 +19,8 @@
 #include <vector>
 
 #include <boost/iterator/indirect_iterator.hpp>
+#include <boost/tuple/tuple.hpp>
+
 
 namespace cvisual {
 
@@ -199,14 +201,13 @@ public: // Public Data.
 		@param y the y-position of the mouse cursor, in pixels.
 		@param d_pixels the allowable variation in pixels to successfully score
 			a hit.
-		@return  the nearest selected object and the position that it was hit.
-           May be NULL if nothing was hit, in which case the position is 
-           undefined
+		@return  the nearest selected object, the position that it was hit, and
+			the position of the mouse cursor on the near clipping plane.
+           retval.get<0>() may be NULL if nothing was hit, in which case the 
+           positions are undefined.
 	*/
-	std::pair<shared_ptr<renderable>, vector>
+	boost::tuple<shared_ptr<renderable>, vector, vector>
 	pick( float x, float y, float d_pixels = 2.0);
-	// TODO: Modify the above to return a pair<shared_ptr<renderable>, vector>,
-	// where the vector is the nearest position on the body that was picked.
 	
 	/** Recenters the scene.  Call this function exactly once to move the visual
 	 * center of the scene to the true center of the scene.  This will work

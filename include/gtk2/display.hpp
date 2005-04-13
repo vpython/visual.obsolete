@@ -52,7 +52,6 @@ class display : public display_kernel,
 	
 	// The interface for reading keyboard presses from this display in Python.
 	atomic_queue<std::string> keys;
-	mouse_t mouse;
 	
  public:
 	display();
@@ -90,6 +89,7 @@ class display : public display_kernel,
 	void destroy();
 	
 	atomic_queue<std::string>& get_kb();
+	mouse_t& get_mouse();
 	
  private:
 	// Signal handlers for the various widgets.

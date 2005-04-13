@@ -1,6 +1,7 @@
 #include "gtk2/display.hpp"
 #include "vpython-config.h"
 #include "util/errors.hpp"
+#include "python/gil.hpp"
 
 #include <boost/thread/thread.hpp>
 #include <boost/lexical_cast.hpp>
@@ -190,6 +191,17 @@ display::add_renderable( shared_ptr<renderable> obj)
 	if (!active && visible) {
 		gui_main::add_display(this);
 	}
+}
+
+mouse_t&
+display::get_mouse()
+{
+	if (!visible)
+		visible = true;
+	if (!active)
+		gui_main::add_display( this);
+
+	return area->get_mouse();
 }
 
 void

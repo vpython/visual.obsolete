@@ -6,7 +6,10 @@
 #include "label.hpp"
 #include "font.hpp"
 #include "util/errors.hpp"
+
 #include <sstream>
+#include <iostream>
+
 #include <boost/scoped_array.hpp>
 using boost::scoped_array;
 
@@ -355,7 +358,7 @@ label::gl_render( const view& scene)
 		// The label to world orientation transform.
 		tmatrix lwt;
 		vector x_axis = scene.forward.cross( scene.up).norm();
-		lwt.x_column( x_axis);
+		lwt.x_column( scene.right /*x_axis*/);
 		lwt.y_column( scene.up);
 		lwt.z_column( -scene.forward);
 		lwt.w_column();
@@ -375,7 +378,8 @@ label::gl_render( const view& scene)
 			scene.tan_hfov_x * eye_dist * 2.0 / scene.window_width,
 			scene.tan_hfov_y * eye_dist * 2.0 / scene.window_height,
 			1);
-
+		
+		
 		// Optionally draw the line, and move the origin to the bottom left
 		// corner of the text box.		
 		if (xoffset || yoffset) {

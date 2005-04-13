@@ -10,6 +10,8 @@
 #include <boost/thread/condition.hpp>
 #include <cassert>
 
+#include "python/gil.hpp"
+
 namespace cvisual {
 
 #ifdef NDEBUG
@@ -59,7 +61,18 @@ namespace cvisual {
  }
 #endif
 
-using boost::condition;
+// using boost::condition;
+
+class condition : public boost::condition
+{
+ public:
+	template <typename Lock>
+	void wait( Lock& L)
+	{
+		python::gil_release R;
+		boost::condition::wait(L);
+	}
+};
 
 } // !namesapce cvisual
 

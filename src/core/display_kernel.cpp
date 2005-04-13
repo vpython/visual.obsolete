@@ -460,12 +460,50 @@ display_kernel::world_to_view_transform(
 	check_gl_error();
 	
 	// Finish initializing the view object.
-	geometry.camera = camera / gcf;
-	geometry.tan_hfov_x = tan_hfov_x;
-	geometry.tan_hfov_y = tan_hfov_y;
-	// The true viewing vertical direction is not the same as what is needed for
-	// gluLookAt().
-	geometry.up = forward.cross_b_cross_c(up, forward).norm();
+	if (uniform && range.x == range.y && range.x == range.z) {
+		geometry.camera = camera / gcf;
+		geometry.tan_hfov_x = tan_hfov_x;
+		geometry.tan_hfov_y = tan_hfov_y;
+		// The true viewing vertical direction is not the same as what is needed for
+		// gluLookAt().
+		geometry.up = forward.cross_b_cross_c(up, forward).norm();
+		geometry.right = geometry.forward.cross( geometry.up);
+#if 1
+	}
+	else {
+		// There has got to be a better way to do this in the non-uniform case,
+		// but lacking one, I am using this technique instead.
+		tmatrix modelview;
+		modelview.gl_modelview_get();
+		tmatrix projection;
+		projection.gl_projection_get();
+		tmatrix ctm_inv; //< The inverse of the current transformation matrix
+		inverse( ctm_inv, projection*modelview);
+		vector origin = ctm_inv.project(vector());
+		vector back_origin = ctm_inv.project( vector(0,0,1));
+		vector near_right = ctm_inv.project( vector(1,0,0));
+		vector near_top = ctm_inv.project( vector(0,1,0));
+		
+		geometry.up = (near_top-origin).norm();
+		geometry.forward = (back_origin - origin).norm();
+		geometry.right = (near_right - origin).norm();
+
+		vector near_left = ctm_inv.project( vector(-1,0,0));
+		vector far_left = ctm_inv.project( vector(-1,0,1));
+		vector far_right = ctm_inv.project( vector(1,0,1));
+		double fov_x = (far_left-near_left).diff_angle(far_right-near_right);
+		geometry.tan_hfov_x = std::tan(fov_x*0.5);
+		
+		vector near_bottom = ctm_inv.project( vector(0,-1,0));
+		vector far_top = ctm_inv.project( vector(0,1,1));
+		vector far_bottom = ctm_inv.project( vector(0,-1,1));
+		geometry.tan_hfov_y = 
+			std::tan((far_bottom-near_bottom).diff_angle(far_top-near_top)*.5);
+		double dist = std::sin((M_PI-fov_x)*0.5)*(near_right-far_right).mag()
+			/std::sin(fov_x);
+		geometry.camera = (near_left-far_left).norm()*dist + near_left;
+	}
+#endif
 }
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
@@ -503,6 +541,12 @@ display_kernel::recalc_extent(void)
 			// Compute range such that the three axes, centered at center,
 			// will contain the entire scene.
 			range = world_extent.range( center);
+			if (!range.x)
+				range.x = 1.0;
+			if (!range.y)
+				range.y = 1.0;
+			if (!range.z)
+				range.z = 1.0;
 		}
 		if (range.mag() > 1e150)
 			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
@@ -790,7 +834,7 @@ display_kernel::render_scene(void)
 	return true;
 }
 
-std::pair< shared_ptr<renderable>, vector>
+boost::tuple< shared_ptr<renderable>, vector, vector>
 display_kernel::pick( float x, float y, float d_pixels)
 {
 	using boost::scoped_array;
@@ -798,6 +842,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 	lock L(mtx);
 	shared_ptr<renderable> best_pick;
     vector pickpos;
+    vector mousepos;
 	try {
 		clear_gl_error();
 		// Notes:
@@ -917,7 +962,15 @@ display_kernel::pick( float x, float y, float d_pixels)
             modelview.matrix_addr(),
             projection.matrix_addr(),
             viewport_bounds,
-            &pickpos.x, &pickpos.y, &pickpos.z);    
+            &pickpos.x, &pickpos.y, &pickpos.z);
+        // TODO: Replace the calls to gluUnProject() with own tmatrix inverse
+        // and such for optimization
+        gluUnProject(
+        	x, window_height - y, 0,
+        	modelview.matrix_addr(),
+        	projection.matrix_addr(),
+        	viewport_bounds,
+        	&mousepos.x, &mousepos.y, &mousepos.z);
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;
@@ -925,7 +978,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
 	}
-	return std::make_pair(best_pick, pickpos);
+	return boost::make_tuple( best_pick, pickpos, mousepos);
 }
 
 void

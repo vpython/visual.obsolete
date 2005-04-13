@@ -74,6 +74,9 @@ struct view
 	vector center;
 	/// The true up direction of the scene in world space.
 	vector up;
+	/// The true right direction of the scene in world space
+	vector right;
+	
 	/// The width of the window in pixels.
 	float window_width;
 	/// The height of the window in pixels.

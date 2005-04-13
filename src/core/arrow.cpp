@@ -204,7 +204,7 @@ arrow::get_center() const
 void 
 arrow::gl_pick_render( const view&)
 {
-	if (degenerate())
+	if (degenerate() || !model)
 		return;
 	model.gl_render();
 }

@@ -22,6 +22,7 @@
 
 namespace cvisual {
 
+
 class render_surface : public Gtk::GL::DrawingArea
 {
  private:
@@ -29,15 +30,47 @@ class render_surface : public Gtk::GL::DrawingArea
 	float last_mousepos_x;
 	float last_mousepos_y;
 
-	float last_mouseclick_x;
-	float last_mouseclick_y;
-	// States of the mouse button.
-	bool left_button_down;
-	bool middle_button_down;
-	bool right_button_down;
-	bool dragging;
-	shared_ptr<renderable> last_pick;
+	// Track mouse press, release, clicks, drags, and drops.
+	struct mousebutton
+	{
+		bool down;
+		bool dragging;
+		float last_down_x;
+		float last_down_y;
+		
+		mousebutton() 
+			: down(false), dragging(false), 
+			last_down_x(-1.0f), last_down_y(-1.0f) {}
+		
+		void press( float x, float y)
+		{
+			down = true;
+			last_down_x = x;
+			last_down_y = y;
+		}
+		
+		// Returns true when a drag event should be generated, false otherwise
+		bool drag() 
+		{
+			if (down && !dragging) {
+				dragging = true;
+				return true;
+			}
+			return false;
+		}
+		
+		// Returns true for drops, false for clicks
+		bool release()
+		{
+			down = false;
+			last_down_x = -1;
+			last_down_y = -1;
+			return dragging;
+		}
+	} left_button, right_button, middle_button;
+	
 	mouse_t mouse;
+    
 	// The length of the Glib::signal_timout, in milliseconds.
 	long cycle_time;
 	// Used to disconnect the timer when resetting the time.
@@ -55,7 +88,7 @@ class render_surface : public Gtk::GL::DrawingArea
 	void gl_free();
 	
 	// Returns the mouse object, and updates some of its parameters.
-	mouse_t& get_mouse();
+	mouse_t& get_mouse() { return mouse; }
  
  protected:
 	// Low-level signal handlers

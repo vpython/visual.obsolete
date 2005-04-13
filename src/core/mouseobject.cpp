@@ -8,31 +8,83 @@
 
 namespace cvisual {
 
-
-/* Translate a button click code into a text string.
- */ 
-std::string* 
-mousebase::button_name(int buttons) 
+static void init_event( int which, shared_ptr<event> ret, const mouse_t& mouse)
 {
-	switch (buttons) {
-		case display_kernel::NONE:
-			return 0;
-		case display_kernel::LEFT:
-			return new std::string("left");
-		case display_kernel::RIGHT:
-			return new std::string("right");
-		case display_kernel::MIDDLE:
-			return new std::string("middle");
+	ret->position = mouse.position;
+	ret->pick = mouse.pick;
+	ret->pickpos = mouse.pickpos;
+	ret->cam = mouse.cam;
+	ret->ray = mouse.ray;
+	ret->set_shift( mouse.is_shift());
+	ret->set_ctrl( mouse.is_ctrl());
+	ret->set_alt( mouse.is_alt());
+	switch (which) {
+		case 1:
+			ret->set_leftdown( true);
+			break;
+		case 2:
+			ret->set_middledown( true);
+			break;
+		case 3:
+			ret->set_rightdown( true);
+			break;
 		default:
-			// This should *never* happen.
-			throw std::invalid_argument("Button type should be left, right, or middle.");
+			bool button_is_known = false;
+			assert( button_is_known == true);
 	}
 }
 
-std::string* 
-mousebase::get_buttons()
+shared_ptr<event>
+press_event( int which, const mouse_t& mouse)
 {
-	return button_name( buttons);
+	shared_ptr<event> ret( new event());;
+	ret->set_press( true);
+	init_event( which, ret, mouse);
+	return ret;
+}
+
+shared_ptr<event>
+drop_event( int which, const mouse_t& mouse)
+{
+	shared_ptr<event> ret( new event());;
+	ret->set_release( true);
+	ret->set_drop( true);
+	init_event( which, ret, mouse);
+	return ret;
+}
+
+shared_ptr<event>
+click_event( int which, const mouse_t& mouse)
+{
+	shared_ptr<event> ret( new event());;
+	ret->set_release( true);
+	ret->set_click( true);
+	init_event( which, ret, mouse);
+	return ret;
+}
+
+shared_ptr<event>
+drag_event( int which, const mouse_t& mouse)
+{
+	shared_ptr<event> ret( new event());;
+	ret->set_drag( true);
+	init_event( which, ret, mouse);
+	return ret;
+}
+
+/* Translate a button click code into a text string.
+ */ 
+std::string*
+mousebase::get_buttons() const
+{
+	if (buttons.test( left))
+		return new std::string( "left");
+	else if (buttons.test( right))
+		return new std::string( "right");
+	else if (buttons.test( middle))
+		return new std::string( "middle");
+	else
+		return 0;
 }
 
 /* Project the cursor's current location onto the plane specified by the normal 
@@ -60,51 +112,6 @@ mousebase::project2( vector normal, vector point)
 	double t = -ndc / ndr;
 	vector v = cam + ray*t;
 	return v;	
-}
-
-std::string*
-mousebase::get_press()
-{
-	if (is_press())
-		return get_buttons();
-	else
-		return 0;
-}
-
-std::string*
-mousebase::get_release()
-{
-	if (is_release())
-		return get_buttons();
-	else
-		return 0;
-}
-
-std::string*
-mousebase::get_drag()
-{
-	if (is_drag())
-		return get_buttons();
-	else
-		return 0;
-}
-
-std::string*
-mousebase::get_drop()
-{
-	if (is_drop())
-		return get_buttons();
-	else
-		return 0;
-}
-
-std::string*
-mousebase::get_click()
-{
-	if (is_click())
-		return get_buttons();
-	else
-		return 0;
 }
 
 shared_ptr<renderable>
@@ -190,8 +197,5 @@ mouse_t::push_event( shared_ptr<event> e)
 		click_count++;
 	events.push( e);
 }
-
-
-
 
 } // !namespace visual

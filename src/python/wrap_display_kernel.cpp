@@ -8,6 +8,7 @@
 #include "display.hpp"
 #include "mouseobject.hpp"
 #include "util/errors.hpp"
+#include "python/gil.hpp"
 
 #include <boost/python/class.hpp>
 #include <boost/python/to_python_converter.hpp>
@@ -35,26 +36,23 @@ static void
 force_py_exit(void)
 {
 	VPYTHON_NOTE("Inserting the pending shutdown call...");
-	PyGILState_STATE state = PyGILState_Ensure();
-	Py_AddPendingCall( &py_quit, 0);
-	PyGILState_Release(state);
+	{
+		python::gil_lock L;
+		Py_AddPendingCall( &py_quit, 0);
+	}
 	VPYTHON_NOTE( "The pending shutdown call has been entered.");
 }
 
 static void
 wrap_shutdown(void)
 {
-	Py_BEGIN_ALLOW_THREADS
 	gui_main::shutdown();
-	Py_END_ALLOW_THREADS
 }
 
 static void
 wrap_waitclosed(void)
 {
-	Py_BEGIN_ALLOW_THREADS
 	gui_main::waitclosed();
-	Py_END_ALLOW_THREADS
 }
 
 namespace py = boost::python;
@@ -185,6 +183,32 @@ class py_display_kernel : public display_kernel, public SigC::Object
 };
 
 namespace {
+
+boost::python::object
+get_buttons( const mousebase* This)
+{
+	std::string* ret = This->get_buttons();
+	if (ret) {
+		boost::python::object py_ret( *ret);
+		delete ret;
+		return py_ret;
+	}
+	else {
+		return boost::python::object();
+	}
+}
+
+template <bool (mousebase:: *f)(void) const>
+boost::python::object
+test_state( const mousebase* This)
+{
+	if ((This->*f)()) {
+		return get_buttons(This);
+	}
+	else
+		return boost::python::object();
+}
+
 using namespace boost::python;
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( pick_overloads, display_kernel::pick, 
 	2, 3)
@@ -280,6 +304,8 @@ wrap_display_kernel(void)
 		.add_property( "visible", &display::get_visible, &display::set_visible)
 		.add_property( "kb", py::make_function(
 			&display::get_kb, py::return_internal_reference<>()))
+		.add_property( "mouse", py::make_function(
+			&display::get_mouse, py::return_internal_reference<>()))
 		;
 	
 	py::to_python_converter<
@@ -315,18 +341,12 @@ wrap_display_kernel(void)
 		.add_property( "pickpos", &mousebase::get_pickpos)
 		.add_property( "camera", &mousebase::get_camera)
 		.add_property( "ray", &mousebase::get_ray)
-		.add_property( "button", make_function(
-			&mousebase::get_buttons, return_value_policy<manage_new_object>()))
-		.add_property( "press",  make_function(
-			&mousebase::get_press, return_value_policy<manage_new_object>()))
-		.add_property( "release",  make_function(
-			&mousebase::get_release, return_value_policy<manage_new_object>()))
-		.add_property( "click",  make_function(
-			&mousebase::get_click, return_value_policy<manage_new_object>()))
-		.add_property( "drag",  make_function(
-			&mousebase::get_drag, return_value_policy<manage_new_object>()))
-		.add_property( "drop",  make_function(
-			&mousebase::get_drop, return_value_policy<manage_new_object>()))
+		.add_property( "button", &get_buttons)
+		.add_property( "press", &test_state<&mousebase::is_press>)
+		.add_property( "release", &test_state<&mousebase::is_release>)
+		.add_property( "click", &test_state<&mousebase::is_click>)
+		.add_property( "drag", &test_state<&mousebase::is_drag>)
+		.add_property( "drop", &test_state<&mousebase::is_drop>)
 		.add_property( "shift", &mousebase::is_shift)
 		.add_property( "alt", &mousebase::is_alt)
 		.add_property( "ctrl", &mousebase::is_ctrl)

@@ -22,6 +22,7 @@ view::view( const view& other, const tmatrix& wft)
 	forward( wft.times_v(forward)),
 	center( wft * other.center),
 	up( wft.times_v(other.up)),
+	right( wft.times_v(other.right)),
 	window_width( other.window_width),
 	window_height( other.window_height),
 	forward_changed( true),
@@ -30,6 +31,9 @@ view::view( const view& other, const tmatrix& wft)
 	lod_adjust( other.lod_adjust),
 	anaglyph( other.anaglyph),
 	coloranaglyph( other.coloranaglyph),
+	// TODO: tan_hfov_x and tan_hfov_y must be revisited in the face of
+	// nonuniform scaling.  It may be more appropriate to describe the viewing
+	// frustum in a different way entirely.
 	tan_hfov_x( other.tan_hfov_x),
 	tan_hfov_y( other.tan_hfov_y),
 	screen_objects( z_comparator( forward))

@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <cassert>
 
 #include <boost/lexical_cast.hpp>
 
@@ -32,12 +33,6 @@ namespace {
 render_surface::render_surface( display_kernel& _core, bool activestereo)
 	: last_mousepos_x(0),
 	last_mousepos_y(0),
-	last_mouseclick_x(0),
-	last_mouseclick_y(0),
-	left_button_down(false),
-	middle_button_down(false),
-	right_button_down(false),
-	dragging(false),
 	cycle_time(30),
 	core( _core)
 {
@@ -135,8 +130,8 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 	if (event->state & GDK_BUTTON3_MASK) {
 		core.report_mouse_motion( dx, dy, display_kernel::RIGHT);
 		buttondown = true;
-	}
-	else if (!buttondown) {
+	}	
+	if (!buttondown) {
 		core.report_mouse_motion( dx, dy, display_kernel::NONE);
 	}
 	mouse.set_shift( event->state & GDK_SHIFT_MASK);
@@ -145,6 +140,14 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 	last_mousepos_x = static_cast<float>(event->x);
 	last_mousepos_y = static_cast<float>(event->y);
 	mouse.cam = core.calc_camera();
+	
+	
+	if (left_button.drag())
+		mouse.push_event( drag_event( 1, mouse));
+	if (middle_button.drag())
+		mouse.push_event( drag_event( 2, mouse));
+	if (right_button.drag())
+		mouse.push_event( drag_event( 3, mouse));
 	return true;
 }
 
@@ -187,10 +190,13 @@ render_surface::forward_render_scene()
 {
 	Glib::Timer time;
 	bool sat = core.render_scene();
-	double elapsed = time.elapsed();
-	
 	if (!sat)
 		return sat;
+	// TODO: Figure out an optimzation to avoid performing this extra pick
+	// rendering cycle when the user isn't looking at scene.mouse[.{pick,pickpos,pos}]
+	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
+		core.pick( last_mousepos_x, last_mousepos_y);
+	double elapsed = time.elapsed();
 	
 	/* Scheduling logic for the rendering pulse.  This code is intended to make
 	 * the rendering loop a better citizen with regard to sharing CPU time with
@@ -236,19 +242,44 @@ render_surface::on_expose_event( GdkEventExpose*)
 	return true;
 }
 
+
 bool 
 render_surface::on_button_press_event( GdkEventButton* event)
 {
-	last_mouseclick_x = event->x;
-	last_mouseclick_y = event->y;
-	
-	
+	if (event->type == GDK_BUTTON_RELEASE)
+		// Ignore erronious condition
+		return true;
+	if (event->button > 3)
+		// Ignore extra buttons (such as scroll wheel and forward/back)
+		return true;
+	mouse.set_shift( event->state & GDK_SHIFT_MASK);
+	mouse.set_ctrl( event->state & GDK_CONTROL_MASK);
+	mouse.set_alt( event->state & GDK_MOD1_MASK);
+	switch (event->button) {
+		case 1: // Left
+			left_button.press( event->x, event->y);
+			break;
+		case 2: // Middle
+			middle_button.press( event->x, event->y);
+			break;
+		case 3: // Right
+			right_button.press( event->x, event->y);
+			break;
+		default:
+			// Captured above
+			break;
+	}
+	// Generate a press event.
+	mouse.push_event( press_event( event->button, mouse));
 	return true;
 }
+
+
 
 bool 
 render_surface::on_button_release_event( GdkEventButton* event)
 {
+# if 0
 	// Only handles the signal if:
 	// 	- something has connected to object_picked.
 	//  - the left mouse button is the source.
@@ -257,11 +288,41 @@ render_surface::on_button_release_event( GdkEventButton* event)
 		&& event->button == 1
 		&& fabs(last_mouseclick_x - event->x) < 4
 		&& fabs(last_mouseclick_y - event->y) < 4) {
-		std::pair< shared_ptr<renderable>, vector> pick
+		boost::tuple< shared_ptr<renderable>, vector, vector> pick
 			= core.pick( event->x, event->y);
-		if (pick.first)
-			object_clicked( pick.first, pick.second);
+		if (pick.get<0>())
+			object_clicked( pick.get<0>(), pick.get<1>());
 	}
+	return true;
+#endif
+	if (event->type != GDK_BUTTON_RELEASE)
+		// Ignore erronious condition
+		return true;
+	if (event->button > 3)
+		// Ignore extra buttons (such as scroll wheel and forward/back)
+		return true;
+	mouse.set_shift( event->state & GDK_SHIFT_MASK);
+	mouse.set_ctrl( event->state & GDK_CONTROL_MASK);
+	mouse.set_alt( event->state & GDK_MOD1_MASK);
+	bool drop = false;
+	switch (event->button) {
+		case 1:
+			drop = left_button.release();
+			break;
+		case 2:
+			drop = middle_button.release();
+			break;
+		case 3:
+			drop = right_button.release();
+			break;
+		default:
+			// Captured above
+			break;
+	}
+	if (drop)
+		mouse.push_event( drop_event( event->button, mouse));
+	else
+		mouse.push_event( click_event( event->button, mouse));
 	return true;
 }
 
@@ -284,6 +345,17 @@ render_surface::gl_swap_buffers()
 {
 	get_gl_window()->swap_buffers();
 }
+
+#if 0
+mouse_t&
+render_surface::get_mouse()
+{
+    watching_mouse = true;
+    // Set a condition variable to wait
+}
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
 
 basic_app::_init::_init()
 {
