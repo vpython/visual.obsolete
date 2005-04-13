@@ -22,3 +22,6 @@ bounce_test
 convex_test
 curve_test
 sleep_test
+ellipsoid_async_test
+matrix_inverse_bench
+win32_sleep_test
