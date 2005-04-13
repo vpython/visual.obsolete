@@ -48,7 +48,7 @@ EnsurePythonVersion( 2, 2)
 base = Environment( CCFLAGS=['-pipe'],
 	LINKFLAGS=['-Wl,--warn-once'],
 	ENV = os.environ,
-	CPPPATH='include')
+	CPPPATH=['include', '/usr/include/python2.3'])
 # Add flags for debugging symbols and optimization.
 AddDebugFlags( base)
 # Crank up the warnings
@@ -66,7 +66,7 @@ if sys.platform.find('linux') >= 0:
 AddThreadingFlags( core)
 
 core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2')
-core.Append( LIBS='gle')
+core.Append( LIBS=['gle', 'python2.3'])
 
 srcs = [ "src/core/arrow.cpp", 
 	"src/core/util/displaylist.cpp",
@@ -79,7 +79,6 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/util/vector.cpp",
 	"src/core/util/clipping_plane.cpp",
 	"src/core/util/tmatrix.cpp",
-	"src/core/util/checksum.cpp",
 	"src/core/util/gl_free.cpp",
 	"src/core/axial.cpp",
 	"src/core/box.cpp",
