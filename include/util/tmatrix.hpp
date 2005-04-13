@@ -24,7 +24,7 @@ struct vertex
 	inline vertex( const vector& v, double _w = 1.0)
 		: x( v.x), y(v.y), z(v.z), w(_w) {}
 	inline operator vector() const
-	{ return vector( x/w, y/w, z/w); }
+	{ double w_i = 1.0/w; return vector( x*w_i, y*w_i, z*w_i); }
 	
 	inline void
 	gl_render() const
@@ -40,7 +40,12 @@ private:
 	  eliminating a reformatting penalty.
 	*/
 	double M[4][4];
+		
+    friend void inverse( tmatrix& ret, const tmatrix& arg);
 public:
+	/** Returns the address of the first element in the matrix.  Ideally, this
+	 * funciton should not exist.
+	 */
     inline double* matrix_addr() { return M[0]; }
 
 	/** Create a new tmatrix, initialized to the identity matrix. */
@@ -158,8 +163,8 @@ public:
 		M[3][3]=w;
 	}
 
-	/** Projects v to o using the current tmatrix values. */
-	void project(const vector& v, vertex& o) const throw();
+	/** Projects v using the current tmatrix values. */
+	vertex project(const vector& v) const throw();
 
 	/** An alias for operator*= */
 	void concat(const tmatrix& A, const tmatrix& B) throw();
@@ -204,7 +209,10 @@ public:
 	tmatrix& gl_texture_get();
 	tmatrix& gl_color_get();
 	tmatrix& gl_projection_get();
-    friend void inverse( tmatrix& ret, const tmatrix& arg);
+	/**
+	 * Dump this matrix to a formatted string.
+	 */
+	std::string to_string() const;
 };
 
 // Compute the inverse of arg, and store it in ret.

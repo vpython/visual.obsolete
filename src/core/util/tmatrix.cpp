@@ -6,6 +6,7 @@
 
 #include "util/tmatrix.hpp"
 #include <cmath>
+#include <sstream>
 
 namespace cvisual {
 
@@ -166,6 +167,7 @@ tmatrix::operator*( const tmatrix& o) const
 	return ret;	
 }
 
+#if 0
 // TODO: Reverse address me
 void 
 tmatrix::invert_ortho(const tmatrix& A) throw()
@@ -185,6 +187,7 @@ tmatrix::invert_ortho(const tmatrix& A) throw()
 			 );
 	w_row();
 }
+#endif
 
 vector 
 tmatrix::times_inv( const vector& v, double w) const throw()
@@ -219,13 +222,15 @@ tmatrix::operator*( const vector& v) const throw()
 		);
 }
 
-void
-tmatrix::project( const vector& v, vertex& o) const throw()
+vertex
+tmatrix::project( const vector& v) const throw()
 {
+	vertex o;
 	o.x = M[0][0]*v.x + M[1][0]*v.y + M[2][0]*v.z + M[3][0];
 	o.y = M[0][1]*v.x + M[1][1]*v.y + M[2][1]*v.z + M[3][1];
 	o.z = M[0][2]*v.x + M[1][2]*v.y + M[2][2]*v.z + M[3][2];
 	o.w = M[0][3]*v.x + M[1][3]*v.y + M[2][3]*v.z + M[3][3];
+	return o;
 }
 
 void
@@ -294,6 +299,17 @@ tmatrix::gl_color_get()
 		for (size_t j = 0; j < 4; ++j)
 			M[i][j] = static_cast<double>(m[i][j]);
 	return *this;
+}
+
+std::string
+tmatrix::to_string() const
+{
+	std::ostringstream formatter;
+	formatter << "| " << M[0][0] << " " << M[1][0] << " " << M[2][0] << " " << M[3][0] << "|\n";
+	formatter << "| " << M[0][1] << " " << M[1][1] << " " << M[2][1] << " " << M[3][1] << "|\n";
+	formatter << "| " << M[0][2] << " " << M[1][2] << " " << M[2][2] << " " << M[3][2] << "|\n";
+	formatter << "| " << M[0][3] << " " << M[1][3] << " " << M[2][3] << " " << M[3][3] << "|\n";
+	return formatter.str();
 }
 
 gl_matrix_stackguard::gl_matrix_stackguard()
