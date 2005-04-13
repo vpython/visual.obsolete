@@ -3,9 +3,9 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include <boost/python/detail/wrap_python.hpp>
+#include <boost/crc.hpp>
 
 #include "util/errors.hpp"
-#include "util/checksum.hpp"
 
 #include "python/slice.hpp"
 #include "python/curve.hpp"
@@ -491,27 +491,10 @@ curve::closed_path() const
 long
 curve::checksum( size_t begin, size_t end)
 {
-	using cvisual::checksum;
-	long ret = 0;
-	
-	checksum( ret, &radius);
-	const double* pos_i = index( pos, begin);
-	const double* pos_end = index( pos, end);
-	while (pos_i < pos_end) {
-		checksum( ret, pos_i);
-		checksum( ret, pos_i+1);
-		checksum( ret, pos_i+2);
-		pos_i += 3;
-	}
-	const float* color_i = findex( color, begin);
-	const float* color_end = findex( color, end);
-	while (color_i < color_end) {
-		checksum( ret, color_i);
-		checksum( ret, color_i+1);
-		checksum( ret, color_i+2);
-		color_i += 3;
-	}
-	return ret;
+	boost::crc_32_type engine;
+	engine.process_block( index( pos, begin), index( pos, end));
+	engine.process_block( findex( color, begin), findex( color, end));
+	return engine.checksum();
 }
 
 vector

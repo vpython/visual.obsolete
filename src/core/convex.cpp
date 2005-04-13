@@ -4,7 +4,8 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "convex.hpp"
-#include "util/checksum.hpp"
+
+#include <boost/crc.hpp>
 
 namespace cvisual {
 
@@ -13,14 +14,9 @@ convex::jitter_table convex::jitter;
 long
 convex::checksum() const
 {
-	using cvisual::checksum;
-	long ret = 0;
-	for (std::vector<vector>::const_iterator i = pos.begin(); i != pos.end(); ++i) {
-		checksum( ret, &i->x);
-		checksum( ret, &i->y);
-		checksum( ret, &i->z);
-	}
-	return ret;
+	boost::crc_32_type engine;
+	engine.process_block( &pos.begin()->x, &pos.end()->x);
+	return engine.checksum();
 }
 
 bool
@@ -33,24 +29,11 @@ void
 convex::recalc()
 {
 	hull.clear();
-#if 0
-	const double* pos_i = index( pos, 0);
-	// A face from the first, second, and third vectors.
-	hull.push_back( face( vector(pos_i), vector(pos_i+3), vector(pos_i+3*2)));
-	// The reverse face from the first, third, and second vectors.
-	hull.push_back( face( vector(pos_i), vector(pos_i+3*2), vector(pos_i+3)));
-	// The remainder of the possible faces.
-	for (int i = 3; i < count; ++i) {
-		addpoint( i, vector(pos_i + i*3));
-	}
-#else
 	hull.push_back( face( pos[0], pos[1], pos[2]));
 	hull.push_back( face( pos[0], pos[2], pos[1]));
 	for (size_t i = 3; i < pos.size(); ++i) {
 		add_point( i, pos[i]);
 	}
-
-#endif
 
 	last_checksum = checksum();
 }

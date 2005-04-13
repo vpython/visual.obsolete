@@ -4,9 +4,10 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "python/convex.hpp"
-#include "util/checksum.hpp"
 #include "python/slice.hpp"
+
 #include <boost/python/extract.hpp>
+#include <boost/crc.hpp>
 
 namespace cvisual { namespace python {
 
@@ -29,18 +30,9 @@ convex::jitter_table convex::jitter;
 long
 convex::checksum() const
 {
-	using cvisual::checksum;
-	long ret = 0;
-	
-	const double* pos_i = index( pos, 0);
-	const double* pos_end = index( pos, count);
-	while (pos_i < pos_end) {
-		checksum( ret, pos_i);
-		checksum( ret, pos_i+1);
-		checksum( ret, pos_i+2);
-		++pos_i;
-	}
-	return ret;
+	boost::crc_32_type engine;
+	engine.process_block( index( pos, 0), index( pos, count));
+	return engine.checksum();
 }
 
 bool

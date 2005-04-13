@@ -5,7 +5,8 @@
 
 #include "curve.hpp"
 #include "util/errors.hpp"
-#include "util/checksum.hpp"
+
+#include <boost/crc.hpp>
 
 #include <iostream>
 
@@ -54,23 +55,10 @@ curve::closed_path() const
 long
 curve::checksum( size_t begin, size_t end)
 {
-	using cvisual::checksum;
-	long ret = 0;
-	
-	checksum( ret, &radius);
-	for (std::vector<rgb>::const_iterator i = color.begin()+1+begin; 
-			i < color.begin()+1+end; ++i) {
-		checksum( ret, &i->red);
-		checksum( ret, &i->green);
-		checksum( ret, &i->blue);
-	}
-	for (std::vector<vector>::const_iterator i = pos.begin()+begin; 
-			i < pos.begin()+end+2; ++i) {
-		checksum( ret, &i->x);
-		checksum( ret, &i->y);
-		checksum( ret, &i->z);
-	}
-	return ret;
+	boost::crc_32_type engine;
+	engine.process_block( &(color.begin()+1+begin)->red, &(color.begin()+1+end)->red);
+	engine.process_block( &(pos.begin()+begin)->x, &(pos.begin()+end+2)->x);
+	return engine.checksum();
 }
 
 curve::curve()
