@@ -111,6 +111,7 @@ class mouse_t : public mousebase
 	int click_count; // number of queued events which are left clicks
 	
  public:
+	mouse_t() : click_count(0) {}
 	mutex mtx;
 	
 	// The following member functions are synchronized - no additional locking
