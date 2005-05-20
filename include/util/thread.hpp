@@ -67,7 +67,7 @@ class condition : public boost::condition
 {
  public:
 	template <typename Lock>
-	void wait( Lock& L)
+	void py_wait( Lock& L)
 	{
 		python::gil_release R;
 		boost::condition::wait(L);
