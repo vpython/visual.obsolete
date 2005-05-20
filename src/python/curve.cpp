@@ -527,9 +527,12 @@ curve::grow_extent( extent& world)
 {
 	const double* pos_i = index(pos, 0);
 	const double* pos_end = index( pos, count);
-	for ( ; pos_i < pos_end; pos_i += 3) {
-		world.add_point( vector(pos_i));
-	}
+	if (radius == 0.0)
+		for ( ; pos_i < pos_end; pos_i += 3)
+			world.add_point( vector(pos_i));
+	else
+		for ( ; pos_i < pos_end; pos_i += 3)
+			world.add_sphere( vector(pos_i), radius);
 }
 
 void
