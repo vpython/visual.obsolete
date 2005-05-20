@@ -2,6 +2,7 @@
 #include "vpython-config.h"
 #include "util/errors.hpp"
 #include "python/gil.hpp"
+#include "util/gl_free.hpp"
 
 #include <boost/thread/thread.hpp>
 #include <boost/lexical_cast.hpp>
@@ -11,6 +12,7 @@ using boost::lexical_cast;
 #include <gdkmm/pixbuf.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/radiobutton.h>
+#include <gtkmm/main.h>
 #include <gdk/gdkkeysyms.h>
 
 #ifdef VPYTHON_USE_GTKMM_24
@@ -193,15 +195,19 @@ display::add_renderable( shared_ptr<renderable> obj)
 	}
 }
 
-mouse_t&
+mouse_t*
 display::get_mouse()
 {
 	if (!visible)
 		visible = true;
 	if (!active)
 		gui_main::add_display( this);
-
-	return area->get_mouse();
+	
+	if (!area) {
+		return 0;
+	}
+	else
+		return &area->get_mouse();
 }
 
 void
@@ -327,6 +333,8 @@ display::create()
 	active = true;
 	area->grab_focus();
 	assert( area->can_focus());
+	while (Gtk::Main::events_pending())
+		Gtk::Main::iteration();
 }
 
 void
@@ -520,7 +528,8 @@ condition* gui_main::init_signal = 0;
 
 
 gui_main::gui_main()
-	: kit( 0, 0), caller( 0), returned( false), waiting_allclosed(false), thread_exited(false)
+	: kit( 0, 0), caller( 0), returned( false), waiting_allclosed(false), 
+	thread_exited(false), shutting_down( false)
 {
 	Gtk::GL::init( 0, 0);
 	if (!Glib::thread_supported())
@@ -605,13 +614,16 @@ gui_main::add_display( display* d)
 {
 	init_thread();
 	lock L(self->call_lock);
+	if (self->shutting_down) {
+		return;
+	}
 	VPYTHON_NOTE( std::string("Adding new display object at address ") 
 		+ lexical_cast<std::string>(d));
 	self->caller = d;
 	self->returned = false;
 	self->signal_add_display();
 	while (!self->returned)
-		self->call_complete.wait(L);
+		self->call_complete.py_wait(L);
 	self->caller = 0;
 }
 
@@ -637,7 +649,7 @@ gui_main::remove_display( display* d)
 	self->returned = false;
 	self->signal_remove_display();
 	while (!self->returned)
-		self->call_complete.wait(L);
+		self->call_complete.py_wait(L);
 	self->caller = 0;
 }
 
@@ -663,13 +675,14 @@ gui_main::shutdown()
 	self->returned = false;
 	self->signal_shutdown();
 	while (!self->returned)
-		self->call_complete.wait(L);
+		self->call_complete.py_wait(L);
 }
 
 void
 gui_main::shutdown_impl()
 {
 	lock L(call_lock);
+	shutting_down = true;
 	for (std::list<display*>::iterator i = displays.begin(); i != displays.end(); ++i) {
 		(*i)->destroy();
 	}
@@ -697,6 +710,8 @@ gui_main::quit()
 {
 	assert( self != 0);
 	lock L(self->call_lock);
+	self->shutting_down = true;
+	on_gl_free();
 	for (std::list<display*>::iterator i = self->displays.begin(); 
 			i != self->displays.end(); ++i) {
 		(*i)->destroy();

@@ -89,7 +89,7 @@ class display : public display_kernel,
 	void destroy();
 	
 	atomic_queue<std::string>& get_kb();
-	mouse_t& get_mouse();
+	mouse_t* get_mouse();
 	
  private:
 	// Signal handlers for the various widgets.
@@ -127,6 +127,7 @@ class gui_main : public SigC::Object
 	volatile bool returned;
 	volatile bool waiting_allclosed;
 	volatile bool thread_exited;
+	volatile bool shutting_down;
 	
 	std::list<display*> displays;
 	
