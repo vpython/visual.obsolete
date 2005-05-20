@@ -4,6 +4,7 @@
 
 #include "mouseobject.hpp"
 #include "display_kernel.hpp"
+#include "python/gil.hpp"
 #include <stdexcept>
 
 namespace cvisual {
@@ -173,6 +174,7 @@ mouse_t::num_clicks() const
 shared_ptr<event>
 mouse_t::pop_event()
 {
+	python::gil_release R;
 	shared_ptr<event> ret = events.pop();
 	if (ret->is_click())
 		click_count--;
@@ -182,6 +184,7 @@ mouse_t::pop_event()
 shared_ptr<event>
 mouse_t::pop_click()
 {
+	python::gil_release R;
 	shared_ptr<event> ret = events.pop();
 	while (!ret->is_click()) {
 		ret = events.pop();
