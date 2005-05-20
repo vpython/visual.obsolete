@@ -63,7 +63,7 @@ box::gl_pick_render( const view& scene)
 	vector view_pos = pos * scene.gcf;
 	glTranslated( view_pos.x, view_pos.y, view_pos.z);
 	model_world_transform().gl_mult();
-	glScaled( axis.mag() * gcf, width * gcf, height * gcf);
+	glScaled( axis.mag() * gcf, height * gcf, width * gcf);
 	simple_model.gl_render();
 }
 
