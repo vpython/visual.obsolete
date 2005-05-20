@@ -39,7 +39,7 @@ displaylist::gl_compile_begin()
 {
 	if (!handle) {
 		handle = shared_ptr<unsigned int>( 
-			new unsigned int, &displaylist::deleter);
+			new unsigned int(), &displaylist::deleter);
 		*handle = glGenLists(1);
 		VPYTHON_NOTE( "Allocated displaylist number " 
 			+ lexical_cast<std::string>(*handle));
@@ -66,10 +66,10 @@ displaylist::gl_free()
 {
 	if (handle && *handle) {
 		VPYTHON_NOTE( "Deleting displaylist number " 
-			+ lexical_cast<std::string>(handle));
+			+ lexical_cast<std::string>(*handle));
 		glDeleteLists( *handle, 1);
+		*handle = 0;
 	}
-	*handle = 0;
 }
 
 } // !namespace cvisual
