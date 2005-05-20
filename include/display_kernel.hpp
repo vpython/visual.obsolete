@@ -17,6 +17,8 @@
 #include <sigc++/signal.h>
 #include <list>
 #include <vector>
+#include <set>
+#include <string>
 
 #include <boost/iterator/indirect_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -33,6 +35,7 @@ using boost::indirect_iterator;
 class display_kernel
 {
  private: // Private data
+ 	static shared_ptr<std::set<std::string> > extensions;
 	mutable mutex mtx;
 	
 	float window_width; ///< The last reported width of the window.
@@ -54,7 +57,7 @@ class display_kernel
 
 	double fov; ///< The field of view, in radians
 	bool autoscale; ///< True if Visual should scale the camera's position automatically.
-	/** True if Visual should automatically center the center of the scene. */
+	/** True if Visual should automatically reposition the center of the scene. */
 	bool autocenter;
 	/** True if the autoscaler should compute uniform axes. */
 	bool uniform;

@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <algorithm>
+#include <iterator>
 #include <sstream>
 #include <iostream>
 #include <boost/scoped_array.hpp>
@@ -18,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 
 namespace cvisual {
+
+shared_ptr<std::set<std::string> > display_kernel::extensions;
 
 void 
 display_kernel::enable_lights()
@@ -279,6 +282,14 @@ display_kernel::report_realize()
 	lock L(mtx);
 	gl_begin();
 	clear_gl_error();
+	if (!extensions) {
+		using namespace std;
+		VPYTHON_NOTE( "Querying the list of OpenGL extensions.");
+		extensions.reset( new set<string>());
+		istringstream strm( string( (const char*)(glGetString( GL_EXTENSIONS))));
+		copy( istream_iterator<string>(strm), istream_iterator<string>(), 
+			inserter( *extensions, extensions->begin()));
+	}
 	
 	// Those features of OpenGL that are always used are set up here.	
 	// Depth buffer properties
@@ -298,7 +309,10 @@ display_kernel::report_realize()
 	glEnable( GL_COLOR_MATERIAL);
 	
 	// FSAA.  Doesn't seem to have much of an effect on my TNT2 card.  Grrr.
-	glEnable( GL_MULTISAMPLE_ARB);
+	if (extensions->find( "GL_ARB_multisample") != extensions->end()) {
+		VPYTHON_NOTE( "Using GL_ARB_multisample extension.");
+		glEnable( GL_MULTISAMPLE_ARB);
+	}
 
 	check_gl_error();
 	gl_end();
