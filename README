@@ -24,7 +24,8 @@ run	A script that sets up environment variables to use the target libs and
 	plugin.  ex: './run python2.3' will place site-packages/ in sys.path.
 bin/  
 	Programs are built in-place here.  To run any of the tests, prefix the
-	command with the run script, like: './run bin/sphere_texture_test'
+	command with the run script, like: './run bin/sphere_texture_test'.
+	For a python program, say "./run python bin/bounce2.py'.
 lib/
 	Target libraries are built in-place here.
 site-packages/
