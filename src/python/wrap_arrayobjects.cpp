@@ -18,7 +18,7 @@ namespace cvisual {
 namespace {
 using namespace boost::python;
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( faces_smooth_shade, 
-	python::faces::smooth_shade, 0, 1);
+	python::faces::smooth_shade, 0, 1)
 }
 
 void
