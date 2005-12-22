@@ -7,10 +7,10 @@ namespace cvisual { namespace python {
 
 class gil_release
 {
-	PyThreadState *save;
+	PyThreadState *state;
  public:
-	inline gil_release() : save(PyEval_SaveThread()) {}
-	inline ~gil_release() { PyEval_RestoreThread(save); }
+	inline gil_release() : state( PyEval_SaveThread()) {}
+	inline ~gil_release() { PyEval_RestoreThread(state); }
 };
 
 class gil_lock
