@@ -126,7 +126,7 @@ curve::gl_render( const view& scene)
 		first = false;
 	}
 	
-	size_t size = std::min(256u, true_size);
+	size_t size = std::min( size_t(256), true_size);
 	size_t begin = 0;
 	cache_iterator c = cache.begin();
 	const bool do_thinline = (radius == 0.0);
