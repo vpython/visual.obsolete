@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+
+<HEAD>
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
+
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+
+<TITLE> Description of Objects in VPython</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="#ffffff">
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="label.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="options.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+  <b class="navlabel">Previous:</b> <a class="sectref" HREF="label.html">The label 
+  Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
+  <b class="navlabel">Next:</b> <a class="sectref" HREF="faces.html">The faces 
+  object</A> <br>
+
+  <hr>
+
+</DIV>
+
+<DIV>
+
+  <H1 CLASS="Heading-1"> <font color="#0000A0">Composite Objects with frame</font></H1>
+
+</DIV>
+
+<DIV>
+
+<P CLASS="Normal">
+
+You can group objects together to make a composite object that can be moved and rotated as though it were a single object. Create a frame object, and associate objects with that frame:</P>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+f = frame()</H2>
+
+<P CLASS="program">
+
+cylinder(frame=f, pos=(0,0,0), radius=0.1, length=1, color=color.cyan)</P>
+
+<P CLASS="program">
+
+sphere(frame=f, pos=(1,0,0), radius=0.2, color=color.red)</P>
+
+<P CLASS="program">
+
+f.axis = (0,1,0)</P>
+
+<P CLASS="program">
+
+f.pos = (-1,0,0)</P>
+
+    <P CLASS="Normal"> By default, frame() has a position of (0,0,0) and axis 
+      in the x direction (1,0,0). The cylinder and sphere are created within the 
+      frame. When any of the frame attributes are changed (<span class="attribute">pos</span>, 
+      <span class="attribute">x</span>, <span class="attribute">y</span>, <span class="attribute">z</span>, 
+      <span class="attribute">axis</span>, or <span class="attribute">up</span>), 
+      the composite object is reoriented and repositioned.</P>
+    <P CLASS="Normal">Another frame attribute is <span class="attribute">objects</span>, 
+      which is a list of currently visible objects contained in the frame (the 
+      list does not include objects that are currently invisible). If you want 
+      to make all the objects in a frame be red, do the following (assume the 
+      frame is named f):</P>
+    <div> 
+      <h2 class="program0"> for obj in f.objects:<br>
+        obj.color = color.red</h2>
+      </div>
+
+    <P CLASS="Normal">If you use this method to make all the objects invisible, 
+      the f.objects list will be empty. If you need a list containing all the 
+      objects, both visible and invisible, you need to maintain your own list 
+      of objects.</P>
+    <P CLASS="Normal"> If <span class="program0"><font color="#FF0000">ball</font></span> 
+      is an object in a frame, <font color="#FF0000">ball.pos</font> is the position 
+      local to the frame, not the actual position in &quot;world space&quot;. 
+      Here is a routine that will calculate the position of a vector such as <font color="#FF0000">ball.pos</font> 
+      in world space:</P>
+    <div> 
+      <h2 class="program0"> def world_space_pos(frame, local):<br>
+        &quot;&quot;&quot;Returns the position of local in world space.&quot;&quot;&quot;<br>
+        x_axis = norm(frame.axis)<br>
+        z_axis = norm(cross(frame.axis, frame.up))<br>
+        y_axis = norm(cross(z_axis, x_axis))<br>
+        return frame.pos+local.x*x_axis+local.y*y_axis+local.z*z_axis<br>
+      </h2>
+      <DIV>
+        <DIV></DIV>
+      </DIV>
+    </div>
+    </DIV>
+
+</DIV>
+
+<DIV> </DIV>
+
+<hr>
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="label.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="options.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+  <b class="navlabel">Previous:</b> <a class="sectref" href="label.html">The label 
+  Object</a><b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
+  <b class="navlabel">Next:</b> <a class="sectref" href="faces.html">The faces 
+  object</a><br>
+
+  <hr>
+
+</DIV>
+
+</BODY>
+
+</HTML>
+

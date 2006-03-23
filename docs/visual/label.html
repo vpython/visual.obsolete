@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> Description of Objects in VPython</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+      <td><A HREF="convex.html"><img src="icons/previous.gif" border="0" height="32"
+  alt="Previous Page" width="32"></A></td>
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+  alt="Up One Level" width="32"></A></td>
+      <td><A HREF="frame.html"><img src="icons/next.gif" border="0" height="32"
+  alt="Next Page" width="32"></A></td>
+<td align="center" width="100%">Visual Reference</td>
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+  alt="Contents" width="32"></A></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+</tr></table>
+<b class="navlabel">Previous:</b> <a class="sectref" HREF="convex.html">The convex Object</A>
+<b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A>
+<b class="navlabel">Next:</b> <a class="sectref" HREF="frame.html">The frame Object</A>
+<br><hr>
+</DIV>
+<DIV>
+  <H1 CLASS="Heading-1"> <font color="#0000A0">The label Object</font></H1>
+</DIV>
+<DIV> 
+  <P CLASS="Normal"> With the label object you can display text in a box. Here 
+    are simple examples (in the second label statement, note the standard Python 
+    scheme for formatting numerical values, where 1.5f means 1 figure before the 
+    decimal point and 5 after):</P>
+  <DIV> 
+    <H2 CLASS="program0"> box(pos=(0,0,0), color=color.red)</H2>
+    <H2 CLASS="program0">label(pos=(0,0.25,0), text='This is a box')</H2>
+    <H2 CLASS="program0">label(pos=(0,-0.25,0), text='pi = %1.5f' % pi)</H2>
+    </DIV>
+  <P CLASS="Normal"><IMG SRC="VisualRef-7.gif" ALIGN="RIGHT"> There are many additional 
+    label options. In the accompanying diagram, a sphere representing the Earth 
+    (whose center is at <span class="attribute"> earth.pos</span>) has an associated 
+    label carrying the text &quot;Earth&quot; in a box, connected to the sphere 
+    by a line which stops at the surface of the sphere:</P>
+<DIV>
+<H2 CLASS="program0">
+earthlabel = label(pos=earth.pos, text='Earth', xoffset=20, yoffset=12, space=earth.radius, height=10, border=6)</H2>
+    <P CLASS="Normal"> A unique feature of the label object is that several attributes 
+      are given in terms of screen pixels instead of the usual &quot;world-space&quot; 
+      coordinates. For example, the height of the text is given in pixels, with 
+      the result that the text remains readable even when the sphere object is 
+      moved far away. Other pixel-oriented attributes include <span class="attribute">xoffset</span>, 
+      <span class="attribute">yoffset</span>, and <span class="attribute">border</span>. 
+      Here are the label attributes:</P>
+    <P CLASS="attributes"> <span class="attribute">pos</span>; <span class="attribute">x</span>,<span class="attribute">y</span>,<span class="attribute">z</span> 
+      The point in world space being labeled</P>
+    <P CLASS="attributes"> <span class="attribute">xoffset</span>, <span class="attribute">yoffset</span> 
+      The x and y components of the line, in pixels (see diagram)</P>
+    <P CLASS="attributes"> <span class="attribute">text</span> The text to be 
+      displayed, such as 'Earth'<br>
+      (Line breaks can be included as \n, as in label.text = &quot;Three\nlines\nof 
+      text&quot;)</P>
+    <P CLASS="attributes"> <span class="attribute">height</span> Height of the font 
+      in pixels</P>
+    <P CLASS="attributes"> <span class="attribute">color</span>, <span class="attribute">red</span>, 
+      <span class="attribute">green</span>, <span class="attribute">blue</span> 
+      Color of the text</P>
+    <P CLASS="attributes"> <span class="attribute">opacity</span> Opacity of the 
+      background of the box, default 0.66<BR>
+(0 transparent, 1 opaque, for objects behind the box)</P>
+    <P CLASS="attributes"> <span class="attribute">border</span> Distance in pixels 
+      from the text to the surrounding box</P>
+    <P CLASS="attributes"> <span class="attribute">box</span> 1 if the box should 
+      be drawn (default), else 0</P>
+    <P CLASS="attributes"> <span class="attribute">line</span> 1 if the line from 
+      the box to pos should be drawn (default), else 0</P>
+    <P CLASS="attributes"> <span class="attribute">linecolor</span> Color of the line 
+      and box</P>
+    <P CLASS="attributes"> <span class="attribute">space</span> World-space radius 
+      of a sphere surrounding pos,<BR>
+into which the connecting line does not go</P>
+    <P CLASS="attributes"> <span class="attribute">font</span> Optional name of 
+      the font, such as `helvetica'</P>
+    <P CLASS="attributes">&nbsp;</P>
+</DIV>
+</DIV>
+<DIV> </DIV>
+<hr>
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+      <td><A HREF="convex.html"><img src="icons/previous.gif" border="0" height="32"
+  alt="Previous Page" width="32"></A></td>
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+  alt="Up One Level" width="32"></A></td>
+      <td><A HREF="frame.html"><img src="icons/next.gif" border="0" height="32"
+  alt="Next Page" width="32"></A></td>
+<td align="center" width="100%">Visual Reference</td>
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+  alt="Contents" width="32"></A></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+</tr></table>
+<b class="navlabel">Previous:</b> <a class="sectref" HREF="convex.html">The convex Object</A>
+<b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A>
+<b class="navlabel">Next:</b> <a class="sectref" HREF="frame.html">The frame Object</A>
+<br><hr>
+</DIV>
+</BODY>
+</HTML>

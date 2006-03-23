@@ -1,0 +1,414 @@
+A.link {
+	color: blue;
+	text-decoration: underline;
+}
+A.visited {
+	color: purple;
+	text-decoration: underline;
+}
+A.active {
+	color: red;
+	text-decoration: underline;
+}
+P.answer {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times";
+}
+P.attributes {
+	display: block;
+	text-align: justify;
+	text-indent: -54.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 72.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Century Schoolbook";
+}
+P.Body {
+	display: block;
+	text-align: left;
+	text-indent: 0.000000pt;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times New Roman";
+}
+P.Body-Text {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times New Roman";
+}
+P.Equation {
+	display: block;
+	text-align: center;
+	text-indent: 0.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times";
+}
+P.Footer {
+	display: block;
+	text-align: left;
+	text-indent: 0.000000pt;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 12.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times";
+}
+P.Footnote {
+	display: block;
+	text-align: left;
+	text-indent: 0.000000pt;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 18.000000pt;
+	margin-left: 18.000000pt;
+	font-size: 12.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times";
+}
+P.Header {
+	display: block;
+	text-align: left;
+	text-indent: 0.000000pt;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 12.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times";
+}
+H1.Heading-1, H2.Heading-1, H3.Heading-1, H4.Heading-1, H5.Heading-1, H6.Heading-1 {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 14.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 12.000000pt;
+	font-weight: Bold;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Century Schoolbook";
+}
+H2.heading-1, H3.heading-1, H4.heading-1, H5.heading-1, H6.heading-1 {
+	display: block;
+	text-align: left;
+	text-indent: -180.000000pt;
+	margin-top: 24.000000pt;
+	margin-bottom: 12.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 180.000000pt;
+	font-size: 20.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Helvetica";
+}
+P.heading-1b {
+	display: block;
+	text-align: right;
+	text-indent: 0.000000pt;
+	margin-top: 24.000000pt;
+	margin-bottom: 12.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 20.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Helvetica";
+}
+H2.heading-2, H3.heading-2, H4.heading-2, H5.heading-2, H6.heading-2 {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 30.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 14.000000pt;
+	font-weight: Bold;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Helvetica";
+}
+H1.Heading-3, H2.Heading-3, H3.Heading-3, H4.Heading-3, H5.Heading-3, H6.Heading-3 {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 9.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Italic;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Century Schoolbook";
+}
+H1.heading-3, H2.heading-3, H3.heading-3, H4.heading-3, H5.heading-3, H6.heading-3 {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 24.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 12.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Helvetica";
+}
+H1.heading-4, H2.heading-4, H3.heading-4, H4.heading-4, H5.heading-4, H6.heading-4 {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 14.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 12.000000pt;
+	font-weight: medium;
+	font-style: Oblique;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Helvetica";
+}
+H1.heading-5, H2.heading-5, H3.heading-5, H4.heading-5, H5.heading-5, H6.heading-5 {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 36.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Oblique;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Helvetica";
+}
+H2.Heading2, H3.Heading2, H4.Heading2, H5.Heading2, H6.Heading2 {
+	display: block;
+	text-align: left;
+	text-indent: 0.000000pt;
+	margin-top: 10.000000pt;
+	margin-bottom: 3.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 12.000000pt;
+	font-weight: Bold;
+	font-style: Italic;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times";
+}
+P.Normal {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Century Schoolbook";
+}
+P.program {
+	display: block;
+	text-align: left;
+	text-indent: -36.000000pt;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 54.000000pt;
+	font-size: 10pt;
+	font-weight: Bold;
+	font-style: normal;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: Courier;
+}
+P.program0 {
+	display: block;
+	text-align: left;
+	texA.link {
+	color: blue;
+	text-decoration: underline;
+; font-family: Courier; font-size: 10pt; font-style: normal; font-weight: bold
+}
+A.visited {
+	color: purple;
+	text-decoration: underline;
+}
+A.active {
+	color: red;
+	text-decoration: underline;
+}
+P.answer {
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Times";
+}
+P.attributes {
+	display: block;
+	text-align: justify;
+	text-indent: -54.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 72.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: "Century Schoolbook";
+}
+P.Body {
+	display: block;
+	text-align: left;
+	text-indent: 0.000000pt;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 10.000000pt;
+	font-weight: medium;
+	font-style: Regular;
+
+H1.heading-2 { 
+	display: block;
+	text-align: justify;
+	text-indent: 0.000000pt;
+	margin-top: 30.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+	font-size: 14pt;
+	font-weight: Bold;
+	font-style: Regular;
+	color: #000000;
+	text-decoration: none;
+	vertical-align: baseline;
+	text-transform: none;
+	font-family: Helvetica;
+ } 

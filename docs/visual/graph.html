@@ -1,0 +1,492 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+
+<HEAD>
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
+
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+
+<TITLE> Description of Objects in VPython</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="#ffffff">
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="vector.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="display.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+<b class="navlabel">Previous:</b> <a class="sectref" HREF="vector.html">The vector Object</A>
+
+<b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A>
+
+<b class="navlabel">Next:</b> <a class="sectref" HREF="display.html">Controlling Windows</A>
+
+<br><hr>
+
+</DIV>
+
+<DIV>
+
+  <H1 CLASS="Heading-1"> <font color="#0000A0">Graph Plotting</font></H1>
+
+</DIV>
+
+<DIV> 
+
+  <P CLASS="Normal"> In this section we describe features for plotting graphs 
+
+    with tick marks and labels. Here is a simple example of how to plot a graph:</P>
+
+</DIV>
+
+<DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+from visual.graph import *		# import graphing features</H2>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">&nbsp;
+
+</H2>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+funct1 = gcurve(color=color.cyan)		# a connected curve object</H2>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">&nbsp;
+
+</H2>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+for x in arange(0., 8.1, 0.1):		# x goes from 0 to 8</H2>
+
+<P CLASS="program">
+
+&nbsp;&nbsp;&nbsp;&nbsp;funct1.plot(pos=(x,5.*cos(2.*x)*exp(-0.2*x)))	# plot</P>
+
+    <P CLASS="Normal"> Importing from <span class="attribute">visual.graph</span> 
+
+      makes available all Visual objects plus the graph plotting module. The graph 
+
+      is autoscaled to display all the data in the window.</P>
+
+    <P CLASS="Normal"> A connected curve (<span class="attribute">gcurve</span>) 
+      is just one of several kinds of graph plotting objects. Other options are 
+      disconnected dots (<span class="attribute"><span class="attribute">gdot</span>s</span>), 
+      vertical bars (<span class="attribute">gvbars</span>), horizontal bars (<span class="attribute"><span class="attribute">ghbar</span>s</span>), 
+      and binned data displayed as vertical bars (<span class="attribute">ghistogram</span>; 
+      see later discussion). When creating one of these objects, you can specify 
+      a color attribute. For <span class="attribute">gvbars</span> and <span class="attribute">ghbars</span> 
+      you can also specify a <span class="attribute">delta</span> attribute, which 
+      specifies the width of the bar (the default is <span class="attribute">delta=1.</span>).</P>
+
+<P CLASS="Normal">
+
+You can plot more than one thing on the same graph:</P>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+funct1 = gcurve(color=color.cyan)	</H2>
+
+    <P CLASS="program"> funct2 = gvbars(delta=0.05, color=color.blue)</P>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+for x in arange(0., 8.1, 0.1):	</H2>
+
+</DIV>
+
+
+
+<H2 CLASS="program0">
+
+&nbsp;&nbsp;&nbsp;&nbsp;funct1.plot(pos=(x,5.*cos(2.*x)*exp(-0.2*x)))	# curve</H2>
+
+<P CLASS="program">
+
+&nbsp;&nbsp;&nbsp;&nbsp;funct2.plot(pos=(x,4.*cos(0.5*x)*exp(-0.1*x)))	# vbars</P>
+
+<P CLASS="Normal">
+
+In a plot operation you can specify a different color to override the original setting:</P>
+
+
+
+<DIV>
+
+<H2 CLASS="program0">
+
+mydots.plot(pos=(x1,y1), color=color.green)	</H2>
+
+    <P CLASS="Normal"> When you create a <span class="attribute">gcurve</span>, 
+      <span class="attribute">gdots</span>, <span class="attribute"><span class="attribute">gvbar</span>s</span>, 
+      or <span class="attribute">ghbars</span> object, you can provide a list 
+      of points to be plotted, just as is the case with the ordinary <span class="attribute">curve</span> 
+      object:</P>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+points = [(1,2), (3,4), (-5,2), (-5,-3)]</H2>
+
+    <P CLASS="program"> data = gdots(pos=points, color=color.blue)</P>
+
+    <P CLASS="Normal">This list option is available only when creating the <span class="attribute">gdots</span> 
+      object.</P>
+    <P CLASS="Normal">&nbsp;</P>
+
+    <P CLASS="Normal"><font color="#0000A0">Overall gdisplay options</font></P>
+
+    <P CLASS="Normal">You can establish a <span class="attribute">gdisplay</span> 
+
+      to set the size, position, and title for the title bar of the graph window, 
+
+      specify titles for the x and y axes, and specify maximum values for each 
+
+      axis, before creating <span class="attribute">gcurve</span> or other kind 
+
+      of graph plotting object:</P>
+
+</DIV>
+
+</DIV>
+
+<DIV><DIV>
+
+<H2 CLASS="program0">
+
+graph1 = gdisplay(x=0, y=0, width=600, height=150, </H2>
+
+    <P CLASS="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title='N 
+
+      vs. t', xtitle='t', ytitle='N', </P>
+
+    <P CLASS="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xmax=50., 
+
+      xmin=-20., ymax=5E3, ymin=-2E3, </P>
+
+    <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;foreground=color.black, 
+
+      background=color.white)</p>
+
+    <P CLASS="Normal"> In this example, the graph window will be located at (0,0), 
+
+      with a size of 600 by 150 pixels, and the title bar will say 'N vs. t'. 
+
+      The graph will have a title 't' on the horizontal axis and 'N' on the vertical 
+
+      axis. Instead of autoscaling the graph to display all the data, the graph 
+
+      will have fixed limits. The horizontal axis will extend from -20. to +50., 
+
+      and the vertical axis will extend from -2000. to +5000. (xmin and ymin must 
+
+      be negative; xmax and ymax must be positive.) The foreground color (white 
+
+      by default) is black, and the background color (black by default) is white. 
+
+      If you simply say <span class="attribute">gdisplay()</span>, the defaults 
+
+      are <span class="attribute">x=0</span>, <span class="attribute">y=0</span>, 
+
+      <span class="attribute">width=800</span>, <span class="attribute">height=400</span>, 
+
+      no titles, fully autoscaled.</P>
+
+    <P CLASS="Normal"> Every gdisplay has the attribute <span class="attribute">display</span>, 
+
+      so you can manipulate basic display aspects of the graphing window:</P>
+
+    <h2 class="program0">graph1.display.visible = 0 # make the display invisible 
+
+    </h2>
+
+    <p class="program"> </p>
+
+    <P CLASS="Normal">You can have more than one graph window: just create another 
+
+      <span class="attribute"> gdisplay</span>. By default, any graphing objects 
+
+      created following a <span class="attribute">gdisplay</span> belong to that 
+
+      window. You can also specify which window a new object belongs to: </P>
+
+    </DIV>
+
+  <DIV> 
+
+    <H2 CLASS="program0"> energy = gdots(gdisplay=graph1, color=color.blue)</H2>
+
+    <p class="Normal">&nbsp;</p>
+
+    <p class="Normal"><font color="#0000A0">Histograms (sorted, binned data)</font></p>
+
+    <h2 class="attribute"></h2>
+
+    
+
+  </DIV>
+
+</DIV>
+
+<DIV>
+
+<P CLASS="Normal">The purpose of <span class="attribute">ghistogram</span> is 
+
+    to sort data into bins and display the distribution. Suppose you have a list 
+
+    of the ages of a group of people, such as [5, 37, 12, 21, 8, 63, 52, 75, 7]. 
+
+    You want to sort these data into bins 20 years wide and display the numbers 
+
+    in each bin in the form of vertical bars. The first bin (0 to 20) contains 
+
+    4 people [5, 12, 8, 7], the second bin (20 to 40) contains 2 people [21, 37], 
+
+    the third bin (40 to 60) contains 1 person [52], and the fourth bin (60-80) 
+
+    contains 2 people [63, 75]. Here is how you could make this display:</P>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+from visual.graph import *	</H2>
+
+<P CLASS="program">
+
+.....</P>
+
+</DIV>
+
+<DIV>
+
+    <H2 CLASS="program0"> agelist1<EM CLASS="code"> = </EM>[5, 37, 12, 21, 8, 63, 
+
+      52, 75, 7] </H2>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+ages = ghistogram(bins=arange(0, 80, 20), color=color.red)	</H2>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+ages.plot(data=agelist1)	# plot the age distribution</H2>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+.....</H2>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+ages.plot(data=agelist2)	# plot a different distribution</H2>
+
+    <P CLASS="Normal"> You specify a list (bins) into which data will be sorted. 
+
+      In the example given here, bins goes from 0 to 80 by 20's. By default, if 
+
+      you later say</P>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+ages.plot(data=agelist2)</H2>
+
+<P CLASS="Normal">
+
+the new distribution replaces the old one. If on the other hand you say</P>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+ages.plot(data=agelist2, accumulate=1)</H2>
+
+<P CLASS="Normal">
+
+the new data are added to the old data. </P>
+
+<P CLASS="Normal">
+
+If you say the following, </P>
+
+</DIV>
+
+<DIV>
+
+<H2 CLASS="program0">
+
+ghistogram(bins=arange(0,50,0.1), accumulate=1, average=1)</H2>
+
+    <P CLASS="Normal"> each plot operation will accumulate the data and average the 
+
+      accumulated data. The default is no accumulation and no averaging.</P>
+
+    <P CLASS="Normal">&nbsp;</P>
+
+</DIV>
+
+</DIV>
+
+<DIV> 
+
+  <div>
+
+    <div>
+
+      <p class="Normal"><font color="#0000A0">gdisplay vs. display</font></p>
+
+      <h2 class="attribute"></h2>
+
+    </div>
+
+  </div>
+
+  <div> A gdisplay window is closely related to a display window. The main difference 
+
+    is that a gdisplay is essentially two-dimensional and has nonuniform x and 
+
+    y scale factors. When you create a gdisplay (either explicitly, or implicitly 
+
+    with the first gcurve or other graphing object), the current display is saved 
+
+    and restored, so that later creation of ordinary Visual objects such as sphere 
+
+    or box will correctly be associated with a previous display, not the more 
+
+    recent gdisplay.</div>
+
+  <P CLASS="Normal">&nbsp;</P>
+
+</DIV>
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="vector.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="display.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+<b class="navlabel">Previous:</b> <a class="sectref" HREF="vector.html">The vector Object</A>
+
+<b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A>
+
+<b class="navlabel">Next:</b> <a class="sectref" HREF="display.html">Controlling Windows</A>
+
+<br><hr>
+
+</DIV>
+
+</BODY>
+
+</HTML>
+

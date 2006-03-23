@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=ISO-8859-1">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <meta name="GENERATOR"
+ content="Adobe FrameMaker 5.5/HTML Export Filter">
+  <link rel="STYLESHEET" href="VisualRef.css" charset="ISO-8859-1"
+ type="text/css">
+  <title>Description of Objects in VPython</title>
+</head>
+<body bgcolor="#ffffff">
+<div class="navigation">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+  <tbody>
+    <tr>
+      <td><a href="ellipsoid.html"><img src="icons/previous.gif"
+ border="0" height="32" alt="Previous Page" width="32"></a></td>
+      <td><a href="index.html"><img src="icons/up.gif" border="0"
+ height="32" alt="Up One Level" width="32"></a></td>
+      <td><a href="helix.html"><img src="icons/next.gif" border="0"
+ height="32" alt="Next Page" width="32"></a></td>
+      <td align="center" width="100%">Visual Reference</td>
+      <td><a href="index.html"><img src="icons/contents.gif" border="0"
+ height="32" alt="Contents" width="32"></a></td>
+      <td><img src="icons/blank.gif" border="0" height="32" alt=""
+ width="32"></td>
+      <td><img src="icons/blank.gif" border="0" height="32" alt=""
+ width="32"></td>
+    </tr>
+  </tbody>
+</table>
+<b class="navlabel">Previous:</b> <a class="sectref"
+ href="ellipsoid.html">The ellipsoid Object</a> <b class="navlabel">Up:</b>
+<a class="sectref" href="index.html">Contents</a> <b class="navlabel">Next:</b>
+<a class="sectref" href="helix.html">The helix Object</a> <br>
+<hr></div>
+<div>
+<h1 class="Heading-1"> <font color="#0000a0">The curve Object</font></h1>
+</div>
+<div>
+<p class="Normal">The curve object displays straight lines between
+points, and if the points are sufficiently close together you get the
+appearance of a smooth curve. In addition to its basic use for
+displaying curves, the curve object has powerful capabilities for other
+uses, such as efficient plotting of functions.</p>
+<p class="Normal"> Some attributes, such as <span class="attribute">pos</span>
+and <span class="attribute">color</span>, can be different for each
+point in the curve. These attributes are stored as Numeric arrays. The
+Numeric module for Python provides powerful array processing
+capabilities; for example, two entire arrays can be added together.
+Numeric arrays can be accessed using standard Python rules for
+referring to the nth item in a sequence (that is, <span
+ class="attribute">seq[0]</span> is the first item in <span
+ class="attribute">seq</span>, <span class="attribute">seq[1]</span>
+is the second, <span class="attribute">seq[2]</span> is the third,
+etc). For example, <span class="attribute">anycurve.pos[0]</span> is
+the position of the first point in <span class="attribute">anycurve</span>.</p>
+<p class="Normal">
+You can give curve an explicit list of coordinates enclosed in
+brackets, like all Python sequences. Here is an example of a 2D square:</p>
+<div>
+<h2 class="program0">square = curve(pos=[(0,0),(0,1),(1,1),(1,0),(0,0)])</h2>
+<p class="Normal">
+Essentially, (1,1) is shorthand for (1,1,0). However, you cannot mix 2D
+and 3D points in one list.</p>
+<p class="Normal">
+Curves can have thickness, specified by the radius of a cross section
+of the curve (the curve has a thickness or diameter that is twice this
+radius):</p>
+</div>
+<div>
+<h2 class="program0">curve(pos=[(0,0,0), (1,0,0), (2,1,0)], radius=0.05)</h2>
+<p class="Normal">
+The default radius is 0, which draws a thin curve. A nonzero radius
+makes a "thick" curve, but a very small radius may make a curve that is
+too thin to see.</p>
+<p class="Normal"> In the following example, the <span
+ class="attribute">arange()</span> function (provided by the Python
+Numeric module, which is imported by the Visual module, gives a
+sequence of values from 0 to 20 in steps of 0.1 (not including the last
+value, 20).</p>
+</div>
+<div>
+<h2 class="program0">c = curve( x = arange(0,20,0.1) ) # Draw a helix</h2>
+<p class="program">
+c.y = sin( 2.0*c.x )</p>
+<p class="program">
+c.z = cos( 2.0*c.x )</p>
+<p class="Normal"> The <span class="attribute">x</span>, <span
+ class="attribute">y</span>, and <span class="attribute">z</span>
+attributes allow curves to be used to graph functions easily:</p>
+</div>
+<div>
+<h2 class="program0">curve( x=arange(100), y=arange(100)**0.5,
+color=color.red)</h2>
+<p class="Normal">
+A function grapher looks like this (a complete program!):</p>
+</div>
+<div>
+<h2 class="program0"> eqn = raw_input('Equation in x: ')</h2>
+<p class="program">
+x = arange( 0, 10, 0.1 )</p>
+<p class="program">
+curve( x=x, y=eval(eqn) )</p>
+<p class="Normal">Parametric graphing is also easy:</p>
+</div>
+<div>
+<h2 class="program0">t = arange(0, 10, 0.1)</h2>
+<p class="program">
+curve( x = sin(t), y = 1.0/(1+t), z = t**0.5,<br>
+red = cos(t), green = 0, blue = 0.5*(1-cos(t)) )</p>
+<p class="Normal">
+Here are the curve attributes:</p>
+<p class="attributes"> <span class="attribute">pos[]</span> Array of
+position of points in the curve: pos[0], pos[1], pos[2]....<br>
+The current number of points is given by len(curve.pos)</p>
+<p class="attributes"> <span class="attribute">x[ ]</span>, <span
+ class="attribute">y[ ]</span>, <span class="attribute">z[ ]</span>
+Components of pos; each defaults to [0,0,0,0,...]</p>
+<p class="attributes"> <span class="attribute">color[ ]</span> Color
+of points in the curve</p>
+<p class="attributes"> <span class="attribute">red[ ]</span>, <span
+ class="attribute">green[ ]</span>, <span class="attribute">blue[ ]</span>
+Color components of points in the curve</p>
+<p class="attributes"> <span class="attribute">radius</span> Radius of
+cross-section of curve<br>
+The default radius=0 makes a thin curve</p>
+<p class="Normal">&nbsp; </p>
+<p class="Normal"><font color="#0000a0">Adding more points to a curve</font></p>
+<p class="Normal"> Curves can be created incrementally with the <span
+ class="attribute">append()</span> function. A new point by default
+shares the characteristics of the last point.</p>
+</div>
+<div>
+<h2 class="program0">helix = curve( color = color.cyan )</h2>
+<p class="program">
+for t in arange(0, 2*pi, 0.1):</p>
+<p class="program">
+&nbsp;&nbsp;&nbsp;&nbsp;helix.append( pos=(t,sin(t),cos(t)) )</p>
+<p class="Normal"> One of the many uses of curves is to leave a trail
+behind a moving object. For example, if <span class="attribute">ball</span>
+is a moving sphere, this will add a point to its trail: </p>
+</div>
+<div>
+<h2 class="program0">trail = curve()</h2>
+<p class="program">
+ball = sphere()</p>
+<p class="program">
+...# Every time you update the position of the ball:</p>
+<p class="program">
+trail.append(pos=ball.pos)</p>
+<p class="Normal">&nbsp; </p>
+<p class="Normal"><font color="#0000a0">Interpolation</font></p>
+<p class="Normal">
+The curve machinery interpolates from one point to the next. For
+example, suppose the first three points are red but the fourth point is
+blue, as in the following example. The lines connecting the first three
+points are all red, but the line going from the third point (red) to
+the fourth point (blue) is displayed with a blend going from red to
+blue.</p>
+</div>
+<div>
+<h2 class="program0">c = curve( pos=[(0,0,0), (1,0,0)], color=color.red
+)</h2>
+<p class="program">
+c.append( pos=(1,1,0) ) # add a red point</p>
+<p class="program">
+c.append( pos=(0,1,0), color=color.blue) # add blue point</p>
+<p class="Normal">
+If you want an abrupt change in color or thickness, simply add another
+point at the same location. In the following example, adding a blue
+point at the same location as the third (red) point makes the final
+line be purely blue.</p>
+</div>
+<div>
+<h2 class="program0">c = curve( pos=[(0,0,0), (1,0,0)], color=color.red
+)</h2>
+<p class="program">
+c.append( pos=(1,1,0) ) # add a red point</p>
+<p class="program">
+c.append( pos=(1,1,0), color=color.blue) # same point, blue</p>
+<p class="program">
+c.append( pos=(0,1,0) ) # add blue point</p>
+</div>
+</div>
+<div>
+<h1 class="Heading-1">&nbsp; </h1>
+</div>
+<hr>
+<div class="navigation">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+  <tbody>
+    <tr>
+      <td><a href="ellipsoid.html"><img src="icons/previous.gif"
+ border="0" height="32" alt="Previous Page" width="32"></a></td>
+      <td><a href="index.html"><img src="icons/up.gif" border="0"
+ height="32" alt="Up One Level" width="32"></a></td>
+      <td><a href="helix.html"><img src="icons/next.gif" border="0"
+ height="32" alt="Next Page" width="32"></a></td>
+      <td align="center" width="100%">Visual Reference</td>
+      <td><a href="index.html"><img src="icons/contents.gif" border="0"
+ height="32" alt="Contents" width="32"></a></td>
+      <td><img src="icons/blank.gif" border="0" height="32" alt=""
+ width="32"></td>
+      <td><img src="icons/blank.gif" border="0" height="32" alt=""
+ width="32"></td>
+    </tr>
+  </tbody>
+</table>
+  <b class="navlabel">Previous:</b> <a class="sectref"
+ href="ellipsoid.html">The ellipsoid Object</a> <b class="navlabel">Up:</b> <a class="sectref" href="index.html">Contents</a> 
+  <b class="navlabel">Next:</b> <a class="sectref" href="helix.html">The helix 
+  Object</a> <br>
+<hr></div>
+</body>
+</html>

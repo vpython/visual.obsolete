@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+
+<HEAD>
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
+
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+
+<TITLE> Description of Objects in VPython</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="#ffffff">
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="frame.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="defaults.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+  <b class="navlabel">Previous:</b> <a class="sectref" HREF="faces.html">The faces 
+  Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
+  <b class="navlabel">Next:</b> <a class="sectref" HREF="defaults.html">Convenient 
+  Defaults</A> <br>
+
+  <hr>
+
+</DIV>
+
+<DIV>
+
+  <H1 CLASS="Heading-1"> <font color="#0000A0">Additional Attributes</font></H1>
+
+</DIV>
+
+
+
+<DIV> 
+
+  <P CLASS="Normal"> The following attributes apply to all VPython objects:</P>
+
+  <P CLASS="attributes"> <span class="attribute">visible</span> If false (0), 
+
+    object is not displayed; e.g. <span class="attribute">ball.visible = 0</span><EM CLASS="program"><BR>
+
+    </EM> Use <span class="attribute">ball.visible = 1</span> to make the ball 
+
+    visible again.</P>
+
+  <P CLASS="attributes"><span class="attribute">frame</span> Place this object 
+
+    into a specified frame, as in <span class="attribute">ball = sphere(frame 
+
+    = f1)</span> </P>
+
+  <P CLASS="attributes"> <span class="attribute">display</span> When you start 
+
+    a VPython program, for convenience Visual creates a display window and names 
+
+    it <span class="attribute">scene</span>. By default, objects you create go 
+
+    into that display window. You can choose to put an object in a different display 
+
+    like this: </P>
+
+</DIV>
+
+<blockquote> 
+  <blockquote> 
+    <DIV><span class="program (unavailable)"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scene2 
+      = display( title = &quot;Act IV, Scene 2&quot; ) </b></span></DIV>
+    <DIV><b><span class="program (unavailable)"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rod 
+      = cylinder( display = scene2 )</span></b> </DIV>
+    <blockquote> 
+      <DIV class="attributes">The function <font color="#FF0000">display.get_selected()</font> 
+        returns a reference to the display in which objects are currently being 
+        created.</DIV>
+    </blockquote>
+  </blockquote>
+</blockquote>
+<DIV> 
+  <P CLASS="attributes"><span class="attribute">__class__</span> Name of the class 
+    of object. For example, <span class="attribute">ball.__class__ is sphere</span> 
+    is true if <span class="attribute">ball</span> is a sphere object. There are 
+    two underscores before and after the word <span class="attribute">class</span>. 
+    In a list of visible objects provided by <a href="display.html">scene.objects</a>, 
+    if <span class="attribute">obj</span> is in this list you can determine the 
+    class of the object with <span class="attribute">obj.__class__</span>. </P>
+  <P CLASS="attributes"><span class="attribute">__copy()__</span> Makes a copy 
+    of an object. There are two underscores before and after the <span class="attribute">copy()</span>. 
+    Without any arguments, this results in creating a second object in the exact 
+    same position as the first, which is probably not what you want. The <font color="#FF0000">__copy__()</font> 
+    function takes a list of keyword=value argument pairs which are applied to 
+    the new object before making it visible. For example, to clone an object from 
+    one display to another, you would execute: <font color="#FF0000">new_object 
+    = old_object.__copy__( display=new_display)</font>. Restriction: If the original 
+    object is within a frame, and the new object is on a different display, you 
+    must supply both a new display and a new frame for the new object (the new 
+    frame may be None). This is due to the restriction that an object may not 
+    be located within a frame that is in a separate display. The attribute <font color="#FF0000">__members__</font> 
+    used to give a list of all the object's attributes but is no longer available 
+    in VPython. Its main use was in copying objects.</P>
+  <blockquote> 
+    <p>Here is an example that uses the __copy()__ function. The following routine 
+      copies all of the Visual objects currently existing in one display into 
+      a previously defined second display:</p>
+  </blockquote>
+</DIV>
+<blockquote> 
+  <DIV> 
+    <p><b><span class="program (unavailable)">def clone_universe( new_display, 
+      old_display):<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Create a dictionary of 
+      frames in the old display<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# to the corresponding frames 
+      in the new display.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;frames = dict()<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Initialize the lookup 
+      dictionary<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for obj in old_display.objects:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if 
+      obj.__class__ == frame:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;frames[obj] 
+      = obj.__copy__( frame=None, display=new_display)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# For each old reference 
+      frame that was within another reference frame,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# place the new reference 
+      frame within the appropriate frame in the new<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# display. Here old is an 
+      object and new is its frame in the new display.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for old, new in frames.iteritems():<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if 
+      old.frame:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new.frame 
+      = frames[old.frame]<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Copy over the universe.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for obj in old_display.objects:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if 
+      obj.__class__ == frame:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+      Already taken care of above.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if 
+      obj.frame:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+      Then initialize with the corresponding reference frame in the new<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+      display.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.__copy__( 
+      display=new_display, frame=frames[obj.frame])<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+      Don't need to care about the frame attribute, since it is None.<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.__copy__( 
+      display=new_display)</span></b></p>
+  </DIV>
+</blockquote>
+<DIV>
+<P CLASS="Normal">See <a href="display.html">Controlling One or More Visual 
+    Display Windows</a> for more information on creating and manipulating display 
+    objects.</P>
+  <P CLASS="Normal">&nbsp;</P>
+</DIV>
+
+<DIV> </DIV>
+
+<hr>
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="frame.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="defaults.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+  <b class="navlabel">Previous:</b> <a class="sectref" HREF="faces.html">The faces 
+  Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
+  <b class="navlabel">Next:</b> <a class="sectref" HREF="defaults.html">Convenient 
+  Defaults</A> <br>
+
+  <hr>
+
+</DIV>
+
+</BODY>
+
+</HTML>
+

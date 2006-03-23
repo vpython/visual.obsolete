@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+
+<HEAD>
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
+
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+
+<TITLE> Description of Objects in VPython</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="#ffffff">
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="keyboard.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="factorial.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+  <b class="navlabel">Previous:</b> <a class="sectref" href="keyboard.html">Keyboard 
+  Interactions</a> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
+  <b class="navlabel">Next:</b> <a class="sectref" href="factorial.html">factorial 
+  & combin</a> <br>
+  <hr>
+
+</DIV>
+
+<DIV>
+
+  <h1 CLASS="Heading-1"> <font color="#0000A0">Controls: buttons, sliders, toggles, 
+    and menus</font></h1>
+
+</DIV>
+
+<DIV> 
+  <p>You can create buttons, sliders, toggle switches, and pull-down menus to 
+    control your program. You import these capabilities with this statement:</p>
+    <div> 
+      
+    <h2 class="program0"> from visual.controls import *</h2>
+  </div>
+      <p>Importing from <span class="attribute">visual.controls</span> makes available 
+    all Visual objects plus the controls module. To use the control features, 
+    you create a special controls window and add control objects to that window, 
+    specifying what actions should take place when the controls are manipulated. 
+    For example, an action associated with a button might be the execution of 
+    a function to change the color of a Visual object. After creating the controls, 
+    you repeatedly call an interact routine to check for user manipulation of 
+    the controls, which trigger actions. For a detailed example, see the VPython 
+    demo program <span class="attribute">controlstest.py</span>. </p>
+  <p>Here is a small example. All it does is change the button text when you click 
+    the button. The Python construction &quot;lambda:&quot; is required for the 
+    controls module to have the correct context (&quot;namespace&quot;) for calling 
+    the specified routine.</p>
+  <p class="program">from visu<span class="program">al.controls import *</span></p>
+  <p class="program">&nbsp;</p>
+  <p class="program"><span class="program">def change(): # Called by controls 
+    when button is clicked</span></p>
+  <p class="program"><span class="program">&nbsp;&nbsp;&nbsp;&nbsp;if b.text == 
+    'Click me':</span></p>
+  <p class="program"><span class="program">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.text 
+    = 'Try again'</span></p>
+  <p class="program"><span class="program">&nbsp;&nbsp;&nbsp;&nbsp;else:</span></p>
+  <p class="program"><span class="program">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.text 
+    = 'Click me'</span></p>
+  <p class="program">&nbsp;</p>
+  <p class="program"><span class="program">c = controls() # Create controls window</span></p>
+  <p class="program"><span class="program"># Create a button in the controls window:</span></p>
+  <p class="program"><span class="program">b = button( pos=(0,0), width=60, height=60, 
+    </span></p>
+  <p class="program"><span class="program">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text='Click 
+    me', action=lambda: change() )</span></p>
+  <p class="program"><span class="program">while 1:</span></p>
+  <p class="program"><span class="program">&nbsp;&nbsp;&nbsp;&nbsp;c.interact() 
+    # Check for mouse ev</span>ents and drive specified actions</p>
+</div>
+
+<P CLASS="attributes">&nbsp; </P>
+<p class="Normal"><font color="#0000A0">Controls window</font></p>
+<p class="attributes"> <span class="attribute">controls()</span> Creates a controls 
+  window with the specified attributes, and returns it. For example, the following 
+  creates a controls window 300 by 300, located at (0,400) with respect to the 
+  upper left corner of the screen, with 'Controlling the Scene' in the title bar, 
+  and a range of 50 (window coordinates from -50 to +50 in x and y):</p>
+<DIV> 
+
+    <H2 CLASS="program0"> c = controls(title='Controlling the Scene',</H2>
+
+    <P CLASS="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x=0, y=400, width=300, height=300, 
+      range=50)</P>
+
+  </DIV>
+
+<DIV></DIV>
+
+<DIV>
+
+<DIV> 
+
+    <P CLASS="Normal"><font color="#0000A0">Controls window parameters</font></P>
+
+    <P CLASS="attributes"> <span class="attribute">x</span>, <span class="attribute">y</span> 
+
+      Position of the window on the screen (pixels from upper left)</P>
+
+    <P CLASS="attributes"> <span class="attribute">width</span>, <span class="attribute">height</span> 
+      Width and height of the display area in pixels.</P>
+
+    <P CLASS="attributes"> <span class="attribute">title</span> Text in the control 
+      window's title bar.</P>
+
+    <P CLASS="attributes"><span class="attribute">range</span> The extent of the 
+      region of interest away from the center along each axis. The default is 
+      100. The center of a controls window is always (0,0).</P>
+    <p class="attributes"> <span class="attribute"></span></p>
+
+    <P CLASS="Normal"><font color="#0000A0">Control objects</font></P>
+    <P CLASS="Normal">After creating a controls window, you can create the following 
+      control objects that will appear in that window:</P>
+    <p class="attributes"> <span class="attribute"><b>button</b></span> A button 
+      to click.</p>
+    <p class="attributes"> <span class="attribute"><b>slider</b></span> Drag a 
+      slider to enter a numeric value graphically.</p>
+    <p class="attributes"> <span class="attribute"><b>toggle</b></span> Click 
+      on the handle to flip a toggle switch.</p>
+    <p class="attributes"><span class="attribute"><b>menu</b></span> A pull-down 
+      menu of options.</p>
+    <P CLASS="Normal">Control objects have the following attributes:</P>
+    <p class="attributes"> <span class="attribute">pos</span><span class="attribute"></span> 
+      Position of the control (center of button or toggle, one end of slider, 
+      upper left corner of menu title)</p>
+    <p class="attributes"> <span class="attribute">color</span> Gray by default</p>
+    <p class="attributes"> <span class="attribute">width</span><span class="attribute"></span> 
+      Width of button, toggle, or menu</p>
+    <p class="attributes"> <span class="attribute">height</span> Height of button, 
+      toggle, or menu</p>
+    <p class="attributes"><span class="attribute">axis</span> Axis for slider, 
+      pointing from <span class="attribute">pos</span><span class="attribute"></span> 
+      to other end (as for cylinder or arrow)</p>
+    <p class="attributes"> <span class="attribute">length</span> Length of slider 
+      (in direction of axis)</p>
+    <p class="attributes"> <span class="attribute">min, max</span> Minimum and 
+      maximum values for a slider</p>
+    <p class="attributes"> <span class="attribute">value</span> Value of toggle 
+      (0 or 1) or slider (depends on slider min and max). The value of a toggle 
+      or slider can be set as well as read. If you set the value of a toggle or 
+      slider, the control moves to the position that corresponds to that value.</p>
+    <p class="attributes"> <span class="attribute">text</span> Text to display 
+      on a button, or menu title</p>
+    <p class="attributes"> <span class="attribute">text0</span> Text to display 
+      below a toggle switch (associated with toggle value = 0)</p>
+    <p class="attributes"> <span class="attribute">text1</span> Text to display 
+      above a toggle switch (associated with toggle value = 1)</p>
+    <p class="attributes"> <span class="attribute">action</span> Specify Python 
+      statement to be executed when a control is manipulated</p>
+    <p class="attributes"> <span class="attribute">items</span> For menus only, 
+      list of menu items to choose from. Here is how to add a menu item to a menu 
+      named m1:</p>
+    <p class="program">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m1.items.append( 
+      ('Red', lambda: cubecolor(color.red)) )</p>
+    <p class="attributes"></p>
+    <p class="attributes"> This adds to the pull-down menu an item 'Red' which 
+      when chosen will pass the value color.red to the subroutine cubecolor(). 
+      The Python construction &quot;lambda:&quot; is required for the controls 
+      module to have the correct context (&quot;namespace&quot;) for calling the 
+      specified routine.</p>
+    <P CLASS="Normal">&nbsp;</P>
+
+    </DIV>
+
+</DIV>
+
+<br><hr>
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="keyboard.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="factorial.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+  <b class="navlabel">Previous:</b> <a class="sectref" href="keyboard.html">Keyboard 
+  Interactions</a> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
+  <b class="navlabel">Next:</b> <a class="sectref" href="factorial.html">factorial 
+  & combin</a> <br>
+  <hr>
+
+</DIV>
+
+</BODY>
+
+</HTML>
+

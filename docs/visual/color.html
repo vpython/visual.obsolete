@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> Description of Objects in VPython</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+      <td><A HREF="rotation.html"><img src="icons/previous.gif" border="0" height="32"
+  alt="Previous Page" width="32"></A></td>
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+  alt="Up One Level" width="32"></A></td>
+      <td><A HREF="delete.html"><img src="icons/next.gif" border="0" height="32"
+  alt="Next Page" width="32"></A></td>
+<td align="center" width="100%">Visual Reference</td>
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+  alt="Contents" width="32"></A></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+</tr></table>
+  <b class="navlabel">Previous:</b> <a class="sectref" HREF="rotation.html">Rotating 
+  an Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
+  <b class="navlabel">Next:</b> <a class="sectref" HREF="delete.html">Deleting an 
+  Object </A> <br>
+  <hr>
+</DIV>
+<DIV>
+  <H1 CLASS="Heading-1"> <font color="#0000A0">Specifying Colors</font></H1>
+</DIV>
+<DIV>
+<P CLASS="Normal">
+In the RGB color system, you specify a color in terms of fractions of red, green, and blue, corresponding to how strongly glowing are the tiny red, green, and blue dots of the computer screen. In the RGB scheme, white is the color with a maximum of red, blue, and green (1, 1, 1). Black has minimum amounts (0, 0, 0). The brightest red is represented by (1, 0, 0); that is, it has the full amount of red, no green, and no blue.</P>
+  <P CLASS="Normal"> Here are some examples of RGB colors, with names you can 
+    use in Visual:</P>
+  <table width="75%" border="0">
+    <tr> 
+      <td width="32%"><font size="3">&nbsp&nbsp&nbsp&nbsp(1,0,0) color.red</font></td>
+      <td width="37%"><font size="3">(1,1,0) color.yellow</font></td>
+      <td width="31%"><font size="3">(0,0,0) color.black</font></td>
+    </tr>
+    <tr> 
+      <td><font size="3">&nbsp&nbsp&nbsp&nbsp(0,1,0) color.green</font></td>
+      <td>(1,0.5,0) color.orange</td>
+      <td><font size="3">(1,1,1) color.white</font></td>
+    </tr>
+    <tr> 
+      <td><font size="3">&nbsp&nbsp&nbsp&nbsp(0,0,1) color.blue</font></td>
+      <td><font size="3">(0,1,1) color.cyan</font></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td><font size="3">&nbsp&nbsp&nbsp&nbsp</font></td>
+      <td><font size="3">(1,0,1) color.magenta</font></td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <P CLASS="Normal">You can also create your own colors, such as these:</P>
+  <P CLASS="attributes"> (0.5, 0.5, 0.5) a rather dark grey </P>
+  <P CLASS="attributes">(1,0.7,0.2) a coppery color</P>
+<P CLASS="Normal">
+Colors may appear differently on different computers, and under different 3D lighting conditions. The named colors above are most likely to display appropriately, because RGB values of 0 or 1 are unaffected by differing color corrections (&quot;gamma&quot; corrections).</P>
+  <P CLASS="Normal"> The VPython demo program <span class="attribute">colorsliders.py</span> 
+    lets you adjust RGB sliders to visualize colors and print color triples that 
+    you copy into your program. It also provides HSV sliders to adjust hue, saturation 
+    (how much white is added to dilute the hue), and value (brightness), which 
+    is an alternative way to describe colors. </P>
+  <P CLASS="Normal"> Currently Visual only accepts RGB color descriptions, but 
+    there are functions for converting color triples between RGB and HSV:</P>
+<DIV>
+<H2 CLASS="program0">
+c = (1,1,0)</H2>
+<P CLASS="program">
+c2 = color.rgb_to_hsv(c)	# convert RGB to HSV</P>
+<P CLASS="program">
+print hsv	# (0.16667, 1, 1)</P>
+<P CLASS="program">
+c3 = color.hsv_to_rgb(c2)	# convert back to RGB</P>
+<P CLASS="program">
+print c3	# (1, 1, 0)</P>
+    <P CLASS="Normal"> Another example: <b>sphere(radius=2, color=hsv_to_rgb( 
+      (0.5,1,0.8) ) </b></P>
+    <P CLASS="Normal">&nbsp;</P>
+    </DIV>
+</DIV>
+<DIV> </DIV>
+<hr>
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+      <td><A HREF="rotation.html"><img src="icons/previous.gif" border="0" height="32"
+  alt="Previous Page" width="32"></A></td>
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+  alt="Up One Level" width="32"></A></td>
+      <td><A HREF="delete.html"><img src="icons/next.gif" border="0" height="32"
+  alt="Next Page" width="32"></A></td>
+<td align="center" width="100%">Visual Reference</td>
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+  alt="Contents" width="32"></A></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+</tr></table>
+  <b class="navlabel">Previous:</b> <a class="sectref" HREF="rotation.html">Rotating 
+  an Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
+  <b class="navlabel">Next:</b> <a class="sectref" HREF="delete.html">Deleting an Object</A> <br>
+  <hr>
+</DIV>
+</BODY>
+</HTML>

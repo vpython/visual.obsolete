@@ -1,0 +1,428 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+
+<HEAD>
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
+
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+
+<TITLE> Description of Objects in VPython</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="#ffffff">
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="graph.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="mouse.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+<b class="navlabel">Previous:</b> <a class="sectref" HREF="graph.html">Graph Plotting</A>
+
+<b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A>
+
+<b class="navlabel">Next:</b> <a class="sectref" HREF="mouse.html">Mouse Interactions</A>
+
+<br><hr>
+
+</DIV>
+
+<DIV>
+
+  <h1 CLASS="Heading-1"> <font color="#0000A0">Controlling One or More Visual 
+
+    Display Windows</font></h1>
+
+</DIV>
+
+<DIV> Initially, there is one Visual display window named <span class="attribute">scene</span>. 
+  Display objects do not create windows on the screen unless they are used, so 
+  if you immediately create your own display object early in your program you 
+  will not need to worry about scene. If you simply begin creating objects such 
+  as sphere they will go into scene. 
+  <P CLASS="attributes"> <span class="attribute">display()</span> Creates a display 
+    with the specified attributes, makes it the selected display, and returns 
+    it. For example, the following creates another Visual display window 600 by 
+    200, with 'Graph of position' in the title bar, centered on (5,0,0) and with 
+    a background color of cyan filling the window.</P>
+  <DIV> 
+    <H2 CLASS="program0"> scene2 = display(title='Graph of position',</H2>
+    <P CLASS="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;width=600, height=200,</P>
+    <P CLASS="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;center=(5,0,0), background=(0,1,1))</P>
+    <P CLASS="Normal"> <font color="#0000A0">General-purpose options</font></P>
+    <P CLASS="attributes"> <span class="attribute">select()</span> Makes the specified 
+      display the &quot;selected display&quot;, so that objects will be drawn 
+      into this display by default; e.g. <span class="attribute">scene.select() 
+      </span></P>
+  </DIV>
+</DIV>
+<blockquote> 
+  <blockquote> 
+    <blockquote>
+      <DIV class="attributes">
+        <DIV>The function <font color="#FF0000">display._selected()</font> returns 
+          a reference to the display in which objects are currently being created 
+          (which will be None if no display has been created yet).</DIV>
+      </DIV>
+    </blockquote>
+  </blockquote>
+</blockquote>
+<DIV>
+  <DIV>
+    <P CLASS="attributes"> <span class="attribute">foreground</span> Set color 
+      to be used by default in creating new objects such as sphere; default is 
+      white. Example: <span class="attribute">scene.foreground = (1,0,0)</span> 
+    </P>
+    <P CLASS="attributes"> <span class="attribute">background</span> Set color 
+      to be used to fill the display window; default is black.</P>
+    <P CLASS="attributes"><span class="attribute">stereo</span> Stereoscopic option; 
+      <span class="attribute">scene.stereo = 'redcyan'</span> will generate a 
+      scene for the left eye and a scene for the right eye, to be viewed with 
+      red-cyan glasses, with the red lens over the left eye. (There are also <span class="attribute">'redblue'</span> 
+      and <span class="attribute">'yellowblue'</span> options; note that objects 
+      that were not originally white may be somewhat dim.) <br>
+      <br>
+      Setting <span class="attribute">scene.stereo = 'crosseyed'</span> produces 
+      side-by-side images which if small enough can be seen in 3D by crossing 
+      your eyes but focusing on the screen (this takes some practice). Setting 
+      <span class="attribute">scene.stereo = 'passive'</span> produces side-by-side 
+      images which if small enough can be seen in 3D by looking &quot;wall-eyed&quot;, 
+      looking into the far distance but focusing on the screen (this too takes 
+      some practice). <span class="attribute"><br>
+      <br>
+      scene.stereo = 'active'</span> will render alternating left eye/right eye 
+      images for viewing through shutter glasses if the graphics system supports 
+      quad buffered stereo. If stereo equipment is not available, setting the 
+      option has no effect, and <span class="attribute">scene.stereo</span> will 
+      have the value <span class="attribute">'nostereo'</span>. You can also use 
+      <span class="attribute">scene.stereo = 'passive'</span> with quad buffered 
+      stereo for display using two polarized projectors (for stereo viewing using 
+      simple passive polarized glasses). (Quad buffered 'active' stereo is only 
+      available on specialised graphics systems that have the necessary hardware 
+      and shutter glass connector, such as PCs with nVidia Quadro graphics cards. 
+      It generates the illusion of depth by rendering each frame twice from slightly 
+      different viewpoints corresponding to the left and right eyes. Special shutter 
+      glasses are synchronised with the alternating images so that each eye sees 
+      only the matching frame, and your brain does the rest. It's called 'quad 
+      buffered' because there is an OpenGL buffer per eye, both double-buffered 
+      for smooth updating. 'Passive' stereo requires a video card that can drive 
+      two monitors, or two projectors.) </P>
+    <P CLASS="attributes"><span class="attribute">stereodepth</span> By default, 
+      the front of the scene is located at the location of the physical screen, 
+      which reduces eye strain. Setting <span class="attribute">scene.stereodepth 
+      = 1</span> moves the center of the scene to the location of the physical 
+      screen, with the front half of the scene seeming to stick dramatically out 
+      of the screen. <span class="attribute">scene.stereodepth = 2</span> moves 
+      the scene fully in front of the physical screen, for maximally dramatic 
+      stereo effect.</P>
+    <P CLASS="attributes"><span class="attribute">ambient</span> Amount of nondirectional 
+      (&quot;ambient&quot;) lighting. Default is 0.2. Also see the following <span class="attribute">lights</span> 
+      attribute.</P>
+    <P CLASS="attributes"><span class="attribute">lights</span> List of vectors 
+      representing directions from the origin to the lights. The magnitude of 
+      the vector is the intensity. For example, <span class="attribute">scene.lights 
+      = [vector(1,0,0)]</span> with <span class="attribute">scene.ambient = 0</span> 
+      will light the scene from the right side, with no ambient lighting on the 
+      left. By default there are two lights in the list: (0.17, 0.35, 0.70), magnitude 
+      0.8, and (-0.26, -0.07, -0.13), magnitude 0.3. The attributes <font color="#FF0000">lights</font> 
+      and <font color="#FF0000">ambient</font> must be used with some care, because 
+      if the total lighting intensity exceeds 1 anywhere in the scene the results 
+      are unpredictable. </P>
+    <P CLASS="attributes"><span class="attribute">cursor.visible</span> By setting 
+      <span class="attribute">scene.cursor.visible = 0</span>, the mouse cursor 
+      becomes invisible. This is often appropriate while dragging an object using 
+      the mouse. Restore the cursor with <span class="attribute">scene.cursor.visible 
+      = 1</span>.</P>
+    <P CLASS="attributes"><span class="attribute">objects</span> A list of all 
+      the visible objects in the display; invisible objects are not listed. For 
+      example, this makes all boxes in the scene red: </P>
+    <P CLASS="program">&nbsp;&nbsp;&nbsp;&nbsp;for obj in scene2.objects: <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;if obj.__class__ == box # can say either box or 
+      'box'<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.color = color.red</P>
+  </DIV>
+</DIV>
+
+<p class="attributes"><span class="attribute"><font color="#000000">To obtain 
+
+  </font>camera position</span>, see <a href="mouse.html">Mouse Interactions</a>.</p>
+
+<p class="attributes">&nbsp;</p>
+
+<DIV>
+
+    <DIV> </DIV>
+
+  </DIV>
+
+<DIV>
+
+<DIV> 
+
+    <P CLASS="Normal"><font color="#0000A0">Controlling the window</font></P>
+
+    <P CLASS="attributes"> <span class="attribute">x</span>, <span class="attribute">y</span> 
+
+      Position of the window on the screen (pixels from upper left)</P>
+
+    <P CLASS="attributes"> <span class="attribute">width</span>, <span class="attribute">height</span> 
+
+      Width and height of the display area in pixels: scene.height = 200</P>
+
+    <P CLASS="attributes"> <span class="attribute">title</span> Text in the window's 
+
+      title bar: scene.title = 'Planetary Orbit'</P>
+
+    <P CLASS="attributes"> <span class="attribute">visible</span> Make sure the 
+      display is visible; <span class="attribute">scene2.visible = 1</span><EM CLASS="program"> 
+      </EM> makes the display named <span class="attribute">scene2</span> visible. 
+      This is automatically called when new primitives are added to the display, 
+      or the mouse is referenced. Setting <span class="attribute">visible</span> 
+      to 0 hides the display.</P>
+    <P CLASS="attributes"><span class="attribute">fullscreen</span> Full screen 
+      option; <span class="attribute">scene2.fullscreen = 1</span><EM CLASS="program"> 
+      </EM> makes the display named <span class="attribute">scene2</span> take 
+      up the entire screen. In this case there is no close box visible; press 
+      Escape to exit. <br>
+      There is currently a bug in the fullscreen option for Linux/Unix/Mac OSX. 
+      Keyset input is not recognized, including the Escape key. If you use the 
+      fullscreen option on these systems, be sure to program a mouse input for 
+      quitting the program.</P>
+
+    <P CLASS="attributes"> <span class="attribute">exit</span> If <span class="attribute">sceneb.exit 
+      = 0</span>, the program does not quit when the close box of the <span class="attribute">sceneb</span> 
+      display is clicked. The default is <span class="attribute">sceneb.exit = 
+      1</span>, in which case clicking the close box does make the program quit.</P>
+    <P CLASS="attributes">&nbsp; </P>
+    <P CLASS="attributes">&nbsp; </P>
+    <P CLASS="Normal"> <font color="#0000A0">Controlling the view</font></P>
+
+    <P CLASS="attributes"> <span class="attribute">center</span> Location at which 
+
+      the camera continually looks, even as the user rotates the position of the 
+
+      camera. If you change <span class="attribute">center</span>, the camera 
+
+      moves to continue to look in the same &quot;compass&quot; direction toward 
+
+      the new center, unless you also change <span class="attribute">forward</span> 
+
+      (see next attribute). Default (0,0,0).</P>
+
+    <P CLASS="attributes"><span class="attribute">autocenter</span> scene.center 
+
+      is continuously updated to be the center of the smallest axis-aligned box 
+
+      containing the scene. This means that if your program moves the entire scene, 
+
+      the center of that scene will continue to be centered in the window.</P>
+
+    <P CLASS="attributes"> <span class="attribute">forward</span> Vector pointing 
+
+      in the same direction as the camera looks (that is, from the current camera 
+
+      location, given by scene.mouse.camera, toward scene.center). The user rotation 
+
+      controls, when active, will change this vector continuously. When <span class="attribute">forward</span> 
+
+      is changed, the camera position changes to continue looking at <span class="attribute">center</span>. 
+
+      Default (0,0,-1).</P>
+
+    <P CLASS="attributes"> <span class="attribute">fov</span> Field of view of 
+
+      the camera in radians. This is defined as the maximum of the horizontal 
+
+      and vertical fields of view. You can think of it as the angular size of 
+
+      an object of size range, or as the angular size of the longer axis of the 
+
+      window as seen by the user. Default pi/3.0 radians (60 degrees).</P>
+
+    <P CLASS="attributes"> <span class="attribute">range</span> The extent of 
+
+      the region of interest away from <span class="attribute">center</span> along 
+
+      each axis. This is always 1.0/scale, so use either <span class="attribute">range</span> 
+
+      or <span class="attribute">scale</span> depending on which makes the most 
+
+      sense in your program. Default (10,10,10) or set by <span class="attribute">autoscale</span>.</P>
+
+    <P CLASS="attributes"> <span class="attribute">scale</span> A scaling factor 
+
+      which scales the region of interest into the sphere with unit radius. This 
+
+      is always 1.0/range, so use either <span class="attribute">range</span> 
+
+      or <span class="attribute">scale</span> depending on which makes the most 
+
+      sense in your program. Default (0.1,0.1,0.1) or set by autoscale.</P>
+
+    <P CLASS="attributes"> <span class="attribute">uniform = 0</span> each axis 
+
+      has different units and scales</P>
+
+    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;autoscale will 
+
+      scale axes independently</P>
+
+    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the x and y 
+
+      axes will be scaled by the aspect ratio of the window</P>
+
+    <P CLASS="attributes"> <span class="attribute">uniform = 1</span> each axis 
+
+      has the same scale</P>
+
+    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;autoscale scales 
+
+      axes together</P>
+
+    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the aspect 
+
+      ratio of the window does not affect scaling</P>
+
+    <P CLASS="attributes"> <span class="attribute">up</span> A vector representing 
+
+      world-space up. This vector will always project to a vertical line on the 
+
+      screen (think of the camera as having a &quot;plumb bob&quot; that keeps 
+
+      the top of the screen oriented toward up). The camera also rotates around 
+
+      this axis when the user rotates &quot;horizontally&quot;. By default the 
+
+      y axis is the <span class="attribute">up</span> vector.</P>
+
+    <P CLASS="attributes"> There is an interaction between <span class="attribute">up</span> 
+
+      and <span class="attribute">forward</span>, the direction that the camera 
+
+      is pointing. By default, the camera points in the -z direction (0,0,-1). 
+
+      In this case, you can make the x or y axes (or anything between) be the 
+
+      <span class="attribute">up</span> vector, but you cannot make the z axis 
+
+      be the <span class="attribute">up</span> vector, because this is the axis 
+
+      about which the camera rotates when you set the <span class="attribute">up</span> 
+
+      attribute. If you want the z axis to point up, first set <span class="attribute">forward</span> 
+
+      to something other than the -z axis, for example (1,0,0).</P>
+
+    <P CLASS="attributes"> <span class="attribute">autoscale = 0</span> no automatic 
+
+      scaling (set range or scale explicitly)</P>
+
+    <P CLASS="attributes"> <span class="attribute">&nbsp;&nbsp;&nbsp;&nbsp;autoscale 
+
+      = 1</span> automatic scaling (default)</P>
+
+    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;It is often useful to let Visual 
+
+      make an initial display with autoscaling, then turn autoscaling off to prevent 
+
+      further automated changes.</P>
+
+    <P CLASS="attributes"> <span class="attribute">userzoom = 0</span> user cannot 
+
+      zoom in and out of the scene</P>
+
+    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;<span class="attribute">userzoom 
+
+      =<span class="attribute"> </span>1</span> user can zoom (default)</P>
+
+    <P CLASS="attributes"> <span class="attribute">userspin = 0</span> user cannot 
+
+      rotate the scene</P>
+
+    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;<span class="attribute">userspin 
+
+      = 1</span> user can rotate (default)</P>
+
+  </DIV>
+
+</DIV>
+
+<br><hr>
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+
+<tr>
+
+      <td><A HREF="graph.html"><img src="icons/previous.gif" border="0" height="32"
+
+  alt="Previous Page" width="32"></A></td>
+
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+
+  alt="Up One Level" width="32"></A></td>
+
+      <td><A HREF="mouse.html"><img src="icons/next.gif" border="0" height="32"
+
+  alt="Next Page" width="32"></A></td>
+
+<td align="center" width="100%">Visual Reference</td>
+
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+
+  alt="Contents" width="32"></A></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+      <td><img src="icons/blank.gif" border="0" height="32"
+
+  alt="" width="32"></td>
+
+</tr></table>
+
+<b class="navlabel">Previous:</b> <a class="sectref" HREF="graph.html">Graph Plotting</A>
+
+<b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A>
+
+<b class="navlabel">Next:</b> <a class="sectref" HREF="mouse.html">Mouse Interactions</A>
+
+<br><hr>
+
+</DIV>
+
+</BODY>
+
+</HTML>
+

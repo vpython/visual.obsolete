@@ -1,0 +1,48 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+</head>
+
+<body bgcolor="#FFFFFF">
+<p class="Normal"><font color="#0000A0">Click example</font></p>
+<div> 
+  <p class="Normal"> This program displays a sphere (which automatically creates 
+    a window referred to as <span class="attribute">scene</span>), then repeatedly 
+    waits for a mouse left click, prints the mouse position, and displays a small 
+    red sphere. A mouse left click is defined as pressing and releasing the left 
+    mouse button at nearly the same location.</p>
+</div>
+<div> 
+  <h2 class="program0"> scene.range = 4</h2>
+  <p class="program">sphere() # display a white sphere for context</p>
+  <p class="program"> while 1:</p>
+  <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;if scene.mouse.clicked:</p>
+  <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m = scene.mouse.getclick()</p>
+  <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loc = m.pos</p>
+  <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print loc</p>
+  <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sphere(pos=loc, 
+    radius=0.1, color=(1,0,0))</p>
+  <p class="Normal"> Try running this program. You will find that if you click 
+    inside the white sphere, nothing seems to happen. This is because the mouse 
+    click is in the x,y plane, so the little red sphere is buried inside the large 
+    white sphere. If you rotate the scene and then click, you'll see that the 
+    little red spheres go into the new plane parallel to the screen and passing 
+    through <span class="attribute">display.center</span>. If you want all the 
+    red spheres to go into the xy plane, do this:</p>
+  </div>
+<div> 
+  <h2 class="program0"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loc = 
+    m.project(normal=(0,0,1))</h2>
+  <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if loc: 
+    # loc is None if no intersection with plane</p>
+  <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print 
+    loc</p>
+  <p class="program"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sphere(pos=loc, 
+    radius=0.1, color=(1,0,0))</p>
+</div>
+<p class="Normal">Choose Back, or <a href="mouse.html">Go to top of mouse documentation</a></p>
+
+</body>
+</html>

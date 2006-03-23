@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
+<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE> Description of Objects in VPython</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+      <td><A HREF="index.html"><img src="icons/previous.gif" border="0" height="32"
+  alt="Previous Page" width="32"></A></td>
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+  alt="Up One Level" width="32"></A></td>
+      <td><A HREF="arrow.html"><img src="icons/next.gif" border="0" height="32"
+  alt="Next Page" width="32"></A></td>
+<td align="center" width="100%">Visual Reference</td>
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+  alt="Contents" width="32"></A></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+</tr></table>
+<b class="navlabel">Previous:</b> <a class="sectref" HREF="index.html">Contents</A>
+<b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A>
+<b class="navlabel">Next:</b> <a class="sectref" HREF="arrow.html">The arrow Object</A>
+<br><hr>
+</DIV>
+<DIV>
+  <H1 CLASS="Heading-1"> <font color="#0000A0">The cylinder Object</font></H1>
+</DIV>
+<DIV>
+<P CLASS="Normal"> <IMG SRC="VisualRef-1.gif" ALIGN="RIGHT"> Here is an example 
+    of how to make a cylinder, naming it &quot;rod&quot; for future reference:</P>
+  <DIV> 
+    <H2 CLASS="program0"> rod = cylinder(pos=(0,2,1), axis=(5,0,0), radius=1)</H2>
+    <P CLASS="Normal"> The center of one end of this cylinder is at x=0, y=2, 
+      and z=1. Its axis lies along the x axis, with length 5, so that the other 
+      end of the cylinder is at (5,2,1), as shown in the accompanying diagram.</P>
+    <P CLASS="Normal"> You can modify the position of the cylinder after it has 
+      been created, which has the effect of moving it immediately to the new position:</P>
+  </DIV>
+  <DIV> 
+    <P CLASS="program"> rod.pos = (15,11,9) # change position (x,y,z)</P>
+    <P CLASS="program"> rod.x = 15 # only change pos.x</P>
+    <P CLASS="Normal"> If you create an object such as a cylinder but without 
+      giving it a name such as <span class="attribute">rod</span>, you can't refer 
+      to it later. This doesn't matter if you never intend to modify the object.</P>
+    <P CLASS="Normal"> Since we didn't specify a color, the cylinder will be the 
+      current &quot;foreground&quot; color (see <a href="display.html">Controlling 
+      One or More Visual Display Windows</a>). The default foreground color is 
+      white. After creating the cylinder, you can change its color:</P>
+  </DIV>
+  <DIV> 
+    <P CLASS="program"> rod.color = (0,0,1) # make rod be blue</P>
+    <P CLASS="Normal"> This will make the cylinder suddenly turn blue, using the 
+      so-called RGB system for specifying colors in terms of fractions of red, 
+      green, and blue. (For details on choosing colors, see <a href="color.html">Specifying 
+      Colors</a>.) You can set individual amounts of red, green, and blue like 
+      this:</P>
+  </DIV>
+  <DIV> 
+    <P CLASS="program"> rod.red = 0.4</P>
+    <P CLASS="program"> rod.green = 0.7</P>
+    <P CLASS="program"> rod.blue = 0.8</P>
+    <P CLASS="Normal"> The cylinder object can be created with other, optional 
+      attributes, which can be listed in any order. Here is a full list of attributes, 
+      most of which also apply to other objects:</P>
+    <P CLASS="attributes"> <font color="#FF0000" class="attribute">pos</font> 
+      Position: the center of one end of the cylinder; default = (0,0,0)<BR>
+      A triple, in parentheses, such as (3,2,5)</P>
+    <P CLASS="attributes"> <font color="#FF0000">axis</font> The axis points from 
+      pos to the other end of the cylinder, default = (1,0,0)</P>
+    <P CLASS="attributes"> <span class="attribute">x</span>, <span class="attribute">y</span>, 
+      <span class="attribute">z</span> Essentially the same as pos.x, pos.y, pos.z, 
+      defaults are all 0</P>
+    <P CLASS="attributes"> <span class="attribute">radius</span> The radius of 
+      the cylinder, default = 1</P>
+    <P CLASS="attributes"> <span class="attribute">length</span> Length of axis; 
+      if not specified, axis determines the length, default = 1<BR>
+      If length is specified, it overrides the length given by axis</P>
+    <P CLASS="attributes"> <span class="attribute">color</span> Color of object, 
+      as a red-green-blue (RGB) triple: (1,0,0) is pure red, default = (1,1,1), 
+      which is color.white</P>
+    <P CLASS="attributes"> <span class="attribute">red</span>, <span class="attribute">green</span>, 
+      <span class="attribute">blue</span> (can set these color attributes individually), 
+      defaults are all 1</P>
+    <P CLASS="attributes"> <span class="attribute">up</span> Which side of the 
+      cylinder is &quot;up&quot;; this has only a subtle effect on the 3D appearance 
+      of the cylinder, default (0,1,0)</P>
+    <P CLASS="Normal"> Note that the <span class="attribute">pos</span> attribute 
+      for cylinder, arrow, cone, and pyramid corresponds to one end of the object, 
+      whereas for a box, sphere, or ring it corresponds to the center of the object. 
+    </P>
+    <P CLASS="Normal"> When you start a VPython program, for convenience Visual 
+      creates a display window and names it <span class="attribute">scene</span>. 
+      By default, objects that you create go into that display window. See <a href="display.html">Controlling 
+      One or More Visual Display Windows</a> later in this reference for how you 
+      can create additional display windows and place objects in them.</P>
+    <P CLASS="Normal"><br>
+    </P>
+    </DIV>
+</DIV>
+<DIV></DIV>
+<hr>
+<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+      <td><A HREF="index.html"><img src="icons/previous.gif" border="0" height="32"
+  alt="Previous Page" width="32"></A></td>
+      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
+  alt="Up One Level" width="32"></A></td>
+      <td><A HREF="arrow.html"><img src="icons/next.gif" border="0" height="32"
+  alt="Next Page" width="32"></A></td>
+<td align="center" width="100%">Visual Reference</td>
+      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
+  alt="Contents" width="32"></A></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+      <td><img src="icons/blank.gif" border="0" height="32"
+  alt="" width="32"></td>
+</tr></table>
+<b class="navlabel">Previous:</b> <a class="sectref" HREF="index.html">Contents</A>
+<b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A>
+<b class="navlabel">Next:</b> <a class="sectref" HREF="arrow.html">The arrow Object</A>
+<br><hr>
+</DIV>
+</BODY>
+</HTML>
