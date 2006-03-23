@@ -1,0 +1,269 @@
+The purpose of this file is to fully document the installation
+procedure for VPython from source on all supported platforms.
+
+Table of Contents:
+I:   Prerequisites
+II:  Configuration
+III: Building
+IV:  Final Installation
+V:   Troubleshooting
+VI:  Notes for Redistributors
+
+I.  Prerequisites:
+	Most or all of these may be provided by your operating system 
+	distributor.  In every case, you must have the "developer" version
+	of the packages to ensure that the required header files are 
+	available.
+
+	GNU g++ version 3.2.x or >= 3.3.1 (gcc.gnu.org).
+	Python 2.2.x or 2.3.x or 2.4.x (www.python.org).
+	The Boost C++ libraries version 1.30.0, 1.30.2, or 1.31 and higher 
+		(www.boost.org).  Note that 1.31 is required if you are using Python 
+		2.3 or higher, and is reccomended in any case due to getting much
+		better error messages.  1.32.0 or higher is required if you want to use
+		GNU G++ 3.4.0 or higher to build the suite.
+		
+		IMPORTANT: Boost 1.33 did NOT work with Visual when tried Dec. 2005.
+		(But on Ubuntu Linux it's called 1.32.0+1.33.0, and it works, Feb. 2006.)
+		
+	Gtk+ 1.2.x (Not required on Windows) (www.gtk.org).
+	GtkGLArea 1.2.x (Not required on Windows) (www.gnome.org).
+	Numeric Python AND/OR the Python Numarray library (numpy.sourceforge.net).
+	An implementation of OpenGL.
+	
+	On Microsoft Windows, MinGW and MSYS are required to build VPython from 
+	source.
+	
+	A.  Apple OSX (Version 10.2.x)
+		- Go to www.apple.com/macosx/features/x11/download and download
+		both X11 and the X11 SDK.
+		- Install fink from fink.sourceforge.net.  Answer 'y' when asked
+		about adding a line to ~/.cshrc.  You do not need to run
+		'dselect'.
+		- In a terminal editor run the following:
+		rehash
+		sudo apt-get update
+		sudo apt-get install pkgconfig gtk+ gtkglarea python22
+		rehash
+		which python2.2 (Verify this reports /sw/bin/python2.2)
+		Install GCC from source using version 3.3.1 or higher.  First
+		install the Apple Developer's Tools (called XCode in 10.3)
+		including an installation of GCC 3.3.  Download and unpack
+		the sources for GCC from gcc.gnu.org.  This creates a directory 
+		named like 'gcc-3.3.3'.  Make a new directory alongside this 
+		directory, such as 'buildgcc3.3.3'. cd into the new directory and
+		 run: 
+		`../gcc-3.3.3/configure --enable-languages=c,c++ --disable-shared \
+		--enable-version-specific-runtime-libs --program-suffix=-3.3.3 \
+		--enable-threads=posix`
+		Build the new compiler with `make bootstrap`.  Optionally, to save
+		some disk space, build with `make CXXFLAGS=-O2`, instead.
+		install the compiler with `sudo make install`
+		Download
+		OpenGL is provided with the standard OS installation.
+	# TODO: include directions for building Boost.Python on OSX(gulp).
+	
+	B.  Microsoft Windows
+		Download and install the MinGW 3.1 and MSYS 1.0.9 packages from
+		www.mingw.org.  Also download the MinGW Utils package (version 0.1 or
+		higher).  You may need to add C:\mingw\bin to your PATH.
+		Download and install Python 2.4.x from www.python.org.
+		OpenGL is provided with the standard OS installation.
+		
+		From an MSYS shell run the following:
+		> pexports /c/windows/system32/python24.dll > libpython24.def
+		> dlltool --input-def libpython24.def --output-lib libpython24.a
+		Copy the resulting libpython24.a into C:\mingw\lib
+		
+		Download a precompiled version of the 'bjam' tool from www.boost.org 
+		and place it into C:\mingw\bin (or anywhere else on your PATH).
+		Download and unpack the Boost source tree.
+		In MSYS:
+		> cd boost_1_31_0/libs/python/build
+		> bjam -sTOOLS=mingw -sPYTHON_VERSION=2.4 -sPYTHON_ROOT=C:/Python24
+		> cp bin-stage/boost_python.dll /mingw/bin/
+		
+		> pexports bin-stage/boost_python.dll > libboost_python24.def
+		> dlltool --input-def libboost_python24.def --output-lib libboost_python24.a
+		> cp libboost_python24.a /mingw/lib/
+		
+		Copy boost_1_31_0/boost to /mingw/include/
+		
+	C.  GNU/Linux
+		Please note that these package lists are my best-guess based on 
+		browsing the various package listings.  If you have any corrections or
+		additions please write to visualpython-users@lists.sourceforge.net.
+		
+		Users of Debian Sid, Sarge, and derivatives will need these packages:
+			python2.3-dev
+			python2.3-numeric *
+			python2.3-numarray *
+			gtkglarea5-dev
+			libgtk1.2-dev
+			g++
+			libboost-python-dev
+			libglu-dev (xlibmesa-glu-dev OR nvidia-glx-dev) **
+		
+		* VPython may be built against Numeric, Numarray, or both.  If you
+		build VPython with support for both, you can select which library
+		you want to use for array objects at runtime.
+
+		** libglu-dev doesn't exist; it is Provided by other packages.  If 
+		you use Mesa+DRI, then xlibmesa-glu-dev will meet this requirement.
+		If you use NVIDIA's non-free OpenGL drivers you will need
+		nvidia-glx-dev.  Other drivers may require you to use a specific -dev
+		package for that driver.
+			
+		Users of Debian Woody and derivatives will need to obtain backports 
+		of the above from (eg.) www.backports.org.
+		
+		Users of RPM-based systems will need the following packages and their
+		dependancies:
+			boost-python-devel
+			python-devel
+			python-numeric
+			gtk+-devel
+			gtkglarea-devel
+			g++
+		
+		Users of Gentoo will need these packages and their dependancies from
+		portage:
+			boost
+			gcc
+			Python
+			gtk+
+			gtkglarea
+			numeric
+		
+		If you are using Gentoo and have numarray (<1.0) installed, you must
+		pass --without-numarray to VPython's configure.
+		
+		WARNING: You cannot build some dependancies with G++ 3.3.x or 3.2.x and
+		others with G++ 3.4.x; the two are not compatable with each other.
+			
+		You must have an implementation of OpenGL (aka GLX) installed on your
+		system.  Mesa (and the DRI), Nvidia, and ATI each provide usable GLX
+		implementaions.  Properly configuring OpenGL may involve editing
+		/etc/X11/XF86Config-4 and is not covered here.  A simple operational 
+		test is to run the `glxgears` program.
+		
+
+II.   Configuration 
+	On most systems, configuration should be automatic.  Just run 'configure'.
+
+	However, configure also provides a large number of options and is sensitive to 
+	several environment variables to properly configure VPython for unique use cases. 
+	Additionally, it is a good idea to build VPython in a directory separate from the
+	source tree.  Just run configure with the fully-qualified path to it, eg (from a
+	directory alongside visual-2.9) `../visual-2.9/configure`
+	
+	Run `configure --help` for the complete list of options and brief descriptions.
+	
+	If you have multiple versions of Python installed, and the one named 'python' that
+	is first on your PATH (identified with `which python`) is not the one you want to 
+	build Visual for, specify the correct interpreter by setting the PYTHON
+	environment variable to the desired interpreter's full path.
+	
+	If you have multiple versions of GNU G++ installed, and the default is inadequate
+	for VPython, specify the correct one by setting the CXX environment variable to
+	its fully-qualified path.
+	
+	If you have both Numarray and Numeric Python installed, and you want to
+	explicitly disable support for one of them, use the option 
+	--without-numarray, or --without-numeric, as appropriate.
+	
+	If you are using G++ 3.3.x on Darwin, you must set the CXXFLAGS environment 
+	variable to	include "-finline-functions".  You should also include "-O2".  All of 
+	these options must be separated by whitespace.
+	
+	You should generally supply the --prefix option to cause Visual to be installed to
+	the same prefix that Python is installed (default is /usr/local).
+	
+	On Linux, do this:
+	which python (make a note of the prefix preceding /bin/python, typically /usr or /usr/local)
+	If prefix is /usr/local, execute ../visual-x.x.x/configure
+	If prefix is something else, execute ../visual-x.x.x/configure --prefix=/usr (or whatever)
+	
+	If you are only building VPython once, you may pass the option
+	--disable-dependancy-tracking to make the build itself go a little faster.
+	
+	If your GNOME libraries are installed in a non-standard location (such as 
+	/sw in OSX fink, or /opt/gnome in SUSE), you must set the CPPFLAGS 
+	environment variable to -I/other_prefix/include to ensure that you pick up
+	the gtkglarea header files.
+	
+	The prebuilt binary for MS Windows is configured with (in MSYS):
+	CXXFLAGS="-O2 -finline-functions -march=i686" PYTHON=/c/Python24/python \
+	PYTHONPATH="c:\Python24\lib\site-packages" ../visual-2.9/configure
+	
+	The prebuilt binary for Apple OSX is configured with (in Bash):
+	CXX=/usr/local/bin/g++-3.3.3 CXXFLAGS="-O2 -finline-functions" \
+	PYTHON=/sw/bin/python CPPFLAGS=-I/sw/include ../visual-2.9/configure \
+	--prefix=/sw
+	
+	Another interesting configuration is to install VPython into a prefix other than
+	the same prefix that Python is installed in.  This may be useful to test your
+	VPython programs with different versions of Visual on the same system
+	simultaneously.  After choosing an approprate prefix, such as /home/jonathan, run
+	configure as normally but specify the PYTHONPATH environment variable to be
+	[prefix]/lib/python2.4/site-packages, replacing python2.4 with python2.2 if that
+	is your interpreter.  You must create this PYTHONPATH directory if it does not
+	already exist.
+	
+	WARNING: If you are using a Pentium 4 and glibc 2.3.2 or earlier, and are
+	enabling numarray support, do not use -march=pentium4 or -mfpmath=sse as 
+	compiler options in CXXFLAGS or CFLAGS.  There is a bug in this version 
+	of glibc, triggered by numarray, that will lead to SIGFPE (Floating Point
+	Error) at runtime.
+
+III.  Build
+	Just run 'make'.  
+	
+	Optionally, you may override the following variables by
+	specifying them in the form VARIABLE=value as arguments to make:
+	LDFLAGS, LIBS, CXXFLAGS, and CPPFLAGS affect options passed to the linker,
+	compiler, and preprocessor, respectively.
+	DESTDIR may be used to prepend DESTDIR to the 'prefix' specified when running
+	configure.  This option is mostly useful to binary redistributors of VPython.
+	
+	If you want debugging symbols in your build (adds roughly 70 MB of data to the
+	final object file), you must manually edit cvisual/Makefile and remove `-g0` from
+	the CXXFLAGS variable.
+	
+	The Makefiles support the following targets:
+	all: (the default) compiles all the required software
+	clean: deletes files created by the compiler
+	distclean: deletes all files created by the configure and make programs.  This
+		option is useful if you want to start over from a clean source tree.
+	install: copies all required files in the locations specified by configure
+	install-strip: Performs the 'install' target and strips the final object files.
+		It also makes getting a backtrace impossible on most platforms. 
+
+IV.  Install
+	You must have write privaleges to the installation directory to proceed.  Unless
+	you are installing into your home directory, that generally means becoming root
+	with a program like `sudo` or `su`
+	On Apple OSX, run `sudo make install`
+	On MS Windows, there usually isn't a distinction between administrators and
+	normal users, so you can just run 'make install'
+	
+	Alternatively, you may run 'make install-strip' to install a somewhat smaller
+	executable.
+
+V:   Troubleshooting
+	The single most likely cause of an error in the build is that one or more
+	develoment header files could not be found.  VPython logs its configuration stage
+	in config.log, and its build stage in src/build.log.  If the build fails you
+	must read src/build.log to see what happened.  In the event that you cannot
+	solve the problem, compress config.log and src/build.log and include them with
+	your request for assistance to visualpython-users@lists.sourceforge.net.
+	
+	But before you do that, it is a good idea to read the archives of the mailing list
+	since someone else has probably worked through your problem already.
+
+VI:	  Notes for redistributors
+	If you are redistributing a binary package of VPython for a particular
+	system, the appropriate build-dependancy is to build Visual with support
+	for both Numeric and Numarray.  The runtime-dependancy is one or the other
+	or both.  It is perfectly safe to build Visual with support for both and
+	only have one installed when running it on another machine.

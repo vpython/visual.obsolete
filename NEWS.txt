@@ -1,0 +1,68 @@
+Visual 3.2.4
+===============================================================================
+	BUGS FIXED:
+	* Ensure that the last point of a curve is always rendered.
+	* diff_angle with (0,0,0) vectors returns 0 instead of pi/2
+	* Documention corrected to state frame.objects includes only visible objects.
+	* display.exit = 0 again works (only that window closes)
+
+Visual 3.2.1
+===============================================================================
+	BUGS FIXED:
+	* Fix an undefined reference error in cvisualmodule.so
+
+Visual 3.2.0
+===============================================================================
+	NEW FEATURES:
+	* New stereo mode: "crosseyed".  It is just like 'passive', but reversed
+		left-to-right.
+	* Added the dependancy list for Genoo systems to INSTALL.txt.
+	
+	BUGS FIXED:
+	* A crash that affected users of some NVIDIA Quadro video cards on Windows
+		has been fixed.
+	* Work around sizeof(float*) < sizeof(int) on AMD64 systems.
+
+Visual 3.1.1
+===============================================================================
+	NEW FEATURES:
+	* There is no longer a restriction on rotating past the up axis, such that
+		the scene may be rotated upside-down under user control.
+	* The MS Windows builds include packages for Python 2.3 and 2.4, upgrades
+		Boost.Python to version 1.32, and adds Numarray 1.1.1.
+	* The MS Windows installer has been componentized, and will respect an
+		existing installation of Numeric or Numarray.	
+
+	BUGS FIXED:
+	* A resource leak in the label object has been fixed.
+	* configure option --with-gtkgl-prefix works correctly (only affects *nix
+		and OSX users).
+	* The bounds check for display.up and display.forward is more robust.
+	* A crash in the free function rotate( vector, angle, axis) has been fixed.
+	* Thin curve objects are rendered with the correct color in anaglyph stereo
+		rendering modes.
+	* The "vpython" script is working again.
+	
+	KNOWN ISSUES:
+	* "make install" is broken on Windows.  Use the generated
+		MakeVPython.iss Inno Setup file to build an installer and run it.
+
+Visual 3.1.0
+===============================================================================
+	NEW FEATURES:
+	* This is the first release that has been produced from our new CVS layout.
+		This enables a more deterministic release process that will reduce
+		regressions.
+	* Numarray support has been added.  You can enable support for Numeric and
+		Numarray in the same build, and select between them at runtime.  See
+		INSTALL.txt for details.
+
+	BUGS FIXED:
+	* The autotools support for MS Windows has been significantly improved.
+	* Nx2 arrays are supported for convex.pos and faces.pos
+	* faces.color is initialized in the correct order.  This bug prevented you
+		from initializing faces.color to an array in the constructor.
+	* {primitive,frame}.rotate( pos=foo, origin=bar) works as expected.
+	* The shutdown procedure is kinder to the shell when using Bash.
+	* Several uninitialized value errors were fixed in the display class when
+		using the GTK+ backend.

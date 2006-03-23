@@ -1,0 +1,28 @@
+VPython CVS is maintained at cvs.sourceforge.net:/cvsroot/visualpython
+Anonymous access is via pserver, as user anonymous, empty password.
+
+Mainline development is taking place in the "vpython" module.  The modules 
+"cvisual", "Programs", "visual", and "installer" contain the mainline source 
+changes prior to December 22, 2004, and are no longer maintained.  Experimental
+development is taking place in the "vpython-core2" module at this time.
+
+Makefile.in, configure, and the helper programs for them are not maintained in
+CVS. You will have to run the autogen.sh script after a fresh checkout to 
+create configure (set the version number appropriately in configure.ac before
+running autogen.sh). Also set this version number in the first line of __init__.py.
+
+If you are using Windows, you will need MinGW, MSYS, and the 
+MSYS-DTK from www.mingw.org, and you will need to copy share/aclocal/* (from
+our CVS) to /share/aclocal (in MSYS) prior to running autogen.sh. You will
+also need to install msys-automake, msys-autoconf, and msys-libtool.
+
+The source distribution is built with "make dist-bzip2"  "make bzip" is also
+supported.
+
+Please provide patches in unified diff format, as generated with
+$ cvs diff -u
+
+This project uses tabs for indentation in C++, and spaces in Python.
+
+We do not use a separate developer's mailing list, so please direct any 
+development-related questions to visualpython-users@lists.sourceforge.net.
