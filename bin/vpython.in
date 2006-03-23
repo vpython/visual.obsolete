@@ -1,0 +1,24 @@
+#! /bin/sh
+# Variables determined by configure.
+PYTHON=@PYTHON@
+visualexampledir=@visualexampledir@
+IDLE=idle
+PYTHONPATH=@PYTHONPATH@
+export PYTHONPATH
+
+case "$1" in
+'-h') echo "USAGE:  $0 [file]"
+    echo "Default is to start in the examples directory: $visualexampledir"
+    exit 1
+    ;;
+'--help') echo "USAGE:  $0 [file]"
+    echo "Default is to start in the examples directory: $visualexampledir"
+    exit 1
+    ;;
+'')
+    cd $visualexampledir
+    $PYTHON $IDLE
+    ;;
+*)  $PYTHON $IDLE "$*"
+    ;;
+esac
