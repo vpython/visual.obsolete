@@ -71,15 +71,21 @@ CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo \
 	convex.lo curve.lo cvisualmodule.lo faces.lo num_util.lo \
 	scalar_array.lo slice.lo vector_array.lo wrap_arrayobjects.lo \
 	wrap_display_kernel.lo wrap_primitive.lo wrap_rgba.lo \
-	wrap_vector.lo 
+	wrap_vector.lo clipping_plane.lo displaylist.lo errors.lo extent.lo \
+	gl_free.lo icosophere.lo lighting.lo quadric.lo rgba.lo texture.lo \
+	tmatrix.lo vector.lo
 
 # Distribution file list.
 DISTFILES = $(subst .lo,.cpp,$(CVISUAL_OBJS) \
-	xgl.lo xgl2.lo wgl.lo platlinux.lo platwin.lo) linux-symbols.map \
+	font.lo winfont.lo main.lo winmain.lo \
+	random_device.lo winrandom_device.lo \
+	rate.lo winrate.lo \
+	render_surface.lo winrender_surface.lo \
+	timer.lo wintimer.lo) linux-symbols.map \
 	osx-symbols.txt
 
 # The "soversion" for this iteration of Visual.
-CVISUAL_VERSION_INFO = 1:0:0
+CVISUAL_VERSION_INFO = 2:0:0
 	
 # Installation target locations
 pythondir = @pythondir@
