@@ -4,7 +4,7 @@
 AC_INIT( [Visual Python], [3.2.9], [visualpython-users@lists.sourceforge.net])
 AM_INIT_AUTOMAKE( visual, 3.2.9)
 
-AC_CONFIG_SRCDIR(src/arrow.cpp)
+AC_CONFIG_SRCDIR(src/core/arrow.cpp)
 
 # Compiling C and C++ code
 
@@ -35,8 +35,12 @@ AM_CHECK_PYTHON_HEADERS([], [
 
 if test $platform_win32 = yes; then
 	# We are on Win32.
-	AC_SUBST([GLOBJ], [wgl])
-	AC_SUBST([PLATFORMOBJ], [platwin])
+	AC_SUBST([FONTOBJ], [winfont])
+	AC_SUBST([MAINOBJ], [winmain])
+	AC_SUBST([RANDOMDEVICEOBJ], [winrandom_device])
+	AC_SUBST([RATEOBJ], [winrate])
+	AC_SUBST([RENDERSURFACEOBJ], [winrender_surface])
+	AC_SUBST([TIMEROBJ], [wintimer])
 	AC_DEFINE([HAVE_WIN32_API],[1])
 	# The current working directory, as a backslashified Win32 style path.
 	AC_SUBST([WIN32_CWD], [`pwd -W | sed -e "s/\\//\\\\\/g"`])
@@ -53,8 +57,12 @@ else
 	AC_SUBST([GTHREAD_LIBS])
 
 	AM_PATH_GTKGL([
-		AC_SUBST([PLATFORMOBJ], [platlinux])
-		AC_SUBST([GLOBJ], [xgl])
+		AC_SUBST([FONTOBJ], [font])
+		AC_SUBST([MAINOBJ], [main])
+		AC_SUBST([RANDOMDEVICEOBJ], [random_device])
+		AC_SUBST([RATEOBJ], [rate])
+		AC_SUBST([RENDERSURFACEOBJ], [render_surface])
+		AC_SUBST([TIMEROBJ], [timer])
 		AC_DEFINE([HAVE_GTK_GL_AREA],[1])], 
 		[AC_MSG_ERROR([gtkglarea is required on Unix-like systems])])
 fi
