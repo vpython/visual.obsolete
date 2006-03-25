@@ -17,7 +17,7 @@
 #include <Numeric/arrayobject.h>
 
 #include "util/rate.hpp"
-#include "display.hpp"
+#include "gtk2/display.hpp"
 #include "util/errors.hpp"
 
 namespace cvisual {

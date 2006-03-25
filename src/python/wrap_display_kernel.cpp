@@ -5,7 +5,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
-#include "display.hpp"
+#include "gtk2/display.hpp"
 #include "mouseobject.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"
