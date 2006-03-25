@@ -9,7 +9,7 @@
 #include "display_kernel.hpp"
 #include "mouseobject.hpp"
 
-#include <gtkmm/gl/drawingarea.h>
+#include <gtkmm/drawingarea.h>
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
 #include <gtkmm/image.h>
