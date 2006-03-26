@@ -32,7 +32,6 @@ VISUAL_NUMERICLIBS()
 AM_CHECK_PYTHON_HEADERS([], [
 	AC_MSG_ERROR([A suitable python interpreter was found, but you do not have the header files required for building C/C++ extensions to python, or another problem was encoutered when compiling a program that uses Python.h.])])
 
-
 if test $platform_win32 = yes; then
 	# We are on Win32.
 	AC_SUBST([FONTOBJ], [winfont])
@@ -47,24 +46,25 @@ if test $platform_win32 = yes; then
 	# The top-level source directory.
 	AC_SUBST([WIN32_SRCDIR], [`cd $srcdir ; pwd -W | sed -e "s/\\//\\\\\/g"`])
 else
-	PKG_CHECK_MODULES( GTK, gtk+ >= 1.0, ,
-		[AC_MSG_ERROR(Gtk+ is required on Unix-like systems)])
-		AC_SUBST([GTK_LIBS])
-		AC_SUBST([GTK_CFLAGS])
-	PKG_CHECK_MODULES( GTHREAD, gthread >= 1.0, ,
+	PKG_CHECK_MODULES( GTK, gtkglextmm-1.0 >= 1.0, ,
+		[AC_MSG_ERROR(gtkglextmm is required on Unix-like systems)])
+	AC_SUBST([GTK_LIBS])
+	AC_SUBST([GTK_CFLAGS])
+	PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
 		[AC_MSG_ERROR(GThread is required on Unix-like systems)])
 	AC_SUBST([GTHREAD_CFLAGS])
 	AC_SUBST([GTHREAD_LIBS])
+	PKG_CHECK_MODULES( FTGL, ftgl >= 0.0, ,
+		[AC_MSG_ERROR(FTGL is required on Unix-like systems)])
+	AC_SUBST([FTGL_CFLAGS])
+	AC_SUBST([FTGL_LIBS])
 
-	AM_PATH_GTKGL([
-		AC_SUBST([FONTOBJ], [font])
-		AC_SUBST([MAINOBJ], [main])
-		AC_SUBST([RANDOMDEVICEOBJ], [random_device])
-		AC_SUBST([RATEOBJ], [rate])
-		AC_SUBST([RENDERSURFACEOBJ], [render_surface])
-		AC_SUBST([TIMEROBJ], [timer])
-		AC_DEFINE([HAVE_GTK_GL_AREA],[1])], 
-		[AC_MSG_ERROR([gtkglarea is required on Unix-like systems])])
+	AC_SUBST([FONTOBJ], [font])
+	AC_SUBST([MAINOBJ], [main])
+	AC_SUBST([RANDOMDEVICEOBJ], [random_device])
+	AC_SUBST([RATEOBJ], [rate])
+	AC_SUBST([RENDERSURFACEOBJ], [render_surface])
+	AC_SUBST([TIMEROBJ], [timer])
 fi
 
 # The major.minor version of Python, with the "." stripped out.

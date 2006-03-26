@@ -46,8 +46,8 @@ OSX_CPPFLAGS = #-no-cpp-precomp -fno-common -Wno-long-double
 # System configuration variables for Unix-like systems
 GTK_LIBS = @GTK_LIBS@
 GTK_CFLAGS = @GTK_CFLAGS@
-#GTKGL_LIBS = @GTKGL_LIBS@ -lGLU
-#GTKGL_CFLAGS = @GTKGL_CFLAGS@
+FTGL_LIBS = @FTGL_LIBS@
+FTGL_CFLAGS = @FTGL_CFLAGS@
 GTHREAD_LIBS = @GTHREAD_LIBS@
 GTHREAD_CFLAGS = @GTHREAD_CFLAGS@
 
