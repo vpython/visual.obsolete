@@ -205,8 +205,8 @@ ifeq ($(PYTHON_PLATFORM),win32)
   INSTALL_RULE = $(GENERIC_INSTALLRULE)
 else 
   # These options are common to both Linux and OSX.
-  CVISUAL_LIBS += $(GTK_LIBS) $(GTKGL_LIBS) $(GTHREAD_LIBS) -lboost_python
-  CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTKGL_CFLAGS) $(GTHREAD_CFLAGS)
+  CVISUAL_LIBS += $(GTK_LIBS) $(FTGL_LIBS) $(GTHREAD_LIBS) -lboost_python
+  CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(FTGL_CFLAGS) $(GTHREAD_CFLAGS)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
   PLATFORM_OBJS = platlinux.lo xgl.lo
