@@ -54,7 +54,7 @@ else
 		[AC_MSG_ERROR(GThread is required on Unix-like systems)])
 	AC_SUBST([GTHREAD_CFLAGS])
 	AC_SUBST([GTHREAD_LIBS])
-	PKG_CHECK_MODULES( FTGL, ftgl >= 0.0, ,
+	PKG_CHECK_MODULES( FTGL, ftgl >= 1.0, ,
 		[AC_MSG_ERROR(FTGL is required on Unix-like systems)])
 	AC_SUBST([FTGL_CFLAGS])
 	AC_SUBST([FTGL_LIBS])
