@@ -4,7 +4,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "label.hpp"
-#include "font.hpp"
+#include "gtk2/font.hpp"
 #include "util/errors.hpp"
 
 #include <sstream>

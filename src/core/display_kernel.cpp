@@ -7,7 +7,7 @@
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
 #include "frame.hpp"
-#include "font.hpp"
+#include "gtk2/font.hpp"
 
 #include <cassert>
 #include <algorithm>
