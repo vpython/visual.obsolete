@@ -46,8 +46,8 @@ OSX_CPPFLAGS = #-no-cpp-precomp -fno-common -Wno-long-double
 # System configuration variables for Unix-like systems
 GTK_LIBS = @GTK_LIBS@
 GTK_CFLAGS = @GTK_CFLAGS@
-GTKGL_LIBS = @GTKGL_LIBS@ -lGLU
-GTKGL_CFLAGS = @GTKGL_CFLAGS@
+#GTKGL_LIBS = @GTKGL_LIBS@ -lGLU
+#GTKGL_CFLAGS = @GTKGL_CFLAGS@
 GTHREAD_LIBS = @GTHREAD_LIBS@
 GTHREAD_CFLAGS = @GTHREAD_CFLAGS@
 
@@ -124,11 +124,11 @@ define OSX_SORULE$
 	@$(_OSX_SORULE) 2>> $(LOGFILE)
 endef
 
-# Rules to build dependancy files with GCC.
+# Rules to build dependency files with GCC.
 _GXX3_DEPRULE = $(CXX) $(CVISUAL_CPPFLAGS) $(CPPFLAGS) $(CVISUAL_CXXFLAGS) \
 	$(CXXFLAGS) -MM -MT "$*.lo $@" -MF $@ $<
 define GXX3_DEPRULE
-	@echo Updating dependancy information for $< ...
+	@echo Updating dependency information for $< ...
 	@echo $(_GXX3_DEPRULE) >> $(LOGFILE)
 	@$(_GXX3_DEPRULE) 2>> $(LOGFILE)
 endef
@@ -157,7 +157,7 @@ LT_DEPRULE = $(GXX3_DEPRULE)
 #_LT_DEPRULE = source='$<' object='$*.lo' libtool=no depfile='$*.d' $(CXXDEPMODE) \
 #	$(depcomp) $(CXX) $< $(CVISUAL_CPPFLAGS) $(CPPFLAGS) -E
 #define LT_DEPRULE
-#	@echo Updating dependancy information for $< ...
+#	@echo Updating dependency information for $< ...
 #	@echo $(_LT_DEPRULE) >> $(LOGFILE)
 #	@$(_LT_DEPRULE) 2>> $(LOGFILE) 1>&/dev/null
 #endef
@@ -230,7 +230,7 @@ else
   endif
 endif
 
-# Create a dependancy list from the object list.
+# Create a dependency list from the object list.
 DEPS = $(subst .lo,.d,$(CVISUAL_OBJS) $(PLATFORM_OBJS))
 
 # The pattern rules themselves.
@@ -319,7 +319,7 @@ else
 	$(RM) $(pythondir)/$(PLATFORM_TARGET)
 endif
 
-# Use the compiler-generated dependancy files.
+# Use the compiler-generated dependency files.
 @AMDEP_TRUE@-include $(DEPS)
 
 # Magic for building the tarball.  Taken directly from a Makefile.in generated
