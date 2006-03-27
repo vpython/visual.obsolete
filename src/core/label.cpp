@@ -361,20 +361,22 @@ label::gl_render( const view& scene)
 	displaylist list;
 	list.gl_compile_begin();
 	{
+		// Zero out the existing matrices, rendering will be in screen coords.
 		gl_matrix_stackguard guard;
 		tmatrix identity;
 		identity.gl_load();
 		glMatrixMode( GL_PROJECTION); { //< Zero out the projection matrix, too
 		gl_matrix_stackguard guard2;
 		identity.gl_load();
-		vector scale = 2.0*vector(1.0/scene.window_width, 1.0/scene.window_height);
-
+		
+		glTranslated( origin.x, origin.y, origin.z);
+		glScaled( 2.0/scene.window_width, 2.0/scene.window_height, 1.0);
 		// At this point, all furthur translations are in direction of label
 		//  space.
 		if (space && (xoffset || yoffset)) {
 			// Move the origin away from the body.
 			vector space_offset = vector(xoffset, yoffset).norm() * std::fabs(space);
-			origin += space_offset * scale;
+			glTranslated( space_offset.x, space_offset.y, space_offset.z);
 		}
 		// Optionally draw the line, and move the origin to the bottom left
 		// corner of the text box.		
@@ -382,25 +384,25 @@ label::gl_render( const view& scene)
 			if (line_enabled) {
 				glBegin( GL_LINES);
 					linecolor.gl_set();
-					origin.gl_render();
-					(origin + vector(xoffset, yoffset)*scale).gl_render();
+					vector().gl_render();
+					vector(xoffset, yoffset).gl_render();
 				glEnd();
 			}
 			if (std::fabs(xoffset) > std::fabs(yoffset)) {
-				origin += scale*vector( 
+				glTranslated( 
 					xoffset + ((xoffset > 0) ? 0 : -box_width), 
 					yoffset - box_height*0.5,
 					0);
 			}
 			else {
-				origin += scale*vector( 
+				glTranslated( 
 					xoffset - box_width*0.5,
 					yoffset + ((yoffset > 0) ? 0 : -box_height),
 					0);
 			}
 		}
 		else {
-			origin += scale*vector(-box_width, -box_height) * 0.5;
+			glTranslated( -box_width*0.5, -box_height*0.5, 0.0);
 		}
 		if (opacity) {
 			// Occlude objects behind the label.
@@ -408,10 +410,10 @@ label::gl_render( const view& scene)
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			rgba( 0, 0, 0, opacity).gl_set();
 			glBegin( GL_QUADS);
-				origin.gl_render();
-				(origin + vector( box_width, 0)*scale).gl_render();
-				(origin + vector( box_width, box_height)*scale).gl_render();
-				(origin + vector( 0, box_height)*scale).gl_render();
+				vector().gl_render();
+				vector( box_width, 0).gl_render();
+				vector( box_width, box_height).gl_render();
+				vector( 0, box_height).gl_render();
 			glEnd();
 			glDisable( GL_BLEND);
 		}
@@ -419,10 +421,10 @@ label::gl_render( const view& scene)
 			// Draw a box around the text.
 			linecolor.gl_set();
 			glBegin( GL_LINE_LOOP);
-				origin.gl_render();
-				(origin + vector( box_width, 0)*scale).gl_render();
-				(origin + vector( box_width, box_height)*scale).gl_render();
-				(origin + vector( 0, box_height)*scale).gl_render();
+				vector().gl_render();
+				vector( box_width, 0).gl_render();
+				vector( box_width, box_height).gl_render();
+				vector( 0, box_height).gl_render();
 			glEnd();
 		}
 		
@@ -441,8 +443,6 @@ label::gl_render( const view& scene)
 		text_iterator text_i = text.begin();
 		text_iterator text_end = text.end();
 		while (tpos_i != tpos_end && text_i != text_end) {
-			*tpos_i = *tpos_i * scale;
-			*tpos_i += origin;
 			glRasterPos3dv( &tpos_i->x);
 			// float raster_pos[3];
 			// GLboolean valid;
