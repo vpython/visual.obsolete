@@ -108,7 +108,7 @@ realmain( std::vector<std::string>&)
 	app.scene.core.add_renderable( thin);
 	app.scene.core.add_renderable( thick);
 	app.scene.core.add_renderable( triangle);
-	app.scene.object_clicked.connect( SigC::slot( on_object_clicked));
+	app.scene.object_clicked.connect( sigc::ptr_fun( &on_object_clicked));
 
 	app.run();
 	return 0;
