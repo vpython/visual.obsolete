@@ -222,6 +222,18 @@ tmatrix::operator*( const vector& v) const throw()
 		);
 }
 
+/** multiplication by an arbirary vertex [x y z w] */
+vertex 
+tmatrix::operator*( const vertex& v) const throw()
+{
+	return vertex(
+		M[0][0]*v.x + M[1][0]*v.y + M[2][0]*v.z + M[3][0]*v.w,
+		M[0][1]*v.x + M[1][1]*v.y + M[2][1]*v.z + M[3][1]*v.w,
+		M[0][2]*v.x + M[1][2]*v.y + M[2][2]*v.z + M[3][2]*v.w,
+		M[0][3]*v.x + M[1][3]*v.y + M[2][3]*v.z + M[3][3]*v.w
+		);
+}
+
 vertex
 tmatrix::project( const vector& v) const throw()
 {
