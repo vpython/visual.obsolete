@@ -5,7 +5,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
-#include "gtk2/display.hpp"
+#include "display.hpp"
 #include "mouseobject.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"
@@ -139,11 +139,11 @@ class py_display_kernel : public display_kernel, public SigC::Object
 		: display_kernel() 
 	{
 		gl_begin.connect( 
-			SigC::slot( *this, &py_display_kernel::on_gl_begin));
+			sigc::mem_fun( *this, &py_display_kernel::on_gl_begin));
 		gl_end.connect( 
-			SigC::slot( *this, &py_display_kernel::on_gl_end));
+			sigc::mem_fun( *this, &py_display_kernel::on_gl_end));
 		gl_swap_buffers.connect( 
-			SigC::slot( *this, &py_display_kernel::on_gl_swap_buffers));
+			sigc::mem_fun( *this, &py_display_kernel::on_gl_swap_buffers));
 	}
 	
 	void set_gl_begin_cb( py::object obj)
@@ -325,7 +325,7 @@ wrap_display_kernel(void)
 	def( "waitclose", wrap_waitclosed, 
 		"Blocks until all of the Displays are closed by the user.");
 		
-	gui_main::on_shutdown.connect( SigC::slot( &force_py_exit));
+	gui_main::on_shutdown.connect( sigc::ptr_fun( &force_py_exit));
 	
 	class_<mousebase>( "clickbase", no_init)
 		.def( "project", &mousebase::project2, 

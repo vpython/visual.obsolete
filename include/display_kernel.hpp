@@ -282,15 +282,15 @@ public: // Public Data.
 	/** A signal that makes the wrapping widget's rendering context 
 		active.  The wrapping object must connect to it.
 	*/
-	SigC::Signal0<void> gl_begin;
+	sigc::signal0<void> gl_begin;
 	/** A signal that deactivates the wrapping widget's rendering context.  
 		The wrapping object must connect to it.
 	*/
-	SigC::Signal0<void> gl_end;
+	sigc::signal0<void> gl_end;
 	/** A signal that swaps the buffers for its rendering context.  The wrapping
 		object must connect to it.
 	*/
-	SigC::Signal0<void> gl_swap_buffers;
+	sigc::signal0<void> gl_swap_buffers;
 };
 
 } // !namespace cvisual

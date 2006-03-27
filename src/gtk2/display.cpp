@@ -15,10 +15,8 @@ using boost::lexical_cast;
 #include <gtkmm/main.h>
 #include <gdk/gdkkeysyms.h>
 
-#ifdef VPYTHON_USE_GTKMM_24
-# include <gtkmm/toggletoolbutton.h>
-# include <gtkmm/radiotoolbutton.h>
-#endif
+#include <gtkmm/toggletoolbutton.h>
+#include <gtkmm/radiotoolbutton.h>
 
 namespace cvisual {
 using boost::thread;
@@ -255,37 +253,13 @@ display::create()
 	else
 		area->set_size_request( (int)width, (int)height);
 	area->signal_key_press_event().connect(
-		SigC::slot( *this, &display::on_key_pressed));
+		sigc::mem_fun( *this, &display::on_key_pressed));
 	
 	Glib::RefPtr<Gdk::Pixbuf> fs_img = Gdk::Pixbuf::create_from_file( 
 		VPYTHON_PREFIX "/data/galeon-fullscreen.png");
 
 	Gtk::Toolbar* tb = Gtk::manage( new Gtk::Toolbar());
 
-#ifndef VPYTHON_USE_GTKMM_24
-	using namespace Gtk::Toolbar_Helpers;
-	tb->tools().push_back( StockElem( 
-		Gtk::Stock::QUIT,  
-		SigC::slot( *this, &display::on_quit_clicked),
-		"Exit VPython"));
-	// Fullscreen toggle button.
-	tb->tools().push_back( ToggleElem( 
-		"Fullscreen",
-		*Gtk::manage( new Gtk::Image(fs_img)),
-		SigC::slot( *this, &display::on_fullscreen_clicked),
-		"Toggle fullscreen on/off"));
-	// The mouse control button group.
-	Gtk::RadioButton::Group mouse_ctl;
-	tb->tools().push_back( Space());
-	tb->tools().push_back( RadioElem(
-		mouse_ctl,
-		"Rotate/Zoom",
-		SigC::slot( *this, &display::on_rotate_clicked)));
-	tb->tools().push_back( RadioElem(
-		mouse_ctl,
-		"Pan",
-		SigC::slot( *this, &display::on_pan_clicked)));
-#else
 	Gtk::ToolButton* button = 0;
 	button = Gtk::manage( new Gtk::ToolButton( Gtk::Stock::QUIT));
 	button->signal_clicked().connect( sigc::ptr_fun( &Gtk::Main::quit));
@@ -304,7 +278,6 @@ display::create()
 	button->signal_clicked().connect(
 		sigc::mem_fun( *this, &display::on_pan_clicked));
 	tb->append( *button);
-#endif
 	
 	Gtk::VBox* frame = Gtk::manage( new Gtk::VBox());
 	frame->pack_start( *tb, Gtk::PACK_SHRINK, 0);
@@ -314,7 +287,7 @@ display::create()
 	window->set_title( title);
 	window->set_icon_from_file(	VPYTHON_PREFIX "/data/logo_t.gif");
 	window->add( *frame);
-	window->signal_delete_event().connect( SigC::slot( *this, &display::on_window_delete));
+	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
 	window->show_all();
 	if (x > 0 || y > 0) {
 		// Accept the defaults allocated by the window manager when none
@@ -534,9 +507,9 @@ gui_main::gui_main()
 	Gtk::GL::init( 0, 0);
 	if (!Glib::thread_supported())
 		Glib::thread_init();
-	signal_add_display.connect( SigC::slot( *this, &gui_main::add_display_impl));
-	signal_remove_display.connect( SigC::slot( *this, &gui_main::remove_display_impl));
-	signal_shutdown.connect( SigC::slot( *this, &gui_main::shutdown_impl));
+	signal_add_display.connect( sigc::mem_fun( *this, &gui_main::add_display_impl));
+	signal_remove_display.connect( sigc::mem_fun( *this, &gui_main::remove_display_impl));
+	signal_shutdown.connect( sigc::mem_fun( *this, &gui_main::shutdown_impl));
 }
 
 
@@ -720,6 +693,6 @@ gui_main::quit()
 	self->kit.quit();
 }
 
-SigC::Signal0<void> gui_main::on_shutdown;
+sigc::signal0<void> gui_main::on_shutdown;
 
 } // !namespace cvisual

@@ -13,10 +13,9 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/toolbar.h>
-#ifdef VPYTHON_USE_GTKMM_24
-# include <gtkmm/toggletoolbutton.h>
-# include <gtkmm/radiotoolbutton.h>
-#endif
+
+#include <gtkmm/toggletoolbutton.h>
+#include <gtkmm/radiotoolbutton.h>
 
 #include <algorithm>
 #include <iostream>
@@ -89,10 +88,10 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 		| Gdk::BUTTON2_MOTION_MASK
 		| Gdk::BUTTON3_MOTION_MASK);
 	set_size_request( 384, 256);
-	core.gl_begin.connect( SigC::slot( *this, &render_surface::gl_begin));
-	core.gl_end.connect( SigC::slot( *this, &render_surface::gl_end));
+	core.gl_begin.connect( sigc::mem_fun( *this, &render_surface::gl_begin));
+	core.gl_end.connect( sigc::mem_fun( *this, &render_surface::gl_end));
 	core.gl_swap_buffers.connect( 
-		SigC::slot( *this, &render_surface::gl_swap_buffers));
+		sigc::mem_fun( *this, &render_surface::gl_swap_buffers));
 	set_flags( get_flags() | Gtk::CAN_FOCUS);
 }
 
@@ -181,7 +180,7 @@ render_surface::on_realize()
 	// Use PRIORITY_DEFAULT_IDLE to ensure that this signal does not get
 	// priority over user-initiated GUI events, like mouse clicks and such.
 	timer = Glib::signal_timeout().connect( 
-		SigC::slot( *this, &render_surface::forward_render_scene),
+		sigc::mem_fun( *this, &render_surface::forward_render_scene),
 		cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
 }
 
@@ -210,7 +209,7 @@ render_surface::forward_render_scene()
 		// Try to give the user process some minimal execution time.
 		cycle_time = int(elapsed * 1000);
 		timer = Glib::signal_timeout().connect( 
-			SigC::slot( *this, &render_surface::forward_render_scene),
+			sigc::mem_fun( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
 		
 		VPYTHON_NOTE( 
@@ -223,7 +222,7 @@ render_surface::forward_render_scene()
 		// Try to give the user process some minimal execution time.
 		cycle_time = int(elapsed * 1000);
 		timer = Glib::signal_timeout().connect( 
-			SigC::slot( *this, &render_surface::forward_render_scene),
+			sigc::mem_fun( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
 		
 		VPYTHON_NOTE( 
@@ -372,31 +371,7 @@ basic_app::basic_app( const char* title)
 	
 	window.set_title( title);
 	window.set_icon_from_file( VPYTHON_PREFIX "/data/logo_t.gif");
-#ifndef VPYTHON_USE_GTKMM_24
-	using namespace Gtk::Toolbar_Helpers;
-	// Quit button	
-	tb.tools().push_back( StockElem( 
-		Gtk::Stock::QUIT,  
-		SigC::slot( &Gtk::Main::quit),
-		"Exit this program"));
-	// Fullscreen toggle button.
-	tb.tools().push_back( ToggleElem( 
-		"Fullscreen",
-		fs_img,
-		SigC::slot( *this, &basic_app::on_fullscreen_clicked),
-		"Toggle fullscreen on/off"));
-	// The mouse control button group.
-	Gtk::RadioButton::Group mouse_ctl;
-	tb.tools().push_back( Space());
-	tb.tools().push_back( RadioElem(
-		mouse_ctl,
-		"Rotate/Zoom",
-		SigC::slot( *this, &basic_app::on_rotate_clicked)));
-	tb.tools().push_back( RadioElem(
-		mouse_ctl,
-		"Pan",
-		SigC::slot( *this, &basic_app::on_pan_clicked)));
-#else
+
 	Gtk::ToolButton* button = 0;
 	button = Gtk::manage( new Gtk::ToolButton( Gtk::Stock::QUIT));
 	button->signal_clicked().connect( sigc::ptr_fun( &Gtk::Main::quit));
@@ -415,7 +390,6 @@ basic_app::basic_app( const char* title)
 		sigc::mem_fun( *this, &basic_app::on_pan_clicked));
 	tb.append( *button);
 	
-#endif
 	// Compose the frame and scen widgets.
 	frame.pack_start( tb, Gtk::PACK_SHRINK, 0);
 	frame.pack_start( scene);
@@ -426,7 +400,7 @@ void
 basic_app::run()
 {
 	scene.signal_delete_event().connect( 
-		SigC::slot( *this, &basic_app::on_delete));
+		sigc::mem_fun( *this, &basic_app::on_delete));
 	window.show_all();
 	kit.run(window);
 }
