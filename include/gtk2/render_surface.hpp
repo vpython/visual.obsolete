@@ -9,19 +9,14 @@
 #include "display_kernel.hpp"
 #include "mouseobject.hpp"
 
-#include <gtkmm/drawingarea.h>
+#include <gtkmm/gl/drawingarea.h>
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
 #include <gtkmm/image.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/box.h>
 
-#ifdef VPYTHON_USE_GTKMM_24
-# include <sigc++/compatibility.h>
-#endif
-
 namespace cvisual {
-
 
 class render_surface : public Gtk::GL::DrawingArea
 {
@@ -74,14 +69,14 @@ class render_surface : public Gtk::GL::DrawingArea
 	// The length of the Glib::signal_timout, in milliseconds.
 	long cycle_time;
 	// Used to disconnect the timer when resetting the time.
-	SigC::Connection timer;
+	sigc::connection timer;
  	
  public:
 	render_surface( display_kernel& _core, bool activestereo = false);
 	display_kernel& core;
 	
 	// Signal fired by button down + button up.
-	SigC::Signal2<void, shared_ptr<renderable>, vector > object_clicked;
+	sigc::signal2<void, shared_ptr<renderable>, vector> object_clicked;
 	
 	// Makes this rendering context active and calls on_gl_free().  This should
 	// generally be done only by the last window to shut down.
