@@ -4,7 +4,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "label.hpp"
-#include "gtk2/font.hpp"
+#include "font.hpp"
 #include "util/errors.hpp"
 
 #include <sstream>
@@ -315,7 +315,7 @@ label::get_linecolor()
 {
 	return linecolor;
 }
-
+#define NEWMODE 1
 void
 label::gl_render( const view& scene)
 {
@@ -349,62 +349,58 @@ label::gl_render( const view& scene)
 	}
 
 	clear_gl_error();
+	vector label_pos = pos * scene.gcf;
+	tmatrix lst = tmatrix().gl_projection_get() * tmatrix().gl_modelview_get();
+	{
+		tmatrix translate;
+		translate.w_column( label_pos);
+		lst = lst * translate;
+	}
+	vector origin = lst * vertex(vector(), 1.0);
+
 	displaylist list;
 	list.gl_compile_begin();
 	{
 		gl_matrix_stackguard guard;
-		vector label_pos = pos * scene.gcf;
-		glTranslated( label_pos.x, label_pos.y, label_pos.z);
-		// The label to world orientation transform.
-		tmatrix lwt;
-		vector x_axis = scene.forward.cross( scene.up).norm();
-		lwt.x_column( scene.right /*x_axis*/);
-		lwt.y_column( scene.up);
-		lwt.z_column( -scene.forward);
-		lwt.w_column();
-		lwt.w_row();
-		lwt.gl_mult();
+		tmatrix identity;
+		identity.gl_load();
+		glMatrixMode( GL_PROJECTION); { //< Zero out the projection matrix, too
+		gl_matrix_stackguard guard2;
+		identity.gl_load();
+		vector scale = 2.0*vector(1.0/scene.window_width, 1.0/scene.window_height);
+
 		// At this point, all furthur translations are in direction of label
 		//  space.
 		if (space && (xoffset || yoffset)) {
 			// Move the origin away from the body.
 			vector space_offset = vector(xoffset, yoffset).norm() * std::fabs(space);
-			glTranslated( space_offset.x, space_offset.y, 0);
+			origin += space_offset * scale;
 		}
-		// Scale the dimentions such that all further operations are in units
-		// of pixels.
-		double eye_dist = ((pos - scene.camera)*scene.gcf).dot( scene.forward);
-		glScaled( 
-			scene.tan_hfov_x * eye_dist * 2.0 / scene.window_width,
-			scene.tan_hfov_y * eye_dist * 2.0 / scene.window_height,
-			1);
-		
-		
 		// Optionally draw the line, and move the origin to the bottom left
 		// corner of the text box.		
 		if (xoffset || yoffset) {
 			if (line_enabled) {
 				glBegin( GL_LINES);
 					linecolor.gl_set();
-					vector().gl_render();
-					vector(xoffset, yoffset).gl_render();
+					origin.gl_render();
+					(origin + vector(xoffset, yoffset)*scale).gl_render();
 				glEnd();
 			}
 			if (std::fabs(xoffset) > std::fabs(yoffset)) {
-				glTranslated( 
+				origin += scale*vector( 
 					xoffset + ((xoffset > 0) ? 0 : -box_width), 
 					yoffset - box_height*0.5,
 					0);
 			}
 			else {
-				glTranslated(
+				origin += scale*vector( 
 					xoffset - box_width*0.5,
 					yoffset + ((yoffset > 0) ? 0 : -box_height),
 					0);
 			}
 		}
 		else {
-			glTranslated(-box_width*0.5, -box_height*0.5, 0);
+			origin += scale*vector(-box_width, -box_height) * 0.5;
 		}
 		if (opacity) {
 			// Occlude objects behind the label.
@@ -412,10 +408,10 @@ label::gl_render( const view& scene)
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			rgba( 0, 0, 0, opacity).gl_set();
 			glBegin( GL_QUADS);
-				vector().gl_render();
-				vector( box_width, 0).gl_render();
-				vector( box_width, box_height).gl_render();
-				vector( 0, box_height).gl_render();
+				origin.gl_render();
+				(origin + vector( box_width, 0)*scale).gl_render();
+				(origin + vector( box_width, box_height)*scale).gl_render();
+				(origin + vector( 0, box_height)*scale).gl_render();
 			glEnd();
 			glDisable( GL_BLEND);
 		}
@@ -423,10 +419,10 @@ label::gl_render( const view& scene)
 			// Draw a box around the text.
 			linecolor.gl_set();
 			glBegin( GL_LINE_LOOP);
-				vector().gl_render();
-				vector( box_width, 0).gl_render();
-				vector( box_width, box_height).gl_render();
-				vector( 0, box_height).gl_render();			
+				origin.gl_render();
+				(origin + vector( box_width, 0)*scale).gl_render();
+				(origin + vector( box_width, box_height)*scale).gl_render();
+				(origin + vector( 0, box_height)*scale).gl_render();
 			glEnd();
 		}
 		
@@ -445,6 +441,8 @@ label::gl_render( const view& scene)
 		text_iterator text_i = text.begin();
 		text_iterator text_end = text.end();
 		while (tpos_i != tpos_end && text_i != text_end) {
+			*tpos_i = *tpos_i * scale;
+			*tpos_i += origin;
 			glRasterPos3dv( &tpos_i->x);
 			// float raster_pos[3];
 			// GLboolean valid;
@@ -454,7 +452,7 @@ label::gl_render( const view& scene)
 			++tpos_i;
 			++text_i;
 		}
-	}
+	} glMatrixMode( GL_MODELVIEW); } // Pops the matricies back off the stack
 	list.gl_compile_end();
 	check_gl_error();
 	scene.screen_objects.insert( std::make_pair(pos, list));
