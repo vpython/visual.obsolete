@@ -294,6 +294,11 @@ render_surface::on_button_release_event( GdkEventButton* event)
 	}
 	return true;
 #endif
+	if (!object_clicked.empty() && mouse.pick
+			&& event->button == 1) {
+		object_clicked( mouse.pick, mouse.pickpos);
+	}
+	
 	if (event->type != GDK_BUTTON_RELEASE)
 		// Ignore erronious condition
 		return true;
