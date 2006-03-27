@@ -48,7 +48,8 @@ EnsurePythonVersion( 2, 2)
 base = Environment( CCFLAGS=['-pipe'],
 	LINKFLAGS=['-Wl,--warn-once'],
 	ENV = os.environ,
-	CPPPATH=['include', '/usr/include/python2.3'])
+	CPPPATH=['include', '/usr/include/python2.4'])
+
 # Add flags for debugging symbols and optimization.
 AddDebugFlags( base)
 # Crank up the warnings
@@ -65,8 +66,8 @@ if sys.platform.find('linux') >= 0:
 # Add compiler flags for threading support.
 AddThreadingFlags( core)
 
-core.ParseConfig( 'pkg-config --cflags --libs sigc++-1.2')
-core.Append( LIBS=['gle', 'python2.3'])
+core.ParseConfig( 'pkg-config --cflags --libs sigc++-2.0')
+core.Append( LIBS=['gle', 'python2.4'])
 
 srcs = [ "src/core/arrow.cpp", 
 	"src/core/util/displaylist.cpp",
@@ -95,9 +96,9 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/sphere.cpp",
 	"src/core/frame.cpp",
 	"src/core/label.cpp",
-	"src/core/curve.cpp",
-	"src/core/convex.cpp",
-	"src/core/faces.cpp" ]
+	"src/core/unused_curve.cpp",
+	"src/core/unused_convex.cpp",
+	"src/core/unused_faces.cpp" ]
 
 if sys.platform == 'win32':
 	srcs.append( 'src/win32/render_surface.cpp')
@@ -118,7 +119,7 @@ else:
 	srcs.append( 'src/gtk2/display.cpp')
 	srcs.append( 'src/gtk2/rate.cpp')
 	
-	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.0 ftgl '
+	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.2 ftgl '
 		+ 'fontconfig gthread-2.0')
 	core.Append( LIBS=["GL", "GLU"], LINKFLAGS="-Wl,--no-undefined")
 	core.Append( CPPPATH='include/gtk2')
