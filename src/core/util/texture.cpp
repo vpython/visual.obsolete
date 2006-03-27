@@ -34,7 +34,7 @@ void
 texture::gl_activate()
 {
 	if (!handle)
-		on_gl_free.connect( SigC::slot(*this, &texture::gl_free));
+		on_gl_free.connect( sigc::mem_fun(*this, &texture::gl_free));
 	if (!handle || damaged) {
 		gl_init();
 		damaged = false;

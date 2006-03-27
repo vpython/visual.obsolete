@@ -43,7 +43,7 @@ displaylist::gl_compile_begin()
 		*handle = glGenLists(1);
 		VPYTHON_NOTE( "Allocated displaylist number " 
 			+ lexical_cast<std::string>(*handle));
-		on_gl_free.connect( SigC::slot(*this, &displaylist::gl_free));
+		on_gl_free.connect( sigc::mem_fun(*this, &displaylist::gl_free));
 	}
 	glNewList( *handle, GL_COMPILE);
 }
