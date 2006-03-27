@@ -6,6 +6,8 @@ libboost-thread-dev
 ftgl-dev
 libgle3-dev
 libgtkglextmm1-dev
+(Note: In Debian Sid, you will need to build gtkglextmm 1.2 from source, and
+	apt-get install libgtkmm-2.4-dev)
 scons
 
 Notes for building:
@@ -72,8 +74,6 @@ TODO (*-ed items are must-do, w/l items are wishlist items):
 		* FTGL.  In particular texture-mapped text and UTF-8 
 			(or other i18n) support.
 		
-		w/l Figure out how the 'bumps' program in xscreensavers-gl does 
-			textured bump-mapping.
 		w/l Semi-automatic algorithmic texture generation.
 	* Add mouse-handling code for the GTK2 backend.
 	* Overhaul the allocation/deallocation strategy for texture objects and
