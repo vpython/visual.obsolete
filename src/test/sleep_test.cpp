@@ -45,6 +45,7 @@ std::ostream&
 operator<<( std::ostream& stream, const timeval& time)
 {
 	stream << time.tv_sec * 1000000 + time.tv_usec << " usec";
+	return stream;
 }
 
 int
