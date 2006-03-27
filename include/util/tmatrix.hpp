@@ -17,11 +17,10 @@ struct vertex
 	double y;
 	double z;
 	double w;
-	inline vertex( double _x, double _y, double _z, double _w)
+	inline vertex( double _x=0, double _y=0, double _z=0, double _w=1.0)
 		: x(_x), y(_y), z(_z), w(_w) {}
-	inline vertex() : x(0), y(0), z(0), w(0) {}
 			
-	inline vertex( const vector& v, double _w = 1.0)
+	explicit inline vertex( const vector& v, double _w = 1.0)
 		: x( v.x), y(v.y), z(v.z), w(_w) {}
 	inline operator vector() const
 	{ double w_i = 1.0/w; return vector( x*w_i, y*w_i, z*w_i); }
@@ -44,7 +43,7 @@ private:
     friend void inverse( tmatrix& ret, const tmatrix& arg);
 public:
 	/** Returns the address of the first element in the matrix.  Ideally, this
-	 * funciton should not exist.
+	 * function should not exist.
 	 */
     inline double* matrix_addr() { return M[0]; }
 
@@ -190,6 +189,9 @@ public:
 
 	/** multiplication by a point [x y z 1] */
 	vector operator*( const vector& v) const throw();
+	
+	/** multiplication by an arbirary vertex [x y z w] */
+	vertex operator*( const vertex& v) const throw();
 	
 	/** Overwrites the currently active matrix in OpenGL with this one. */
 	inline void
