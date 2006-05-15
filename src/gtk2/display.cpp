@@ -258,6 +258,8 @@ display::create()
 	Glib::RefPtr<Gdk::Pixbuf> fs_img = Gdk::Pixbuf::create_from_file( 
 		VPYTHON_PREFIX "/data/galeon-fullscreen.png");
 
+	// TODO: Investigate why these Gtk::manage() calls are not releasing their
+	// memory when needed
 	Gtk::Toolbar* tb = Gtk::manage( new Gtk::Toolbar());
 
 	Gtk::ToolButton* button = 0;
