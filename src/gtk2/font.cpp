@@ -99,10 +99,14 @@ bitmap_font::bitmap_font()
 		char* filename = 0;
 		FcPatternGetString( match, FC_FILE, 0, (FcChar8**)&filename);
 		font = new FTGLPixmapFont( filename);
+		FcPatternDestroy( match);
+		match = NULL;
 		
 		// Set the font size.
 		int dpi = -1;
+		// TODO: Possible memory leak here:
 		Glib::RefPtr<Gdk::Screen> default_screen = Gdk::Screen::get_default();
+		// TODO: Possible memory leak here:
 		Glib::RefPtr<Gtk::Settings> settings = Gtk::Settings::get_for_screen(
 			default_screen);
 		g_object_get( 
@@ -148,6 +152,8 @@ bitmap_font::bitmap_font( const std::string& family, int size)
 		char* filename = 0;
 		FcPatternGetString( match, FC_FILE, 0, (FcChar8**)&filename);
 		font = new FTGLPixmapFont( filename);
+		FcPatternDestroy( match);
+		match = NULL;
 		
 		// Set the font size.
 		int dpi = -1;
