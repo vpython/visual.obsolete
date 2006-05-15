@@ -1004,7 +1004,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
 	}
-	return boost::make_tuple( best_pick, pickpos, mousepos);
+	return boost::make_tuple( best_pick, pickpos / gcf, mousepos / gcf);
 }
 
 
