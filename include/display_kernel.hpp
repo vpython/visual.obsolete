@@ -36,6 +36,9 @@ class display_kernel
 {
  private: // Private data
  	static shared_ptr<std::set<std::string> > extensions;
+ 	static std::string renderer;
+ 	static std::string version;
+ 	static std::string vendor;
 	mutable mutex mtx;
 	
 	float window_width; ///< The last reported width of the window.
@@ -300,6 +303,8 @@ public: // Public Data.
 		object must connect to it.
 	*/
 	sigc::signal0<void> gl_swap_buffers;
+	
+	std::string info( void);
 };
 
 } // !namespace cvisual

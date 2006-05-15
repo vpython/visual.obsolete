@@ -21,6 +21,10 @@
 namespace cvisual {
 
 shared_ptr<std::set<std::string> > display_kernel::extensions;
+std::string display_kernel::vendor;
+std::string display_kernel::version;
+std::string display_kernel::renderer;
+
 
 void 
 display_kernel::enable_lights()
@@ -297,6 +301,10 @@ display_kernel::report_realize()
 		istringstream strm( string( (const char*)(glGetString( GL_EXTENSIONS))));
 		copy( istream_iterator<string>(strm), istream_iterator<string>(), 
 			inserter( *extensions, extensions->begin()));
+			
+		vendor = std::string((const char*)glGetString(GL_VENDOR));
+		version = std::string((const char*)glGetString(GL_VERSION));
+		renderer = std::string((const char*)glGetString(GL_RENDERER));
 	}
 	
 	// Those features of OpenGL that are always used are set up here.	
@@ -1277,5 +1285,29 @@ display_kernel::get_objects() const
 		layer_world_transparent.begin(), layer_world_transparent.end());
 	return ret;
 }
+
+std::string 
+display_kernel::info() 
+{
+	lock L(mtx);
+	if (!extensions)
+		return std::string( "Renderer inactive.\n");
+	else {
+		std::string s;
+		s += "OpenGL renderer active.\n  Vendor: "
+		  + vendor
+		  + "\n  Version: " + version
+		  + "\n  Renderer: " + renderer
+		  + "\n  Extensions: ";
+		
+		// this->extensions is a list of extensions
+		std::ostringstream buffer;
+		std::copy( extensions->begin(), extensions->end(), 
+			std::ostream_iterator<std::string>( buffer, "\n"));
+		s += buffer.str();
+		return s;
+	}
+}
+
 
 } // !namespace cvisual
