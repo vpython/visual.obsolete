@@ -991,8 +991,15 @@ display_kernel::pick( float x, float y, float d_pixels)
             &pickpos.x, &pickpos.y, &pickpos.z);
         // TODO: Replace the calls to gluUnProject() with own tmatrix inverse
         // and such for optimization
+        vector center;
+        gluProject( center.x, center.y, center.z,
+           	modelview.matrix_addr(),
+            projection.matrix_addr(),
+            viewport_bounds,
+            &center.x, &center.y, &center.z);
+        	
         gluUnProject(
-        	x, window_height - y, 0,
+        	x, window_height - y, center.z,
         	modelview.matrix_addr(),
         	projection.matrix_addr(),
         	viewport_bounds,
