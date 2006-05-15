@@ -19,6 +19,7 @@
 #include "util/rate.hpp"
 #include "display.hpp"
 #include "util/errors.hpp"
+#include "python/num_util.hpp"
 
 namespace cvisual {
 void wrap_display_kernel();
@@ -64,9 +65,11 @@ BOOST_PYTHON_MODULE( cvisual)
 #endif
 #endif
 
-	import_array();
-	// Force the use of Numeric.ArrayType for Boost's array backend.
-	numeric::array::set_module_and_type( "Numeric", "ArrayType");
+	// Private functions for initializing and choosing the numeric backend
+	def( "_init_numeric_impl", python::init_numeric_impl);
+	def( "_init_numarray_impl", python::init_numarray_impl);
+	def( "_use_numeric_impl", python::use_numeric_impl);
+	def( "_use_numarray_impl", python::use_numarray_impl);
 	
 	// Initialize the Python thread system.
 	PyEval_InitThreads();

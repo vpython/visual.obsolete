@@ -139,9 +139,9 @@ convex::set_pos( array n_pos)
 	using namespace boost::python;
 	using python::slice;
 	
-	PyArray_TYPES t = type( n_pos);
-	if (t != PyArray_DOUBLE) {
-		n_pos = astype(n_pos, PyArray_DOUBLE);
+	python::array_types t = type( n_pos);
+	if (t != double_t) {
+		n_pos = astype(n_pos, double_t);
 	}
 	std::vector<int> dims = shape( n_pos);
 	if (dims.size() == 1 && count == 0) {

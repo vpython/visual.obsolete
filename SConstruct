@@ -48,7 +48,7 @@ EnsurePythonVersion( 2, 2)
 base = Environment( CCFLAGS=['-pipe'],
 	LINKFLAGS=['-Wl,--warn-once'],
 	ENV = os.environ,
-	CPPPATH=['include', '/usr/include/python2.4'])
+	CPPPATH=['include', '/usr/include/python2.3'])
 
 # Add flags for debugging symbols and optimization.
 AddDebugFlags( base)
@@ -56,7 +56,7 @@ AddDebugFlags( base)
 # Crank up the warnings.  Note that I am disabling the warning WRT use of long long,
 # since it really is needed in src/gtk2/rate.cpp.
 base.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
-	'-std=c++98', '-Wdisabled-optimization', '-D_GLIBCPP_CONCEPT_CHECKS',
+	'-std=c++98', '-Wdisabled-optimization',
 	'-pedantic', '-Wno-long-long'] )
 
 core = base.Copy()
@@ -67,7 +67,7 @@ if sys.platform.find('linux') >= 0:
 AddThreadingFlags( core)
 
 core.ParseConfig( 'pkg-config --cflags --libs sigc++-2.0')
-core.Append( LIBS=['gle', 'python2.4'])
+core.Append( LIBS=['gle', 'python2.3'])
 
 srcs = [ "src/core/arrow.cpp", 
 	"src/core/util/displaylist.cpp",
@@ -189,13 +189,13 @@ base.Program( target='bin/sleep_test', source='src/test/sleep_test.cpp')
 from vpython_config_helpers import PythonPlugin, SetupPythonConfVars
 
 py = core.Copy()
-SetupPythonConfVars(py)
+# SetupPythonConfVars(py)
 py.Append( CPPPATH='/usr/include/python2.3', 
-	LIBS=['vpython-core'],
+	LIBS=['vpython-core', 'boost_python'],
 	LIBPATH='lib',
 	# Boost.Python's headers produce prodigious amounts of warnings WRT unused
 	#   parameters.
-	CPPFLAGS='-Wno-unused')
+	CPPFLAGS=['-Wno-unused', '-DHAVE_CONFIG_H'])
 
 cvisual = PythonPlugin( env=py,
 	target='site-packages/cvisual',
@@ -204,6 +204,8 @@ cvisual = PythonPlugin( env=py,
 		'src/python/wrap_rgba.cpp',
 		'src/python/wrap_primitive.cpp',
 		'src/python/num_util.cpp',
+		'src/python/num_util_impl_numeric.cpp',
+		'src/python/num_util_impl_numarray.cpp',
 		'src/python/slice.cpp',
 		'src/python/curve.cpp',
 		'src/python/faces.cpp',

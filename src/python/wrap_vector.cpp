@@ -34,7 +34,7 @@ void
 validate_array( const array& arr)
 {
 	std::vector<int> dims = shape(arr);
-	if (type(arr) != PyArray_DOUBLE) {
+	if (type(arr) != double_t) {
 		throw std::invalid_argument( "Array must be of type Float64.");
 	}
 	if (!iscontiguous(arr)) {

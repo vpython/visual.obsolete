@@ -54,7 +54,7 @@ curve::curve()
 	dims[0] = preallocated_size;
 	dims[1] = 3;
 	pos = makeNum( dims);
-	color = makeNum( dims, PyArray_FLOAT);
+	color = makeNum( dims, float_t);
 	double* pos_i = index( pos, 0);
 	float* color_i = findex( color, 0);
 	pos_i[0] = 0;
@@ -102,7 +102,7 @@ curve::set_length( size_t length)
 		dims[0] = 2*length + 2;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
-		array n_color = makeNum( dims, PyArray_FLOAT);
+		array n_color = makeNum( dims, float_t);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints+1));
 		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * (npoints+1));
 		pos = n_pos;
@@ -186,9 +186,9 @@ curve::append( vector npos, rgb ncolor)
 void
 curve::set_pos( array n_pos)
 {
-	PyArray_TYPES t = type( n_pos);
-	if (t != PyArray_DOUBLE) {
-		n_pos = astype( n_pos, PyArray_DOUBLE);
+	python::array_types t = type( n_pos);
+	if (t != double_t) {
+		n_pos = astype( n_pos, double_t);
 	}
 	std::vector<int> dims = shape( n_pos);
 	if (dims.size() == 1 && !dims[0]) {
@@ -235,9 +235,9 @@ curve::set_pos_v( const vector& npos)
 void
 curve::set_color( array n_color)
 {
-	PyArray_TYPES t = type(n_color);
-	if (t != PyArray_FLOAT) {
-		n_color = astype( n_color, PyArray_FLOAT);
+	python::array_types t = type(n_color);
+	if (t != float_t) {
+		n_color = astype( n_color, float_t);
 	}
 	std::vector<int> dims = shape( n_color);
 	if (dims.size() == 1 && dims[0] == 3) {

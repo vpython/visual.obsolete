@@ -47,7 +47,7 @@ faces::faces()
 	dims[0] = 256;
 	dims[1] = 3;
 	pos = makeNum(dims);
-	color = makeNum(dims, PyArray_FLOAT);
+	color = makeNum(dims, float_t);
 	normal = makeNum(dims);
 	double* i = index( pos, 0);
 	i[0] = i[1] = i[2] = 0.0;
@@ -79,7 +79,7 @@ faces::set_length( int length)
 		dims[0] = 2 * length;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
-		array n_color = makeNum( dims, PyArray_FLOAT);
+		array n_color = makeNum( dims, float_t);
 		array n_normal = makeNum( dims);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * npoints);
 		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * npoints);
@@ -301,8 +301,8 @@ faces::set_color( array n_color)
 	if (n_dims[0] != count)
 		throw std::invalid_argument( "color must be the same size as pos.");
 
-	if (type(n_color) != PyArray_FLOAT) {
-		n_color = astype( n_color, PyArray_FLOAT);
+	if (type(n_color) != float_t) {
+		n_color = astype( n_color, float_t);
 	}
 	lock L(mtx);
 	color[slice(0, count)] = n_color;
