@@ -35,7 +35,8 @@ BOOST_INCLUDES = # @BOOST_INCLUDES@
 WIN32_PYTHON_VERSION = $(subst .,"",$(PYTHON_VERSION))
 WIN32_LIBS = -lpython$(WIN32_PYTHON_VERSION) \
 	-lboost_python$(WIN32_PYTHON_VERSION) -lgdi32 -lopengl32 -lglu32
-WIN32_CPPFLAGS = -mthreads -IC:/Python$(WIN32_PYTHON_VERSION)/Include
+WIN32_CPPFLAGS = -mthreads -IC:/Python$(WIN32_PYTHON_VERSION)/Include \
+	-I$(top_srcdir)/include/win32
 WIN32_LDFLAGS = -mthreads
 
 # Prevent using the broken Apple C preprocessor,
@@ -45,7 +46,7 @@ OSX_CPPFLAGS = #-no-cpp-precomp -fno-common -Wno-long-double
 
 # System configuration variables for Unix-like systems
 GTK_LIBS = @GTK_LIBS@
-GTK_CFLAGS = @GTK_CFLAGS@
+GTK_CFLAGS = @GTK_CFLAGS@ -I$(top_srcdir)/include/gtk2
 FTGL_LIBS = @FTGL_LIBS@
 FTGL_CFLAGS = @FTGL_CFLAGS@
 GTHREAD_LIBS = @GTHREAD_LIBS@
@@ -62,18 +63,16 @@ CPPFLAGS = @CPPFLAGS@
 
 # Object file list.  Since we are building a shared library with PIC code, we 
 #   follow the libtool convention of using a .lo extension.
-CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo \
-	cylinder.lo display_kernel.lo ellipsoid.lo \
-	frame.lo label.lo mouseobject.lo pmap_sphere.lo primitive.lo \
+CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
+	ellipsoid.lo frame.lo label.lo mouseobject.lo primitive.lo \
 	pyramid.lo rectangular.lo renderable.lo ring.lo sphere.lo \
-	display.lo file_texture.lo font.lo main.lo random_device.lo \
-	rate.lo render_surface.lo timer.lo \
-	convex.lo curve.lo cvisualmodule.lo faces.lo num_util.lo \
+	display.lo file_texture.lo font.lo random_device.lo rate.lo \
+	render_surface.lo timer.lo convex.lo curve.lo cvisualmodule.lo faces.lo \
+	num_util.lo num_util_impl_numarray.lo num_util_impl_numeric.lo \
 	scalar_array.lo slice.lo vector_array.lo wrap_arrayobjects.lo \
-	wrap_display_kernel.lo wrap_primitive.lo wrap_rgba.lo \
-	wrap_vector.lo clipping_plane.lo displaylist.lo errors.lo extent.lo \
-	gl_free.lo icosophere.lo lighting.lo quadric.lo rgba.lo texture.lo \
-	tmatrix.lo vector.lo
+	wrap_display_kernel.lo wrap_primitive.lo wrap_rgba.lo wrap_vector.lo \
+	clipping_plane.lo displaylist.lo errors.lo extent.lo gl_free.lo lighting.lo \
+	quadric.lo rgba.lo texture.lo tmatrix.lo vector.lo
 
 # Distribution file list.
 DISTFILES = $(subst .lo,.cpp,$(CVISUAL_OBJS) \
@@ -85,7 +84,7 @@ DISTFILES = $(subst .lo,.cpp,$(CVISUAL_OBJS) \
 	osx-symbols.txt
 
 # The "soversion" for this iteration of Visual.
-CVISUAL_VERSION_INFO = 2:0:0
+CVISUAL_VERSION_INFO = 3:0:0
 	
 # Installation target locations
 pythondir = @pythondir@
@@ -124,18 +123,9 @@ define OSX_SORULE$
 	@$(_OSX_SORULE) 2>> $(LOGFILE)
 endef
 
-# Rules to build dependency files with GCC.
-_GXX3_DEPRULE = $(CXX) $(CVISUAL_CPPFLAGS) $(CPPFLAGS) $(CVISUAL_CXXFLAGS) \
-	$(CXXFLAGS) -MM -MT "$*.lo $@" -MF $@ $<
-define GXX3_DEPRULE
-	@echo Updating dependency information for $< ...
-	@echo $(_GXX3_DEPRULE) >> $(LOGFILE)
-	@$(_GXX3_DEPRULE) 2>> $(LOGFILE)
-endef
-
 # Default compile rules to use when on Win32 or OSX.
 _DEFAULT_CXX_RULE = $(CXX) $(CVISUAL_CPPFLAGS) $(CPPFLAGS) $(CVISUAL_CXXFLAGS) \
-	$(CXXFLAGS) -c -o $@ $<
+	$(CXXFLAGS) -MMD -c -o $@ $<
 define DEFAULT_CXX_RULE
 	@echo Compiling $< ...
 	@echo $(_DEFAULT_CXX_RULE) >> $(LOGFILE)
@@ -143,24 +133,12 @@ define DEFAULT_CXX_RULE
 endef
 
 # Fall back on these rules when not on OSX or Win32.
-_LT_CXX_RULE = $(LIBTOOL) --mode=compile $(CXX) $(CVISUAL_CPPFLAGS) $(CPPFLAGS) \
-	$(CVISUAL_CXXFLAGS) $(CXXFLAGS) -c -o $@ $<
+_LT_CXX_RULE = $(LIBTOOL) --mode=compile $(_DEFAULT_CXX_RULE)
 define LT_CXX_RULE
 	@echo Compiling $< ...
 	@echo $(_LT_CXX_RULE) >> $(LOGFILE)
 	@$(_LT_CXX_RULE) 2>> $(LOGFILE) 1>&2
 endef
-
-# Assume using GCC 3.x to build this thing.
-LT_DEPRULE = $(GXX3_DEPRULE)
-# Note that the following rule appears to be busted right now.
-#_LT_DEPRULE = source='$<' object='$*.lo' libtool=no depfile='$*.d' $(CXXDEPMODE) \
-#	$(depcomp) $(CXX) $< $(CVISUAL_CPPFLAGS) $(CPPFLAGS) -E
-#define LT_DEPRULE
-#	@echo Updating dependency information for $< ...
-#	@echo $(_LT_DEPRULE) >> $(LOGFILE)
-#	@$(_LT_DEPRULE) 2>> $(LOGFILE) 1>&/dev/null
-#endef
 
 _LT_LINKRULE = $(LIBTOOL) --mode=link $(CXX) $(CVISUAL_LDFLAGS) $(LDFLAGS) $^ \
 	$(CVISUAL_LIBS) $(LIBS) -module -version-info $(CVISUAL_VERSION_INFO) \
@@ -195,13 +173,13 @@ endef
 ifeq ($(PYTHON_PLATFORM),win32)
   # Windows -- Only MinGW is directly supported.
   CXX_RULE = $(DEFAULT_CXX_RULE)
-  CXX_DEPRULE = $(GXX3_DEPRULE)
   LINK_RULE = $(WIN32_DLLRULE)
   CVISUAL_CPPFLAGS += $(WIN32_CPPFLAGS)
   CVISUAL_LIBS += $(WIN32_LIBS)
   CVISUAL_LDFLAGS += $(WIN32_LDFLAGS)
   PLATFORM_TARGET = cvisual.dll
-  PLATFORM_OBJS = platwin.lo wgl.lo
+  PLATFORM_OBJS = winfont.lo winrandom_device.lo winrate.lo \
+  	winrender_surface.lo wintimer.lo
   INSTALL_RULE = $(GENERIC_INSTALLRULE)
 else 
   # These options are common to both Linux and OSX.
@@ -209,12 +187,12 @@ else
   CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(FTGL_CFLAGS) $(GTHREAD_CFLAGS)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
-  PLATFORM_OBJS = platlinux.lo xgl.lo
+  PLATFORM_OBJS = display.lo file_texture.lo font.lo random_device.lo rate.lo \
+  	render_surface.lo timer.lo
 
   ifeq ($(PYTHON_PLATFORM),darwin)
     # Special rules for OSX
     CXX_RULE = $(DEFAULT_CXX_RULE)
-    CXX_DEPRULE = $(GXX3_DEPRULE)
     LINK_RULE = $(OSX_SORULE)
     PLATFORM_TARGET = cvisualmodule.so
     CVISUAL_CPPFLAGS += $(OSX_CPPFLAGS)
@@ -222,7 +200,6 @@ else
  else
     # Libtoolish rules.  These should apply to all POSIX-like systems.
     CXX_RULE = $(LT_CXX_RULE)
-    CXX_DEPRULE = $(LT_DEPRULE)
     LINK_RULE = $(LT_LINKRULE)
     PLATFORM_TARGET = cvisualmodule.la
     CVISUAL_LIBS += -lstdc++
@@ -234,9 +211,6 @@ endif
 DEPS = $(subst .lo,.d,$(CVISUAL_OBJS) $(PLATFORM_OBJS))
 
 # The pattern rules themselves.
-
-%.d: %.cpp
-	$(CXX_DEPRULE)
 
 %.lo: %.cpp
 	$(CXX_RULE)

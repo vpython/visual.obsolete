@@ -1,8 +1,8 @@
 
 # Process this file with Autoconf to produce a configure script
 
-AC_INIT( [Visual Python], [3.2.9], [visualpython-users@lists.sourceforge.net])
-AM_INIT_AUTOMAKE( visual, 3.2.9)
+AC_INIT( [Visual Python], [4.beta0], [visualpython-users@lists.sourceforge.net])
+AM_INIT_AUTOMAKE( visual, 4.beta0)
 
 AC_CONFIG_SRCDIR(src/core/arrow.cpp)
 
@@ -46,12 +46,12 @@ if test $platform_win32 = yes; then
 	# The top-level source directory.
 	AC_SUBST([WIN32_SRCDIR], [`cd $srcdir ; pwd -W | sed -e "s/\\//\\\\\/g"`])
 else
-	PKG_CHECK_MODULES( GTK, gtkglextmm-1.0 >= 1.0, ,
-		[AC_MSG_ERROR(gtkglextmm is required on Unix-like systems)])
+	PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2, ,
+		[AC_MSG_ERROR(gtkglextmm 1.2+ is required on Unix-like systems)])
 	AC_SUBST([GTK_LIBS])
 	AC_SUBST([GTK_CFLAGS])
 	PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
-		[AC_MSG_ERROR(GThread is required on Unix-like systems)])
+		[AC_MSG_ERROR(GThread 2.0+ is required on Unix-like systems)])
 	AC_SUBST([GTHREAD_CFLAGS])
 	AC_SUBST([GTHREAD_LIBS])
 	PKG_CHECK_MODULES( FTGL, ftgl >= 1.0, ,
@@ -82,7 +82,8 @@ else
 fi
 AC_SUBST([PYTHONPATH], "$python_path")
 
-AC_CONFIG_FILES( Makefile src/Makefile site-packages/visual/Makefile docs/Makefile examples/Makefile MakeVPython.iss)
+AC_CONFIG_FILES( Makefile src/Makefile site-packages/visual/Makefile 
+	docs/Makefile examples/Makefile MakeVPython.iss bin/vpython)
 AM_CONFIG_HEADER( include/config.h)
 
 AC_OUTPUT()
