@@ -210,11 +210,16 @@ arrow::gl_pick_render( const view&)
 }
 
 void
-arrow::gl_render( const view&)
+arrow::gl_render( const view& scene)
 {
 	if (degenerate())
 		return;
 	color.gl_set();
+	gl_matrix_stackguard guard;
+	vector view_pos = pos * scene.gcf;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);			
+	model_world_transform().gl_mult();
+	
 	model.gl_render();
 }
 
@@ -285,12 +290,7 @@ arrow::update_cache( const view& scene)
 	else {
 		clear_gl_error();
 		model.gl_compile_begin();
-		{
-			gl_matrix_stackguard guard;
-			vector view_pos = pos * scene.gcf;
-			glTranslated( view_pos.x, view_pos.y, view_pos.z);			
-			model_world_transform().gl_mult();
-			
+		{			
 			const vector tip( eff_length, 0, 0);
 			const vector backface[4] = { 
 				vector(0, eff_shaftwidth, -eff_shaftwidth), 
