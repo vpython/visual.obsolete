@@ -107,7 +107,7 @@ class render_surface : public Gtk::GL::DrawingArea
 	bool forward_render_scene();
 };
 
-class basic_app : public SigC::Object
+class basic_app : public sigc::trackable
 {
  private:
 	/** Initialize Gtkmm */

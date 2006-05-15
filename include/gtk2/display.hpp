@@ -32,7 +32,7 @@ class display : public display_kernel,
  private:
 	scoped_ptr<render_surface> area;
 	scoped_ptr<Gtk::Window> window;
-	SigC::Connection timer;
+	sigc::connection timer;
 
 	mutex mtx;
 	bool active; ///< True when the display is actually visible
