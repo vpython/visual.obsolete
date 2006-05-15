@@ -64,7 +64,7 @@ TODO (*-ed items are must-do, w/l items are wishlist items):
 	* Forward-port changes to support numeric/numarray (done)
 	* Remove libgle dependancy; integrate advanced curve type
 	* Provide simple texture API
-	* Pango+texture text rendering
+	* Pango+texture text rendering; Remove FTGL dependancy
 	* Write simple icons for the toolbar widgets
 	* Verify performance of the autoscaler, particularly with regards to
 		frustum depth parameters.
