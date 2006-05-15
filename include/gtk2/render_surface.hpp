@@ -37,15 +37,18 @@ class render_surface : public Gtk::GL::DrawingArea
 			: down(false), dragging(false), 
 			last_down_x(-1.0f), last_down_y(-1.0f) {}
 		
+		// When the button is pressed, call this function with its screen
+		// coordinate position
 		void press( float x, float y)
 		{
 			down = true;
 			last_down_x = x;
 			last_down_y = y;
+			dragging = false;
 		}
 		
 		// Returns true when a drag event should be generated, false otherwise
-		bool drag() 
+		bool is_dragging() 
 		{
 			if (down && !dragging) {
 				dragging = true;

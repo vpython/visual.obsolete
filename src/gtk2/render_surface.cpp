@@ -141,11 +141,11 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 	mouse.cam = core.calc_camera();
 	
 	
-	if (left_button.drag())
+	if (left_button.is_dragging())
 		mouse.push_event( drag_event( 1, mouse));
-	if (middle_button.drag())
+	if (middle_button.is_dragging())
 		mouse.push_event( drag_event( 2, mouse));
-	if (right_button.drag())
+	if (right_button.is_dragging())
 		mouse.push_event( drag_event( 3, mouse));
 	return true;
 }
@@ -195,8 +195,9 @@ render_surface::forward_render_scene()
 	// rendering cycle when the user isn't looking at scene.mouse[.{pick,pickpos,pos}]
 	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
 		core.pick( last_mousepos_x, last_mousepos_y);
+
+#if 0
 	double elapsed = time.elapsed();
-	
 	/* Scheduling logic for the rendering pulse.  This code is intended to make
 	 * the rendering loop a better citizen with regard to sharing CPU time with
 	 * the Python working thread.  If the time for one render pulse is
@@ -231,6 +232,7 @@ render_surface::forward_render_scene()
 		return false;
 		
 	}
+#endif
 	return sat;
 }
 
@@ -273,27 +275,9 @@ render_surface::on_button_press_event( GdkEventButton* event)
 	return true;
 }
 
-
-
 bool 
 render_surface::on_button_release_event( GdkEventButton* event)
 {
-# if 0
-	// Only handles the signal if:
-	// 	- something has connected to object_picked.
-	//  - the left mouse button is the source.
-	//  - there are less than 4 pixels of mouse drag in the event.
-	if (!object_clicked.empty()
-		&& event->button == 1
-		&& fabs(last_mouseclick_x - event->x) < 4
-		&& fabs(last_mouseclick_y - event->y) < 4) {
-		boost::tuple< shared_ptr<renderable>, vector, vector> pick
-			= core.pick( event->x, event->y);
-		if (pick.get<0>())
-			object_clicked( pick.get<0>(), pick.get<1>());
-	}
-	return true;
-#endif
 	if (!object_clicked.empty() && mouse.pick
 			&& event->button == 1) {
 		object_clicked( mouse.pick, mouse.pickpos);
