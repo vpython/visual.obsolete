@@ -60,25 +60,30 @@ src/test/
 	
 
 TODO (*-ed items are must-do, w/l items are wishlist items):
-	* Port to Win32/wGL. (in progress)
-	Investigate port to native Mac/Carbon (alternatively, Mac/Cocoa).
-	* Transparency for rings.
-	Textures for rings?
-	w/l Snapshot/screenshot support for the display object.
-
-	Possible new objects:
-		w/l face_strip
-		* a texture loader that reads from a Numeric array.
-
-	More research: 
-		* FTGL.  In particular texture-mapped text and UTF-8 
-			(or other i18n) support.
-		
-		w/l Semi-automatic algorithmic texture generation.
-	* Add mouse-handling code for the GTK2 backend.
-	* Overhaul the allocation/deallocation strategy for texture objects and
-	display lists.  The current implementation leaks an object whenever it
-	is deallocated from Python outside of any rendering context.  All of the
-	renderable objects need to be able to recover from having their caches 
-	deleted out from under them.
+	* Port to GTK on Windows
+	* Forward-port changes to support numeric/numarray (done)
+	* Remove libgle dependancy; integrate advanced curve type
+	* Provide simple texture API
+	* Pango+texture text rendering
+	* Write simple icons for the toolbar widgets
+	* Verify performance of the autoscaler, particularly with regards to
+		frustum depth parameters.
+	* Autotoolize the project (done)
+	* Update INSTALL.txt, NEWS.txt
+	-------- 3.0.ALPHA0 release here ---------
+	* Write demo of display_kernel integration using PyGTK
+	* Generic texture support for all objects.
+	* Generic transparency for all objects.  Consider full-scene polygon sorting
+		of translucent bodies.
+	* Write documentation for new features
+		- lighting
+		- display_kernel
+		- new scaling effects
+		- texturing
+	* Ability to disable the toolbar
+	* Optimize away extra display_kernel::pick() calls
+	* Investigate slowness
+	----------- 3.0.BETA0 release here ---------------
+	* Additional features as users request
+	* Fix bugs identified with ALPHA0 and BETA0
 	
