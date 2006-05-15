@@ -4,7 +4,7 @@
 
 #include "gtk2/font.hpp"
 
-#include <FTGLPixmapFont.h>
+#include <FTGL/FTGLPixmapFont.h>
 #include <fontconfig/fontconfig.h>
 
 #include <pangomm/fontdescription.h>
