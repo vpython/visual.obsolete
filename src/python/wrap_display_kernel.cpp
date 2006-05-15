@@ -261,6 +261,10 @@ wrap_display_kernel(void)
 		.add_property( "show_renderspeed", 
 			&display_kernel::is_showing_renderspeed,
 			&display_kernel::set_show_renderspeed)
+		.add_property( "userspin", &display::spin_is_allowed, 
+			&display::allow_spin)
+		.add_property( "userzoom", &display::zoom_is_allowed, 
+			&display::allow_zoom)
 		.add_property( "renderspeed", &display_kernel::get_renderspeed) 
 		.def( "_set_range", &display_kernel::set_range_d)
 		.def( "_set_range", &display_kernel::set_range)

@@ -159,6 +159,8 @@ display_kernel::display_kernel()
 	fps( 3e-3), // Ambitiously initialize to 3 ms per cycle.
 	show_renderspeed( true),
 	background(0, 0, 0, 0), //< Transparent black.
+	spin_allowed(true),
+	zoom_allowed(true),
 	mouse_mode( ZOOM_ROTATE),
 	stereo_mode( NO_STEREO),
 	lod_adjust(0)
@@ -218,12 +220,14 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 					break;
 				case PAN:
 					// Pan front/back.
-					center += pan_rate * vfrac * forward.norm();
+					if (spin_allowed)
+						center += pan_rate * vfrac * forward.norm();
 					break;
 				case ZOOM_ROLL: case ZOOM_ROTATE: {
 					// Zoom in/out.
 						lock L(mtx);
-						user_scale *= std::pow( 10.0f, vfrac);
+						if (zoom_allowed)
+							user_scale *= std::pow( 10.0f, vfrac);
 					}
 					break;
 			}
@@ -238,29 +242,34 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 					vector horiz_dir = forward.cross(up).norm();
 					// A vector pointing along the camera's vertical axis.
 					vector vert_dir = horiz_dir.cross(forward).norm();
-					center += -horiz_dir * pan_rate * hfrac;
-					center += vert_dir * pan_rate * vfrac;
+					lock L(mtx);
+					if (spin_allowed) {
+						center += -horiz_dir * pan_rate * hfrac;
+						center += vert_dir * pan_rate * vfrac;
+					}
 					break;
 				}
 				case ZOOM_ROTATE: {
-					// Rotate
-					// First perform the rotation about the up vector.
-					tmatrix R = rotation( -hfrac * 2.0, up.norm());
-					forward = R * forward;
-					
-					// Then perform rotation about an axis orthogonal to up and
-					// forward.
-					double vertical_angle = vfrac * 2.0;
-					double max_vertical_angle = up.diff_angle(-forward.norm());
-					if (vertical_angle > max_vertical_angle - 0.02) {
-						vertical_angle = max_vertical_angle - 0.02;
+					if (spin_allowed) {
+						// Rotate
+						// First perform the rotation about the up vector.
+						tmatrix R = rotation( -hfrac * 2.0, up.norm());
+						forward = R * forward;
+						
+						// Then perform rotation about an axis orthogonal to up and
+						// forward.
+						double vertical_angle = vfrac * 2.0;
+						double max_vertical_angle = up.diff_angle(-forward.norm());
+						if (vertical_angle > max_vertical_angle - 0.02) {
+							vertical_angle = max_vertical_angle - 0.02;
+						}
+						else if (vertical_angle < -M_PI + max_vertical_angle+0.02) {
+							vertical_angle = -M_PI + max_vertical_angle + 0.02;
+						}
+						R = rotation( -vertical_angle, forward.cross(up).norm());
+						forward = R * forward;
+						forward_changed = true;
 					}
-					else if (vertical_angle < -M_PI + max_vertical_angle+0.02) {
-						vertical_angle = -M_PI + max_vertical_angle + 0.02;
-					}
-					R = rotation( -vertical_angle, forward.cross(up).norm());
-					forward = R * forward;
-					forward_changed = true;
 					break;
 				}
 			}
@@ -993,6 +1002,33 @@ display_kernel::pick( float x, float y, float d_pixels)
 		std::exit(1);
 	}
 	return boost::make_tuple( best_pick, pickpos, mousepos);
+}
+
+
+void 
+display_kernel::allow_spin(bool b)
+{
+	lock L(mtx);
+	spin_allowed = b;
+}
+
+bool 
+display_kernel::spin_is_allowed(void) const
+{
+	return spin_allowed;
+}
+	
+void 
+display_kernel::allow_zoom(bool b)
+{
+	lock L(mtx);
+	zoom_allowed = b;
+}
+
+bool 
+display_kernel::zoom_is_allowed(void) const
+{
+	return zoom_allowed;
 }
 
 void

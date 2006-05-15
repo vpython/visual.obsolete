@@ -93,6 +93,10 @@ class display_kernel
 	bool show_renderspeed;
 	rgba background; ///< The background color of the scene.
 	rgba forground; ///< The default color for objects to be rendered into the scene.
+	
+	// Whether or not the user is allowed to spin or zoom the display
+	bool spin_allowed;
+	bool zoom_allowed;
  
 	/** Set up the OpenGL transforms from world space to view space. */
 	void world_to_view_transform( view&, int whicheye = 0, bool forpick = false);
@@ -223,6 +227,13 @@ public: // Public Data.
 	 * regardless of the value of this->autoscale.
 	 */
 	void rescale();
+	
+	void allow_spin(bool);
+	bool spin_is_allowed(void) const;
+	
+	void allow_zoom(bool);
+	bool zoom_is_allowed(void) const;
+	
 	
 	// Python properties
 	void set_up( const vector& n_up);
