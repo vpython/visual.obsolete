@@ -13,6 +13,7 @@ view::view( const vector& n_forward, vector& n_center, float& n_width,
 	: forward( n_forward), center(n_center), window_width( n_width), 
 	window_height( n_height), forward_changed( n_forward_changed), 
 	gcf( n_gcf), gcf_changed( n_gcf_changed), lod_adjust(0),
+	anaglyph(false), coloranaglyph(false), tan_hfov_x(0), tan_hfov_y(0),
 	screen_objects( z_comparator( forward))
 {
 }
