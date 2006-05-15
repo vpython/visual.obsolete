@@ -63,8 +63,6 @@ class display_kernel
 	bool uniform;
 	/** A scaling factor determined by middle mouse button scrolling. */
 	double user_scale;
-	/** A scaling factor determined by the extent of the scene. */
-	double world_scale;
 	/** The global scaling factor.  It is used to ensure that objects with 
 	 large dimensions are rendered properly.  See the .cpp file for details.
 	*/

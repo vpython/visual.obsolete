@@ -152,7 +152,6 @@ display_kernel::display_kernel()
 	autocenter(false),
 	uniform(true),
 	user_scale(1.0),
-	world_scale(10.0),
 	gcf(1.0),
 	gcf_changed(false),
 	ambient( 0.2, 0.2, 0.2),
@@ -366,10 +365,6 @@ display_kernel::world_to_view_transform(
 	
 	// See http://www.stereographics.com/support/developers/pcsdk.htm for a
 	// discussion regarding the design basis for the frustum offset code.
-		
-	// Verify a precondition:
-	// Objects must be within a reasonable size on the screen.
-	assert( std::fabs(std::log( world_scale * gcf)) < std::log( 1e12));
 	
 	vector scene_center = (center * gcf).scale_inv(range);
 	vector scene_up = up.norm();
@@ -578,9 +573,9 @@ display_kernel::recalc_extent(void)
 		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
 	}
 	// TODO: There should be a faster way to do this comparison.
-	if (std::fabs(std::log( world_scale * gcf)) >= std::log( 1e10)) {
+	if (std::fabs(std::log( range.mag() * gcf)) >= std::log( 1e10)) {
 		// Reset the global correction factor.
-		gcf = 1.0 / world_scale;
+		gcf = 1.0 / range.mag();
 		gcf_changed = true;
 	}
 }
