@@ -125,7 +125,7 @@ endef
 
 # Default compile rules to use when on Win32 or OSX.
 _DEFAULT_CXX_RULE = $(CXX) $(CVISUAL_CPPFLAGS) $(CPPFLAGS) $(CVISUAL_CXXFLAGS) \
-	$(CXXFLAGS) -MMD -c -o $@ $<
+	$(CXXFLAGS) -MMD -MF $*.d -MT "$*.d $*.lo" -c -o $@ $<
 define DEFAULT_CXX_RULE
 	@echo Compiling $< ...
 	@echo $(_DEFAULT_CXX_RULE) >> $(LOGFILE)
