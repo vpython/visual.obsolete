@@ -6,6 +6,7 @@
 #include "sphere.hpp"
 #include "util/quadric.hpp"
 #include "util/errors.hpp"
+#include "util/icososphere.hpp"
 
 namespace cvisual {
 
@@ -71,15 +72,15 @@ sphere::gl_render( const view& geometry)
 	int lod = 0;
 	if (coverage < 0) // Behind the camera, but still visible.
 		lod = 5;
-	else if (coverage < 10)
-		lod = 0;
 	else if (coverage < 20)
+		lod = 0;
+	else if (coverage < 45)
 		lod = 1;
-	else if (coverage < 60)
+	else if (coverage < 85)
 		lod = 2;
-	else if (coverage < 135)
-		lod = 3;
 	else if (coverage < 300)
+		lod = 3;
+	else if (coverage < 600)
 		lod = 4;
 	else
 		lod = 5;
@@ -214,32 +215,38 @@ sphere::update_cache( const view&)
 		// To be uesd for very distant spheres.
 		// .25 in
 		lod_cache[0].gl_compile_begin();
-		sph.render_sphere( 1.0, 13, 7);
+		// sph.render_sphere( 1.0, 13, 7);
+		icososphere( 1);
 		lod_cache[0].gl_compile_end();
 		
 		// .5 in
 		lod_cache[1].gl_compile_begin();
-		sph.render_sphere( 1.0, 19, 11);
+		// sph.render_sphere( 1.0, 19, 11);
+		icososphere( 2);
 		lod_cache[1].gl_compile_end();
 
 		// 1 in (not quite, but pretty close)
 		lod_cache[2].gl_compile_begin();
-		sph.render_sphere( 1.0, 35, 19);
+		// sph.render_sphere( 1.0, 35, 19);
+		icososphere( 3);
 		lod_cache[2].gl_compile_end();
 
 		// 2 in
 		lod_cache[3].gl_compile_begin();
-		sph.render_sphere( 1.0, 55, 29);
+		// sph.render_sphere( 1.0, 55, 29);
+		icososphere( 4);
 		lod_cache[3].gl_compile_end();
 		
 		// 5 in
 		lod_cache[4].gl_compile_begin();
-		sph.render_sphere( 1.0, 70, 34);
+		// sph.render_sphere( 1.0, 70, 34);
+		icososphere( 5);
 		lod_cache[4].gl_compile_end();
 		
 		// Only for the very largest bodies.
 		lod_cache[5].gl_compile_begin();
-		sph.render_sphere( 1.0, 140, 69);
+		// sph.render_sphere( 1.0, 140, 69);
+		icososphere( 6);
 		lod_cache[5].gl_compile_end();
 	
 		// All of the higher-numbered models also include texture coordinates.
