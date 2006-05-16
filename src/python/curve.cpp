@@ -47,7 +47,7 @@ curve::curve()
 	: pos( 0), color( 0), antialias( false),
 	radius(0.0),
 	preallocated_size(257),
-	count(0)
+	count(0), sides(4)
 {
 	// Perform initial allocation of storage space for the buggar.
 	std::vector<int> dims(2);
@@ -63,6 +63,20 @@ curve::curve()
 	color_i[0] = 1;
 	color_i[1] = 1;
 	color_i[2] = 1;
+	
+	int curve_around = sides;
+
+	for (int i=0; i<curve_around; i++) {
+		curve_sc[i]  = std::cos(i * 2 * M_PI / curve_around);
+		curve_sc[i+curve_around] = std::sin(i * 2 * M_PI / curve_around);
+	}
+
+	for (int i=0; i<128; i++) {
+		curve_slice[i*2]       = i*curve_around;
+		curve_slice[i*2+1]     = i*curve_around + 1;
+		curve_slice[i*2 + 256] = i*curve_around + (curve_around - 1);
+		curve_slice[i*2 + 257] = i*curve_around;
+	}
 }
 
 curve::curve( const curve& other)
@@ -71,6 +85,19 @@ curve::curve( const curve& other)
 	radius( other.radius), preallocated_size( other.preallocated_size),
 	count( other.count)
 {
+	int curve_around = sides;
+
+	for (int i=0; i<curve_around; i++) {
+		curve_sc[i]  = std::cos(i * 2 * M_PI / curve_around);
+		curve_sc[i+curve_around] = std::sin(i * 2 * M_PI / curve_around);
+	}
+
+	for (int i=0; i<128; i++) {
+		curve_slice[i*2]       = i*curve_around;
+		curve_slice[i*2+1]     = i*curve_around + 1;
+		curve_slice[i*2 + 256] = i*curve_around + (curve_around - 1);
+		curve_slice[i*2 + 257] = i*curve_around;
+	}
 }
 
 object
@@ -618,12 +645,157 @@ void
 curve::thickline( const view& scene, size_t begin, size_t end)
 {
 	assert( end > begin);
+#if 1
+	int curve_around = sides;
+	std::vector<vector> projected;
+	std::vector<vector> normals;
+	std::vector<rgb> light;
+
+	float *cost = curve_sc;
+	float *sint = cost + curve_around;
+
+	vector lastx(1, 0, 0), lasty(0, 1, 0);
+	
+	// pos and color iterators
+	const double* v_i = index( pos, begin);
+	const float* c_i = findex( color, begin);
+	bool mono = monochrome( begin, end);
+	rgb constant_color;
+	if (mono) {
+		// Manipulate colors when we are in stereo mode.
+		constant_color = rgb( static_cast<float>( c_i[0]),
+		                     static_cast<float>( c_i[1]),
+		                     static_cast<float>( c_i[2]));
+		if (scene.anaglyph) {
+			if (scene.coloranaglyph) {
+				constant_color = constant_color.desaturate();
+			}
+			else {
+				constant_color = constant_color.grayscale();
+			}
+		}
+		
+	}
+	
+	size_t count = end - begin;
+	for(size_t corner=0; corner < count; ++corner, v_i += 3, c_i += 3 ) {
+		// The vector to which v_i currently points towards.
+		vector current( v_i[0], v_i[1], v_i[2] );
+
+		/* To construct the circle of vertices around a point on the curve,
+		 * I need an orthonormal basis of the plane of the circle.  A and B,
+		 * normalized vectors pointing toward the next and from the previous
+		 * points on the curve, are vectors in the plane of the *curve* at
+		 * this point.  The cross product and the difference of these vectors
+		 * are orthogonal and lie in the appropriate plane.
+       * Then parallel transport the last frame to this plane
+		 * a) vectors 'initial' and 'final' specify the normal to the plane at the beginning
+		 * and end of the curve in which the surrounding tube terminates
+		 * b) vector 'vecx' specifies the 'x'-direction of the frame in the beginning plane
+		 *    This is useful to change the orientation of the surrounding box when sides=4
+		 * c) int 'sides' specifies the number of sides for the tube 2 <= sides <= 20
+		 * d)	rscale specifies how to define radius in the planes at the end of each segment
+		 *		rscale = 0.0 defaults to projection of radius into plane without length scaling
+		 *                 and without parallel transport
+		 *    rscale > 0.0 scales the radius so that the tube is of constant diameter
+		 *    rscale small may give sharp points at very acute corners
+		 *    rscale = 1.0 gives same as default tube except uses parallel transport for frame
+		 * e) array rvect = (x,y,z) defines radius in x and y frame directions, z coordinate is not used
+		 *    this allows radius to vary along curve and should be defined for each point in curve
+	Last change:  AWW  21 Aug 2004    1:12 pm
+	
+		Added to VPython-core2 16 May 2006
+		 */
+
+		vector next( v_i[3], v_i[4], v_i[5]); // The next vector in pos
+		vector prev( v_i[-3], v_i[-2], v_i[-1]); // The previous vector in pos
+		vector A = (next - current).norm();
+		vector B = (current - prev).norm();
+		vector x = (A - B).norm();
+		vector y = A.cross(B).norm();
+		if (!x || !y) {
+			x = lastx;
+			y = lasty;
+		}
+
+		// remove twists
+		if (x.dot(lastx) < 0)
+			x = -x;
+		if (y.dot(lasty) < 0)
+			y = -y;
+
+		// save last set of vectors
+		lastx = x;
+		lasty = y;
+
+		// scale radii
+		x *= radius * scene.gcf;
+		y *= radius * scene.gcf;
+		
+		rgb rendered_color;
+		if (!mono) {
+			// Manipulate colors when we are in stereo mode.
+			rendered_color = rgb( static_cast<float>( c_i[0]),
+			                     static_cast<float>( c_i[1]),
+			                     static_cast<float>( c_i[2]));
+			if (scene.anaglyph) {
+				if (scene.coloranaglyph) {
+					rendered_color = rendered_color.desaturate();
+				}
+				else {
+					rendered_color = rendered_color.grayscale();
+				}
+			}
+		}
+		
+		for (int a=0; a < curve_around; a++) {
+			float c = cost[a];
+			float s = sint[a];
+			normals.push_back( (x*c + y*s).norm());
+			projected.push_back( (current + x*c + y*s)*scene.gcf);
+			if (!mono) {
+				light.push_back( rendered_color);
+			}
+		}
+	}
+	size_t npoints = normals.size() / curve_around;
+	glEnableClientState( GL_VERTEX_ARRAY);
+	glEnableClientState( GL_NORMAL_ARRAY);
+	if (!mono)
+		glEnableClientState( GL_COLOR_ARRAY);
+	else
+		constant_color.gl_set();
+	
+	int *ind = curve_slice;
+	for (int a=0; a < curve_around; a++) {
+		int ai = a;
+		if (a == curve_around-1) {
+			ind += 256;
+			ai = 0;
+		}
+
+		for (int i = 0; i < npoints; i += 127) {
+			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*curve_around + ai].x);
+			if (!mono)
+				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*curve_around + ai)].red );
+			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*curve_around + ai].x);
+			if (npoints-i < 128)
+				glDrawElements(GL_TRIANGLE_STRIP, 2*(npoints-i), GL_UNSIGNED_INT, ind);
+			else
+				glDrawElements(GL_TRIANGLE_STRIP, 256, GL_UNSIGNED_INT, ind);
+		}
+	}
+	glDisableClientState( GL_VERTEX_ARRAY);
+	glDisableClientState( GL_NORMAL_ARRAY);
+	if (!mono)
+		glDisableClientState( GL_COLOR_ARRAY);
+#else
 	std::vector<rgb> tcolor;
 	std::vector<vector> spos;
-	float (*used_color)[3] = &((converter<float>*)index( color, begin-1))->data;
+	float (*used_color)[3] = &((converter<float>*)findex( color, begin-1))->data;
 	double (*used_pos)[3] = &((converter<double>*)index( pos, begin-1))->data;
 	
-	gleSetNumSides(6);
+	gleSetNumSides(4);
 	gleSetJoinStyle( TUBE_JN_ANGLE | TUBE_NORM_PATH_EDGE | TUBE_NORM_EDGE);
 	
 	if (scene.gcf != 1.0) {
@@ -680,6 +852,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			end-begin+2, used_pos,
 			used_color, radius * scene.gcf);
 	}
+#endif
 }
 
 void 
@@ -741,6 +914,7 @@ curve::gl_render( const view& scene)
 	}
 	while (size > 1) {
 		assert( c != c_end);
+#if 1
 		long check = checksum( begin, begin+size);
 		if (check == c->checksum)
 			c->gl_cache.gl_render();
@@ -754,6 +928,12 @@ curve::gl_render( const view& scene)
 			c->checksum = check;
 			c->gl_cache.gl_render();
 		}
+#else
+		if (do_thinline)
+			thinline( scene, begin, begin+size);
+		else
+			thickline( scene, begin, begin+size);
+#endif
 		begin += size-1;
 		size = (begin + 256 < true_size)
 			? 256 : true_size-begin;

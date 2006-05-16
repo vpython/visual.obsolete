@@ -60,6 +60,11 @@ class curve : public renderable
 	// Compute a checksum over the elements of the specified [begin,end) range.
 	long checksum( size_t begin, size_t end);
 
+	static const int MAX_SIDES = 20;
+	size_t sides;
+	int curve_slice[512];
+	float curve_sc[2*MAX_SIDES];     // 8 == max_sides * 2
+
  public:
 	
 	curve();
