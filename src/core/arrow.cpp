@@ -102,12 +102,7 @@ arrow::cache_transparent_model( const view& scene)
 	// Compile the rendering code for the beastie.
 	clear_gl_error();
 	model.gl_compile_begin();
-	{
-		gl_matrix_stackguard guard;
-		vector view_pos = pos * scene.gcf;
-		glTranslated( view_pos.x, view_pos.y, view_pos.z);		
-		model_world_transform().gl_mult();
-		
+	{	
 		glEnable( GL_BLEND);
 		// glEnable( GL_POLYGON_SMOOTH);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -219,8 +214,11 @@ arrow::gl_render( const view& scene)
 	vector view_pos = pos * scene.gcf;
 	glTranslated( view_pos.x, view_pos.y, view_pos.z);			
 	model_world_transform().gl_mult();
-	
+	lighting_prepare();
+	shiny_prepare();
 	model.gl_render();
+	shiny_complete();
+	lighting_complete();
 }
 
 void

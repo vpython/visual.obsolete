@@ -623,6 +623,8 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	float (*used_color)[3] = &((converter<float>*)index( color, begin-1))->data;
 	double (*used_pos)[3] = &((converter<double>*)index( pos, begin-1))->data;
 	
+	gleSetNumSides(6);
+	gleSetJoinStyle( TUBE_JN_ANGLE | TUBE_NORM_PATH_EDGE | TUBE_NORM_EDGE);
 	
 	if (scene.gcf != 1.0) {
 		// Must scale the pos data.
@@ -719,12 +721,6 @@ curve::gl_render( const view& scene)
 	}
 
 	clear_gl_error();
-	static bool first = true;
-	if (first) {
-		gleSetNumSides(6);
-		gleSetJoinStyle( TUBE_JN_ANGLE | TUBE_NORM_PATH_EDGE);
-		first = false;
-	}
 	
 	size_t size = std::min(c_cache::items, true_size);
 	size_t begin = 0;
@@ -738,6 +734,10 @@ curve::gl_render( const view& scene)
 		glEnable( GL_BLEND);
 		glEnable( GL_LINE_SMOOTH);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE);	
+	}
+	else {
+		lighting_prepare();
+		shiny_prepare();
 	}
 	while (size > 1) {
 		assert( c != c_end);
@@ -766,6 +766,11 @@ curve::gl_render( const view& scene)
 		glDisable( GL_BLEND);
 		glDisable( GL_LINE_SMOOTH);
 	}
+	else {
+		shiny_complete();
+		lighting_complete();
+	}
+	
 	check_gl_error();
 
 }

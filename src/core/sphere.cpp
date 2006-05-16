@@ -61,11 +61,7 @@ sphere::gl_render( const view& geometry)
 	if (degenerate())
 		return;
 	clear_gl_error();
-	if (!lit)
-		glDisable( GL_LIGHTING);
-	
-	// All of the models are slightly different when shininess is specified.
-	const bool shiny = shininess != 1.0;
+	lighting_prepare();
 	
 	// Each of the cutoff values below were determined experimentally
 	// based on looking at the terminator between the most and least illuminated
@@ -103,12 +99,7 @@ sphere::gl_render( const view& geometry)
 	glScaled( scale.x, scale.y, scale.z);
 	
 	// Set up material properties for shininess.
-	if (shiny) {
-		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
-		int gl_shininess = static_cast<int>(shininess * 128);
-		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( .8, .8, .8).red);
-		glMateriali( GL_FRONT, GL_SHININESS, gl_shininess);
-	}
+	shiny_prepare();
 	
 	color.gl_set();
 	// Mode specific rendering code follows
@@ -125,8 +116,6 @@ sphere::gl_render( const view& geometry)
 		// this level of subdivision.
 		size_t tex_lod = std::max(lod + 6, 10);
 		tex->gl_activate();
-		if (shiny)
-			glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 		
 		// Render the back half.
 		glCullFace( GL_FRONT);
@@ -140,8 +129,6 @@ sphere::gl_render( const view& geometry)
 		glDisable( GL_CULL_FACE);
 		glDisable( GL_TEXTURE_2D);
 		glDisable( GL_BLEND);		
-		if (shiny)
-			glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);			
 	}
 	else if (color.alpha != 1.0) { // Render a transparent sphere.
 		// Since spheres have identical symmetry
@@ -173,9 +160,6 @@ sphere::gl_render( const view& geometry)
 		glEnable( GL_TEXTURE_2D);
 		tex->gl_activate();
 		rgba(1.0, 1.0, 1.0, 1.0).gl_set();
-		// Use separate specular highlights, when requested.
-		if (shiny)
-			glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);		
 		
 		// Render the object, using culling of the backface if the camera is not
 		// within the space of the body.
@@ -190,20 +174,14 @@ sphere::gl_render( const view& geometry)
 		}
 		
 		// Cleanup.
-		glDisable( GL_TEXTURE_2D);
-		if (shiny)
-			glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);			
+		glDisable( GL_TEXTURE_2D);		
 	}
 	else {
 		// Render a simple sphere.
 		lod_cache[lod].gl_render();
 	}
-	if (shiny) {
-		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
-		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( 0, 0, 0).red);
-	}
-	if (!lit)
-		glEnable( GL_LIGHTING);
+	shiny_complete();
+	lighting_complete();
 	check_gl_error();
 }
 

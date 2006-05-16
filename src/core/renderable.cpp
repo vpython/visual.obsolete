@@ -58,12 +58,14 @@ view::pixel_coverage( const vector& pos, double radius) const
 }
 
 renderable::renderable()
-	: model_damaged(true), z_damaged(true), visible(true), lit(true)
+	: model_damaged(true), z_damaged(true), visible(true), lit(true), 
+		shininess(0.0)
 {
 }
 
 renderable::renderable( const renderable& other)
-	: model_damaged(true), z_damaged(true), visible(true), lit(other.lit)
+	: model_damaged(true), z_damaged(true), visible(true), lit(other.lit), 
+		shininess(other.shininess)
 {
 }
 
@@ -118,6 +120,75 @@ renderable::refresh_cache(const view& geometry)
 		update_cache( geometry);
 		model_damaged = false;
 	}
+}
+
+void
+renderable::set_shininess( const float s)
+{
+	lock L(mtx);
+	model_damage();
+	shininess = clamp( 0.0f, s, 1.0f);
+}
+
+float
+renderable::get_shininess()
+{
+	return shininess;
+}
+
+void
+renderable::set_lit(bool l)
+{
+	lock L(mtx);
+	lit = l;
+}
+
+bool
+renderable::is_lit()
+{
+	return lit;
+}
+
+bool
+renderable::shiny( void)
+{
+	return shininess != 0.0 && shininess != 1.0;
+}
+
+void
+renderable::lighting_prepare( void)
+{
+	if (!lit)
+		glDisable( GL_LIGHTING);
+}
+
+void
+renderable::shiny_prepare( void)
+{
+	if (shiny()) {
+		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+		glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+		int gl_shininess = static_cast<int>(shininess * 128);
+		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( .8, .8, .8).red);
+		glMateriali( GL_FRONT, GL_SHININESS, gl_shininess);
+	}
+}
+
+void
+renderable::shiny_complete( void)
+{
+	if (shiny()) {
+		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
+		glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
+		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( 0, 0, 0).red);
+	}
+}
+
+void
+renderable::lighting_complete( void)
+{
+	if (!lit)
+		glEnable( GL_LIGHTING);
 }
 
 } // !namespace cvisual

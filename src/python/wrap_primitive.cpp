@@ -69,7 +69,10 @@ py_rotate( tuple args, dict kwargs)
 void
 wrap_primitive()
 {
-	class_<renderable, boost::noncopyable>( "renderable", no_init);
+	class_<renderable, boost::noncopyable>( "renderable", no_init)
+		.add_property( "shininess", &renderable::get_shininess, &renderable::set_shininess)
+		.add_property( "lit", &renderable::is_lit, &renderable::set_lit)
+		;
 
 	class_<primitive, bases<renderable>, noncopyable>( 
 			"primitive", no_init)
@@ -91,8 +94,6 @@ wrap_primitive()
 		.add_property( "green", &primitive::get_green, &primitive::set_green)
 		.add_property( "blue", &primitive::get_blue, &primitive::set_blue)
 		.add_property( "alpha", &primitive::get_alpha, &primitive::set_alpha)		
-		.add_property( "shininess", &primitive::get_shininess, &primitive::set_shininess)
-		.add_property( "lit", &primitive::is_lit, &primitive::set_lit)
         .def( "rotate", raw_function( &py_rotate<primitive>))
 		;
 		

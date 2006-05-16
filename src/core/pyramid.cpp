@@ -122,6 +122,8 @@ pyramid::gl_render( const view& scene)
 	if (degenerate())
 		return;
 	clear_gl_error();
+	lighting_prepare();
+	shiny_prepare();
 	{
 		vector view_pos = pos * scene.gcf;
 		gl_matrix_stackguard guard;
@@ -144,6 +146,8 @@ pyramid::gl_render( const view& scene)
 		else
 			simple_model.gl_render();
 	}
+	shiny_complete();
+	lighting_complete();
 	check_gl_error();
 }
 

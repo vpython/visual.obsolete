@@ -104,6 +104,8 @@ box::gl_render( const view& scene)
 	bool flat = axis.mag() == 0.0 || width == 0.0 || height == 0.0;
 	
 	clear_gl_error();
+	lighting_prepare();
+	shiny_prepare();
 	color.gl_set();
 	{
 		if (flat)
@@ -163,6 +165,8 @@ box::gl_render( const view& scene)
 		if (flat)
 			glDisable( GL_POLYGON_OFFSET_FILL);
 	}
+	shiny_prepare();
+	lighting_prepare();
 	check_gl_error();
 }
 

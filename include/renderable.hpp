@@ -161,6 +161,12 @@ public:
 	 * damage states.
 	 */
 	void refresh_cache( const view&);
+	
+	void set_lit(bool);
+	bool is_lit();
+	
+	void set_shininess( float);
+	float get_shininess();
 
 protected:
 	friend class display_kernel;
@@ -181,6 +187,21 @@ protected:
 	bool visible;
 	/** True if the object should be rendered with lighting enabled */
 	bool lit;
+	/** non-zero (and non-unit) if the object should be rendered with GL shininess */
+	float shininess;
+	
+	// Utility functions that subclasses may use to easily prepare and complete
+	// lighting and shininess properties.
+	void lighting_prepare( void);
+	void lighting_complete( void);
+	
+ private:
+	bool shiny( void);
+
+ protected:
+	void shiny_prepare( void);
+	void shiny_complete( void);
+	
 	friend class z_comparator;
 	/** A function that must be overridden if a subclass wants to cache its state
 		for rendering optimization.

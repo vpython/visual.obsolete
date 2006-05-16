@@ -93,6 +93,8 @@ cylinder::gl_render( const view& scene)
 	if (degenerate())
 		return;
 	clear_gl_error();
+	lighting_prepare();
+	shiny_prepare();
 
 	// See sphere::gl_render() for a description of the level of detail calc.
 	double coverage = scene.pixel_coverage( pos, radius);
@@ -116,14 +118,6 @@ cylinder::gl_render( const view& scene)
 		lod = 0;
 	else if (lod > 5)
 		lod = 5;
-	
-	const bool shiny = shininess != 1.0;
-	if (shiny) {
-		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
-		int gl_shininess = static_cast<int>(shininess * 128);
-		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( .8, .8, .8).red);
-		glMateriali( GL_FRONT, GL_SHININESS, gl_shininess);		
-	}
 	
 	gl_matrix_stackguard guard;
 	vector view_pos = pos * scene.gcf;
@@ -158,10 +152,8 @@ cylinder::gl_render( const view& scene)
 	}
 	
 	// Cleanup.
-	if (shiny) {
-		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
-		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( 0, 0, 0).red);		
-	}
+	shiny_complete();
+	lighting_complete();
 	check_gl_error();
 }
 

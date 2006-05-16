@@ -28,8 +28,6 @@ class primitive : public renderable
 	shared_vector axis;
 	shared_vector up;
 	shared_vector pos;
-	float shininess;
-	bool lit;
 
 	// Returns a tmatrix that performs reorientation of the object from model
 	// orientation to world (and view) orientation.
@@ -41,7 +39,6 @@ class primitive : public renderable
 	// Generate a displayobject at the origin, with up pointing along +y and
 	// an axis = vector(1, 0, 0).
 	primitive();
-	primitive( const vector& pos, const vector& axis, const vector& up);
 	primitive( const primitive& other);
 	
 	// See above for PRIMITIVE_TYPEINFO_DECL/IMPL.
@@ -88,12 +85,6 @@ class primitive : public renderable
 	
 	void set_alpha( double x);
 	double get_alpha();
-	
-	void set_shininess( float);
-	float get_shininess();
-	
-	void set_lit(bool);
-	bool is_lit();
 };
 
 } // !namespace cvisual

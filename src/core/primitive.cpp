@@ -91,20 +91,13 @@ primitive::get_center() const
 }
 
 primitive::primitive()
-	: axis(mtx, 1,0,0), up(mtx, 0,1,0), pos(mtx, 0,0,0), shininess(1.0), 
-		lit(true)
+	: axis(mtx, 1,0,0), up(mtx, 0,1,0), pos(mtx, 0,0,0)
 {
 }
 
 primitive::primitive( const primitive& other)
 	: renderable( other), axis(mtx, other.axis), up( mtx, other.up), 
-		pos(mtx, other.pos), shininess( other.shininess), lit( other.lit)
-{
-}
-
-primitive::primitive( 
-	const vector& n_pos, const vector& n_axis, const vector& n_up)
-	: axis(mtx, n_axis), up(mtx, n_up), pos(mtx, n_pos), shininess( 1.0), lit(true)
+		pos(mtx, other.pos)
 {
 }
 
@@ -276,33 +269,6 @@ rgba
 primitive::get_color()
 {
 	return color;
-}
-
-void
-primitive::set_shininess( const float s)
-{
-	lock L(mtx);
-	model_damage();
-	shininess = clamp( 0.0f, s, 1.0f);
-}
-
-float
-primitive::get_shininess()
-{
-	return shininess;
-}
-
-void
-primitive::set_lit(bool l)
-{
-	lock L(mtx);
-	lit = l;
-}
-
-bool
-primitive::is_lit()
-{
-	return lit;
 }
 
 PRIMITIVE_TYPEINFO_IMPL(primitive)

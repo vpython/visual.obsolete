@@ -136,6 +136,8 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	
 	// Point OpenGL at the vertex data for the first triangle strip.
 	clear_gl_error();
+	lighting_prepare();
+	shiny_prepare();
 	glEnableClientState( GL_VERTEX_ARRAY);
 	glEnableClientState( GL_NORMAL_ARRAY);
 	glVertexPointer( 3, GL_DOUBLE, 0, vertexes.get());
@@ -158,6 +160,8 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	
 	glDisableClientState( GL_VERTEX_ARRAY);
 	glDisableClientState( GL_NORMAL_ARRAY);
+	shiny_complete();
+	lighting_complete();
 	check_gl_error();
 	return;
 }
