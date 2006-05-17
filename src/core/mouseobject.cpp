@@ -148,6 +148,9 @@ event::create_press(
 
 /************** mouseObject implementation **************/
 
+mouse_t::~mouse_t()
+{
+}
 
 void 
 mouse_t::clear_events( int i)

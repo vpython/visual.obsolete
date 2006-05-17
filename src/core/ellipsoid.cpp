@@ -17,6 +17,10 @@ ellipsoid::ellipsoid( const ellipsoid& other)
 {
 }
 
+ellipsoid::~ellipsoid()
+{
+}
+
 void 
 ellipsoid::set_length( double l)
 {

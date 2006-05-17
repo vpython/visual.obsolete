@@ -19,6 +19,7 @@ class cone : public axial
  public:
 	cone();
 	cone( const cone& other);
+	virtual ~cone();
 	
 	void set_length( double l);
 	double get_length();

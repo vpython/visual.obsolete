@@ -62,6 +62,9 @@ class arrow : public primitive
 	/** Default arrow.  Pointing along +x, unit length, 
 	 */
 	arrow();
+	arrow( const arrow& other);
+	virtual ~arrow();
+	
 	void set_headwidth( double hw);
 	double get_headwidth();
 	

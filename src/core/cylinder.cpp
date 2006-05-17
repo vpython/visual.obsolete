@@ -43,6 +43,10 @@ cylinder::cylinder( const cylinder& other)
 {
 }
 
+cylinder::~cylinder()
+{
+}
+
 void
 cylinder::update_cache( const view&)
 {

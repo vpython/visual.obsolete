@@ -84,6 +84,7 @@ class convex : public renderable
  public:
 	convex();
 	convex( const convex& other);
+	virtual ~convex();
 	void append( vector pos);
 	void set_color( const rgba&);
 	rgba get_color();

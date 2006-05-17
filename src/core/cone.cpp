@@ -30,7 +30,7 @@ render_cone_model( size_t n_sides, size_t n_stacks = 1)
 {
 #if 0
 	// I've swapped out this algorithm for the GLU version, but I'm keeping it
-	// around in case I need it for something else later.
+	// around in case I need it for something else later. -JDB
 	
 	// A rotation matrix to generate the edge vertexes and normals.
 	tmatrix rotator = rotation( -2 * M_PI / n_sides, vector( 1, 0, 0));
@@ -87,6 +87,10 @@ cone::cone()
 
 cone::cone( const cone& other)
 	: axial(other)
+{
+}
+
+cone::~cone()
 {
 }
 

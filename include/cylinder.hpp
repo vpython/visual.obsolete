@@ -20,6 +20,7 @@ class cylinder : public axial
  public:
 	cylinder();
 	cylinder( const cylinder&);
+	virtual ~cylinder();
 	
 	void set_length( double l);
 	double get_length();

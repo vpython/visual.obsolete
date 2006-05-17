@@ -65,6 +65,10 @@ faces::faces( const faces& other)
 {
 }
 
+faces::~faces()
+{
+}
+
 void
 faces::set_length( int length)
 {

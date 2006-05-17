@@ -121,6 +121,17 @@ arrow::arrow()
 {
 }
 
+arrow::arrow( const arrow& other)
+	: primitive(other), fixedwidth( other.fixedwidth), 
+	headwidth( other.headwidth), headlength( other.headlength), 
+	shaftwidth( other.shaftwidth)
+{	
+}
+
+arrow::~arrow()
+{
+}
+
 void
 arrow::set_headwidth( double hw)
 {

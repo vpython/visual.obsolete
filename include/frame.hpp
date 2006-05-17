@@ -69,6 +69,7 @@ class frame : public renderable
  public:
 	frame();
 	frame( const frame& other);
+	virtual ~frame();
     void rotate( double angle, const vector& axis, const vector& origin);
 
 	void add_renderable( shared_ptr<renderable> child);

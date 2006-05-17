@@ -66,9 +66,9 @@ class curve : public renderable
 	float curve_sc[2*MAX_SIDES];     // 8 == max_sides * 2
 
  public:
-	
 	curve();
 	curve( const curve& other);
+	virtual ~curve();
 
 	void append_rgb( vector, float r=-1, float g=-1, float b=-1);
 	void append( vector _pos, rgb _color); // Append a single position with new color.

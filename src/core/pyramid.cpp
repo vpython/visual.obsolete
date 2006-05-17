@@ -28,6 +28,10 @@ pyramid::pyramid( const pyramid& other)
 {
 }
 
+pyramid::~pyramid()
+{
+}
+
 void 
 pyramid::gl_pick_render( const view& scene)
 {

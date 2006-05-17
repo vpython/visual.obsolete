@@ -28,6 +28,10 @@ frame::frame( const frame& other)
 	model_damage();
 }
 
+frame::~frame()
+{
+}
+
 void 
 frame::set_pos( const vector& n_pos)
 {

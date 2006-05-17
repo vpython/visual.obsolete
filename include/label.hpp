@@ -19,6 +19,7 @@ class label : public renderable
  public:
 	label();
 	label( const label& other);
+	virtual ~label();
 
 	void set_pos( const vector& n_pos);
 	shared_vector& get_pos();

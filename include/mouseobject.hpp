@@ -27,6 +27,7 @@ class mousebase
 
  public:
 	mousebase() {}
+	virtual ~mousebase();
 	// The position of the mouse, either currently, or when the even happened.
 	vector position;
 	// The position of the camera in the scene.
@@ -112,6 +113,7 @@ class mouse_t : public mousebase
 	
  public:
 	mouse_t() : click_count(0) {}
+	virtual ~mouse_t();
 	mutex mtx;
 	
 	// The following member functions are synchronized - no additional locking

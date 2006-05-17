@@ -38,6 +38,8 @@ class faces : public renderable
  public:
 	faces();
 	faces( const faces& other);
+	virtual ~faces();
+	
 	// Add another vertex, normal, and color to the faces.
 	void append( vector, vector, rgb);
 	void append( vector, vector);

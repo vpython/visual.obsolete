@@ -126,6 +126,9 @@ convex::convex( const convex& other)
 {
 }
 
+convex::~convex()
+{
+}
 
 boost::python::object
 convex::get_pos()

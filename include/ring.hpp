@@ -22,6 +22,7 @@ class ring : public axial
  public:
 	ring();
 	ring( const ring& other);
+	virtual ~ring();
 	void set_thickness( double t);
 	double get_thickness();
 	

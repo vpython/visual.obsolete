@@ -27,6 +27,7 @@ class pyramid : public rectangular
  public:
 	pyramid();
 	pyramid( const pyramid& other);
+	virtual ~pyramid();
 	
  protected:
 	virtual void gl_pick_render( const view&);

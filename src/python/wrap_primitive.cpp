@@ -109,7 +109,7 @@ wrap_primitive()
 		;
 		
 	class_< arrow, bases<primitive>, noncopyable >("arrow")
-		// .def( init<const visual::arrow&>())
+		.def( init<const arrow&>())
 		.add_property( "length", &arrow::get_length, &arrow::set_length)
 		.add_property( "shaftwidth", &arrow::get_shaftwidth, &arrow::set_shaftwidth)
 		.add_property( "headlength", &arrow::get_headlength, &arrow::set_headlength)

@@ -47,6 +47,10 @@ label::label( const label& other)
 {
 }
 
+label::~label()
+{
+}
+
 void
 label::set_pos( const vector& n_pos)
 {

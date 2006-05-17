@@ -100,6 +100,10 @@ curve::curve( const curve& other)
 	}
 }
 
+curve::~curve()
+{
+}
+
 object
 curve::get_pos()
 {

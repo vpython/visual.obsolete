@@ -19,6 +19,7 @@ class ellipsoid : public sphere
  public:
 	ellipsoid();
 	ellipsoid( const ellipsoid& other);
+	virtual ~ellipsoid();
 	
 	void set_length( double l);
 	double get_length();

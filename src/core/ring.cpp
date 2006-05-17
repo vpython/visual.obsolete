@@ -28,6 +28,10 @@ ring::ring( const ring& other)
 {	
 }
 
+ring::~ring()
+{
+}
+
 void
 ring::set_thickness( double t)
 {
