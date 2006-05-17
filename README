@@ -62,12 +62,12 @@ src/test/
 TODO (*-ed items are must-do, w/l items are wishlist items):
 	* Port to GTK on Windows
 	* Forward-port changes to support numeric/numarray (done)
-	* Remove libgle dependancy; integrate advanced curve type
+	* Remove libgle dependancy; integrate advanced curve type (done)
 	* Provide simple texture API
 	* Pango+texture text rendering; Remove FTGL dependancy
 	* Write simple icons for the toolbar widgets
 	* Verify performance of the autoscaler, particularly with regards to
-		frustum depth parameters.
+		frustum depth parameters. (done)
 	* Autotoolize the project (done)
 	* Update INSTALL.txt, NEWS.txt
 	-------- 3.0.ALPHA0 release here ---------
@@ -82,7 +82,7 @@ TODO (*-ed items are must-do, w/l items are wishlist items):
 		- texturing
 	* Ability to disable the toolbar
 	* Optimize away extra display_kernel::pick() calls
-	* Investigate slowness
+	* Investigate slowness (mostly done)
 	----------- 3.0.BETA0 release here ---------------
 	* Additional features as users request
 	* Fix bugs identified with ALPHA0 and BETA0
