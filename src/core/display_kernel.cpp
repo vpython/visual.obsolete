@@ -9,6 +9,8 @@
 #include "frame.hpp"
 #include "font.hpp"
 
+#include <GL/glext.h>
+
 #include <cassert>
 #include <algorithm>
 #include <iterator>
@@ -24,7 +26,6 @@ shared_ptr<std::set<std::string> > display_kernel::extensions;
 std::string display_kernel::vendor;
 std::string display_kernel::version;
 std::string display_kernel::renderer;
-
 
 void 
 display_kernel::enable_lights()
@@ -326,8 +327,13 @@ display_kernel::report_realize()
 	
 	// FSAA.  Doesn't seem to have much of an effect on my TNT2 card.  Grrr.
 	if (extensions->find( "GL_ARB_multisample") != extensions->end()) {
-		VPYTHON_NOTE( "Using GL_ARB_multisample extension.");
 		glEnable( GL_MULTISAMPLE_ARB);
+		int n_samples, n_buffers;
+		glGetIntegerv( GL_SAMPLES_ARB, &n_samples);
+		glGetIntegerv( GL_SAMPLE_BUFFERS_ARB, &n_buffers);
+		VPYTHON_NOTE( "Using GL_ARB_multisample extension: samples:" 
+			+ boost::lexical_cast<std::string>(n_samples)
+			+ " buffers: " + boost::lexical_cast<std::string>(n_buffers));
 	}
 
 	check_gl_error();
