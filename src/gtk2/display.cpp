@@ -264,7 +264,7 @@ display::create()
 
 	Gtk::ToolButton* button = 0;
 	button = Gtk::manage( new Gtk::ToolButton( Gtk::Stock::QUIT));
-	button->signal_clicked().connect( sigc::ptr_fun( &Gtk::Main::quit));
+	button->signal_clicked().connect( sigc::mem_fun( *this, &display::on_quit_clicked));
 	tb->append( *button);
 	button = Gtk::manage( new Gtk::ToggleToolButton( 
 		*Gtk::manage( new Gtk::Image(fs_img)), "Fullscreen"));
@@ -369,9 +369,11 @@ display::on_window_delete(GdkEventAny*)
 	area.reset();
 	
 	gui_main::report_window_delete( this);
-	if (exit)
+	if (exit) {
+		VPYTHON_NOTE( "Initiating shutdown from window closure");
 		gui_main::quit();
-	
+	}
+		
 	return true;
 }
 
