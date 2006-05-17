@@ -540,6 +540,8 @@ gui_main::thread_proc(void)
 		init_signal->notify_all();
 	}
 	self->run();
+	VPYTHON_NOTE( "Cleaning up allocated GL resources");
+	render_surface::final_cleanup();
 	VPYTHON_NOTE( "Terminating GUI thread.");
 	gui_main::on_shutdown();
 }

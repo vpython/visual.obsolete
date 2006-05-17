@@ -9,6 +9,10 @@
 #include "vpython-config.h"
 
 #include <gtkmm/gl/init.h>
+#include <gdkmm/gl/pixmap.h>
+#include <gdkmm/gl/pixmapext.h>
+
+#include <gdkmm/pixmap.h>
 #include <gdkmm/pixbuf.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/radiobutton.h>
@@ -27,6 +31,62 @@ namespace cvisual {
 
 namespace {
 	Glib::RefPtr<Gdk::GL::Context> share_list;
+}
+
+void
+render_surface::final_cleanup( void)
+{
+	if (share_list) {
+		try {
+			Glib::RefPtr<Gdk::GL::Config> config = 
+				Gdk::GL::Config::create( Gdk::GL::MODE_RGB
+					| Gdk::GL::MODE_DOUBLE
+					| Gdk::GL::MODE_DEPTH );
+			if (!config) {
+				VPYTHON_WARNING( "Failed to initialize any OpenGL configuration");
+				return;
+			}
+			
+			Glib::RefPtr<Gdk::Pixmap> dummy_target = 
+				Gdk::Pixmap::create( Glib::RefPtr<Gdk::Drawable>(), 1, 1, config->get_depth());
+			if (!dummy_target) {
+				VPYTHON_WARNING( "Failed to create a dummy Gdk::Pixmap");
+				return;
+			}
+			
+			Glib::RefPtr<Gdk::GL::Pixmap> target = 
+				Gdk::GL::ext( dummy_target).set_gl_capability( config);
+			if (!target) {
+				VPYTHON_WARNING( "Failed to create a dummy Gdk::GL::Pixmap");
+				return;
+			}
+			
+			Glib::RefPtr<Gdk::GL::Context> local_ctx = Gdk::GL::Context::create(
+				target, share_list, false);
+			if (!local_ctx) {
+				VPYTHON_WARNING( "Failed to create a new shared Gdk::GL::Context");
+				return;
+			}
+			
+			if (!target->gl_begin( local_ctx)) {
+				VPYTHON_WARNING( "Failed to gl_begin() the dummy Gdk::GL::Pixmap");
+				return;
+			}
+			
+			clear_gl_error();
+			on_gl_free();
+			check_gl_error();
+			
+			target->gl_end();
+		} catch (std::exception& err) {
+			std::ostringstream msg;
+			msg << "Failed releasing GL resources: " << err.what();
+			VPYTHON_CRITICAL_ERROR( msg.str());
+		}
+		share_list.clear();
+	}
+	else
+		VPYTHON_NOTE( "No renderer was made active; nothing to clean up");
 }
 
 render_surface::render_surface( display_kernel& _core, bool activestereo)

@@ -87,6 +87,9 @@ class render_surface : public Gtk::GL::DrawingArea
 	
 	// Returns the mouse object, and updates some of its parameters.
 	mouse_t& get_mouse() { return mouse; }
+	
+	// To be called before the GUI thread exits.
+	static void final_cleanup( void);
  
  protected:
 	// Low-level signal handlers
