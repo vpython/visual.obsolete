@@ -71,7 +71,7 @@ void
 box::update_cache( const view&)
 {
 	if (first) {
-		glPolygonOffset( 0, 2);
+		// glPolygonOffset( 0, 2);
 		clear_gl_error();
 		first = false;
 		// First set up the non-textured model.
@@ -108,8 +108,9 @@ box::gl_render( const view& scene)
 	shiny_prepare();
 	color.gl_set();
 	{
-		if (flat)
-			glEnable( GL_POLYGON_OFFSET_FILL);
+		// TODO: Handle special case of flat rendering
+		// if (flat)
+		//	glEnable( GL_POLYGON_OFFSET_FILL);
 		double gcf = scene.gcf;
 		gl_matrix_stackguard guard;
 		vector view_pos = pos * scene.gcf;
