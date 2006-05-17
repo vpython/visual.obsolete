@@ -73,6 +73,10 @@ drag_event( int which, const mouse_t& mouse)
 	return ret;
 }
 
+mousebase::~mousebase()
+{
+}
+
 /* Translate a button click code into a text string.
  */ 
 std::string*
