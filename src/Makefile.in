@@ -58,7 +58,7 @@ CVISUAL_CPPFLAGS = $(BOOST_INCLUDES) $(PYTHON_INCLUDES) -DHAVE_CONFIG_H \
 	-I$(top_srcdir)/include -I$(top_builddir)/include
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-CXXFLAGS = @CXXFLAGS@ -ftemplate-depth-120 -g0
+CXXFLAGS = @CXXFLAGS@ -ftemplate-depth-120
 CPPFLAGS = @CPPFLAGS@
 
 # Object file list.  Since we are building a shared library with PIC code, we 
@@ -72,7 +72,7 @@ CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
 	scalar_array.lo slice.lo vector_array.lo wrap_arrayobjects.lo \
 	wrap_display_kernel.lo wrap_primitive.lo wrap_rgba.lo wrap_vector.lo \
 	clipping_plane.lo displaylist.lo errors.lo extent.lo gl_free.lo lighting.lo \
-	quadric.lo rgba.lo texture.lo tmatrix.lo vector.lo
+	quadric.lo rgba.lo texture.lo tmatrix.lo vector.lo icososphere.lo
 
 # Distribution file list.
 DISTFILES = $(subst .lo,.cpp,$(CVISUAL_OBJS) \
@@ -184,7 +184,7 @@ ifeq ($(PYTHON_PLATFORM),win32)
 else 
   # These options are common to both Linux and OSX.
   CVISUAL_LIBS += $(GTK_LIBS) $(FTGL_LIBS) $(GTHREAD_LIBS) -lboost_python \
-  	-lboost_thread -lgle
+  	-lboost_thread
   CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(FTGL_CFLAGS) $(GTHREAD_CFLAGS)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 

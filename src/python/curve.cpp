@@ -12,7 +12,9 @@
 
 #include <stdexcept>
 #include <cassert>
-#include <GL/gle.h>
+#if 0
+# include <GL/gle.h>
+#endif
 
 using boost::python::make_tuple;
 using boost::python::object;
