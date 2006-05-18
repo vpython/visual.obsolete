@@ -7,7 +7,7 @@
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
 #include "frame.hpp"
-#include "font.hpp"
+#include "text.hpp"
 
 #include <GL/glext.h>
 
@@ -821,11 +821,10 @@ display_kernel::render_scene(void)
 		if (show_renderspeed) {
 			std::ostringstream fps_msg;
 			fps_msg << "Cycle time: ";
-			fps_msg.width(6);
+			fps_msg.precision(4);
 			fps_msg << fps.read();
 			glColor3f( 
 				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
-			bitmap_font font;
 
 			glMatrixMode( GL_PROJECTION);
 			glPushMatrix();
@@ -834,13 +833,13 @@ display_kernel::render_scene(void)
 			glMatrixMode( GL_MODELVIEW);
 			glPushMatrix();
 			glLoadIdentity();
-			glTranslated( 0, -font.descent(), 0);
 			
 			glDisable( GL_DEPTH_TEST);
-			glRasterPos2d( 0, 0);
-			font.gl_render( fps_msg.str());
+			boost::shared_ptr<font> default_font = font::find_font();
+			boost::shared_ptr<layout> lay_out = default_font->lay_out( fps_msg.str());
+			lay_out->gl_render( vector(5, lay_out->extent().y + 3));
 			glEnable( GL_DEPTH_TEST);
-			
+
 			glPopMatrix();
 			glMatrixMode( GL_PROJECTION);
 			glPopMatrix();
