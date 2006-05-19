@@ -96,7 +96,7 @@ arrow::recalc_sorted_model( const double& gcf)
 }
 
 void
-arrow::cache_transparent_model( const view& scene)
+arrow::cache_transparent_model( const view&)
 {
 	assert( color.alpha < 1.0);
 	// Compile the rendering code for the beastie.
