@@ -56,8 +56,6 @@ else
 	AC_SUBST([GTHREAD_CFLAGS])
 	AC_SUBST([GTHREAD_LIBS])
 
-	AC_SUBST([FONTOBJ], [font])
-	AC_SUBST([MAINOBJ], [main])
 	AC_SUBST([RANDOMDEVICEOBJ], [random_device])
 	AC_SUBST([RATEOBJ], [rate])
 	AC_SUBST([RENDERSURFACEOBJ], [render_surface])
