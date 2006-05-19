@@ -75,7 +75,7 @@ CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
 
 # Distribution file list.
 DISTFILES = $(subst .lo,.cpp,$(CVISUAL_OBJS) \
-	font.lo winfont.lo main.lo winmain.lo \
+	winfont.lo main.lo winmain.lo \
 	random_device.lo winrandom_device.lo \
 	rate.lo winrate.lo \
 	render_surface.lo winrender_surface.lo \
@@ -186,7 +186,7 @@ else
   CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTHREAD_CFLAGS)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
-  PLATFORM_OBJS = display.lo file_texture.lo font.lo random_device.lo rate.lo \
+  PLATFORM_OBJS = display.lo file_texture.lo random_device.lo rate.lo \
   	render_surface.lo timer.lo
 
   ifeq ($(PYTHON_PLATFORM),darwin)
