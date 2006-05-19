@@ -7,7 +7,7 @@
 #include <glibmm/init.h>
 #include <glibmm/convert.h>
 
-#include <iostream>
+#include <string>
 
 namespace cvisual {
 
@@ -33,13 +33,10 @@ struct glib_ustring_from_pyunicode
 		using py::handle;
 		using py::allow_null;
 		if (PyString_CheckExact(obj)) {
-			std::cout << "An exact string type\n";
 			return obj;
 		}
 		// This object will be released in construct()
 		PyObject* uni_object = PyUnicode_FromObject( obj);
-		if (uni_object)
-			std::cout << "A unicode object\n";
 		return uni_object;
 	}
 
@@ -60,7 +57,6 @@ struct glib_ustring_from_pyunicode
 		else {
 			assert( PyUnicode_Check( obj) == true);
 			size_t remaining = PyUnicode_GET_DATA_SIZE( obj);
-			std::cout << "Converting to UTF8; size: " << remaining << "\n";
 			const char *src_data = PyUnicode_AS_DATA( obj);
 			new (storage) Glib::ustring(
 				utf16_to_utf8->convert( std::string(src_data, remaining)));
