@@ -4,7 +4,6 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "label.hpp"
-#include "font.hpp"
 #include "util/errors.hpp"
 
 #include <sstream>
@@ -21,12 +20,13 @@ label::label()
 	xoffset(0),
 	yoffset(0),
 	border(5),
-	font_description("default"),
-	font_size(0),
+	font_description(),
+	font_size(-1),
 	box_enabled(true),
 	line_enabled(true),
 	linecolor( color),
-	opacity(0.66)
+	opacity(0.66),
+	text_changed(true)
 {
 }
 
@@ -43,7 +43,8 @@ label::label( const label& other)
 	line_enabled( other.line_enabled),
 	linecolor( other.linecolor),
 	opacity( other.opacity),
-	text( other.text)
+	text( other.text),
+	text_changed( true)
 {
 }
 
@@ -178,29 +179,17 @@ label::get_opacity()
 }
 
 void
-label::set_text( std::string t)
+label::set_text( Glib::ustring t)
 {
 	lock L(mtx);
-	text.clear();
-	std::istringstream buf( t);
-	std::string line;
-	while (std::getline( buf, line)) {;
-		text.push_back( line);
-	}
+	text = t;
+	text_changed = true;
 }
 
-std::string
+Glib::ustring
 label::get_text()
 {
-	std::string ret;
-	if (text.empty())
-		return ret;
-	ret += text.front();
-	for (text_iterator i = text.begin()+1; i != text.end(); ++i) {
-		ret += '\n';
-		ret += *i;
-	}
-	return ret;
+	return text;
 }
 
 void 
@@ -256,13 +245,14 @@ label::get_border()
 }
 
 void 
-label::set_font_family( std::string name)
+label::set_font_family( Glib::ustring name)
 {
 	lock L(mtx);
 	font_description = name;
+	text_changed = true;
 }
 
-std::string
+Glib::ustring
 label::get_font_family()
 {
 	return font_description;
@@ -273,6 +263,7 @@ label::set_font_size( double n_size)
 {
 	lock L(mtx);
 	font_size = n_size;
+	text_changed = true;
 }
 
 double
@@ -319,38 +310,29 @@ label::get_linecolor()
 {
 	return linecolor;
 }
-#define NEWMODE 1
+
 void
 label::gl_render( const view& scene)
 {
-	// Compute the width of the text box.
-	double box_width = 0.0;
-	color.gl_set();
-	// bitmap_font font( font_description);
-	bitmap_font font;
-	for (text_iterator i = text.begin(); i != text.end(); ++i) {
-		double str_width = font.width(*i);
-		if (str_width > box_width)
-			box_width = str_width;
+	if (text_changed) {
+		boost::shared_ptr<font> texmap_font = 
+			font::find_font( font_description, int(font_size));
+		if (text == Glib::ustring())
+			text_layout = texmap_font->lay_out( " ");
+		else
+			text_layout = texmap_font->lay_out( text);
+		text_changed = false;
 	}
-	box_width += 2.0 * border;
+	// Compute the width of the text box.
+	vector extents = text_layout->extent();
+	double box_width = extents.x + 2.0*border;
 
 	// Compute the positions of the text in the text box, and the height of the
 	// text box.  The text positions are relative to the lower left corner of 
 	// the text box.
-	double box_height = border * 2.0 
-		+ ((text.empty()) ? 1 : text.size()) *( -font.descent() + font.ascent());
+	double box_height = border*2.0 + extents.y;
 	
-	scoped_array<vector> text_pos( new vector[text.size()]);
-	// vector text_pos[text.size()];
-	vector* tpos_i = text_pos.get();
-	vector* tpos_end = text_pos.get() + text.size();
-	vector next_tpos( border, box_height - border - font.ascent());
-	while (tpos_i != tpos_end) {
-		*tpos_i = next_tpos; // (tpos_i - 1) - vector(0, font.ascent() - font.descent());
-		next_tpos.y -= (font.ascent() - font.descent());
-		++tpos_i;
-	}
+	vector text_pos( border, box_height - border);
 
 	clear_gl_error();
 	vector label_pos = pos * scene.gcf;
@@ -365,6 +347,7 @@ label::gl_render( const view& scene)
 	displaylist list;
 	list.gl_compile_begin();
 	{
+		color.gl_set();
 		// Zero out the existing matrices, rendering will be in screen coords.
 		gl_matrix_stackguard guard;
 		tmatrix identity;
@@ -431,31 +414,9 @@ label::gl_render( const view& scene)
 				vector( 0, box_height).gl_render();
 			glEnd();
 		}
-		
-		// The following three lines work around a wierd problem.  Without them,
-		// the first line of text below will not be rendered properly.  The physical
-		// appearance is as if, for the first line of text, glRasterPos was far 
-		// away in the visual depth direction.  I have only observed this issue 
-		// with the ATI proprietary fglrx driver at this time - MESA's software
-		// renderer is fine.  So is NVIDIA's Linux GLX driver.
-		glRasterPos3d( 0, 0, 0);
-		glPushAttrib( GL_ENABLE_BIT);
-		glPopAttrib();
 
 		// Render the text iteself.
-		tpos_i = text_pos.get();		
-		text_iterator text_i = text.begin();
-		text_iterator text_end = text.end();
-		while (tpos_i != tpos_end && text_i != text_end) {
-			glRasterPos3dv( &tpos_i->x);
-			// float raster_pos[3];
-			// GLboolean valid;
-			// glGetBooleanv( GL_CURRENT_RASTER_POSITION_VALID, &valid);
-			// glGetFloatv( GL_CURRENT_RASTER_POSITION, raster_pos);
-			font.gl_render( *text_i);
-			++tpos_i;
-			++text_i;
-		}
+		text_layout->gl_render( text_pos);
 	} glMatrixMode( GL_MODELVIEW); } // Pops the matricies back off the stack
 	list.gl_compile_end();
 	check_gl_error();

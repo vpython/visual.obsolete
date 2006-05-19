@@ -28,6 +28,7 @@ void wrap_rgba();
 void wrap_light(); // Also defined in wrap_rgba.cpp
 void wrap_vector();
 void wrap_arrayobjects();
+void wrap_glib_ustring();
 
 namespace python {
 	void wrap_vector_array();
@@ -93,9 +94,7 @@ BOOST_PYTHON_MODULE( cvisual)
 	wrap_arrayobjects();
 	python::wrap_vector_array();
 	python::wrap_scalar_array();
-	
-	// To be exported:
-	// mouse objects.
+	wrap_glib_ustring();
 }
 
 } // !namespace cvisual

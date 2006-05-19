@@ -2,9 +2,9 @@
 #define VPYTHON_GTK2_TEXT_HPP
 
 #include <boost/shared_ptr.hpp>
-#include <string>
 
 #include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
 
 #include "util/texture.hpp"
 #include "util/vector.hpp"
@@ -28,16 +28,16 @@ class font
 {
  private:
 	Glib::RefPtr<Pango::Context> ft2_context;
-	font( const std::string&, int);
+	font( const Glib::ustring&, int);
 
  public:
 	~font();
 	
 	boost::shared_ptr<layout> 
-	lay_out( const std::string& text );
+	lay_out( const Glib::ustring& text );
 	
 	static boost::shared_ptr<font> 
-	find_font( const std::string& desc = std::string(), int height = -1);
+	find_font( const Glib::ustring& desc = Glib::ustring(), int height = -1);
 };
 
 
@@ -51,11 +51,14 @@ class layout
  	float width;
  	float height;
  	boost::shared_ptr<ft2_texture> tex;
+ 	vector coord[4];
+ 	vector tcoord[4];
  	
 	layout( float w, float h, boost::shared_ptr<ft2_texture> t);
 
  public:
 	void gl_render( const vector& pos);
+	// The extent of an empty string is zero width, and ascent+descent height
 	inline vector extent(void) { return vector( width, height, 0); }
 };
 

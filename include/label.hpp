@@ -7,12 +7,11 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "renderable.hpp"
-#include <string>
+#include "text.hpp"
+#include <glibmm/ustring.h>
 #include <vector>
 
 namespace cvisual {
-
-class bitmap_font;
 
 class label : public renderable
 {
@@ -51,8 +50,8 @@ class label : public renderable
 	void set_opacity( double);
 	double get_opacity();
 
-	void set_text( std::string t);
-	std::string get_text();
+	void set_text( Glib::ustring t);
+	Glib::ustring get_text();
 
 	void set_space( double space);
 	double get_space();
@@ -66,8 +65,8 @@ class label : public renderable
 	void set_border( double border);
 	double get_border();
 
-	void set_font_family( std::string name);
-	std::string get_font_family();
+	void set_font_family( Glib::ustring name);
+	Glib::ustring get_font_family();
 
 	void set_font_size(double);
 	double get_font_size();
@@ -92,7 +91,7 @@ class label : public renderable
 	double border;    // space between text and box
 	
 	/// A common name for the font.
-	std::string font_description;
+	Glib::ustring font_description;
 	/// The nominal size of the font, in pixels.
 	double font_size;
 	
@@ -104,11 +103,10 @@ class label : public renderable
 	double opacity; ///< The opacity of the background for the text.
 	
 	// Text strings in python may be specified by the """ ... """ syntax in python.
-	//   This means that we may recieve text strings that span multiple lines.
-	//   Each element of this container contains a single continuous line for 
-	//   the displayed text.
-	std::vector<std::string> text;
-	typedef std::vector<std::string>::const_iterator text_iterator;
+	// This case is handled by the layout code
+	Glib::ustring text;
+	bool text_changed;
+	boost::shared_ptr<layout> text_layout;
     
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;

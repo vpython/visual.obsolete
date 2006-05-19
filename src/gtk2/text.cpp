@@ -27,7 +27,9 @@ int
 next_power_of_two(const int arg) 
 {
 	int ret = 2;
-	while (ret < arg && ret < (1 << 16))
+	// upper bound of 28 chosen to limit memory growth to about 256MB, which is
+	// _much_ larger than most supported textures
+	while (ret < arg && ret < (1 << 28))
 		ret <<= 1;
 	return ret;
 }
@@ -64,13 +66,23 @@ ft2_texture::ft2_texture( FT_Bitmap& bitmap)
 	
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1);	
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_ALPHA, texw, texh, 0, GL_ALPHA, 
 		GL_UNSIGNED_BYTE, texdata.get());
+
+	int saved_alignment = -1;
+	glGetIntegerv( GL_UNPACK_ALIGNMENT, &saved_alignment);
+	
+	int alignment = bitmap.width % 4;
+	if (!alignment)
+		alignment = 4;
+	if (alignment == 3)
+		alignment = 1;
+	glPixelStorei( GL_UNPACK_ALIGNMENT, alignment);	
 
 	glTexSubImage2D( GL_TEXTURE_2D, 0, 
 		0, 0, bitmap.width, bitmap.rows, 
 		GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
+	glPixelStorei( GL_UNPACK_ALIGNMENT, saved_alignment);
 	
 	width = bitmap.width / float(texw);
 	height = bitmap.rows /float(texh);
@@ -90,8 +102,6 @@ ft2_texture::gl_free()
 	}
 }
 
-
-// Constant.
 ft2_texture::~ft2_texture()
 {
 	gl_free();
@@ -112,18 +122,18 @@ namespace {
 PangoFT2FontMap* fontmap = 0;
 // The set of all fonts that have been loaded so far, indexed by their
 // description
-typedef std::map< std::pair<std::string, int>, boost::shared_ptr<font> >
+typedef std::map< std::pair<Glib::ustring, int>, boost::shared_ptr<font> >
 	fontcache_t;
 fontcache_t font_cache;
 }
 
-font::font( const std::string& desc, int height)
+font::font( const Glib::ustring& desc, int height)
 	: ft2_context( Glib::wrap( pango_ft2_font_map_create_context( fontmap)))
 {
 	Pango::FontDescription font_desc = Glib::wrap(gtk_style_new())->get_font();
 	if (height > 0)
 		font_desc.set_size( height * Pango::SCALE);
-	if (desc != std::string())
+	if (desc != Glib::ustring())
 		font_desc.set_family( desc);
 	font_desc.set_style( Pango::STYLE_NORMAL);
 	
@@ -135,7 +145,7 @@ font::~font()
 }
 
 boost::shared_ptr<font>
-font::find_font( const std::string& desc, int height)
+font::find_font( const Glib::ustring& desc, int height)
 {
 	if (!fontmap) {
 		int dpi = -1;
@@ -167,7 +177,7 @@ font::find_font( const std::string& desc, int height)
 }
 
 boost::shared_ptr<layout>
-font::lay_out( const std::string& text)
+font::lay_out( const Glib::ustring& text)
 {
 	Glib::RefPtr<Pango::Layout> pango_layout = Pango::Layout::create( ft2_context);
 
@@ -178,7 +188,6 @@ font::lay_out( const std::string& text)
 	
 	const int saved_width = PANGO_PIXELS(extents.get_width());
 	if (extents.get_width() == 0 || extents.get_height() == 0) {
-		std::cout << "Error!!\n";
     	return boost::shared_ptr<layout>();
 	}
 	
@@ -205,6 +214,15 @@ font::lay_out( const std::string& text)
 layout::layout( float w, float h, boost::shared_ptr<ft2_texture> t)
 	: width(w), height(h), tex(t)
 {
+	coord[0] = vector();
+	coord[1] = vector(0, -height);
+	coord[2] = vector(width, -height);
+	coord[3] = vector(width, 0);
+	
+	tcoord[0] = vector();
+	tcoord[1] = vector(0, tex->height);
+	tcoord[2] = vector(tex->width, tex->height);
+	tcoord[3] = vector(tex->width, 0);
 }
 
 
@@ -217,16 +235,14 @@ layout::gl_render( const vector& pos)
 	tex->gl_activate();
 	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	
+	glTranslated( pos.x, pos.y, pos.z);
 	glBegin( GL_QUADS);
-		glTexCoord2f( 0, 0);
-		(pos).gl_render();
-		glTexCoord2f( 0, tex->height);
-		((pos - vector(0, height))).gl_render();
-		glTexCoord2f( tex->width, tex->height);
-		((pos + vector(width, -height))).gl_render();
-		glTexCoord2f( tex->width, 0);
-		((pos + vector(width, 0))).gl_render();
+	for (size_t i = 0; i < 4; ++i) {
+		glTexCoord2d( tcoord[i].x, tcoord[i].y);
+		coord[i].gl_render();
+	}
 	glEnd();
+	
 	glDisable( GL_BLEND);
 	glDisable( GL_TEXTURE_2D);
 }
