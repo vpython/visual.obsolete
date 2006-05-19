@@ -46,18 +46,15 @@ if test $platform_win32 = yes; then
 	# The top-level source directory.
 	AC_SUBST([WIN32_SRCDIR], [`cd $srcdir ; pwd -W | sed -e "s/\\//\\\\\/g"`])
 else
-	PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2, ,
-		[AC_MSG_ERROR(gtkglextmm 1.2+ is required on Unix-like systems)])
+	PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4, ,
+		[AC_MSG_ERROR(gtkglextmm 1.2+, pangoft2, glibmm-2.4, and pangomm-1.4 are required on Unix-like systems)])
 	AC_SUBST([GTK_LIBS])
 	AC_SUBST([GTK_CFLAGS])
+
 	PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
 		[AC_MSG_ERROR(GThread 2.0+ is required on Unix-like systems)])
 	AC_SUBST([GTHREAD_CFLAGS])
 	AC_SUBST([GTHREAD_LIBS])
-	PKG_CHECK_MODULES( FTGL, ftgl >= 1.0, ,
-		[AC_MSG_ERROR(FTGL is required on Unix-like systems)])
-	AC_SUBST([FTGL_CFLAGS])
-	AC_SUBST([FTGL_LIBS])
 
 	AC_SUBST([FONTOBJ], [font])
 	AC_SUBST([MAINOBJ], [main])
