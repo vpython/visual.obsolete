@@ -17,12 +17,14 @@ bool box::first = true;
 bool
 box::degenerate()
 {
+	double epsilon = vector(axis.mag(), width, height).mag();
+	epsilon *= 0.001;
 	int num_equal_to_zero = 0;
-	if (axis.mag() == 0.0)
+	if (axis.mag() < epsilon)
 		num_equal_to_zero++;
-	if (width == 0.0)
+	if (width < epsilon)
 		num_equal_to_zero++;
-	if (height == 0.0)
+	if (height < epsilon)
 		num_equal_to_zero++;
 	return num_equal_to_zero > 1;
 }
@@ -101,16 +103,21 @@ box::gl_render( const view& scene)
 {
 	if (degenerate())
 		return;
-	bool flat = axis.mag() == 0.0 || width == 0.0 || height == 0.0;
+	double saved_height = height;
+	double saved_width = width;
+	double saved_length = axis.mag();
 	
+	double size = vector(width, axis.mag(), height).mag();
+	size *= 0.002; // 1/500 th of its size, or about 1 pixel
+	width = std::max( size, width);
+	height = std::max( size, height);
+	axis.set_mag( std::max( size, axis.mag()));
+
 	clear_gl_error();
 	lighting_prepare();
 	shiny_prepare();
 	color.gl_set();
 	{
-		// TODO: Handle special case of flat rendering
-		// if (flat)
-		//	glEnable( GL_POLYGON_OFFSET_FILL);
 		double gcf = scene.gcf;
 		gl_matrix_stackguard guard;
 		vector view_pos = pos * scene.gcf;
@@ -163,12 +170,13 @@ box::gl_render( const view& scene)
 			// Render the simple opaque box		
 			simple_model.gl_render();
 		}
-		if (flat)
-			glDisable( GL_POLYGON_OFFSET_FILL);
 	}
 	shiny_prepare();
 	lighting_prepare();
 	check_gl_error();
+	axis.set_mag( saved_length);
+	width = saved_width;
+	height = saved_height;
 }
 
 void 
