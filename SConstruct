@@ -13,7 +13,7 @@ def AddDebugFlags(env):
 		elif ARGUMENTS['with-debug'] == "full":
 			env.Append( CCFLAGS='-g', DEFINES="_GLIBCXX_DEBUG")
 	elif release:
-		env.Append( CCFLAGS=['-O2', '-g0', '-malign-double'])
+		env.Append( CCFLAGS=['-O2', '-g', '-malign-double'])
 	else:
 		env.Append( CCFLAGS=['-O0', '-g'])
 
@@ -27,7 +27,7 @@ def AddThreadingFlags(env):
 ################################################################################
 
 # When packaging a release, set this value to true.
-release = False
+release = True
 
 SetOption( "implicit_cache", 1)
 EnsurePythonVersion( 2, 2)
@@ -61,8 +61,6 @@ base.Append( CCFLAGS=['-Wall', '-W', '-Wsign-compare', '-Wconversion',
 
 core = base.Copy()
 # Workaround brain-dead behavior in FTGL's header file layout
-if sys.platform.find('linux') >= 0:
-	core.Append( CPPPATH=['/usr/include/FTGL'])
 # Add compiler flags for threading support.
 AddThreadingFlags( core)
 
@@ -81,6 +79,7 @@ srcs = [ "src/core/arrow.cpp",
 	"src/core/util/clipping_plane.cpp",
 	"src/core/util/tmatrix.cpp",
 	"src/core/util/gl_free.cpp",
+	"src/core/util/icososphere.cpp",
 	"src/core/axial.cpp",
 	"src/core/box.cpp",
 	"src/core/cone.cpp",
@@ -112,15 +111,15 @@ if sys.platform == 'win32':
 	libname = 'bin/vpython-core'
 else:
 	srcs.append( 'src/gtk2/render_surface.cpp')
-	srcs.append( 'src/gtk2/font.cpp')
+	srcs.append( 'src/gtk2/text.cpp')
 	srcs.append( 'src/gtk2/file_texture.cpp')
 	srcs.append( 'src/gtk2/timer.cpp')
 	srcs.append( 'src/gtk2/random_device.cpp')
 	srcs.append( 'src/gtk2/display.cpp')
 	srcs.append( 'src/gtk2/rate.cpp')
 	
-	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.2 ftgl '
-		+ 'fontconfig gthread-2.0')
+	core.ParseConfig( 'pkg-config --cflags --libs gtkglextmm-1.2 '
+		+ 'fontconfig gthread-2.0 pangomm-1.4 pangoft2')
 	core.Append( LIBS=["GL", "GLU"], LINKFLAGS="-Wl,--no-undefined")
 	core.Append( CPPPATH='include/gtk2')
 	libname='lib/vpython-core'
