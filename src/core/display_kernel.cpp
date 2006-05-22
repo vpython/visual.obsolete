@@ -567,6 +567,8 @@ display_kernel::recalc_extent(void)
 			// compute range such that a unit cube, with sides == .5 * range,
 			// centered at center, will contain the entire scene.
 			double _range = world_extent.uniform_range( center);
+			if (_range <= 0.0)
+				_range = 1.0;
 			range = vector( _range, _range, _range);
 		}
 		else {
