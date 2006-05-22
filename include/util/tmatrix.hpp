@@ -241,9 +241,9 @@ class gl_matrix_stackguard
  public:
 	// A stackguard that only performs a push onto the matrix stack.
 	// Postcondition: the stack is one matrix taller, but identical to before.
-	gl_matrix_stackguard();
+	inline gl_matrix_stackguard() { glPushMatrix(); }
 	gl_matrix_stackguard( const tmatrix&);
-	~gl_matrix_stackguard();
+	inline ~gl_matrix_stackguard() { glPopMatrix(); }
 };
 
 } // !namespace cvisual

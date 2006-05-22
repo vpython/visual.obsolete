@@ -324,20 +324,10 @@ tmatrix::to_string() const
 	return formatter.str();
 }
 
-gl_matrix_stackguard::gl_matrix_stackguard()
-{
-	glPushMatrix();
-}
-
 gl_matrix_stackguard::gl_matrix_stackguard( const tmatrix& m)
 {
 	glPushMatrix();
 	m.gl_mult();
-}
-
-gl_matrix_stackguard::~gl_matrix_stackguard()
-{
-	glPopMatrix();
 }
 
 } // !namespace cvisual
