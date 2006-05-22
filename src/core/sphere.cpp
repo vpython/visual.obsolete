@@ -8,6 +8,8 @@
 #include "util/errors.hpp"
 #include "util/icososphere.hpp"
 
+#include <vector>
+
 namespace cvisual {
 
 bool sphere::first = true;
@@ -15,6 +17,7 @@ bool sphere::first = true;
 // last four include texture data.
 displaylist sphere::lod_cache[12];
 
+static std::vector<icososphere> models;
 
 sphere::sphere()
 {
@@ -53,7 +56,8 @@ sphere::gl_pick_render( const view& geometry)
 	model_world_transform().gl_mult();
 	const vector scale = get_scale() * geometry.gcf;
 	glScaled( scale.x, scale.y, scale.z);
-	lod_cache[lod].gl_render();
+	// lod_cache[lod].gl_render();
+	models[lod].gl_render();
 }
 
 void
@@ -105,6 +109,7 @@ sphere::gl_render( const view& geometry)
 	color.gl_set();
 	// Mode specific rendering code follows
 	if (tex && (color.alpha != 1.0 || tex->has_alpha())) {
+		// textured, and alpha-blended sphere
 		// Setup for blending
 		glEnable( GL_BLEND);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -131,7 +136,7 @@ sphere::gl_render( const view& geometry)
 		glDisable( GL_TEXTURE_2D);
 		glDisable( GL_BLEND);		
 	}
-	else if (color.alpha != 1.0) { // Render a transparent sphere.
+	else if (color.alpha != 1.0) { // Render a transparent constant color sphere
 		// Since spheres have identical symmetry
 		// along the view axis regardless of thier orientation, this code is
 		// easy (albeit somewhat slow) thanks to GL_CULL_FACE. 
@@ -143,11 +148,12 @@ sphere::gl_render( const view& geometry)
 		
 		// Render the back half.
 		glCullFace( GL_FRONT);
-		lod_cache[lod].gl_render();
+		// lod_cache[lod].gl_render();
+		models[lod].gl_render();
 		
 		// Render the front half.
 		glCullFace( GL_BACK);
-		lod_cache[lod].gl_render();
+		models[lod].gl_render();
 		
 		// Cleanup.
 		glDisable( GL_CULL_FACE);
@@ -179,7 +185,8 @@ sphere::gl_render( const view& geometry)
 	}
 	else {
 		// Render a simple sphere.
-		lod_cache[lod].gl_render();
+		// lod_cache[lod].gl_render();
+		models[lod].gl_render();
 	}
 	shiny_complete();
 	lighting_complete();
@@ -208,12 +215,16 @@ void
 sphere::update_cache( const view&)
 {
 	if (first) {
+		for (int i = 0; i < 6; ++i) {
+			models.push_back( icososphere(i+1));
+		}
 		clear_gl_error();
 		first = false;
 		quadric sph;
 		
 		// To be uesd for very distant spheres.
 		// .25 in
+#if 0
 		lod_cache[0].gl_compile_begin();
 		// sph.render_sphere( 1.0, 13, 7);
 		icososphere( 1);
@@ -248,7 +259,7 @@ sphere::update_cache( const view&)
 		// sph.render_sphere( 1.0, 140, 69);
 		icososphere( 6);
 		lod_cache[5].gl_compile_end();
-	
+#endif
 		// All of the higher-numbered models also include texture coordinates.
 		sph.do_textures( true);
 		lod_cache[6].gl_compile_begin();

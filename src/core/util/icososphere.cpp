@@ -6,8 +6,6 @@
 #include "wrap_gl.hpp"
 #include <cmath>
 
-#include <boost/scoped_array.hpp>
-
 // sphmodel.h - Deep magic to generate sphere models
 //   I generate spheres by subdividing an icosahedron, a Platonic
 //     solid with 12 vertices and 20 sides, each an equilateral
@@ -25,62 +23,24 @@
 
 namespace cvisual { namespace /* unnamed */ {
 
-struct sph_model
-{
-    boost::scoped_array<float> verts;
-    boost::scoped_array<int> indices;
-    int nverts;
-    int ni;
-
-    static inline void
-    normalize(float v[3])
-    {
-        float n = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-        float m = 1.0 / std::sqrt( n );
-
-        v[0] *= m;
-        v[1] *= m;
-        v[2] *= m;
-    }
-
-    inline float*
-    newe( int span)
-    {
-        float* e = verts.get() + 3*(nverts - 1);  // one before the beginning
-        nverts += span-1;
-        return e;
-    }
-
-    sph_model( int depth);
-
-    inline float*
-    avgptr( float* a, float* b)
-    { return (float*)( int(a) + ((int(b)-int(a))>>1) ); }
-
-    void subdivide( int span, float* v1, float* v2, float *v3, 
-        float* s1, float* s2, float* s3,
-        float* e1, float* e2, float* e3 );
-};
-
-
-static const float SX = .525731112119133606F;
-static const float SZ = .850650808352039932F;
+const float SX = .525731112119133606F;
+const float SZ = .850650808352039932F;
 
 /* icosahedron model copied from the OpenGL programming guide */
-static const float vdata[12][3] = {
+const float vdata[12][3] = {
 	{-SX, 0.0, SZ}, {SX, 0.0, SZ}, {-SX, 0.0,-SZ}, {SX, 0.0, -SZ},
 	{0.0, SZ, SX}, {0.0, SZ, -SX}, {0.0, -SZ, SX}, {0.0, -SZ, -SX},
 	{SZ, SX, 0.0}, {-SZ, SX, 0.0}, {SZ, -SX, 0.0}, {-SZ, -SX, 0.0}
 };
 
-static const int tindices[20][3] = {
+const int tindices[20][3] = {
 	{0,4,1}, {0,9,4}, {9,5,4}, {4,5,8}, {4,8,1},
 	{8,10,1}, {8,3,10}, {5,3,8}, {5,2,3}, {2,7,3},
 	{7,10,3}, {7,6,10}, {7,11,6}, {11,0,6}, {0,1,6},
 	{6,1,10}, {9,0,11}, {9,11,2}, {9,2,5}, {7,2,11}
 };
 
-static const int edges[30][2] = {
+const int edges[30][2] = {
 /*  0 */ {0,1}, {0,4}, {0,6}, {0,9}, {0,11},
 /*  5 */ {1,4}, {1,6}, {1,8}, {1,10},
 /*  9 */ {2,3}, {2,5}, {2,7}, {2,9}, {2,11},
@@ -93,7 +53,26 @@ static const int edges[30][2] = {
 /* 29 */ {9,11}
 };
 
-sph_model::sph_model( int depth)
+inline void
+normalize(float v[3])
+{
+    float n = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
+    float m = 1.0 / std::sqrt( n );
+
+    v[0] *= m;
+    v[1] *= m;
+    v[2] *= m;
+}
+
+inline float*
+avgptr( float* a, float* b)
+{
+	return (float*)( int(a) + ((int(b)-int(a))>>1) );
+}
+
+} // !namespace anonymous
+
+icososphere::icososphere( int depth)
 {
 	int span = (1<<depth);
 	int triangles = 20 << (depth<<1);
@@ -103,6 +82,7 @@ sph_model::sph_model( int depth)
 	ni = 0;
 	verts.reset( new float[ 3*vertices ]);
 	indices.reset( new int[ 3*triangles ]);
+	// std::cout << "newed " << ((3*vertices*sizeof(float) + 3*triangles*sizeof(int)) >> 10) << " Kbytes of geometry memory\n";
 	std::memset(verts.get(), 0, sizeof(float)*3*vertices);
 	std::memcpy(verts.get(), vdata, sizeof(vdata));
 
@@ -135,7 +115,7 @@ sph_model::sph_model( int depth)
 }
 
 void
-sph_model::subdivide( int span, float* v1, float* v2, float *v3
+icososphere::subdivide( int span, float* v1, float* v2, float *v3
 	, float* s1, float* s2, float* s3
 	, float* e1, float* e2, float* e3 )
 {
@@ -182,17 +162,14 @@ sph_model::subdivide( int span, float* v1, float* v2, float *v3
 	}
 }
 
-} // !namespace anonymous
-
 void 
-icososphere( int level)
+icososphere::gl_render()
 {
-    sph_model model( level);
     glEnableClientState( GL_VERTEX_ARRAY);
     glEnableClientState( GL_NORMAL_ARRAY);
-    glVertexPointer( 3, GL_FLOAT, 3*sizeof(float), model.verts.get());
-    glNormalPointer( GL_FLOAT, 3*sizeof(float), model.verts.get());
-    glDrawElements(GL_TRIANGLES, model.ni, GL_UNSIGNED_INT, model.indices.get());
+    glVertexPointer( 3, GL_FLOAT, 3*sizeof(float), verts.get());
+    glNormalPointer( GL_FLOAT, 3*sizeof(float), verts.get());
+    glDrawElements(GL_TRIANGLES, ni, GL_UNSIGNED_INT, indices.get());
     glDisableClientState( GL_NORMAL_ARRAY);
     glDisableClientState( GL_VERTEX_ARRAY);
 }
