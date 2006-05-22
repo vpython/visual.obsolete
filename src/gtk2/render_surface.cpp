@@ -102,7 +102,7 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 			Gdk::GL::MODE_RGBA
 			| Gdk::GL::MODE_DOUBLE
 			| Gdk::GL::MODE_DEPTH
-			| Gdk::GL::MODE_MULTISAMPLE
+			//| Gdk::GL::MODE_MULTISAMPLE
 			| Gdk::GL::MODE_STEREO );
 		if (!config) {
 			// Try again without the multisample extension.
@@ -121,7 +121,8 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 			Gdk::GL::MODE_RGBA
 			| Gdk::GL::MODE_DOUBLE
 			| Gdk::GL::MODE_DEPTH
-			| Gdk::GL::MODE_MULTISAMPLE );
+			//| Gdk::GL::MODE_MULTISAMPLE
+			);
 		if (!config) {
 			// Try again without the multisample extension.
 			config = Gdk::GL::Config::create( Gdk::GL::MODE_RGB
