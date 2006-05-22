@@ -6,9 +6,10 @@
 #include <boost/python/tuple.hpp>
 
 #include <map>
-#include <GL/gl.h>
+#include "wrap_gl.hpp"
 
 #include "python/slice.hpp"
+#include "util/gl_enable.hpp"
 
 using boost::python::numeric::array;
 
@@ -347,9 +348,9 @@ faces::gl_render( const view& scene)
 	std::vector<vector> spos;
 	std::vector<rgb> tcolor;
 	
-	glEnableClientState( GL_VERTEX_ARRAY);
-	glEnableClientState( GL_NORMAL_ARRAY);
-	glEnableClientState( GL_COLOR_ARRAY);
+	gl_enable_client vertexes( GL_VERTEX_ARRAY);
+	gl_enable_client normals( GL_NORMAL_ARRAY);
+	gl_enable_client colors( GL_COLOR_ARRAY);
 	
 	glNormalPointer( GL_DOUBLE, 0, index( normal, 0));
 	
@@ -382,16 +383,11 @@ faces::gl_render( const view& scene)
 	else
 		glColorPointer( 3, GL_FLOAT, 0, findex( color, 0));
 	
-	glEnable( GL_CULL_FACE);
+	gl_enable cull_face( GL_CULL_FACE);
 	for (int drawn = 0; drawn < count - count%3; drawn += 54) {
 		glDrawArrays( GL_TRIANGLES, drawn, 
 			std::min( count - count%3 - drawn, (int)54));
 	}
-	glDisable( GL_CULL_FACE);
-	
-	glDisableClientState( GL_COLOR_ARRAY);
-	glDisableClientState( GL_NORMAL_ARRAY);
-	glDisableClientState( GL_VERTEX_ARRAY);
 }
 
 void 

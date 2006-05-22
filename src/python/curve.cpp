@@ -6,6 +6,7 @@
 #include <boost/crc.hpp>
 
 #include "util/errors.hpp"
+#include "util/gl_enable.hpp"
 
 #include "python/slice.hpp"
 #include "python/curve.hpp"
@@ -740,7 +741,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		if (!x || !y || x == y) {
 			std::ostringstream msg;
 			msg << "Degenerate curve case! please report the following "
-				"information to visualpython-users@lists.sourceforge.net: "
+				"information to visualpython-users@lists.sourceforge.net: ";
 			msg << "current:" << current << " next:" << next << " prev:" << prev
 		 		<< " A:" << A << " B:" << B << " x:" << x << " y:" << y
 		 		<< " lastx:" << lastx << " lasty:" << lasty << " first:" 
@@ -788,8 +789,8 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		}
 	}
 	size_t npoints = normals.size() / curve_around;
-	glEnableClientState( GL_VERTEX_ARRAY);
-	glEnableClientState( GL_NORMAL_ARRAY);
+	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
+	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
 	if (mono) {
 		rendered_color.gl_set();
 		glDisableClientState( GL_COLOR_ARRAY);
@@ -816,8 +817,6 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 				glDrawElements(GL_TRIANGLE_STRIP, 256, GL_UNSIGNED_INT, ind);
 		}
 	}
-	glDisableClientState( GL_VERTEX_ARRAY);
-	glDisableClientState( GL_NORMAL_ARRAY);
 	if (!mono)
 		glDisableClientState( GL_COLOR_ARRAY);
 #else

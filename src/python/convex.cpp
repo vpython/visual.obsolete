@@ -5,6 +5,7 @@
 
 #include "python/convex.hpp"
 #include "python/slice.hpp"
+#include "util/gl_enable.hpp"
 
 #include <boost/python/extract.hpp>
 #include <boost/crc.hpp>
@@ -251,7 +252,7 @@ convex::gl_render( const view& scene)
 	}
 
 	glShadeModel(GL_FLAT);
-	glEnable(GL_CULL_FACE);
+	gl_enable cull_face( GL_CULL_FACE);
 	color.gl_set();
 	
 	glBegin(GL_TRIANGLES);
@@ -262,7 +263,6 @@ convex::gl_render( const view& scene)
 		(f->corner[2] * scene.gcf).gl_render();
 	}
 	glEnd();
-	glDisable(GL_CULL_FACE);
 	glShadeModel( GL_SMOOTH);
 }
 
