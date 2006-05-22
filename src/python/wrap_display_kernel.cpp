@@ -228,7 +228,7 @@ wrap_display_kernel(void)
 		.add_property( "objects", &display_kernel::get_objects)
 		.def( "add_light", &display_kernel::add_light)
 		.def( "remove_light", &display_kernel::remove_light)
-		.add_property( "lights", &display_kernel::get_lights)
+		.def( "_get_lights", &display_kernel::get_lights)
 		.add_property( "ambient", &display_kernel::get_ambient, 
 			&display_kernel::set_ambient)
 		.add_property( "up",
