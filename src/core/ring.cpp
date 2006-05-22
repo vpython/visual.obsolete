@@ -6,6 +6,8 @@
 #include "ring.hpp"
 #include "util/displaylist.hpp"
 #include "util/errors.hpp"
+#include "util/gl_enable.hpp"
+
 #include <utility>
 #include <boost/scoped_array.hpp>
 using boost::scoped_array;
@@ -142,8 +144,9 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	clear_gl_error();
 	lighting_prepare();
 	shiny_prepare();
-	glEnableClientState( GL_VERTEX_ARRAY);
-	glEnableClientState( GL_NORMAL_ARRAY);
+	
+	{ gl_enable_client vertex_array( GL_VERTEX_ARRAY);
+	gl_enable_client normal_array( GL_NORMAL_ARRAY);
 	glVertexPointer( 3, GL_DOUBLE, 0, vertexes.get());
 	glNormalPointer( GL_DOUBLE, 0, normals.get());
 	color.gl_set();
@@ -161,9 +164,8 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 			glDrawArrays( GL_TRIANGLE_STRIP, 0, bands * 2 + 2);
 		}
 	}
+	} // pop off client state array safties
 	
-	glDisableClientState( GL_VERTEX_ARRAY);
-	glDisableClientState( GL_NORMAL_ARRAY);
 	shiny_complete();
 	lighting_complete();
 	check_gl_error();

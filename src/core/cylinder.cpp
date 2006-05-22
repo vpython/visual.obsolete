@@ -7,6 +7,7 @@
 #include "util/errors.hpp"
 #include "util/displaylist.hpp"
 #include "util/quadric.hpp"
+#include "util/gl_enable.hpp"
 
 namespace cvisual {
 
@@ -24,10 +25,9 @@ render_cylinder_model( size_t n_sides, size_t n_stacks = 1)
 	quadric q;
 	q.render_cylinder( 1.0, 1.0, n_sides, n_stacks);
 	q.render_disk( 1.0, n_sides, n_stacks);
-	glPushMatrix();
+	gl_matrix_stackguard guard;
 	glTranslatef( 1.0f, 0.0f, 0.0f);
 	q.render_disk( 1.0, n_sides, n_stacks * 3);
-	glPopMatrix();
 }
 
 static displaylist cylinder_simple_model[6];
@@ -133,8 +133,8 @@ cylinder::gl_render( const view& scene)
 	
 	if (color.alpha != 1.0) {
 		// Setup for blending
-		glEnable( GL_BLEND);
-		glEnable( GL_CULL_FACE);
+		gl_enable blend( GL_BLEND);
+		gl_enable cull_face( GL_CULL_FACE);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		color.gl_set();
 				
@@ -145,10 +145,6 @@ cylinder::gl_render( const view& scene)
 		// Render the front half.
 		glCullFace( GL_BACK);
 		cylinder_simple_model[lod].gl_render();
-		
-		// Cleanup.
-		glDisable( GL_CULL_FACE);
-		glDisable( GL_BLEND);
 	}
 	else {
 		color.gl_set();

@@ -7,6 +7,7 @@
 #include "util/errors.hpp"
 #include "util/displaylist.hpp"
 #include "util/quadric.hpp"
+#include "util/gl_enable.hpp"
 
 #include <vector>
 
@@ -178,8 +179,8 @@ cone::gl_render( const view& scene)
 	
 	if (color.alpha != 1.0) {
 		// Setup for blending
-		glEnable( GL_BLEND);
-		glEnable( GL_CULL_FACE);
+		gl_enable blend( GL_BLEND);
+		gl_enable cull_face( GL_CULL_FACE);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		color.gl_set();
 				
@@ -190,10 +191,6 @@ cone::gl_render( const view& scene)
 		// Render the front half.
 		glCullFace( GL_BACK);
 		cone_simple_model[lod].gl_render();
-		
-		// Cleanup.
-		glDisable( GL_CULL_FACE);
-		glDisable( GL_BLEND);
 	}
 	else {
 		color.gl_set();

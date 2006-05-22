@@ -5,6 +5,7 @@
 
 #include "pyramid.hpp"
 #include "util/errors.hpp"
+#include "util/gl_enable.hpp"
 
 namespace cvisual {
 
@@ -140,12 +141,11 @@ pyramid::gl_render( const view& scene)
 		if (color.alpha != 1.0) {
 			vector forward = mwt.times_inv((pos - scene.camera)).norm();
 			sorted_model->sort( forward);
-			glEnable( GL_BLEND);
+			gl_enable blend( GL_BLEND);
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glBegin( GL_TRIANGLES);
 				sorted_model->gl_render();
 			glEnd();
-			glDisable( GL_BLEND);
 		}
 		else
 			simple_model.gl_render();

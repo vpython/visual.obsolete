@@ -6,6 +6,7 @@
 #include "display_kernel.hpp"
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
+#include "util/gl_enable.hpp"
 #include "frame.hpp"
 #include "text.hpp"
 
@@ -686,7 +687,7 @@ display_kernel::draw(
 	
 	// Render all objects in screen space.
 	disable_lights();
-	glDisable( GL_DEPTH_TEST);
+	gl_disable depth_test( GL_DEPTH_TEST);
 	typedef std::multimap<vector, displaylist, z_comparator>::iterator
 		screen_iterator;
 	screen_iterator k( scene_geometry.screen_objects.begin());
@@ -696,7 +697,6 @@ display_kernel::draw(
 		++k;
 	}
 	scene_geometry.screen_objects.clear();
-	glEnable( GL_DEPTH_TEST);
 	
 	return true;
 }
@@ -836,11 +836,12 @@ display_kernel::render_scene(void)
 			glPushMatrix();
 			glLoadIdentity();
 			
-			glDisable( GL_DEPTH_TEST);
-			boost::shared_ptr<font> default_font = font::find_font();
-			boost::shared_ptr<layout> lay_out = default_font->lay_out( fps_msg.str());
-			lay_out->gl_render( vector(5, lay_out->extent().y + 3));
-			glEnable( GL_DEPTH_TEST);
+			{ 
+				gl_disable depth_test(GL_DEPTH_TEST);
+				boost::shared_ptr<font> default_font = font::find_font();
+				boost::shared_ptr<layout> lay_out = default_font->lay_out( fps_msg.str());
+				lay_out->gl_render( vector(5, lay_out->extent().y + 3));
+			}
 
 			glPopMatrix();
 			glMatrixMode( GL_PROJECTION);

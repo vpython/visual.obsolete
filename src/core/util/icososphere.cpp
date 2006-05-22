@@ -4,6 +4,7 @@
 
 #include "util/icososphere.hpp"
 #include "wrap_gl.hpp"
+#include "util/gl_enable.hpp"
 #include <cmath>
 
 // sphmodel.h - Deep magic to generate sphere models
@@ -165,13 +166,11 @@ icososphere::subdivide( int span, float* v1, float* v2, float *v3
 void 
 icososphere::gl_render()
 {
-    glEnableClientState( GL_VERTEX_ARRAY);
-    glEnableClientState( GL_NORMAL_ARRAY);
+	gl_enable_client vertexes( GL_VERTEX_ARRAY);
+	gl_enable_client normals( GL_NORMAL_ARRAY);
     glVertexPointer( 3, GL_FLOAT, 3*sizeof(float), verts.get());
     glNormalPointer( GL_FLOAT, 3*sizeof(float), verts.get());
-    glDrawElements(GL_TRIANGLES, ni, GL_UNSIGNED_INT, indices.get());
-    glDisableClientState( GL_NORMAL_ARRAY);
-    glDisableClientState( GL_VERTEX_ARRAY);
+    glDrawElements( GL_TRIANGLES, ni, GL_UNSIGNED_INT, indices.get());
 }
 
 } // !namespace cvisual

@@ -5,6 +5,7 @@
 
 #include "box.hpp"
 #include "util/errors.hpp"
+#include "util/gl_enable.hpp"
 
 namespace cvisual {
 
@@ -132,24 +133,20 @@ box::gl_render( const view& scene)
 			vector model_forward = inv.times_v( object_forward).norm();
 			textured_sorted_model.sort( model_forward);
 			
-			glEnable( GL_BLEND);
+			gl_enable blend( GL_BLEND);
+			gl_enable tex2d( GL_TEXTURE_2D);
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glEnable( GL_TEXTURE_2D);
 			tex->gl_activate();
 			
 			glBegin( GL_QUADS);
 			textured_sorted_model.gl_render();
 			glEnd();
-			
-			glDisable( GL_TEXTURE_2D);
-			glDisable( GL_BLEND);
 		}
 		else if (tex) {
 			// Render the textured box
-			glEnable( GL_TEXTURE_2D);
+			gl_enable tex2D( GL_TEXTURE_2D);
 			tex->gl_activate();
 			textured_model.gl_render();
-			glDisable( GL_TEXTURE_2D);
 		}
 		else if (color.alpha < 1.0) {
 			// Render the transparent box
@@ -158,13 +155,12 @@ box::gl_render( const view& scene)
 			vector model_forward = inv.times_v( object_forward).norm();
 			sorted_model.sort( model_forward);
 
-			glEnable( GL_BLEND);
+			gl_enable blend( GL_BLEND);
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			
 			glBegin( GL_QUADS);
 			sorted_model.gl_render();
 			glEnd();
-			glDisable( GL_BLEND);
 		}
 		else {
 			// Render the simple opaque box		

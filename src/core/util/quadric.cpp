@@ -5,6 +5,7 @@
 
 #include "wrap_gl.hpp"
 #include "util/quadric.hpp"
+#include "util/tmatrix.hpp"
 
 namespace cvisual {
 
@@ -85,13 +86,12 @@ quadric::render_sphere( double radius, int slices, int stacks)
 	// GLU orients the quadrics along the +z axis.  Since VPython's default
 	// orientation places up along the y-axis, I am applying a simple rotation
 	// transform to make this happen.
-	glPushMatrix();
+	gl_matrix_stackguard guard;
 	// Start texture coordinate generation at +x vice +z.
 	glRotatef( 90, 0, 1, 0);
 	// Point the pole along +y
 	glRotatef( 90, -1, 0, 0);
 	gluSphere( q, radius, slices, stacks);
-	glPopMatrix();
 }
 
 void
@@ -101,28 +101,25 @@ quadric::render_cylinder( double base_radius, double top_radius, double height,
 	// Again, GLU orients cylinders along the +z axis, and they must be
 	// reoriented along the +x axis for VPython's convention of rendering along
 	// the "axis" vector.
-	glPushMatrix();
+	gl_matrix_stackguard guard;
 	glRotatef( 90, 0, 1, 0);
 	gluCylinder( q, base_radius, top_radius, height, slices, stacks);
-	glPopMatrix();
 }
 
 void
 quadric::render_cylinder( double radius, double height, int slices, int stacks)
 {
-	glPushMatrix();
+	gl_matrix_stackguard guard;
 	glRotatef( 90, 0, 1, 0);
 	gluCylinder( q, radius, radius, height, slices, stacks);
-	glPopMatrix();
 }
 
 void 
 quadric::render_disk( double radius, int slices, int rings)
 {
-	glPushMatrix();
+	gl_matrix_stackguard guard;
 	glRotatef( 90, 0, -1, 0);
 	gluDisk( q, 0.0, radius, slices, rings);
-	glPopMatrix();
 }
 
 } // !namespace cvisual

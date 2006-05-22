@@ -7,6 +7,7 @@
 #include "util/quadric.hpp"
 #include "util/errors.hpp"
 #include "util/icososphere.hpp"
+#include "util/gl_enable.hpp"
 
 #include <vector>
 
@@ -111,12 +112,12 @@ sphere::gl_render( const view& geometry)
 	if (tex && (color.alpha != 1.0 || tex->has_alpha())) {
 		// textured, and alpha-blended sphere
 		// Setup for blending
-		glEnable( GL_BLEND);
+		gl_enable blend( GL_BLEND);
+		gl_enable cull_face( GL_CULL_FACE);
+		gl_enable tex2D( GL_TEXTURE_2D);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable( GL_CULL_FACE);
 		
 		// Set up the texturing
-		glEnable( GL_TEXTURE_2D);
 		// I am limiting the maximum level of detail in this case because it can
 		// bring my poor system to a screaming halt.  It still looks good at
 		// this level of subdivision.
@@ -129,12 +130,7 @@ sphere::gl_render( const view& geometry)
 		
 		// Render the front half.
 		glCullFace( GL_BACK);
-		lod_cache[tex_lod].gl_render();
-		
-		// Cleanup.
-		glDisable( GL_CULL_FACE);
-		glDisable( GL_TEXTURE_2D);
-		glDisable( GL_BLEND);		
+		lod_cache[tex_lod].gl_render();	
 	}
 	else if (color.alpha != 1.0) { // Render a transparent constant color sphere
 		// Since spheres have identical symmetry
@@ -142,9 +138,9 @@ sphere::gl_render( const view& geometry)
 		// easy (albeit somewhat slow) thanks to GL_CULL_FACE. 
 		
 		// Setup for blending
-		glEnable( GL_BLEND);
+		gl_enable blend( GL_BLEND);
+		gl_enable cull_face( GL_CULL_FACE);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable( GL_CULL_FACE);
 		
 		// Render the back half.
 		glCullFace( GL_FRONT);
@@ -154,17 +150,13 @@ sphere::gl_render( const view& geometry)
 		// Render the front half.
 		glCullFace( GL_BACK);
 		models[lod].gl_render();
-		
-		// Cleanup.
-		glDisable( GL_CULL_FACE);
-		glDisable( GL_BLEND);
 	}
 	else if (tex) { // Render a textured body
 		// Shift to the textured sphere model set.
 		size_t tex_lod = lod + 6;
 		
 		// Set up the texturing
-		glEnable( GL_TEXTURE_2D);
+		gl_enable tex2D( GL_TEXTURE_2D);
 		tex->gl_activate();
 		rgba(1.0, 1.0, 1.0, 1.0).gl_set();
 		
@@ -172,16 +164,12 @@ sphere::gl_render( const view& geometry)
 		// within the space of the body.
 		const bool hide_back = (geometry.camera - pos).mag() > radius;
 		if (hide_back) {
-			glEnable( GL_CULL_FACE);
+			gl_enable cull_face( GL_CULL_FACE);
 			glCullFace( GL_BACK);
+			lod_cache[tex_lod].gl_render();
 		}
-		lod_cache[tex_lod].gl_render();
-		if (hide_back) {
-			glDisable( GL_CULL_FACE);
-		}
-		
-		// Cleanup.
-		glDisable( GL_TEXTURE_2D);		
+		else
+			lod_cache[tex_lod].gl_render();
 	}
 	else {
 		// Render a simple sphere.

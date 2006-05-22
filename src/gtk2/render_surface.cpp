@@ -256,7 +256,7 @@ render_surface::forward_render_scene()
 	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
 		core.pick( last_mousepos_x, last_mousepos_y);
 
-#if 0
+#if 1
 	double elapsed = time.elapsed();
 	/* Scheduling logic for the rendering pulse.  This code is intended to make
 	 * the rendering loop a better citizen with regard to sharing CPU time with
@@ -268,7 +268,7 @@ render_surface::forward_render_scene()
 	if (elapsed > double(cycle_time + 5)/1000) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
-		cycle_time = int(elapsed * 1000);
+		cycle_time = int(elapsed * 1000) + 5;
 		timer = Glib::signal_timeout().connect( 
 			sigc::mem_fun( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
@@ -281,7 +281,7 @@ render_surface::forward_render_scene()
 	if (elapsed < double(cycle_time-5)/1000 && cycle_time > 30) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
-		cycle_time = int(elapsed * 1000);
+		cycle_time = int(elapsed * 1000) + 5;
 		timer = Glib::signal_timeout().connect( 
 			sigc::mem_fun( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
@@ -404,7 +404,7 @@ render_surface::get_mouse()
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-
+#if 0
 basic_app::_init::_init()
 {
 	Gtk::GL::init(NULL, NULL);
@@ -486,5 +486,6 @@ basic_app::on_delete( GdkEventAny*)
 	scene.gl_free();
 	return true;
 }
+#endif
 
 } // !namespace cvisual

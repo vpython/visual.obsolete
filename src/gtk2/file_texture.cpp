@@ -8,8 +8,8 @@
 
 #include <iostream>
 #include <boost/lexical_cast.hpp>
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "wrap_gl.hpp"
+#include "util/gl_enable.hpp"
 
 // This file is a part of libvpython-gtk2.so
 
@@ -64,7 +64,7 @@ file_texture::file_texture( const std::string& file, bool _ignorealpha)
 void
 file_texture::gl_init()
 {
-	glEnable( GL_TEXTURE_2D);
+	gl_enable tex2D( GL_TEXTURE_2D);
 	glGenTextures(1, &handle);
 	VPYTHON_NOTE( "Allocated texture number " + boost::lexical_cast<std::string>(handle));
 	glBindTexture(GL_TEXTURE_2D, handle);
@@ -87,7 +87,6 @@ file_texture::gl_init()
 			image->get_height(), GL_RGB, GL_UNSIGNED_BYTE, 
 			image->get_pixels());
 	}
-	glDisable( GL_TEXTURE_2D);
 }
 
 void

@@ -5,6 +5,7 @@
 
 #include "label.hpp"
 #include "util/errors.hpp"
+#include "util/gl_enable.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -393,7 +394,7 @@ label::gl_render( const view& scene)
 		}
 		if (opacity) {
 			// Occlude objects behind the label.
-			glEnable( GL_BLEND);
+			gl_enable blend( GL_BLEND);
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			rgba( 0, 0, 0, opacity).gl_set();
 			glBegin( GL_QUADS);
@@ -402,7 +403,6 @@ label::gl_render( const view& scene)
 				vector( box_width, box_height).gl_render();
 				vector( 0, box_height).gl_render();
 			glEnd();
-			glDisable( GL_BLEND);
 		}
 		if (box_enabled) {
 			// Draw a box around the text.

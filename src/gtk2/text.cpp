@@ -1,6 +1,7 @@
 #include "gtk2/text.hpp"
 #include "util/gl_free.hpp"
 #include "util/errors.hpp"
+#include "util/gl_enable.hpp"
 
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
@@ -52,18 +53,22 @@ class ft2_texture : public sigc::trackable, public boost::noncopyable
 ft2_texture::ft2_texture( FT_Bitmap& bitmap)
 	: handle( 0)
 {	
-	glEnable( GL_TEXTURE_2D);
+	gl_enable tex2D( GL_TEXTURE_2D);
 	glGenTextures(1, &handle);
 	VPYTHON_NOTE( "Allocated texture number " 
 		+ boost::lexical_cast<std::string>(handle));
 	on_gl_free.connect( sigc::mem_fun( *this, &ft2_texture::gl_free));
 	
+	// TODO: Write an optimized code path that uses GL_TEXTURE_RECTANGLE_ARB
 	glBindTexture( GL_TEXTURE_2D, handle);
 	int texw = next_power_of_two( bitmap.width);
 	int texh = next_power_of_two( bitmap.rows);
 	boost::scoped_array<uint8_t> texdata( new uint8_t[texw*texh]);
 	memset( texdata.get(), 0, texw*texh);
 	
+	// WIll force the GL to use the exact pixel values computed by Pango+Ft2
+	// This provides the best-looking text on-screen and closely matches the
+	// system native text appearance.
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_ALPHA, texw, texh, 0, GL_ALPHA, 
@@ -71,7 +76,6 @@ ft2_texture::ft2_texture( FT_Bitmap& bitmap)
 
 	int saved_alignment = -1;
 	glGetIntegerv( GL_UNPACK_ALIGNMENT, &saved_alignment);
-	
 	int alignment = bitmap.width % 4;
 	if (!alignment)
 		alignment = 4;
@@ -86,7 +90,6 @@ ft2_texture::ft2_texture( FT_Bitmap& bitmap)
 	
 	width = bitmap.width / float(texw);
 	height = bitmap.rows /float(texh);
-	glDisable( GL_TEXTURE_2D);
 }
 
 void
@@ -95,9 +98,8 @@ ft2_texture::gl_free()
 	if (handle) {
 		VPYTHON_NOTE( "Deleting texture number " 
 			+ boost::lexical_cast<std::string>(handle));
-		glEnable( GL_TEXTURE_2D);
+		gl_enable tex2D( GL_TEXTURE_2D);
 		glDeleteTextures(1, &handle);
-		glDisable( GL_TEXTURE_2D);
 		handle = 0;
 	}
 }
@@ -229,8 +231,8 @@ layout::layout( float w, float h, boost::shared_ptr<ft2_texture> t)
 void
 layout::gl_render( const vector& pos)
 {
-	glEnable( GL_TEXTURE_2D);
-	glEnable( GL_BLEND);
+	gl_enable tex2D( GL_TEXTURE_2D);
+	gl_enable blend( GL_BLEND);
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	tex->gl_activate();
 	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -242,9 +244,6 @@ layout::gl_render( const vector& pos)
 		coord[i].gl_render();
 	}
 	glEnd();
-	
-	glDisable( GL_BLEND);
-	glDisable( GL_TEXTURE_2D);
 }
 
 } // !namespace cvisual

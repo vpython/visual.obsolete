@@ -5,6 +5,7 @@
 
 #include "arrow.hpp"
 #include "util/errors.hpp"
+#include "util/gl_enable.hpp"
 
 namespace cvisual {
 	
@@ -103,14 +104,12 @@ arrow::cache_transparent_model( const view&)
 	clear_gl_error();
 	model.gl_compile_begin();
 	{	
-		glEnable( GL_BLEND);
-		// glEnable( GL_POLYGON_SMOOTH);
+		gl_enable blend( GL_BLEND);
+		// gl_enable polygon_smooth( GL_POLYGON_SMOOTH);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glBegin( GL_TRIANGLES);
 			sorted_model->gl_render();
 		glEnd();
-		// glDisable( GL_POLYGON_SMOOTH);
-		glDisable( GL_BLEND);
 	}
 	model.gl_compile_end();
 	check_gl_error();
