@@ -12,6 +12,8 @@
 
 #include <stdexcept>
 #include <cassert>
+#include <sstream>
+
 #if 0
 # include <GL/gle.h>
 #endif
@@ -28,7 +30,7 @@ const size_t curve::c_cache::items;
 namespace {
 	
 // returns a pointer to the ith vector in the array.
-double* index( array a, size_t i)
+double* index( const array& a, size_t i)
 {
 	// This is technically an unsafe cast since the alignment requirement
 	// goes up for the cast.  It is made safe by padding actions within the Numeric
@@ -37,7 +39,7 @@ double* index( array a, size_t i)
 	return ((double*)data(a)) + (i+1) * 3;
 }
 
-float* findex( array a, size_t i)
+float* findex( const array& a, size_t i)
 {
 	return ((float*)data(a)) + (i+1)*3;
 }
@@ -514,7 +516,7 @@ curve::closed_path() const
 	//   and the scope of the entire curve is large relative to the points' 
 	//     proximity to the origin.
 	// In this case, it returns false when it should be true.
-	vector begin( index(pos, 1));
+	vector begin( index(pos, 0));
 	vector end( index(pos, count-1));
 	return eq_frac(begin.x, end.x, 1e-5) 
 		&& eq_frac(begin.y, end.y, 1e-5) 
@@ -525,7 +527,8 @@ long
 curve::checksum( size_t begin, size_t end)
 {
 	boost::crc_32_type engine;
-	engine.process_block( index( pos, begin), index( pos, end));
+	engine.process_block( &radius, &radius + sizeof(radius));
+	engine.process_block( index( pos, begin-1), index( pos, end+1));
 	engine.process_block( findex( color, begin), findex( color, end));
 	return engine.checksum();
 }
@@ -666,24 +669,24 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	const double* v_i = index( pos, begin);
 	const float* c_i = findex( color, begin);
 	bool mono = monochrome( begin, end);
-	rgb constant_color;
+	rgb rendered_color;
 	if (mono) {
 		// Manipulate colors when we are in stereo mode.
-		constant_color = rgb( static_cast<float>( c_i[0]),
+		rendered_color = rgb( static_cast<float>( c_i[0]),
 		                     static_cast<float>( c_i[1]),
 		                     static_cast<float>( c_i[2]));
 		if (scene.anaglyph) {
 			if (scene.coloranaglyph) {
-				constant_color = constant_color.desaturate();
+				rendered_color = rendered_color.desaturate();
 			}
 			else {
-				constant_color = constant_color.grayscale();
+				rendered_color = rendered_color.grayscale();
 			}
 		}
-		
 	}
 	
 	size_t count = end - begin;
+	bool first = true;
 	for(size_t corner=0; corner < count; ++corner, v_i += 3, c_i += 3 ) {
 		// The vector to which v_i currently points towards.
 		vector current( v_i[0], v_i[1], v_i[2] );
@@ -719,9 +722,30 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		vector B = (current - prev).norm();
 		vector x = (A - B).norm();
 		vector y = A.cross(B).norm();
-		if (!x || !y) {
+		if (first && !x) {
+			x = A.cross( vector(0, 0, 1));
+			if (!x)
+				x = A.cross(vector( 1, 0, 0));
+			y = A.cross(x);
+		}
+		if (first && !y) {
+			y = A.cross(x);
+		}
+		first = false;
+		if (!x)
 			x = lastx;
+		if (!y)
 			y = lasty;
+		
+		if (!x || !y || x == y) {
+			std::ostringstream msg;
+			msg << "Degenerate curve case! please report the following "
+				"information to visualpython-users@lists.sourceforge.net: "
+			msg << "current:" << current << " next:" << next << " prev:" << prev
+		 		<< " A:" << A << " B:" << B << " x:" << x << " y:" << y
+		 		<< " lastx:" << lastx << " lasty:" << lasty << " first:" 
+		 		<< first << std::endl;
+		 	VPYTHON_WARNING( msg.str());
 		}
 
 		// remove twists
@@ -735,10 +759,9 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		lasty = y;
 
 		// scale radii
-		x *= radius * scene.gcf;
-		y *= radius * scene.gcf;
+		x *= radius;
+		y *= radius;
 		
-		rgb rendered_color;
 		if (!mono) {
 			// Manipulate colors when we are in stereo mode.
 			rendered_color = rgb( static_cast<float>( c_i[0]),
@@ -767,10 +790,12 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	size_t npoints = normals.size() / curve_around;
 	glEnableClientState( GL_VERTEX_ARRAY);
 	glEnableClientState( GL_NORMAL_ARRAY);
-	if (!mono)
-		glEnableClientState( GL_COLOR_ARRAY);
+	if (mono) {
+		rendered_color.gl_set();
+		glDisableClientState( GL_COLOR_ARRAY);
+	}
 	else
-		constant_color.gl_set();
+		glEnableClientState( GL_COLOR_ARRAY);
 	
 	int *ind = curve_slice;
 	for (int a=0; a < curve_around; a++) {
