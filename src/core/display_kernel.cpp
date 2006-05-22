@@ -247,7 +247,6 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 					vector horiz_dir = forward.cross(up).norm();
 					// A vector pointing along the camera's vertical axis.
 					vector vert_dir = horiz_dir.cross(forward).norm();
-					lock L(mtx);
 					if (spin_allowed) {
 						center += -horiz_dir * pan_rate * hfrac;
 						center += vert_dir * pan_rate * vfrac;
