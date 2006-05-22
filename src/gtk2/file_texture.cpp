@@ -66,6 +66,8 @@ file_texture::gl_init()
 {
 	gl_enable tex2D( GL_TEXTURE_2D);
 	glGenTextures(1, &handle);
+	on_gl_free.connect( sigc::mem_fun(*this, &texture::gl_free));
+	
 	VPYTHON_NOTE( "Allocated texture number " + boost::lexical_cast<std::string>(handle));
 	glBindTexture(GL_TEXTURE_2D, handle);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

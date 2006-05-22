@@ -18,11 +18,7 @@ texture::texture()
 
 texture::~texture()
 {
-	if (handle) {
-		VPYTHON_NOTE( "Deleting texture number " 
-			+ lexical_cast<std::string>(handle));
-		glDeleteTextures(1, &handle);
-	}
+	gl_free();
 }
 
 texture::operator bool() const
@@ -33,8 +29,8 @@ texture::operator bool() const
 void
 texture::gl_activate()
 {
-	if (!handle)
-		on_gl_free.connect( sigc::mem_fun(*this, &texture::gl_free));
+	lock L(mtx);
+	damage_check();
 	if (!handle || damaged) {
 		gl_init();
 		damaged = false;
@@ -67,6 +63,11 @@ texture::gl_free()
 
 void
 texture::gl_transform()
+{
+}
+
+void 
+texture::damage_check()
 {
 }
 

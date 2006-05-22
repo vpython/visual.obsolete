@@ -8,6 +8,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include "util/gl_free.hpp"
+#include "util/thread.hpp"
 
 namespace cvisual {
 
@@ -33,9 +34,9 @@ class texture : public sigc::trackable
 {
  private:
 	bool damaged;
-	void gl_free();
 
  public:
+	mutex mtx;
 	/** Release the handle to OpenGL.  Subclasses must not call 
  		glDeleteTextures() on this class's handle.
 	*/
@@ -77,10 +78,15 @@ class texture : public sigc::trackable
 	// This function must assume that the active matrix is GL_MODELVIEW and must
 	// return in that state.
 	virtual void gl_transform();
+	
+	// THis function will be called by gl_activate() so that subclasses can
+	// detect asynchronous changes to themselves
+	void damage_check();
  
 	// Mutable subclasses must call this function whenever their texture data
 	// needs to be reloaded into OpenGL.
 	void damage();
+	void gl_free();
 };
 
 } // !namespace cvisual
