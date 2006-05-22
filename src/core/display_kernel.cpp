@@ -265,14 +265,13 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 						// forward.
 						double vertical_angle = vfrac * 2.0;
 						double max_vertical_angle = up.diff_angle(-forward.norm());
-						if (vertical_angle > max_vertical_angle - 0.02) {
-							vertical_angle = max_vertical_angle - 0.02;
-						}
-						else if (vertical_angle < -M_PI + max_vertical_angle+0.02) {
-							vertical_angle = -M_PI + max_vertical_angle + 0.02;
-						}
 						R = rotation( -vertical_angle, forward.cross(up).norm());
 						forward = R * forward;
+						// Over the top (or under the bottom) rotation
+						if (vertical_angle > max_vertical_angle ||
+							vertical_angle < max_vertical_angle - M_PI)
+							// Over the top (or under the bottom) rotation
+							up = -up;
 						forward_changed = true;
 					}
 					break;
