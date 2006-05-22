@@ -23,7 +23,7 @@ faces::degenerate() const
 
 namespace {	
 // returns a pointer to the ith vector in the array.
-double* index( array a, size_t i)
+double* index( const array& a, size_t i)
 {
 	// This is technically an unsafe cast since the alignment requirement
 	// goes up for the cast.  It is made safe by padding actions within the Numeric
@@ -32,7 +32,7 @@ double* index( array a, size_t i)
 	return ((double*)data(a)) + i * 3;
 }
 
-float* findex( array a, size_t i)
+float* findex( const array& a, size_t i)
 {
 	return ((float*)data(a)) + i * 3;
 }

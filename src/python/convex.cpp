@@ -13,7 +13,7 @@ namespace cvisual { namespace python {
 
 namespace {	
 // returns a pointer to the ith vector in the array.
-double* index( array a, size_t i)
+double* index( const array& a, size_t i)
 {
 	// This is technically an unsafe cast since the alignment requirement
 	// goes up for the cast.  It is made safe by padding actions within the Numeric
