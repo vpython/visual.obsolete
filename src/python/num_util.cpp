@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 namespace { 
-	const char* rcsid = "$Id: num_util.cpp,v 1.3 2006/05/15 16:13:55 jbrandmeyer Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.4 2006/05/23 19:42:51 jbrandmeyer Exp $";
 }
 
 // Moved into the visual namespace to prevent clashes with other projects using
@@ -100,5 +100,48 @@ astype(array arr, array_types t)
 	assert( astype_impl != 0);
 	return astype_impl( arr, t);
 }
+
+size_t 
+typesize( array_types t)
+{
+	size_t result = 0;
+	switch (t) {
+	    case char_t:
+	    	result = sizeof (char);
+	    	break;
+	    case uchar_t:
+	    	result = sizeof (unsigned char);
+	    	break;
+	    case schar_t:
+	    	result = sizeof (signed char);
+	    	break;
+	    case short_t:
+	    	result = sizeof (short);
+	    	break;
+	    case int_t:
+	    	result = sizeof (int);
+	    	break;
+	    case long_t:
+	    	result = sizeof (long);
+	    	break;
+	    case float_t:
+	    	result = sizeof (float);
+	    	break;
+	    case double_t:
+	    	result = sizeof (double);
+	    	break;
+	    case cfloat_t:
+	    	result = sizeof (float)*2;
+	    	break;
+	    case cdouble_t:
+	    	result = sizeof (double)*2;
+	    	break;
+		default:
+			bool type_is_recognized = false;
+			assert( type_is_recognized == true);
+	}
+	return result;
+}
+
 
 } } // !namespace cvisual::python
