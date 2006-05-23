@@ -630,7 +630,7 @@ display_kernel::draw(
 	world_iterator i_end( layer_world.end());
 	while (i != i_end) {
 		lock L(i->mtx);
-		if (i->color.alpha != 1.0) {
+		if (i->color.alpha != 1.0 || (i->get_texture() && i->get_texture()->has_alpha())) {
 			// The color of the object has become transparent when it was not
 			// initially.  Move it to the transparent layer.  The penalty for
 			// being rendered in the transparent layer when it is opaque is only
