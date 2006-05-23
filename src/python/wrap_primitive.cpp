@@ -210,7 +210,8 @@ wrap_primitive()
 	class_<numeric_texture, shared_ptr<numeric_texture>, bases<texture>, noncopyable>( "texture")
 		.add_property( "data", &numeric_texture::get_data, &numeric_texture::set_data)
 		.add_property( "type", &numeric_texture::set_type, &numeric_texture::set_type)
-		.add_property( "mipmapped", &numeric_texture::is_mipmapped, &numeric_texture::set_mipmapped)
+		.add_property( "mipmap", &numeric_texture::is_mipmapped, &numeric_texture::set_mipmapped)
+		.add_property( "antialias", &numeric_texture::is_antialiased, &numeric_texture::set_antialias);
 		;
 }	
 	
