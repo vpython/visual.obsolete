@@ -76,7 +76,7 @@ texture::damage_check()
 void
 texture::damage()
 {
-	damaged = false;
+	damaged = true;
 }
 
 int
