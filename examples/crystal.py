@@ -1,6 +1,7 @@
 from visual import *
 from random import random
 from time import clock
+import sys
 
 N = 5
 Ntotal = N*N*N
@@ -122,11 +123,10 @@ def crystal(N=3, delta=1.0, R=None, sradius=None):
 sradius = R/3.
 vrange = 0.2*L*sqrt(k/m)
 dt = 2.*pi*sqrt(m/k)/40.
-scene.visible = 0
-
+scene.visible = False
 atoms = crystal(N=N, delta=L, R=R, sradius=sradius)
-scene.visible = 1
-scene.autoscale = 0
+scene.visible = True
+scene.autoscale = False
 
 ptotal = vector()
 for a in atoms:
@@ -167,4 +167,5 @@ while 1:
     if Nsteps == 100:
         tt = clock()-tt
         print '%0.2f' % tt, 'sec for', Nsteps, 'steps with', N, 'on a side'
+        # sys.exit(0)
     Nsteps += 1
