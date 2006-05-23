@@ -32,6 +32,7 @@ class numeric_texture : public texture
 	array_types data_type; // The type of C data in the memory object
 	GLenum data_textype; // The type of GL texture object (GL_ALPHA, GL_RGB, etc)
 	bool data_mipmapped; // true if the data should be mipmapped
+	bool data_antialias;
 	
 	size_t tex_width;
 	size_t tex_height;
@@ -39,6 +40,7 @@ class numeric_texture : public texture
 	array_types tex_type;
 	GLenum tex_textype;
 	bool tex_mipmapped;
+	bool tex_antialias;
 	// Types of damage: those that change the array's type and/or dimensions,
 	// and those that change its contents
 	uint32_t checksum;
@@ -46,10 +48,11 @@ class numeric_texture : public texture
 	
 	bool degenerate() const;
 	bool should_reinitialize() const;
+
  protected:
 	virtual void damage_check(void);
 	virtual void gl_init(void);
-	virtual void transform(void);
+	virtual void gl_transform(void);
 
  public:
 	numeric_texture();
@@ -62,7 +65,10 @@ class numeric_texture : public texture
 	std::string get_type() const;
 	
 	void set_mipmapped( bool);
-	bool is_mipmapped(void);
+	bool is_mipmapped( void);
+	
+	void set_antialias( bool);
+	bool is_antialiased( void);
 };
 
 } } // !namespace cvisual::python

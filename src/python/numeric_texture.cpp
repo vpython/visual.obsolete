@@ -39,9 +39,9 @@ boost::crc_32_type engine;
 numeric_texture::numeric_texture()
 	: texdata(0), 
 	data_width(0), data_height(0), data_channels(0), data_type( notype_t), 
-		data_textype( 0), data_mipmapped(true),
+		data_textype( 0), data_mipmapped(true), data_antialias(false),
 	tex_width(0), tex_height(0), tex_channels(0), tex_type(notype_t),
-		tex_textype( 0), tex_mipmapped(false),
+		tex_textype( 0), tex_mipmapped(false), tex_antialias(false),
 	checksum(0)
 {
 }
@@ -83,19 +83,26 @@ numeric_texture::gl_init(void)
 		return;
 	
 	gl_enable tex2D( GL_TEXTURE_2D);
-	glGenTextures(1, &handle);
-	on_gl_free.connect( sigc::mem_fun(*this, &texture::gl_free));
-	VPYTHON_NOTE( "Allocated texture number " + boost::lexical_cast<std::string>(handle));	
+	if (!handle) {
+		glGenTextures(1, &handle);
+		on_gl_free.connect( sigc::mem_fun(*this, &texture::gl_free));
+		VPYTHON_NOTE( "Allocated texture number " + boost::lexical_cast<std::string>(handle));
+	}
 	glBindTexture(GL_TEXTURE_2D, handle);
 	
 	if (data_mipmapped) {
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+			data_antialias ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
+			data_antialias ? GL_LINEAR : GL_NEAREST);
 	}
 	else {
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+			data_antialias ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
+			data_antialias ? GL_LINEAR : GL_NEAREST);
 	}
+	tex_antialias = data_antialias;
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP);
@@ -179,11 +186,10 @@ numeric_texture::gl_init(void)
 			0, 0, data_width, data_height, 
 			internal_format, gl_type_name(tex_type), data(texdata));
 	glPixelStorei( GL_UNPACK_ALIGNMENT, saved_alignment);	
-	
 }
 
 void
-numeric_texture::transform(void)
+numeric_texture::gl_transform(void)
 {
 	if (degenerate())
 		return;
@@ -202,7 +208,7 @@ numeric_texture::damage_check(void)
 {
 	if (degenerate())
 		return;
-	if (should_reinitialize()) {
+	if (should_reinitialize() || data_antialias != tex_antialias) {
 		damage();
 		return;
 	}
@@ -252,8 +258,8 @@ numeric_texture::set_data( boost::python::numeric::array data)
 	lock L(mtx);
 	damage();
 	texdata = data;
-	data_width = dims[0];
-	data_height = dims[1];
+	data_height = dims[0];
+	data_width = dims[1];
 	data_channels = dims[2];
 	have_alpha = (
 		data_channels == 2 || 
@@ -328,5 +334,17 @@ numeric_texture::is_mipmapped(void)
 	return data_mipmapped;
 }
 
+void
+numeric_texture::set_antialias( bool aa)
+{
+	lock L(mtx);
+	data_antialias = aa;
+}
+
+bool 
+numeric_texture::is_antialiased( void)
+{
+	return data_antialias;
+}
 
 } } // !namespace cvisual::python
