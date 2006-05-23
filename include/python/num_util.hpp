@@ -137,6 +137,10 @@ namespace cvisual { namespace python {
     // While these functions set the chosen API.
     void use_numeric_impl();
     void use_numarray_impl();
+    
+    // Returns sizeof(type) for a given array_types object
+    size_t typesize( array_types t);
+    
 
 } } //  namespace cvisual::python
 
