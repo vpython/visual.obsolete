@@ -64,8 +64,8 @@ renderable::renderable()
 }
 
 renderable::renderable( const renderable& other)
-	: model_damaged(true), z_damaged(true), visible(true), lit(other.lit), 
-		shininess(other.shininess)
+	: model_damaged(true), z_damaged(true), tex(other.tex),
+		visible(other.visible), lit(other.lit), shininess(other.shininess)
 {
 }
 
@@ -147,6 +147,19 @@ bool
 renderable::is_lit()
 {
 	return lit;
+}
+
+void
+renderable::set_texture( shared_ptr<texture> t)
+{
+	lock L(mtx);
+	tex = t;
+}
+
+shared_ptr<texture>
+renderable::get_texture()
+{
+	return tex;
 }
 
 bool

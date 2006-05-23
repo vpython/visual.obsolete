@@ -8,7 +8,6 @@
 
 #include "axial.hpp"
 #include "util/displaylist.hpp"
-#include "util/texture.hpp"
 
 namespace cvisual {
 
@@ -17,10 +16,6 @@ namespace cvisual {
 class sphere : public axial
 {
  private:
-	/// A texture map to be applied to the sphere.  A Mercator projection is 
-	/// performed from the image to the sphere's surface.
-	shared_ptr<texture> tex;
-
 	/** The level-of-detail cache.  It is stored for the life of the program, and
 		initialized when the first sphere is rendered.  The last six use the
 		same detail level as the first six, but also include texture coordinates.
@@ -34,9 +29,6 @@ class sphere : public axial
 	sphere();
 	sphere( const sphere& other);
 	virtual ~sphere();
-	
-	void set_texture( shared_ptr<texture>);
-	shared_ptr<texture> get_texture();
  
  protected:
 	/** Renders a simple sphere with the #2 level of detail.  */

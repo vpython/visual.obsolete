@@ -1,52 +1,19 @@
 #include "python/numeric_texture.hpp"
+#include "util/gl_enable.hpp"
+#include "util/errors.hpp"
 
 #include <boost/crc.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/scoped_array.hpp>
+#include <iostream>
 
 namespace cvisual { namespace python {
 
 
 namespace {
-int
-next_power_of_two(const int arg) 
-{
-	int ret = 2;
-	// upper bound of 28 chosen to limit memory growth to about 256MB, which is
-	// _much_ larger than most supported textures
-	while (ret < arg && ret < (1 << 28))
-		ret <<= 1;
-	return ret;
-}
 
-size_t typesize( array_types t)
-{
-	switch (t) {
-	    case char_t:
-	    	return sizeof (char);
-	    case uchar_t:
-	    	return sizeof (unsigned char);
-	    case schar_t:
-	    	return sizeof (signed char);
-	    case short_t:
-	    	return sizeof (short);
-	    case int_t:
-	    	return sizeof (int);
-	    case long_t:
-	    	return sizeof (long);
-	    case float_t:
-	    	return sizeof (float);
-	    case double_t:
-	    	return sizeof (double);
-	    case cfloat_t:
-	    	return sizeof (float)*2;
-	    case cdouble_t:
-	    	return sizeof (double)*2;
-		default:
-			bool type_is_recognized = false;
-			assert( type_is_recognized == true);
-	}
-}
-
-GLenum gl_type_name( array_types t)
+GLenum 
+gl_type_name( array_types t)
 {
 	switch (t) {
 	    case char_t:
@@ -60,7 +27,7 @@ GLenum gl_type_name( array_types t)
 	    case int_t:
 	    	return GL_INT;
 	    case float_t:
-	    	return FLOAT;
+	    	return GL_FLOAT;
 	    default:
 	    	return 1;
 	}
@@ -70,8 +37,12 @@ boost::crc_32_type engine;
 } // !namespace (anonymous)
 
 numeric_texture::numeric_texture()
-	: texdata(0), width(0), height(0), channels(0), type( notype_t), checksum(0),
-	mipmapped(true)
+	: texdata(0), 
+	data_width(0), data_height(0), data_channels(0), data_type( notype_t), 
+		data_textype( 0), data_mipmapped(true),
+	tex_width(0), tex_height(0), tex_channels(0), tex_type(notype_t),
+		tex_textype( 0), tex_mipmapped(false),
+	checksum(0)
 {
 }
 
@@ -80,9 +51,29 @@ numeric_texture::~numeric_texture()
 }
 
 bool
-numeric_texture::degenerate()
+numeric_texture::degenerate() const
 {
-	return width == 0 || height == 0 || channels == 0 || type == notype_t;
+	return data_width == 0 || data_height == 0 || data_channels == 0 || data_type == notype_t;
+}
+
+bool
+numeric_texture::should_reinitialize(void) const
+{
+	return (
+		data_channels != tex_channels ||
+		data_mipmapped != tex_mipmapped ||
+		data_type != tex_type ||
+		(
+			tex_mipmapped &&
+			next_power_of_two(data_width) != tex_width ||
+			next_power_of_two(data_height) != tex_height 
+		) ||
+		(
+			!tex_mipmapped &&
+			data_width != tex_width ||
+			data_height != tex_height
+		)
+	);
 }
 
 void 
@@ -91,46 +82,104 @@ numeric_texture::gl_init(void)
 	if (degenerate())
 		return;
 	
-	// Otherwise, something is damaged.  Either the texture must be reinitialized
-	// or just its data has changed.
-	bool reinitialize = (
-		data_channels != tex_channels ||
-		next_power_of_two(data_width) != tex_width ||
-		next_power_of_two(data_height) != tex_height
-	);
+	gl_enable tex2D( GL_TEXTURE_2D);
+	glGenTextures(1, &handle);
+	on_gl_free.connect( sigc::mem_fun(*this, &texture::gl_free));
+	VPYTHON_NOTE( "Allocated texture number " + boost::lexical_cast<std::string>(handle));	
+	glBindTexture(GL_TEXTURE_2D, handle);
 	
-	GLenum format;
-	switch (tex_channels) {
-		case 1:
-			format = GL_LUMINANCE;
-			break;
-		case 2:
-			format = GL_LUMINANCE_ALPHA;
-			break;
-		case 3:
-			format = GL_RGB;
-			break;
-		case 4:
-			format = GL_RGBA;
-			break;
-		default: // Won't ever happen
-			format = GL_RGB;
+	if (data_mipmapped) {
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
+	else {
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+	
+	
+	// Something is damaged.  Either the texture must be reinitialized
+	// or just its data has changed.
+	bool reinitialize = should_reinitialize();
+	
+	GLenum internal_format;
+	if (!data_textype) {
+		switch (tex_channels) {
+			case 1:
+				internal_format = GL_LUMINANCE;
+				break;
+			case 2:
+				internal_format = GL_LUMINANCE_ALPHA;
+				break;
+			case 3:
+				internal_format = GL_RGB;
+				break;
+			case 4:
+				internal_format = GL_RGBA;
+				break;
+			default: // Won't ever happen
+				internal_format = GL_RGB;
+		}
+	}
+	else
+		internal_format = data_textype;
+	tex_textype = data_textype;
 	
 	if (reinitialize) {
+		// Compute a fresh checksum
+		engine.reset();
+		engine.process_block( data(texdata), 
+			data(texdata) + data_width*data_height*data_channels * typesize(data_type));
+		checksum = engine.checksum();
+	}
+	int saved_alignment = -1;
+	glGetIntegerv( GL_UNPACK_ALIGNMENT, &saved_alignment);
+	int alignment = data_width % 4;
+	if (!alignment)
+		alignment = 4;
+	if (alignment == 3)
+		alignment = 1;
+	glPixelStorei( GL_UNPACK_ALIGNMENT, alignment);	
+	
+	
+	if (reinitialize && !data_mipmapped) {
 		tex_width = next_power_of_two(data_width);
 		tex_height = next_power_of_two(data_height);
 		tex_channels = data_channels;
-		size_t data_size = tex_width*tex_height*typesize(data_type)*data_channels
-		boost::scoped_array dummy_data( 
-			new unsigned char[data_size]);
+		tex_textype = data_textype;
+		tex_type = data_type;
+		tex_mipmapped = false;
+		
+		size_t data_size = tex_width*tex_height*typesize(data_type)*data_channels;
+		boost::scoped_array<unsigned char> dummy_data( new unsigned char[data_size]);
 		memset( dummy_data.get(), 0, data_size);
-		glTexImage2D( GL_TEXTURE_2D, 0, tex_channels, tex_width, tex_height,
-			0, format, gl_type_name( type), dummy_data.get());
+		
+		glTexImage2D( GL_TEXTURE_2D, 0, internal_format, tex_width, tex_height,
+			0, internal_format, gl_type_name( tex_type), dummy_data.get());
+		glTexSubImage2D( GL_TEXTURE_2D, 0, 
+			0, 0, data_width, data_height, 
+			internal_format, gl_type_name( tex_type), data(texdata));
 	}
+	else if (data_mipmapped) {
+		tex_width = data_width;
+		tex_height = data_height;
+		tex_channels = data_channels;
+		tex_type = data_type;
+		tex_textype = data_textype;
+		tex_mipmapped = true;
+		
+		gluBuild2DMipmaps( GL_TEXTURE_2D, internal_format, tex_width, tex_height,
+			internal_format, gl_type_name(tex_type), data(texdata));
+	}
+	else // Only upload new texture subimage
+		glTexSubImage2D( GL_TEXTURE_2D, 0, 
+			0, 0, data_width, data_height, 
+			internal_format, gl_type_name(tex_type), data(texdata));
+	glPixelStorei( GL_UNPACK_ALIGNMENT, saved_alignment);	
 	
-	glTexSubImage2d( GL_TEXTURE_2D, 0, 0, 0,
-		data_width, data_height, format, gl_type_name(type), data(texdata));
 }
 
 void
@@ -138,6 +187,14 @@ numeric_texture::transform(void)
 {
 	if (degenerate())
 		return;
+	glMatrixMode( GL_TEXTURE);
+	glLoadIdentity();
+	if (data_width != tex_width || data_height != tex_height) {
+		float x_scale = float(data_width) / tex_width;
+		float y_scale = float(data_height) / tex_height;
+		glScalef( x_scale, y_scale, 1);
+	}
+	glMatrixMode( GL_MODELVIEW);
 }
 
 void
@@ -145,11 +202,15 @@ numeric_texture::damage_check(void)
 {
 	if (degenerate())
 		return;
-	if (tex_channels != data_channels)
+	if (should_reinitialize()) {
 		damage();
-	engine.process_block( data(texdata), width*height*channels * typesize(type));
-	uint32_t result = engine.checksum();
+		return;
+	}
+	
 	engine.reset();
+	engine.process_block( data(texdata), 
+		data(texdata) + data_width*data_height*data_channels * typesize(data_type));
+	uint32_t result = engine.checksum();
 	if (result != checksum) {
 		checksum = result;
 		damage();
@@ -159,7 +220,8 @@ numeric_texture::damage_check(void)
 void
 numeric_texture::set_data( boost::python::numeric::array data)
 {
-	if (data == object() && texdata != object()) {
+	namespace py = boost::python;
+	if (data == py::object() && texdata != py::object()) {
 		throw std::invalid_argument( 
 			"Cannot nullify a texture by assigning its data to None");
 	}
@@ -178,22 +240,27 @@ numeric_texture::set_data( boost::python::numeric::array data)
 			"Texture data must be NxMxC, where C is between 1 and 4 (inclusive)");
 	}
 	
-	if (t == double_t)
+	if (t == double_t) {
 		data = astype( data, float_t);
-	if (t == long_t)
+		t = float_t;
+	}
+	if (t == long_t) {
 		data = astype( data, int_t);
-	
+		t = int_t;
+	}
+
 	lock L(mtx);
 	damage();
 	texdata = data;
 	data_width = dims[0];
 	data_height = dims[1];
 	data_channels = dims[2];
-	if (data_channels == 2 || data_channels == 4) {
-		have_alpha = true;
-	}
-	else
-		have_alpha = false;
+	have_alpha = (
+		data_channels == 2 || 
+		data_channels == 4 ||
+		(data_channels == 1 && data_textype == GL_ALPHA)
+	);
+
 	data_type = t;
 }
 
@@ -202,5 +269,64 @@ numeric_texture::get_data()
 {
 	return texdata;
 }
+
+void
+numeric_texture::set_type( std::string requested_type)
+{
+	GLenum req_type = 0;
+	if (requested_type == "luminance")
+		req_type = GL_LUMINANCE;
+	else if (requested_type == "alpha")
+		req_type = GL_ALPHA;
+	else if (requested_type == "luminance_alpha")
+		req_type = GL_LUMINANCE_ALPHA;
+	else if (requested_type == "rgb")
+		req_type = GL_RGB;
+	else if (requested_type == "rgba")
+		req_type = GL_RGBA;
+	else if (requested_type == "auto")
+		req_type = 0;
+	else
+		throw std::invalid_argument( "Unknown texture type");
+	lock L(mtx);
+	data_textype = req_type;
+	if (req_type == GL_RGBA || req_type == GL_ALPHA || req_type == GL_LUMINANCE_ALPHA)
+		have_alpha = true;
+	damage();
+}
+
+std::string
+numeric_texture::get_type() const
+{
+	switch (data_textype) {
+		case GL_LUMINANCE:
+			return std::string( "luminance");
+		case GL_ALPHA:
+			return std::string( "alpha");
+		case GL_LUMINANCE_ALPHA:
+			return std::string( "luminance_alpha");
+		case GL_RGB:
+			return std::string( "rgb");
+		case GL_RGBA:
+			return std::string( "rgba");
+		case 0: default:
+			return std::string( "auto");
+	}
+}
+
+void
+numeric_texture::set_mipmapped( bool m)
+{
+	lock L(mtx);
+	damage();
+	data_mipmapped = m;
+}
+
+bool
+numeric_texture::is_mipmapped(void)
+{
+	return data_mipmapped;
+}
+
 
 } } // !namespace cvisual::python

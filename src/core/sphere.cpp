@@ -25,24 +25,12 @@ sphere::sphere()
 }
 
 sphere::sphere( const sphere& other)
-	: axial(other), tex(other.tex)
+	: axial(other)
 {
 }
 
 sphere::~sphere()
 {
-}
-
-void
-sphere::set_texture( shared_ptr<texture> t)
-{
-	tex = t;
-}
-
-shared_ptr<texture>
-sphere::get_texture()
-{
-	return tex;
 }
 
 void

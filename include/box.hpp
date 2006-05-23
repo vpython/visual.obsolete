@@ -8,7 +8,6 @@
 
 #include "rectangular.hpp"
 #include "util/sorted_model.hpp"
-#include "util/texture.hpp"
 #include "util/displaylist.hpp"
 
 namespace cvisual {
@@ -16,9 +15,6 @@ namespace cvisual {
 class box : public rectangular
 {
  private:
-	// This object may be textured.
-	shared_ptr<texture> tex;
-
 	// A model to be used for rendering transparent objects.
 	static z_sorted_model<quad, 6> sorted_model;
 	// A model to be used for transparent and textured objects.
@@ -42,9 +38,6 @@ class box : public rectangular
 	box();
 	box( const box& other);
 	virtual ~box();
-	
-	void set_texture( shared_ptr<texture> t);
-	shared_ptr<texture> get_texture();
 	
  protected:
 	virtual void gl_pick_render( const view&);

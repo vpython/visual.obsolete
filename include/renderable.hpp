@@ -10,6 +10,7 @@
 #include "util/extent.hpp"
 #include "util/thread.hpp"
 #include "util/displaylist.hpp"
+#include "util/texture.hpp"
 #include <boost/shared_ptr.hpp>
 
 #include <map>
@@ -167,12 +168,19 @@ public:
 	
 	void set_shininess( float);
 	float get_shininess();
+	
+	void set_texture( shared_ptr<texture> t);
+	shared_ptr<texture> get_texture();
 
 protected:
 	friend class display_kernel;
 	renderable();
 	renderable( const renderable& other);
 	mutex mtx;
+	
+	// Some objects may be textured.
+	shared_ptr<texture> tex;
+	
 	/** If a subclass changes a property that affects its cached state, it must
 		call this function to ensure that its cache is updated on the next render
 		pass.

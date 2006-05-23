@@ -16,6 +16,7 @@
 #include "pyramid.hpp"
 #include "label.hpp"
 #include "frame.hpp"
+#include "python/numeric_texture.hpp"
 
 #include "python/wrap_vector.hpp"
 
@@ -72,6 +73,7 @@ wrap_primitive()
 	class_<renderable, boost::noncopyable>( "renderable", no_init)
 		.add_property( "shininess", &renderable::get_shininess, &renderable::set_shininess)
 		.add_property( "lit", &renderable::is_lit, &renderable::set_lit)
+		.add_property( "texture", &renderable::get_texture, &renderable::set_texture)
 		;
 
 	class_<primitive, bases<renderable>, noncopyable>( 
@@ -119,7 +121,6 @@ wrap_primitive()
 	
 	class_< sphere, bases<axial> >( "sphere")
 		.def( init<const sphere&>())
-		.add_property( "texture", &sphere::get_texture, &sphere::set_texture)
 		;
 
 	class_< cylinder, bases<axial> >( "cylinder")
@@ -202,6 +203,14 @@ wrap_primitive()
         .def( "rotate", raw_function( &py_rotate<frame>))
 		.def( "add_renderable", &frame::add_renderable)
 		.def( "remove_renderable", &frame::remove_renderable)
+		;
+	
+	using python::numeric_texture;
+	class_<texture, noncopyable>( "texbase", no_init);
+	class_<numeric_texture, shared_ptr<numeric_texture>, bases<texture>, noncopyable>( "texture")
+		.add_property( "data", &numeric_texture::get_data, &numeric_texture::set_data)
+		.add_property( "type", &numeric_texture::set_type, &numeric_texture::set_type)
+		.add_property( "mipmapped", &numeric_texture::is_mipmapped, &numeric_texture::set_mipmapped)
 		;
 }	
 	
