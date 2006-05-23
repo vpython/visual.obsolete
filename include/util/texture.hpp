@@ -43,7 +43,7 @@ class texture : public sigc::trackable
 	virtual ~texture();
 
 	/** True iff the texture object is managing something. */
-	operator bool() const;
+	// operator bool() const;
  
 	/** Make this texture active.  This function constitutes use under the
 		"initialize on first use" rule, and will incur a one-time speed and 
@@ -79,15 +79,23 @@ class texture : public sigc::trackable
 	// return in that state.
 	virtual void gl_transform();
 	
-	// THis function will be called by gl_activate() so that subclasses can
+	// This function will be called by gl_activate() so that subclasses can
 	// detect asynchronous changes to themselves
-	void damage_check();
+	virtual void damage_check();
  
 	// Mutable subclasses must call this function whenever their texture data
 	// needs to be reloaded into OpenGL.
 	void damage();
 	void gl_free();
 };
+
+#ifdef __GNUC__
+#define PURE __attribute__((pure))
+#else
+#define PURE
+#endif
+
+int next_power_of_two(const int arg) PURE ;
 
 } // !namespace cvisual
 

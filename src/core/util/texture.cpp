@@ -12,7 +12,7 @@ using boost::lexical_cast;
 namespace cvisual {
 
 texture::texture()
-	: damaged(false), handle(0)
+	: damaged(false), handle(0), have_alpha(false)
 {
 }
 
@@ -21,10 +21,12 @@ texture::~texture()
 	gl_free();
 }
 
+#if 0
 texture::operator bool() const
 {
 	return handle != 0;
 }
+#endif
 
 void
 texture::gl_activate()
@@ -75,6 +77,17 @@ void
 texture::damage()
 {
 	damaged = false;
+}
+
+int
+next_power_of_two(const int arg) 
+{
+	int ret = 2;
+	// upper bound of 28 chosen to limit memory growth to about 256MB, which is
+	// _much_ larger than most supported textures
+	while (ret < arg && ret < (1 << 28))
+		ret <<= 1;
+	return ret;
 }
 
 } // !namespace cvisual

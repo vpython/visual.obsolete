@@ -2,6 +2,7 @@
 #include "util/gl_free.hpp"
 #include "util/errors.hpp"
 #include "util/gl_enable.hpp"
+#include "util/texture.hpp"
 
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
@@ -23,18 +24,6 @@ namespace cvisual {
 
 /******************************************************************************/
 // ft2_texture implementation
-namespace {
-int
-next_power_of_two(const int arg) 
-{
-	int ret = 2;
-	// upper bound of 28 chosen to limit memory growth to about 256MB, which is
-	// _much_ larger than most supported textures
-	while (ret < arg && ret < (1 << 28))
-		ret <<= 1;
-	return ret;
-}
-}
 
 class ft2_texture : public sigc::trackable, public boost::noncopyable
 {
