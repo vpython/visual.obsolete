@@ -35,25 +35,12 @@ box::box()
 }
 
 box::box( const box& other)
-	: rectangular( other), tex( other.tex)
+	: rectangular( other)
 {
 }
 
 box::~box()
 {
-}
-
-void
-box::set_texture( shared_ptr<texture> t)
-{
-	lock L(mtx);
-	tex = t;
-}
-
-shared_ptr<texture>
-box::get_texture()
-{
-	return tex;
 }
 
 void 
@@ -126,7 +113,7 @@ box::gl_render( const view& scene)
 		model_world_transform().gl_mult();
 		glScaled( axis.mag() * gcf, height * gcf, width*gcf);
 		
-		if (tex && color.alpha != 1.0) {
+		if (tex && (color.alpha < 1.0 || tex->has_alpha())) {
 			// Render the textured and transparent box.
 			vector object_forward = (pos - scene.camera).norm();
 			tmatrix inv = world_model_transform();
@@ -167,8 +154,8 @@ box::gl_render( const view& scene)
 			simple_model.gl_render();
 		}
 	}
-	shiny_prepare();
-	lighting_prepare();
+	shiny_complete();
+	lighting_complete();
 	check_gl_error();
 	axis.set_mag( saved_length);
 	width = saved_width;
