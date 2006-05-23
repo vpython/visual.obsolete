@@ -71,7 +71,7 @@ CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
 	wrap_display_kernel.lo wrap_primitive.lo wrap_rgba.lo wrap_vector.lo \
 	clipping_plane.lo displaylist.lo errors.lo extent.lo gl_free.lo lighting.lo \
 	quadric.lo rgba.lo texture.lo tmatrix.lo vector.lo icososphere.lo text.lo \
-	wrap_ustring.lo
+	wrap_ustring.lo numeric_texture.lo
 
 # Distribution file list.
 DISTFILES = $(subst .lo,.cpp,$(CVISUAL_OBJS) \
@@ -139,9 +139,10 @@ define LT_CXX_RULE
 	@$(_LT_CXX_RULE) 2>> $(LOGFILE) 1>&2
 endef
 
-_LT_LINKRULE = $(LIBTOOL) --mode=link $(CXX) $(CVISUAL_LDFLAGS) $(LDFLAGS) $^ \
-	$(CVISUAL_LIBS) $(LIBS) -module -version-info $(CVISUAL_VERSION_INFO) \
-	-o $@ -Wl,--version-script=$(srcdir)/linux-symbols.map \
+_LT_LINKRULE = $(LIBTOOL) --mode=link $(CXX) $(CVISUAL_LDFLAGS) \
+	$(LDFLAGS) $^ $(CVISUAL_LIBS) $(LIBS) -module \
+	-version-info $(CVISUAL_VERSION_INFO) -o $@ \
+	-Wl,--version-script=$(srcdir)/linux-symbols.map \
 	-rpath $(pythondir)/$(PLATFORM_TARGET)
 define LT_LINKRULE
 	@echo Linking $@ ...
@@ -182,7 +183,13 @@ ifeq ($(PYTHON_PLATFORM),win32)
   INSTALL_RULE = $(GENERIC_INSTALLRULE)
 else 
   # These options are common to both Linux and OSX.
-  CVISUAL_LIBS += $(GTK_LIBS) $(GTHREAD_LIBS) -lboost_python -lboost_thread
+  # The filter-out statement removes an extraneous flag brought in by 
+  # gmodule-2.0.pc on some platforms.  This reduces the symbol table (and
+  # size of the final binary) by about 1 MB, and makes Python's "import" go 
+  # _much_ faster at runtime.
+  _FILTER_OUT = "-Wl,--export-dynamic"
+  CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
+  	$(GTHREAD_LIBS) -lboost_python -lboost_thread)
   CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTHREAD_CFLAGS)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
