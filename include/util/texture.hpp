@@ -86,6 +86,9 @@ class texture : public sigc::trackable
 	// Mutable subclasses must call this function whenever their texture data
 	// needs to be reloaded into OpenGL.
 	void damage();
+
+ public: 
+ 	// Should be protected; makeing this public works around a GCC 3.4.2 bug
 	void gl_free();
 };
 
