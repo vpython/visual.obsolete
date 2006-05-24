@@ -32,35 +32,15 @@ VISUAL_NUMERICLIBS()
 AM_CHECK_PYTHON_HEADERS([], [
 	AC_MSG_ERROR([A suitable python interpreter was found, but you do not have the header files required for building C/C++ extensions to python, or another problem was encoutered when compiling a program that uses Python.h.])])
 
-if test $platform_win32 = yes; then
-	# We are on Win32.
-	AC_SUBST([FONTOBJ], [winfont])
-	AC_SUBST([MAINOBJ], [winmain])
-	AC_SUBST([RANDOMDEVICEOBJ], [winrandom_device])
-	AC_SUBST([RATEOBJ], [winrate])
-	AC_SUBST([RENDERSURFACEOBJ], [winrender_surface])
-	AC_SUBST([TIMEROBJ], [wintimer])
-	AC_DEFINE([HAVE_WIN32_API],[1])
-	# The current working directory, as a backslashified Win32 style path.
-	AC_SUBST([WIN32_CWD], [`pwd -W | sed -e "s/\\//\\\\\/g"`])
-	# The top-level source directory.
-	AC_SUBST([WIN32_SRCDIR], [`cd $srcdir ; pwd -W | sed -e "s/\\//\\\\\/g"`])
-else
-	PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4, ,
-		[AC_MSG_ERROR(gtkglextmm 1.2+, pangoft2, glibmm-2.4, and pangomm-1.4 are required on Unix-like systems)])
-	AC_SUBST([GTK_LIBS])
-	AC_SUBST([GTK_CFLAGS])
+PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4, ,
+	[AC_MSG_ERROR(gtkglextmm 1.2+, pangoft2, glibmm-2.4, and pangomm-1.4 are required on Unix-like systems)])
+AC_SUBST([GTK_LIBS])
+AC_SUBST([GTK_CFLAGS])
 
-	PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
-		[AC_MSG_ERROR(GThread 2.0+ is required on Unix-like systems)])
-	AC_SUBST([GTHREAD_CFLAGS])
-	AC_SUBST([GTHREAD_LIBS])
-
-	AC_SUBST([RANDOMDEVICEOBJ], [random_device])
-	AC_SUBST([RATEOBJ], [rate])
-	AC_SUBST([RENDERSURFACEOBJ], [render_surface])
-	AC_SUBST([TIMEROBJ], [timer])
-fi
+PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
+	[AC_MSG_ERROR(GThread 2.0+ is required on Unix-like systems)])
+AC_SUBST([GTHREAD_CFLAGS])
+AC_SUBST([GTHREAD_LIBS])
 
 # The major.minor version of Python, with the "." stripped out.
 AC_SUBST([WIN32_PYTHON_VERSION], [`echo $PYTHON_VERSION | sed -e "s/\.//"`])

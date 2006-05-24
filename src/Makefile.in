@@ -52,7 +52,7 @@ GTHREAD_CFLAGS = @GTHREAD_CFLAGS@
 
 # Option flags for the compiler, constructed from the above.
 # Note that I am forcing no debugging symbols by default.
-CVISUAL_CPPFLAGS = $(BOOST_INCLUDES) $(PYTHON_INCLUDES) -DHAVE_CONFIG_H \
+CVISUAL_CPPFLAGS = $(BOOST_INCLUDES) -DHAVE_CONFIG_H \
 	-I$(top_srcdir)/include -I$(top_builddir)/include
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
@@ -64,8 +64,7 @@ CPPFLAGS = @CPPFLAGS@
 CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
 	ellipsoid.lo frame.lo label.lo mouseobject.lo primitive.lo \
 	pyramid.lo rectangular.lo renderable.lo ring.lo sphere.lo \
-	display.lo file_texture.lo random_device.lo rate.lo \
-	render_surface.lo timer.lo convex.lo curve.lo cvisualmodule.lo faces.lo \
+	display.lo render_surface.lo convex.lo curve.lo cvisualmodule.lo faces.lo \
 	num_util.lo num_util_impl_numarray.lo num_util_impl_numeric.lo \
 	scalar_array.lo slice.lo vector_array.lo wrap_arrayobjects.lo \
 	wrap_display_kernel.lo wrap_primitive.lo wrap_rgba.lo wrap_vector.lo \
@@ -174,12 +173,11 @@ ifeq ($(PYTHON_PLATFORM),win32)
   # Windows -- Only MinGW is directly supported.
   CXX_RULE = $(DEFAULT_CXX_RULE)
   LINK_RULE = $(WIN32_DLLRULE)
-  CVISUAL_CPPFLAGS += $(WIN32_CPPFLAGS)
-  CVISUAL_LIBS += $(WIN32_LIBS)
+  CVISUAL_CPPFLAGS += $(WIN32_CPPFLAGS) $(GTK_CFLAGS) $(GTHREAD_CFLAGS)
+  CVISUAL_LIBS += $(WIN32_LIBS) $(GTK_LIBS) $(GTHREAD_LIBS) -lboost_thread
   CVISUAL_LDFLAGS += $(WIN32_LDFLAGS)
   PLATFORM_TARGET = cvisual.dll
-  PLATFORM_OBJS = winfont.lo winrandom_device.lo winrate.lo \
-  	winrender_surface.lo wintimer.lo
+  PLATFORM_OBJS = winrandom_device.lo winrate.lo wintimer.lo
   INSTALL_RULE = $(GENERIC_INSTALLRULE)
 else 
   # These options are common to both Linux and OSX.
@@ -190,11 +188,10 @@ else
   _FILTER_OUT = "-Wl,--export-dynamic"
   CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
   	$(GTHREAD_LIBS) -lboost_python -lboost_thread)
-  CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTHREAD_CFLAGS)
+  CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTHREAD_CFLAGS) $(PYTHON_INCLUDES)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
-  PLATFORM_OBJS = display.lo file_texture.lo random_device.lo rate.lo \
-  	render_surface.lo timer.lo
+  PLATFORM_OBJS = file_texture.lo random_device.lo rate.lo timer.lo
 
   ifeq ($(PYTHON_PLATFORM),darwin)
     # Special rules for OSX
