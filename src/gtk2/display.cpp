@@ -18,6 +18,9 @@ using boost::lexical_cast;
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/radiotoolbutton.h>
 
+#include <cstdlib>
+#include <sstream>
+
 namespace cvisual {
 using boost::thread;
 	
@@ -254,10 +257,19 @@ display::create()
 		area->set_size_request( (int)width, (int)height);
 	area->signal_key_press_event().connect(
 		sigc::mem_fun( *this, &display::on_key_pressed));
-	
-	Glib::RefPtr<Gdk::Pixbuf> fs_img = Gdk::Pixbuf::create_from_file( 
-		VPYTHON_PREFIX "/data/galeon-fullscreen.png");
-
+		
+	Glib::RefPtr<Gdk::Pixbuf> fs_img;
+	try {
+		fs_img = Gdk::Pixbuf::create_from_file( 
+			VPYTHON_PREFIX "/data/galeon-fullscreen.png");
+	}
+	catch (std::exception& e) {
+		std::ostringstream msg;
+		msg << "Could not find VPython data file: " <<  e.what()
+			<< "; aborting\n";
+		VPYTHON_CRITICAL_ERROR( msg.str());
+		std::exit(1);
+	}
 	// TODO: Investigate why these Gtk::manage() calls are not releasing their
 	// memory when needed
 	Gtk::Toolbar* tb = Gtk::manage( new Gtk::Toolbar());
