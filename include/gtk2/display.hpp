@@ -13,12 +13,17 @@
 
 #include <boost/scoped_ptr.hpp>
 
+#define USE_GLADE 1
+
 #include <gtkmm/gl/drawingarea.h>
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
 #include <gtkmm/image.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/box.h>
+#if USE_GLADE
+#include <libglademm/xml.h>
+#endif
 #include <glibmm.h>
 
 namespace cvisual {
@@ -31,7 +36,12 @@ class display : public display_kernel,
 {
  private:
 	scoped_ptr<render_surface> area;
+	#if USE_GLADE
+	Glib::RefPtr<Gnome::Glade::Xml> glade_file;
+	Gtk::Window* window;
+	#else
 	scoped_ptr<Gtk::Window> window;
+	#endif
 	sigc::connection timer;
 
 	mutex mtx;
@@ -82,6 +92,7 @@ class display : public display_kernel,
 	virtual void add_renderable_screen( shared_ptr<renderable>);
 	static void set_selected( shared_ptr<display> d);
 	static shared_ptr<display> get_selected();
+	static void set_dataroot( Glib::ustring dataroot);
 	
 	// Called by the gui_main class below when this window needs to create
 	// or destroy itself.

@@ -32,8 +32,8 @@ VISUAL_NUMERICLIBS()
 AM_CHECK_PYTHON_HEADERS([], [
 	AC_MSG_ERROR([A suitable python interpreter was found, but you do not have the header files required for building C/C++ extensions to python, or another problem was encoutered when compiling a program that uses Python.h.])])
 
-PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4, ,
-	[AC_MSG_ERROR(gtkglextmm 1.2+, pangoft2, glibmm-2.4, and pangomm-1.4 are required on Unix-like systems)])
+PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4 libglademm-2.4, ,
+	[AC_MSG_ERROR(gtkglextmm 1.2+, pangoft2, glibmm-2.4, and pangomm-1.4 libglademm-2.4 are required on Unix-like systems)])
 AC_SUBST([GTK_LIBS])
 AC_SUBST([GTK_CFLAGS])
 

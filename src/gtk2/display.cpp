@@ -15,6 +15,7 @@ using boost::lexical_cast;
 #include <gtkmm/main.h>
 #include <gdk/gdkkeysyms.h>
 
+
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/radiotoolbutton.h>
 
@@ -73,6 +74,16 @@ using boost::thread;
 	
 
 shared_ptr<display> display::selected;
+
+namespace {
+Glib::ustring dataroot = "";
+}
+
+void
+display::set_dataroot( Glib::ustring _dataroot)
+{
+	dataroot = _dataroot;
+}
 
 display::display()
 	: active( false),
@@ -246,6 +257,29 @@ display::set_fullscreen( bool fs)
 	fullscreen = fs;
 }
 
+namespace {
+
+inline void 
+widget_fail( const Glib::ustring& name)
+{
+	std::ostringstream msg;
+	msg << "Getting widget named: " << name << " failed!\n";
+	VPYTHON_CRITICAL_ERROR( msg.str());
+	std::exit(1);
+}
+
+template <typename GtkWidget>
+inline GtkWidget*
+get_widget( Glib::RefPtr<Gnome::Glade::Xml> tree, const Glib::ustring& name)
+{
+	GtkWidget* result = dynamic_cast<GtkWidget*>( tree->get_widget( name));
+    if (!result) {
+    	widget_fail( name);
+    }
+    return result;
+}
+} // !namespace (anon)
+
 void
 display::create()
 {
@@ -257,7 +291,23 @@ display::create()
 		area->set_size_request( (int)width, (int)height);
 	area->signal_key_press_event().connect(
 		sigc::mem_fun( *this, &display::on_key_pressed));
-		
+	
+#if USE_GLADE
+	// Glade-based UI.
+	// TODO: Figure out a sane data prefixing setup.
+	glade_file = Gnome::Glade::Xml::create( dataroot + "vpython.glade");
+	get_widget<Gtk::ToolButton>(glade_file, "quit_button")->signal_clicked().connect(
+		sigc::mem_fun( *this, &display::on_quit_clicked));
+	get_widget<Gtk::ToolButton>(glade_file, "fullscreen_button")->signal_clicked().connect(
+		sigc::mem_fun( *this, &display::on_fullscreen_clicked));
+	get_widget<Gtk::ToolButton>(glade_file, "rotate_zoom_button")->signal_clicked().connect(
+		sigc::mem_fun( *this, &display::on_rotate_clicked));
+	get_widget<Gtk::ToolButton>(glade_file, "pan_button")->signal_clicked().connect(
+		sigc::mem_fun( *this, &display::on_pan_clicked));
+	window = get_widget<Gtk::Window>(glade_file, "window1");
+	get_widget<Gtk::VBox>( glade_file, "vbox1")->pack_start( *area);
+
+#else
 	Glib::RefPtr<Gdk::Pixbuf> fs_img;
 	try {
 		fs_img = Gdk::Pixbuf::create_from_file( 
@@ -298,9 +348,12 @@ display::create()
 	frame->pack_start( *area);
 	
 	window.reset( new Gtk::Window());
-	window->set_title( title);
 	window->set_icon_from_file(	VPYTHON_PREFIX "/data/logo_t.gif");
 	window->add( *frame);
+	
+	#endif
+	window->set_title( title);
+	
 	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
 	window->show_all();
 	if (x > 0 || y > 0) {
@@ -330,8 +383,14 @@ display::destroy()
 	timer.disconnect();
 	window->hide();
 	active = false;
+#if USE_GLADE
+	window = 0;
+	area.reset();
+	glade_file.clear();
+#else
 	window.reset();
 	area.reset();
+#endif
 }
 
 atomic_queue<std::string>& 
@@ -377,9 +436,15 @@ display::on_window_delete(GdkEventAny*)
 	VPYTHON_NOTE( "Closing a window from the GUI.");
 	timer.disconnect();
 	active = false;
+#if USE_GLADE
+	window = NULL;
+	area.reset();
+	glade_file.clear();
+#else
 	window.reset();
 	area.reset();
-	
+#endif
+
 	gui_main::report_window_delete( this);
 	if (exit) {
 		VPYTHON_NOTE( "Initiating shutdown from window closure");
