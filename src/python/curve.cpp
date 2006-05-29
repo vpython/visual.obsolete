@@ -15,10 +15,6 @@
 #include <cassert>
 #include <sstream>
 
-#if 0
-# include <GL/gle.h>
-#endif
-
 using boost::python::make_tuple;
 using boost::python::object;
 
@@ -59,9 +55,9 @@ curve::curve()
 	dims[0] = preallocated_size;
 	dims[1] = 3;
 	pos = makeNum( dims);
-	color = makeNum( dims, float_t);
+	color = makeNum( dims);
 	double* pos_i = index( pos, 0);
-	float* color_i = findex( color, 0);
+	double* color_i = index( color, 0);
 	pos_i[0] = 0;
 	pos_i[1] = 0;
 	pos_i[2] = 0;
@@ -138,9 +134,9 @@ curve::set_length( size_t length)
 		dims[0] = 2*length + 2;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
-		array n_color = makeNum( dims, float_t);
+		array n_color = makeNum( dims);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints+1));
-		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * (npoints+1));
+		std::memcpy( data( n_color), data( color), sizeof(double) * 3 * (npoints+1));
 		pos = n_pos;
 		color = n_color;
 		preallocated_size = dims[0];
@@ -157,9 +153,9 @@ curve::set_length( size_t length)
 			pos_i += 3;
 		}
 		
-		const float* last_color = findex( color, npoints-1);
-		float* color_i = findex( color, npoints);
-		float* color_end = findex( color, length);
+		const double* last_color = index( color, npoints-1);
+		double* color_i = index( color, npoints);
+		double* color_end = index( color, length);
 		while (color_i < color_end) {
 			color_i[0] = last_color[0];
 			color_i[1] = last_color[1];
@@ -176,12 +172,12 @@ curve::set_length( size_t length)
 }
 
 void
-curve::append_rgb( vector npos, float red, float blue, float green) 
+curve::append_rgb( vector npos, double red, double blue, double green) 
 {
 	lock L(mtx);
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
-	float* last_color = findex( color, count-1);
+	double* last_color = index( color, count-1);
 	last_pos[0] = npos.x;
 	last_pos[1] = npos.y;
 	last_pos[2] = npos.z;
@@ -210,7 +206,7 @@ curve::append( vector npos, rgb ncolor)
 	lock L(mtx);
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
-	float* last_color = findex( color, count-1);
+	double* last_color = index( color, count-1);
 	last_pos[0] = npos.x;
 	last_pos[1] = npos.y;
 	last_pos[2] = npos.z;
@@ -272,8 +268,8 @@ void
 curve::set_color( array n_color)
 {
 	python::array_types t = type(n_color);
-	if (t != float_t) {
-		n_color = astype( n_color, float_t);
+	if (t != double_t) {
+		n_color = astype( n_color, double_t);
 	}
 	std::vector<int> dims = shape( n_color);
 	if (dims.size() == 1 && dims[0] == 3) {
@@ -474,8 +470,8 @@ curve::degenerate() const
 bool
 curve::monochrome( size_t begin, size_t end)
 {
-	const float* color_i = findex( color, begin);
-	const float* color_end = findex( color, end);
+	const double* color_i = index( color, begin);
+	const double* color_end = index( color, end);
 	
 	rgb first_color( color_i[0], color_i[1], color_i[2]);
 	color_i += 3;
@@ -530,7 +526,7 @@ curve::checksum( size_t begin, size_t end)
 	boost::crc_32_type engine;
 	engine.process_block( &radius, &radius + sizeof(radius));
 	engine.process_block( index( pos, begin-1), index( pos, end+1));
-	engine.process_block( findex( color, begin), findex( color, end));
+	engine.process_block( index( color, begin), index( color, end));
 	return engine.checksum();
 }
 
@@ -579,7 +575,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 	// The following may be empty, but they are kept at this scope to ensure
 	// that their memory will be valid when rendering the body below.
 	double (*spos)[3] = NULL;
-	float (*tcolor)[3] = NULL;
+	double (*tcolor)[3] = NULL;
 	
 	if (scene.gcf != 1.0) {
 		// Must scale the pos data.
@@ -598,7 +594,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 	bool segment_monochrome = monochrome( begin, end);
 	if (segment_monochrome) {
 		// We can get away without using a color array.
-		const float* c_i = findex( color, begin);
+		const double* c_i = index( color, begin);
 		rgb scolor( c_i[0], c_i[1], c_i[2]);
 		if (scene.anaglyph) {
 			if (scene.coloranaglyph)
@@ -613,10 +609,10 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 		glEnableClientState( GL_COLOR_ARRAY);
 		if (scene.anaglyph) {
 			// Must desaturate or grayscale the color.
-			tcolor = new float[end-begin][3];
+			tcolor = new double[end-begin][3];
 			
-			const float* color_i = findex( color, begin);
-			const float* color_end = findex( color, end);
+			const double* color_i = index( color, begin);
+			const double* color_end = index( color, end);
 			for (size_t i = 0; i < end-begin; ++i, color_i += 3) {
 				rgb scolor( color_i[0], color_i[1], color_i[2]);
 				if (scene.coloranaglyph)
@@ -668,7 +664,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	
 	// pos and color iterators
 	const double* v_i = index( pos, begin);
-	const float* c_i = findex( color, begin);
+	const double* c_i = index( color, begin);
 	bool mono = monochrome( begin, end);
 	rgb rendered_color;
 	if (mono) {
@@ -822,7 +818,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 #else
 	std::vector<rgb> tcolor;
 	std::vector<vector> spos;
-	float (*used_color)[3] = &((converter<float>*)findex( color, begin-1))->data;
+	double (*used_color)[3] = &((converter<double>*)index( color, begin-1))->data;
 	double (*used_pos)[3] = &((converter<double>*)index( pos, begin-1))->data;
 	
 	gleSetNumSides(4);
@@ -844,7 +840,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	}
 	if (monochrome( begin, end)) {
 		// Can get away without using a color array.
-		const float* color_i = findex( color, begin);
+		const double* color_i = index( color, begin);
 		rgb scolor( color_i[0], color_i[1], color_i[2]);
 		if (scene.anaglyph) {
 			if (scene.coloranaglyph)
@@ -864,8 +860,8 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			// Must desaturate or grayscale the color.
 			std::vector<rgb> tmp( end-begin+2);
 			tcolor.swap(tmp);
-			const float* color_i = findex( color, begin-1);
-			const float* color_end = findex( color, begin+1);
+			const double* color_i = index( color, begin-1);
+			const double* color_end = index( color, begin+1);
 			for (std::vector<rgb>::iterator i = tcolor.begin(); 
 				i < tcolor.end() && color_i < color_end; 
 				++i, color_i+=3) {
@@ -875,7 +871,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 				else
 					*i = scolor.grayscale();
 			}
-			used_color = &((converter<float>*)&*tcolor.begin())->data;
+			used_color = &((converter<double>*)&*tcolor.begin())->data;
 		}
 		
 		glePolyCylinder( 
