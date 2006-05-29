@@ -20,6 +20,7 @@
 #include "display.hpp"
 #include "util/errors.hpp"
 #include "python/num_util.hpp"
+#include "python/gil.hpp"
 
 namespace cvisual {
 void wrap_display_kernel();
@@ -53,6 +54,13 @@ translate_std_runtime_error( std::runtime_error e)
 	PyErr_SetString( PyExc_RuntimeError, e.what());
 }
 
+void
+py_rate( double freq)
+{
+	python::gil_release R;
+	rate(freq);
+}
+
 BOOST_PYTHON_MODULE( cvisual)
 {
 	VPYTHON_NOTE( "Importing cvisual from vpython-core2.");
@@ -83,7 +91,7 @@ BOOST_PYTHON_MODULE( cvisual)
 	register_exception_translator<std::runtime_error>( 
 		&translate_std_runtime_error);
 
-	def( "rate", rate, "rate(arg) -> Limits the execution rate of a loop to arg"
+	def( "rate", py_rate, "rate(arg) -> Limits the execution rate of a loop to arg"
 		" iterations per second.");
 
 	wrap_vector();
