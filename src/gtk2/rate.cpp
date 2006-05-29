@@ -79,20 +79,20 @@ rate_timer::delay( double _delay)
 	// Computation of the requested delay is the same, but the execution differs
 	// from OSX.  This is to provide somewhat more accurate timing on Linux, 
 	// whose timing is abominable.
-	wait -= 10000; // Subtract off 10 ms.
-	if (wait > 0) {
+	if (wait > 2000) {
 		timespec sleep_wait(wait);
 		nanosleep( &sleep_wait, &remaining);
 	}
-
-	// Busy wait out the remainder of the time.
-	gettimeofday( &now, 0);
-	wait = delay - ((long long)now - origin);
-	while (wait > 0) {
+	else {
+		// Busy wait out the remainder of the time.
 		gettimeofday( &now, 0);
 		wait = delay - ((long long)now - origin);
+		while (wait > 0) {
+			gettimeofday( &now, 0);
+			wait = delay - ((long long)now - origin);
+		}
 	}
-#endif
+#endif // !defined __APPLE__
 	gettimeofday( &this->origin, 0);
 }
 
