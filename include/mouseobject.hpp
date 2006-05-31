@@ -32,8 +32,6 @@ class mousebase
 	vector position;
 	// The position of the camera in the scene.
 	vector cam;
-	// A vector pointing from the camera into the scene colinear with the mouse.
-	vector ray;
 	// The object nearest to the cursor when this event happened.
 	shared_ptr<renderable> pick;
 	// The position on the object that intersects with ray.
@@ -61,7 +59,7 @@ class mousebase
 	inline bool is_ctrl() const { return modifiers.test( ctrl); }
 	inline vector get_pos() const { return position; }
 	inline vector get_camera() const { return cam; }
-	inline vector get_ray() const { return ray; }
+	inline vector get_ray() const { return (position - cam).norm(); }
 	inline vector get_pickpos() const { return pickpos; }
 	shared_ptr<renderable> get_pick();
 	

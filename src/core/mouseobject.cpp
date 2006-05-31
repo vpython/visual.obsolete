@@ -15,7 +15,6 @@ static void init_event( int which, shared_ptr<event> ret, const mouse_t& mouse)
 	ret->pick = mouse.pick;
 	ret->pickpos = mouse.pickpos;
 	ret->cam = mouse.cam;
-	ret->ray = mouse.ray;
 	ret->set_shift( mouse.is_shift());
 	ret->set_ctrl( mouse.is_ctrl());
 	ret->set_alt( mouse.is_alt());
@@ -99,9 +98,9 @@ vector
 mousebase::project1( vector normal, double dist)
 {
 	double ndc = normal.dot(cam) - dist;
-	double ndr = normal.dot(ray);
+	double ndr = normal.dot(get_ray());
 	double t = -ndc / ndr;
-	vector v = cam + ray*t;
+	vector v = cam + get_ray()*t;
 	return v;
 }
 
@@ -113,9 +112,9 @@ mousebase::project2( vector normal, vector point)
 {
 	double dist = normal.dot(point);
 	double ndc = normal.dot(cam) - dist;
-	double ndr = normal.dot(ray);
+	double ndr = normal.dot(get_ray());
 	double t = -ndc / ndr;
-	vector v = cam + ray*t;
+	vector v = cam + get_ray()*t;
 	return v;	
 }
 
