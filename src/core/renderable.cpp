@@ -23,7 +23,6 @@ view::view( const view& other, const tmatrix& wft)
 	forward( wft.times_v(forward)),
 	center( wft * other.center),
 	up( wft.times_v(other.up)),
-	right( wft.times_v(other.right)),
 	window_width( other.window_width),
 	window_height( other.window_height),
 	forward_changed( true),

@@ -156,12 +156,6 @@ public: // Public Data.
 	std::list< shared_ptr<light> >
 	get_lights() const
 	{ return lights; }
-	/** Clears the set of existing lights, and creates a pair of default lights. 
-		The first is at <0.25, 0.5, 1.0> inf with 0.8 gray.  The second is at 
-		<-1.0, -0.25, -0> inf with 0.2 gray.  This function is automatically
-		called once at construction time.
-	*/
-	void illuminate_default();
 	
 	/** Add a normal renderable object to the list of objects to be rendered into
 	 *  world space.

@@ -75,8 +75,6 @@ struct view
 	vector center;
 	/// The true up direction of the scene in world space.
 	vector up;
-	/// The true right direction of the scene in world space
-	vector right;
 	
 	/// The width of the window in pixels.
 	float window_width;
@@ -203,7 +201,7 @@ protected:
 	void lighting_prepare( void);
 	void lighting_complete( void);
 	
- private:
+	// True if the body will get specular highlights
 	bool shiny( void);
 
  protected:
