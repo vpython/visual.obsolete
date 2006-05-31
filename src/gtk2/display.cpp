@@ -292,9 +292,7 @@ display::create()
 	area->signal_key_press_event().connect(
 		sigc::mem_fun( *this, &display::on_key_pressed));
 	
-#if USE_GLADE
 	// Glade-based UI.
-	// TODO: Figure out a sane data prefixing setup.
 	glade_file = Gnome::Glade::Xml::create( dataroot + "vpython.glade");
 	get_widget<Gtk::ToolButton>(glade_file, "quit_button")->signal_clicked().connect(
 		sigc::mem_fun( *this, &display::on_quit_clicked));
@@ -307,51 +305,7 @@ display::create()
 	window = get_widget<Gtk::Window>(glade_file, "window1");
 	get_widget<Gtk::VBox>( glade_file, "vbox1")->pack_start( *area);
 
-#else
-	Glib::RefPtr<Gdk::Pixbuf> fs_img;
-	try {
-		fs_img = Gdk::Pixbuf::create_from_file( 
-			VPYTHON_PREFIX "/data/galeon-fullscreen.png");
-	}
-	catch (std::exception& e) {
-		std::ostringstream msg;
-		msg << "Could not find VPython data file: " <<  e.what()
-			<< "; aborting\n";
-		VPYTHON_CRITICAL_ERROR( msg.str());
-		std::exit(1);
-	}
-	// TODO: Investigate why these Gtk::manage() calls are not releasing their
-	// memory when needed
-	Gtk::Toolbar* tb = Gtk::manage( new Gtk::Toolbar());
 
-	Gtk::ToolButton* button = 0;
-	button = Gtk::manage( new Gtk::ToolButton( Gtk::Stock::QUIT));
-	button->signal_clicked().connect( sigc::mem_fun( *this, &display::on_quit_clicked));
-	tb->append( *button);
-	button = Gtk::manage( new Gtk::ToggleToolButton( 
-		*Gtk::manage( new Gtk::Image(fs_img)), "Fullscreen"));
-	button->signal_clicked().connect( 
-		sigc::mem_fun( *this, &display::on_fullscreen_clicked));
-	tb->append( *button);
-	Gtk::RadioButtonGroup mouse_ctl;
-	button = Gtk::manage( new Gtk::RadioToolButton( mouse_ctl, "Rotate/Zoom"));
-	button->signal_clicked().connect(
-		sigc::mem_fun( *this, &display::on_rotate_clicked));
-	tb->append( *button);
-	button = Gtk::manage( new Gtk::RadioToolButton( mouse_ctl, "Pan"));
-	button->signal_clicked().connect(
-		sigc::mem_fun( *this, &display::on_pan_clicked));
-	tb->append( *button);
-	
-	Gtk::VBox* frame = Gtk::manage( new Gtk::VBox());
-	frame->pack_start( *tb, Gtk::PACK_SHRINK, 0);
-	frame->pack_start( *area);
-	
-	window.reset( new Gtk::Window());
-	window->set_icon_from_file(	VPYTHON_PREFIX "/data/logo_t.gif");
-	window->add( *frame);
-	
-	#endif
 	window->set_title( title);
 	
 	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
@@ -448,6 +402,8 @@ display::on_window_delete(GdkEventAny*)
 	gui_main::report_window_delete( this);
 	if (exit) {
 		VPYTHON_NOTE( "Initiating shutdown from window closure");
+		if (area)
+			area->gl_free();
 		gui_main::quit();
 	}
 		
@@ -458,6 +414,8 @@ void
 display::on_quit_clicked()
 {
 	VPYTHON_NOTE( "Initiating shutdown from the GUI.");
+	if (area)
+		area->gl_free();
 	gui_main::quit();
 }
 
@@ -619,8 +577,6 @@ gui_main::thread_proc(void)
 		init_signal->notify_all();
 	}
 	self->run();
-	VPYTHON_NOTE( "Cleaning up allocated GL resources");
-	render_surface::final_cleanup();
 	VPYTHON_NOTE( "Terminating GUI thread.");
 	gui_main::on_shutdown();
 }
@@ -767,7 +723,6 @@ gui_main::quit()
 	assert( self != 0);
 	lock L(self->call_lock);
 	self->shutting_down = true;
-	on_gl_free();
 	for (std::list<display*>::iterator i = self->displays.begin(); 
 			i != self->displays.end(); ++i) {
 		(*i)->destroy();

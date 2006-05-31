@@ -82,14 +82,13 @@ class render_surface : public Gtk::GL::DrawingArea
 	sigc::signal2<void, shared_ptr<renderable>, vector> object_clicked;
 	
 	// Makes this rendering context active and calls on_gl_free().  This should
-	// generally be done only by the last window to shut down.
-	void gl_free();
+	// generally be done only by the last window to shut down, however it is
+	// harmless to call it more than once during the shutdown.  Attempting to 
+	// render after this is called will probably not work...
+	void gl_free( void);
 	
 	// Returns the mouse object, and updates some of its parameters.
 	mouse_t& get_mouse() { return mouse; }
-	
-	// To be called before the GUI thread exits.
-	static void final_cleanup( void);
  
  protected:
 	// Low-level signal handlers
@@ -111,39 +110,6 @@ class render_surface : public Gtk::GL::DrawingArea
 	void gl_end();
 	void gl_swap_buffers();
 	bool forward_render_scene();
-};
-
-class basic_app : public sigc::trackable
-{
- private:
-	/** Initialize Gtkmm */
-	Gtk::Main kit;
-	/** Helper class used to initialize Gtk::GL at the right time. */
-	struct _init
-	{
-		_init();
-	} init;
-	
-	/** The parent window. */
-	Gtk::Window window;
-	/** An image widget for one of the toolbars.  It loads the fullscreen
-	 * toggle image, shamelessly ripped from Galeon.
-	 */
-	Gtk::Image fs_img;
-	Gtk::Toolbar tb;
-	Gtk::VBox frame;
-	display_kernel _core;
-	
- private:
-	void on_fullscreen_clicked();
-	void on_pan_clicked();
-	void on_rotate_clicked();
-	bool on_delete(GdkEventAny*);
- 
- public:
-	render_surface scene;
-	basic_app( const char* title);
-	void run();	
 };
 
 } // !namespace cvisual

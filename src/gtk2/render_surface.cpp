@@ -33,62 +33,6 @@ namespace {
 	Glib::RefPtr<Gdk::GL::Context> share_list;
 }
 
-void
-render_surface::final_cleanup( void)
-{
-	if (share_list) {
-		try {
-			Glib::RefPtr<Gdk::GL::Config> config = 
-				Gdk::GL::Config::create( Gdk::GL::MODE_RGB
-					| Gdk::GL::MODE_DOUBLE
-					| Gdk::GL::MODE_DEPTH );
-			if (!config) {
-				VPYTHON_WARNING( "Failed to initialize any OpenGL configuration");
-				return;
-			}
-			
-			Glib::RefPtr<Gdk::Pixmap> dummy_target = 
-				Gdk::Pixmap::create( Glib::RefPtr<Gdk::Drawable>(), 1, 1, config->get_depth());
-			if (!dummy_target) {
-				VPYTHON_WARNING( "Failed to create a dummy Gdk::Pixmap");
-				return;
-			}
-			
-			Glib::RefPtr<Gdk::GL::Pixmap> target = 
-				Gdk::GL::ext( dummy_target).set_gl_capability( config);
-			if (!target) {
-				VPYTHON_WARNING( "Failed to create a dummy Gdk::GL::Pixmap");
-				return;
-			}
-			
-			Glib::RefPtr<Gdk::GL::Context> local_ctx = Gdk::GL::Context::create(
-				target, share_list, false);
-			if (!local_ctx) {
-				VPYTHON_WARNING( "Failed to create a new shared Gdk::GL::Context");
-				return;
-			}
-			
-			if (!target->gl_begin( local_ctx)) {
-				VPYTHON_WARNING( "Failed to gl_begin() the dummy Gdk::GL::Pixmap");
-				return;
-			}
-			
-			clear_gl_error();
-			on_gl_free();
-			check_gl_error();
-			
-			target->gl_end();
-		} catch (std::exception& err) {
-			std::ostringstream msg;
-			msg << "Failed releasing GL resources: " << err.what();
-			VPYTHON_CRITICAL_ERROR( msg.str());
-		}
-		share_list.clear();
-	}
-	else
-		VPYTHON_NOTE( "No renderer was made active; nothing to clean up");
-}
-
 render_surface::render_surface( display_kernel& _core, bool activestereo)
 	: last_mousepos_x(0),
 	last_mousepos_y(0),
@@ -159,6 +103,7 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 void
 render_surface::gl_free()
 {
+	VPYTHON_NOTE( "Releasing GL resources");
 	gl_begin();
 	try {
 		clear_gl_error();
@@ -176,7 +121,13 @@ bool
 render_surface::on_motion_notify_event( GdkEventMotion* event)
 {
 	// Direct the core to perform rendering ops.
-	
+#ifdef G_OS_WIN32
+	// Fake middle mouse events on Win32
+	if (event->state & GDK_BUTTON3_MASK && event->state & GDK_BUTTON1_MASK) {
+		event->state |= GDK_BUTTON2_MASK;
+		event->state &= ~(GDK_BUTTON3_MASK | GDK_BUTTON1_MASK);
+	}
+#endif
 	// The vertical and horizontal changes of the mouse position since the last
 	// call.
 	float dy = static_cast<float>( event->y) - last_mousepos_y;
@@ -304,7 +255,6 @@ render_surface::on_expose_event( GdkEventExpose*)
 	return true;
 }
 
-
 bool 
 render_surface::on_button_press_event( GdkEventButton* event)
 {
@@ -394,99 +344,5 @@ render_surface::gl_swap_buffers()
 {
 	get_gl_window()->swap_buffers();
 }
-
-#if 0
-mouse_t&
-render_surface::get_mouse()
-{
-    watching_mouse = true;
-    // Set a condition variable to wait
-}
-#endif
-
-////////////////////////////////////////////////////////////////////////////////
-#if 0
-basic_app::_init::_init()
-{
-	Gtk::GL::init(NULL, NULL);
-}
-
-basic_app::basic_app( const char* title)
-	: kit( NULL, NULL), 
-	fs_img( Gdk::Pixbuf::create_from_file( 
-			VPYTHON_PREFIX "/data/galeon-fullscreen.png")),
-	scene( _core)
-{
-	_core.illuminate_default();
-	
-	window.set_title( title);
-	window.set_icon_from_file( VPYTHON_PREFIX "/data/logo_t.gif");
-
-	Gtk::ToolButton* button = 0;
-	button = Gtk::manage( new Gtk::ToolButton( Gtk::Stock::QUIT));
-	button->signal_clicked().connect( sigc::ptr_fun( &Gtk::Main::quit));
-	tb.append( *button);
-	button = Gtk::manage( new Gtk::ToggleToolButton( fs_img, "Fullscreen"));
-	button->signal_clicked().connect( 
-		sigc::mem_fun( *this, &basic_app::on_fullscreen_clicked));
-	tb.append( *button);
-	Gtk::RadioButtonGroup mouse_ctl;
-	button = Gtk::manage( new Gtk::RadioToolButton( mouse_ctl, "Rotate/Zoom"));
-	button->signal_clicked().connect(
-		sigc::mem_fun( *this, &basic_app::on_rotate_clicked));
-	tb.append( *button);
-	button = Gtk::manage( new Gtk::RadioToolButton( mouse_ctl, "Pan"));
-	button->signal_clicked().connect(
-		sigc::mem_fun( *this, &basic_app::on_pan_clicked));
-	tb.append( *button);
-	
-	// Compose the frame and scen widgets.
-	frame.pack_start( tb, Gtk::PACK_SHRINK, 0);
-	frame.pack_start( scene);
-	window.add( frame);
-}
-
-void
-basic_app::run()
-{
-	scene.signal_delete_event().connect( 
-		sigc::mem_fun( *this, &basic_app::on_delete));
-	window.show_all();
-	kit.run(window);
-}
-
-void
-basic_app::on_fullscreen_clicked()
-{
-	static bool fullscreen = false;
-	if (fullscreen) {
-		window.unfullscreen();
-		fullscreen = false;
-	}
-	else {
-		window.fullscreen();
-		fullscreen = true;
-	}
-}
-
-void
-basic_app::on_pan_clicked()
-{
-	scene.core.mouse_mode = display_kernel::PAN;
-}
-
-void
-basic_app::on_rotate_clicked()
-{
-	scene.core.mouse_mode = display_kernel::ZOOM_ROTATE;
-}
-
-bool
-basic_app::on_delete( GdkEventAny*)
-{
-	scene.gl_free();
-	return true;
-}
-#endif
 
 } // !namespace cvisual
