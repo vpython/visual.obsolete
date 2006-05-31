@@ -139,6 +139,9 @@ boost::shared_ptr<font>
 font::find_font( const Glib::ustring& desc, int height)
 {
 	if (!fontmap) {
+		#ifdef G_OS_WIN32
+		int dpi = 90;
+		#else
 		int dpi = -1;
 		// TODO: Possible memory leak here:
 		Glib::RefPtr<Gdk::Screen> default_screen = Gdk::Screen::get_default();
@@ -150,6 +153,7 @@ font::find_font( const Glib::ustring& desc, int height)
 			dpi /= 1024;
 		else
 			dpi = 90;
+		#endif
 		fontmap = (PangoFT2FontMap*)pango_ft2_font_map_new();
 		pango_ft2_font_map_set_resolution( fontmap, dpi, dpi);
 	}
