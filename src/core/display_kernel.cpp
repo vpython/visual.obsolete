@@ -97,22 +97,6 @@ display_kernel::remove_light( shared_ptr<light> old_light)
 	lights.remove( old_light);
 }
 
-void 
-display_kernel::illuminate_default()
-{
-	lights.clear();
-	ambient = rgba( 0.2, 0.2, 0.2);
-	shared_ptr<light> n_light( new 
-		light( vector(0.25, 0.5, 1.0).norm(), rgba( 0.8, 0.8, 0.8)));
-	n_light->set_local( false);
-	add_light( n_light);
-	
-	n_light =  shared_ptr<light>(
-		new light( vector( -1.0, -0.25, -0).norm(), rgba( 0.3, 0.3, 0.3)));
-	n_light->set_local( false);
-	add_light( n_light);
-}
-
 // Compute the horizontal and vertial tangents of half the field-of-view.
 void 
 display_kernel::tan_hfov( double* x, double* y)
@@ -421,8 +405,8 @@ display_kernel::world_to_view_transform(
 	// TODO: This should be doable with a simple glTranslated() call, but I haven't
 	// found the magic formula for it.
 	vector camera_stereo_delta = camera_stereo_offset 
-		* up.cross( camera).norm() * whicheye;
-	camera += camera_stereo_delta;
+		* up.cross( scene_camera).norm() * whicheye;
+	scene_camera += camera_stereo_delta;
 	scene_center += camera_stereo_delta;
 	// A multiple of the number of eye_length's away from the camera to place
 	// the zero-parallax plane.
@@ -492,13 +476,12 @@ display_kernel::world_to_view_transform(
 	
 	// Finish initializing the view object.
 	if (uniform && range.x == range.y && range.x == range.z) {
-		geometry.camera = camera / gcf;
+		geometry.camera = camera;
 		geometry.tan_hfov_x = tan_hfov_x;
 		geometry.tan_hfov_y = tan_hfov_y;
 		// The true viewing vertical direction is not the same as what is needed for
 		// gluLookAt().
 		geometry.up = forward.cross_b_cross_c(up, forward).norm();
-		geometry.right = geometry.forward.cross( geometry.up);
 #if 1
 	}
 	else {
@@ -517,7 +500,6 @@ display_kernel::world_to_view_transform(
 		
 		geometry.up = (near_top-origin).norm();
 		geometry.forward = (back_origin - origin).norm();
-		geometry.right = (near_right - origin).norm();
 
 		vector near_left = ctm_inv.project( vector(-1,0,0));
 		vector far_left = ctm_inv.project( vector(-1,0,1));
