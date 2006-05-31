@@ -63,20 +63,34 @@ sphere::gl_render( const view& geometry)
 	// due to the sharp contrast on the curved surface.
 	double coverage = geometry.pixel_coverage( pos, radius);
 	int lod = 0;
-	if (coverage < 0) // Behind the camera, but still visible.
-		lod = 5;
-	else if (coverage < 20)
-		lod = 0;
-	else if (coverage < 45)
-		lod = 1;
-	else if (coverage < 85)
-		lod = 2;
-	else if (coverage < 300)
-		lod = 3;
-	else if (coverage < 600)
-		lod = 4;
-	else
-		lod = 5;
+	if (shiny()) {
+		if (coverage < 0) // Behind the camera, but still visible.
+			lod = 5;
+		else if (coverage < 25)
+			lod = 0;
+		else if (coverage < 60)
+			lod = 1;
+		else if (coverage < 150)
+			lod = 2;
+		else if (coverage < 400)
+			lod = 3;
+		else if (coverage < 1000)
+			lod = 4;
+		else
+			lod = 5;
+	}
+	else {
+		if (coverage < 0) // Behind the camera, but still visible.
+			lod = 3;
+		else if (coverage < 30)
+			lod = 0;
+		else if (coverage < 100)
+			lod = 1;
+		else if (coverage < 300)
+			lod = 2;
+		else
+			lod = 3;
+	}
 	lod += geometry.lod_adjust;
 	if (lod > 5)
 		lod = 5;
