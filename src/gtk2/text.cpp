@@ -3,6 +3,7 @@
 #include "util/errors.hpp"
 #include "util/gl_enable.hpp"
 #include "util/texture.hpp"
+#include "wrap_gl.hpp"
 
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
@@ -17,7 +18,6 @@
 #include <map>
 #include <utility>
 #include <iostream>
-#include <GL/gl.h>
 #include <inttypes.h>
 
 namespace cvisual {
