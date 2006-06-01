@@ -30,48 +30,28 @@ Source: "Lib\idlelib\config-main.def"; DestDir: "{app}\Lib\idlelib\"; Flags: uni
 ;
 Source: "@WIN32_CWD@\site-packages\*.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\mingwm10.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "C:\MinGW\bin\boost_python.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual 
+Source: "C:\MinGW\bin\boost_python-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual 
+Source: "C:\MinGW\bin\boost_thread-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "@WIN32_SRCDIR@\site-packages\visual\*.py"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_SRCDIR@\site-packages\visual\*.gif"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_SRCDIR@\site-packages\visual\*.glade"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_SRCDIR@\site-packages\visual\*.png"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 ;
 ; Uncomment the following line after compiling .pyc files, and rebuild installer:
 ;Source: "Lib\site-packages\visual\*.pyc"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 ; 
 Source: "include\Numeric\*.h"; DestDir: "{app}\include\Numeric\"; Components: Numeric
 Source: "Lib\site-packages\Numeric.pth"; DestDir: "{app}\Lib\site-packages\"; Components: Numeric
-Source: "Lib\site-packages\Numeric\*.py"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: Numeric
-Source: "Lib\site-packages\Numeric\*.pyc"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: Numeric
-Source: "Lib\site-packages\Numeric\*.pyd"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: Numeric
-Source: "Lib\site-packages\Numeric\FFT\*.py"; DestDir: "{app}\Lib\site-packages\Numeric\FFT\"; Components: Numeric
-Source: "Lib\site-packages\Numeric\FFT\*.pyd"; DestDir: "{app}\Lib\site-packages\Numeric\FFT\"; Components: Numeric
-Source: "Lib\site-packages\Numeric\MA\*.py"; DestDir: "{app}\Lib\site-packages\Numeric\MA\"; Components: Numeric
-Source: "Lib\site-packages\Numeric\RNG\*.py"; DestDir: "{app}\Lib\site-packages\Numeric\RNG\"; Components: Numeric
-Source: "Lib\site-packages\Numeric\RNG\*.pyd"; DestDir: "{app}\Lib\site-packages\Numeric\RNG\"; Components: Numeric
+Source: "Lib\site-packages\Numeric\*.py"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: Numeric; Flags: recursesubdirs
+Source: "Lib\site-packages\Numeric\*.pyc"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: Numeric; Flags: recursesubdirs
+Source: "Lib\site-packages\Numeric\*.pyd"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: Numeric; Flags: recursesubdirs
 ;
 Source: "include\numarray\*.h"; DestDir: "{app}\include\numarray\"; Components: numarray
-Source: "Lib\site-packages\numarray\*.py"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray
-Source: "Lib\site-packages\numarray\*.pyc"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray
-Source: "Lib\site-packages\numarray\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray
+Source: "Lib\site-packages\numarray\*.py"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray; Flags: recursesubdirs
+Source: "Lib\site-packages\numarray\*.pyc"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray; Flags: recursesubdirs
+Source: "Lib\site-packages\numarray\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray; Flags: recursesubdirs
 Source: "Lib\site-packages\numarray\LICENSE.txt"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray
 Source: "Lib\site-packages\numarray\testdata.fits"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray
-Source: "Lib\site-packages\numarray\codegenerator\*.py"; DestDir: "{app}\Lib\site-packages\numarray\codegenerator\"; Components: numarray
-Source: "Lib\site-packages\numarray\convolve\*.py"; DestDir: "{app}\Lib\site-packages\numarray\convolve\"; Components: numarray
-Source: "Lib\site-packages\numarray\convolve\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\convolve\"; Components: numarray
-Source: "Lib\site-packages\numarray\examples\*.py"; DestDir: "{app}\Lib\site-packages\numarray\examples\"; Components: numarray
-Source: "Lib\site-packages\numarray\examples\convolve\*.py"; DestDir: "{app}\Lib\site-packages\numarray\examples\convolve\"; Components: numarray
-Source: "Lib\site-packages\numarray\examples\convolve\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\examples\convolve\"; Components: numarray
-Source: "Lib\site-packages\numarray\fft\*.py"; DestDir: "{app}\Lib\site-packages\numarray\fft\"; Components: numarray
-Source: "Lib\site-packages\numarray\fft\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\fft\"; Components: numarray
-Source: "Lib\site-packages\numarray\image\*.py"; DestDir: "{app}\Lib\site-packages\numarray\image\"; Components: numarray
-Source: "Lib\site-packages\numarray\image\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\image\"; Components: numarray
-Source: "Lib\site-packages\numarray\linear_algebra\*.py"; DestDir: "{app}\Lib\site-packages\numarray\linear_algebra\"; Components: numarray
-Source: "Lib\site-packages\numarray\linear_algebra\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\linear_algebra\"; Components: numarray
-Source: "Lib\site-packages\numarray\ma\*.py"; DestDir: "{app}\Lib\site-packages\numarray\ma\"; Components: numarray
-Source: "Lib\site-packages\numarray\ma\Legal.htm"; DestDir: "{app}\Lib\site-packages\numarray\ma\"; Components: numarray
-Source: "Lib\site-packages\numarray\mlab\*.py"; DestDir: "{app}\Lib\site-packages\numarray\mlab\"; Components: numarray
-Source: "Lib\site-packages\numarray\nd_image\*.py"; DestDir: "{app}\Lib\site-packages\numarray\nd_image\"; Components: numarray
-Source: "Lib\site-packages\numarray\nd_image\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\nd_image\"; Components: numarray
-Source: "Lib\site-packages\numarray\random_array\*.py"; DestDir: "{app}\Lib\site-packages\numarray\random_array\"; Components: numarray
-Source: "Lib\site-packages\numarray\random_array\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\random_array\"; Components: numarray
 ;
 Source: "@WIN32_SRCDIR@\examples\*.py"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
 ;
@@ -82,8 +62,11 @@ Source: "@WIN32_SRCDIR@\docs\visual\*.css"; DestDir: "{app}\Lib\site-packages\vi
 Source: "@WIN32_SRCDIR@\docs\visual\*.txt"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "@WIN32_SRCDIR@\docs\visual\icons\*.gif"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\icons\"; Components: Documentation
 
+Source: "C:\msys\1.0\local\gtkrun\*"; DestDir: "{app}\Lib\site-packages\gtkrun\"; Components: Gtk; Flags: recursesubdirs
+
 [Components]
 Name: Visual; Description: "The Visual extension modue to Python"; Types: full compact custom; Flags: fixed
+Name: Gtk; Description: "The Gimp Tool Kit runtime (version 2.8)"; Types: full compact custom; Flags: fixed
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
 Name: Numeric; Description: "Numeric Python 23.8 {code:NumericStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumeric( 'C:\Python@WIN32_PYTHON_VERSION@' )
