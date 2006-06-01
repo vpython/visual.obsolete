@@ -1,3 +1,23 @@
+Visual 4.beta0
+===============================================================================
+	NEW FEATURES:
+	* A menu bar with some simple functions
+	* New mouse interaction mode "pan", selectable by the user
+	* Most objects support an "alpha" color property, that controls 
+		transparency.  This also makes foo.color a 4-tuple (RGBA)
+	* Most objects support a "shininess" property, that controls specular 
+		highlighting (value between 0 and 1, exactly 0 or 1 disable it)
+	* Most objects can have their lighting explicitly turned off 
+		(foo.lit = False)
+	* Simple texturing support (see examples/textest.py)
+	* Advanced lighting support, including spotlights, attenuation, and local
+		 (non-infinity) sources (no demo as yet, see help(light))
+	* Supports integration with other GUI toolkits, such as PyGTK, WxPython,
+		PyObjC, etc (no demo yet)
+	
+	BUGS FIXED:
+	* Translucent labels occlude each other in a spatially-correct way
+
 Visual 3.2.4
 ===============================================================================
 	BUGS FIXED:

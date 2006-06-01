@@ -15,26 +15,23 @@ I.  Prerequisites:
 	of the packages to ensure that the required header files are 
 	available.
 
-	GNU g++ version 3.2.x or >= 3.3.1 (gcc.gnu.org).
+	GNU g++ version 3.2.x or >= 3.3.1 (3.4.6 reccomended) (gcc.gnu.org).
 	Python 2.2.x or 2.3.x or 2.4.x (www.python.org).
-	The Boost C++ libraries version 1.30.0, 1.30.2, or 1.31 and higher 
+	The Boost C++ libraries version 1.31 and higher (1.33.1 reccomended)
 		(www.boost.org).  Note that 1.31 is required if you are using Python 
 		2.3 or higher, and is reccomended in any case due to getting much
 		better error messages.  1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
 		
-		IMPORTANT: Boost 1.33 did NOT work with Visual when tried Dec. 2005.
-		(But on Ubuntu Linux it's called 1.32.0+1.33.0, and it works, Feb. 2006.)
-		
-	Gtk+ 1.2.x (Not required on Windows) (www.gtk.org).
-	GtkGLArea 1.2.x (Not required on Windows) (www.gnome.org).
+	GtkGLExtmm 1.2.x (gtkglext.sourceforge.net).
+	libglademm (www.gtkmm.org).
 	Numeric Python AND/OR the Python Numarray library (numpy.sourceforge.net).
 	An implementation of OpenGL.
 	
 	On Microsoft Windows, MinGW and MSYS are required to build VPython from 
 	source.
 	
-	A.  Apple OSX (Version 10.2.x)
+	A.  Apple OSX (Version 10.2.x) WARNING: This is woefully out of date
 		- Go to www.apple.com/macosx/features/x11/download and download
 		both X11 and the X11 SDK.
 		- Install fink from fink.sourceforge.net.  Answer 'y' when asked
@@ -63,7 +60,7 @@ I.  Prerequisites:
 		OpenGL is provided with the standard OS installation.
 	# TODO: include directions for building Boost.Python on OSX(gulp).
 	
-	B.  Microsoft Windows
+	B.  Microsoft Windows # Also really out of date
 		Download and install the MinGW 3.1 and MSYS 1.0.9 packages from
 		www.mingw.org.  Also download the MinGW Utils package (version 0.1 or
 		higher).  You may need to add C:\mingw\bin to your PATH.
@@ -95,14 +92,16 @@ I.  Prerequisites:
 		additions please write to visualpython-users@lists.sourceforge.net.
 		
 		Users of Debian Sid, Sarge, and derivatives will need these packages:
-			python2.3-dev
-			python2.3-numeric *
-			python2.3-numarray *
-			gtkglarea5-dev
-			libgtk1.2-dev
+			python2.4-dev
+			python2.4-numeric-ext *
+			python2.4-numarray-ext *
+			libglademm-2.4-dev
 			g++
 			libboost-python-dev
-			libglu-dev (xlibmesa-glu-dev OR nvidia-glx-dev) **
+			libboost-thread-dev
+			libboost-dev
+			libglu-dev ((libglu-mesa-dev and libgl1-mesa-dri) OR nvidia-glx-dev) **
+			GtkGLExtmm 1.2.x and GtkGLExt 1.2.x from source (gtkglext.sourceforge.net)
 		
 		* VPython may be built against Numeric, Numarray, or both.  If you
 		build VPython with support for both, you can select which library
@@ -114,9 +113,11 @@ I.  Prerequisites:
 		nvidia-glx-dev.  Other drivers may require you to use a specific -dev
 		package for that driver.
 			
-		Users of Debian Woody and derivatives will need to obtain backports 
-		of the above from (eg.) www.backports.org.
+		Users of Debian Sarge and derivatives will need to obtain backports 
+		of some of the above from (eg.) www.backports.org.
 		
+		WARNING: The following is out of date; Notes from a Fedora or Suse
+			user are welcome.
 		Users of RPM-based systems will need the following packages and their
 		dependancies:
 			boost-python-devel
@@ -126,6 +127,7 @@ I.  Prerequisites:
 			gtkglarea-devel
 			g++
 		
+		WARNING: Also out-of-date...
 		Users of Gentoo will need these packages and their dependancies from
 		portage:
 			boost
@@ -139,13 +141,14 @@ I.  Prerequisites:
 		pass --without-numarray to VPython's configure.
 		
 		WARNING: You cannot build some dependancies with G++ 3.3.x or 3.2.x and
-		others with G++ 3.4.x; the two are not compatable with each other.
+		others with G++ 3.4.x; the two are not compatable with each other.  I
+		think that 3.4.x is compatable with 4.0.x and 4.1.x.
 			
 		You must have an implementation of OpenGL (aka GLX) installed on your
 		system.  Mesa (and the DRI), Nvidia, and ATI each provide usable GLX
 		implementaions.  Properly configuring OpenGL may involve editing
-		/etc/X11/XF86Config-4 and is not covered here.  A simple operational 
-		test is to run the `glxgears` program.
+		/etc/X11/XF86Config-4 (or xorg.conf) and is not covered here.  A simple 
+		operational test is to run the `glxgears` program.
 		
 
 II.   Configuration 
