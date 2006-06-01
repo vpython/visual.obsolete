@@ -14,6 +14,8 @@ Visual 4.beta0
 		 (non-infinity) sources (no demo as yet, see help(light))
 	* Supports integration with other GUI toolkits, such as PyGTK, WxPython,
 		PyObjC, etc (no demo yet)
+	* frame.scale linearly scales all of the frame's children's dimensions
+		Negative values are allowed.
 	
 	BUGS FIXED:
 	* Translucent labels occlude each other in a spatially-correct way
