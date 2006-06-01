@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
+#include <unistd.h>
 
 #include <stdexcept>
 
@@ -85,9 +86,8 @@ rate_timer::delay( double _delay)
 	}
 	else {
 		// Busy wait out the remainder of the time.
-		gettimeofday( &now, 0);
-		wait = delay - ((long long)now - origin);
 		while (wait > 0) {
+			sched_yield();
 			gettimeofday( &now, 0);
 			wait = delay - ((long long)now - origin);
 		}
