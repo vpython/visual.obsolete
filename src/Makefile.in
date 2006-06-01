@@ -74,10 +74,8 @@ CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
 
 # Distribution file list.
 DISTFILES = $(subst .lo,.cpp,$(CVISUAL_OBJS) \
-	winfont.lo main.lo winmain.lo \
 	random_device.lo winrandom_device.lo \
 	rate.lo winrate.lo \
-	render_surface.lo winrender_surface.lo \
 	timer.lo wintimer.lo) linux-symbols.map \
 	osx-symbols.txt
 
