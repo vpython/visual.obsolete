@@ -73,11 +73,7 @@ CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
 	wrap_ustring.lo numeric_texture.lo
 
 # Distribution file list.
-DISTFILES = $(subst .lo,.cpp,$(CVISUAL_OBJS) \
-	random_device.lo winrandom_device.lo \
-	rate.lo winrate.lo \
-	timer.lo wintimer.lo) linux-symbols.map \
-	osx-symbols.txt
+DISTFILES = linux-symbols.map osx-symbols.txt core gtk2 python win32
 
 # The "soversion" for this iteration of Visual.
 CVISUAL_VERSION_INFO = 3:0:0
