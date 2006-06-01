@@ -28,7 +28,7 @@ OutputDir=@WIN32_CWD@
 ; and help set for Visual before building package.
 Source: "Lib\idlelib\config-main.def"; DestDir: "{app}\Lib\idlelib\"; Flags: uninsneveruninstall
 ;
-Source: "@WIN32_CWD@\site-packages\*.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_CWD@\site-packages\cvisual.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\mingwm10.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\boost_python-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual 
 Source: "C:\MinGW\bin\boost_thread-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
