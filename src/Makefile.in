@@ -191,7 +191,7 @@ else
   CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTHREAD_CFLAGS) $(PYTHON_INCLUDES)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
-  PLATFORM_OBJS = file_texture.lo random_device.lo rate.lo timer.lo
+  PLATFORM_OBJS = random_device.lo rate.lo timer.lo
 
   ifeq ($(PYTHON_PLATFORM),darwin)
     # Special rules for OSX
