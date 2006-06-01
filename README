@@ -60,7 +60,7 @@ src/test/
 	
 
 TODO (*-ed items are must-do, w/l items are wishlist items):
-	* Port to GTK on Windows
+	* Port to GTK on Windows (done)
 	* Forward-port changes to support numeric/numarray (done)
 	* Remove libgle dependancy; integrate advanced curve type (done)
 	* Provide simple texture API (done)
@@ -69,10 +69,10 @@ TODO (*-ed items are must-do, w/l items are wishlist items):
 	* Verify performance of the autoscaler, particularly with regards to
 		frustum depth parameters. (done)
 	* Autotoolize the project (done)
-	* Fix any+all bugs identified in examples/*.py
+	* Fix any+all bugs identified in examples/*.py (in progress)
 	* Provide compatability interface for lighting (done)
-	* Update INSTALL.txt, NEWS.txt
-	-------- 3.0.ALPHA0 release here ---------
+	* Update INSTALL.txt, NEWS.txt (done)
+	-------- 4.0.BETA0 release here ---------
 	* Write demo of display_kernel integration using PyGTK
 	* Generic texture support for all objects.
 	* Generic transparency for all objects.  Consider full-scene polygon sorting
@@ -87,7 +87,6 @@ TODO (*-ed items are must-do, w/l items are wishlist items):
 	* Investigate slowness (mostly done)
 	* Add points object
 		- support GL_POINT_SPRITE?
-	----------- 3.0.BETA0 release here ---------------
 	* Additional features as users request
 	* Fix bugs identified with ALPHA0 and BETA0
 	
