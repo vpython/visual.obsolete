@@ -42,14 +42,16 @@ PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
 AC_SUBST([GTHREAD_CFLAGS])
 AC_SUBST([GTHREAD_LIBS])
 
-# Some Windows-specific macros.  The first two are used exclusively by the
-# .iss.in script
-# The current working directory, as a backslashified Win32 style path.
-AC_SUBST([WIN32_CWD], [`pwd -W | sed -e "s/\\//\\\\\/g"`])
-# The top-level source directory.
-AC_SUBST([WIN32_SRCDIR], [`cd $srcdir ; pwd -W | sed -e "s/\\//\\\\\/g"`])
-# The major.minor version of Python, with the "." stripped out.
-AC_SUBST([WIN32_PYTHON_VERSION], [`echo $PYTHON_VERSION | sed -e "s/\.//"`])
+if test $platform_win32 = yes; then
+	# Some Windows-specific macros.  The first two are used exclusively by the
+	# .iss.in script
+	# The current working directory, as a backslashified Win32 style path.
+	AC_SUBST([WIN32_CWD], [`pwd -W | sed -e "s/\\//\\\\\/g"`])
+	# The top-level source directory.
+	AC_SUBST([WIN32_SRCDIR], [`cd $srcdir ; pwd -W | sed -e "s/\\//\\\\\/g"`])
+	# The major.minor version of Python, with the "." stripped out.
+	AC_SUBST([WIN32_PYTHON_VERSION], [`echo $PYTHON_VERSION | sed -e "s/\.//"`])
+fi
 
 # Enable documentation and visualdocdir if desired
 VISUAL_DOCS()
