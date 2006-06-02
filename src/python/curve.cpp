@@ -323,7 +323,7 @@ curve::set_blue( const array& blue)
 {
 	lock L(mtx);
 	set_length( shape(blue).at(0));
-	color[make_tuple(slice(0,count), 2)] = blue;
+	color[make_tuple(slice(1,count+1), 2)] = blue;
 }
 
 void
