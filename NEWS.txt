@@ -1,5 +1,17 @@
+Visual 4.beta1
+================================================================================
+	NEW FEATURES:
+	* A new points object
+	
+	BUGS FIXED:
+	* The Gtk runtime shipped with VPython on Windows uses the Gtk-Wimp (Windows
+		native widgets) theme by default.
+	* Texture data of NxM is automatically interpreted as NxMx1
+	* Setting curve.blue works correctly
+	* Thin curve's color is rendered correctly
+
 Visual 4.beta0
-===============================================================================
+================================================================================
 	NEW FEATURES:
 	* A menu bar with some simple functions
 	* New mouse interaction mode "pan", selectable by the user
