@@ -307,6 +307,10 @@ display_kernel::report_realize()
 	glEnable( GL_NORMALIZE);
 	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable( GL_COLOR_MATERIAL);
+	// Ensures that fully transparent pixels don't write into the depth buffer,
+	// ever.
+	glEnable( GL_ALPHA_TEST);
+	glAlphaFunc( GL_GREATER, 0.0);
 	
 	// FSAA.  Doesn't seem to have much of an effect on my TNT2 card.  Grrr.
 	if (extensions->find( "GL_ARB_multisample") != extensions->end()) {
