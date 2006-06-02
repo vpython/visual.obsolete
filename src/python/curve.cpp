@@ -45,7 +45,7 @@ float* findex( const array& a, size_t i)
 
 
 curve::curve()
-	: pos( 0), color( 0), antialias( false),
+	: pos( 0), color( 0), antialias( true),
 	radius(0.0),
 	preallocated_size(257),
 	count(0), sides(4)
@@ -651,7 +651,7 @@ void
 curve::thickline( const view& scene, size_t begin, size_t end)
 {
 	assert( end > begin);
-#if 1
+	
 	int curve_around = sides;
 	std::vector<vector> projected;
 	std::vector<vector> normals;
@@ -815,70 +815,6 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	}
 	if (!mono)
 		glDisableClientState( GL_COLOR_ARRAY);
-#else
-	std::vector<rgb> tcolor;
-	std::vector<vector> spos;
-	double (*used_color)[3] = &((converter<double>*)index( color, begin-1))->data;
-	double (*used_pos)[3] = &((converter<double>*)index( pos, begin-1))->data;
-	
-	gleSetNumSides(4);
-	gleSetJoinStyle( TUBE_JN_ANGLE | TUBE_NORM_PATH_EDGE | TUBE_NORM_EDGE);
-	
-	if (scene.gcf != 1.0) {
-		// Must scale the pos data.
-		std::vector<vector> tmp(end-begin+2);
-		spos.swap( tmp);
-		const double* pos_i = index( pos, begin-1);
-		const double* pos_end = index( pos, end+1);
-		for (std::vector<vector>::iterator i = spos.begin(); 
-				i < spos.end() && pos_i < pos_end; ++i, pos_i += 3) {
-			i->x = pos_i[0] * scene.gcf;
-			i->y = pos_i[1] * scene.gcf;
-			i->z = pos_i[2] * scene.gcf;
-		}
-		used_pos = &((converter<double>*)&*spos.begin())->data;
-	}
-	if (monochrome( begin, end)) {
-		// Can get away without using a color array.
-		const double* color_i = index( color, begin);
-		rgb scolor( color_i[0], color_i[1], color_i[2]);
-		if (scene.anaglyph) {
-			if (scene.coloranaglyph)
-				scolor.desaturate().gl_set();
-			else
-				scolor.grayscale().gl_set();
-		}
-		else
-			scolor.gl_set();
-		
-		glePolyCylinder( 
-			end-begin+2, used_pos,
-			0, radius * scene.gcf);
-	}
-	else {
-		if (scene.anaglyph) {
-			// Must desaturate or grayscale the color.
-			std::vector<rgb> tmp( end-begin+2);
-			tcolor.swap(tmp);
-			const double* color_i = index( color, begin-1);
-			const double* color_end = index( color, begin+1);
-			for (std::vector<rgb>::iterator i = tcolor.begin(); 
-				i < tcolor.end() && color_i < color_end; 
-				++i, color_i+=3) {
-				rgb scolor( color_i[0], color_i[1], color_i[2]);
-				if (scene.coloranaglyph)
-					*i = scolor.desaturate();
-				else
-					*i = scolor.grayscale();
-			}
-			used_color = &((converter<double>*)&*tcolor.begin())->data;
-		}
-		
-		glePolyCylinder( 
-			end-begin+2, used_pos,
-			used_color, radius * scene.gcf);
-	}
-#endif
 }
 
 void 
@@ -930,9 +866,11 @@ curve::gl_render( const view& scene)
 		glEnableClientState( GL_VERTEX_ARRAY);
 		glDisable( GL_LIGHTING);
 		// Assume monochrome.
-		glEnable( GL_BLEND);
-		glEnable( GL_LINE_SMOOTH);
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE);	
+		if (antialias) {
+			glEnable( GL_BLEND);
+			glEnable( GL_LINE_SMOOTH);
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
+		}
 	}
 	else {
 		lighting_prepare();
@@ -940,7 +878,9 @@ curve::gl_render( const view& scene)
 	}
 	while (size > 1) {
 		assert( c != c_end);
-#if 1
+		// TODO: Make a smarter caching algorithm.  Should only make a cache
+		// if the checksum has been constant for some predetermined number of
+		// rendering cycles.
 		long check = checksum( begin, begin+size);
 		if (check == c->checksum)
 			c->gl_cache.gl_render();
@@ -954,12 +894,6 @@ curve::gl_render( const view& scene)
 			c->checksum = check;
 			c->gl_cache.gl_render();
 		}
-#else
-		if (do_thinline)
-			thinline( scene, begin, begin+size);
-		else
-			thickline( scene, begin, begin+size);
-#endif
 		begin += size-1;
 		size = (begin + 256 < true_size)
 			? 256 : true_size-begin;
@@ -969,8 +903,10 @@ curve::gl_render( const view& scene)
 		glDisableClientState( GL_VERTEX_ARRAY);
 		glDisableClientState( GL_COLOR_ARRAY);
 		glEnable( GL_LIGHTING);
-		glDisable( GL_BLEND);
-		glDisable( GL_LINE_SMOOTH);
+		if (antialias) {
+			glDisable( GL_BLEND);
+			glDisable( GL_LINE_SMOOTH);
+		}
 	}
 	else {
 		shiny_complete();

@@ -19,7 +19,7 @@ using boost::python::numeric::array;
 
 class curve : public renderable
 {
- private:
+ protected:
 	// The pos and color arrays are always overallocated to make appends
 	// faster.  Whenever they are read from Python, we return a slice into the
 	// array that starts at its beginning and runs up to the last used position
@@ -38,7 +38,19 @@ class curve : public renderable
 	// index( , count+2) is used as the after-the-last point when rendering with
 	//    gle.
 	size_t count;
-
+	// Verify that the pos and color arrays have room for the requested length
+	// if not, they are grown as required and the old data is copied over.
+	void set_length( size_t new_length);
+	
+	// Returns true if the object is single-colored.
+	bool monochrome( size_t begin, size_t end);
+	
+	virtual void gl_render( const view&);
+	virtual vector get_center() const;
+	virtual void gl_pick_render( const view&);
+	virtual void grow_extent( extent&);
+	
+ private:
 	// A type used to cache (in OpenGL memory) a displaylist for a chunk of the
 	// curve.
 	struct c_cache 
@@ -51,8 +63,6 @@ class curve : public renderable
 	std::vector<c_cache> cache;
 	typedef std::vector<c_cache>::iterator cache_iterator;
 
-	// Returns true if the object is single-colored.
-	bool monochrome( size_t begin, size_t end);
 	// Returns true if the object is degenarate and should not be rendered.
  	bool degenerate() const;
 	// Returns true if the cuve follows a closed path.
@@ -77,7 +87,7 @@ class curve : public renderable
 	boost::python::object get_pos(void);
 	boost::python::object get_color(void);
 	
-	inline bool get_antialias( void) { return false; }
+	inline bool get_antialias( void) { return antialias; }
 	inline double get_radius( void) { return radius; }
 
 	void set_pos( array pos); // An Nx3 array
@@ -109,20 +119,11 @@ class curve : public renderable
 	void set_z_d( const double z);
 	
  private:
-	virtual void gl_render( const view&);
-	virtual vector get_center() const;
-	virtual void gl_pick_render( const view&);
-	virtual void grow_extent( extent&);
 	
 	void thinline( const view&, size_t begin, size_t end);
 	void thickline( const view&, size_t begin, size_t end);
 
-	// Verify that the pos and color arrays have room for the requested length
-	// if not, they are grown as required and the old data is copied over.
-	void set_length( size_t new_length);
 };
-
-void curve_init_type();
 
 } } // !namespace cvisual::python
 
