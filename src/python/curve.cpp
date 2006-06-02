@@ -533,7 +533,11 @@ curve::checksum( size_t begin, size_t end)
 vector
 curve::get_center() const
 {
-	if (count == 0)
+	// TODO: Optimize this by only recomputing the center when the checksum of
+	// the entire object has changed.
+	// TODO: Only add the "optimization" if the checksum is actually faster than
+	// computing the average value every time...
+	if (degenerate())
 		return vector();
 	vector ret;
 	const double* pos_i = index( pos, 0);
@@ -558,6 +562,8 @@ curve::gl_pick_render( const view& scene)
 void
 curve::grow_extent( extent& world)
 {
+	if (degenerate())
+		return;
 	const double* pos_i = index(pos, 0);
 	const double* pos_end = index( pos, count);
 	if (radius == 0.0)
@@ -626,7 +632,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 			glColorPointer( 3, GL_FLOAT, 0, tcolor);
 		}
 		else
-			glColorPointer( 3, GL_FLOAT, 0, index( color, begin));
+			glColorPointer( 3, GL_DOUBLE, 0, index( color, begin));
 	}
 	glDrawArrays( GL_LINE_STRIP, 0, end-begin);
 	
