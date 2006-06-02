@@ -6,6 +6,7 @@
 #include "python/convex.hpp"
 #include "python/slice.hpp"
 #include "util/gl_enable.hpp"
+#include "util/errors.hpp"
 
 #include <boost/python/extract.hpp>
 #include <boost/crc.hpp>
@@ -205,6 +206,7 @@ convex::set_length( size_t length)
 		npoints = 1;
 		
 	if (length > preallocated_size) {
+		VPYTHON_NOTE( "Reallocating buffers for a convex object");
 		std::vector<int> dims(2);
 		dims[0] = 2 * length;
 		dims[1] = 3;
