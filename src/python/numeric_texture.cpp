@@ -238,10 +238,11 @@ numeric_texture::set_data( boost::python::numeric::array data)
 	if (t == cfloat_t || t == cdouble_t || t == object_t || t == notype_t)
 		throw std::invalid_argument( "Invalid texture data type");
 	std::vector<int> dims = shape( data);
-	if (dims.size() != 3) {
-		throw std::invalid_argument( "Texture data must be NxMxC");
+	if (dims.size() != 3 && dims.size() != 2) {
+		throw std::invalid_argument( "Texture data must be NxMxC or NxM");
 	}
-	if (dims[2] < 1 || dims[2] > 4) {
+	if (dims.size() == 3)
+		if (dims[2] < 1 || dims[2] > 4) {
 		throw std::invalid_argument( 
 			"Texture data must be NxMxC, where C is between 1 and 4 (inclusive)");
 	}
@@ -260,7 +261,7 @@ numeric_texture::set_data( boost::python::numeric::array data)
 	texdata = data;
 	data_height = dims[0];
 	data_width = dims[1];
-	data_channels = dims[2];
+	data_channels = dims.size() == 3 ? dims[2] : 1;
 	have_alpha = (
 		data_channels == 2 || 
 		data_channels == 4 ||
