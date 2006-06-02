@@ -70,7 +70,7 @@ CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
 	wrap_display_kernel.lo wrap_primitive.lo wrap_rgba.lo wrap_vector.lo \
 	clipping_plane.lo displaylist.lo errors.lo extent.lo gl_free.lo lighting.lo \
 	quadric.lo rgba.lo texture.lo tmatrix.lo vector.lo icososphere.lo text.lo \
-	wrap_ustring.lo numeric_texture.lo
+	wrap_ustring.lo numeric_texture.lo points.lo
 
 # Distribution file list.
 DISTFILES = linux-symbols.map osx-symbols.txt core gtk2 python win32

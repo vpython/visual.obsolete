@@ -8,6 +8,7 @@
 #include "python/curve.hpp"
 #include "python/faces.hpp"
 #include "python/convex.hpp"
+#include "python/points.hpp"
 
 #include <boost/python/class.hpp>
 #include <boost/python/args.hpp>
@@ -100,6 +101,51 @@ wrap_arrayobjects()
 		.def( "set_pos", &convex::set_pos_l)
 		.def( "get_pos", &convex::get_pos)
 		;
+
+	using python::points;
+
+	void (points::*pappend_v_r)( vector, rgba) = &points::append;
+	void (points::*pappend_v)( vector) = &points::append;
+	
+	class_<points, bases<renderable> >( "points")
+		.def( init<const points&>())
+		.add_property( "size", &points::get_size, &points::set_size)  // AKA thickness.
+		.add_property( "antialias", &points::get_antialias, &points::set_antialias)
+		.def( "get_color", &points::get_color)
+		.def( "set_color", &points::set_color_l)
+		.def( "set_color", &points::set_color)
+		.def( "set_color", &points::set_color_t)
+		.def( "set_red", &points::set_red_l)
+		.def( "set_red", &points::set_red_d)
+		.def( "set_red", &points::set_red)
+		.def( "set_green", &points::set_green_l)
+		.def( "set_green", &points::set_green_d)
+		.def( "set_green", &points::set_green)
+		.def( "set_blue", &points::set_blue_l)
+		.def( "set_blue", &points::set_blue_d)
+		.def( "set_blue", &points::set_blue)
+		.def( "set_alpha", &points::set_alpha_l)
+		.def( "set_alpha", &points::set_alpha_d)
+		.def( "set_alpha", &points::set_alpha)
+		.def( "set_pos", &points::set_pos_v)
+		.def( "get_pos", &points::get_pos)
+		.def( "set_pos", &points::set_pos_l)
+		.def( "set_pos", &points::set_pos)
+		.def( "set_x", &points::set_x_l)
+		.def( "set_x", &points::set_x_d)
+		.def( "set_x", &points::set_x)
+		.def( "set_y", &points::set_y_l)
+		.def( "set_y", &points::set_y_d)
+		.def( "set_y", &points::set_y) 
+		.def( "set_z", &points::set_z_l)
+		.def( "set_z", &points::set_z_d)
+		.def( "set_z", &points::set_z)
+		.def( "append", pappend_v_r, args( "pos", "color"))
+		.def( "append", &points::append_rgba,
+			(args("pos"), args("r")=-1, args("g")=-1, args("b")=-1, args("a")=-1))
+		.def( "append", pappend_v, args("pos"))
+		;
+
 }
 
 } // !namespace cvisual
