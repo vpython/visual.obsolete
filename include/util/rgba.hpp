@@ -34,6 +34,8 @@ class rgba
 		: red(r), green(g), blue(b), alpha(a) {}
 	inline rgba( float bw)
 		: red(bw), green(bw), blue(bw), alpha(1) {}
+	inline explicit rgba( const float* c)
+		: red(c[0]), green(c[1]), blue(c[2]), alpha( c[3]) {}
 			
 	/** Convert to HSVA, lower saturation by 50%, convert back to RGBA. 
 		@return The desaturated color.
