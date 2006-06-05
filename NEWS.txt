@@ -12,7 +12,7 @@ Visual 4.beta1
 			property antialias: boolean; If true, points are rounded.
 				otherwise, they are square.
 		Caveats:
-		if "GL_ARB_point_parameters" in scene.extensions:
+		if "GL_ARB_point_parameters" in scene.info():
 			then type = "world" will work.
 		else:
 			type is silently ignored and considered to be "screen"
@@ -29,6 +29,9 @@ Visual 4.beta1
 	* Texture data of NxM is automatically interpreted as NxMx1
 	* Setting curve.blue works correctly
 	* Thin curve's color is rendered correctly
+	
+	KNOWN ISSUES:
+	* The Windows build will only run on Windows XP (Pro and Home) and 2000.
 
 Visual 4.beta0
 ================================================================================
