@@ -1,11 +1,31 @@
 Visual 4.beta1
 ================================================================================
 	NEW FEATURES:
-	* A new points object
+	* A new points object:
+		class points(cvisual.renderable):
+			property pos: Nx3 Numeric double array
+			property color: Nx4 Numeric float array
+			property size: double; the size of every point in the array, in
+				either pixels or world-space units
+			property type: "world" or "screen"; Defines whether a points object's
+				size property is defined in world coordinates or screen coordinates
+			property antialias: boolean; If true, points are rounded.
+				otherwise, they are square.
+		Caveats:
+		if "GL_ARB_point_parameters" in scene.extensions:
+			then type = "world" will work.
+		else:
+			type is silently ignored and considered to be "screen"
+		There is an implementation-defined size range for either round or
+		square points, which is not easily visible to client programs at this
+		time.  Specifying a size outside this range will cause it to be
+		sliently clamped internally to whatever range that the hardware supports.
+
 	
 	BUGS FIXED:
 	* The Gtk runtime shipped with VPython on Windows uses the Gtk-Wimp (Windows
 		native widgets) theme by default.
+	* Several DLL's in the Gtk runtime have been fixed
 	* Texture data of NxM is automatically interpreted as NxMx1
 	* Setting curve.blue works correctly
 	* Thin curve's color is rendered correctly
