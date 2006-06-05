@@ -11,6 +11,8 @@
 #if defined(_WIN32) || defined(_MSC_VER)
 # define WIN32_LEAN_AND_MEAN 1
 # include <windows.h>
+#else
+# define GL_GLEXT_PROTOTYPES 1
 #endif
 
 #include <GL/gl.h>
