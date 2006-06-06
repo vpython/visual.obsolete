@@ -289,17 +289,13 @@ render_surface::on_button_press_event( GdkEventButton* event)
 bool 
 render_surface::on_button_release_event( GdkEventButton* event)
 {
-	if (!object_clicked.empty() && mouse.pick
-			&& event->button == 1) {
-		object_clicked( mouse.pick, mouse.pickpos);
-	}
-	
 	if (event->type != GDK_BUTTON_RELEASE)
 		// Ignore erronious condition
 		return true;
 	if (event->button > 3)
 		// Ignore extra buttons (such as scroll wheel and forward/back)
 		return true;
+	
 	mouse.set_shift( event->state & GDK_SHIFT_MASK);
 	mouse.set_ctrl( event->state & GDK_CONTROL_MASK);
 	mouse.set_alt( event->state & GDK_MOD1_MASK);
