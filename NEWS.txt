@@ -1,3 +1,10 @@
+Visual 4.beta2
+================================================================================
+	NEW FEATURES:
+	* The Windows builds are no longer dependent on Gtk+; they use the Win32
+		API directly.  Windows 98,ME,XP,2K are supported.  Windows 95 is _not_
+		supported.
+
 Visual 4.beta1
 ================================================================================
 	NEW FEATURES:
