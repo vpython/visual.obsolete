@@ -13,7 +13,6 @@
 
 #include <boost/scoped_ptr.hpp>
 
-#define USE_GLADE 1
 
 #include <gtkmm/gl/drawingarea.h>
 #include <gtkmm/main.h>
@@ -21,10 +20,7 @@
 #include <gtkmm/image.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/box.h>
-#if USE_GLADE
 #include <libglademm/xml.h>
-#endif
-#include <glibmm.h>
 
 namespace cvisual {
 using boost::scoped_ptr;
@@ -36,12 +32,8 @@ class display : public display_kernel,
 {
  private:
 	scoped_ptr<render_surface> area;
-	#if USE_GLADE
 	Glib::RefPtr<Gnome::Glade::Xml> glade_file;
 	Gtk::Window* window;
-	#else
-	scoped_ptr<Gtk::Window> window;
-	#endif
 	sigc::connection timer;
 
 	mutex mtx;

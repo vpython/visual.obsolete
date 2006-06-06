@@ -337,14 +337,9 @@ display::destroy()
 	timer.disconnect();
 	window->hide();
 	active = false;
-#if USE_GLADE
 	window = 0;
 	area.reset();
 	glade_file.clear();
-#else
-	window.reset();
-	area.reset();
-#endif
 }
 
 atomic_queue<std::string>& 
@@ -390,14 +385,9 @@ display::on_window_delete(GdkEventAny*)
 	VPYTHON_NOTE( "Closing a window from the GUI.");
 	timer.disconnect();
 	active = false;
-#if USE_GLADE
 	window = NULL;
 	area.reset();
 	glade_file.clear();
-#else
-	window.reset();
-	area.reset();
-#endif
 
 	gui_main::report_window_delete( this);
 	if (exit) {
@@ -550,8 +540,6 @@ gui_main::gui_main()
 	signal_remove_display.connect( sigc::mem_fun( *this, &gui_main::remove_display_impl));
 	signal_shutdown.connect( sigc::mem_fun( *this, &gui_main::shutdown_impl));
 }
-
-
 
 void
 gui_main::run()
