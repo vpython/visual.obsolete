@@ -180,14 +180,14 @@ label::get_opacity()
 }
 
 void
-label::set_text( Glib::ustring t)
+label::set_text( string_t t)
 {
 	lock L(mtx);
 	text = t;
 	text_changed = true;
 }
 
-Glib::ustring
+string_t
 label::get_text()
 {
 	return text;
@@ -246,14 +246,14 @@ label::get_border()
 }
 
 void 
-label::set_font_family( Glib::ustring name)
+label::set_font_family( string_t name)
 {
 	lock L(mtx);
 	font_description = name;
 	text_changed = true;
 }
 
-Glib::ustring
+string_t
 label::get_font_family()
 {
 	return font_description;
@@ -318,7 +318,7 @@ label::gl_render( const view& scene)
 	if (text_changed) {
 		boost::shared_ptr<font> texmap_font = 
 			font::find_font( font_description, int(font_size));
-		if (text == Glib::ustring())
+		if (text == string_t())
 			text_layout = texmap_font->lay_out( " ");
 		else
 			text_layout = texmap_font->lay_out( text);
