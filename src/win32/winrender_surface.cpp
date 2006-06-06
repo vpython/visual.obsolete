@@ -4,8 +4,12 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "win32/render_surface.hpp"
+#include "win32/display.hpp"
 #include "util/errors.hpp"
 #include "vpython-config.h"
+
+// For GET_X_LPARAM, GET_Y_LPARAM
+#include <windowsx.h>
 
 #include <sigc++/sigc++.h>
 
@@ -13,6 +17,11 @@
 #include <cstring>
 #include <cassert>
 #include <iostream>
+
+#include <boost/thread/thread.hpp>
+using boost::thread;
+#include <boost/lexical_cast.hpp>
+using boost::lexical_cast;
 
 namespace cvisual {
 
@@ -45,6 +54,7 @@ win32_write_critical(
 // widget that should handle a particular callback message.
 std::map<HWND, render_surface*> render_surface::widgets;
 render_surface* render_surface::current = 0;
+shared_ptr<render_surface> render_surface::selected;
 
 void
 render_surface::register_win32_class()
@@ -93,7 +103,7 @@ render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 		case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN:
 			return This->on_buttondown( wParam, lParam);
 		case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
-			return This->onbuttonup( wParam, lParam);
+			return This->on_buttonup( wParam, lParam);
 		case WM_WINDOWPOSCHANGED:
 			return This->on_windowmove( wParam, lParam);
 		default:
@@ -117,7 +127,7 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 	switch (lParam) {
 		case 0:
 			// Opening for the first time.
-			core.report_realize();
+			report_realize();
 			SetTimer( widget_handle, id, 30, &render_surface::timer_callback);
 			break;
 		case SW_PARENTCLOSING:
@@ -152,27 +162,27 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 	float dy = mouse_y - last_mousepos_y;
 	bool mouselocked = false;
 	if (middle_down) {
-		core.report_mouse_motion( dx, dy, display_kernel::MIDDLE);
+		report_mouse_motion( dx, dy, display_kernel::MIDDLE);
 		mouselocked = true;
 	}
 	if (right_down) {
-		core.report_mouse_motion( dx, dy, display_kernel::RIGHT);
+		report_mouse_motion( dx, dy, display_kernel::RIGHT);
 		mouselocked = true;
 	}
 	if (!buttondown)
-		core.report_mouse_motion( dx, dy, display_kernel::NONE);
+		report_mouse_motion( dx, dy, display_kernel::NONE);
 	
 	mouse.set_shift( wParam & MK_SHIFT);
 	mouse.set_ctrl( wParam & MK_CONTROL);
 	mouse.set_alt( GetKeyState( VK_MENU) < 0);
 	if (mouselocked) {
-		SetCursorPos( last_mousepos_x, last_mousepos_y);
+		SetCursorPos( static_cast<int>(last_mousepos_x), static_cast<int>(last_mousepos_y));
 	}
 	else {
 		last_mousepos_x = mouse_x;
 		last_mousepos_y = mouse_y;
 	}
-	mouse.cam = core.calc_camera();
+	mouse.cam = calc_camera();
 	
 	if (left_button.is_dragging())
 		mouse.push_event( drag_event( 1, mouse));
@@ -189,19 +199,19 @@ render_surface::on_size( WPARAM, LPARAM lParam)
 {
 	window_width = LOWORD(lParam);
 	window_height = HIWORD(lParam);
-	core.report_resize( window_width, window_height);
+	report_resize( window_width, window_height);
 	return 0;
 }
 
 LRESULT  
 render_surface::on_paint( WPARAM, LPARAM)
 {
-	bool sat = core.render_scene();
+	bool sat = render_scene();
 	if (!sat)
 		return 1;
 	
 	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
-		core.pick( last_mousepos_x, last_mousepos_y);
+		pick( last_mousepos_x, last_mousepos_y);
 	// TODO: Add timer cycle time munging (or at least consider it)
 	RECT dims;
 	// The following calls report the fact that the widget area has been 
@@ -293,7 +303,7 @@ found:
 		if (drop)
 			mouse.push_event( drop_event( button_id, mouse));
 		else
-			mouse.push_event( click_event( event->button, mouse));
+			mouse.push_event( click_event( button_id, mouse));
 	return 0;
 	#undef unique
 	#undef drop
@@ -363,9 +373,11 @@ render_surface::render_surface()
 	
 	// Connect callbacks from the display_kernel to this object.  These will not
 	// be called back from the core until report_realize is called.
-	core.gl_begin.connect( sigc::mem_fun( *this, &render_surface::gl_begin));
-	core.gl_end.connect( sigc::mem_fun( *this, &render_surface::gl_end));
-	core.gl_swap_buffers.connect( 
+	display_kernel::gl_begin.connect( 
+		sigc::mem_fun( *this, &render_surface::gl_begin));
+	display_kernel::gl_end.connect( 
+		sigc::mem_fun( *this, &render_surface::gl_end));
+	display_kernel::gl_swap_buffers.connect( 
 		sigc::mem_fun( *this, &render_surface::gl_swap_buffers));
 }
 
@@ -378,10 +390,10 @@ render_surface::create()
 	SystemParametersInfo( SPI_GETWORKAREA, 0, &screen, 0);
 	int style = -1;
 	if (fullscreen) {
-		x = screen.left;
-		y = screen.top;
-		window_width = screen.right - x;
-		window_height = screen.bottom - y;
+		x = static_cast<float>( screen.left);
+		y = static_cast<float>( screen.top);
+		window_width = static_cast<float>( screen.right) - x;
+		window_height = static_cast<float>( screen.bottom) - y;
 		style = WS_OVERLAPPED | WS_POPUP | WS_MAXIMIZE | WS_VISIBLE;
 	}
 	else
@@ -391,10 +403,10 @@ render_surface::create()
 		win32_class.lpszClassName,
 		title.c_str(),
 		style,
-		x > 0 ? x : CW_USEDEFAULT,
-		y > 0 ? y : CW_USEDEFAULT,
-		window_width > 0 ? window_width : CW_USEDEFAULT,
-		window_height > 0 ? window_height : CW_USEDEFAULT,
+		x > 0 ? static_cast<int>(x) : CW_USEDEFAULT,
+		y > 0 ? static_cast<int>(y) : CW_USEDEFAULT,
+		window_width > 0 ? static_cast<int>(window_width) : CW_USEDEFAULT,
+		window_height > 0 ? static_cast<int>(window_height) : CW_USEDEFAULT,
 		0,
 		0, // A unique index to identify this widget by the parent
 		GetModuleHandle(0),
@@ -451,7 +463,7 @@ void
 render_surface::destroy()
 {
 	DestroyWindow( widget_handle);
-	hwnd = 0;
+	// widget_handle = 0;
 	active = false;
 }
 
@@ -524,7 +536,7 @@ render_surface::get_height()
 }
 	
 void 
-render_surface::set_visible( bool v)
+render_surface::set_visible( bool vis)
 {
 	if (vis && !active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
@@ -630,8 +642,8 @@ render_surface::get_selected()
 /******************************* gui_main implementatin **********************/
 
 gui_main* gui_main::self = 0;
-mutex* gui_main::init_lock = 0;
-condition* gui_main::init_signal = 0;
+mutex* volatile gui_main::init_lock = 0;
+condition* volatile gui_main::init_signal = 0;
 sigc::signal0<void> gui_main::on_shutdown;
 
 
@@ -642,7 +654,7 @@ gui_main::gui_main()
 {
 	// Force the create of a message queue
 	MSG message;
-	PeekMessage( &message, NULL, WM_USER, WM_USER, PM_NOREMOVE)
+	PeekMessage( &message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 }
 
 void 

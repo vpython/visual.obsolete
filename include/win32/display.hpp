@@ -6,61 +6,7 @@
 
 namespace cvisual {
 
-class display : public display_kernel
-{
- private:
-// TODO: Does this actually have to have a new window class type?
-// Yes: To handle keyboard events, at least.
-	HWND window_handle;
-	static LRESULT CALLBACK 
-	dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	
-	static void register_win32_class();
-	static WNDCLASS win32_class;
-	static std::map<HWND, basic_app*> windows;
-	
-	// Message handlers
-	LRESULT on_size( WPARAM, LPARAM);
-	LRESULT on_create( WPARAM, LPARAM);
-	LRESULT on_command( WPARAM, LPARAM);
-	LRESULT on_getminmaxinfo( WPARAM, LPARAM);
-	
- public:
-	display();
-	virtual ~display();
-	
-	void set_x( float x);
-	float get_x();
- 
-	void set_y( float y);
-	float get_y();
- 
-	void set_width( float w);
-	float get_width();
- 
-	void set_height( float h);
-	float get_height();
-	
-	void set_visible( bool v);
-	bool get_visible();
-
-	void set_title( std::string n_title);
-	std::string get_title();
- 
-	bool is_fullscreen();
-	void set_fullscreen( bool);
-	
-	virtual void add_renderable( shared_ptr<renderable>);
-	virtual void add_renderable_screen( shared_ptr<renderable>);
-	
-	static void set_selected( shared_ptr<display> d);
-	static shared_ptr<display> get_selected();
-	
-	static void set_dataroot( Glib::ustring dataroot);
-	
-	atomic_queue<std::string>& get_kb();
-	mouse_t* get_mouse();
-};
+typedef render_surface display;
 
 class gui_main
 {
@@ -72,22 +18,29 @@ class gui_main
  		VPYTHON_SHUTDOWN
  	};
  	
+ 	// Signal functions, called from the Python thread
+ 	void signal_add_display();
+ 	void signal_remove_display();
+ 	void signal_shutdown();
+ 	
+ 	// And their implementations, executed in the Win32 thread
  	void add_display_impl();
 	void remove_display_impl();
 	void shutdown_impl();
- 	
+	
 	// Storage used for communication, initialized by the caller, filled by the
 	// callee.  Some of them are marked volitile to inhibit optimizations that
 	// could prevent a read operation from observing the change in state.
+ 	DWORD idThread;
 	mutex call_lock;
 	condition call_complete;
-	display* caller;
+	render_surface* caller;
 	volatile bool returned;
 	volatile bool waiting_allclosed;
 	volatile bool thread_exited;
 	volatile bool shutting_down;
 	
-	std::list<display*> displays;
+	std::list<render_surface*> displays;
 	
 	// Componants of the startup sequence.
 	gui_main();
@@ -95,8 +48,8 @@ class gui_main
 	static gui_main* self; //< Always initialized by the thread after it starts
 	// up.
 	// init_{signal,lock} are always initialized by the Python thread.
-	static mutex* init_lock;
-	static condition* init_signal;
+	static mutex* volatile init_lock;
+	static condition* volatile init_signal;
 	static void thread_proc(void);
 	static void init_thread(void);
 	

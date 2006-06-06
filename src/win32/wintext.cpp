@@ -1,4 +1,7 @@
 #include "win32/text.hpp"
+#include "util/errors.hpp"
+
+#include <boost/lexical_cast.hpp>
 
 namespace cvisual {
 
@@ -23,14 +26,14 @@ font::font( const std::string& desc, int size)
 		font_handle = (HFONT)GetStockObject( SYSTEM_FONT);
 	}
 	listbase = glGenLists(256);
-	SelectObject( dev_context, font);
+	SelectObject( dev_context, font_handle);
 	wglUseFontBitmaps( dev_context, 0, 256, listbase);
 }
 
 font::~font()
 {
 	if (listbase >= 0) {
-		glDeleteLists( listbase);
+		glDeleteLists( listbase, 256);
 		listbase = -1;
 	}
 }
