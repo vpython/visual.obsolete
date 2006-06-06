@@ -32,15 +32,6 @@ VISUAL_NUMERICLIBS()
 AM_CHECK_PYTHON_HEADERS([], [
 	AC_MSG_ERROR([A suitable python interpreter was found, but you do not have the header files required for building C/C++ extensions to python, or another problem was encoutered when compiling a program that uses Python.h.])])
 
-PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4 libglademm-2.4 freetype2, ,
-	[AC_MSG_ERROR(gtkglextmm 1.2+, pangoft2, glibmm-2.4, and pangomm-1.4 libglademm-2.4 are required on Unix-like systems)])
-AC_SUBST([GTK_LIBS])
-AC_SUBST([GTK_CFLAGS])
-
-PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
-	[AC_MSG_ERROR(GThread 2.0+ is required on Unix-like systems)])
-AC_SUBST([GTHREAD_CFLAGS])
-AC_SUBST([GTHREAD_LIBS])
 
 if test $platform_win32 = yes; then
 	# Some Windows-specific macros.  The first two are used exclusively by the
@@ -51,6 +42,20 @@ if test $platform_win32 = yes; then
 	AC_SUBST([WIN32_SRCDIR], [`cd $srcdir ; pwd -W | sed -e "s/\\//\\\\\/g"`])
 	# The major.minor version of Python, with the "." stripped out.
 	AC_SUBST([WIN32_PYTHON_VERSION], [`echo $PYTHON_VERSION | sed -e "s/\.//"`])
+	PKG_CHECK_MODULES( GTK, sigc++-2.0, ,
+		[AC_MSG_ERROR( sigc++ 2.x is required in Windows)])
+	AC_SUBST([GTK_LIBS])
+	AC_SUBST([GTK_CFLAGS])
+else
+	PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4 libglademm-2.4 freetype2, ,
+		[AC_MSG_ERROR(gtkglextmm 1.2+, pangoft2, glibmm-2.4, and pangomm-1.4 libglademm-2.4 are required on Unix-like systems)])
+	AC_SUBST([GTK_LIBS])
+	AC_SUBST([GTK_CFLAGS])
+	
+	PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
+		[AC_MSG_ERROR(GThread 2.0+ is required on Unix-like systems)])
+	AC_SUBST([GTHREAD_CFLAGS])
+	AC_SUBST([GTHREAD_LIBS])
 fi
 
 # Enable documentation and visualdocdir if desired
