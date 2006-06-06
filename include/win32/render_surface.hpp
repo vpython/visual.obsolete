@@ -23,7 +23,7 @@ namespace cvisual {
 class basic_app;
 class bitmap_font;
 
-class render_surface : public SigC::Object
+class render_surface : public sigc::renderable
 {
  private:
 	friend class basic_app;
@@ -74,10 +74,11 @@ class render_surface : public SigC::Object
 	display_kernel core;
 
 	// Signal fired by button down + button up
-	SigC::Signal1<void, shared_ptr<renderable> > object_clicked;
+	sigc::signal1<void, shared_ptr<renderable> > object_clicked;
 	static render_surface* current;
 };
 
+#if 0
 class basic_app
 {
  private:
@@ -111,6 +112,7 @@ class basic_app
 	// Shows the main window and enters the message loop, returning when done.
 	void run();
 };
+#endif
 
 } // !namespace cvisual
 

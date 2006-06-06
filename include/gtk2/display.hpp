@@ -65,7 +65,7 @@ class display : public display_kernel,
 	
  public:
 	display();
-	~display();
+	virtual ~display();
 
 	void set_x( float x);
 	float get_x();
@@ -90,8 +90,10 @@ class display : public display_kernel,
 
 	virtual void add_renderable( shared_ptr<renderable>);
 	virtual void add_renderable_screen( shared_ptr<renderable>);
+	
 	static void set_selected( shared_ptr<display> d);
 	static shared_ptr<display> get_selected();
+	
 	static void set_dataroot( Glib::ustring dataroot);
 	
 	// Called by the gui_main class below when this window needs to create
@@ -115,7 +117,7 @@ class display : public display_kernel,
 // A singlton.  This class provides all of the abstraction from the Gtk::Main
 // object, in addition to providing asynchronous communication channels between
 // threads.
-class gui_main : public SigC::Object
+class gui_main : public sigc::trackable
 {
  private:
 	Gtk::Main kit;

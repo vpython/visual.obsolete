@@ -90,7 +90,7 @@ struct lights_to_py_list
 };
 
 // The purpose of this class is to expose the signal-handling methods to Python.
-class py_display_kernel : public display_kernel, public SigC::Object
+class py_display_kernel : public display_kernel, public sigc::trackable
 {
  private:
 	py::object gl_begin_cb;
