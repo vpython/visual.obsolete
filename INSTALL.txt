@@ -22,8 +22,7 @@ I.  Prerequisites:
 		2.3 or higher, and is reccomended in any case due to getting much
 		better error messages.  1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
-		
-	GtkGLExtmm 1.2.x (gtkglext.sourceforge.net).
+	GtkGLExtmm 1.2.x (gtkglext.sourceforge.net)
 	libglademm (www.gtkmm.org).
 	Numeric Python AND/OR the Python Numarray library (numpy.sourceforge.net).
 	An implementation of OpenGL.
@@ -100,7 +99,7 @@ I.  Prerequisites:
 			libboost-python-dev
 			libboost-thread-dev
 			libboost-dev
-			libglu-dev ((libglu-mesa-dev and libgl1-mesa-dri) OR nvidia-glx-dev) **
+			libglu-dev ((libglu1-mesa-dev and libgl1-mesa-dri) OR nvidia-glx-dev) **
 			GtkGLExtmm 1.2.x and GtkGLExt 1.2.x from source (gtkglext.sourceforge.net)
 		
 		* VPython may be built against Numeric, Numarray, or both.  If you
