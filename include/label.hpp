@@ -8,7 +8,6 @@
 
 #include "renderable.hpp"
 #include "text.hpp"
-#include <glibmm/ustring.h>
 #include <vector>
 
 namespace cvisual {

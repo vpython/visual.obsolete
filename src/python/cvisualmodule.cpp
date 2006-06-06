@@ -102,7 +102,9 @@ BOOST_PYTHON_MODULE( cvisual)
 	wrap_arrayobjects();
 	python::wrap_vector_array();
 	python::wrap_scalar_array();
+#if !(defined(_WIN32) || defined(_MSC_VER))
 	wrap_glib_ustring();
+#endif
 }
 
 } // !namespace cvisual
