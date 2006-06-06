@@ -15,13 +15,14 @@ namespace Pango {
 
 namespace cvisual {
 
+typedef Glib::ustring string_t;
+
 /* There will be a platform-specifc font class, as well as layout and
  * provider classes.  The layout and provider implementations will be invisible
  * from the headers.  However, the provider will provide at least
  * boost::shared_ptr<font> create_font( const std::string& desc, int size);
  * in its implementation header.
  */
-
 class layout;
 
 class font
@@ -39,7 +40,6 @@ class font
 	static boost::shared_ptr<font> 
 	find_font( const Glib::ustring& desc = Glib::ustring(), int height = -1);
 };
-
 
 class ft2_texture;
 

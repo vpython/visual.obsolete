@@ -50,8 +50,8 @@ class label : public renderable
 	void set_opacity( double);
 	double get_opacity();
 
-	void set_text( Glib::ustring t);
-	Glib::ustring get_text();
+	void set_text( string_t t);
+	string_t get_text();
 
 	void set_space( double space);
 	double get_space();
@@ -65,8 +65,8 @@ class label : public renderable
 	void set_border( double border);
 	double get_border();
 
-	void set_font_family( Glib::ustring name);
-	Glib::ustring get_font_family();
+	void set_font_family( string_t name);
+	string_t get_font_family();
 
 	void set_font_size(double);
 	double get_font_size();
@@ -91,7 +91,7 @@ class label : public renderable
 	double border;    // space between text and box
 	
 	/// A common name for the font.
-	Glib::ustring font_description;
+	string_t font_description;
 	/// The nominal size of the font, in pixels.
 	double font_size;
 	
@@ -104,7 +104,7 @@ class label : public renderable
 	
 	// Text strings in python may be specified by the """ ... """ syntax in python.
 	// This case is handled by the layout code
-	Glib::ustring text;
+	string_t text;
 	bool text_changed;
 	boost::shared_ptr<layout> text_layout;
     
