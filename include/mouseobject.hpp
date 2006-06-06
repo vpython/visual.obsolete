@@ -140,6 +140,53 @@ shared_ptr<event> drop_event( int which, const mouse_t& mouse);
 shared_ptr<event> press_event( int which, const mouse_t& mouse);
 shared_ptr<event> drag_event( int which, const mouse_t& mouse);
 
+// Utility object for tracking mouse press, release, clicks, drags, and drops.
+struct mousebutton
+{
+	bool down;
+	bool dragging;
+	float last_down_x;
+	float last_down_y;
+	
+	mousebutton() 
+		: down(false), dragging(false), 
+		last_down_x(-1.0f), last_down_y(-1.0f) {}
+	
+	// When the button is pressed, call this function with its screen
+	// coordinate position.  It returns true if this is a unique event
+	bool press( float x, float y)
+	{
+		if (down) {
+			return false;
+		}
+		down = true;
+		last_down_x = x;
+		last_down_y = y;
+		dragging = false;
+		return true;
+	}
+	
+	// Returns true when a drag event should be generated, false otherwise
+	bool is_dragging() 
+	{
+		if (down && !dragging) {
+			dragging = true;
+			return true;
+		}
+		return false;
+	}
+	
+	// Returns (is_unique, is_drop)
+	std::pair<bool, bool> release()
+	{
+		bool unique = down;
+		down = false;
+		last_down_x = -1;
+		last_down_y = -1;
+		return std::make_pair(unique, dragging);
+	}
+};
+
 } // !namespace cvisual
 
 #endif // !VPYTHON_MOUSEOBJECT_HPP

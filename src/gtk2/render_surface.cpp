@@ -302,13 +302,13 @@ render_surface::on_button_release_event( GdkEventButton* event)
 	bool drop = false;
 	switch (event->button) {
 		case 1:
-			drop = left_button.release();
+			drop = left_button.release().second;
 			break;
 		case 2:
-			drop = middle_button.release();
+			drop = middle_button.release().second;
 			break;
 		case 3:
-			drop = right_button.release();
+			drop = right_button.release().second;
 			break;
 		default:
 			// Captured above

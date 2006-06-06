@@ -25,48 +25,7 @@ class render_surface : public Gtk::GL::DrawingArea
 	float last_mousepos_x;
 	float last_mousepos_y;
 
-	// Track mouse press, release, clicks, drags, and drops.
-	struct mousebutton
-	{
-		bool down;
-		bool dragging;
-		float last_down_x;
-		float last_down_y;
-		
-		mousebutton() 
-			: down(false), dragging(false), 
-			last_down_x(-1.0f), last_down_y(-1.0f) {}
-		
-		// When the button is pressed, call this function with its screen
-		// coordinate position
-		void press( float x, float y)
-		{
-			down = true;
-			last_down_x = x;
-			last_down_y = y;
-			dragging = false;
-		}
-		
-		// Returns true when a drag event should be generated, false otherwise
-		bool is_dragging() 
-		{
-			if (down && !dragging) {
-				dragging = true;
-				return true;
-			}
-			return false;
-		}
-		
-		// Returns true for drops, false for clicks
-		bool release()
-		{
-			down = false;
-			last_down_x = -1;
-			last_down_y = -1;
-			return dragging;
-		}
-	} left_button, right_button, middle_button;
-	
+	mousebutton left_button, right_button, middle_button;
 	mouse_t mouse;
     
 	// The length of the Glib::signal_timout, in milliseconds.
