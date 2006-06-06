@@ -39,7 +39,9 @@ class display_kernel
  	static std::string renderer;
  	static std::string version;
  	static std::string vendor;
+ protected:
 	mutable mutex mtx;
+ private:
 	
 	float window_width; ///< The last reported width of the window.
 	float window_height; ///< The last reported height of the window.
