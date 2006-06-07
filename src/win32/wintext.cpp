@@ -22,10 +22,13 @@ font::font( const std::string& desc, int size)
 	: font_handle(0), listbase(0)
 {
 	HDC dev_context = render_surface::current->dev_context;
-	if (desc == std::string() && size < 0) {
+	if (desc == std::string("") && size < 0) {
+		VPYTHON_NOTE( "Allocating default system font");
 		font_handle = (HFONT)GetStockObject( SYSTEM_FONT);
 	}
 	else {
+		VPYTHON_NOTE( "Allocating custom font: " + desc 
+			+ boost::lexical_cast<std::string>( size));
 		font_handle = CreateFont( 
 			size > 0 ? -size : 0, 
 			0, 0, 0, 0, 0, 0, 0, // width, angle, underline, bold, etc
@@ -85,10 +88,10 @@ font::find_font( const std::string& desc, int height)
 		return i->second;;
 	}
 	else {
-		VPYTHON_NOTE( "Created new font and added to cache: " + desc + ";" + 
-			boost::lexical_cast<std::string>(height));
 		boost::shared_ptr<font> ret( new font( desc, height));
 		font_cache[std::make_pair(desc, height)] = ret;
+		VPYTHON_NOTE( "Created new font and added to cache: " + desc + ";" + 
+			boost::lexical_cast<std::string>(height));
 		return ret;
 	}
 }
