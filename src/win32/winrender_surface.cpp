@@ -37,8 +37,8 @@ render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	switch (uMsg) {
 		// Handle the cases for the kinds of messages that we are listening for.
-		case WM_DESTROY:
-			return This->on_destroy( wParam, lParam);
+		case WM_CLOSE:
+			return This->on_close( wParam, lParam);
 		case WM_SIZE:
 			return This->on_size( wParam, lParam);
 		case WM_PAINT:
@@ -156,22 +156,25 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 	bool left_down = wParam & MK_LBUTTON;
 	bool middle_down = wParam & MK_MBUTTON;
 	bool right_down = wParam & MK_RBUTTON;
-	if (left_down && right_down)
+	if (left_down && right_down) {
 		middle_down = true;
+		right_down = false;
+		left_down = false;
+	}
 	bool buttondown = left_down || middle_down || right_down;
 	float mouse_x = LOWORD(lParam);
 	float mouse_y = HIWORD(lParam);
 	
 	float dx = mouse_x - last_mousepos_x;
 	float dy = mouse_y - last_mousepos_y;
-	bool mouselocked = false;
+	// bool mouselocked = false;
 	if (middle_down) {
 		report_mouse_motion( dx, dy, display_kernel::MIDDLE);
-		mouselocked = true;
+		// mouselocked = true;
 	}
 	if (right_down) {
 		report_mouse_motion( dx, dy, display_kernel::RIGHT);
-		mouselocked = true;
+		// mouselocked = true;
 	}
 	if (!buttondown)
 		report_mouse_motion( dx, dy, display_kernel::NONE);
@@ -179,13 +182,13 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 	mouse.set_shift( wParam & MK_SHIFT);
 	mouse.set_ctrl( wParam & MK_CONTROL);
 	mouse.set_alt( GetKeyState( VK_MENU) < 0);
-	if (mouselocked) {
-		SetCursorPos( static_cast<int>(last_mousepos_x), static_cast<int>(last_mousepos_y));
-	}
-	else {
-		last_mousepos_x = mouse_x;
-		last_mousepos_y = mouse_y;
-	}
+	// if (mouselocked) {
+	//	SetCursorPos( static_cast<int>(last_mousepos_x), static_cast<int>(last_mousepos_y));
+	// }
+	// else {
+	last_mousepos_x = mouse_x;
+	last_mousepos_y = mouse_y;
+	// }
 	mouse.cam = calc_camera();
 	
 	if (left_button.is_dragging())
@@ -225,18 +228,24 @@ render_surface::on_paint( WPARAM, LPARAM)
 	return 0;
 }
 
-LRESULT  
-render_surface::on_destroy( WPARAM, LPARAM)
+LRESULT
+render_surface::on_close( WPARAM, LPARAM)
 {
-	// Perform cleanup actions.
+	VPYTHON_NOTE( "Closing a window from the GUI");
 	UINT id = 1;
 	KillTimer( widget_handle, id);
+	if (exit) {
+		gl_free();
+	}
+	gui_main::report_window_delete(this);
 	wglDeleteContext( gl_context);
 	ReleaseDC( widget_handle, dev_context);
 	widgets.erase( widget_handle);
+	DestroyWindow(widget_handle);
 	if (exit) {
-		PostQuitMessage( 0);
+		PostQuitMessage(0);
 	}
+	active = false;
 	return 0;
 }
 
@@ -273,8 +282,8 @@ render_surface::on_buttonup( WPARAM wParam, LPARAM lParam)
 	mouse.set_ctrl( wParam & MK_CONTROL);
 	mouse.set_alt( GetKeyState( VK_MENU) < 0);
 	
-	float x = (float)GET_X_LPARAM(lParam);
-	float y = (float)GET_Y_LPARAM(lParam);
+	// float x = (float)GET_X_LPARAM(lParam);
+	// float y = (float)GET_Y_LPARAM(lParam);
 	
 	int button_id = 0;
 	std::pair<bool, bool> unique_drop( false, false);
@@ -314,13 +323,11 @@ found:
 }
 
 LRESULT
-render_surface::on_windowmove( WPARAM wParam, LPARAM lParam)
+render_surface::on_windowmove( WPARAM, LPARAM lParam)
 {
 	WINDOWPOS* pos = (WINDOWPOS*)lParam;
 	x = pos->x;
 	y = pos->y;
-	window_width = pos->cx;
-	window_height = pos->cy;
 	return 0;
 }
 
@@ -352,30 +359,13 @@ render_surface::on_gl_swap_buffers()
 	SwapBuffers( dev_context);
 }
 
-void
-render_surface::gl_free()
-{
-	VPYTHON_NOTE( "Releasing GL resources");
-	on_gl_begin();
-	try {
-		clear_gl_error();
-		on_gl_free();
-		check_gl_error();
-	}
-	catch (gl_error& error) {
-		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: " + std::string(error.what()));
-		std::cerr << "Continuing with the shutdown." << std::endl;
-	}
-	on_gl_end();
-}
-
 render_surface::render_surface()
 	: x(-1), y(-1),
 	exit(true), visible(true), fullscreen(false), title( "VPython"),
-	last_mousepos_x(0), last_mousepos_y(0), mouselocked( false), active(false),
 	window_width(-1), window_height(-1),
 	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
-	saved_dc(0), saved_glrc(0)
+	saved_dc(0), saved_glrc(0),
+	last_mousepos_x(0), last_mousepos_y(0), mouselocked( false), active(false)
 {	
 	// Connect callbacks from the display_kernel to this object.  These will not
 	// be called back from the core until report_realize is called.
@@ -469,9 +459,8 @@ render_surface::create()
 void
 render_surface::destroy()
 {
-	DestroyWindow( widget_handle);
+	CloseWindow( widget_handle);
 	// widget_handle = 0;
-	active = false;
 }
 
 render_surface::~render_surface()
@@ -689,8 +678,10 @@ gui_main::run()
 	MSG message;
 	while (true) {
 		while (PeekMessage(&message, 0, 0, 0, PM_REMOVE)) {
-			if (message.message == WM_QUIT)
+			if (message.message == WM_QUIT) {
+				VPYTHON_NOTE( "WM_QUIT recieved");
 				goto quit;
+			}
 			
 			if (message.hwnd ==0) { // One of the threaded callbacks
 				switch (message.message) {
