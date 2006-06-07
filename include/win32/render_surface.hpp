@@ -74,7 +74,7 @@ class render_surface : public display_kernel
 	LRESULT on_mousemove( WPARAM, LPARAM);
 	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_paint( WPARAM, LPARAM);
-	LRESULT on_destroy( WPARAM, LPARAM);
+	LRESULT on_close( WPARAM, LPARAM);
 	LRESULT on_buttondown( WPARAM, LPARAM);
 	LRESULT on_buttonup( WPARAM, LPARAM);
 	// LRESULT on_getminmaxinfo( WPARAM, LPARAM);
@@ -101,12 +101,6 @@ class render_surface : public display_kernel
  public:
 	render_surface();
 	virtual ~render_surface();
-
-	// Makes this rendering context active and calls on_gl_free().  This should
-	// generally be done only by the last window to shut down, however it is
-	// harmless to call it more than once during the shutdown.  Attempting to 
-	// render after this is called will probably not work...
-	void gl_free( void);
 	
 	// Called by the gui_main class below when this window needs to create
 	// or destroy itself.
