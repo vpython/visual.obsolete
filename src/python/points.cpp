@@ -102,10 +102,11 @@ points::points( const points& other)
 	: renderable( other),
 	pos( other.pos),
 	color( other.color),
-	antialias( other.antialias),
-	size( other.size), size_type( other.size_type),
 	preallocated_size( other.preallocated_size),
-	count( other.count)
+	count( other.count),
+	size_type( other.size_type),
+	antialias( other.antialias),
+	size( other.size)
 {
 }
 
@@ -258,6 +259,8 @@ points::get_size_type( void)
 			return "screen";
 		case WORLD:
 			return "world";
+		default:
+			return "";
 	}
 }
 
@@ -746,7 +749,7 @@ points::get_center() const
 	const double* pos_end = index( pos, count);
 	const float* color_i = findex( color, 0);
 	const float* color_end = findex( color, count);
-	for ( ;pos_i < pos_end; pos_i += 3, color_i += 4) {
+	for ( ;pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 4) {
 		if (antialias || color_i[3] != 1.0)
 			ret += vector(pos_i);
 	}
