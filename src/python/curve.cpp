@@ -619,7 +619,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 			
 			const double* color_i = index( color, begin);
 			const double* color_end = index( color, end);
-			for (size_t i = 0; i < end-begin; ++i, color_i += 3) {
+			for (size_t i = 0; i < end-begin && color_i < color_end; ++i, color_i += 3) {
 				rgb scolor( color_i[0], color_i[1], color_i[2]);
 				if (scene.coloranaglyph)
 					scolor = scolor.desaturate();
@@ -658,7 +658,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 {
 	assert( end > begin);
 	
-	int curve_around = sides;
+	size_t curve_around = sides;
 	std::vector<vector> projected;
 	std::vector<vector> normals;
 	std::vector<rgb> light;
@@ -780,7 +780,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			}
 		}
 		
-		for (int a=0; a < curve_around; a++) {
+		for (size_t a=0; a < curve_around; a++) {
 			float c = cost[a];
 			float s = sint[a];
 			normals.push_back( (x*c + y*s).norm());
@@ -801,14 +801,14 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		glEnableClientState( GL_COLOR_ARRAY);
 	
 	int *ind = curve_slice;
-	for (int a=0; a < curve_around; a++) {
-		int ai = a;
+	for (size_t a=0; a < curve_around; a++) {
+		size_t ai = a;
 		if (a == curve_around-1) {
 			ind += 256;
 			ai = 0;
 		}
 
-		for (int i = 0; i < npoints; i += 127) {
+		for (size_t i = 0; i < npoints; i += 127u) {
 			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*curve_around + ai].x);
 			if (!mono)
 				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*curve_around + ai)].red );
@@ -816,7 +816,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			if (npoints-i < 128)
 				glDrawElements(GL_TRIANGLE_STRIP, 2*(npoints-i), GL_UNSIGNED_INT, ind);
 			else
-				glDrawElements(GL_TRIANGLE_STRIP, 256, GL_UNSIGNED_INT, ind);
+				glDrawElements(GL_TRIANGLE_STRIP, 256u, GL_UNSIGNED_INT, ind);
 		}
 	}
 	if (!mono)
