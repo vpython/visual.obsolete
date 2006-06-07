@@ -10,7 +10,7 @@
 #include "frame.hpp"
 #include "text.hpp"
 
-#include <GL/glext.h>
+#include "wrap_gl.hpp"
 
 #include <cassert>
 #include <algorithm>
@@ -438,6 +438,14 @@ display_kernel::world_to_view_transform(
 	}
 	#if 0
 	// Enable this to peek at the actual scene geometry.
+	int max_proj_stack_depth = -1;
+	int max_mv_stack_depth = -1;
+	int proj_stack_depth = -1;
+	int mv_stack_depth = -1;
+	glGetIntegerv( GL_MAX_PROJECTION_STACK_DEPTH, &max_proj_stack_depth);
+	glGetIntegerv( GL_MAX_MODELVIEW_STACK_DEPTH, &max_mv_stack_depth);
+	glGetIntegerv( GL_PROJECTION_STACK_DEPTH, &proj_stack_depth);
+	glGetIntegerv( GL_MODELVIEW_STACK_DEPTH, &mv_stack_depth);
 	std::cerr << "scene_geometry: camera:" << scene_camera 
         << " true camera:" << camera
 		<< " center:" << scene_center << " true center:" << center
@@ -445,7 +453,10 @@ display_kernel::world_to_view_transform(
 		<< " gcf:" << gcf << " nearclip:" << nearclip 
 		<< " farclip:" << farclip << " user_scale:" << user_scale
         << " cot_hfov:" << cot_hfov << " tan_hfov_x:" << tan_hfov_x
-        << " tan_hfov_y: " << tan_hfov_y;
+        << " tan_hfov_y: " << tan_hfov_y
+        << " window_width:" << window_width << " window_height:" << window_height
+        << " max_proj_depth:" << max_proj_stack_depth << " current_proj_depth:" << proj_stack_depth
+        << " max_mv_depth:" << max_mv_stack_depth << " current_mv_depth:" << mv_stack_depth;
 	world_extent.dump_extent();
 	std::cerr << std::endl;
 	#endif
@@ -456,7 +467,7 @@ display_kernel::world_to_view_transform(
 		scene_up.x, scene_up.y, scene_up.z);
 	vector scene_range = range * gcf;
 	glScaled( 1.0/scene_range.x, 1.0/scene_range.y, 1.0/scene_range.z);
-		
+
 	// Establish a parallel-axis asymmetric stereo projection frustum.
 	glMatrixMode( GL_PROJECTION);
 	if (!forpick)
@@ -862,6 +873,7 @@ display_kernel::pick( float x, float y, float d_pixels)
     vector pickpos;
     vector mousepos;
 	try {
+		gl_begin();
 		clear_gl_error();
 		// Notes:
 		// culled polygons don't count.  glRasterPos() does count.
@@ -996,6 +1008,7 @@ display_kernel::pick( float x, float y, float d_pixels)
         	projection.matrix_addr(),
         	viewport_bounds,
         	&mousepos.x, &mousepos.y, &mousepos.z);
+        gl_end();
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;
