@@ -98,7 +98,7 @@ class texture : public sigc::trackable
 #define PURE
 #endif
 
-int next_power_of_two(const int arg) PURE ;
+size_t next_power_of_two(size_t arg) PURE ;
 
 } // !namespace cvisual
 

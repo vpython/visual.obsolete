@@ -79,10 +79,10 @@ texture::damage()
 	damaged = true;
 }
 
-int
-next_power_of_two(const int arg) 
+size_t
+next_power_of_two(size_t arg) 
 {
-	int ret = 2;
+	size_t ret = 2;
 	// upper bound of 28 chosen to limit memory growth to about 256MB, which is
 	// _much_ larger than most supported textures
 	while (ret < arg && ret < (1 << 28))
