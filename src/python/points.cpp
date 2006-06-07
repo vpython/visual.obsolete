@@ -35,12 +35,11 @@ double gl_smooth_radius_range[2] = {-1, -1};
 int world_scale_points_supported = -1;
 
 #if defined( _WIN32) || defined (_MSC_VER)
-void default_glPointParameterfvARB( GLenum, const GLfloat*)
+void APIENTRY default_glPointParameterfvARB( GLenum, const GLfloat*)
 {
 	return;
 }
-PFNGLPOINTPARAMETERFVARBPROC glPointParameterfvARB = 
-	(PFNGLPOINTPARAMETERFVARBPROC)default_glPointParameterfvARB;
+PFNGLPOINTPARAMETERFVARBPROC glPointParameterfvARB = default_glPointParameterfvARB;
 #endif
 
 void 
