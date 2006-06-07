@@ -72,14 +72,14 @@ class render_surface : public display_kernel
 	// Procedures used to process messages.
 	LRESULT on_showwindow( WPARAM, LPARAM);
 	LRESULT on_mousemove( WPARAM, LPARAM);
-	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_paint( WPARAM, LPARAM);
 	LRESULT on_close( WPARAM, LPARAM);
 	LRESULT on_buttondown( WPARAM, LPARAM);
 	LRESULT on_buttonup( WPARAM, LPARAM);
-	// LRESULT on_getminmaxinfo( WPARAM, LPARAM);
+	LRESULT on_getminmaxinfo( WPARAM, LPARAM);
 	// LRESULT on_keypress( UINT, WPARAM, LPARAM);
-	LRESULT on_windowmove( WPARAM, LPARAM);
+	LRESULT on_size( WPARAM, LPARAM);
+	LRESULT on_move( WPARAM, LPARAM);
 	
 	// Callbacks provided to the display_kernel object.
 	void on_gl_begin();

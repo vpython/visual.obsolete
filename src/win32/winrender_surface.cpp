@@ -41,6 +41,8 @@ render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			return This->on_close( wParam, lParam);
 		case WM_SIZE:
 			return This->on_size( wParam, lParam);
+		case WM_MOVE:
+			return This->on_move( wParam, lParam);
 		case WM_PAINT:
 			return This->on_paint( wParam, lParam);
 		case WM_MOUSEMOVE:
@@ -52,8 +54,8 @@ render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			return This->on_buttondown( wParam, lParam);
 		case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
 			return This->on_buttonup( wParam, lParam);
-		case WM_WINDOWPOSCHANGED:
-			return This->on_windowmove( wParam, lParam);
+		case WM_GETMINMAXINFO:
+			return This->on_getminmaxinfo( wParam, lParam);
 		default:
 			return DefWindowProc( hwnd, uMsg, wParam, lParam);
 	}
@@ -202,17 +204,44 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 }
 
 LRESULT  
-render_surface::on_size( WPARAM, LPARAM lParam)
+render_surface::on_size( WPARAM, LPARAM)
 {
-	window_width = LOWORD(lParam);
-	window_height = HIWORD(lParam);
-	report_resize( window_width, window_height);
+	RECT dims;
+	// The following calls report the fact that the widget area has been 
+	// repainted to the windowing system.
+	GetClientRect( widget_handle, &dims);
+	if (dims.right != window_width || dims.bottom != window_height) {
+		window_width = dims.right;
+		window_height = dims.bottom;
+		report_resize( window_width, window_height);
+	}
+	return 0;
+}
+
+LRESULT
+render_surface::on_move( WPARAM, LPARAM lParam)
+{
+	x = LOWORD( lParam);
+	y = HIWORD( lParam);
+	return 0;
+}
+
+LRESULT
+render_surface::on_getminmaxinfo( WPARAM, LPARAM lParam)
+{
+	MINMAXINFO* info = (MINMAXINFO*)lParam;
+	// Prevents making the window too small.
+	info->ptMinTrackSize.x = 70;
+	info->ptMinTrackSize.y = 70;
 	return 0;
 }
 
 LRESULT  
 render_surface::on_paint( WPARAM, LPARAM)
 {
+	if (window_width < 1 || window_height < 1)
+		return 0;
+	
 	bool sat = render_scene();
 	if (!sat)
 		return 1;
@@ -263,11 +292,11 @@ render_surface::on_buttondown( WPARAM wParam, LPARAM lParam)
 	if (wParam & MK_LBUTTON && left_button.press(x, y)) {
 		button_id = 1;
 	}
-	if (wParam & MK_RBUTTON && right_button.press( x, y)) {
-		button_id = 3;
-	}
-	if (wParam & MK_MBUTTON && middle_button.press( x, y)) {
+	else if (wParam & MK_MBUTTON && middle_button.press( x, y)) {
 		button_id = 2;
+	}
+	else if (wParam & MK_RBUTTON && right_button.press( x, y)) {
+		button_id = 3;
 	}
 	
 	if (button_id)
@@ -290,24 +319,24 @@ render_surface::on_buttonup( WPARAM wParam, LPARAM lParam)
 	#define unique unique_drop.first
 	#define drop unique_drop.second
 	
-	if (wParam & MK_LBUTTON) {
+	if (!(wParam & MK_LBUTTON)) {
 		unique_drop = left_button.release();
 		if (unique) {
 			button_id = 1;
 			goto found;
 		}
 	}
-	if (wParam & MK_RBUTTON) {
-		unique_drop = right_button.release();
-		if (unique) {
-			button_id = 3;
-			goto found;
-		}
-	}
-	if (wParam & MK_MBUTTON) {
+	if (!(wParam & ~MK_MBUTTON)) {
 		unique_drop = middle_button.release();
 		if (unique) {
 			button_id = 2;
+			goto found;
+		}
+	}
+	if (!(wParam & ~MK_RBUTTON)) {
+		unique_drop = right_button.release();
+		if (unique) {
+			button_id = 3;
 			goto found;
 		}
 	}
@@ -320,15 +349,6 @@ found:
 	return 0;
 	#undef unique
 	#undef drop
-}
-
-LRESULT
-render_surface::on_windowmove( WPARAM, LPARAM lParam)
-{
-	WINDOWPOS* pos = (WINDOWPOS*)lParam;
-	x = pos->x;
-	y = pos->y;
-	return 0;
 }
 
 WNDCLASS render_surface::win32_class;
@@ -393,7 +413,7 @@ render_surface::create()
 		style = WS_OVERLAPPED | WS_POPUP | WS_MAXIMIZE | WS_VISIBLE;
 	}
 	else
-		style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+		style = WS_OVERLAPPEDWINDOW;
 	
 	widget_handle = CreateWindow(
 		win32_class.lpszClassName,
