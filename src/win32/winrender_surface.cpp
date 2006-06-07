@@ -23,67 +23,15 @@ using boost::thread;
 #include <boost/lexical_cast.hpp>
 using boost::lexical_cast;
 
-namespace cvisual {
-
-/**************************** Utilities ************************************/
-// Extracts and decodes a Win32 error message.
-void
-win32_write_critical( 
-	std::string file, int line, std::string func, std::string msg)
-{
-	DWORD code = GetLastError();
-	char* message = 0;
-	FormatMessage( 
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
-		0, // Ignored parameter
-		code, // Error code to be decoded.
-		0, // Use the default language
-		(char*)&message, // The output buffer to fill the message
-		512, // Allocate at least one byte in order to free something below.
-		0); // No additional arguments.
-	
-	std::cerr << "VPython ***Critical Error*** " << file << ":" << line << ": "
-		<< func << ": " << msg << ": " << message;
-	LocalFree(message);
-	std::exit(1);
-}
-
-/**************** render_surface implementation  *****************/
-
-// A lookup-table for the default widget procedure to use to find the actual
-// widget that should handle a particular callback message.
-std::map<HWND, render_surface*> render_surface::widgets;
-render_surface* render_surface::current = 0;
-shared_ptr<render_surface> render_surface::selected;
-
-void
-render_surface::register_win32_class()
-{
-	static bool done = false;
-	if (done)
-		return;
-	else {
-		std::memset( &win32_class, 0, sizeof(win32_class));
-		
-		win32_class.lpszClassName = "vpython_win32_render_surface";
-		win32_class.lpfnWndProc = &render_surface::dispatch_messages;
-		win32_class.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
-		win32_class.hInstance = GetModuleHandle(0);
-		win32_class.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-		win32_class.hCursor = LoadCursor( NULL, IDC_ARROW );
-		if (!RegisterClass( &win32_class))
-			WIN32_CRITICAL_ERROR("RegisterClass()");
-		done = true;
-	}
-}
-
 // TODO: Change mouse movement handling to lock the mouse in place and continue
 // to process events.
 // This function dispatches incoming messages to the particular message-handler.
+extern "C" {
 LRESULT CALLBACK 
-render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	render_surface* This = widgets[hwnd];
+	using namespace cvisual;
+	render_surface* This = render_surface::widgets[hwnd];
 	if (This == 0)
 		return DefWindowProc( hwnd, uMsg, wParam, lParam);
 
@@ -112,12 +60,68 @@ render_surface::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 }
 
 VOID CALLBACK
-render_surface::timer_callback( HWND hwnd, UINT, UINT_PTR, DWORD)
+render_surface_timer_callback( HWND hwnd, UINT, UINT_PTR, DWORD)
 {
-	render_surface* This = widgets[hwnd];
+	using namespace cvisual;
+	render_surface* This = render_surface::widgets[hwnd];
 	if (0 == This)
 		return;
 	This->on_paint(0, 0);
+}
+} // !extern "C"
+
+namespace cvisual {
+
+/**************************** Utilities ************************************/
+// Extracts and decodes a Win32 error message.
+void
+win32_write_critical( 
+	std::string file, int line, std::string func, std::string msg)
+{
+	DWORD code = GetLastError();
+	char* message = 0;
+	FormatMessage( 
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+		0, // Ignored parameter
+		code, // Error code to be decoded.
+		0, // Use the default language
+		(char*)&message, // The output buffer to fill the message
+		512, // Allocate at least one byte in order to free something below.
+		0); // No additional arguments.
+	
+	std::cerr << "VPython ***Win32 Critical Error*** " << file << ":" << line << ": "
+		<< func << ": " << msg << ": " << message;
+	LocalFree(message);
+	std::exit(1);
+}
+
+/**************** render_surface implementation  *****************/
+
+// A lookup-table for the default widget procedure to use to find the actual
+// widget that should handle a particular callback message.
+std::map<HWND, render_surface*> render_surface::widgets;
+render_surface* render_surface::current = 0;
+shared_ptr<render_surface> render_surface::selected;
+
+void
+render_surface::register_win32_class()
+{
+	static bool done = false;
+	if (done)
+		return;
+	else {
+		std::memset( &win32_class, 0, sizeof(win32_class));
+		
+		win32_class.lpszClassName = "vpython_win32_render_surface";
+		win32_class.lpfnWndProc = &render_surface_dispatch_messages;
+		win32_class.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
+		win32_class.hInstance = GetModuleHandle(0);
+		win32_class.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+		win32_class.hCursor = LoadCursor( NULL, IDC_ARROW );
+		if (!RegisterClass( &win32_class))
+			WIN32_CRITICAL_ERROR("RegisterClass()");
+		done = true;
+	}
 }
 
 LRESULT 
@@ -128,7 +132,7 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 		case 0:
 			// Opening for the first time.
 			report_realize();
-			SetTimer( widget_handle, id, 30, &render_surface::timer_callback);
+			SetTimer( widget_handle, id, 30, &render_surface_timer_callback);
 			break;
 		case SW_PARENTCLOSING:
 			// Stop rendering when the window is minimized.
@@ -136,7 +140,7 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 			break;
 		case SW_PARENTOPENING:
 			// restart rendering when the window is restored.
-			SetTimer( widget_handle, id, 30, &render_surface::timer_callback);
+			SetTimer( widget_handle, id, 30, &render_surface_timer_callback);
 			break;
 		default:
 			return DefWindowProc( widget_handle, WM_SHOWWINDOW, wParam, lParam);
@@ -324,21 +328,26 @@ WNDCLASS render_surface::win32_class;
 
 // Callbacks provided to the display_kernel object.
 void 
-render_surface::gl_begin()
+render_surface::on_gl_begin()
 {
-	wglMakeCurrent( dev_context, gl_context);
+	saved_dc = wglGetCurrentDC();
+	saved_glrc = wglGetCurrentContext();
+	if (!wglMakeCurrent( dev_context, gl_context))
+		WIN32_CRITICAL_ERROR( "wglMakeCurrent failed");
 	current = this;
 }
 
 void 
-render_surface::gl_end()
+render_surface::on_gl_end()
 {
-	wglMakeCurrent( 0, 0);
+	wglMakeCurrent( saved_dc, saved_glrc);
+	saved_dc = 0;
+	saved_glrc = 0;
 	current = 0;
 }
 
 void 
-render_surface::gl_swap_buffers()
+render_surface::on_gl_swap_buffers()
 {
 	SwapBuffers( dev_context);
 }
@@ -347,7 +356,7 @@ void
 render_surface::gl_free()
 {
 	VPYTHON_NOTE( "Releasing GL resources");
-	gl_begin();
+	on_gl_begin();
 	try {
 		clear_gl_error();
 		on_gl_free();
@@ -357,7 +366,7 @@ render_surface::gl_free()
 		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: " + std::string(error.what()));
 		std::cerr << "Continuing with the shutdown." << std::endl;
 	}
-	gl_end();
+	on_gl_end();
 }
 
 render_surface::render_surface()
@@ -365,20 +374,17 @@ render_surface::render_surface()
 	exit(true), visible(true), fullscreen(false), title( "VPython"),
 	last_mousepos_x(0), last_mousepos_y(0), mouselocked( false), active(false),
 	window_width(-1), window_height(-1),
-	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0)
-{
-	// Initialize data
-	// Initialize the win32_class
-	render_surface::register_win32_class();
-	
+	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
+	saved_dc(0), saved_glrc(0)
+{	
 	// Connect callbacks from the display_kernel to this object.  These will not
 	// be called back from the core until report_realize is called.
-	display_kernel::gl_begin.connect( 
-		sigc::mem_fun( *this, &render_surface::gl_begin));
-	display_kernel::gl_end.connect( 
-		sigc::mem_fun( *this, &render_surface::gl_end));
-	display_kernel::gl_swap_buffers.connect( 
-		sigc::mem_fun( *this, &render_surface::gl_swap_buffers));
+	gl_begin.connect( 
+		sigc::mem_fun( *this, &render_surface::on_gl_begin));
+	gl_end.connect( 
+		sigc::mem_fun( *this, &render_surface::on_gl_end));
+	gl_swap_buffers.connect( 
+		sigc::mem_fun( *this, &render_surface::on_gl_swap_buffers));
 }
 
 void
@@ -455,7 +461,8 @@ render_surface::create()
 		root_glrc = gl_context;
 	else
 		wglShareLists( root_glrc, gl_context);
-	
+	active = true;
+	visible = true;
 	ShowWindow( widget_handle, SW_SHOW);
 }
 
@@ -742,7 +749,7 @@ gui_main::init_thread(void)
 		init_signal = new condition;
 		VPYTHON_NOTE( "Starting GUI thread.");
 		lock L(*init_lock);
-		thread gtk( &gui_main::thread_proc);
+		thread gui( &gui_main::thread_proc);
 		while (!self)
 			init_signal->wait(L);
 	}
