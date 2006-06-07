@@ -342,9 +342,6 @@ faces::gl_render( const view& scene)
 	if (degenerate())
 		return;
 	
-	// Initialize iterators and endpoints.
-	const float* color_i = findex(color, 0);
-	
 	std::vector<vector> spos;
 	std::vector<rgb> tcolor;
 	
