@@ -1,41 +1,65 @@
 #include "win32/text.hpp"
+#include "win32/render_surface.hpp"
 #include "util/errors.hpp"
+#include "util/gl_free.hpp"
 
 #include <boost/lexical_cast.hpp>
 
 namespace cvisual {
 
+void
+font::gl_free(void)
+{
+	if (listbase > 0) {
+		VPYTHON_NOTE( "Releasing 256 displaylists, starting with number " 
+			+ boost::lexical_cast<std::string>(listbase));
+		glDeleteLists( listbase, 256);
+		listbase = 0;
+	}
+}
+
 font::font( const std::string& desc, int size)
-	: font_handle(0), listbase(-1)
+	: font_handle(0), listbase(0)
 {
 	HDC dev_context = render_surface::current->dev_context;
-	font_handle = CreateFont( -size, 0,
-		0, 0,
-		0,
-		0, 0, 0,
-		DEFAULT_CHARSET,
-		OUT_DEFAULT_PRECIS,
-		CLIP_DEFAULT_PRECIS,
-		PROOF_QUALITY,
-		VARIABLE_PITCH | FF_SWISS,
-		desc != std::string() ? desc.c_str() : 0
-	);
-	if (!font_handle) {
-		VPYTHON_WARNING( "Could not allocate requested font, "
-			"falling back to system default");
+	if (desc == std::string() && size < 0) {
 		font_handle = (HFONT)GetStockObject( SYSTEM_FONT);
 	}
+	else {
+		font_handle = CreateFont( 
+			size > 0 ? -size : 0, 
+			0, 0, 0, 0, 0, 0, 0, // width, angle, underline, bold, etc
+			DEFAULT_CHARSET,
+			OUT_DEFAULT_PRECIS,
+			CLIP_DEFAULT_PRECIS,
+			PROOF_QUALITY,
+			VARIABLE_PITCH | FF_SWISS,
+			desc != std::string() ? desc.c_str() : 0
+		);
+		if (!font_handle) {
+			VPYTHON_WARNING( "Could not allocate requested font, "
+				"falling back to system default");
+			font_handle = (HFONT)GetStockObject( SYSTEM_FONT);
+		}
+	}
 	listbase = glGenLists(256);
+	if (!listbase) {
+		VPYTHON_WARNING( "Failed to allocate displaylists for text rendering");
+	}
+	else {
+		VPYTHON_NOTE( "Allocated 256 displaylists starting with number "
+			+ boost::lexical_cast<std::string>( listbase));
+	}
+	on_gl_free.connect( sigc::mem_fun( *this, &font::gl_free));
 	SelectObject( dev_context, font_handle);
 	wglUseFontBitmaps( dev_context, 0, 256, listbase);
 }
 
 font::~font()
 {
-	if (listbase >= 0) {
-		glDeleteLists( listbase, 256);
-		listbase = -1;
-	}
+	// TODO: THis is not the correct action.  The correct action is to set a 
+	// pending delete call.
+	// gl_free();
 }
 
 boost::shared_ptr<layout> 

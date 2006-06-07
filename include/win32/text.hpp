@@ -1,8 +1,11 @@
 #ifndef VPYTHON_WIN32_TEXT_HPP
 #define VPYTHON_WIN32_TEXT_HPP
 
-#include "win32/render_surface.hpp"
 #include <boost/shared_ptr.hpp>
+#include <string>
+#include <sigc++/object.h>
+#include "util/vector.hpp"
+#include "wrap_gl.hpp"
 
 namespace cvisual {
 
@@ -16,7 +19,8 @@ class font : public sigc::trackable
  private:
 	font( const std::string&, int);
 	HFONT font_handle;
-	int listbase;
+	unsigned int listbase;
+	void gl_free(void);
 
  public:
 	~font();
@@ -35,9 +39,9 @@ class layout
 
  	float width;
  	float height;
- 	int listbase;
+ 	unsigned int listbase;
  	std::string text;
-	layout(float w, float h, int l_base, const std::string& t )
+	layout(float w, float h, unsigned int l_base, const std::string& t )
 		: width(w), height(h), listbase( l_base), text(t)
 	{}
 
