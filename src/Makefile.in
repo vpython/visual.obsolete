@@ -35,8 +35,8 @@ BOOST_INCLUDES = # @BOOST_INCLUDES@
 WIN32_PYTHON_VERSION = $(subst .,"",$(PYTHON_VERSION))
 WIN32_LIBS = -lpython$(WIN32_PYTHON_VERSION) \
 	-lboost_python$(WIN32_PYTHON_VERSION) -lgdi32 -lopengl32 -lglu32
-WIN32_CPPFLAGS = -mthreads -IC:/Python$(WIN32_PYTHON_VERSION)/Include \
-	-I$(top_srcdir)/include/win32
+WIN32_CPPFLAGS = -mthreads -mms-bitfields -I$(top_srcdir)/include/win32 \
+	-IC:/Python$(WIN32_PYTHON_VERSION)/Include
 WIN32_LDFLAGS = -mthreads
 
 # Prevent using the broken Apple C preprocessor,
