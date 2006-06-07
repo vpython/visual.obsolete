@@ -100,23 +100,6 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 	set_flags( get_flags() | Gtk::CAN_FOCUS);
 }
 
-void
-render_surface::gl_free()
-{
-	VPYTHON_NOTE( "Releasing GL resources");
-	gl_begin();
-	try {
-		clear_gl_error();
-		on_gl_free();
-		check_gl_error();
-	}
-	catch (gl_error& error) {
-		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: " + std::string(error.what()));
-		std::cerr << "Continuing with the shutdown." << std::endl;
-	}
-	gl_end();
-}
-
 bool 
 render_surface::on_motion_notify_event( GdkEventMotion* event)
 {

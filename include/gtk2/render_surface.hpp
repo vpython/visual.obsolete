@@ -37,12 +37,6 @@ class render_surface : public Gtk::GL::DrawingArea
 	render_surface( display_kernel& _core, bool activestereo = false);
 	display_kernel& core;
 	
-	// Makes this rendering context active and calls on_gl_free().  This should
-	// generally be done only by the last window to shut down, however it is
-	// harmless to call it more than once during the shutdown.  Attempting to 
-	// render after this is called will probably not work...
-	void gl_free( void);
-	
 	// Returns the mouse object, and updates some of its parameters.
 	mouse_t& get_mouse() { return mouse; }
  

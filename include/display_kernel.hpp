@@ -225,6 +225,12 @@ public: // Public Data.
 	 */
 	void rescale();
 	
+	/** Release GL resources.  Call this as many times as you like during the
+	 * shutdown.  However, neither pick() nor render_scene() may be called on
+	 * any display_kernel after gl_free() has been invoked.
+	 */
+	void gl_free();
+	
 	void allow_spin(bool);
 	bool spin_is_allowed(void) const;
 	

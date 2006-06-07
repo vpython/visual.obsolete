@@ -1019,6 +1019,24 @@ display_kernel::pick( float x, float y, float d_pixels)
 	return boost::make_tuple( best_pick, pickpos / gcf, mousepos / gcf);
 }
 
+void
+display_kernel::gl_free()
+{
+	VPYTHON_NOTE( "Releasing GL resources");
+	gl_begin();
+	try {
+		clear_gl_error();
+		on_gl_free();
+		check_gl_error();
+	}
+	catch (gl_error& error) {
+		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: " 
+			+ std::string(error.what())
+			+ "; Continuing with the shutdown.");
+	}
+	gl_end();
+	VPYTHON_NOTE( "GL resource release complete");
+}
 
 void 
 display_kernel::allow_spin(bool b)
