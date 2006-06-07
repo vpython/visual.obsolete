@@ -18,6 +18,16 @@
 #include <string>
 #include <sigc++/object.h>
 
+extern "C" {
+VOID CALLBACK
+render_surface_timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+
+// A callback function to dispatch normal messages from the system.
+LRESULT CALLBACK 
+render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+} // !extern "C"
+
+
 namespace cvisual {
 
 // NOTE: This implementation might require Windows 98 (For the timer callback).
@@ -27,6 +37,10 @@ class render_surface : public display_kernel
 {
  private:
 	friend class font;
+	friend VOID CALLBACK
+		::render_surface_timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+	friend LRESULT CALLBACK 
+		::render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static render_surface* current;
 	
 	// Properties of the main window.
@@ -46,13 +60,10 @@ class render_surface : public display_kernel
  	HDC dev_context;
  	HGLRC gl_context;
  	
- 	// A callback function to dispatch normal messages from the system.
-	static LRESULT CALLBACK 
-	dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam,	LPARAM lParam);
+ 	HDC saved_dc;
+ 	HGLRC saved_glrc;
 	
 	// A callback function to handle the render pulse.
-	static VOID CALLBACK
-	timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 	
 	static void register_win32_class();
 	static WNDCLASS win32_class;
@@ -71,9 +82,9 @@ class render_surface : public display_kernel
 	LRESULT on_windowmove( WPARAM, LPARAM);
 	
 	// Callbacks provided to the display_kernel object.
-	void gl_begin();
-	void gl_end();
-	void gl_swap_buffers();
+	void on_gl_begin();
+	void on_gl_end();
+	void on_gl_swap_buffers();
 	
 	mousebutton left_button, right_button, middle_button;
 	mouse_t mouse;
