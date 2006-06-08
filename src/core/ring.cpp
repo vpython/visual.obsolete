@@ -86,8 +86,22 @@ ring::gl_render( const view& scene)
 	if (shiny()) {
 		rings *= 2; bands *= 2;
 	}
-
-	do_render_opaque( scene, rings, bands);
+	
+	clear_gl_error(); 
+	{
+		lighting_prepare();
+		shiny_prepare();
+		gl_enable_client vertex_array( GL_VERTEX_ARRAY);
+		gl_enable_client normal_array( GL_NORMAL_ARRAY);
+		gl_matrix_stackguard guard;
+		if (color.alpha == 1.0)
+			do_render_opaque( scene, rings, bands);
+		else
+			do_render_translucent( scene, rings, bands);
+		shiny_complete();
+		lighting_complete();
+	}
+	check_gl_error();
 	return;
 }
 
@@ -101,7 +115,7 @@ ring::grow_extent( extent& world)
 }
 
 void 
-ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
+ring::band_prepare( const view& scene, size_t rings, size_t bands)
 {
 	// Implementation.  In software, I create a pair of arrays for vertex and
 	// normal data, filling them with the coordinates for one band of 
@@ -144,35 +158,71 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 	normals[bands*2+1] = normals[1];
 	
 	// Point OpenGL at the vertex data for the first triangle strip.
-	clear_gl_error();
-	lighting_prepare();
-	shiny_prepare();
 	
-	{ gl_enable_client vertex_array( GL_VERTEX_ARRAY);
-	gl_enable_client normal_array( GL_NORMAL_ARRAY);
 	glVertexPointer( 3, GL_DOUBLE, 0, vertexes.get());
 	glNormalPointer( GL_DOUBLE, 0, normals.get());
 	color.gl_set();
-	{	
-		gl_matrix_stackguard guard;
-		vector scaled_pos = pos * scene.gcf;
-		glTranslated( scaled_pos.x, scaled_pos.y, scaled_pos.z);
-		model_world_transform().gl_mult();
-		// Draw the first strip.
+	vector scaled_pos = pos * scene.gcf;
+	glTranslated( scaled_pos.x, scaled_pos.y, scaled_pos.z);
+	model_world_transform().gl_mult();
+}
+
+void
+ring::gl_draw( const view& scene, size_t rings, size_t bands)
+{
+	// Draw the first strip.
+	for (size_t i = 0; i < rings; ++i) {
+		// Successively render the same triangle strip for each band, 
+		// rotated about the model's x axis into the next position.
+		glRotated( 360.0 / rings, 1, 0, 0);
 		glDrawArrays( GL_TRIANGLE_STRIP, 0, bands * 2 + 2);
-		for (size_t i = 0; i < rings; ++i) {
-			// Successively render the same triangle strip for each band, 
-			// rotated about the model's x axis into the next position.
-			glRotated( 360.0 / rings, 1, 0, 0);
-			glDrawArrays( GL_TRIANGLE_STRIP, 0, bands * 2 + 2);
-		}
 	}
-	} // pop off client state array safties
-	
-	shiny_complete();
-	lighting_complete();
-	check_gl_error();
+}
+
+void 
+ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
+{
+	band_prepare( scene, rings, bands);
+	gl_draw( scene, rings, bands);
 	return;
+}
+
+void
+ring::do_render_translucent( const view& scene, size_t rings, size_t bands)
+{
+	band_prepare( scene, rings, bands);
+	
+	gl_enable clip0( GL_CLIP_PLANE0);
+	gl_enable cull_face( GL_CULL_FACE);
+	gl_enable blend( GL_BLEND);
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	tmatrix modelview; modelview.gl_modelview_get();
+	vertex eye_center = modelview.project( vector()); // same as w_column?
+	// Correct for perspective division
+	double eye_radius = (vector(eye_center) - modelview * vector(radius*scene.gcf, 0)).mag();
+	eye_center.z -= eye_radius * std::cos( M_PI*0.5 - std::atan( scene.tan_hfov_x));
+	// The plane equations
+	double show_back[] = { 0, 0, -1, eye_center.z / eye_center.w };
+	double show_front[] = { 0, 0, 1, -eye_center.z / eye_center.w };
+	
+	{ 	gl_matrix_stackguard g;
+		glLoadIdentity();
+		glClipPlane( GL_CLIP_PLANE0, show_back);
+	}
+	glCullFace( GL_FRONT);
+	gl_draw( scene, rings, bands);
+	glCullFace( GL_BACK);
+	gl_draw( scene, rings, bands);
+	
+	{	gl_matrix_stackguard g;
+		glLoadIdentity();
+		glClipPlane( GL_CLIP_PLANE0, show_front);
+	}
+	glCullFace( GL_FRONT);
+	gl_draw( scene, rings, bands);
+	glCullFace( GL_BACK);
+	gl_draw( scene, rings, bands);
 }
 
 PRIMITIVE_TYPEINFO_IMPL(ring)
