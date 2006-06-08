@@ -290,7 +290,7 @@ wrap_display_kernel(void)
 	
 	typedef atomic_queue<std::string> kb_object;
 	py::class_< kb_object, noncopyable>( "kb_object", no_init)
-		.def( "getkey", &kb_object::pop, "Returns the next key press value.")
+		.def( "getkey", &kb_object::py_pop, "Returns the next key press value.")
 		.add_property( "keys", &kb_object::size) 
 		;
 	
