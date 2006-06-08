@@ -38,6 +38,9 @@ sphere::gl_pick_render( const view& geometry)
 {
 	if (degenerate())
 		return;
+	if (first)
+		update_cache(geometry);
+	clear_gl_error();
 	size_t lod = 2;
 	gl_matrix_stackguard guard;
 	const vector view_pos = pos * geometry.gcf;
@@ -47,6 +50,7 @@ sphere::gl_pick_render( const view& geometry)
 	glScaled( scale.x, scale.y, scale.z);
 	// lod_cache[lod].gl_render();
 	models[lod].gl_render();
+	check_gl_error();
 }
 
 void

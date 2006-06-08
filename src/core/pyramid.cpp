@@ -38,12 +38,16 @@ pyramid::gl_pick_render( const view& scene)
 {
 	if (degenerate())
 		return;
+	if (!simple_model)
+		update_cache( scene);
+	clear_gl_error();
 	vector view_pos = pos * scene.gcf;
 	gl_matrix_stackguard guard;
 	glTranslated( view_pos.x, view_pos.y, view_pos.z);
 	model_world_transform().gl_mult();
 	glScaled( axis.mag() * scene.gcf, height * scene.gcf, width * scene.gcf);
 	simple_model.gl_render();
+	check_gl_error();
 }
 
 void 

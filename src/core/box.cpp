@@ -48,12 +48,15 @@ box::gl_pick_render( const view& scene)
 {
 	if (degenerate())
 		return;
+	if (first)
+		update_cache( scene);
 	double gcf = scene.gcf;
 	gl_matrix_stackguard guard;
 	vector view_pos = pos * scene.gcf;
 	glTranslated( view_pos.x, view_pos.y, view_pos.z);
 	model_world_transform().gl_mult();
 	glScaled( axis.mag() * gcf, height * gcf, width * gcf);
+
 	simple_model.gl_render();
 }
 

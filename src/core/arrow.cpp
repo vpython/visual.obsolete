@@ -207,10 +207,12 @@ arrow::get_center() const
 }
 
 void 
-arrow::gl_pick_render( const view&)
+arrow::gl_pick_render( const view& scene)
 {
 	if (degenerate() || !model)
 		return;
+	if (!model)
+		update_cache( scene);
 	model.gl_render();
 }
 
@@ -219,6 +221,7 @@ arrow::gl_render( const view& scene)
 {
 	if (degenerate())
 		return;
+
 	color.gl_set();
 	gl_matrix_stackguard guard;
 	vector view_pos = pos * scene.gcf;

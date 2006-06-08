@@ -112,6 +112,7 @@ cone::update_cache( const view&)
 {
 	if (first) {
 		first = false;
+		clear_gl_error();
 		// The number of faces corrisponding to each level of detail.
 		size_t n_faces[] = { 8, 16, 32, 46, 68, 90 };
 		size_t n_stacks[] = { 1, 2, 4, 7, 10, 14 };
@@ -120,6 +121,7 @@ cone::update_cache( const view&)
 			render_cone_model( n_faces[i], n_stacks[i]);
 			cone_simple_model[i].gl_compile_end();
 		}
+		check_gl_error();
 	}
 }
 
@@ -128,6 +130,8 @@ cone::gl_pick_render( const view& scene)
 {
 	if (degenerate())
 		return;
+	if (first)
+		update_cache( scene);
 	size_t lod = 2;
 	gl_matrix_stackguard guard;
 	glTranslated( pos.x, pos.y, pos.z);

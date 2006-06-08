@@ -52,6 +52,7 @@ cylinder::update_cache( const view&)
 {
 	if (first) {
 		first = false;
+		clear_gl_error();
 		// The number of faces corrisponding to each level of detail.
 		size_t n_faces[] = { 8, 16, 32, 64, 96, 188 };
 		size_t n_stacks[] = {1, 1, 3, 6, 10, 20 };
@@ -60,6 +61,7 @@ cylinder::update_cache( const view&)
 			render_cylinder_model( n_faces[i], n_stacks[i]);
 			cylinder_simple_model[i].gl_compile_end();
 		}
+		check_gl_error();
 	}
 }
 
@@ -80,7 +82,10 @@ cylinder::gl_pick_render( const view& scene)
 {
 	if (degenerate())
 		return;
+	if (first)
+		update_cache(scene);
 	size_t lod = 2;
+	clear_gl_error();
 	gl_matrix_stackguard guard;
 	vector view_pos = pos * scene.gcf;
 	glTranslated( view_pos.x, view_pos.y, view_pos.z);
@@ -89,6 +94,7 @@ cylinder::gl_pick_render( const view& scene)
 	const double axial_scale = axis.mag() * scene.gcf;
 	glScaled( axial_scale, radial_scale, radial_scale);
 	cylinder_simple_model[lod].gl_render();
+	check_gl_error();
 }
 
 void 
