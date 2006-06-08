@@ -1,9 +1,20 @@
 Visual 4.beta2
 ================================================================================
 	NEW FEATURES:
-	* The Windows builds are no longer dependent on Gtk+; they use the Win32
+	* The Windows build is no longer dependent on Gtk+; it uses the Win32
 		API directly.  Windows 98,ME,XP,2K are supported.  Windows 95 is _not_
-		supported.
+		supported, and will not be for the forseeable future.
+	* Ring objects support translucency.
+	
+	BUGS FIXED:
+	* Programs that track UI events should exit cleanly when the user closes
+		a window, rather than hang.
+
+Visual 4.beta1.1 (this was not announced)
+================================================================================
+	BUGS FIXED:
+	* The Gtk+ libs in the Windows build were updated with less-stripped versions
+	* Compiled object files were removed from the source tarball.
 
 Visual 4.beta1
 ================================================================================
