@@ -311,6 +311,7 @@ wrap_display_kernel(void)
 			&display::get_kb, py::return_internal_reference<>()))
 		.add_property( "mouse", py::make_function(
 			&display::get_mouse, py::return_internal_reference<>()))
+		// TODO: add cursor attribute
 		;
 
 	py::def( "_set_dataroot", &display::set_dataroot);
