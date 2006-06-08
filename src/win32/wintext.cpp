@@ -2,8 +2,10 @@
 #include "win32/render_surface.hpp"
 #include "util/errors.hpp"
 #include "util/gl_free.hpp"
+#include "wrap_gl.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <sstream>
 
 namespace cvisual {
 
@@ -11,32 +13,33 @@ void
 font::gl_free(void)
 {
 	if (listbase > 0) {
-		VPYTHON_NOTE( "Releasing 256 displaylists, starting with number " 
+		VPYTHON_NOTE( "Releasing 255 displaylists, starting with number " 
 			+ boost::lexical_cast<std::string>(listbase));
-		glDeleteLists( listbase, 256);
+		glDeleteLists( listbase, 255);
 		listbase = 0;
 	}
 }
 
 font::font( const std::string& desc, int size)
-	: font_handle(0), listbase(0)
+	: ascent(0), font_handle(0), listbase(0)
 {
+	size = 12;
 	HDC dev_context = render_surface::current->dev_context;
-	if (desc == std::string("") && size < 0) {
+	if (desc == std::string() && size < 0) {
 		VPYTHON_NOTE( "Allocating default system font");
 		font_handle = (HFONT)GetStockObject( SYSTEM_FONT);
 	}
 	else {
-		VPYTHON_NOTE( "Allocating custom font: " + desc 
+		VPYTHON_NOTE( "Allocating custom font: " + desc + " "
 			+ boost::lexical_cast<std::string>( size));
 		font_handle = CreateFont( 
 			size > 0 ? -size : 0, 
 			0, 0, 0, 0, 0, 0, 0, // width, angle, underline, bold, etc
 			DEFAULT_CHARSET,
-			OUT_DEFAULT_PRECIS,
+			OUT_TT_PRECIS,
 			CLIP_DEFAULT_PRECIS,
-			PROOF_QUALITY,
-			VARIABLE_PITCH | FF_SWISS,
+			DEFAULT_QUALITY,
+			DEFAULT_PITCH | FF_DONTCARE,
 			desc != std::string() ? desc.c_str() : 0
 		);
 		if (!font_handle) {
@@ -45,17 +48,21 @@ font::font( const std::string& desc, int size)
 			font_handle = (HFONT)GetStockObject( SYSTEM_FONT);
 		}
 	}
-	listbase = glGenLists(256);
+	listbase = glGenLists(255);
 	if (!listbase) {
 		VPYTHON_WARNING( "Failed to allocate displaylists for text rendering");
 	}
 	else {
-		VPYTHON_NOTE( "Allocated 256 displaylists starting with number "
+		VPYTHON_NOTE( "Allocated 255 displaylists, starting with number "
 			+ boost::lexical_cast<std::string>( listbase));
 	}
 	on_gl_free.connect( sigc::mem_fun( *this, &font::gl_free));
 	SelectObject( dev_context, font_handle);
-	wglUseFontBitmaps( dev_context, 0, 256, listbase);
+	TEXTMETRIC tm;
+	GetTextMetrics( dev_context, &tm);
+	ascent = tm.tmAscent;
+	height = tm.tmAscent + tm.tmDescent;
+	wglUseFontBitmaps( dev_context, 0, 255, listbase);
 }
 
 font::~font()
@@ -66,12 +73,29 @@ font::~font()
 }
 
 boost::shared_ptr<layout> 
-font::lay_out( const std::string& text )
+font::lay_out( const std::string& new_text )
 {
-	SIZE size;
-	GetTextExtentPoint32(
-		render_surface::current->dev_context, text.c_str(), text.size(), &size);
-	return boost::shared_ptr<layout>( new layout( size.cx, size.cy, listbase, text));
+	std::vector<std::string> text;
+	
+	// Parse the 
+	std::istringstream buf( new_text);
+	std::string line;
+	while (std::getline( buf, line))
+		text.push_back( line);
+	
+	float maxwidth = 0;
+	float total_height;
+	for (layout::text_iter i = text.begin(); i != text.end(); ++i) {
+		SIZE size;
+		GetTextExtentPoint32(
+			render_surface::current->dev_context, 
+			i->c_str(), i->size(), &size);
+		total_height += std::min( float(size.cy), height);
+		maxwidth = std::max( float(size.cx), maxwidth);
+	}
+	
+	return boost::shared_ptr<layout>( 
+		new layout( maxwidth, total_height, height, ascent, listbase, text));
 }
 
 namespace {
@@ -99,9 +123,13 @@ font::find_font( const std::string& desc, int height)
 void
 layout::gl_render( const vector& pos)
 {
-	glRasterPos3dv( &pos.x);
+	vector raster_pos = pos - vector(0, ascent);
 	glListBase( listbase);
-	glCallLists( text.size(), GL_UNSIGNED_BYTE, text.c_str());
+	for (text_iter i = text.begin(); i != text.end(); ++i) {
+		glRasterPos3dv( &raster_pos.x);
+		glCallLists( i->size(), GL_UNSIGNED_BYTE, i->c_str());
+		raster_pos.y -= line_height;
+	}
 };
 	
 } // !namespace cvisual

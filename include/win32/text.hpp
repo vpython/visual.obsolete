@@ -3,6 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include <vector>
 #include <sigc++/object.h>
 #include "util/vector.hpp"
 #include "wrap_gl.hpp"
@@ -17,6 +18,8 @@ class layout;
 class font : public sigc::trackable
 {
  private:
+	float ascent;
+	float height;
 	font( const std::string&, int);
 	HFONT font_handle;
 	unsigned int listbase;
@@ -39,10 +42,13 @@ class layout
 
  	float width;
  	float height;
+ 	float line_height;
+ 	float ascent;
  	unsigned int listbase;
- 	std::string text;
-	layout(float w, float h, unsigned int l_base, const std::string& t )
-		: width(w), height(h), listbase( l_base), text(t)
+ 	std::vector<std::string> text;
+ 	typedef std::vector<std::string>::iterator text_iter;
+	layout(float w, float h, float l_h, float a, unsigned int l_base, const std::vector<std::string>& t )
+		: width(w), height(h), line_height(l_h), ascent(a), listbase( l_base), text(t)
 	{}
 
  public:
