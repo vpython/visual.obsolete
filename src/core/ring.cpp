@@ -83,6 +83,9 @@ ring::gl_render( const view& scene)
 	if (rings < 0)
 		rings = 80;
 	rings = clamp( 7, rings, 80);
+	if (shiny()) {
+		rings *= 2; bands *= 2;
+	}
 
 	do_render_opaque( scene, rings, bands);
 	return;
