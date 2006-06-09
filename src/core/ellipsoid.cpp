@@ -92,6 +92,7 @@ ellipsoid::grow_extent( extent& world)
 	if (degenerate())
 		return;
 	world.add_sphere( pos, std::max( width, std::max( height, axis.mag())));
+	world.add_body();
 }
 
 PRIMITIVE_TYPEINFO_IMPL(ellipsoid)

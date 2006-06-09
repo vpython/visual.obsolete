@@ -333,7 +333,7 @@ points::set_color( array n_color)
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
 		lock L(mtx);
-		color[slice( 0,npoints)] = n_color;
+		color[slice( 0, npoints)] = n_color;
 		return;
 	}
 	if (dims.size() == 2 && dims[1] == 3) {
@@ -776,6 +776,7 @@ points::grow_extent( extent& world)
 	else
 		for ( ; pos_i < pos_end; pos_i += 3)
 			world.add_sphere( vector(pos_i), size);
+	world.add_body();
 }
 
 } } // !namespace cvisual::python

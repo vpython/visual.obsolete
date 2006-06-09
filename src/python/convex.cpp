@@ -306,6 +306,7 @@ convex::grow_extent( extent& world)
 		world.add_point( f->corner[1]);
 		world.add_point( f->corner[2]);
 	}
+	world.add_body();
 }
 
 } } // !namespace cvisual::python

@@ -572,6 +572,7 @@ curve::grow_extent( extent& world)
 	else
 		for ( ; pos_i < pos_end; pos_i += 3)
 			world.add_sphere( vector(pos_i), radius);
+	world.add_body();
 }
 
 void

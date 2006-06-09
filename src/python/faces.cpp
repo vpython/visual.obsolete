@@ -417,6 +417,7 @@ faces::grow_extent( extent& world)
 		world.add_point( vector(pos_i));
 		pos_i++;
 	}
+	world.add_body();
 }
 
 void
