@@ -40,7 +40,7 @@ class ring : public axial
 	void do_render_opaque( const view&, size_t rings, size_t bands);
 	void do_render_translucent( const view&, size_t rings, size_t bands);
 	
-	void band_prepare( const view&, size_t, size_t, float**, float**) NONNULL;
+	void band_prepare( const view&, size_t, size_t);
 	void gl_draw( const view&, size_t, size_t);
 };
 

@@ -115,7 +115,7 @@ ring::grow_extent( extent& world)
 }
 
 void 
-ring::band_prepare( const view& scene, size_t rings, size_t bands, float** verts, float** norms)
+ring::band_prepare( const view& scene, size_t rings, size_t bands)
 {
 	// Implementation.  In software, I create a pair of arrays for vertex and
 	// normal data, filling them with the coordinates for one band of 
@@ -157,26 +157,9 @@ ring::band_prepare( const view& scene, size_t rings, size_t bands, float** verts
 	}
 	vertexes[bands*2+1] = vertexes[1];
 	normals[bands*2+1] = normals[1];
-#if 0
-	// Point OpenGL at the vertex data for the first triangle strip.
-	*verts = new float[n_verts*3];
-	*norms = new float[n_verts*3];
-	for (size_t i = 0; i < n_verts; ++i) {
-		(*verts)[i*3] = vertexes[i].x;
-		(*verts)[i*3+1] = vertexes[i].y;
-		(*verts)[i*3+2] = vertexes[i].z;
-	}
-	for (size_t i = 0; i < n_verts; ++i) {
-		(*norms)[i*3] = normals[i].x;
-		(*norms)[i*3+1] = normals[i].y;
-		(*norms)[i*3+2] = normals[i].z;
-	}
-	glVertexPointer( 3, GL_FLOAT, 0, *verts);
-	glNormalPointer( GL_FLOAT, 0, *norms);
-#else
+
 	glVertexPointer( 3, GL_DOUBLE, 0, vertexes.get());
 	glNormalPointer( GL_DOUBLE, 0, normals.get());
-#endif
 	color.gl_set();
 	vector scaled_pos = pos * scene.gcf;
 	glTranslated( scaled_pos.x, scaled_pos.y, scaled_pos.z);
@@ -198,21 +181,15 @@ ring::gl_draw( const view& scene, size_t rings, size_t bands)
 void 
 ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 {
-	float* norms;
-	float* verts;
-	band_prepare( scene, rings, bands, &verts, &norms);
+	band_prepare( scene, rings, bands);
 	gl_draw( scene, rings, bands);
-	delete[] norms;
-	delete[] verts;
 	return;
 }
 
 void
 ring::do_render_translucent( const view& scene, size_t rings, size_t bands)
 {
-	float* norms;
-	float* verts;
-	band_prepare( scene, rings, bands, &norms, &verts);
+	band_prepare( scene, rings, bands);
 	
 	gl_enable clip0( GL_CLIP_PLANE0);
 	gl_enable cull_face( GL_CULL_FACE);
@@ -245,8 +222,6 @@ ring::do_render_translucent( const view& scene, size_t rings, size_t bands)
 	gl_draw( scene, rings, bands);
 	glCullFace( GL_BACK);
 	gl_draw( scene, rings, bands);
-	delete[] verts;
-	delete[] norms;
 }
 
 PRIMITIVE_TYPEINFO_IMPL(ring)
