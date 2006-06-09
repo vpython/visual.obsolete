@@ -393,7 +393,7 @@ display::on_window_delete(GdkEventAny*)
 	if (exit) {
 		VPYTHON_NOTE( "Initiating shutdown from window closure");
 		if (area)
-			area->gl_free();
+			gl_free();
 		gui_main::quit();
 	}
 		
@@ -405,7 +405,7 @@ display::on_quit_clicked()
 {
 	VPYTHON_NOTE( "Initiating shutdown from the GUI.");
 	if (area)
-		area->gl_free();
+		gl_free();
 	gui_main::quit();
 }
 
