@@ -157,19 +157,19 @@ ring::band_prepare( const view& scene, size_t rings, size_t bands, float** verts
 	}
 	vertexes[bands*2+1] = vertexes[1];
 	normals[bands*2+1] = normals[1];
-#if 1
+#if 0
 	// Point OpenGL at the vertex data for the first triangle strip.
 	*verts = new float[n_verts*3];
 	*norms = new float[n_verts*3];
 	for (size_t i = 0; i < n_verts; ++i) {
-		*verts[i*3] = vertexes[i].x;
-		*verts[i*3+1] = vertexes[i].y;
-		*verts[i*3+3] = vertexes[i].z;
+		(*verts)[i*3] = vertexes[i].x;
+		(*verts)[i*3+1] = vertexes[i].y;
+		(*verts)[i*3+2] = vertexes[i].z;
 	}
 	for (size_t i = 0; i < n_verts; ++i) {
-		*norms[i*3] = normals[i].x;
-		*norms[i*3+1] = normals[i].y;
-		*norms[i*3+3] = normals[i].z;
+		(*norms)[i*3] = normals[i].x;
+		(*norms)[i*3+1] = normals[i].y;
+		(*norms)[i*3+2] = normals[i].z;
 	}
 	glVertexPointer( 3, GL_FLOAT, 0, *verts);
 	glNormalPointer( GL_FLOAT, 0, *norms);
