@@ -8,6 +8,12 @@
 
 #include "axial.hpp"
 
+#ifdef __GNUC__
+# define NONNULL __attribute__((nonnull))
+#else
+# define NONNULL
+#endif
+
 namespace cvisual {
 
 class ring : public axial
@@ -34,7 +40,7 @@ class ring : public axial
 	void do_render_opaque( const view&, size_t rings, size_t bands);
 	void do_render_translucent( const view&, size_t rings, size_t bands);
 	
-	void band_prepare( const view&, size_t, size_t);
+	void band_prepare( const view&, size_t, size_t, float**, float**) NONNULL;
 	void gl_draw( const view&, size_t, size_t);
 };
 
