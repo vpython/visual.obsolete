@@ -74,8 +74,10 @@ struct glib_ustring_to_pyunicode
 	static PyObject* convert( const Glib::ustring& str)
 	{
 		std::string converted = utf8_to_utf16->convert( str);
-		return PyUnicode_FromUnicode( 
-			(const Py_UNICODE*)converted.data(), converted.size());
+		PyObject* ret = PyUnicode_FromUnicode( 0, str.size());
+		Py_UNICODE* buf = PyUnicode_AS_UNICODE( ret);
+		std::memcpy( buf, converted.c_str(), converted.size());
+		return ret;
 	}
 };
 

@@ -34,6 +34,7 @@ Visual 4.beta2
 	* Label object color properties are applied correctly
 	* Copyright notices (license.txt and LIBSIGC_COPYING.txt) have been added to
 	  the Windows distribution.
+	* (Linux/UNIX only) label.text returns a properly formed unicode string
 
 Visual 4.beta1.1 (this was not announced)
 ================================================================================
