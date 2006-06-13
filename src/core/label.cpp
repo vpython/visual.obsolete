@@ -344,11 +344,17 @@ label::gl_render( const view& scene)
 		lst = lst * translate;
 	}
 	vector origin = lst * vertex(vector(), 1.0);
+	rgba stereo_linecolor = linecolor;
+	if (scene.anaglyph)
+		if (scene.coloranaglyph)
+			stereo_linecolor = linecolor.desaturate();
+		else
+			stereo_linecolor = linecolor.grayscale();
 
 	displaylist list;
 	list.gl_compile_begin();
 	{
-		color.gl_set();
+		stereo_linecolor.gl_set();
 		// Zero out the existing matrices, rendering will be in screen coords.
 		gl_matrix_stackguard guard;
 		tmatrix identity;
@@ -371,7 +377,6 @@ label::gl_render( const view& scene)
 		if (xoffset || yoffset) {
 			if (line_enabled) {
 				glBegin( GL_LINES);
-					linecolor.gl_set();
 					vector().gl_render();
 					vector(xoffset, yoffset).gl_render();
 				glEnd();
@@ -406,7 +411,7 @@ label::gl_render( const view& scene)
 		}
 		if (box_enabled) {
 			// Draw a box around the text.
-			linecolor.gl_set();
+			stereo_linecolor.gl_set();
 			glBegin( GL_LINE_LOOP);
 				vector().gl_render();
 				vector( box_width, 0).gl_render();
@@ -416,6 +421,7 @@ label::gl_render( const view& scene)
 		}
 
 		// Render the text iteself.
+		color.gl_set();
 		text_layout->gl_render( text_pos);
 	} glMatrixMode( GL_MODELVIEW); } // Pops the matricies back off the stack
 	list.gl_compile_end();
