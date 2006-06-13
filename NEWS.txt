@@ -3,12 +3,22 @@ Visual 4.beta2
 	NEW FEATURES:
 	* The Windows build is no longer dependent on Gtk+; it uses the Win32
 		API directly.  Windows 98,ME,XP,2K are supported.  Windows 95 is _not_
-		supported, and will not be for the forseeable future.
-	* Ring objects support translucency.
+		supported, and will not be for the forseeable future.  The official
+		Microsoft end of life date for Windows 98 and ME is coming soon 
+		(30 June 2006).  Support by VPython for those versions of Windows is
+		deprecated.
+	* Ring objects support translucency. (but it is somewhat expensive)
+	* Graphs of points utilize the new points object
 	
 	BUGS FIXED:
 	* Programs that track UI events should exit cleanly when the user closes
 		a window, rather than hang.
+	* A universe consiting of only one instance of a points, curve, convex, faces,
+		or ellipsoid will be displayed properly.
+	* Boxes with negative dimentions are rendered correctly
+	* renderable.shininess = 1.0 is no longer a synonym for diabling shininess
+	  (shininess is maximized in this case)
+	* Label object color properties are applied correctly
 
 Visual 4.beta1.1 (this was not announced)
 ================================================================================
