@@ -32,10 +32,13 @@ Source: "@WIN32_CWD@\site-packages\cvisual.dll"; DestDir: "{app}\Lib\site-packag
 Source: "C:\MinGW\bin\mingwm10.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\boost_python-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual 
 Source: "C:\MinGW\bin\boost_thread-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "C:\MinGW\bin\libsigc-2.0-0.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "@WIN32_SRCDIR@\site-packages\visual\*.py"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "@WIN32_SRCDIR@\site-packages\visual\*.gif"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "@WIN32_SRCDIR@\site-packages\visual\*.glade"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "@WIN32_SRCDIR@\site-packages\visual\*.png"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_SRCDIR@\LIBSIGC_COPYING.txt"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_SRCDIR@\license.txt"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+; Source: "@WIN32_SRCDIR@\site-packages\visual\*.gif"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+; Source: "@WIN32_SRCDIR@\site-packages\visual\*.glade"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+; Source: "@WIN32_SRCDIR@\site-packages\visual\*.png"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 ;
 ; Uncomment the following line after compiling .pyc files, and rebuild installer:
 ;Source: "Lib\site-packages\visual\*.pyc"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
@@ -62,11 +65,11 @@ Source: "@WIN32_SRCDIR@\docs\visual\*.css"; DestDir: "{app}\Lib\site-packages\vi
 Source: "@WIN32_SRCDIR@\docs\visual\*.txt"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "@WIN32_SRCDIR@\docs\visual\icons\*.gif"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\icons\"; Components: Documentation
 
-Source: "C:\msys\1.0\local\gtkrun\*"; DestDir: "{app}\Lib\site-packages\gtkrun\"; Components: Gtk; Flags: recursesubdirs
+; Source: "C:\msys\1.0\local\gtkrun\*"; DestDir: "{app}\Lib\site-packages\gtkrun\"; Components: Gtk; Flags: recursesubdirs
 
 [Components]
 Name: Visual; Description: "The Visual extension modue to Python"; Types: full compact custom; Flags: fixed
-Name: Gtk; Description: "The Gimp Tool Kit runtime (version 2.8)"; Types: full compact custom; Flags: fixed
+; Name: Gtk; Description: "The Gimp Tool Kit runtime (version 2.8)"; Types: full compact custom; Flags: fixed
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
 Name: Numeric; Description: "Numeric Python 23.8 {code:NumericStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumeric( 'C:\Python@WIN32_PYTHON_VERSION@' )
