@@ -7,6 +7,11 @@ Visual 4.beta2
 		Microsoft end of life date for Windows 98 and ME is coming soon 
 		(30 June 2006).  Support by VPython for those versions of Windows is
 		deprecated.
+		This build depends on a third-party library, libsigc++, which is licensed
+		under the GNU Lesser General Public License, version 2.1.  (which was also
+		the case for Gtk).  To comply with the terms of this license, the source
+		code for libsigc++ is available from our download site alongside the
+		Windows package.
 	* Ring objects support translucency. (but it is somewhat expensive)
 	* Graphs of points utilize the new points object
 	
@@ -19,6 +24,8 @@ Visual 4.beta2
 	* renderable.shininess = 1.0 is no longer a synonym for diabling shininess
 	  (shininess is maximized in this case)
 	* Label object color properties are applied correctly
+	* Copyright notices (license.txt and LIBSIGC_COPYING.txt) have been added to
+	  the Windows distribution.
 
 Visual 4.beta1.1 (this was not announced)
 ================================================================================
