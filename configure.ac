@@ -32,7 +32,7 @@ VISUAL_NUMERICLIBS()
 AM_CHECK_PYTHON_HEADERS([], [
 	AC_MSG_ERROR([A suitable python interpreter was found, but you do not have the header files required for building C/C++ extensions to python, or another problem was encoutered when compiling a program that uses Python.h.])])
 
-
+PKG_PROG_PKG_CONFIG()
 if test $platform_win32 = yes; then
 	# Some Windows-specific macros.  The first two are used exclusively by the
 	# .iss.in script
@@ -47,8 +47,8 @@ if test $platform_win32 = yes; then
 	AC_SUBST([GTK_LIBS])
 	AC_SUBST([GTK_CFLAGS])
 else
-	PKG_CHECK_MODULES( GTK, gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4 libglademm-2.4 freetype2, ,
-		[AC_MSG_ERROR(gtkglextmm 1.2+, pangoft2, glibmm-2.4, and pangomm-1.4 libglademm-2.4 are required on Unix-like systems)])
+	PKG_CHECK_MODULES( GTK, [gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4 libglademm-2.4 freetype2], ,
+		[AC_MSG_ERROR([gtkglextmm 1.2, pangoft2, glibmm-2.4, and pangomm-1.4 libglademm-2.4 are required on Unix-like systems])])
 	AC_SUBST([GTK_LIBS])
 	AC_SUBST([GTK_CFLAGS])
 	
