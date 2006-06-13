@@ -164,7 +164,7 @@ renderable::get_texture()
 bool
 renderable::shiny( void)
 {
-	return shininess != 0.0 && shininess != 1.0;
+	return shininess != 0.0;
 }
 
 void
@@ -180,7 +180,7 @@ renderable::shiny_prepare( void)
 	if (shiny()) {
 		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
 		glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
-		int gl_shininess = static_cast<int>(shininess * 128);
+		int gl_shininess = std::min( 127, static_cast<int>(shininess * 128));
 		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( .8, .8, .8).red);
 		glMateriali( GL_FRONT, GL_SHININESS, gl_shininess);
 	}
