@@ -382,7 +382,7 @@ render_surface::on_gl_swap_buffers()
 render_surface::render_surface()
 	: x(-1), y(-1),
 	exit(true), visible(true), fullscreen(false), title( "VPython"),
-	window_width(-1), window_height(-1),
+	window_width(430), window_height(430),
 	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
 	saved_dc(0), saved_glrc(0),
 	last_mousepos_x(0), last_mousepos_y(0), mouselocked( false), active(false)
@@ -405,24 +405,52 @@ render_surface::create()
 	RECT screen;
 	SystemParametersInfo( SPI_GETWORKAREA, 0, &screen, 0);
 	int style = -1;
+	int real_x = static_cast<int>(x);
+	int real_y = static_cast<int>(y);
+	int real_width = static_cast<int>(window_width);
+	int real_height = static_cast<int>(window_height);
+	
 	if (fullscreen) {
-		x = static_cast<float>( screen.left);
-		y = static_cast<float>( screen.top);
-		window_width = static_cast<float>( screen.right) - x;
-		window_height = static_cast<float>( screen.bottom) - y;
+		real_x = screen.left;
+		real_y = screen.top;
+		real_width = screen.right - real_x;
+		real_height = screen.bottom - real_y;
 		style = WS_OVERLAPPED | WS_POPUP | WS_MAXIMIZE | WS_VISIBLE;
 	}
-	else
-		style = WS_OVERLAPPEDWINDOW;
+	else if (real_x < 0 && real_y < 0 || real_x > screen.right || real_y > screen.bottom) {
+		real_x = CW_USEDEFAULT;
+		real_y = CW_USEDEFAULT;
+	} 
+	else if (real_x < screen.left) {
+		real_x = screen.left;
+	} 
+	else if (real_y < screen.top) {
+		real_y = screen.top;
+	}
+	
+	if (real_x + real_width > screen.right) 
+		real_width = screen.right - real_x;
+	if (real_y + real_height > screen.bottom) 
+		real_height = screen.bottom - real_y;
+	
+	if (!fullscreen)
+		style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+		
+	std::cerr << "Creating window at " << real_x << "," << real_y << " with size " << real_width << "x" << real_height << std::endl;
 	
 	widget_handle = CreateWindow(
 		win32_class.lpszClassName,
 		title.c_str(),
 		style,
+#if 0
 		x > 0 ? static_cast<int>(x) : CW_USEDEFAULT,
 		y > 0 ? static_cast<int>(y) : CW_USEDEFAULT,
 		window_width > 0 ? static_cast<int>(window_width) : CW_USEDEFAULT,
 		window_height > 0 ? static_cast<int>(window_height) : CW_USEDEFAULT,
+#else
+		real_x, real_y,
+		real_width, real_height,
+#endif
 		0,
 		0, // A unique index to identify this widget by the parent
 		GetModuleHandle(0),
