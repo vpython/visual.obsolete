@@ -436,21 +436,12 @@ render_surface::create()
 	if (!fullscreen)
 		style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 		
-	std::cerr << "Creating window at " << real_x << "," << real_y << " with size " << real_width << "x" << real_height << std::endl;
-	
 	widget_handle = CreateWindow(
 		win32_class.lpszClassName,
 		title.c_str(),
 		style,
-#if 0
-		x > 0 ? static_cast<int>(x) : CW_USEDEFAULT,
-		y > 0 ? static_cast<int>(y) : CW_USEDEFAULT,
-		window_width > 0 ? static_cast<int>(window_width) : CW_USEDEFAULT,
-		window_height > 0 ? static_cast<int>(window_height) : CW_USEDEFAULT,
-#else
 		real_x, real_y,
 		real_width, real_height,
-#endif
 		0,
 		0, // A unique index to identify this widget by the parent
 		GetModuleHandle(0),
