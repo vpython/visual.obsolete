@@ -88,7 +88,6 @@ box::update_cache( const view&)
 	}
 }
 
-
 void 
 box::gl_render( const view& scene)
 {
@@ -100,9 +99,12 @@ box::gl_render( const view& scene)
 	
 	double size = vector(width, axis.mag(), height).mag();
 	size *= 0.002; // 1/500 th of its size, or about 1 pixel
-	width = std::max( size, width);
-	height = std::max( size, height);
-	axis.set_mag( std::max( size, axis.mag()));
+	if (std::fabs(width) < size)
+		width = size;
+	if (std::fabs(height) < size)
+		height = size;
+	if (std::fabs(axis.mag()) < size)
+		axis.set_mag( size);
 
 	clear_gl_error();
 	lighting_prepare();
@@ -121,6 +123,12 @@ box::gl_render( const view& scene)
 			vector object_forward = (pos - scene.camera).norm();
 			tmatrix inv = world_model_transform();
 			vector model_forward = inv.times_v( object_forward).norm();
+			if (axis.mag() < 0)
+				model_forward.x *= -1;
+			if (height < 0)
+				model_forward.y *= -1;
+			if (width < 0)
+				model_forward.z *= -1;
 			textured_sorted_model.sort( model_forward);
 			
 			gl_enable blend( GL_BLEND);
@@ -143,6 +151,12 @@ box::gl_render( const view& scene)
 			vector object_forward = (pos - scene.camera).norm();
 			tmatrix inv = world_model_transform();
 			vector model_forward = inv.times_v( object_forward).norm();
+			if (axis.mag() < 0)
+				model_forward.x *= -1;
+			if (height < 0)
+				model_forward.y *= -1;
+			if (width < 0)
+				model_forward.z *= -1;
 			sorted_model.sort( model_forward);
 
 			gl_enable blend( GL_BLEND);
