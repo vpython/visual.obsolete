@@ -14,7 +14,15 @@ Visual 4.beta2
 		Windows package.
 	* Ring objects support translucency. (but it is somewhat expensive)
 	* Graphs of points utilize the new points object
-	
+	* (Actually present since 4.beta0) Label objects' text supports Unicode
+		strings.  On Linux/Unix, any unicode character supported by the selected
+		font should be displayed correctly.  This feature is not implemented for
+		Windows.  Additionally, the default text font for Linux is the system
+		font (rather than courier), rendered using Freetype 2.
+	* The colorsliders demo includes an alpha (opacity) slider
+	* The gdots object uses the new points object for rendering cleaner point
+	    graphs
+
 	BUGS FIXED:
 	* Programs that track UI events should exit cleanly when the user closes
 		a window, rather than hang.
