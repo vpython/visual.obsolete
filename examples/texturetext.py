@@ -25,10 +25,10 @@ z.axis *= 2
 # Changes in the display are a consequence of changing the underlying data.
 scene.mouse.getclick()
 print "click!"
-save = array(checkerboard[:,1,:])
-checkerboard[:,1,:] = checkerboard[:,2,:]
-checkerboard[:,2,:] = save
-save = array(checkerboard[1,:,:])
-checkerboard[1,:,:] = checkerboard[2,:,:]
-checkerboard[2,:,:] = save
+save = array(checkerboard[:,1])
+checkerboard[:,1] = checkerboard[:,2]
+checkerboard[:,2] = save
+save = array(checkerboard[1,:])
+checkerboard[1,:] = checkerboard[2,:]
+checkerboard[2,:] = save
 
