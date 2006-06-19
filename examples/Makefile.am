@@ -12,7 +12,7 @@ examplefiles = bounce.py bounce2.py colorsliders.py controlstest.py \
 	graphtest.py gyro.py gyro2.py hanoi.py labels.py lathe.py \
 	lorenz.py orbit.py planar.py randombox.py stars.py \
 	stonehenge.py texttest.py texturetest.py tictac.py tictacdat.py \
-	Tk-Visual.py torooid_drag.py toroid.py wave.py
+	Tk-Visual.py toroid_drag.py toroid.py wave.py
 else
 examplefiles =
 endif
