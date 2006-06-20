@@ -164,7 +164,6 @@ sphere::gl_render( const view& geometry)
 		// Set up the texturing
 		gl_enable tex2D( GL_TEXTURE_2D);
 		tex->gl_activate();
-		rgba(1.0, 1.0, 1.0, 1.0).gl_set();
 		
 		// Render the object, using culling of the backface if the camera is not
 		// within the space of the body.
