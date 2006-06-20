@@ -13,7 +13,7 @@ namespace cvisual { namespace python {
  * Python users can specify a texture as NxMxC, where N and M are preferred to
  * be powers of 2.  C is the number of color channels, and must be one of 
  * 1, 2, 3, or 4.  The meaning of the texture is determined by its channels:
- * 1: luminance map
+ * 1: luminance or alpha map (default: luminance)
  * 2: luminance-alpha
  * 3: RGB
  * 4: RGBA
@@ -44,7 +44,6 @@ class numeric_texture : public texture
 	// Types of damage: those that change the array's type and/or dimensions,
 	// and those that change its contents
 	uint32_t checksum;
-	
 	
 	bool degenerate() const;
 	bool should_reinitialize() const;
