@@ -122,8 +122,11 @@ vector::proj( const vector& v) const throw()
 double 
 vector::diff_angle( const vector& v) const throw()
 {
-	// By taking dot product of the normal vectors, we minimize the possible error.
-	return std::acos( this->dot( v) / std::sqrt( mag2() * v.mag2()) );
+	double magfirst = this->mag2();
+	double magsecond = v.mag2();
+	if (magfirst == 0.0 || magsecond == 0.0)
+		return (double) 0.0;
+	return std::acos( this->dot( v) / std::sqrt(magfirst*magsecond) );
 }
   
 std::string 
