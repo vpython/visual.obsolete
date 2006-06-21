@@ -1,3 +1,7 @@
+// Copyright (c) 2006 by Jonathan Brandmeyer and others.
+// See the file license.txt for complete license terms.
+// See the file authors.txt for a complete list of contributors.
+
 #ifndef VPYTHON_PYTHON_NUMERIC_TEXTURE_HPP
 #define VPYTHON_PYTHON_NUMERIC_TEXTURE_HPP
 
