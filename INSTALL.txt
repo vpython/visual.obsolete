@@ -83,6 +83,12 @@ I.  Prerequisites:
 		> dlltool --input-def libboost_python24.def --output-lib libboost_python24.a
 		> cp libboost_python24.a /mingw/lib/
 		
+		> cd boost_1_31_0/libs/thread/build
+		> bjam -sTOOLS=mingw
+		> cp bin-stage/boost_thread-mgw-mt-d-1_31d.dll /mingw/bin/
+		> cp bin-stage/boost_thread-mgw-mt-d-1_31d.lib /mingw/lib/
+		In /mingw/lib, change the name of this .lib file to libboost_thread.a
+		
 		Copy boost_1_31_0/boost to /mingw/include/
 		
 	C.  GNU/Linux
@@ -90,7 +96,7 @@ I.  Prerequisites:
 		browsing the various package listings.  If you have any corrections or
 		additions please write to visualpython-users@lists.sourceforge.net.
 		
-		Users of Debian Sid, Sarge, and derivatives will need these packages:
+		Users of Debian Sid, Sarge, and derivatives such as Ubuntu will need these packages:
 			python2.4-dev
 			python2.4-numeric-ext *
 			python2.4-numarray-ext *
@@ -101,6 +107,16 @@ I.  Prerequisites:
 			libboost-dev
 			libglu-dev ((libglu1-mesa-dev and libgl1-mesa-dri) OR nvidia-glx-dev) **
 			GtkGLExtmm 1.2.x and GtkGLExt 1.2.x from source (gtkglext.sourceforge.net)
+			  (On Ubuntu it was necessary to remove the existing GtkGLExt and then build
+			  from source with ./configure --prefix=/usr, make, install, because although
+			  it is really version 1.2, it shows up as version 1.0.)
+		
+		Currently there seems to be a problem building visual against the standard Ubuntu
+		/usr/bin/python2.4. Attempt to run visual gives an error because of a mismatch between
+		the actual Unicode representation of 4 bytes and what for some reason visual thinks is
+		2 bytes. It is possible to install python from source into /usr/local/bin/python2.4 and
+		build visual for it, because its pyconfig.h specifies 2 byte representation. It is not
+		yet known why the build against /usr/bin/python2.4 picks up the wrong definition.
 		
 		* VPython may be built against Numeric, Numarray, or both.  If you
 		build VPython with support for both, you can select which library
