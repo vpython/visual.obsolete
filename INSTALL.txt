@@ -197,10 +197,20 @@ II.   Configuration
 	You should generally supply the --prefix option to cause Visual to be installed to
 	the same prefix that Python is installed (default is /usr/local).
 	
-	On Linux, do this:
-	which python (make a note of the prefix preceding /bin/python, typically /usr or /usr/local)
-	If prefix is /usr/local, execute ../visual-x.x.x/configure
-	If prefix is something else, execute ../visual-x.x.x/configure --prefix=/usr (or whatever)
+	On Linux, do this: which python
+	Make a note of the prefix preceding /bin/python, typically /usr or /usr/local.
+	
+	(a) If prefix is /usr/local, execute
+     	../visual-x.x.x/configure
+	(b) If prefix is something else, and Visual can go into prefix/lib/python/site-packages, execute
+     	../visual-x.x.x/configure --prefix=prefix
+	(c) If you want to use a different version of Python than the one found with "which python",
+   		or (b) is not appropriate, specify both the particular Python and where to install Visual:
+      	PYTHON=/somewhere1/bin/python ../visual-x.x.x/configure --prefix=/somewhere2
+	If "somewhere1" and "somewhere2" are different, you must also add the "somewhere2"
+	directory to Python's module search path. For details, at www.python.org read section 4.1
+	(Modifying Python's Search Path) in the section Installing Python Modules of the Python
+	on-line documentation.
 	
 	If you are only building VPython once, you may pass the option
 	--disable-dependancy-tracking to make the build itself go a little faster.
