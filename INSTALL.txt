@@ -111,13 +111,6 @@ I.  Prerequisites:
 			  from source with ./configure --prefix=/usr, make, install, because although
 			  it is really version 1.2, it shows up as version 1.0.)
 		
-		Currently there seems to be a problem building visual against the standard Ubuntu
-		/usr/bin/python2.4. Attempt to run visual gives an error because of a mismatch between
-		the actual Unicode representation of 4 bytes and what for some reason visual thinks is
-		2 bytes. It is possible to install python from source into /usr/local/bin/python2.4 and
-		build visual for it, because its pyconfig.h specifies 2 byte representation. It is not
-		yet known why the build against /usr/bin/python2.4 picks up the wrong definition.
-		
 		* VPython may be built against Numeric, Numarray, or both.  If you
 		build VPython with support for both, you can select which library
 		you want to use for array objects at runtime.
