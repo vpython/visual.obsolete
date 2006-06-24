@@ -137,6 +137,36 @@ numeric_texture::gl_init(void)
 	}
 	else
 		internal_format = data_textype;
+		
+		switch (data_textype) {
+			case GL_LUMINANCE:
+				if (data_channels != 1)
+					throw std::invalid_argument( 
+						"Specify luminance data with single values.");
+				break;
+			case GL_ALPHA:
+				if (data_channels != 1)
+					throw std::invalid_argument( 
+						"Specify opacity data with single values.");
+				break;
+			case GL_LUMINANCE_ALPHA:
+				if (data_channels != 2)
+					throw std::invalid_argument( 
+						"Specify luminance and opacity data with double values, [luminance,opacity].");
+				break;
+			case GL_RGB:
+				if (data_channels != 3)
+					throw std::invalid_argument( 
+						"Specify RGB data with triple values, [r,g,b].");
+				break;
+			case GL_RGBA:
+				if (data_channels != 4)
+					throw std::invalid_argument( 
+						"Specify RGB_opacity data with quadruple values, [r,g,b,opacity].");
+				break;
+			case 0: default: // Won't ever happen
+				break;
+		}
 	tex_textype = internal_format;
 	
 	if (reinitialize) {
