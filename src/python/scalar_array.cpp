@@ -130,7 +130,7 @@ scalar_array
 scalar_array::operator*( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable array multiplication.");
+		throw std::out_of_range( "Incompatible array multiplication.");
 	
 	scalar_array ret( data.size());
 	
@@ -146,7 +146,7 @@ vector_array
 scalar_array::operator*( const vector_array& v) const
 {
 	if (data.size() != v.data.size())
-		throw std::out_of_range( "Incompatable array multiplication.");
+		throw std::out_of_range( "Incompatible array multiplication.");
 	
 	vector_array ret( data.size());
 	
@@ -183,7 +183,7 @@ const scalar_array&
 scalar_array::operator*=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable array multiplication.");
+		throw std::out_of_range( "Incompatible array multiplication.");
 	
 	const_iterator s_i = s.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++s_i) {
@@ -207,7 +207,7 @@ scalar_array
 scalar_array::operator/( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable array division.");
+		throw std::out_of_range( "Incompatible array division.");
 	
 	scalar_array ret( data.size());
 	
@@ -232,7 +232,7 @@ const scalar_array&
 scalar_array::operator/=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable array division.");
+		throw std::out_of_range( "Incompatible array division.");
 
 	const_iterator s_i = s.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++s_i) {
@@ -245,7 +245,7 @@ scalar_array
 scalar_array::operator+( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable array addition.");
+		throw std::out_of_range( "Incompatible array addition.");
 	
 	scalar_array ret( data.size());
 	
@@ -283,7 +283,7 @@ const scalar_array&
 scalar_array::operator+=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable array addition.");
+		throw std::out_of_range( "Incompatible array addition.");
 
 	const_iterator s_i = s.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++s_i) {
@@ -297,7 +297,7 @@ scalar_array
 scalar_array::operator-( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable array subtraction.");
+		throw std::out_of_range( "Incompatible array subtraction.");
 	
 	scalar_array ret( data.size());
 	
@@ -335,7 +335,7 @@ const scalar_array&
 scalar_array::operator-=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable array subtraction.");
+		throw std::out_of_range( "Incompatible array subtraction.");
 
 	const_iterator s_i = s.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++s_i) {
