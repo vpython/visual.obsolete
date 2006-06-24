@@ -116,7 +116,7 @@ wrap_glib_ustring(void)
 	try {
 	utf16_to_utf8 = new Glib::IConv( "UTF-8", pyunicode_encoding);
 	} catch (Glib::ConvertError& e) {
-		std::cerr << "Faile creating converter from " << pyunicode_encoding
+		std::cerr << "Failed creating converter from " << pyunicode_encoding
 			<< " to UTF8: " << e.what() << std::endl;
 	}
 	if (!(utf8_to_utf16 && utf16_to_utf8)) {
