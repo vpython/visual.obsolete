@@ -160,7 +160,7 @@ vector_array
 vector_array::operator*( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable vector array multiplication.");
+		throw std::out_of_range( "Incompatible vector array multiplication.");
 	
 	vector_array ret( data.size());
 	scalar_array::const_iterator s_i = s.begin();
@@ -188,7 +188,7 @@ vector_array
 vector_array::operator/( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable vector array division.");
+		throw std::out_of_range( "Incompatible vector array division.");
 	
 	vector_array ret( data.size());
 	scalar_array::const_iterator s_i = s.begin();
@@ -225,7 +225,7 @@ const vector_array&
 vector_array::operator*=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable vector array multiplication.");
+		throw std::out_of_range( "Incompatible vector array multiplication.");
 	
 
 	scalar_array::const_iterator s_i = s.begin();	
@@ -249,7 +249,7 @@ const vector_array&
 vector_array::operator/=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
-		throw std::out_of_range( "Incompatable vector array multiplication.");
+		throw std::out_of_range( "Incompatible vector array multiplication.");
 	
 
 	scalar_array::const_iterator s_i = s.begin();	
@@ -276,7 +276,7 @@ vector_array
 vector_array::operator+( const vector_array& v) const
 {
 	if (data.size() != v.data.size())
-		throw std::out_of_range( "Incompatable vector array addition.");
+		throw std::out_of_range( "Incompatible vector array addition.");
 	
 	vector_array ret( data.size());
 	
@@ -304,7 +304,7 @@ vector_array
 vector_array::operator-( const vector_array& v) const
 {
 	if (data.size() != v.data.size())
-		throw std::out_of_range( "Incompatable vector array subtraction.");
+		throw std::out_of_range( "Incompatible vector array subtraction.");
 	
 	vector_array ret( data.size());
 	
@@ -329,7 +329,7 @@ const vector_array&
 vector_array::operator+=( const vector_array& v)
 {
 	if (data.size() != v.data.size())
-		throw std::out_of_range( "Incompatable vector array addition.");
+		throw std::out_of_range( "Incompatible vector array addition.");
 	
 	const_iterator v_i = v.data.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++v_i) {
@@ -352,7 +352,7 @@ const vector_array&
 vector_array::operator-=( const vector_array& v)
 {
 	if (data.size() != v.data.size())
-		throw std::out_of_range( "Incompatable vector array subtraction.");
+		throw std::out_of_range( "Incompatible vector array subtraction.");
 	
 	const_iterator v_i = v.data.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++v_i) {
@@ -378,7 +378,7 @@ vector_array
 vector_array::cross( const vector_array& v)
 {
 	if (v.data.size() != data.size())
-		throw std::out_of_range( "Incompatable vector_array types." );
+		throw std::out_of_range( "Incompatible vector_array types." );
 	
 	vector_array ret( data.size());
 	
@@ -431,7 +431,7 @@ vector_array
 vector_array::proj( const vector_array& v)
 {
 	if (v.data.size() != data.size())
-		throw std::out_of_range( "Incompatable vector_array types." );
+		throw std::out_of_range( "Incompatible vector_array types." );
 	
 	vector_array ret( data.size());
 	iterator r_i = ret.data.begin();
@@ -510,7 +510,7 @@ scalar_array
 vector_array::dot( const vector_array& v)
 {
 	if (v.data.size() != data.size())
-		throw std::out_of_range( "Incompatable vector_array types." );
+		throw std::out_of_range( "Incompatible vector_array types." );
 	
 	scalar_array ret( data.size());
 	scalar_array::iterator r_i = ret.begin();
@@ -538,7 +538,7 @@ scalar_array
 vector_array::comp( const vector_array& v)
 {
 	if ( data.size() != v.data.size() )
-		throw std::out_of_range( "Incompatable array scalar projection.");
+		throw std::out_of_range( "Incompatible array scalar projection.");
 	
 	scalar_array ret( data.size());
 	
@@ -591,7 +591,7 @@ vector_array::set_x( const scalar_array& x)
 		data = std::deque<vector>( x.size());
 	}
 	if (x.data.size() != data.size())
-		throw std::out_of_range( "Incompatable array assignment.");
+		throw std::out_of_range( "Incompatible array assignment.");
 
 	scalar_array::const_iterator x_i = x.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++x_i) {
@@ -607,7 +607,7 @@ vector_array::set_y( const scalar_array& y)
 		data = std::deque<vector>( y.size());
 	}
 	if (y.data.size() != data.size())
-		throw std::out_of_range( "Incompatable array assignment.");
+		throw std::out_of_range( "Incompatible array assignment.");
 
 	scalar_array::const_iterator y_i = y.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++y_i) {
@@ -623,7 +623,7 @@ vector_array::set_z( const scalar_array& z)
 		data = std::deque<vector>( z.size());
 	}
 	if (z.data.size() != data.size())
-		throw std::out_of_range( "Incompatable array assignment.");
+		throw std::out_of_range( "Incompatible array assignment.");
 
 	scalar_array::const_iterator z_i = z.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++z_i) {
@@ -688,7 +688,7 @@ vector_array
 vector_array::operator>=( const scalar_array& s) const
 {
 	if (s.data.size() != data.size())
-		throw std::out_of_range( "Incompatable vector_array to scalar_array comparison." );
+		throw std::out_of_range( "Incompatible vector_array to scalar_array comparison." );
 
 	vector_array ret( data.size());
 	iterator r_i = ret.begin();
@@ -705,7 +705,7 @@ vector_array
 vector_array::operator>=( const vector_array& v) const
 {
 	if (v.data.size() != data.size())
-		throw std::out_of_range( "Incompatable vector_array to vector_array comparison" );
+		throw std::out_of_range( "Incompatible vector_array to vector_array comparison" );
 
 	vector_array ret( data.size());
 	iterator r_i = ret.begin();
@@ -735,7 +735,7 @@ vector_array
 vector_array::operator<=( const scalar_array& s) const
 {
 	if (s.data.size() != data.size())
-		throw std::out_of_range( "Incompatable vector_array comparison." );
+		throw std::out_of_range( "Incompatible vector_array comparison." );
 
 	vector_array ret( data.size());
 	iterator r_i = ret.begin();
@@ -752,7 +752,7 @@ vector_array
 vector_array::operator<=( const vector_array& v) const
 {
 	if (v.data.size() != data.size())
-		throw std::out_of_range( "Incompatable vector_array comparison." );
+		throw std::out_of_range( "Incompatible vector_array comparison." );
 
 	vector_array ret( data.size());
 	iterator r_i = ret.begin();
@@ -770,7 +770,7 @@ vector_array
 vector_array::operator*( const vector_array& v) const
 {
 	if (v.data.size() != data.size())
-		throw std::out_of_range( "Incompatable vector_array multiplication." );
+		throw std::out_of_range( "Incompatible vector_array multiplication." );
 
 	vector_array ret( data.size());
 	iterator r_i = ret.begin();
