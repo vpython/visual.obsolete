@@ -118,7 +118,7 @@ numeric_texture::gl_init(void)
 	
 	GLenum internal_format;
 	if (!data_textype) {
-		switch (tex_channels) {
+		switch (data_channels) {
 			case 1:
 				internal_format = GL_LUMINANCE;
 				break;
@@ -137,7 +137,7 @@ numeric_texture::gl_init(void)
 	}
 	else
 		internal_format = data_textype;
-	tex_textype = data_textype;
+	tex_textype = internal_format;
 	
 	if (reinitialize) {
 		// Compute a fresh checksum
