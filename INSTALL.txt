@@ -70,6 +70,9 @@ I.  Prerequisites:
 		> pexports /c/windows/system32/python24.dll > libpython24.def
 		> dlltool --input-def libpython24.def --output-lib libpython24.a
 		Copy the resulting libpython24.a into C:\mingw\lib
+		See http://www.python.org/doc/current/inst/tweak-flags.html for discussion.
+		It appears that Python2.4 for Windows ships with such a file in Python/libs.
+		However, it appears that the standard msys machinery doesn't look in Python/libs.
 		
 		Download a precompiled version of the 'bjam' tool from www.boost.org 
 		and place it into C:\mingw\bin (or anywhere else on your PATH).
