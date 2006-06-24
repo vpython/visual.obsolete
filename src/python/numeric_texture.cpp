@@ -135,7 +135,7 @@ numeric_texture::gl_init(void)
 				internal_format = GL_RGB;
 		}
 	}
-	else
+	else {
 		internal_format = data_textype;
 		
 		switch (data_textype) {
@@ -167,6 +167,7 @@ numeric_texture::gl_init(void)
 			case 0: default: // Won't ever happen
 				break;
 		}
+	}
 	tex_textype = internal_format;
 	
 	if (reinitialize) {
