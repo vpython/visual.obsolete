@@ -18,8 +18,8 @@ class extent
 {
  private:
 	// Defines a minimum bounding box for the scene in camera coordinates.
-	vector maxs; ///< The lower left rear corner or the bounding box
-	vector mins; ///< The upper right forward corner of the bounding box
+	vector mins; ///< The lower left rear corner of the bounding box
+	vector maxs; ///< The upper right forward corner of the bounding box
 	bool first;  ///< True if the first element in the box has not been set.
 	size_t buffer_depth; ///< The required depth of the selection buffer.
 	int frame_depth;
