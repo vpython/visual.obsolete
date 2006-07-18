@@ -59,7 +59,7 @@ I.  Prerequisites:
 		OpenGL is provided with the standard OS installation.
 	# TODO: include directions for building Boost.Python on OSX(gulp).
 	
-	B.  Microsoft Windows # Also really out of date
+	B.  Microsoft Windows # Not quite up to date
 		Download and install the MinGW 3.1 and MSYS 1.0.9 packages from
 		www.mingw.org.  Also download the MinGW Utils package (version 0.1 or
 		higher).  You may need to add C:\mingw\bin to your PATH.
@@ -78,9 +78,8 @@ I.  Prerequisites:
 		and place it into C:\mingw\bin (or anywhere else on your PATH).
 		Download and unpack the Boost source tree.
 		In MSYS:
-		> cd boost_1_31_0/libs/python/build
+		> cd boost_1_32_0
 		> bjam -sTOOLS=mingw -sPYTHON_VERSION=2.4 -sPYTHON_ROOT=C:/Python24
-		> cp bin-stage/boost_python.dll /mingw/bin/
 		
 		> pexports bin-stage/boost_python.dll > libboost_python24.def
 		> dlltool --input-def libboost_python24.def --output-lib libboost_python24.a
