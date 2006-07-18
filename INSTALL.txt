@@ -76,22 +76,43 @@ I.  Prerequisites:
 		
 		Download a precompiled version of the 'bjam' tool from www.boost.org 
 		and place it into C:\mingw\bin (or anywhere else on your PATH).
-		Download and unpack the Boost source tree.
-		In MSYS:
-		> cd boost_1_32_0
-		> bjam -sTOOLS=mingw -sPYTHON_VERSION=2.4 -sPYTHON_ROOT=C:/Python24
 		
-		> pexports bin-stage/boost_python.dll > libboost_python24.def
-		> dlltool --input-def libboost_python24.def --output-lib libboost_python24.a
-		> cp libboost_python24.a /mingw/lib/
+		Download latest bjam (3.1.13) and copy to mingw/bin.
+		Download latest Boost (1.33.1), unpack.
+		Copy boost_1_33_1/boost folder to mingw/include.
+		At top level of boost_1_33_1, execute
+		> bjam -sTOOLS=mingw -sPYTHON_VERSION=2.4 -sPYTHON_ROOT=/c/Python24
+		Takes about 50 minutes to build everything.
+
+		In the Boost bin directory, find the release versions of python and thread files.
+		The python files are in
+			bin/boost/libs/python/build/boost_python.dll/mingw/release/threading-multi
+		There is a bug in the Boost libraries, in that the .dll file in this directory
+		is missing references to the numeric library. In this directory, execute this:
+		> g++ -shared -mthreads -o boost_python-mgw-mt-1_33_1.dll *.obj -lpython24 -Wl,--out-implib,libboost_python24.a
+		Copy the resulting .dll file to mingw/bin, with the name boost_python-mgw-mt-1_33_1.dll.
+		Copy the .lib file to mingw/lib, with the name libboost_python24.a.
 		
-		> cd boost_1_31_0/libs/thread/build
-		> bjam -sTOOLS=mingw
-		> cp bin-stage/boost_thread-mgw-mt-d-1_31d.dll /mingw/bin/
-		> cp bin-stage/boost_thread-mgw-mt-d-1_31d.lib /mingw/lib/
-		In /mingw/lib, change the name of this .lib file to libboost_thread.a
+		The thread files are in
+			bin/boost/libs/thread/build/boost_thread.dll/mingw/release/threading-multi
+		Copy the .dll file to mingw/bin.
+		Copy the .lib file to mingw/lib, and change the name to libboost_thread.a.
 		
-		Copy boost_1_31_0/boost to /mingw/include/
+		Download pkg-config-0.20 in zip format and unzip.
+		There is some ambiguity about where to move the pieces, as some components need
+		to be in msys. Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
+		but also to msys/share/aclocal.
+		You probably also need to set an environment variable for pkg-config:
+		Right click My Computer > Properties > Advanced > Environment Variables and
+		add a new entry PKG_CONFIG_PATH is c:\mingw\lib\pkgconfig.
+		
+		Download the source for libsigc++-2.0.17 and unpack.
+		In the directory, execute ./configure, then make.
+		Copy the .dll to mingw/bin and the .a, .la, and .dll.a files to mingw/lib.
+		Copy the sigc++-2.0 folder (which contains include files) to mingw/include.
+		Copy sigc++-2.0.pc to mingw/lib/pkgconfig.
+		
+		To be completed....(iconv stuff....)
 		
 	C.  GNU/Linux
 		Please note that these package lists are my best-guess based on 
