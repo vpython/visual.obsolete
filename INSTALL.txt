@@ -59,7 +59,7 @@ I.  Prerequisites:
 		OpenGL is provided with the standard OS installation.
 	# TODO: include directions for building Boost.Python on OSX(gulp).
 	
-	B.  Microsoft Windows # Not quite up to date
+	B.  Microsoft Windows
 		Download and install the MinGW 3.1 and MSYS 1.0.9 packages from
 		www.mingw.org.  Also download the MinGW Utils package (version 0.1 or
 		higher).  You may need to add C:\mingw\bin to your PATH.
@@ -81,8 +81,10 @@ I.  Prerequisites:
 		Download latest Boost (1.33.1), unpack.
 		Copy boost_1_33_1/boost folder to mingw/include.
 		At top level of boost_1_33_1, execute
-		> bjam -sTOOLS=mingw -sPYTHON_VERSION=2.4 -sPYTHON_ROOT=/c/Python24
+		> bjam -sTOOLS=mingw
 		Takes about 50 minutes to build everything.
+		(Note: we used to do bjam -sTOOLS=mingw -sPYTHON_VERSION=2.4 -sPYTHON_ROOT=/c/Python24
+		when compiling only specific Boost libraries.)
 
 		In the Boost bin directory, find the release versions of python and thread files.
 		The python files are in
@@ -98,8 +100,12 @@ I.  Prerequisites:
 		Copy the .dll file to mingw/bin.
 		Copy the .lib file to mingw/lib, and change the name to libboost_thread.a.
 		
-		Download pkg-config-0.20 in zip format and unzip.
-		There is some ambiguity about where to move the pieces, as some components need
+		Note: The Boost files that start with "libboost" are static libraries that we don't use.
+		
+		Download pkg-config-0.20 in zip format and unzip. Libraries (e.g. sigc++, see below)
+		register their version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
+		possible for the build process to find the installed version of the library.
+		There is some ambiguity about where to put the pkk-config pieces, as some components need
 		to be in msys. Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
 		but also to msys/share/aclocal.
 		You probably also need to set an environment variable for pkg-config:
@@ -107,12 +113,26 @@ I.  Prerequisites:
 		add a new entry PKG_CONFIG_PATH is c:\mingw\lib\pkgconfig.
 		
 		Download the source for libsigc++-2.0.17 and unpack.
-		In the directory, execute ./configure, then make.
+		In the new directory, execute ./configure, then make.
 		Copy the .dll to mingw/bin and the .a, .la, and .dll.a files to mingw/lib.
 		Copy the sigc++-2.0 folder (which contains include files) to mingw/include.
-		Copy sigc++-2.0.pc to mingw/lib/pkgconfig.
+		Copy sigc++-2.0.pc to mingw/lib/pkgconfig. Check to make sure that this
+		file gives mingw as the prefix.
+		Can test that pkg-config is correctly installed by executing this:
+		> pkg-config --cflags --libs sigc++-2.0
 		
-		To be completed....(iconv stuff....)
+		Download libiconv-1.9.1.bin.woe32.zip and unzip.
+		Copy the files in bin to mingw/bin.
+		Copy the files in include to mingw/include.
+		Copy the files in lib to mingw/lib.
+		Copy the files in share to mingw/share.
+		
+		Download gettext-0.14.5.zip and unzip.
+		Copy the bin/intl.dll to mingw/bin.
+		
+		Download gettext-dev-0.14.5.zip and unzip.
+		Copy include/libintl.h to mingw/include.
+		From lib, copy intl.lib, intl.def, and libintl.a to mingw/lib.
 		
 	C.  GNU/Linux
 		Please note that these package lists are my best-guess based on 
