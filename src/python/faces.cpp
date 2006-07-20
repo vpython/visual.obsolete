@@ -401,7 +401,7 @@ faces::get_center() const
 	double* pos_end = index( pos, count);
 	while (pos_i < pos_end) {
 		ret += vector(pos_i);
-		pos_i++;
+		pos_i += 3; // 3 doubles per vector point
 	}
 	if (count)
 		ret /= count;
@@ -415,7 +415,7 @@ faces::grow_extent( extent& world)
 	double* pos_end = index( pos, count);
 	while (pos_i < pos_end) {
 		world.add_point( vector(pos_i));
-		pos_i++;
+		pos_i += 3; // 3 doubles per vector point
 	}
 	world.add_body();
 }
