@@ -114,19 +114,6 @@ I.  Prerequisites:
 		Can test that pkg-config is correctly installed by executing this:
 		> pkg-config --cflags libsigc-2.0
 		> pkg-config --cflags sigc++-2.0
-	
-		Download libiconv-1.9.1.bin.woe32.zip and unzip.
-		Copy the files in bin to mingw/bin.
-		Copy the files in include to mingw/include.
-		Copy the files in lib to mingw/lib.
-		Copy the files in share to mingw/share.
-		
-		Download gettext-0.14.5.zip and unzip.
-		Copy bin/intl.dll to mingw/bin.
-		
-		Download gettext-dev-0.14.5.zip and unzip.
-		Copy include/libintl.h to mingw/include.
-		From lib, copy intl.lib, intl.def, and libintl.a to mingw/lib.
 		
 	C.  GNU/Linux
 		Please note that these package lists are my best-guess based on 
