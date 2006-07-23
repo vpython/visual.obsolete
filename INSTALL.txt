@@ -63,47 +63,40 @@ I.  Prerequisites:
 		Download and install the MinGW 3.1 and MSYS 1.0.9 packages from
 		www.mingw.org.  Also download the MinGW Utils package (version 0.1 or
 		higher).  You may need to add C:\mingw\bin to your PATH.
+		
 		Download and install Python 2.4.x from www.python.org.
-		OpenGL is provided with the standard OS installation.
+		OpenGL is provided with the standard Windows installation.
 		
 		From an MSYS shell run the following:
 		> pexports /c/windows/system32/python24.dll > libpython24.def
 		> dlltool --input-def libpython24.def --output-lib libpython24.a
-		Copy the resulting libpython24.a into C:\mingw\lib
+		> cp libpython24.a /mingw/lib
 		See http://www.python.org/doc/current/inst/tweak-flags.html for discussion.
-		It appears that Python2.4 for Windows ships with such a file in Python/libs.
-		However, it appears that the standard msys machinery doesn't look in Python/libs.
 		
 		Download a precompiled version of the 'bjam' tool from www.boost.org 
 		and place it into C:\mingw\bin (or anywhere else on your PATH).
 		
-		Download latest bjam (3.1.13) and copy to mingw/bin.
-		Download latest Boost (1.33.1), unpack.
-		Copy boost_1_33_1/boost folder to mingw/include.
-		At top level of boost_1_33_1, execute
-		> bjam -sTOOLS=mingw
-		Takes about 50 minutes to build everything.
-		(Note: we used to do bjam -sTOOLS=mingw -sPYTHON_VERSION=2.4 -sPYTHON_ROOT=/c/Python24
-		when compiling only specific Boost libraries.)
-
-		In the Boost bin directory, find the release versions of python and thread files.
-		The python files are in
-			bin/boost/libs/python/build/boost_python.dll/mingw/release/threading-multi
-		There is a bug in the Boost libraries, in that the .dll file in this directory
-		is missing references to the numeric library. In this directory, execute this:
-		> g++ -shared -mthreads -o boost_python-mgw-mt-1_33_1.dll *.obj -lpython24 -Wl,--out-implib,libboost_python24.a
-		Copy the resulting .dll file to mingw/bin, with the name boost_python-mgw-mt-1_33_1.dll.
-		Copy the .lib file to mingw/lib, with the name libboost_python24.a.
+		Download latest Boost (1.33.1) from www.boost.org.
+		> tar -xjf boost_1_33_1.tar.bz2
+		> cd boost_1_33_1
+		> bjam -sTOOLS=mingw -sPYTHON_ROOT=/c/Python24 -sPYTHON_VERSION=2.4 stage
+		May take about an hour to build everything.
+		Copy boost_1_33_1/boost folder to mingw/include:
+		> cp -r boost/ /mingw/include/
 		
-		The thread files are in
-			bin/boost/libs/thread/build/boost_thread.dll/mingw/release/threading-multi
-		Copy the .dll file to mingw/bin.
-		Copy the .lib file to mingw/lib, and change the name to libboost_thread.a.
+		> cp stage/lib/boost_thread-mgw-mt-1_33_1.dll /mingw/bin
+		> cp stage/lib/boost_thread-mgw-mt-1_33_1.lib /mingw/lib/libboost_thread.a
 		
-		Note: The Boost files that start with "libboost" are static libraries that we don't use.
+		> cd bin/boost/libs/python/build/boost_python.dll/mingw/release/threading-multi/
+		Correct an error in the boost library, which is missing references to the numeric module:
+		> g++ -shared -o boost_python-mgw-mt-1_33_1.dll *.obj -Wl,--out-implib,boost_python-mgw-mt-1_33_1.lib /c/WINDOWS/system32/python24.dll 
+		> cp boost_python-mgw-mt-1_33_1.dll /mingw/bin
+		> cp boost_python-mgw-mt-1_33_1.lib /mingw/lib/libboost_python24.a 
 		
-		Download pkg-config-0.20 in zip format and unzip. Libraries (e.g. sigc++, see below)
-		register their version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
+		Note: The Boost files that start with "libboost" are static libraries that we don't use.	
+		
+		Download pkg-config-0.20 in zip format and unzip. A library such as sigc++, see below,
+		registers its version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
 		possible for the build process to find the installed version of the library.
 		There is some ambiguity about where to put the pkk-config pieces, as some components need
 		to be in msys. Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
@@ -112,15 +105,16 @@ I.  Prerequisites:
 		Right click My Computer > Properties > Advanced > Environment Variables and
 		add a new entry PKG_CONFIG_PATH is c:\mingw\lib\pkgconfig.
 		
-		Download the source for libsigc++-2.0.17 and unpack.
-		In the new directory, execute ./configure, then make.
-		Copy the .dll to mingw/bin and the .a, .la, and .dll.a files to mingw/lib.
-		Copy the sigc++-2.0 folder (which contains include files) to mingw/include.
-		Copy sigc++-2.0.pc to mingw/lib/pkgconfig. Check to make sure that this
-		file gives mingw as the prefix.
+		Download the source for libsigc++-2.0.17 from libsigc.sourceforge.net.
+		> tar -xjf libsigc++-2.0.17.tar.bz2
+		cd to the new directory, execute 
+		> ./configure --prefix=/mingw
+		> make
+		> make install
 		Can test that pkg-config is correctly installed by executing this:
-		> pkg-config --cflags --libs sigc++-2.0
-		
+		> pkg-config --cflags libsigc-2.0
+		> pkg-config --cflags sigc++-2.0
+	
 		Download libiconv-1.9.1.bin.woe32.zip and unzip.
 		Copy the files in bin to mingw/bin.
 		Copy the files in include to mingw/include.
@@ -128,7 +122,7 @@ I.  Prerequisites:
 		Copy the files in share to mingw/share.
 		
 		Download gettext-0.14.5.zip and unzip.
-		Copy the bin/intl.dll to mingw/bin.
+		Copy bin/intl.dll to mingw/bin.
 		
 		Download gettext-dev-0.14.5.zip and unzip.
 		Copy include/libintl.h to mingw/include.
@@ -200,7 +194,6 @@ I.  Prerequisites:
 		implementaions.  Properly configuring OpenGL may involve editing
 		/etc/X11/XF86Config-4 (or xorg.conf) and is not covered here.  A simple 
 		operational test is to run the `glxgears` program.
-		
 
 II.   Configuration 
 	On most systems, configuration should be automatic.  Just run 'configure'.
@@ -256,9 +249,8 @@ II.   Configuration
 	environment variable to -I/other_prefix/include to ensure that you pick up
 	the gtkglarea header files.
 	
-	The prebuilt binary for MS Windows is configured with (in MSYS):
-	CXXFLAGS="-O2 -finline-functions -march=i686" PYTHON=/c/Python24/python \
-	PYTHONPATH="c:\Python24\lib\site-packages" ../visual-2.9/configure
+	Compling a prebuilt binary for MS Windows is configured with (in MSYS):
+	PYTHON=/c/Python24/python.exe CXXFLAGS="-O2 -march=i686" ./configure
 	
 	The prebuilt binary for Apple OSX is configured with (in Bash):
 	CXX=/usr/local/bin/g++-3.3.3 CXXFLAGS="-O2 -finline-functions" \
@@ -308,8 +300,21 @@ IV.  Install
 	you are installing into your home directory, that generally means becoming root
 	with a program like `sudo` or `su`
 	On Apple OSX, run `sudo make install`
-	On MS Windows, there usually isn't a distinction between administrators and
-	normal users, so you can just run 'make install'
+	
+	On MS Windows, you need to install innosetup (www.jrsoftware.org/isinfo.php).
+	Make sure that C:\Python24\Lib\idlelib\config-main.def has edit startup and 
+	autosave set to 1 and that help is set for Visual before building the package.
+	Double-click MakeVPython.iss in the make directory. 
+	Near the start of the file, update AppVerName if necessary.
+	Do Build > Compile to produce a Windows installer.
+	Run the installer, then run compilevisual.py from the Visual source package to
+	Python-compile all the Visual .py files (produces .pyc files).
+	Run inno setup again, but uncomment the line that copies .pyc files.
+	This produces a Windows installer that can be used by an administrator to
+	install a fully-compiled Visual into a protected area that users can't write
+	to. Without this second inno setup to get the .pyc files, every user would
+	have to recompile some of the site-packages/visual/*.py files. No big deal,
+	but nicer to have these files already compiled.
 	
 	Alternatively, you may run 'make install-strip' to install a somewhat smaller
 	executable.
