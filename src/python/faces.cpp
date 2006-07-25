@@ -357,7 +357,7 @@ faces::gl_render( const view& scene)
 		const double* pos_i = index(pos, 0);
 		for (std::vector<vector>::iterator i = spos.begin(); i != spos.end(); ++i) {
 			*i = scene.gcf * vector(pos_i);
-			pos_i++;
+			pos_i += 3;
 		}
 		glVertexPointer( 3, GL_DOUBLE, 0, &*spos.begin());
 	}
@@ -373,7 +373,7 @@ faces::gl_render( const view& scene)
 				*i = rgb(color_i[0], color_i[1], color_i[2]).desaturate();
 			else
 				*i =  rgb(color_i[0], color_i[1], color_i[2]).grayscale();
-			color_i++;
+			color_i += 3;
 		}
 		glColorPointer( 3, GL_FLOAT, 0, &*tcolor.begin());
 	}
