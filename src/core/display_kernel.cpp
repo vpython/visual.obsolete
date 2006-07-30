@@ -108,24 +108,27 @@ display_kernel::tan_hfov( double* x, double* y)
 		aspect_ratio *= 2.0;
 	if (aspect_ratio > 1.0) {
 		// Tall window
-		*x = tan_hfov;
-		*y = tan_hfov * aspect_ratio;
+		*x = tan_hfov / aspect_ratio;
+		*y = tan_hfov;
 	}
 	else {
 		// Wide window
-		*y = tan_hfov;
-		*x = tan_hfov / aspect_ratio;;
+		*x = tan_hfov;
+		*y = tan_hfov * aspect_ratio;
 	}
 }
 
 vector
 display_kernel::calc_camera()
 {
+	return camera; 
+	/* old scheme not necessary?
 	double tan_hfov_x = 0.0;
 	double tan_hfov_y = 0.0;
 	tan_hfov( &tan_hfov_x, &tan_hfov_y);
 	double cot_hfov = 1 / std::min(tan_hfov_x, tan_hfov_y);
 	return (-forward.norm() * cot_hfov*user_scale).scale(range) + center;
+	*/
 }
 
 display_kernel::display_kernel()
@@ -141,12 +144,13 @@ display_kernel::display_kernel()
 	autoscale(true),
 	autocenter(false),
 	uniform(true),
+	camera(0,0,0),
 	user_scale(1.0),
 	gcf(1.0),
 	gcf_changed(false),
 	ambient( 0.2, 0.2, 0.2),
 	fps( 3e-3), // Ambitiously initialize to 3 ms per cycle.
-	show_renderspeed( true),
+	show_renderspeed( false),
 	background(0, 0, 0, 0), //< Transparent black.
 	spin_allowed(true),
 	zoom_allowed(true),
@@ -367,7 +371,7 @@ display_kernel::world_to_view_transform(
 	// See http://www.stereographics.com/support/developers/pcsdk.htm for a
 	// discussion regarding the design basis for the frustum offset code.
 	
-	vector scene_center = (center * gcf).scale_inv(range);
+	vector scene_center = center * gcf;
 	vector scene_up = up.norm();
     vector scene_forward = forward.norm();
 
@@ -376,32 +380,31 @@ display_kernel::world_to_view_transform(
 	double tan_hfov_y = 0.0;
 	tan_hfov( &tan_hfov_x, &tan_hfov_y);
 
-	// The cotangent of half of the narrower field of view.
-	double cot_hfov = 1 / std::min(tan_hfov_x, tan_hfov_y);
-	// The camera position used for gluLookAt
-	vector scene_camera = -scene_forward*cot_hfov*user_scale
-		+ scene_center;
-	// The true camera position, in world space. 
-	vector camera = (-scene_forward * cot_hfov*user_scale).scale(range) 
-		+ center;
+	// The cotangent of half of the wider field of view.
+	double cot_hfov = 1.0 / std::max(tan_hfov_x, tan_hfov_y);
+	
+	// gcf chosen so gcf*world -> scene fits in a 2 by 2 by 2 cube.
+	// scene_camera  is theposition used in gluLookAt to observe this cube.
+	
+	double nearest, farthest; // nearest and farthest points relative to <0,0,0> when projected onto forward
+	world_extent.near_and_far(forward, nearest, farthest);
+	nearest *= gcf;
+	farthest *= gcf;
+
+	// Position camera so that a 2 by 2 by 2 cube will have all its front face showing, with some border.
+	vector scene_camera = scene_center-1.05*(cot_hfov+1.0)*user_scale*scene_forward;
+	double nearclip = (cot_hfov-1.0)*user_scale; // from camera to front face of cube
+	// Compute farclip to include all objects (assuming camera pointed at them).
+	double farclip = (scene_center-scene_camera).mag()+farthest-scene_center.dot(scene_forward);
+	if (farclip <= nearclip) // if camera is beyond the objects, facing away from them
+		farclip = (scene_center-scene_camera).mag()-nearest+scene_center.dot(scene_forward);
+	
+	// The true camera position, in world space.
+	camera = scene_camera/gcf;
+
 	// The true distance between the camera and the visual center of the scene,
 	// in scaled world space.
 	double eye_length = (center-camera).mag() * gcf;
-
-	// Establish the distances to the clipping planes.  The are specified
-    // in scene space and not world space.
-	double nearclip = world_extent.nearclip( camera, scene_forward);
-    nearclip /= std::fabs( scene_forward.scale(range).mag());
-	double farclip = world_extent.farclip( camera, scene_forward);
-    farclip /= std::fabs( scene_forward.scale(range).mag());
-    // Prevent loosing too much precision in the depth buffer
-    if (nearclip < .01 * farclip)
-        nearclip = .01 * farclip;
-    // Prevent allowing the clipping planes to be at the same distance.
-    else if (std::fabs(1.0 - farclip / nearclip) < .01) {
-        nearclip *= .99;
-        farclip *= 1.01;
-    }
     
 	// Translate camera left/right 2% of the viewable width of the scene at
 	// the distance of its center.
@@ -431,10 +434,11 @@ display_kernel::world_to_view_transform(
 		// A scale based on the aspect ratio.
 		double width = (stereo_mode == PASSIVE_STEREO) 
 			? window_width*0.5 : window_width;
-		if (window_height > width) // Tall
-			glScaled( 1.0, window_height / width, 1.0);
-		else // Wide
-			glScaled( width / window_height, 1.0, 1.0);
+		if (width > window_height) // wide
+			glScaled( 1.0, (window_height/width)*(range.x/range.y), 1.0);
+		else // tall
+			glScaled( (width/window_height)*(range.y/range.x), 1.0, 1.0);
+		
 	}
 	#if 0
 	// Enable this to peek at the actual scene geometry.
@@ -449,9 +453,10 @@ display_kernel::world_to_view_transform(
 	std::cerr << "scene_geometry: camera:" << scene_camera 
         << " true camera:" << camera
 		<< " center:" << scene_center << " true center:" << center
-		<< " up:" << scene_up << " range:" << range*gcf 
+		<< " forward:" << scene_forward << " true forward:" << forward
+		<< " up:" << scene_up << " range:" << range 
 		<< " gcf:" << gcf << " nearclip:" << nearclip 
-		<< " farclip:" << farclip << " user_scale:" << user_scale
+		<< " farclip:" << farclip << " farthese:" << farthest << " user_scale:" << user_scale
         << " cot_hfov:" << cot_hfov << " tan_hfov_x:" << tan_hfov_x
         << " tan_hfov_y: " << tan_hfov_y
         << " window_width:" << window_width << " window_height:" << window_height
@@ -465,8 +470,8 @@ display_kernel::world_to_view_transform(
 		scene_camera.x, scene_camera.y, scene_camera.z,
 		scene_center.x, scene_center.y, scene_center.z,
 		scene_up.x, scene_up.y, scene_up.z);
-	vector scene_range = range * gcf;
-	glScaled( 1.0/scene_range.x, 1.0/scene_range.y, 1.0/scene_range.z);
+	//vector scene_range = range * gcf;
+	//glScaled( 1.0/scene_range.x, 1.0/scene_range.y, 1.0/scene_range.z);
 
 	// Establish a parallel-axis asymmetric stereo projection frustum.
 	glMatrixMode( GL_PROJECTION);
@@ -490,15 +495,15 @@ display_kernel::world_to_view_transform(
 	check_gl_error();
 	
 	// Finish initializing the view object.
-	if (uniform && range.x == range.y && range.x == range.z) {
+	if (1) {  // (uniform && range.x == range.y && range.x == range.z) {
 		geometry.camera = camera;
 		geometry.tan_hfov_x = tan_hfov_x;
 		geometry.tan_hfov_y = tan_hfov_y;
 		// The true viewing vertical direction is not the same as what is needed for
 		// gluLookAt().
 		geometry.up = forward.cross_b_cross_c(up, forward).norm();
-#if 1
 	}
+#if 0
 	else {
 		// There has got to be a better way to do this in the non-uniform case,
 		// but lacking one, I am using this technique instead.
@@ -559,8 +564,8 @@ display_kernel::recalc_extent(void)
 		center.assign_locked( world_extent.center());
 	}
 	if (autoscale) {
-		if (uniform) {
-			// compute range such that a unit cube, with sides == .5 * range,
+		if (0) { //(uniform) {
+			// compute range such that a cube, 2 units on a side, (range.x == 1.0)
 			// centered at center, will contain the entire scene.
 			double _range = world_extent.uniform_range( center);
 			if (_range <= 0.0)
@@ -584,12 +589,16 @@ display_kernel::recalc_extent(void)
         // We should NEVER deliberately set range to zero on any axis.
 		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
 	}
+	gcf = 1.0/(std::max(std::max(range.x,range.y),range.z));
+	gcf_changed = true;
+	/*
 	// TODO: There should be a faster way to do this comparison.
 	if (std::fabs(std::log( range.mag() * gcf)) >= std::log( 1e10)) {
 		// Reset the global correction factor.
 		gcf = 1.0 / range.mag();
 		gcf_changed = true;
 	}
+	*/
 }
 
 void 

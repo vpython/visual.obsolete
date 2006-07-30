@@ -65,16 +65,8 @@ class extent
 	/** Returns the center position of the scene in world space. */
 	vector center() const;
 
-
-	/** Returns a distance from the camera that minimizes forward encroachment into the scene. */
-	double nearclip( const vector& camera, const vector& forward) const;
-	
-	/** Returns the distance to the point that is farthest forward from the 
-	 * camera. 
-	 * @param camera  The location of the camera in world space.
-	 * @parm forward  The direction of the camera (should be a unit vector). 
-	 */
-	double farclip( const vector& camera, const vector& forward) const;
+	/** Returns distance that are nearest and farthest toward center along forward. */
+	void near_and_far( const vector& forward, double& nearest, double& farthest) const;
 	
 	/** Compute the maximum perpenduclar distance from the line defined by
 	 * forward and center and the corners of the bounding box. 

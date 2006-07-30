@@ -155,16 +155,18 @@ frame::frame_world_transform( const double gcf) const
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
 	
-	ret.x_column( x_axis * scale.x * gcf);
-	ret.y_column( y_axis * scale.y * gcf);
-	ret.z_column( z_axis * scale.z * gcf);
+	// I don't understand why removing gcf from the following 3 statements makes frames work (bas):
+	ret.x_column( x_axis * scale.x);
+	ret.y_column( y_axis * scale.y);
+	ret.z_column( z_axis * scale.z);
+	
 	ret.w_column( pos * gcf);
 	ret.w_row();
 	return ret;
 }
 
 tmatrix
-frame::world_frame_transform( const double) const
+frame::world_frame_transform() const
 {
 	// Performs a reorientation transform.
 	// ret = translation o reorientation o scale
@@ -299,9 +301,10 @@ frame::update_z_sort( const view&)
 void 
 frame::gl_render( const view& v)
 {
-	view local( v, world_frame_transform(v.gcf));
+	//view local( v, world_frame_transform()); // this seems irrelevant....??
+	view local = v;
     tmatrix fwt = frame_world_transform(v.gcf);
-	model_damage();
+    model_damage();
 	{
 		gl_matrix_stackguard guard( fwt);
 		
@@ -369,6 +372,7 @@ frame::gl_pick_render( const view& scene)
 	glPushName(0);
 	{
 		gl_matrix_stackguard guard( frame_world_transform(scene.gcf));
+		//gl_matrix_stackguard guard( frame_world_transform(1.0));
 		child_iterator i( children.begin());
 		child_iterator i_end( children.end());
 		// The unique integer to pass to OpenGL.

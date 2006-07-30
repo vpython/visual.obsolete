@@ -52,7 +52,7 @@ class frame : public renderable
  		@param gcf: the global correction factor, propogated from gl_render(). 
  	*/
 	tmatrix frame_world_transform( const double gcf) const;
-	tmatrix world_frame_transform( const double gcf) const;
+	tmatrix world_frame_transform() const;
 	
 	std::list<shared_ptr<renderable> > children;
 	typedef indirect_iterator<std::list<shared_ptr<renderable> >::iterator> 

@@ -50,6 +50,7 @@ class display_kernel
 	shared_vector forward; ///< The direction of the camera, in world space.
 	shared_vector up; ///< The vertical orientation of the scene, in world space.
 	vector range; ///< The range that each axis of the scene should cover in the view.
+	vector camera; //< World coordinates of camera location
 	
 	/** True initally and whenever the camera direction changes.  Set to false
 	 * after every render cycle. 

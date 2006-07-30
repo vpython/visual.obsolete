@@ -83,10 +83,11 @@ extent::merge_local( const tmatrix& fwt, const extent& local)
     if (local.first)
         return;
     
+    // Really should get extent of box, not approximate sphere
     vector min_corner = fwt*local.mins;
     vector max_corner = fwt*local.maxs;
     vector local_center = (min_corner + max_corner) * 0.5;
-    double radius = (min_corner - max_corner).mag();
+    double radius = 0.5*(min_corner - max_corner).mag();
     add_sphere( local_center, radius);
 }
 
@@ -99,49 +100,38 @@ extent::center() const
 	return (mins + maxs) * 0.5;
 }
 
-double
-extent::farclip( const vector& camera, const vector& forward) const
+void
+extent::near_and_far( const vector& forward, double& nearest, double& farthest ) const
 {
-	if (mins == maxs)
+	if (mins == maxs) {
 		// The only way that this should happen is if the scene is empty.
-		return 10.0;
-	
-	vector corners[] = {
-		maxs,
-		vector( mins.x, mins.y, maxs.z),
-		vector( mins.x, maxs.y, mins.z),
-		vector( mins.x, maxs.y, maxs.z),
-		vector( maxs.x, mins.y, mins.z),
-		vector( maxs.x, maxs.y, mins.z),
-		vector( maxs.x, mins.y, maxs.z)		
-	};
-	vector farthest = mins;
-	for (size_t i = 0; i < 7; ++i) {
-		if (corners[i].dot( forward) > farthest.dot( forward))
-			farthest = corners[i];
-	}
-	return (farthest - camera).mag();
-}
+		nearest = 1.0;
+		farthest = 10.0;
+	} 
 
-double
-extent::nearclip( const vector& camera, const vector& forward) const
-{
-    // Compute the distance from the camera to the nearest point
-    vector corners[] = {
-       maxs,
-       vector( mins.x, mins.y, maxs.z),
-       vector( mins.x, maxs.y, mins.z),
-       vector( mins.x, maxs.y, maxs.z),
-       vector( maxs.x, mins.y, mins.z),
-       vector( maxs.x, maxs.y, mins.z),
-       vector( maxs.x, mins.y, maxs.z)     
+    double corners[] = {
+       maxs.dot(forward), // front upper right
+       vector( mins.x, mins.y, maxs.z).dot(forward), // front lower left
+       vector( mins.x, maxs.y, maxs.z).dot(forward), // front upper left
+       vector( maxs.x, mins.y, maxs.z).dot(forward), // front lower right
+       vector( mins.x, maxs.y, mins.z).dot(forward), // back upper left
+       vector( maxs.x, mins.y, mins.z).dot(forward), // back lower right
+       vector( maxs.x, maxs.y, mins.z).dot(forward) // back upper right
     };
-    vector nearest = mins;
+    nearest = farthest = mins.dot(forward); // back lower left
     for (size_t i = 0; i < 7; ++i) {
-        if (corners[i].dot( forward) < nearest.dot( forward))
-            nearest = corners[i];
-    }
-    return (nearest - camera).dot( forward);
+		if (corners[i] < nearest) {
+        	nearest = corners[i];
+        	//std::cerr << "nearest=" << nearest << std::endl;
+        }
+		if (corners[i] > farthest) {
+			farthest = corners[i];
+        	//std::cerr << "farthest=" << farthest << std::endl;
+		}
+	//nearest = center+nearest.dot(forward)*forward;
+	//farthest = center+farthest.dot(forward)*forward;
+	//std::cerr << "near/far=" << nearest << farthest << std::endl;
+	}
 }
 
 double
@@ -162,7 +152,7 @@ extent::widest_offset( const vector& forward, const vector& center) const
 		vector( maxs.x, mins.y, maxs.z)		
 	};
 	for (size_t i = 0; i < 8; ++i) {
-		// The closes point which lies on the line of sight to the corner in
+		// The closest point which lies on the line of sight to the corner in
 		// question.
 		vector closest_point_on_los = 
 			(corners[i] - center).dot( forward)*forward + center;
@@ -180,10 +170,13 @@ extent::range( vector center) const
 {
     if (first)
         return vector(10.0, 10.0, 10.0);
+        /*
 	return vector(
 		std::max( fabs( center.x - mins.x), fabs( center.x - maxs.x)),
 		std::max( fabs( center.y - mins.y), fabs( center.y - maxs.y)),
 		std::max( fabs( center.z - mins.z), fabs( center.z - maxs.z)));
+	*/
+	return (0.5*(maxs-mins));
 }
 
 double 
@@ -227,7 +220,7 @@ extent::get_select_buffer_depth()
 void
 extent::dump_extent() const
 {
-	std::cerr << " extent.mins: " << mins << " extent.maxs: " << maxs;
+	std::cerr << " extent.mins: " << mins << " extent.maxs: " << maxs << std::endl;
 }
 
 } // !namespace cvisual
