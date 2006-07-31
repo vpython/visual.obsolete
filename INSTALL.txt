@@ -112,7 +112,6 @@ I.  Prerequisites:
 		> make
 		> make install
 		Can test that pkg-config is correctly installed by executing this:
-		> pkg-config --cflags libsigc-2.0
 		> pkg-config --cflags sigc++-2.0
 		
 	C.  GNU/Linux
