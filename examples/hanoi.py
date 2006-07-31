@@ -1,6 +1,6 @@
 from visual import *
-# ruth chabay, carnegie mellon university, 2000-06
-# rings may be dragged through stuff - a little surreal
+## ruth chabay, carnegie mellon university, 2000-06
+## rings may be dragged through stuff - a little surreal
 
 scene.y=0
 scene.width=800
@@ -38,29 +38,29 @@ while 1:
             pole1=int((mx+floor.height/2.)/(floor.height/3.))
             # pick up a ring
             if len(stack[pole1])>0:
-                select=stack[pole1][-1]              # remove ring from stack
+                select=stack[pole1][-1]     # remove ring from stack
                 del(stack[pole1][-1])
                 while not (scene.mouse.events and scene.mouse.getevent().drop):      # drag ring
                     select.pos=scene.mouse.project(normal=vector(0,0,1))
                     rate(60)
                 mx=select.x
                 pole2=int((mx+floor.height/2.)/(floor.height/3.))
-            # put down a ring
-            if len(stack[pole2])>0:      # stack not empty
-                if stack[pole2][-1].radius > select.radius:  # legal move
+                # put down a ring
+                if len(stack[pole2])>0:      # stack not empty
+                    if stack[pole2][-1].radius > select.radius:  # legal move
+                        select.x=poles[pole2].x
+                        select.y=-2+len(stack[pole2])
+                        stack[pole2].append(select)
+                        moves=moves+1
+                    else:       # illegal move
+                        select.x=poles[pole1].x
+                        select.y=-2+len(stack[pole1])
+                        stack[pole1].append(select)
+                else:           # stack empty
                     select.x=poles[pole2].x
-                    select.y=-2+len(stack[pole2])
+                    select.y=-2
                     stack[pole2].append(select)
                     moves=moves+1
-                else:       # illegal move
-                    select.x=poles[pole1].x
-                    select.y=-2+len(stack[pole1])
-                    stack[pole1].append(select)
-            else:           # stack empty
-                select.x=poles[pole2].x
-                select.y=-2
-                stack[pole2].append(select)
-                moves=moves+1
         if len(stack[2])==5:    # task completed?
             print "You won in ",moves," moves."
             flash=0
