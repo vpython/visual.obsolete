@@ -3,7 +3,7 @@ from random import random
 from time import clock
 import sys
 
-N = 5
+N = 3
 Ntotal = N*N*N
 scolor = (1,0.5,0)
 bcolor = (0,0.58,0.69)
