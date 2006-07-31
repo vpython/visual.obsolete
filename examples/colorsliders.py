@@ -60,7 +60,7 @@ panel = box(pos=(0,0.5,0), length=1.5, height=1, width=0.1, color=rgba)
 ball = sphere(pos=(0,0.5,0), radius=0.5, color=rgba)
 cube = box(pos=(0,1.2,0), axis=(1,1,1),
            length=wcube, width=wcube, height=wcube, color=rgba)
-behind = arrow( pos=(-.75, 0, -.75), axis=(1.5, 1, 0), color=color.white)
+behind = cylinder( pos=(-.75, 0, -.75), axis=(1.5, 1, 0), radius=0.1, color=color.white)
 dragobj = None
 
 while 1:
