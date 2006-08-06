@@ -12,7 +12,7 @@ using boost::lexical_cast;
 namespace cvisual {
 
 texture::texture()
-	: damaged(false), handle(0), have_alpha(false)
+	: damaged(false), handle(0), have_opacity(false)
 {
 }
 
@@ -47,9 +47,9 @@ texture::gl_activate()
 }
 
 bool
-texture::has_alpha() const
+texture::has_opacity() const
 {
-	return have_alpha;
+	return have_opacity;
 }
 
 void

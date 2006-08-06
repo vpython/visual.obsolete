@@ -129,14 +129,14 @@ rgba
 rgba::desaturate() const
 {
 	rgb ret = cvisual::desaturate( rgb(red, green, blue));
-	return rgba( ret.red, ret.green, ret.blue, alpha);
+	return rgba( ret.red, ret.green, ret.blue, opacity);
 }
 
 rgba
 rgba::grayscale() const
 {
 	rgb ret = cvisual::grayscale( rgb(red, blue, green));
-	return rgba( ret.red, ret.green, ret.blue, alpha);
+	return rgba( ret.red, ret.green, ret.blue, opacity);
 }
 
 rgb
