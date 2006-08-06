@@ -170,13 +170,11 @@ extent::range( vector center) const
 {
     if (first)
         return vector(10.0, 10.0, 10.0);
-        /*
+ 
 	return vector(
 		std::max( fabs( center.x - mins.x), fabs( center.x - maxs.x)),
 		std::max( fabs( center.y - mins.y), fabs( center.y - maxs.y)),
 		std::max( fabs( center.z - mins.z), fabs( center.z - maxs.z)));
-	*/
-	return (0.5*(maxs-mins));
 }
 
 double 
