@@ -176,7 +176,7 @@ void
 primitive::set_axis( const vector& n_axis)
 {
 	model_damage();
-	if (color.alpha != 1.0)
+	if (color.opacity != 1.0)
 		if (n_axis.norm() != axis.norm()) {
 			z_damage();
 		}
@@ -193,7 +193,7 @@ void
 primitive::set_up( const vector& n_up)
 {
 	model_damage();
-	if (color.alpha != 1.0) {
+	if (color.opacity != 1.0) {
 		z_damage();
 	}
 	up = n_up;
@@ -253,16 +253,16 @@ primitive::get_blue()
 }
 
 void
-primitive::set_alpha( double a)
+primitive::set_opacity( double a)
 {
 	lock L(mtx);
-	color.alpha = a;
+	color.opacity = a;
 }
 
 double
-primitive::get_alpha()
+primitive::get_opacity()
 {
-	return color.alpha;
+	return color.opacity;
 }
 
 rgba

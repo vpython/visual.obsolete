@@ -43,9 +43,6 @@ class label : public renderable
 	void set_blue( double x);
 	double get_blue();
 	
-	void set_alpha( double x);
-	double get_alpha();
-	
 	void set_opacity( double);
 	double get_opacity();
 

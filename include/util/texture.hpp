@@ -52,15 +52,15 @@ class texture : public sigc::trackable
 	*/
 	void gl_activate();
  
-	/** Determine whether or not this texture has an alpha channel.
-		@returns True iff there is an alpha channel for this texture.
+	/** Determine whether or not this texture has an opacity channel.
+		@returns True iff there is an opacity channel for this texture.
 	*/
-	bool has_alpha() const;
+	bool has_opacity() const;
  
  protected:
 	// A unique identifier for the texture, to be obtained from glGenTextures().
 	unsigned int handle;
-	bool have_alpha;
+	bool have_opacity;
  
 	// Perform zero initialization of POD members.
 	texture();

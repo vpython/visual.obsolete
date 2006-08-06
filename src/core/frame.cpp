@@ -210,7 +210,7 @@ frame::world_frame_transform() const
 void 
 frame::add_renderable( shared_ptr<renderable> obj)
 {
-	if (obj->color.alpha == 1.0)
+	if (obj->color.opacity == 1.0)
 		children.push_back( obj);
 	else
 		trans_children.push_back( obj);
@@ -219,7 +219,7 @@ frame::add_renderable( shared_ptr<renderable> obj)
 void 
 frame::remove_renderable( shared_ptr<renderable> obj)
 {
-	if (obj->color.alpha != 1.0) {
+	if (obj->color.opacity != 1.0) {
 		std::remove( trans_children.begin(), trans_children.end(), obj);
 	}
 	else
@@ -309,7 +309,7 @@ frame::gl_render( const view& v)
 		gl_matrix_stackguard guard( fwt);
 		
 		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
-			if (i->color.alpha != 1.0) {
+			if (i->color.opacity != 1.0) {
 				// See display_kernel::draw().
 				trans_children.push_back( *i.base());
 				i = children.erase(i.base());
@@ -332,7 +332,7 @@ frame::gl_render( const view& v)
 		
 		// Perform a depth sort of the transparent children from forward to backward.
 		if (!trans_children.empty()) {
-			color.alpha = 0.5;
+			color.opacity = 0.5;
 		}
 		if (trans_children.size() > 1)
 			std::stable_sort( trans_children.begin(), trans_children.end(),

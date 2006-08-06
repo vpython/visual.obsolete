@@ -95,7 +95,8 @@ wrap_primitive()
 		.add_property( "red", &primitive::get_red, &primitive::set_red)
 		.add_property( "green", &primitive::get_green, &primitive::set_green)
 		.add_property( "blue", &primitive::get_blue, &primitive::set_blue)
-		.add_property( "alpha", &primitive::get_alpha, &primitive::set_alpha)		
+		.add_property( "opacity", &primitive::get_opacity, &primitive::set_opacity)
+		.add_property( "alpha", &primitive::get_opacity, &primitive::set_opacity)		
         .def( "rotate", raw_function( &py_rotate<primitive>))
 		;
 		
@@ -161,7 +162,8 @@ wrap_primitive()
 		.add_property( "red", &label::get_red, &label::set_red)
 		.add_property( "green", &label::get_green, &label::set_green)
 		.add_property( "blue", &label::get_blue, &label::set_blue)
-		.add_property( "alpha", &label::get_alpha, &label::set_alpha)
+		.add_property( "opacity", &label::get_opacity, &label::set_opacity)
+		.add_property( "alpha", &label::get_opacity, &label::set_opacity)
 		.add_property( "pos", 
 			make_function(&label::get_pos, return_internal_reference<>()), 
 			&label::set_pos)

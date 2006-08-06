@@ -59,7 +59,7 @@ pyramid::update_cache( const view&)
 	// it.  Transparent pyramids unconditionally resort thier models prior
 	// to rendering them.  Since they only take a few usec to do so, it isn't
 	// a bottleneck.
-	if (color.alpha != 1.0 && !sorted_model) {
+	if (color.opacity != 1.0 && !sorted_model) {
 		// Initialize the sortable model
 		vector corners[4] = {
 			vector(0, 0.5, 0.5),
@@ -142,7 +142,7 @@ pyramid::gl_render( const view& scene)
 		glScaled( axis.mag() * scene.gcf, height * scene.gcf, width * scene.gcf);
 		
 		color.gl_set();
-		if (color.alpha != 1.0) {
+		if (color.opacity != 1.0) {
 			vector forward = mwt.times_inv((pos - scene.camera)).norm();
 			sorted_model->sort( forward);
 			gl_enable blend( GL_BLEND);

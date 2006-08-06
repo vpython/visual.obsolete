@@ -99,7 +99,7 @@ arrow::recalc_sorted_model( const double& gcf)
 void
 arrow::cache_transparent_model( const view&)
 {
-	assert( color.alpha < 1.0);
+	assert( color.opacity < 1.0);
 	// Compile the rendering code for the beastie.
 	clear_gl_error();
 	model.gl_compile_begin();
@@ -288,7 +288,7 @@ arrow::update_cache( const view& scene)
 		eff_headlength, scene.gcf);
 	eff_shaftlength = eff_length - eff_headlength;
 	
-	if (color.alpha != 1.0) {
+	if (color.opacity != 1.0) {
 		if (!sorted_model) {
 			sorted_model.reset( new z_sorted_model<triangle, 22>());
 		}

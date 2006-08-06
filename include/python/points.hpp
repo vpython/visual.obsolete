@@ -91,9 +91,9 @@ class points : public renderable
 	void set_green( const array& green);
 	void set_green_l( const list& green);
 	void set_green_d( const float green);
-	void set_alpha( const array& alpha);
-	void set_alpha_l( const list& alpha);
-	void set_alpha_d( const float alpha);
+	void set_opacity( const array& opacity);
+	void set_opacity_l( const list& opacity);
+	void set_opacity_d( const float opacity);
 	void set_x( const array& x);
 	void set_x_l( const list& x);
 	void set_x_d( const double x);

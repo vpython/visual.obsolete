@@ -153,17 +153,10 @@ label::get_blue()
 	return color.blue;
 }
 
-void
-label::set_alpha( double a)
-{
-	lock L(mtx);
-	color.alpha = a;
-}
-
 double
-label::get_alpha()
+label::get_opacity()
 {
-	return color.alpha;
+	return color.opacity;
 }
 
 void
@@ -171,12 +164,6 @@ label::set_opacity( double o)
 {
 	lock L(mtx);
 	opacity = o;
-}
-
-double
-label::get_opacity()
-{
-	return opacity;
 }
 
 void

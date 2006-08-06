@@ -144,7 +144,7 @@ struct rgba_to_tuple
 {
 	static PyObject* convert( const rgba& color)
 	{
-		py::tuple ret = py::make_tuple( color.red, color.green, color.blue, color.alpha);
+		py::tuple ret = py::make_tuple( color.red, color.green, color.blue, color.opacity);
 		Py_INCREF(ret.ptr());
 		return ret.ptr();
 	}

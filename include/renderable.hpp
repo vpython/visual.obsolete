@@ -123,7 +123,7 @@ private:
 	 */
 	bool model_damaged;	
 	/** True if the model needs to be resorted.  update_z_sort() will be called
-	 * if this is true and color.alpha != 1.0 in the render cycle. 
+	 * if this is true and color.opacity != 1.0 in the render cycle. 
 	 */
 	bool z_damaged;
 

@@ -465,7 +465,7 @@ render_surface::create()
 		PFD_TYPE_RGBA,                   // RGBA type 
 		24,                              // 24-bit color depth 
 		0, 0, 0, 0, 0, 0,                // color bits ignored 
-		0,                               // no alpha buffer 
+		0,                               // no opacity buffer 
 		0,                               // shift bit ignored 
 		0,                               // no accumulation buffer 
 		0, 0, 0, 0,                      // accum bits ignored 

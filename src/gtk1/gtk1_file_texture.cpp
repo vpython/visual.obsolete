@@ -38,7 +38,7 @@ file_texture::gl_init()
 	glBindTexture(GL_TEXTURE_2D, handle);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	if (gdk_pixbuf_get_has_alpha(image)) {
+	if (gdk_pixbuf_get_has_opacity(image)) {
 		gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGBA, gdk_pixbuf_get_width(image),
 			gdk_pixbuf_get_height(image), GL_RGBA, GL_UNSIGNED_BYTE, 
 			gdk_pixbuf_get_pixels(image));

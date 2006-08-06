@@ -118,7 +118,7 @@ box::gl_render( const view& scene)
 		model_world_transform().gl_mult();
 		glScaled( axis.mag() * gcf, height * gcf, width*gcf);
 		
-		if (tex && (color.alpha < 1.0 || tex->has_alpha())) {
+		if (tex && (color.opacity < 1.0 || tex->has_opacity())) {
 			// Render the textured and transparent box.
 			vector object_forward = (pos - scene.camera).norm();
 			tmatrix inv = world_model_transform();
@@ -146,7 +146,7 @@ box::gl_render( const view& scene)
 			tex->gl_activate();
 			textured_model.gl_render();
 		}
-		else if (color.alpha < 1.0) {
+		else if (color.opacity < 1.0) {
 			// Render the transparent box
 			vector object_forward = (pos - scene.camera).norm();
 			tmatrix inv = world_model_transform();

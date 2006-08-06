@@ -94,7 +94,7 @@ ring::gl_render( const view& scene)
 		gl_enable_client vertex_array( GL_VERTEX_ARRAY);
 		gl_enable_client normal_array( GL_NORMAL_ARRAY);
 		gl_matrix_stackguard guard;
-		if (color.alpha == 1.0)
+		if (color.opacity == 1.0)
 			do_render_opaque( scene, rings, bands);
 		else
 			do_render_translucent( scene, rings, bands);

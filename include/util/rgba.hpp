@@ -23,19 +23,19 @@ class rgba
 	float green;
 	/** Blue channel intensity, clamped to [0,1] */
 	float blue;
-	/** Alpha channel intensity, clamped to [0,1] */
-	float alpha;
+	/** opacity channel intensity, clamped to [0,1] */
+	float opacity;
 
 
 	/** Defaults to opaque white. */
-	inline rgba() : red(1.0), green(1.0), blue(1.0), alpha(1.0) {}
+	inline rgba() : red(1.0), green(1.0), blue(1.0), opacity(1.0) {}
 	/** Allocate a new color. */
 	inline rgba( float r, float g, float b, float a = 1.0)
-		: red(r), green(g), blue(b), alpha(a) {}
+		: red(r), green(g), blue(b), opacity(a) {}
 	inline rgba( float bw)
-		: red(bw), green(bw), blue(bw), alpha(1) {}
+		: red(bw), green(bw), blue(bw), opacity(1) {}
 	inline explicit rgba( const float* c)
-		: red(c[0]), green(c[1]), blue(c[2]), alpha( c[3]) {}
+		: red(c[0]), green(c[1]), blue(c[2]), opacity( c[3]) {}
 			
 	/** Convert to HSVA, lower saturation by 50%, convert back to RGBA. 
 		@return The desaturated color.

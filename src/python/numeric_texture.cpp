@@ -297,7 +297,7 @@ numeric_texture::set_data( boost::python::numeric::array data)
 	data_height = dims[0];
 	data_width = dims[1];
 	data_channels = dims.size() == 3 ? dims[2] : 1;
-	have_alpha = (
+	have_opacity = (
 		data_channels == 2 || 
 		data_channels == 4 ||
 		(data_channels == 1 && data_textype == GL_ALPHA)
@@ -318,6 +318,10 @@ numeric_texture::set_type( std::string requested_type)
 	GLenum req_type = 0;
 	if (requested_type == "luminance")
 		req_type = GL_LUMINANCE;
+	else if (requested_type == "opacity")
+		req_type = GL_ALPHA;
+	else if (requested_type == "luminance_opacity")
+		req_type = GL_LUMINANCE_ALPHA;
 	else if (requested_type == "alpha")
 		req_type = GL_ALPHA;
 	else if (requested_type == "luminance_alpha")
@@ -333,7 +337,7 @@ numeric_texture::set_type( std::string requested_type)
 	lock L(mtx);
 	data_textype = req_type;
 	if (req_type == GL_RGBA || req_type == GL_ALPHA || req_type == GL_LUMINANCE_ALPHA)
-		have_alpha = true;
+		have_opacity = true;
 	damage();
 }
 
@@ -344,9 +348,9 @@ numeric_texture::get_type() const
 		case GL_LUMINANCE:
 			return std::string( "luminance");
 		case GL_ALPHA:
-			return std::string( "alpha");
+			return std::string( "opacity");
 		case GL_LUMINANCE_ALPHA:
-			return std::string( "luminance_alpha");
+			return std::string( "luminance_opacity");
 		case GL_RGB:
 			return std::string( "rgb");
 		case GL_RGBA:

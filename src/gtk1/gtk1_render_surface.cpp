@@ -57,7 +57,7 @@ render_surface::render_surface()
 void 
 render_surface::add_renderable( shared_ptr<renderable> obj)
 {
-	if (obj->color.alpha == 1.0)
+	if (obj->color.opacity == 1.0)
 		core.layer_world.push_back( obj);
 	else
 		core.layer_world_transparent.push_back( obj);
@@ -75,7 +75,7 @@ render_surface::remove_renderable( shared_ptr<renderable> obj)
 	// Choice of removal algorithms:  For containers that support thier own
 	// removal methods (list, set), use the member function.  Else, use 
 	// std::remove.
-	if (obj->color.alpha != 1.0) {
+	if (obj->color.opacity != 1.0) {
 		core.layer_world.remove( obj);
 	}
 	else

@@ -166,7 +166,7 @@ points::set_length( size_t length)
 }
 
 void
-points::append_rgba( vector npos, float red, float blue, float green, float alpha) 
+points::append_rgba( vector npos, float red, float blue, float green, float opacity) 
 {
 	lock L(mtx);
 	set_length( count+1);
@@ -181,8 +181,8 @@ points::append_rgba( vector npos, float red, float blue, float green, float alph
 		last_color[1] = green;
 	if (blue != -1)
 		last_color[2] = blue;
-	if (alpha != -1)
-		last_color[3] = alpha;
+	if (opacity != -1)
+		last_color[3] = opacity;
 }
 
 void
@@ -209,7 +209,7 @@ points::append( vector npos, rgba ncolor)
 	last_color[0] = ncolor.red;
 	last_color[1] = ncolor.green;
 	last_color[2] = ncolor.blue;
-	last_color[3] = ncolor.alpha;
+	last_color[3] = ncolor.opacity;
 }
 
 object
@@ -366,7 +366,7 @@ points::set_color_l( const list& color)
 void
 points::set_color_t( const rgba& color)
 {
-	this->set_color( array( make_tuple( color.red, color.green, color.blue, color.alpha)));
+	this->set_color( array( make_tuple( color.red, color.green, color.blue, color.opacity)));
 }
 
 
@@ -395,11 +395,11 @@ points::set_blue( const array& blue)
 }
 
 void
-points::set_alpha( const array& alpha)
+points::set_opacity( const array& opacity)
 {
 	lock L(mtx);
-	set_length(shape( alpha).at(0));
-	color[make_tuple( slice( 0, count), 3)] = alpha;
+	set_length(shape( opacity).at(0));
+	color[make_tuple( slice( 0, count), 3)] = opacity;
 }
 
 void
@@ -421,9 +421,9 @@ points::set_blue_l( const list& blue)
 }
 
 void
-points::set_alpha_l( const list& alpha)
+points::set_opacity_l( const list& opacity)
 {
-	this->set_alpha( array( alpha));
+	this->set_opacity( array( opacity));
 }
 
 void
@@ -531,13 +531,13 @@ points::set_blue_d( float blue)
 }
 
 void
-points::set_alpha_d( float alpha)
+points::set_opacity_d( float opacity)
 {
 	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
-	color[make_tuple(slice(0,count), 3)] = alpha;	
+	color[make_tuple(slice(0,count), 3)] = opacity;	
 }
 
 bool
@@ -589,7 +589,7 @@ points::gl_render( const view& scene)
 	}
 	// Now conditionally apply transformations for gcf and anaglyph color
 	if (translucent_points.size())
-		renderable::color.alpha = 0.5;
+		renderable::color.opacity = 0.5;
 	if (scene.gcf != 1.0) {
 		for (opaque_iterator i = opaque_points.begin(); i != opaque_points.end(); ++i) {
 			i->center *= scene.gcf;
