@@ -49,10 +49,10 @@ while 1:
         if m.drag:
             drag = 1
             obs = None # force update of position
-            scene.cursor.visible = 0
+            # scene.cursor.visible = 0 # not yet implemented
         if m.drop:
             drag = 0
-            scene.cursor.visible = 1
+            # scene.cursor.visible = 1
             arrow(pos=obs, axis=Bscale*BField(obs), shaftwidth=vwidth, color=(0,1,1))
         elif m.click:
             arrow(pos=m.pos, axis=Bscale*BField(m.pos), shaftwidth=vwidth, color=(0,1,1))
