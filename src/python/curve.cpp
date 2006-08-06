@@ -889,8 +889,9 @@ curve::gl_render( const view& scene)
 		// if the checksum has been constant for some predetermined number of
 		// rendering cycles.
 		long check = checksum( begin, begin+size);
-		if (check == c->checksum)
+		if (check == c->checksum and not scene.gcf_changed) {
 			c->gl_cache.gl_render();
+		}
 		else {
 			c->gl_cache.gl_compile_begin();
 			if (do_thinline)
