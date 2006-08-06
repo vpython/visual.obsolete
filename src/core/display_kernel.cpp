@@ -564,41 +564,25 @@ display_kernel::recalc_extent(void)
 		center.assign_locked( world_extent.center());
 	}
 	if (autoscale) {
-		if (0) { //(uniform) {
-			// compute range such that a cube, 2 units on a side, (range.x == 1.0)
-			// centered at center, will contain the entire scene.
-			double _range = world_extent.uniform_range( center);
-			if (_range <= 0.0)
-				_range = 1.0;
-			range = vector( _range, _range, _range);
-		}
-		else {
-			// Compute range such that the three axes, centered at center,
-			// will contain the entire scene.
-			range = world_extent.range( center);
-			if (!range.x)
-				range.x = 1.0;
-			if (!range.y)
-				range.y = 1.0;
-			if (!range.z)
-				range.z = 1.0;
-		}
+		// Compute range such that the three axes, centered at center,
+		// will contain the entire scene.
+		range = world_extent.range( center);
+		if (!range.x)
+			range.x = 1.0;
+		if (!range.y)
+			range.y = 1.0;
+		if (!range.z)
+			range.z = 1.0;
 		if (range.mag() > 1e150)
 			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
 				" an extent greater than about 1e154 units.");
         // We should NEVER deliberately set range to zero on any axis.
 		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
 	}
+	double oldgcf = gcf;
 	gcf = 1.0/(std::max(std::max(range.x,range.y),range.z));
-	gcf_changed = true;
-	/*
-	// TODO: There should be a faster way to do this comparison.
-	if (std::fabs(std::log( range.mag() * gcf)) >= std::log( 1e10)) {
-		// Reset the global correction factor.
-		gcf = 1.0 / range.mag();
-		gcf_changed = true;
-	}
-	*/
+	gcf_changed = (gcf != oldgcf); // always true for some reason....
+	// std::cerr << " gcf=" << gcf << " oldgcf=" << oldgcf << " gcf_changed=" << gcf_changed << std::endl;
 }
 
 void 
@@ -860,7 +844,7 @@ display_kernel::render_scene(void)
 		gl_end();
 		fps.stop();
 		cycles_since_extent++;
-		gcf_changed = false;
+		//gcf_changed = false;
 		forward_changed = false;
 	}
 	catch (gl_error e) {
