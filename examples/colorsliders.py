@@ -1,8 +1,9 @@
 from visual import *
 
 print """
-Click and drag a ball (with mouse button down) on an RGB or HSV slider.
-Click one of the colored objects to print RGB and HSV values.
+Click and drag a ball (with mouse button down) on an RGBO or HSV slider.
+Click one of the colored objects to print RGBO and HSV values.
+RGBO = red, green, blue, opacity; HSV = hue, saturation, value (intensity).
 """
 
 scene.userspin = 0
@@ -47,19 +48,19 @@ scene.height = 400
 scene.center = (0,0.5,0)
 scene.title = "RGB and HSV color"
 wcube = 0.2
-rgba = (1,0,0,1)
+rgbo = (1,0,0,1)
 hsv = color.rgb_to_hsv((1,0,0))
-ctrl = [slider(pos=(-1.75,0,0), color=(1,0,0), max=1., value=rgba[0]),
-           slider(pos=(-1.5,0,0), color=(0,1,0), max=1., value=rgba[1]),
-           slider(pos=(-1.25,0,0), color=(0,0,1), max=1., value=rgba[2]),
-           slider(pos=(-1,0,0), color=(0.5,0.5,0.5),max=1., value=rgba[3]),
+ctrl = [slider(pos=(-1.75,0,0), color=(1,0,0), max=1., value=rgbo[0]),
+           slider(pos=(-1.5,0,0), color=(0,1,0), max=1., value=rgbo[1]),
+           slider(pos=(-1.25,0,0), color=(0,0,1), max=1., value=rgbo[2]),
+           slider(pos=(-1,0,0), color=(0.5,0.5,0.5),max=1., value=rgbo[3]),
         slider(pos=(+1.0,0,0), color=(1,0,0), max=1., value=hsv[0]),
            slider(pos=(+1.25,0,0), color=(1,1,1), max=1., value=hsv[1]),
            slider(pos=(+1.5,0,0), color=(0.5,0.5,0.5), max=1., value=hsv[2])]
-panel = box(pos=(0,0.5,0), length=1.5, height=1, width=0.1, color=rgba)
-ball = sphere(pos=(0,0.5,0), radius=0.5, color=rgba)
+panel = box(pos=(0,0.5,0), length=1.5, height=1, width=0.1, color=rgbo)
+ball = sphere(pos=(0,0.5,0), radius=0.5, color=rgbo)
 cube = box(pos=(0,1.2,0), axis=(1,1,1),
-           length=wcube, width=wcube, height=wcube, color=rgba)
+           length=wcube, width=wcube, height=wcube, color=rgbo)
 behind = cylinder( pos=(-.75, 0, -.75), axis=(1.5, 1, 0), radius=0.1, color=color.white)
 dragobj = None
 
@@ -91,8 +92,8 @@ while 1:
             for nn in range(3):
                 ctrl[nn+4].setslider(hsv[nn])
         else: # hsv sliders
-            rgba = color.hsv_to_rgb((ctrl[4].value,ctrl[5].value,ctrl[6].value)) + (ctrl[3].value,)
-            cube.color = ball.color = panel.color = rgba
+            rgbo = color.hsv_to_rgb((ctrl[4].value,ctrl[5].value,ctrl[6].value)) + (ctrl[3].value,)
+            cube.color = ball.color = panel.color = rgbo
             for nn in range(3):
-                ctrl[nn].setslider(rgba[nn])
+                ctrl[nn].setslider(rgbo[nn])
 
