@@ -393,11 +393,11 @@ display_kernel::world_to_view_transform(
 
 	// Position camera so that a 2 by 2 by 2 cube will have all its front face showing, with some border.
 	vector scene_camera = scene_center-1.05*(cot_hfov+1.0)*user_scale*scene_forward;
-	double nearclip = (cot_hfov-1.0)*user_scale; // from camera to front face of cube
+	double nearclip = 0.1*(cot_hfov-1.0)*user_scale; // from camera to front face of cube
 	// Compute farclip to include all objects (assuming camera pointed at them).
-	double farclip = (scene_center-scene_camera).mag()+farthest-scene_center.dot(scene_forward);
+	double farclip = (scene_center-scene_camera).mag()+1.1*farthest-scene_center.dot(scene_forward);
 	if (farclip <= nearclip) // if camera is beyond the objects, facing away from them
-		farclip = (scene_center-scene_camera).mag()-nearest+scene_center.dot(scene_forward);
+		farclip = (scene_center-scene_camera).mag()-0.9*nearest+scene_center.dot(scene_forward);
 	
 	// The true camera position, in world space.
 	camera = scene_camera/gcf;
@@ -456,7 +456,7 @@ display_kernel::world_to_view_transform(
 		<< " forward:" << scene_forward << " true forward:" << forward
 		<< " up:" << scene_up << " range:" << range 
 		<< " gcf:" << gcf << " nearclip:" << nearclip 
-		<< " farclip:" << farclip << " farthese:" << farthest << " user_scale:" << user_scale
+		<< " farclip:" << farclip << " farthest:" << farthest << " user_scale:" << user_scale
         << " cot_hfov:" << cot_hfov << " tan_hfov_x:" << tan_hfov_x
         << " tan_hfov_y: " << tan_hfov_y
         << " window_width:" << window_width << " window_height:" << window_height
@@ -605,7 +605,7 @@ void
 display_kernel::add_renderable( shared_ptr<renderable> obj)
 {
 	lock L(mtx);
-	if (obj->color.alpha == 1.0)
+	if (obj->color.opacity == 1.0)
 		layer_world.push_back( obj);
 	else
 		layer_world_transparent.push_back( obj);
@@ -636,7 +636,7 @@ display_kernel::draw(
 	world_iterator i_end( layer_world.end());
 	while (i != i_end) {
 		lock L(i->mtx);
-		if (i->color.alpha != 1.0 || (i->get_texture() && i->get_texture()->has_alpha())) {
+		if (i->color.opacity != 1.0 || (i->get_texture() && i->get_texture()->has_opacity())) {
 			// The color of the object has become transparent when it was not
 			// initially.  Move it to the transparent layer.  The penalty for
 			// being rendered in the transparent layer when it is opaque is only
