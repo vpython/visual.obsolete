@@ -73,6 +73,13 @@ class display_kernel
 	 large dimensions are rendered properly.  See the .cpp file for details.
 	*/
 	double gcf;
+	/** Previous computed gcf; if new computed gcf only slightly larger, don't zoom in
+	 so that the display doesn't fibrillate with a bounce.
+	 */
+	double lastgcf;
+	/** Smallest computed gcf; only if gcf gets smaller than mingcf do we adjust gcf.
+	 */
+	double mingcf;
 	/** True if the gcf has changed since the last render cycle.  Set to false
 	 * after every rendering cycle. 
 	 */

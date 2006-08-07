@@ -147,6 +147,8 @@ display_kernel::display_kernel()
 	camera(0,0,0),
 	user_scale(1.0),
 	gcf(1.0),
+	mingcf(1e100),
+	lastgcf(1.0),
 	gcf_changed(false),
 	ambient( 0.2, 0.2, 0.2),
 	fps( 3e-3), // Ambitiously initialize to 3 ms per cycle.
@@ -579,10 +581,15 @@ display_kernel::recalc_extent(void)
         // We should NEVER deliberately set range to zero on any axis.
 		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
 	}
-	double oldgcf = gcf;
-	gcf = 1.0/(std::max(std::max(range.x,range.y),range.z));
-	gcf_changed = (gcf != oldgcf); // always true for some reason....
-	// std::cerr << " gcf=" << gcf << " oldgcf=" << oldgcf << " gcf_changed=" << gcf_changed << std::endl;
+	double newgcf = 1.0/(std::max(std::max(range.x,range.y),range.z));
+	gcf_changed = false;
+	if ( ((newgcf < lastgcf) && (newgcf < mingcf)) || (newgcf > 2.0*lastgcf) ) {
+		if (newgcf < mingcf)
+			mingcf = newgcf;
+		gcf = newgcf;
+		gcf_changed = true;
+	}
+	lastgcf = newgcf;
 }
 
 void 
