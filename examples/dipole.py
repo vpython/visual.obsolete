@@ -9,12 +9,12 @@ Middle button drag up or down to zoom in or out.
 
 ec = 1.6e-19  # electron charge
 
+scene.title="Electric Field Vectors"
+scene.range = 2e-13
+
 charges = [ sphere( pos = (-1e-13,0,0), Q =  ec, color=color.red, radius = 6e-15 ),
             sphere( pos = ( 1e-13,0,0), Q = -ec, color=color.blue, radius = 6e-15 ),
           ]
-
-scene.title="Electric Field Vectors"
-scene.range = 2e-13
 
 def getfield(p):
     f = vector(0,0,0)
