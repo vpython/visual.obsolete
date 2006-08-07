@@ -183,7 +183,7 @@ while 1:
         if abs(dot(ray,scene.forward)) < maxcosine: # do something only if outside crosshairs
             newray = norm(vector(ray.x, 0, ray.z))
             angle = arcsin(dot(cross(scene.forward,newray),scene.up))
-            newforward = rotate(scene.forward, axis=scene.up, angle=angle/10.)
+            newforward = rotate(scene.forward, axis=scene.up, angle=angle/100.)
             scene.center = scene.mouse.camera+newforward*mag(scene.center-scene.mouse.camera)
             scene.forward = newforward
             scene.center = scene.center+scene.forward*ray.y/2.
