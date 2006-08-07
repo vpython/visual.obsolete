@@ -84,7 +84,7 @@ font::lay_out( const std::string& new_text )
 		text.push_back( line);
 	
 	float maxwidth = 0;
-	float total_height;
+	float total_height = 0;
 	for (layout::text_iter i = text.begin(); i != text.end(); ++i) {
 		SIZE size;
 		GetTextExtentPoint32(
