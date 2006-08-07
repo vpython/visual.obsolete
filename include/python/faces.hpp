@@ -60,6 +60,7 @@ class faces : public renderable
 	void set_color_l( boost::python::list color);
 	void set_normal( const array& normal);
 	void set_normal_l( boost::python::list normals);
+	void set_normal_v( const vector);
 };
 
 } } // !namespace cvisual::python

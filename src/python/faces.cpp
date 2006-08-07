@@ -345,11 +345,11 @@ faces::set_normal_l( boost::python::list normals)
 void
 faces::set_normal_v( vector v)
 {
-	using visual::python::slice;
+	using boost::python::make_tuple;
 	// Broadcast the new normal across the array.
 	int npoints = count ? count : 1;
-	write_lock L(mtx);
-	normal[slice(0, npoints)] = v.as_tuple();
+	lock L(mtx);
+	normal[slice(0, npoints)] = make_tuple( v.x, v.y, v.z);
 }
 
 void
@@ -434,12 +434,6 @@ faces::grow_extent( extent& world)
 		pos_i += 3; // 3 doubles per vector point
 	}
 	world.add_body();
-}
-
-void
-faces::set_normal_l( boost::python::list normals)
-{
-	set_normal( array(normals));	
 }
 	
 } } // !namespace cvisual::python
