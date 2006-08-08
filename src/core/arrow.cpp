@@ -213,6 +213,10 @@ arrow::gl_pick_render( const view& scene)
 		return;
 	if (!model)
 		update_cache( scene);
+	gl_matrix_stackguard guard;
+	vector view_pos = pos * scene.gcf;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);
+	model_world_transform().gl_mult();
 	model.gl_render();
 }
 
