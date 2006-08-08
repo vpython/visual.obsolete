@@ -17,7 +17,7 @@ docfiles = visual/VisualRef-7.gif visual/delete.html visual/mouse_click.html vis
 	visual/VisualRef-3.gif visual/convex.html visual/keyboard.html visual/vector.html \
 	visual/VisualRef-4.gif visual/curve.html visual/label.html visual/VisualRef-5.gif \
 	visual/cylinder.html visual/license.txt visual/VisualRef-6.gif visual/defaults.html visual/mouse.html \
-	visual/helix.html \
+	visual/helix.html visual/texture-opacity-lighting.html \
 	visual/icons/blank.gif visual/icons/contents.gif visual/icons/index.gif \
 	visual/icons/modules.gif visual/icons/next.gif visual/icons/previous.gif \
 	visual/icons/up.gif
