@@ -95,8 +95,21 @@ f.pos = (-1,0,0)</P>
       in the x direction (1,0,0). The cylinder and sphere are created within the 
       frame. When any of the frame attributes are changed (<span class="attribute">pos</span>, 
       <span class="attribute">x</span>, <span class="attribute">y</span>, <span class="attribute">z</span>, 
-      <span class="attribute">axis</span>, or <span class="attribute">up</span>), 
-      the composite object is reoriented and repositioned.</P>
+      <span class="attribute">axis</span>, <span class="attribute">up<font color="#000000">, 
+      or </font><span class="attribute">scale</span></span>), the composite object 
+      is reoriented and repositioned.</P>
+    <P CLASS="Normal">You can set the <font color="#FF0000">scale</font> attribute, 
+      a vector, to change the size of all the objects in the frame. For example, 
+      for a frame f, </P>
+    <DIV> 
+      <H2 CLASS="program0"> f.scale = vector(2,-1,1)</H2>
+    </DIV>
+
+<P CLASS="Normal">stretches the objects by a factor of 2 along the x axis 
+      of the frame, flips the objects along the y axis of the frame, and leaves 
+      the z coordinates unchanged.</P>
+    <P CLASS="Normal">You can make all the objects in a frame invisible or visible 
+      by setting the frame's <font color="#FF0000">visible</font> attribute.</P>
     <P CLASS="Normal">Another frame attribute is <span class="attribute">objects</span>, 
       which is a list of currently visible objects contained in the frame (the 
       list does not include objects that are currently invisible). If you want 

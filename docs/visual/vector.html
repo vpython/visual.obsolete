@@ -102,50 +102,60 @@ magnitude squared of a vector:</p>
 <div>
 <h2 class="program0">norm( vector ) # normalized; magnitude of 1</h2>
 <h2 class="program0">norm(vector(1,1,1)) equals vector(1,1,1)/sqrt(3)</h2>
-<p class="Normal">You can also write <span class="attribute">v1.norm()</span><span
- class="attribute"></span>. Since <span class="attribute">norm(v1) =
-v1/mag(v1)</span>, it is not possible to normalize a zero-length
-vector: <span class="attribute">norm(vector(0,0,0))</span> gives an
-error, since division by zero is involved. <span class="attribute"></span>
-</p>
-<div>
-<h2 class="program0">vector1.diff_angle(vector2)</h2>
-<p class="Normal">
-Calculates the angle between two vectors (the "difference" of the
-angles of the two vectors)..</p>
+    <p class="Normal">You can also write <span class="attribute">v1.norm()</span><span
+ class="attribute"></span>. For convenience, <span class="attribute">norm(vector(0,0,0))</span> 
+      is calculated to be <span class="attribute">vector(0,0,0)</span>. <span class="attribute"></span> 
+    </p>
+    <div> 
+      <div>
+        <div>
+          <p class="Normal">To calculate the angle between two vectors (the "difference" 
+            of the angles of the two vectors).</p>
+        </div>
+      </div>
+      <div> 
+        <h2 class="program0"></h2>
+      </div>
+      <h2 class="program0">v1.diff_angle(v2)</h2>
+      <p class="Normal"> You can also write <span class="attribute">v1.diff_angle(v1,v2)</span><span
+ class="attribute"></span>. For convenience, if either of the vectors has zero 
+        magnitude, the difference of the angles is calculated to be zero<span class="attribute"></span>.</p>
+    </div>
+  </div>
+  <div>
+    <p class="Normal"> There is a function for the cross product of two vectors, 
+      which is a vector perpendicular to the plane defined by vector1 and vector2, 
+      in a direction defined by the right-hand rule: if the fingers of the right 
+      hand bend from vector1 toward vector 2, the thumb points in the direction 
+      of the cross product. The magnitude of this vector is equal to the product 
+      of the magnitudes of vector1 and vector2, times the sine of the angle between 
+      the two vectors.</p>
 </div>
-<p class="Normal"><span class="attribute"></span></p>
-</div>
 <div>
-<h2 class="program0">cross( vector1, vector2 )</h2>
-<p class="Normal">
-Creates the cross product of two vectors, which is a vector
-perpendicular to the plane defined by vector1 and vector2, in a
-direction defined by the right-hand rule: if the fingers of the right
-hand bend from vector1 toward vector 2, the thumb points in the
-direction of the cross product. The magnitude of this vector is equal
-to the product of the magnitudes of vector1 and vector2, times the sine
-of the angle between the two vectors.</p>
-</div>
-<div>
-<h2 class="program0">dot( vector1, vector2 )</h2>
-<p class="Normal"> Creates the dot product of two vectors, which is an
-ordinary number equal to the product of the magnitudes of vector1 and
-vector2, times the cosine of the angle between the two vectors. If the
-two vectors are normalized, the dot product gives the cosine of the
-angle between the vectors, which is often useful.</p>
+    <h2 class="program0">cross( vector1, vector2 )</h2>
+    <p class="Normal"> There is a function for the dot product of two vectors, 
+      which is an ordinary number equal to the product of the magnitudes of vector1 
+      and vector2, times the cosine of the angle between the two vectors. If the 
+      two vectors are normalized, the dot product gives the cosine of the angle 
+      between the vectors, which is often useful.</p>
+    <div>
+      <p class="Normal"></p>
+    </div>
+    <div> 
+      <h2 class="program0">dot( vector1, vector2 )</h2>
+    </div>
 <p class="Normal">&nbsp; </p>
-<p class="Normal"><font color="#0000a0">Rotating a vector</font></p>
-<h2 class="program0">
-v2 = rotate(v1, angle=theta, axis=(1,1,1))</h2>
-<p class="Normal"> The default axis is (0,0,1), for a rotation in the
-xy plane around the z axis. There is no origin for rotating a vector.
-Notice too that rotating a vector involves a function, <span
- class="attribute">v = rotate()</span>, as is the case with other
-vector manipulations such as dot() or cross(), whereas rotation of
-graphics objects involves attributes, in the form <span
+    <p class="Normal"><font color="#0000a0">Rotating a vector</font></p>
+    <p class="Normal"> There is a function for rotating a vector:<font color="#0000a0"></font></p>
+    <h2 class="program0"> v2 = rotate(v1, angle=theta, axis=(1,1,1))</h2>
+    <p class="Normal">The default axis is (0,0,1), for a rotation in the xy plane 
+      around the z axis. There is no origin for rotating a vector. Notice too 
+      that rotating a vector involves a function, <span
+ class="attribute">v = rotate()</span>, as is the case with other vector manipulations 
+      such as dot() or cross(), whereas rotation of graphics objects involves 
+      attributes, in the form <span
  class="attribute">object.rotate()</span>.</p>
-<p class="Normal">&nbsp; </p>
+    <p class="Normal">&nbsp; </p>
 <p class="Normal"><font color="#0000a0">Convenient conversion</font></p>
     <p class="Normal"> For convenience Visual automatically converts (a,b,c) into 
       vector(a,b,c), with floating-point values, when creating Visual objects: 
@@ -154,7 +164,7 @@ graphics objects involves attributes, in the form <span
       because (a,b,c) isn't a vector; write vector(a,b,c) instead.</p>
     <p class="Normal">You can convert a vector <font color="#FF0000">vec1</font> 
       to a Python tuple (a,b,c) by <font color="#FF0000">tuple(vec1)</font> or 
-      by the much faster option <font color="#FF0000">vec1.as_tuple(</font>).</p>
+      by the much faster option <font color="#FF0000">vec1.astuple(</font>).</p>
 </div>
 </div>
 <br>

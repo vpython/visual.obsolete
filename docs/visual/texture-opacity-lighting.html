@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<h2 align="center">Summary of new features in VPython 4.0</h2>
+<p align="center"><a href="index.html">Back to contents</a></p>
+<h3>Opacity</h3>
+<p>You can make most objects be partially transparent by specifying a value from 
+  0-1 inclusive for the attribute &quot;opacity&quot;. For example, box(color=color.red, 
+  alpha=0.8) is slightly transparent. An opacity value of 0 means totally transparent, 
+  and 1 means totally opaque. Currently curves and helixes do not allow transparency. 
+  (Currently you can use the synonym &quot;alpha&quot; for &quot;opacity&quot;, 
+  but &quot;alpha&quot; is deprecated.)</p>
+<h3>Surface textures</h3>
+<p>You can create a texture object and then apply it to the surface of an object. 
+  This capability is currently limited to boxes and spheres. A surface texture 
+  is an M by N array of 1, 2, 3, or 4 numerical values (a list or tuple). M and 
+  N must be powers of 2 (1, 2, 4, 8, 16, 32, etc.). Here are the possible values 
+  for each slot in the array:</p>
+<p>1 value: texture type must be &quot;luminance&quot; (how bright) or &quot;opacity&quot;</p>
+<p>2 values (opacity,luminance): texture type must be &quot;opacity_luminance&quot;</p>
+<p>3 values (red,green,blue): texture type must be &quot;rgb&quot;</p>
+<p>4 values (red,green,blue,opacity or alpha): texture type must be &quot;rgbo&quot;</p>
+<p>A VPython texture is basically a mask. For example, if you apply a texture 
+  to a box that is red, any cyan region of the texture will display as black, 
+  because the cyan (0,1,1) doesn't overlap at all with the red (1,0,0).</p>
+<p>You can create a numeric array of zeros in various formats, then assign values:</p>
+<p>zeros([...], UnsignedInt8) means an integer 0-255<br>
+  zeros([...], Int16) means an integer 0-32767<br>
+  zeros([...], Int) means an integer 0-2147483648<br>
+  zeros([...], Float) means a floating-point (fractional) number 0-1</p>
+<p>Here is an example program in which a checkerboard texture is created and applied 
+  to a box:</p>
+<p>from visual import *<br>
+  M=4 # must be a power of 2 (1, 2, 4, 8, 16, 32, etc.)<br>
+  N=4 # must be a power of 2 (1, 2, 4, 8, 16, 32, etc.)<br>
+  checks = zeros([M,N], Float) # create a numeric array of floating-point zeros 
+  (0.0) <br>
+  for i in range(M):<br>
+  &nbsp;&nbsp;&nbsp;&nbsp; for j in range(N):<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ((i&amp;1) ^ (j&amp;1)): 
+  # true for every alternate square of the checkerboard<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;checks[i][j] 
+  = 1.0<br>
+  print checks<br>
+  lum = texture(data=checks, type=&quot;luminance&quot;)<br>
+  box(color=color.cyan, texture=lum)</p>
+<p>If you wanted to create a texture containing &quot;rgb&quot; values, you would 
+  start with zeros([M,N,3], Float), and entries into this array would be the usual 
+  (red,green,blue) triples, with values for each color in the range 0-1 inclusive.</p>
+<p>See the <a href="http://vpython.org/contributed.html" target="_blank">contributed</a> 
+  section of vpython.org for an example of a program to create, save, and use 
+  a wood-grain texture.</p>
+<h3>Lighting</h3>
+<p>Objects now have a &quot;shininess&quot; attribute which by default is 0.5. 
+  A shininess of 0 means no specular highlights. A shininess of 1 means strong 
+  specular highlights. You can also for special purposes specify an attribute 
+  &quot;lit&quot; to False (or 0) in which case lights have no effect on it.</p>
+<p>For compatibility with past programs, there is still a list of lights in scene.lights, 
+  and you can still manipulate those lights as before. However, those lights were 
+  restricted to being very far (&quot;at infinity&quot;) from the scene. Now you 
+  can create lights that are nearby, and if you wish they can be spotlights with 
+  directed beams. The following statement creates a local blue light positioned 
+  at (x,y,z):</p>
+<p>bl = light(pos=(x,y,z), color=color.blue, local=True)</p>
+<p>Note that if you continually update bl.pos, the light will move.</p>
+<p>By default, local is True. If you set local = False, the light is at infinity, 
+  in a direction given by pos.</p>
+<p>Other attributes are spot_direction (a vector), spot_cutoff (half angle of 
+  the beam in degrees), diffuse_color, and specular_color. The attribute attentuation=(const, 
+  linear, quadratic) makes the light diminish with distance d according to the 
+  formula 1/(const + linear*d +quadratic*d). The default is (1,0,0). OpenGL guarantees 
+  to permit a minimum of seven lights.</p>
+<p>If you want to disable all of the old lights, say scene.lights = [], making 
+  an empty list of old lights.</p>
+<h3>Points object</h3>
+<p>A new points object can be plotted in &quot;screen&quot; size as well as the 
+  usual &quot;world&quot; coordinates. Like curve, the pos attribute is a list 
+  of points, as is color. If antialias is True, the points are round; by default 
+  they are square. The size attribute is in screen pixels if the type attribute 
+  is &quot;screen&quot; (the default), but if type is &quot;world&quot;, the size 
+  is in the usual coordinates. A good use for the new object is for the gdots 
+  displayed using visual.graph. These used to be awkward labels using the letter 
+  &quot;o&quot; but have been replaced with screen-pixel points.</p>
+<p> Technical caveats: If the &quot;GL_ARB_point_parameters&quot; property is 
+  shown in scene.info() then type = &quot;world&quot; will work. Otherwise the 
+  type is silently ignored and considered to be &quot;screen&quot;. There is an 
+  implementation-defined size range for either round or square points, which is 
+  not easily visible to programs at this time. Specifying a size outside this 
+  range will cause it to be silently clamped internally to whatever range that 
+  the hardware supports.</p>
+<h3>New frame capabilities</h3>
+<p>You can now make a frame visible or invisible, and all objects in the frame 
+  will be affected. And you can set the vector &quot;scale&quot; attribute of 
+  a frame to change the size of the combined object.</p>
+<h3>Fonts in labels</h3>
+<p>You can now specify font='times' or 'system' or 'symbol' etc. in a label object. 
+</p>
+<p><a href="index.html">Back to contents</a><br>
+</p>
+</body>
+</html>

@@ -47,8 +47,8 @@
     label carrying the text &quot;Earth&quot; in a box, connected to the sphere 
     by a line which stops at the surface of the sphere:</P>
 <DIV>
-<H2 CLASS="program0">
-earthlabel = label(pos=earth.pos, text='Earth', xoffset=20, yoffset=12, space=earth.radius, height=10, border=6)</H2>
+    <H2 CLASS="program0"> earthlabel = label(pos=earth.pos, text='Earth', xoffset=20, 
+      yoffset=12, space=earth.radius, height=10, border=6, font='courier)</H2>
     <P CLASS="Normal"> A unique feature of the label object is that several attributes 
       are given in terms of screen pixels instead of the usual &quot;world-space&quot; 
       coordinates. For example, the height of the text is given in pixels, with 
@@ -64,6 +64,8 @@ earthlabel = label(pos=earth.pos, text='Earth', xoffset=20, yoffset=12, space=ea
       displayed, such as 'Earth'<br>
       (Line breaks can be included as \n, as in label.text = &quot;Three\nlines\nof 
       text&quot;)</P>
+    <P CLASS="attributes"> <span class="attribute">font</span> Name of the desired 
+      font (for example, 'times', or 'system', or 'symbol')</P>
     <P CLASS="attributes"> <span class="attribute">height</span> Height of the font 
       in pixels</P>
     <P CLASS="attributes"> <span class="attribute">color</span>, <span class="attribute">red</span>, 
