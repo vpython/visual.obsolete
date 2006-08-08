@@ -133,7 +133,7 @@ wrap_primitive()
 		;
 		
 
-	class_< ring, bases<primitive> >( "ring")
+	class_< ring, bases<axial> >( "ring")
 		.def( init<const ring&>())
 		.add_property( "thickness", &ring::get_thickness, &ring::set_thickness)
 		;
