@@ -50,11 +50,11 @@ ring::get_thickness()
 void
 ring::gl_pick_render( const view& scene)
 {
+	gl_matrix_stackguard guard;
 	do_render_opaque( scene, 7, 10);
 	return;
 }
 
-// TODO: Figure out how to do transparency for this body.
 void
 ring::gl_render( const view& scene)
 {
