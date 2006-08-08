@@ -138,9 +138,9 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 	
 	if (left_button.is_dragging())
 		mouse.push_event( drag_event( 1, mouse));
-	if (middle_button.is_dragging())
+	if (!core.zoom_is_allowed() && middle_button.is_dragging())
 		mouse.push_event( drag_event( 2, mouse));
-	if (right_button.is_dragging())
+	if (!core.spin_is_allowed() && right_button.is_dragging())
 		mouse.push_event( drag_event( 3, mouse));
 	return true;
 }
