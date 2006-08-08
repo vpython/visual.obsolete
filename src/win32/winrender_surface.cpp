@@ -195,9 +195,9 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 	
 	if (left_button.is_dragging())
 		mouse.push_event( drag_event( 1, mouse));
-	if (middle_button.is_dragging())
+	if (!zoom_is_allowed() && middle_button.is_dragging())
 		mouse.push_event( drag_event( 2, mouse));
-	if (right_button.is_dragging())
+	if (!spin_is_allowed() && right_button.is_dragging())
 		mouse.push_event( drag_event( 3, mouse));
 	
 	return 0;
