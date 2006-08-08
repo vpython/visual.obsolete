@@ -357,8 +357,6 @@ numeric_texture::get_type() const
 			return std::string( "rgb");
 		case GL_RGBA:
 			return std::string( "rgbo");
-		case GL_RGBA:
-			return std::string( "rgba");
 		case 0: default:
 			return std::string( "auto");
 	}
