@@ -57,6 +57,7 @@ Source: "Lib\site-packages\numarray\LICENSE.txt"; DestDir: "{app}\Lib\site-packa
 Source: "Lib\site-packages\numarray\testdata.fits"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray
 ;
 Source: "@WIN32_SRCDIR@\examples\*.py"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
+Source: "@WIN32_SRCDIR@\examples\*.vpt"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
 ;
 Source: "@WIN32_SRCDIR@\docs\index.html"; DestDir: "{app}\Lib\site-packages\visual\docs\"; Components: Documentation
 Source: "@WIN32_SRCDIR@\docs\visual\*.html"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
