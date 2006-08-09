@@ -1,10 +1,14 @@
 from visual import *
 from __future__ import division
 
-# Bruce Sherwood
+# Bruce Sherwood, August 2006
+# Demonstration of transparency (opacity), surface textures, and sophisticated lighting
+#  in the new version 4 of VPython created by Jonathan Brandmeyer
 
 scene.width = scene.height = 800
 scene.forward = (-0.2,-0.2,-1)
+# Read wood-like surface texture from a file.
+# See vpython.org contributed programs for how this texture was created.
 wood = texture(data=pickle.load(open('wood256lum.vpt', 'rU')))
 width = 10 # of wood table
 thick = 0.5 # thickness of wood
@@ -27,15 +31,18 @@ sphere(pos=(0.1*width,R/4,0.45*depth), radius=R/4, color=color.red)
 sphere(pos=(0.15*width,R/4,0.3*depth), radius=R/4, color=color.yellow)
 sphere(pos=(0.15*width,R/4,-0.3*depth), radius=R/4, color=color.green)
 sphere(pos=(0.1*width,R/4,-0.45*depth), radius=R/4, color=color.cyan)
-scene.lights[0].color = (0.4,0.4,0.4) # dim the default lights
-scene.lights[1].color = (0.2,0.2,0.2)
-# Note: It should be possible to put the spotlight in the pendulum frame,
-# but currently there is a bug that spot_direction doesn't change when frame axis changes.
+scene.lights = []
+scene.ambient = 0.25
+l1 = light(pos=(6,2,4), color=0.1)
+l2 = light(pos=(-10,2,4), color=0.05)
+# Note: It should be possible to put the spotlight in the pendulum frame, but
+# currently there is a bug that spot_direction doesn't change when frame axis changes.
 spot = light(pos=(0,H-L,0), local=True, color=0.5,
                   spot_direction=(0,-1,0), spot_cutoff=20)
 scene.center = (0,0.4*H,0)
 scene.range = 0.45*H
 
+# Create a surface texture for the ball
 M = N = 32
 t = zeros([M,N,4], UnsignedInt8)
 colors = [color.blue, color.cyan, color.green, color.yellow]
