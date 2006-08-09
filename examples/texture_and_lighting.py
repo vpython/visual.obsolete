@@ -19,9 +19,12 @@ R = 2 # radius of ball
 H = 10 # height of underside of ceiling above floor
 L = 3.5 # length of pendulum to center of hanging lamp
 # top of floor is at y=0 for convenience
-floor = box(pos=(0,-thick/2,0), size=(width,thick,depth), color=color.orange, texture=wood)
-left = box(pos=(-(width/2+thick/2),height/2-thick,0), size=(thick,height,depth), color=color.orange, texture=wood)
-right = box(pos=(width/2+thick/2,height/2-thick,0), size=(thick,height,depth), color=color.orange, texture=wood)
+floor = box(pos=(0,-thick/2,0), size=(width,thick,depth),
+            shininess=0, color=color.orange, texture=wood)
+left = box(pos=(-(width/2+thick/2),height/2-thick,0), size=(thick,height,depth),
+            shininess=0, color=color.orange, texture=wood)
+right = box(pos=(width/2+thick/2,height/2-thick,0), size=(thick,height,depth),
+            shininess=0, color=color.orange, texture=wood)
 back = box(pos=(0,height/2-thick,-(depth/2+thick/2)), size=(width+2*thick,height,thick), color=color.orange, texture=wood)
 ceiling = box(pos=(0,H+thick/2,0), size=(width/10,thick,width/10), color=color.orange, texture=wood)
 pendulum = frame(pos=(0,H,0), axis=(0,-1,0))
