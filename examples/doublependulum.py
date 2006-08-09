@@ -6,6 +6,8 @@ from visual import *
 # The Lagrangian variables are angle of upper bar, angle of lower bar,
 # measured from the vertical.
 
+# Bruce Sherwood
+
 scene.title = 'Double Pendulum'
 scene.height = scene.width = 800
 

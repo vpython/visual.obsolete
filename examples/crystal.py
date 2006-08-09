@@ -3,6 +3,8 @@ from random import random
 from time import clock
 import sys
 
+# Bruce Sherwood; revised by Jonathan Brandmeyer
+
 N = 3
 Ntotal = N*N*N
 scolor = (1,0.5,0)

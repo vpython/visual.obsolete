@@ -6,6 +6,8 @@ from visual import *
 # The Lagrangian variables are polar angle theta,
 # azimuthal angle phi, and spin angle alpha.
 
+# Bruce Sherwood
+
 scene.width=800
 scene.height=800
 scene.title='Nutating Gyroscope'

@@ -6,6 +6,8 @@ Right button drag to rotate view.
 Middle button drag up or down to zoom in or out.
 """
 
+# David Scherer
+
 scene.title = "Drape"
 restlength = 0.02
 m = 0.010 * restlength

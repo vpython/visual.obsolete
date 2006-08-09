@@ -5,6 +5,8 @@ Drag or click to show the magnetic field interactively.
 Mark the magnetic field vector at the end of the drag.
 """
 
+# Bruce Sherwood
+
 scene.width = 600
 scene.height = 600
 Rbig = 0.6

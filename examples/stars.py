@@ -5,6 +5,8 @@ from random import random
 # Stars interacting gravitationally
 # Program uses Numeric Python arrays for high speed computations
 
+# Bruce Sherwood
+
 win=600
 
 Nstars = 20  # change this to have more or fewer stars

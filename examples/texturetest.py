@@ -5,6 +5,9 @@ from visual import *
 # 3 is RGB, 4 is RGBA
 # The primitive data type can be a char, int, long, short, float, or double.
 # however, int types are converted from 0-255 -> 0.->1.
+
+# Jonathan Brandmeyer
+
 checkerboard = array([[0.,0.,1.,1.], 
 					  [0.,0.,1.,1.],
 					  [1.,1.,0.,0.],

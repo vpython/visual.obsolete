@@ -1,6 +1,8 @@
 from visual import *
 from __future__ import division
 
+# Bruce Sherwood
+
 scene.width = scene.height = 800
 scene.forward = (-0.2,-0.2,-1)
 wood = texture(data=pickle.load(open('wood256lum.vpt', 'rU')))

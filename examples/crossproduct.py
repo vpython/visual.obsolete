@@ -7,6 +7,8 @@ Drag to change green vector
 Click to toggle fixed angle or fixed length
 """
 
+# Ruth Chabay
+
 scene.title="Vector Cross Product"
 scene.width=600
 scene.height=600

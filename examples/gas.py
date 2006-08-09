@@ -6,6 +6,8 @@ from random import random
 # A model of an ideal gas with hard-sphere collisions
 # Program uses Numeric Python arrays for high speed computations
 
+# Bruce Sherwood
+
 win=500
 
 Natoms = 50  # change this to have more or fewer atoms

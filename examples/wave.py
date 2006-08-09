@@ -1,5 +1,7 @@
 from visual import *
 
+# David Scherer
+
 dt = 0.1
 
 g = []

@@ -5,6 +5,8 @@ Click and drag a ball (with mouse button down) on an RGB or HSV slider.
 Click one of the colored objects to print RGB and HSV values.
 """
 
+# Bruce Sherwood; opacity slider added by Jonathan Brandmeyer
+
 scene.userspin = 0
 grey = (0.85, 0.85, 0.85)
 

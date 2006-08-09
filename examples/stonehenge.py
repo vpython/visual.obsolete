@@ -9,6 +9,8 @@ above or below the center of the scene to move forward or
 backward; right or left rotates your direction.
 """
 
+# Bruce Sherwood
+
 # A surreal scene
 
 def hourminute():
