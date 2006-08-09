@@ -56,11 +56,10 @@
   section of vpython.org for an example of a program to create, save, and use 
   a wood-grain texture.</p>
 <h3>Lighting</h3>
-<p>Some objects now have a &quot;shininess&quot; attribute which by default is 
-  0.5; these include sphere, cylinder, ellipsoid, ring, and cone. A shininess 
-  of 0 means no specular highlights. A shininess of 1 means strong specular highlights. 
-  You can also for special purposes specify an attribute &quot;lit&quot; to False 
-  (or 0) in which case lights have no effect on it.</p>
+<p>Objects now have a &quot;shininess&quot; attribute which by default is 0.5. 
+  A shininess of 0 means no specular highlights. A shininess of 1 means strong 
+  specular highlights. You can also for special purposes specify an attribute 
+  &quot;lit&quot; to False (or 0) in which case lights have no effect on it.</p>
 <p>For compatibility with past programs, there is still a list of lights in scene.lights, 
   and you can still manipulate those lights as before. However, those lights were 
   restricted to being very far (&quot;at infinity&quot;) from the scene. Now you 
