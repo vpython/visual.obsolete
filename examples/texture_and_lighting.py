@@ -25,7 +25,8 @@ left = box(pos=(-(width/2+thick/2),height/2-thick,0), size=(thick,height,depth),
             shininess=0, color=color.orange, texture=wood)
 right = box(pos=(width/2+thick/2,height/2-thick,0), size=(thick,height,depth),
             shininess=0, color=color.orange, texture=wood)
-back = box(pos=(0,height/2-thick,-(depth/2+thick/2)), size=(width+2*thick,height,thick), color=color.orange, texture=wood)
+back = box(pos=(0,height/2-thick,-(depth/2+thick/2)), size=(width+2*thick,height,thick),
+            shininess=0, color=color.orange, texture=wood)
 ceiling = box(pos=(0,H+thick/2,0), size=(width/10,thick,width/10), color=color.orange, texture=wood)
 pendulum = frame(pos=(0,H,0), axis=(0,-1,0))
 wire = curve(frame=pendulum, pos=[(0,0,0),(L,0,0)])
@@ -54,7 +55,7 @@ for i in range(0,M,4):
          for ii in range(4):
                  c = colors[ii%4]
                  t[i+ii][j] = (255*c[0],255*c[1],255*c[2],128)
-plaid = texture(data=t, type="rgba")
+plaid = texture(data=t, type="rgbo")
 ball = sphere(pos=(width/4,R,0), radius=R, up=(0,1,1), texture=plaid)
 v = vector(-0.5,0,0)
 dt = 0.03
