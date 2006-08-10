@@ -74,7 +74,7 @@ render_cone_model( size_t n_sides, size_t n_stacks = 1)
 #else
 	quadric q;
 	q.render_cylinder( 1.0, 0.0, 1.0, n_sides, n_stacks);
-	q.render_disk( 1.0, n_sides, n_stacks * 2);
+	q.render_disk( 1.0, n_sides, n_stacks * 2, -1);
 #endif
 }
 

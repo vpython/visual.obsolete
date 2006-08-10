@@ -24,10 +24,10 @@ render_cylinder_model( size_t n_sides, size_t n_stacks = 1)
 {
 	quadric q;
 	q.render_cylinder( 1.0, 1.0, n_sides, n_stacks);
-	q.render_disk( 1.0, n_sides, n_stacks);
+	q.render_disk( 1.0, n_sides, n_stacks, -1); // left end of cylinder
 	gl_matrix_stackguard guard;
 	glTranslatef( 1.0f, 0.0f, 0.0f);
-	q.render_disk( 1.0, n_sides, n_stacks * 3);
+	q.render_disk( 1.0, n_sides, n_stacks, 1); // right end of cylinder
 }
 
 static displaylist cylinder_simple_model[6];
