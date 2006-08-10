@@ -318,10 +318,8 @@ render_surface::on_buttonup( WPARAM wParam, LPARAM lParam)
 	std::pair<bool, bool> unique_drop( false, false);
 	#define unique unique_drop.first
 	#define drop unique_drop.second
-	bool clickok = false;
 	
 	if (!(wParam & ~MK_LBUTTON)) {
-		clickok = true;
 		unique_drop = left_button.release();
 		if (unique) {
 			button_id = 1;
@@ -329,7 +327,6 @@ render_surface::on_buttonup( WPARAM wParam, LPARAM lParam)
 		}
 	}
 	if (!(wParam & ~MK_MBUTTON) && !zoom_is_allowed()) {
-		clickok = true;
 		unique_drop = middle_button.release();
 		if (unique) {
 			button_id = 2;
@@ -337,7 +334,6 @@ render_surface::on_buttonup( WPARAM wParam, LPARAM lParam)
 		}
 	}
 	if (!(wParam & ~MK_RBUTTON) && !spin_is_allowed()) {
-		clickok = true;
 		unique_drop = right_button.release();
 		if (unique) {
 			button_id = 3;
@@ -348,8 +344,9 @@ found:
 	if (button_id)
 		if (drop)
 			mouse.push_event( drop_event( button_id, mouse));
-		else if (clickok)
+		else {
 			mouse.push_event( click_event( button_id, mouse));
+		}
 	return 0;
 	#undef unique
 	#undef drop
