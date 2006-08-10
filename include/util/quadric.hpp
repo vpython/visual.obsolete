@@ -85,8 +85,9 @@ class quadric
 		@param radius The outer radius of the disk.
 		@param slices The number of radial slices to subdivide the disk into.
 		@param rings The number of circumferential subdivisions for the disk.
+		@param rotation +1 for right end of cylinder, -1 for left end (or base of cone)
 	*/
-	void render_disk( double radius, int slices, int rings);
+	void render_disk( double radius, int slices, int rings, int rotation);
 };
 
 } // !namespace cvisual
