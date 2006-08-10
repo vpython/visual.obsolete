@@ -99,6 +99,9 @@ win32_write_critical(
 
 /**************** render_surface implementation  *****************/
 
+// Note: This should really be called "display" for clarity.
+// The fact that it is a display is the reason we can refer directly to zoom and spin.
+
 // A lookup-table for the default widget procedure to use to find the actual
 // widget that should handle a particular callback message.
 std::map<HWND, render_surface*> render_surface::widgets;
