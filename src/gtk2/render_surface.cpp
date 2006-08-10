@@ -283,15 +283,21 @@ render_surface::on_button_release_event( GdkEventButton* event)
 	mouse.set_ctrl( event->state & GDK_CONTROL_MASK);
 	mouse.set_alt( event->state & GDK_MOD1_MASK);
 	bool drop = false;
+	bool clickok = false;
 	switch (event->button) {
 		case 1:
+			clickok = true;
 			drop = left_button.release().second;
 			break;
 		case 2:
-			drop = middle_button.release().second;
+			if (!core.zoom_is_allowed())
+				clickok = true;
+				drop = middle_button.release().second;
 			break;
 		case 3:
-			drop = right_button.release().second;
+			if (!core.spin_is_allowed())
+				clickok = true;
+				drop = right_button.release().second;
 			break;
 		default:
 			// Captured above
@@ -299,7 +305,7 @@ render_surface::on_button_release_event( GdkEventButton* event)
 	}
 	if (drop)
 		mouse.push_event( drop_event( event->button, mouse));
-	else
+	else if (clickok)
 		mouse.push_event( click_event( event->button, mouse));
 	return true;
 }
