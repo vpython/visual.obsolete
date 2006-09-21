@@ -88,10 +88,15 @@ I.  Prerequisites:
 		> cp stage/lib/boost_thread-mgw-mt-1_33_1.lib /mingw/lib/libboost_thread.a
 		
 		> cd bin/boost/libs/python/build/boost_python.dll/mingw/release/threading-multi/
-		Correct an error in the boost library, which is missing references to the numeric module:
+		If you execute "nm boost_python-mgw-mt-1_33_1.lib > nm-lib.txt" and inspect
+		the output file, you will find there are no mentions of numeric, which leads
+		to failure of the build of Visual.
+		
+		To get the references to the numeric module into the library:
 		> g++ -shared -o boost_python-mgw-mt-1_33_1.dll *.obj -Wl,--out-implib,boost_python-mgw-mt-1_33_1.lib /c/WINDOWS/system32/python24.dll 
 		> cp boost_python-mgw-mt-1_33_1.dll /mingw/bin
 		> cp boost_python-mgw-mt-1_33_1.lib /mingw/lib/libboost_python24.a 
+		If you again run "nm" you'll now find lots of mentions of numeric.
 		
 		Note: The Boost files that start with "libboost" are static libraries that we don't use.	
 		
