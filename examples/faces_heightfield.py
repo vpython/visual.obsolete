@@ -13,9 +13,9 @@ class Model:
 
     def FacetedTriangle(self, v1, v2, v3, color=color.white):
         """Add a triangle to the model, apply faceted shading automatically"""
-	v1 = vector(v1)
-	v2 = vector(v2)
-	v3 = vector(v3)
+        v1 = vector(v1)
+        v2 = vector(v2)
+        v3 = vector(v3)
         try:
             normal = norm( cross(v2-v1, v3-v1) )
         except:

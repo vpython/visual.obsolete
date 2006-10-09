@@ -31,7 +31,7 @@ class ProgClass:
 
 #       start animation thread
 
-	thread.start_new_thread(self.box_anim,())
+        thread.start_new_thread(self.box_anim,())
 
     def set_red(self,rstr): # set red component of color
         self.rr = string.atoi(rstr)/100.0
