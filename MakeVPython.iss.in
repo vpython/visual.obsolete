@@ -24,11 +24,11 @@ OutputDir=@WIN32_CWD@
 
 [Files]
 ; Make sure that config-main.def has
-; edit startup and autosave set to 1
+; editor-on-startup and autosave set to 1
 ; and help set for Visual before building package.
 Source: "Lib\idlelib\config-main.def"; DestDir: "{app}\Lib\idlelib\"; Flags: uninsneveruninstall
 ;
-Source: "@WIN32_CWD@\site-packages\cvisual.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_CWD@\site-packages\cvisual.pyd"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\mingwm10.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\boost_python-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual 
 Source: "C:\MinGW\bin\boost_thread-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
@@ -50,6 +50,7 @@ Source: "Lib\site-packages\Numeric\*.pyc"; DestDir: "{app}\Lib\site-packages\Num
 Source: "Lib\site-packages\Numeric\*.pyd"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: Numeric; Flags: recursesubdirs
 ;
 Source: "include\numarray\*.h"; DestDir: "{app}\include\numarray\"; Components: numarray
+Source: "Lib\site-packages\numarray*egg-info"; DestDir: "{app}\Lib\site-packages\"; Components: numarray
 Source: "Lib\site-packages\numarray\*.py"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray; Flags: recursesubdirs
 Source: "Lib\site-packages\numarray\*.pyc"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray; Flags: recursesubdirs
 Source: "Lib\site-packages\numarray\*.pyd"; DestDir: "{app}\Lib\site-packages\numarray\"; Components: numarray; Flags: recursesubdirs
@@ -73,14 +74,14 @@ Name: Visual; Description: "The Visual extension modue to Python"; Types: full c
 ; Name: Gtk; Description: "The Gimp Tool Kit runtime (version 2.8)"; Types: full compact custom; Flags: fixed
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
-Name: Numeric; Description: "Numeric Python 23.8 {code:NumericStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumeric( 'C:\Python@WIN32_PYTHON_VERSION@' )
-Name: numarray; Description: "Python Numarray 1.3.1 {code:NumarrayStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumarray( 'C:\Python@WIN32_PYTHON_VERSION@' )
+Name: Numeric; Description: "Numeric Python 24.2 {code:NumericStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumeric( 'C:\Python@WIN32_PYTHON_VERSION@' )
+Name: numarray; Description: "Python Numarray 1.5.2 {code:NumarrayStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumarray( 'C:\Python@WIN32_PYTHON_VERSION@' )
 
 [Tasks]
 Name: desktopicon; Description: "Create a desktop icon";
 
 [Icons]
-Name: "{userdesktop}\IDLE for VPython"; Filename: "{app}\pythonw.exe"; Parameters: "{app}\Lib\idlelib\idle.pyw"; WorkingDir: "{app}\Lib\site-packages\visual\examples"; IconFilename: "{app}\py.ico"; Tasks: desktopicon
+Name: "{userdesktop}\IDLE for VPython"; Filename: "{app}\pythonw.exe"; Parameters: "{app}\Lib\idlelib\idle.pyw"; WorkingDir: "{app}\Lib\site-packages\visual\examples"; IconFilename: "{app}\DLLs\py.ico"; Tasks: desktopicon
 
 ; This code file contains a ShouldSkipPage function which looks
 ; for an appropriate version of python.exe,
