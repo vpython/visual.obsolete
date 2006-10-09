@@ -1,10 +1,14 @@
 from visual import *
 from random import random
 from time import clock
+import sys
+
+# Bruce Sherwood; revised by Jonathan Brandmeyer
 
 N = 3
 Ntotal = N*N*N
-scolor = (1,1,0)
+scolor = (1,0.5,0)
+bcolor = (0,0.58,0.69)
 springs = []
 atoms = []
 m = 1.
@@ -13,22 +17,25 @@ L = 1.
 R = 0.3*L
 Rs = 0.9*R # end of spring is Rs from center of atom
 
-def getn(N, nx, ny, nz): # find nth atom given nx, ny, nz
+def getn(N, nx, ny, nz): 
+    # find nth atom given nx, ny, nz
     return (ny)*(N**2)+(nx)*N+(nz)
 
-def makespring(natom1, natom2, radius): # make spring from nnth atom to iith atom
+def makespring(natom1, natom2, radius): 
+    # make spring from nnth atom to iith atom
     if natom1 > natom2:
         r12 = atoms[natom2].pos-atoms[natom1].pos
         dir = norm(r12)
         springs.append( helix(pos=atoms[natom1].pos+Rs*dir,
             axis=(L-2*Rs)*dir,
-            radius = radius, color=scolor, thickness = 0.04))
-        springs[-1].natom1 = natom1
-        springs[-1].natom2 = natom2
+            radius = radius, color=scolor, thickness = 0.04)) #, shininess=0.9))
+        springs[-1].atom1 = atoms[natom1]
+        springs[-1].atom2 = atoms[natom2]
         angle = springs[-1].axis.diff_angle( vector(0,1,0))
+        # avoid pathologies if too near the y axis (default "up")
         if angle < 0.1 or angle > pi-0.1:
-            springs[-1].up = vector(-1,0,0) # avoid pathologies if too near the y axis (default "up")
-    
+            springs[-1].up = vector(-1,0,0) 
+
 def crystal(N=3, delta=1.0, R=None, sradius=None):
     if R == None:
         R = 0.2*delta
@@ -46,7 +53,7 @@ def crystal(N=3, delta=1.0, R=None, sradius=None):
             x = xmin+nx*delta
             for nz in range(N):
                 z = zmin+nz*delta
-                atoms.append(sphere(pos=(x,y,z), radius=R, color=c))
+                atoms.append(sphere(pos=(x,y,z), radius=R, color=bcolor))
                 atoms[-1].p = vector()
                 atoms[-1].near = range(6)
                 atoms[-1].wallpos = range(6)
@@ -115,11 +122,13 @@ def crystal(N=3, delta=1.0, R=None, sradius=None):
         
     return atoms
 
-sradius = R/4.
+sradius = R/3.
 vrange = 0.2*L*sqrt(k/m)
 dt = 2.*pi*sqrt(m/k)/40.
+scene.visible = False
 atoms = crystal(N=N, delta=L, R=R, sradius=sradius)
-scene.autoscale = 0
+scene.visible = True
+scene.autoscale = False
 
 ptotal = vector()
 for a in atoms:
@@ -144,21 +153,21 @@ dt_m = dt / m
 while 1:
     rate(50)
     for a in atoms:
-        nearpos = vector_array( a.nearpos)
-        r = nearpos - a.pos
-        # F = k*(r.norm()*(r.mag()-L))
-        a.p += k_dt *(r.norm()*(r.mag()-L)).sum() # using capabilities of Numeric module
+        r = vector_array(a.nearpos) - a.pos
+        a.p += k_dt *(r.norm()*(r.mag()-L)).sum()
 
     for a in atoms:
         a.pos += a.p * dt_m
-        
-    for s in springs:
-        r12 = atoms[s.natom2].pos-atoms[s.natom1].pos
-        dir = norm(r12)
-        s.pos = atoms[s.natom1].pos+Rs*dir
-        s.axis = (r12.mag-2*Rs)*dir
 
+    for s in springs:
+        p1 = s.atom1.pos
+        r12 = s.atom2.pos-p1
+        dir = r12.norm()
+        s.pos = p1+Rs*dir
+        s.axis = (r12.mag-2*Rs)*dir
+    
     if Nsteps == 100:
         tt = clock()-tt
-        print '%0.1f' % tt, 'sec for', Nsteps, 'steps with', N, 'on a side'
+        print '%0.2f' % tt, 'sec for', Nsteps, 'steps with', N, 'on a side'
+        # sys.exit(0)
     Nsteps += 1
