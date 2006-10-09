@@ -1,5 +1,5 @@
-from visual import *
 from __future__ import division
+from visual import *
 
 # Bruce Sherwood, August 2006
 # Demonstration of transparency (opacity), surface textures, and sophisticated lighting
