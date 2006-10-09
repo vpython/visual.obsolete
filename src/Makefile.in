@@ -170,7 +170,7 @@ ifeq ($(PYTHON_PLATFORM),win32)
   CVISUAL_CPPFLAGS += $(WIN32_CPPFLAGS) $(GTK_CFLAGS) $(GTHREAD_CFLAGS)
   CVISUAL_LIBS += $(WIN32_LIBS) $(GTK_LIBS) $(GTHREAD_LIBS) -lboost_thread
   CVISUAL_LDFLAGS += $(WIN32_LDFLAGS)
-  PLATFORM_TARGET = cvisual.dll
+  PLATFORM_TARGET = cvisual.pyd
   PLATFORM_OBJS = winrandom_device.lo winrate.lo wintimer.lo wintext.lo \
   	winrender_surface.lo
   INSTALL_RULE = $(GENERIC_INSTALLRULE)
