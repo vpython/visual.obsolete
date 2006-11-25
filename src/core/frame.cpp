@@ -225,7 +225,7 @@ frame::remove_renderable( shared_ptr<renderable> obj)
 	// Driven from visual/primitives.py set_visible
 	if (obj->color.opacity != 1.0) {
 		std::remove( trans_children.begin(), trans_children.end(), obj);
-		trans_children.erase(trans_children.end());
+		trans_children.pop_back();
 	}
 	else {
 		std::remove( children.begin(), children.end(), obj);
