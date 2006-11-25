@@ -14,7 +14,7 @@
 using boost::python::numeric::array;
 
 namespace cvisual { namespace python {
-	
+
 bool
 faces::degenerate() const
 {
@@ -22,7 +22,7 @@ faces::degenerate() const
 }
 
 
-namespace {	
+namespace {
 // returns a pointer to the ith vector in the array.
 double* index( const array& a, size_t i)
 {
@@ -39,16 +39,16 @@ float* findex( const array& a, size_t i)
 }
 
 } // !namespace (unnamed)
-	
+
 faces::faces()
 	: pos(0), color(0), normal(0), preallocated_size(256),
 	count(0)
 {
-	std::vector<int> dims(2);
+	std::vector<npy_intp> dims(2);
 	dims[0] = 256;
 	dims[1] = 3;
 	pos = makeNum(dims);
-	color = makeNum(dims, float_t);
+	color = makeNum(dims, NPY_FLOAT);
 	normal = makeNum(dims);
 	double* i = index( pos, 0);
 	i[0] = i[1] = i[2] = 0.0;
@@ -59,7 +59,7 @@ faces::faces()
 }
 
 faces::faces( const faces& other)
-	: renderable( other), pos( other.pos), color( other.color), 
+	: renderable( other), pos( other.pos), color( other.color),
 	normal( other.normal),
 	preallocated_size( other.preallocated_size),
 	count( other.count)
@@ -78,13 +78,13 @@ faces::set_length( int length)
 		npoints = length;
 	if (npoints == 0) // The first allocation.
 		npoints = 1;
-		
+
 	if (length > preallocated_size) {
-		std::vector<int> dims(2);
+		std::vector<npy_intp> dims(2);
 		dims[0] = 2 * length;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
-		array n_color = makeNum( dims, float_t);
+		array n_color = makeNum( dims, NPY_FLOAT);
 		array n_normal = makeNum( dims);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * npoints);
 		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * npoints);
@@ -105,7 +105,7 @@ faces::set_length( int length)
 			element_i[2] = last_element[2];
 			element_i += 3;
 		}
-		
+
 		const float* last_color = findex( color, npoints-1);
 		float* color_i = findex( color, npoints);
 		float* color_end = findex( color, length);
@@ -115,7 +115,7 @@ faces::set_length( int length)
 			color_i[2] = last_color[2];
 			color_i += 3;
 		}
-		
+
 		last_element = index( normal, npoints-1);
 		element_i = index( normal, npoints);
 		element_end = index( normal, length);
@@ -190,13 +190,13 @@ faces::smooth_shade(bool doublesided)
 {
 	if (shape(pos) != shape(normal))
 		throw std::invalid_argument( "Dimension mismatch between pos and normal.");
-	
+
 	lock L(mtx);
-	
+
 	// positions -> normals
 	std::map< const vector, vector, stl_cmp_vector> verticies;
 	std::map< const vector, vector, stl_cmp_vector> verticies_backface;
-	
+
 	const double* pos_i = index(pos, 0);
 	double* norm_i = index(normal, 0);
 	const double* pos_end = index( pos, count);
@@ -215,7 +215,7 @@ faces::smooth_shade(bool doublesided)
 			verticies[vector(pos_i)] += vector(norm_i);
 		}
 	}
-	
+
 	pos_i = index(pos, 0);
 	norm_i = index(normal, 0);
 	vector tmp;
@@ -236,19 +236,19 @@ faces::smooth_shade(bool doublesided)
 		norm_i[2] = tmp.get_z();
 	}
 }
-	
-void  
+
+void
 faces::set_pos( const array& n_pos)
 {
 	using namespace python;
 
-	std::vector<int> n_dims = shape(n_pos);
-	std::vector<int> dims = shape(this->pos);
+	std::vector<npy_intp> n_dims = shape(n_pos);
+	std::vector<npy_intp> dims = shape(this->pos);
 
 	if (n_dims.size() == 1 && !n_dims[0]) {
 		lock L(mtx);
 		set_length(0);
-		return;	
+		return;
 	}
 	if (n_dims.size() != 2)
 		throw std::invalid_argument( "Numeric.array members must be Nx3 arrays.");
@@ -274,40 +274,40 @@ faces::set_pos_l( boost::python::list l)
 	set_pos( array( l));
 }
 
-boost::python::object 
-faces::get_pos() 
-{ 
+boost::python::object
+faces::get_pos()
+{
 	return pos[slice(0, count)];
 }
 
-boost::python::object 
+boost::python::object
 faces::get_color()
-{ 
-	return color[slice(0, count)]; 
+{
+	return color[slice(0, count)];
 }
 
-boost::python::object 
-faces::get_normal() 
-{ 
-	return normal[slice(0, count)]; 
+boost::python::object
+faces::get_normal()
+{
+	return normal[slice(0, count)];
 }
 
 
-void  
+void
 faces::set_color( array n_color)
 {
 	using namespace boost::python;
 	using cvisual::python::slice;
-	
-	std::vector<int> n_dims = shape(n_color);
+
+	std::vector<npy_intp> n_dims = shape(n_color);
 
 	if (n_dims.size() != 2 && n_dims[1] != 3)
 		throw std::invalid_argument( "color must be an Nx3 array.");
 	if (n_dims[0] != count)
 		throw std::invalid_argument( "color must be the same size as pos.");
 
-	if (type(n_color) != float_t) {
-		n_color = astype( n_color, float_t);
+	if (type(n_color) != NPY_FLOAT) {
+		n_color = astype( n_color, NPY_FLOAT);
 	}
 	lock L(mtx);
 	color[slice(0, count)] = n_color;
@@ -316,7 +316,7 @@ faces::set_color( array n_color)
 void
 faces::set_color_l( boost::python::list color)
 {
-	set_color( array(color));	
+	set_color( array(color));
 }
 
 void
@@ -329,7 +329,7 @@ faces::set_color_t( rgb c)
 	color[slice(0, npoints)] = make_tuple( c.red, c.green, c.blue);
 }
 
-void  
+void
 faces::set_normal( const array& n_normal)
 {
 	lock L(mtx);
@@ -339,7 +339,7 @@ faces::set_normal( const array& n_normal)
 void
 faces::set_normal_l( boost::python::list normals)
 {
-	set_normal( array(normals));	
+	set_normal( array(normals));
 }
 
 void
@@ -357,16 +357,16 @@ faces::gl_render( const view& scene)
 {
 	if (degenerate())
 		return;
-	
+
 	std::vector<vector> spos;
 	std::vector<rgb> tcolor;
-	
+
 	gl_enable_client vertexes( GL_VERTEX_ARRAY);
 	gl_enable_client normals( GL_NORMAL_ARRAY);
 	gl_enable_client colors( GL_COLOR_ARRAY);
-	
+
 	glNormalPointer( GL_DOUBLE, 0, index( normal, 0));
-	
+
 	if (scene.gcf != 1.0) {
 		std::vector<vector> tmp( count);
 		spos.swap( tmp);
@@ -379,7 +379,7 @@ faces::gl_render( const view& scene)
 	}
 	else
 		glVertexPointer( 3, GL_DOUBLE, 0, index( pos,0));
-		
+
 	if (scene.anaglyph) {
 		std::vector<rgb> tmp( count);
 		tcolor.swap( tmp);
@@ -395,21 +395,21 @@ faces::gl_render( const view& scene)
 	}
 	else
 		glColorPointer( 3, GL_FLOAT, 0, findex( color, 0));
-	
+
 	gl_enable cull_face( GL_CULL_FACE);
 	for (int drawn = 0; drawn < count - count%3; drawn += 54) {
-		glDrawArrays( GL_TRIANGLES, drawn, 
+		glDrawArrays( GL_TRIANGLES, drawn,
 			std::min( count - count%3 - drawn, (int)54));
 	}
 }
 
-void 
+void
 faces::gl_pick_render( const view& scene)
 {
 	gl_render( scene);
 }
 
-vector 
+vector
 faces::get_center() const
 {
 	vector ret;
@@ -424,7 +424,7 @@ faces::get_center() const
 	return ret;
 }
 
-void 
+void
 faces::grow_extent( extent& world)
 {
 	double* pos_i = index( pos, 0);
@@ -435,5 +435,5 @@ faces::grow_extent( extent& world)
 	}
 	world.add_body();
 }
-	
+
 } } // !namespace cvisual::python

@@ -8,15 +8,17 @@ scene.height=600
 scene.title="3D TicTacToe: 4 in a row"
 
 # draw board
+gray = (1,1,1)
 yo=2.       
-base=grid (n=4, ds=1, gridcolor=(1,1,1))
+base=grid (n=4, ds=1, gridcolor=gray)
 base.pos=base.pos+vector(-0.5, -2., -0.5)
 base.radius=0.02
-second=grid(n=4, ds=1)
+
+second=grid(n=4, ds=1, gridcolor=gray)
 second.pos=second.pos+vector(-0.5, -1., -0.5)
-third=grid(n=4, ds=1)
+third=grid(n=4, ds=1, gridcolor=gray)
 third.pos=third.pos+vector(-0.5, 0, -0.5)
-top=grid(n=4, ds=1)
+top=grid(n=4, ds=1, gridcolor=gray)
 top.pos=top.pos+vector(-0.5, 1., -0.5)
 
 # get list of winning combinations

@@ -8,7 +8,7 @@ def draw_slice(sweep, r, axis, frame, color):
     #color=(uniform(0,1),uniform(0,1),uniform(0,1))
 
     ls = len(sweep)
-    pos = zeros( (len(r)*ls, 3), Float )
+    pos = zeros( (len(r)*ls, 3), float64 )
     for j in range(len(r)):
         pos[j*ls:j*ls+ls] = sweep*r[j] + (axis[j],0,0)
     return convex(pos=pos,
@@ -21,7 +21,7 @@ def revolution(radius, length, slices=32, color = (1,1,1), pos = (0,0,0)):
 
     # sweep = unit circle in the yz plane
     t = arange(0,2*pi,2*pi/slices)
-    sweep = zeros( (slices,3), Float) # Numeric array (rows=slices)*(columns=3)
+    sweep = zeros( (slices,3), float64) # Numeric array (rows=slices)*(columns=3)
     sweep[:,1] = cos(t) # set middle column to cos(t)
     sweep[:,2] = sin(t) # set final column to sin(t)
 

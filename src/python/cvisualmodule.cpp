@@ -14,10 +14,10 @@
 #include <boost/python/def.hpp>
 
 #define PY_ARRAY_UNIQUE_SYMBOL visual_PyArrayHandle
-#include <Numeric/arrayobject.h>
+//#include <numpy/arrayobject.h>
 
 #include "util/rate.hpp"
-#include "display.hpp"
+//#include "display.hpp"
 #include "util/errors.hpp"
 #include "python/num_util.hpp"
 #include "python/gil.hpp"
@@ -36,7 +36,7 @@ namespace python {
 	void wrap_scalar_array();
 } // !namespace python
 
-void 
+void
 translate_std_out_of_range( std::out_of_range e)
 {
 	PyErr_SetString( PyExc_IndexError, e.what());
@@ -65,7 +65,8 @@ BOOST_PYTHON_MODULE( cvisual)
 {
 	VPYTHON_NOTE( "Importing cvisual from vpython-core2.");
 	using namespace boost::python;
-	
+	numeric::array::set_module_and_type( "numpy", "ndarray");
+
 #if __GNUG__
 #if __GNUC__ == 3
 #if __GNUCMINOR__ >= 1 && __GNUCMINOR__ < 4
@@ -75,20 +76,18 @@ BOOST_PYTHON_MODULE( cvisual)
 #endif
 
 	// Private functions for initializing and choosing the numeric backend
-	def( "_init_numeric_impl", python::init_numeric_impl);
-	def( "_init_numarray_impl", python::init_numarray_impl);
-	def( "_use_numeric_impl", python::use_numeric_impl);
-	def( "_use_numarray_impl", python::use_numarray_impl);
-	
+	//def( "_init_numpy_impl", python::init_numpy_impl);
+	def("init_numpy", python::init_numpy);
+   // import_array()
 	// Initialize the Python thread system.
 	PyEval_InitThreads();
-	
+
 	// A subset of the python standard exceptions may be thrown from visual
-	register_exception_translator<std::out_of_range>( 
+	register_exception_translator<std::out_of_range>(
 		&translate_std_out_of_range);
-	register_exception_translator<std::invalid_argument>( 
+	register_exception_translator<std::invalid_argument>(
 		&translate_std_invalid_argument);
-	register_exception_translator<std::runtime_error>( 
+	register_exception_translator<std::runtime_error>(
 		&translate_std_runtime_error);
 
 	def( "rate", py_rate, "rate(arg) -> Limits the execution rate of a loop to arg"

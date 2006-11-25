@@ -20,13 +20,13 @@
 // TODO: Figure out what to do with this...
 #define PY_ARRAY_UNIQUE_SYMBOL visual_PyArrayHandle
 #define NO_IMPORT_ARRAY
-#include <Numeric/arrayobject.h>
+#include <numpy/arrayobject.h>
 
 #include <iostream>
 #include <stdexcept>
 
 namespace cvisual { namespace python {
-	
+
 vector_array::vector_array( const boost::python::list& sequence)
 	: data( boost::python::extract<int>( sequence.attr("__len__")()))
 {
@@ -46,7 +46,7 @@ vector_array::vector_array( const boost::python::list& sequence)
 					i->y = boost::python::extract<double>(elem[1]);
 					i->x = boost::python::extract<double>(elem[0]);
 				default:
-					throw std::invalid_argument( 
+					throw std::invalid_argument(
 						"Can only construct a vector from a "
 						"sequence of 2 or 3 doubles.");
 			}
@@ -58,17 +58,17 @@ vector_array::vector_array( boost::python::numeric::array sequence)
 	: data( ((PyArrayObject*)sequence.ptr())->dimensions[0])
 {
 	const PyArrayObject* seq_ptr = (const PyArrayObject*)sequence.ptr();
-	
+
 	if (!( seq_ptr->nd == 2
 		&& seq_ptr->dimensions[1] == 3
 		&& seq_ptr->descr->type_num == PyArray_DOUBLE)) {
 		throw std::invalid_argument( "Must construct a vector_array from an Nx3 array of type Float64.");
 	}
-		
+
 	const double* seq_i = (const double*)seq_ptr->data;
 	iterator i = this->begin();
 	for ( ; i != this->end(); ++i, seq_i += 3) {
-		*i = vector( seq_i[0], seq_i[1], seq_i[2]);	
+		*i = vector( seq_i[0], seq_i[1], seq_i[2]);
 	}
 }
 
@@ -104,7 +104,7 @@ vector_array::head_crop( int i_)
 	size_t i = (size_t)i_;
 	if (i >= data.size())
 		throw std::invalid_argument( "Cannot crop greater than the array's length.");
-	
+
 	iterator begin = data.begin();
 	data.erase( begin, begin+i);
 }
@@ -123,7 +123,7 @@ vector_array::tail_crop( int i_)
 	size_t i = (size_t)i_;
 	if (i >= data.size())
 		throw std::invalid_argument( "Cannot crop greater than the array's length.");
-		
+
 	iterator end = data.end();
 	data.erase( end-i, end);
 }
@@ -132,7 +132,7 @@ vector_array
 vector_array::operator*( double s) const
 {
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		*r_i = *i * s;
@@ -146,7 +146,7 @@ vector_array
 vector_array::operator*( vector v) const
 {
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		vector v_i = *i;
@@ -161,11 +161,11 @@ vector_array::operator*( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible vector array multiplication.");
-	
+
 	vector_array ret( data.size());
 	scalar_array::const_iterator s_i = s.begin();
 	iterator r_i = ret.begin();
-	
+
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++s_i) {
 		*r_i = *i * *s_i;
 	}
@@ -176,7 +176,7 @@ vector_array
 vector_array::operator/( double s) const
 {
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		*r_i = *i / s;
@@ -189,11 +189,11 @@ vector_array::operator/( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible vector array division.");
-	
+
 	vector_array ret( data.size());
 	scalar_array::const_iterator s_i = s.begin();
 	iterator r_i = ret.begin();
-	
+
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++s_i) {
 		*r_i = *i / *s_i;
 	}
@@ -204,7 +204,7 @@ vector_array
 vector_array::operator-() const
 {
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		*r_i = -(*i);
@@ -226,9 +226,9 @@ vector_array::operator*=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible vector array multiplication.");
-	
 
-	scalar_array::const_iterator s_i = s.begin();	
+
+	scalar_array::const_iterator s_i = s.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++s_i) {
 		*i *= *s_i;
 	}
@@ -250,9 +250,9 @@ vector_array::operator/=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible vector array multiplication.");
-	
 
-	scalar_array::const_iterator s_i = s.begin();	
+
+	scalar_array::const_iterator s_i = s.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++s_i) {
 		*i /= *s_i;
 	}
@@ -264,7 +264,7 @@ vector_array
 vector_array::operator+( const vector& v) const
 {
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		*r_i = *i + v;
@@ -277,9 +277,9 @@ vector_array::operator+( const vector_array& v) const
 {
 	if (data.size() != v.data.size())
 		throw std::out_of_range( "Incompatible vector array addition.");
-	
+
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	const_iterator v_i = v.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++v_i) {
@@ -288,11 +288,11 @@ vector_array::operator+( const vector_array& v) const
 	return ret;
 }
 
-vector_array 
-vector_array::operator-( const vector& v) const 
+vector_array
+vector_array::operator-( const vector& v) const
 {
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i ) {
 		*r_i = *i - v;
@@ -305,9 +305,9 @@ vector_array::operator-( const vector_array& v) const
 {
 	if (data.size() != v.data.size())
 		throw std::out_of_range( "Incompatible vector array subtraction.");
-	
+
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	const_iterator v_i = v.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++v_i) {
@@ -325,12 +325,12 @@ vector_array::operator+=( const vector& v)
 	return *this;
 }
 
-const vector_array& 
+const vector_array&
 vector_array::operator+=( const vector_array& v)
 {
 	if (data.size() != v.data.size())
 		throw std::out_of_range( "Incompatible vector array addition.");
-	
+
 	const_iterator v_i = v.data.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++v_i) {
 		*i += *v_i;
@@ -353,7 +353,7 @@ vector_array::operator-=( const vector_array& v)
 {
 	if (data.size() != v.data.size())
 		throw std::out_of_range( "Incompatible vector array subtraction.");
-	
+
 	const_iterator v_i = v.data.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++v_i) {
 		*i -= *v_i;
@@ -366,7 +366,7 @@ vector_array
 vector_array::cross( const vector& v)
 {
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		*r_i = i->cross(v);
@@ -379,9 +379,9 @@ vector_array::cross( const vector_array& v)
 {
 	if (v.data.size() != data.size())
 		throw std::out_of_range( "Incompatible vector_array types." );
-	
+
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	const_iterator v_i = v.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++v_i) {
@@ -394,7 +394,7 @@ vector_array
 vector_array::norm() const
 {
 	vector_array ret( data.size());
-	
+
 	iterator r_i = ret.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		*r_i = i->norm();
@@ -420,7 +420,7 @@ vector_array::proj( const vector& v)
 {
 	vector_array ret( data.size());
 	iterator r_i = ret.data.begin();
-	
+
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		*r_i = i->proj( v);
 	}
@@ -432,11 +432,11 @@ vector_array::proj( const vector_array& v)
 {
 	if (v.data.size() != data.size())
 		throw std::out_of_range( "Incompatible vector_array types." );
-	
+
 	vector_array ret( data.size());
 	iterator r_i = ret.data.begin();
 	const_iterator v_i = v.data.begin();
-	
+
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++v_i) {
 		*r_i = i->proj( *v_i);
 	}
@@ -453,7 +453,7 @@ vector_array::mag() const
 	}
 	return ret;
 }
-	
+
 scalar_array
 vector_array::mag2() const
 {
@@ -463,13 +463,13 @@ vector_array::mag2() const
 		*r_i = i->mag2();
 	}
 	return ret;
-	
+
 }
 
 
 void
 vector_array::rotate( const double& d, vector axis)
-{	
+{
 	for (iterator i = data.begin(); i != data.end(); ++i) {
 		i->rotate( d, axis);
 	}
@@ -481,7 +481,7 @@ vector_array::py_getitem( int index)
 	if (index < 0) {
 		// Negative indexes are counted from the end of the array in Python.
 		index += data.size();
-	}		
+	}
 
 	return data.at(index);
 }
@@ -491,7 +491,7 @@ vector_array::py_setitem( int index, vector value)
 {
 	if (index < 0)
 		index += data.size();
-	
+
 	data.at(index) = value;
 }
 
@@ -511,11 +511,11 @@ vector_array::dot( const vector_array& v)
 {
 	if (v.data.size() != data.size())
 		throw std::out_of_range( "Incompatible vector_array types." );
-	
+
 	scalar_array ret( data.size());
 	scalar_array::iterator r_i = ret.begin();
 	const_iterator v_i = v.begin();
-	
+
 	for ( const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++v_i) {
 		*r_i = i->dot( *v_i);
 	}
@@ -526,7 +526,7 @@ scalar_array
 vector_array::comp( const vector& v)
 {
 	scalar_array ret( data.size());
-	
+
 	scalar_array::iterator r_i = ret.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++r_i) {
 		*r_i = i->comp( v);
@@ -539,9 +539,9 @@ vector_array::comp( const vector_array& v)
 {
 	if ( data.size() != v.data.size() )
 		throw std::out_of_range( "Incompatible array scalar projection.");
-	
+
 	scalar_array ret( data.size());
-	
+
 	scalar_array::iterator r_i = ret.begin();
 	const_iterator v_i = v.begin();
 	for (const_iterator i = data.begin(); i !=data.end(); ++i, ++v_i, ++r_i) {
@@ -783,7 +783,7 @@ vector_array::operator*( const vector_array& v) const
 	return ret;
 }
 
-void 
+void
 vector_array::set_x( boost::python::numeric::array x)
 {
 	this->set_x( scalar_array( x));
@@ -795,13 +795,13 @@ vector_array::set_y( boost::python::numeric::array y)
 	this->set_y( scalar_array( y));
 }
 
-void 
+void
 vector_array::set_z( boost::python::numeric::array z)
 {
 	this->set_z( scalar_array( z));
 }
 
-void 
+void
 vector_array::set_x( double x)
 {
 	this->set_x( scalar_array( size(), x));
@@ -813,7 +813,7 @@ vector_array::set_y( double y)
 	this->set_y( scalar_array( size(), y));
 }
 
-void 
+void
 vector_array::set_z( double z)
 {
 	this->set_z( scalar_array( size(), z));
@@ -826,10 +826,10 @@ vector_array::as_array() const
 	// Make space for the returned array
 	int dims[] = { size(), 3 };
 	boost::python::handle<> ret( PyArray_FromDims( 2, dims, PyArray_DOUBLE));
-	
+
 	// A direct pointer to the PyArrayObject
 	PyArrayObject* ret_ptr = (PyArrayObject *)ret.get();
-	
+
 	// Iterable pointers to copy the data.
 	double* r_i = (double *) ret_ptr->data;
 	const_iterator i = this->begin();
@@ -839,7 +839,7 @@ vector_array::as_array() const
 		r_i[1] = i->get_y();
 		r_i[2] = i->get_z();
 	}
-	return ret;	
+	return ret;
 }
 
 // This algorithm is failing to recognize all of the collisions...
@@ -906,21 +906,21 @@ wrap_vector_array()
 	// For the uninitiated (and sane), these are member function pointers.
 	// They have the following syntax:
 	// return-type (class-type::* pointer-name)(argument-list) = &class-type::member-function;
-	
-	
+
+
 	vector_array (vector_array::* proj_vector)(const vector&) = &vector_array::proj;
 	vector_array (vector_array::* proj_vector_array)( const vector_array&) = &vector_array::proj;
 	vector_array (vector_array::* cross_vector)(const vector&) = &vector_array::cross;
 	vector_array (vector_array::* cross_vector_array)(const vector_array&) = &vector_array::cross;
-		
+
 	scalar_array (vector_array::* dot_vector)(const vector&) = &vector_array::dot;
 	scalar_array (vector_array::* dot_vector_array)(const vector_array&) = &vector_array::dot;
 	scalar_array (vector_array::* comp_vector) (const vector&) = &vector_array::comp;
 	scalar_array (vector_array::* comp_vector_array)(const vector_array&) = &vector_array::comp;
-	
+
 	void (vector_array::* append_vector)(const vector&) = &vector_array::append;
 	void (vector_array::* prepend_vector)(const vector&) = &vector_array::prepend;
-	
+
 	// Overloaded setters for 'x', 'y', and 'z' properties
 	void (vector_array::* set_x_s)(const scalar_array&) = &vector_array::set_x;
 	void (vector_array::* set_x_n)(numeric::array) = &vector_array::set_x;
@@ -931,12 +931,12 @@ wrap_vector_array()
 	void (vector_array::* set_z_s)(const scalar_array&) = &vector_array::set_z;
 	void (vector_array::* set_z_n)(numeric::array) = &vector_array::set_z;
 	void (vector_array::* set_z_d)(double) = &vector_array::set_z;
-	
+
 	vector_array (vector_array::* truediv_double)( double) const = &vector_array::operator/;
 	vector_array (vector_array::* truediv_scalar_array)(const scalar_array&) const = &vector_array::operator/;
 	const vector_array& (vector_array::* itruediv_double)(double) = &vector_array::operator/=;
 	const vector_array& (vector_array::* itruediv_scalar_array)(const scalar_array&) = &vector_array::operator/=;
-	
+
 	class_<vector_array> vector_array_wrapper( "vector_array", init< optional<int, vector> >( args("size", "fill")));
 	vector_array_wrapper.def( init<const list&>())
 		.def( init<numeric::array>())
@@ -995,7 +995,7 @@ wrap_vector_array()
 		.def( "mag2", &vector_array::mag2, "Equivalant to x.mag() * x.mag(), but faster.")
 		.def( "norm", &vector_array::norm, "Returns a vector_array of the unit vectors of this array.")
 		.def( "abs", &vector_array::fabs, "Returns a vector_array of absolute values of the vectors in the array.")
-		// Fancy C++ -> python iterator access 
+		// Fancy C++ -> python iterator access
 		.def( "__iter__", iterator<vector_array>())
 		.def( "__len__", &vector_array::size)
 		.def( "__getitem__", &vector_array::py_getitem, return_internal_reference<>(), "Index this array by a single integer.\n"
@@ -1016,15 +1016,15 @@ wrap_vector_array()
 		.def( "sum", &vector_array::sum, "Returns the sum of all elements in the array.")
 		.def( "as_array", &vector_array::as_array, "Create a self.__len__() x 3 Numeric.array from this vector_array.")
 		;
-		
+
 	vector_array_wrapper.add_property( "x", vector_array_wrapper.attr("get_x"),
 		vector_array_wrapper.attr("set_x"));
 	vector_array_wrapper.add_property( "y", vector_array_wrapper.attr("get_y"),
 		vector_array_wrapper.attr("set_y"));
 	vector_array_wrapper.add_property( "z", vector_array_wrapper.attr("get_z"),
 		vector_array_wrapper.attr("set_z"));
-	
-	
+
+
 	def( "sphere_intercollisions", &sphere_collisions, args( "pos", "radius"),
 		"Evaluate collisions between spheres with centers == pos, and radii == radius.\n"
 		"Returns a list of two-integer tuple indexes.\n"
@@ -1034,7 +1034,7 @@ wrap_vector_array()
 		, "Evaluate collisions between spheres with centers == pos, and radii == radius with\n"
 		  "a plane specified by a normal vector == normal, and a point on the plane == origin.\n"
 		  "Returns a list of integers corrisponding to colliding spheres' indexed into pos." );
-	
+
 }
 
 } } // !namespace cvisual::python

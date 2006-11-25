@@ -595,6 +595,7 @@ display_kernel::recalc_extent(void)
 void 
 display_kernel::add_renderable( shared_ptr<renderable> obj)
 {
+	// Driven from visual/primitives.py set_visible
 	lock L(mtx);
 	if (obj->color.opacity == 1.0)
 		layer_world.push_back( obj);
@@ -605,8 +606,9 @@ display_kernel::add_renderable( shared_ptr<renderable> obj)
 void 
 display_kernel::remove_renderable( shared_ptr<renderable> obj)
 {
+	// Driven from visual/primitives.py set_visible
 	lock L(mtx);
-	// Choice of removal algorithms:  For containers that support thier own
+	// Choice of removal algorithms:  For containers that support their own
 	// removal methods (list, set), use the member function.  Else, use 
 	// std::remove.
 	layer_world.remove( obj);

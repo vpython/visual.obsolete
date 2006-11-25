@@ -14,7 +14,7 @@ class slider:
     def __init__(self, pos=vector(0,0,0), axis=vector(0,1.,0), value=None,
                  width=0.15, min=0, max=100., color=(1,0,0)):
         pos = vector(pos)
-        axis = vector(axis)
+       # axis = vector(axis)
         if value == None:
             value = min
         self.min = min

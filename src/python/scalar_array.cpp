@@ -15,10 +15,10 @@
 
 #define PY_ARRAY_UNIQUE_SYMBOL visual_PyArrayHandle
 #define NO_IMPORT_ARRAY
-#include <Numeric/arrayobject.h>
+#include <numpy/arrayobject.h>
 
 namespace cvisual { namespace python {
-	
+
 /***********************  scalar_array implementation  ***********************/
 
 scalar_array::scalar_array( const boost::python::list& sequence)
@@ -39,7 +39,7 @@ scalar_array::scalar_array( const boost::python::numeric::array& sequence)
 		throw std::invalid_argument( "Must construct a scalar_array from a "
 			"one-dimensional array of type Float64");
 	}
-	
+
 	const double* seq_i = (const double*)seq_ptr->data;
 	iterator i = this->begin();
 	for ( ; i != this->end(); ++i, ++seq_i) {
@@ -54,7 +54,7 @@ scalar_array::as_array() const
 	int dims[] = { this->size() };
 	boost::python::handle<> ret( PyArray_FromDims( 1, dims, PyArray_DOUBLE));
 	PyArrayObject* ret_ptr = (PyArrayObject*)ret.get();
-	
+
 	double* r_i = (double*)ret_ptr->data;
 	const_iterator i = this->begin();
 	for ( ; i != this->end(); ++i, ++r_i) {
@@ -90,7 +90,7 @@ scalar_array::head_crop( int i_)
 	size_t i = (size_t)i_;
 	if (i >= data.size())
 		throw std::out_of_range( "Cannot crop greater than the array's length.");
-	
+
 	iterator begin = data.begin();
 	data.erase( begin, begin+i);
 }
@@ -106,10 +106,10 @@ scalar_array::tail_crop( int i_)
 {
 	if (i_ < 0)
 		throw std::invalid_argument( "Cannot crop a negative amount.");
-	size_t i = (size_t)i_;		
+	size_t i = (size_t)i_;
 	if (i >= data.size())
 		throw std::out_of_range( "Cannot crop greater than the array's length.");
-		
+
 	iterator end = data.end();
 	data.erase( end-i, end);
 }
@@ -125,15 +125,15 @@ scalar_array::operator*( double s) const
 	return ret;
 }
 
-	
+
 scalar_array
 scalar_array::operator*( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible array multiplication.");
-	
+
 	scalar_array ret( data.size());
-	
+
 	const_iterator s_i = s.begin();
 	iterator r_i = ret.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++s_i, ++r_i) {
@@ -141,15 +141,15 @@ scalar_array::operator*( const scalar_array& s) const
 	}
 	return ret;
 }
-	
+
 vector_array
 scalar_array::operator*( const vector_array& v) const
 {
 	if (data.size() != v.data.size())
 		throw std::out_of_range( "Incompatible array multiplication.");
-	
+
 	vector_array ret( data.size());
-	
+
 	vector_array::iterator r_i = ret.begin();
 	vector_array::const_iterator v_i = v.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++v_i) {
@@ -178,20 +178,20 @@ scalar_array::operator*=( double s)
 	}
 	return *this;
 }
-	
+
 const scalar_array&
 scalar_array::operator*=( const scalar_array& s)
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible array multiplication.");
-	
+
 	const_iterator s_i = s.begin();
 	for (iterator i = data.begin(); i != data.end(); ++i, ++s_i) {
 		*i *= *s_i;
 	}
 	return *this;
 }
-	
+
 scalar_array
 scalar_array::operator/( double s) const
 {
@@ -202,15 +202,15 @@ scalar_array::operator/( double s) const
 	}
 	return ret;
 }
-	
+
 scalar_array
 scalar_array::operator/( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible array division.");
-	
+
 	scalar_array ret( data.size());
-	
+
 	const_iterator s_i = s.begin();
 	iterator r_i = ret.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++s_i, ++r_i) {
@@ -218,7 +218,7 @@ scalar_array::operator/( const scalar_array& s) const
 	}
 	return ret;
 }
-	
+
 const scalar_array&
 scalar_array::operator/=( double s)
 {
@@ -227,7 +227,7 @@ scalar_array::operator/=( double s)
 	}
 	return *this;
 }
-	
+
 const scalar_array&
 scalar_array::operator/=( const scalar_array& s)
 {
@@ -240,15 +240,15 @@ scalar_array::operator/=( const scalar_array& s)
 	}
 	return *this;
 }
-	
+
 scalar_array
 scalar_array::operator+( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible array addition.");
-	
+
 	scalar_array ret( data.size());
-	
+
 	iterator r_i = ret.begin();
 	const_iterator s_i = s.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++s_i, ++r_i) {
@@ -257,7 +257,7 @@ scalar_array::operator+( const scalar_array& s) const
 	return *this;
 }
 
-	
+
 scalar_array
 scalar_array::operator+( double s) const
 {
@@ -268,7 +268,7 @@ scalar_array::operator+( double s) const
 	}
 	return ret;
 }
-	
+
 const scalar_array&
 scalar_array::operator+=( double s)
 {
@@ -278,7 +278,7 @@ scalar_array::operator+=( double s)
 	return *this;
 }
 
-	
+
 const scalar_array&
 scalar_array::operator+=( const scalar_array& s)
 {
@@ -292,15 +292,15 @@ scalar_array::operator+=( const scalar_array& s)
 	return *this;
 }
 
-	
+
 scalar_array
 scalar_array::operator-( const scalar_array& s) const
 {
 	if (data.size() != s.data.size())
 		throw std::out_of_range( "Incompatible array subtraction.");
-	
+
 	scalar_array ret( data.size());
-	
+
 	iterator r_i = ret.begin();
 	const_iterator s_i = s.data.begin();
 	for (const_iterator i = data.begin(); i != data.end(); ++i, ++s_i, ++r_i) {
@@ -308,7 +308,7 @@ scalar_array::operator-( const scalar_array& s) const
 	}
 	return ret;
 }
-	
+
 scalar_array
 scalar_array::operator-( double s) const
 {
@@ -320,7 +320,7 @@ scalar_array::operator-( double s) const
 	return ret;
 }
 
-	
+
 const scalar_array&
 scalar_array::operator-=( double s)
 {
@@ -330,7 +330,7 @@ scalar_array::operator-=( double s)
 	return *this;
 }
 
-	
+
 const scalar_array&
 scalar_array::operator-=( const scalar_array& s)
 {
@@ -344,7 +344,7 @@ scalar_array::operator-=( const scalar_array& s)
 	return *this;
 }
 
-	
+
 scalar_array
 scalar_array::operator-() const
 {
@@ -371,7 +371,7 @@ scalar_array::py_getitem( int index)
 {
 	if (index < 0)
 		index += data.size();
-	
+
 	return data.at(index);
 }
 
@@ -385,17 +385,17 @@ scalar_array::sum() const
 	}
 	return ret;
 }
-	
+
 void
 wrap_scalar_array()
 {
 	using namespace boost::python;
-	
+
 	scalar_array (scalar_array::* truediv_self)( const scalar_array&) const = &scalar_array::operator/;
 	const scalar_array& (scalar_array::* itruediv_self)( const scalar_array&) = &scalar_array::operator/=;
 	scalar_array (scalar_array::* truediv_double)( double) const = &scalar_array::operator/;
 	const scalar_array& (scalar_array::* itruediv_double)( double) = &scalar_array::operator/=;
-	
+
 	class_<scalar_array>( "scalar_array", init< optional<int, double> >( args( "size", "fill" ) ))
 		.def( init<const list&>())
 		.def( init<numeric::array>())
@@ -433,10 +433,10 @@ wrap_scalar_array()
 		.def( "tail_clip", &scalar_array::tail_clip)
 		.def( "tail_crop", &scalar_array::tail_crop)
 		.def( "sum", &scalar_array::sum, "Returns the sum of all elements in the array.")
-		.def( "as_array", &scalar_array::as_array, 
+		.def( "as_array", &scalar_array::as_array,
 			"Returns a new self.__len__() x 1 Numeric.array from this scalar_array.")
 		;
-	
+
 }
-	
+
 } } // !namespace cvisual::python

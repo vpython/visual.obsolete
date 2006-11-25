@@ -5,7 +5,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "util/vector.hpp"
- 
+
 #include <boost/python/class.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/implicit.hpp>
@@ -33,8 +33,8 @@ namespace {
 void
 validate_array( const array& arr)
 {
-	std::vector<int> dims = shape(arr);
-	if (type(arr) != double_t) {
+	std::vector<npy_intp> dims = shape(arr);
+	if (type(arr) != NPY_DOUBLE) {
 		throw std::invalid_argument( "Array must be of type Float64.");
 	}
 	if (!iscontiguous(arr)) {
@@ -88,15 +88,15 @@ object
 mag_a( const array& arr)
 {
 	validate_array( arr);
-	std::vector<int> dims = shape(arr);
+	std::vector<npy_intp> dims = shape(arr);
 	// Magnitude of a flat 3-length array
 	if (dims.size() == 1 && dims[0] == 3) {
-		return object( vector( 
-			extract<double>(arr[0]), 
-			extract<double>(arr[1]), 
+		return object( vector(
+			extract<double>(arr[0]),
+			extract<double>(arr[1]),
 			extract<double>(arr[2])).mag());
 	}
-	std::vector<int> rdims(1);
+	std::vector<npy_intp> rdims(1);
 	rdims[0] = dims[0];
 	array ret = makeNum( rdims);
 	for (int i = 0; i< rdims[0]; ++i) {
@@ -109,15 +109,15 @@ object
 mag2_a( const array& arr)
 {
 	validate_array( arr);
-	std::vector<int> dims = shape(arr);
+	std::vector<npy_intp> dims = shape(arr);
 	if (dims.size() == 1 && dims[0] == 3) {
 		// Returns an object of type float.
-		return object( vector( 
-			extract<double>(arr[0]), 
-			extract<double>(arr[1]), 
+		return object( vector(
+			extract<double>(arr[0]),
+			extract<double>(arr[1]),
 			extract<double>(arr[2])).mag2());
 	}
-	std::vector<int> rdims(1);
+	std::vector<npy_intp> rdims(1);
 	rdims[0] = dims[0];
 	array ret = makeNum( rdims);
 	for (int i = 0; i < rdims[0]; ++i) {
@@ -131,12 +131,12 @@ object
 norm_a( const array& arr)
 {
 	validate_array( arr);
-	std::vector<int> dims = shape(arr);
+	std::vector<npy_intp> dims = shape(arr);
 	if (dims.size() == 1 && dims[0] == 3) {
 		// Returns a float
-		return object( vector( 
-			extract<double>(arr[0]), 
-			extract<double>(arr[1]), 
+		return object( vector(
+			extract<double>(arr[0]),
+			extract<double>(arr[1]),
 			extract<double>(arr[2])).norm());
 	}
 	array ret = makeNum(dims);
@@ -152,13 +152,13 @@ dot_a( const array& arg1, const array& arg2)
 {
 	validate_array( arg1);
 	validate_array( arg2);
-	std::vector<int> dims1 = shape(arg1);
-	std::vector<int> dims2 = shape(arg2);
+	std::vector<npy_intp> dims1 = shape(arg1);
+	std::vector<npy_intp> dims2 = shape(arg2);
 	if (dims1 != dims2) {
 		throw std::invalid_argument( "Array shape mismatch.");
 	}
-	
-	std::vector<int> dims_ret(1);
+
+	std::vector<npy_intp> dims_ret(1);
 	dims_ret[0] = dims1[0];
 	array ret = makeNum( dims_ret);
 	const double* arg1_i = (double*)data(arg1);
@@ -174,8 +174,8 @@ cross_a_a( const array& arg1, const array& arg2)
 {
 	validate_array( arg1);
 	validate_array( arg2);
-	std::vector<int> dims1 = shape(arg1);
-	std::vector<int> dims2 = shape(arg2);
+	std::vector<npy_intp> dims1 = shape(arg1);
+	std::vector<npy_intp> dims2 = shape(arg2);
 	if (dims1 != dims2) {
 		throw std::invalid_argument( "Array shape mismatch.");
 	}
@@ -191,14 +191,14 @@ cross_a_a( const array& arg1, const array& arg2)
 		ret_i[1] = ret.get_y();
 		ret_i[2] = ret.get_z();
 	}
-	return ret;	
+	return ret;
 }
 
 array
 cross_a_v( const array& arg1, const vector& arg2)
 {
 	validate_array( arg1);
-	std::vector<int> dims = shape( arg1);
+	std::vector<npy_intp> dims = shape( arg1);
 	array ret = makeNum( dims);
 	const double* arg1_i = (double*)data( arg1);
 	double* ret_i = (double*)data( ret);
@@ -208,7 +208,7 @@ cross_a_v( const array& arg1, const vector& arg2)
 		ret_i[0] = ret.get_x();
 		ret_i[1] = ret.get_y();
 		ret_i[2] = ret.get_z();
-		
+
 	}
 	return ret;
 }
@@ -217,7 +217,7 @@ array
 cross_v_a( const vector& arg1, const array& arg2)
 {
 	validate_array( arg2);
-	std::vector<int> dims = shape( arg2);
+	std::vector<npy_intp> dims = shape( arg2);
 	array ret = makeNum( dims);
 	const double* arg2_i = (double*)data( arg2);
 	double* ret_i = (double*)data( ret);
@@ -227,7 +227,7 @@ cross_v_a( const vector& arg1, const array& arg2)
 		ret_i[0] = ret.get_x();
 		ret_i[1] = ret.get_y();
 		ret_i[2] = ret.get_z();
-		
+
 	}
 	return ret;
 
@@ -245,12 +245,12 @@ struct vector_from_seq
 {
 	vector_from_seq()
 	{
-		py::converter::registry::push_back( 
+		py::converter::registry::push_back(
 			&convertible,
 			&construct,
 			py::type_id<vector>());
 	}
-	
+
 	static void* convertible( PyObject* obj)
 	{
 		using py::handle;
@@ -270,12 +270,12 @@ struct vector_from_seq
 		return obj;
 	}
 
-	static void construct( 
-		PyObject* _obj, 
+	static void construct(
+		PyObject* _obj,
 		py::converter::rvalue_from_python_stage1_data* data)
 	{
 		using namespace boost::python;
-		
+
 		object obj = object(handle<>(borrowed(_obj)));
 		void* storage = (
 			(boost::python::converter::rvalue_from_python_storage<vector>*)
@@ -286,14 +286,14 @@ struct vector_from_seq
 				new (storage) vector( py::extract<double>(obj[0]));
 				break;
 			case 2:
-				new (storage) vector( 
+				new (storage) vector(
 					py::extract<double>( obj[0]),
 					py::extract<double>( obj[1]));
 					break;
 			case 3: default:
 				// Will probably trigger an exception if it is the default
 				// case.
-				new (storage) vector( 
+				new (storage) vector(
 					py::extract<double>( obj[0]),
 					py::extract<double>( obj[1]),
 					py::extract<double>( obj[2]));
@@ -302,7 +302,7 @@ struct vector_from_seq
 	}
 };
 
-py::tuple 
+py::tuple
 vector_as_tuple( const vector& v)
 {
 	return py::make_tuple( v.x, v.y, v.z);
@@ -320,7 +320,7 @@ wrap_vector()
 {
 	vector (*rotate_vector)( vector, double, const vector) = rotate;
 	vector (*rotate)(vector, double) = rotate;
-	
+
 	// Numeric versions for some of the above
 	// TODO: round out the set.
 	def( "mag", mag_a);
@@ -332,6 +332,8 @@ wrap_vector()
 	def( "norm", norm_a);
 
 	// Free functions for vectors
+	py::def( "det3",a_dot_b_cross_c, "The determiant of the mtix of 3 vectors.");
+	py::def( "cross3",a_cross_b_cross_c, "The vector triple product.");
 	py::def( "dot", dot, "The dot product between two vectors.");
 	py::def( "cross", cross, "The cross product between two vectors.");
 	py::def( "mag", mag, "The magnitude of a vector.");
@@ -346,8 +348,8 @@ wrap_vector()
 
 	vector (vector::* truediv)( double) const = &vector::operator/;
 	const vector& (vector::* itruediv)( double) = &vector::operator/=;
-	
-	// The vector class, constructable from 0, one, two or three doubles.	
+
+	// The vector class, constructable from 0, one, two or three doubles.
 	py::class_<vector>("vector", py::init< py::optional<double, double, double> >())
 		// Explicit copy.
 		.def( init<vector>())
@@ -369,7 +371,7 @@ wrap_vector()
 		.def( "clear", &vector::clear, "Zero the state of this vector.  Potentially "
 			"useful for reusing a temporary variable.")
 		.def( "rotate", &vector::rotate, vector_rotate( "Rotate this vector about "
-			"the specified axis through the specified angle, in radians", 
+			"the specified axis through the specified angle, in radians",
 			args( "angle", "axis")))
 		.def( "__abs__", &vector::mag, "Return the magnitude of this vector.")
 		.def( "__pos__", vector_pos, "Return an unmodified copy of this vector.")
@@ -380,7 +382,7 @@ wrap_vector()
 		// Use this to quickly convert vector's to tuples.
 		.def( "astuple", vector_as_tuple, "Convert this vector to a tuple.  "
 			"Same as tuple(vector), but much faster.")
-		// Member operators                          
+		// Member operators
 		.def( -self)
 		.def( self + self)
 		.def( self += self)
@@ -398,9 +400,9 @@ wrap_vector()
 		.def( self_ns::str(self))        // Support ">>> print foo"
 		.def( "__repr__", &vector::repr) // Support ">>> foo"
 		;
-	
-	
-	const shared_vector& (shared_vector::* sitruediv)( const double&) = 
+
+
+	const shared_vector& (shared_vector::* sitruediv)( const double&) =
 	&shared_vector::operator/=;
 	py::class_<shared_vector, py::bases<vector>, boost::noncopyable>( "Vector", no_init)
 		.def( self += other<vector>())
@@ -418,9 +420,9 @@ wrap_vector()
 
 	// Allow automagic conversions from shared_vector to vector.
 	py::implicitly_convertible<shared_vector, vector>();
-	
+
 	// Pass a sequence to some functions that expect type visual::vector.
 	vector_from_seq();
-}	
-	
+}
+
 } // !namespace cvisual

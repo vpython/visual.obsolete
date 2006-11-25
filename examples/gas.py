@@ -90,11 +90,10 @@ while 1:
     # Update all positions
     pos = pos+(p/m)*dt
 
-    r = pos-pos[:,NewAxis] # all pairs of atom-to-atom vectors
+    r = pos-pos[:,newaxis] # all pairs of atom-to-atom vectors
     rmag = sqrt(add.reduce(r*r,-1)) # atom-to-atom scalar distances
-    hit = less_equal(rmag,radius+radius[:,NewAxis])-identity(Natoms)
-    hitlist = sort(nonzero(hit.flat)).tolist() # i,j encoded as i*Natoms+j
-
+    hit = less_equal(rmag,radius+radius[:,None])-identity(Natoms)
+    hitlist = sort(nonzero(hit.flat)[0]).tolist() # i,j encoded as i*Natoms+j
     # If any collisions took place:
     for ij in hitlist:
         i, j = divmod(ij,Natoms) # decode atom pair

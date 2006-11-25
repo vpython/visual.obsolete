@@ -77,7 +77,7 @@ mousebase::~mousebase()
 }
 
 /* Translate a button click code into a text string.
- */ 
+ */
 std::string*
 mousebase::get_buttons() const
 {
@@ -91,10 +91,10 @@ mousebase::get_buttons() const
 		return 0;
 }
 
-/* Project the cursor's current location onto the plane specified by the normal 
+/* Project the cursor's current location onto the plane specified by the normal
  * vector 'normal' and a perpendicular distance 'dist' from the origin.
  */
-vector 
+vector
 mousebase::project1( vector normal, double dist)
 {
 	double ndc = normal.dot(cam) - dist;
@@ -107,7 +107,7 @@ mousebase::project1( vector normal, double dist)
 /* Project the cursor's current position onto the plane specified by the normal vector
  * 'normal' rooted at the position vector 'point'.
  */
-vector 
+vector
 mousebase::project2( vector normal, vector point)
 {
 	double dist = normal.dot(point);
@@ -115,7 +115,7 @@ mousebase::project2( vector normal, vector point)
 	double ndr = normal.dot(get_ray());
 	double t = -ndc / ndr;
 	vector v = cam + get_ray()*t;
-	return v;	
+	return v;
 }
 
 shared_ptr<renderable>
@@ -126,9 +126,9 @@ mousebase::get_pick()
 
 /************** event implementation **************/
 #if 0
-shared_ptr<event> 
-event::create_press( 
-		shared_ptr<renderable> pick, 
+shared_ptr<event>
+event::create_press(
+		shared_ptr<renderable> pick,
 		vector pickpos,
 		modifiers buttonstate,
 		display_kernel::mouse_button buttons)
@@ -144,7 +144,7 @@ event::create_press(
 		ret->set_alt();
 	ret->set_press( true);
 	ret->buttons = buttons;
-	
+
 	return ret;
 }
 #endif
@@ -155,7 +155,7 @@ mouse_t::~mouse_t()
 {
 }
 
-void 
+void
 mouse_t::clear_events( int i)
 {
 	if (i != 0) {
@@ -193,9 +193,9 @@ mouse_t::pop_click()
 {
 	// TODO: Need to find a way to punt the Python interpreter out of here
 	// during a shutdown
-	shared_ptr<event> ret = events.py_pop();
+	shared_ptr<event> ret = events.pop();
 	while (!ret->is_click()) {
-		ret = events.py_pop();
+		ret = events.pop();
 	}
 	click_count--;
 	return ret;

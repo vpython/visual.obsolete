@@ -25,7 +25,7 @@ namespace cvisual { namespace python {
 const size_t curve::c_cache::items;
 
 namespace {
-	
+
 // returns a pointer to the ith vector in the array.
 double* index( const array& a, size_t i)
 {
@@ -40,7 +40,7 @@ float* findex( const array& a, size_t i)
 {
 	return ((float*)data(a)) + (i+1)*3;
 }
-	
+
 } // !namespace visual::(unnamed)
 
 
@@ -51,7 +51,7 @@ curve::curve()
 	count(0), sides(4)
 {
 	// Perform initial allocation of storage space for the buggar.
-	std::vector<int> dims(2);
+	std::vector<npy_intp> dims(2);
 	dims[0] = preallocated_size;
 	dims[1] = 3;
 	pos = makeNum( dims);
@@ -64,7 +64,7 @@ curve::curve()
 	color_i[0] = 1;
 	color_i[1] = 1;
 	color_i[2] = 1;
-	
+
 	int curve_around = sides;
 
 	for (int i=0; i<curve_around; i++) {
@@ -81,8 +81,8 @@ curve::curve()
 }
 
 curve::curve( const curve& other)
-	: renderable( other), pos( other.pos), color( other.color), 
-	antialias( other.antialias), 
+	: renderable( other), pos( other.pos), color( other.color),
+	antialias( other.antialias),
 	radius( other.radius), preallocated_size( other.preallocated_size),
 	count( other.count)
 {
@@ -127,16 +127,16 @@ curve::set_length( size_t length)
 	if (npoints == 0)
 		// The first allocation.
 		npoints = 1;
-		
+
 	if (length > preallocated_size-2) {
 		VPYTHON_NOTE( "Reallocating buffers for a curve object.");
-		std::vector<int> dims(2);
+		std::vector<npy_intp> dims(2);
 		dims[0] = 2*length + 2;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
 		array n_color = makeNum( dims);
-		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints+1));
-		std::memcpy( data( n_color), data( color), sizeof(double) * 3 * (npoints+1));
+		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints + 1));
+		std::memcpy( data( n_color), data( color), sizeof(double) * 3 * (npoints + 1));
 		pos = n_pos;
 		color = n_color;
 		preallocated_size = dims[0];
@@ -152,7 +152,7 @@ curve::set_length( size_t length)
 			pos_i[2] = last_pos[2];
 			pos_i += 3;
 		}
-		
+
 		const double* last_color = index( color, npoints-1);
 		double* color_i = index( color, npoints);
 		double* color_end = index( color, length);
@@ -172,7 +172,7 @@ curve::set_length( size_t length)
 }
 
 void
-curve::append_rgb( vector npos, double red, double blue, double green) 
+curve::append_rgb( vector npos, double red, double blue, double green)
 {
 	lock L(mtx);
 	set_length( count+1);
@@ -197,7 +197,7 @@ curve::append( vector npos)
 	double* last_pos = index( pos, count-1);
 	last_pos[0] = npos.x;
 	last_pos[1] = npos.y;
-	last_pos[2] = npos.z;	
+	last_pos[2] = npos.z;
 }
 
 void
@@ -218,11 +218,11 @@ curve::append( vector npos, rgb ncolor)
 void
 curve::set_pos( array n_pos)
 {
-	python::array_types t = type( n_pos);
-	if (t != double_t) {
-		n_pos = astype( n_pos, double_t);
+	NPY_TYPES t = type( n_pos);
+	if (t != NPY_DOUBLE) {
+		n_pos = astype(n_pos, NPY_DOUBLE);
 	}
-	std::vector<int> dims = shape( n_pos);
+	std::vector<npy_intp> dims = shape( n_pos);
 	if (dims.size() == 1 && !dims[0]) {
 		lock L(mtx);
 		set_length(0);
@@ -267,11 +267,11 @@ curve::set_pos_v( const vector& npos)
 void
 curve::set_color( array n_color)
 {
-	python::array_types t = type(n_color);
-	if (t != double_t) {
-		n_color = astype( n_color, double_t);
+	NPY_TYPES t = type(n_color);
+	if (t != NPY_DOUBLE) {
+		n_color = astype(n_color, NPY_DOUBLE);
 	}
-	std::vector<int> dims = shape( n_color);
+    std::vector<npy_intp> dims = shape( n_color);
 	if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
@@ -377,7 +377,7 @@ curve::set_x_l( const list& x)
 void
 curve::set_y_l( const list& y)
 {
-	set_y( array(y));	
+	set_y( array(y));
 }
 
 void
@@ -393,7 +393,7 @@ curve::set_x_d( const double x)
 	if (count == 0) {
 		set_length(1);
 	}
-	pos[make_tuple(slice(1,count+1), 0)] = x;	
+	pos[make_tuple(slice(1,count+1), 0)] = x;
 }
 
 void
@@ -403,7 +403,7 @@ curve::set_y_d( const double y)
 	if (count == 0) {
 		set_length(1);
 	}
-	pos[make_tuple(slice(1,count+1), 1)] = y;	
+	pos[make_tuple(slice(1,count+1), 1)] = y;
 }
 
 void
@@ -413,7 +413,7 @@ curve::set_z_d( const double z)
 	if (count == 0) {
 		set_length(1);
 	}
-	pos[make_tuple(slice(1,count+1), 2)] = z;	
+	pos[make_tuple(slice(1,count+1), 2)] = z;
 }
 
 void
@@ -423,7 +423,7 @@ curve::set_red_d( const double red)
 	if (count == 0) {
 		set_length(1);
 	}
-	color[make_tuple(slice(1,count+1), 0)] = red;	
+	color[make_tuple(slice(1,count+1), 0)] = red;
 }
 
 void
@@ -433,7 +433,7 @@ curve::set_green_d( const double green)
 	if (count == 0) {
 		set_length(1);
 	}
-	color[make_tuple(slice(1,count+1), 1)] = green;	
+	color[make_tuple(slice(1,count+1), 1)] = green;
 }
 
 void
@@ -443,7 +443,7 @@ curve::set_blue_d( const double blue)
 	if (count == 0) {
 		set_length(1);
 	}
-	color[make_tuple(slice(1,count+1), 2)] = blue;	
+	color[make_tuple(slice(1,count+1), 2)] = blue;
 }
 
 void
@@ -472,10 +472,10 @@ curve::monochrome( size_t begin, size_t end)
 {
 	const double* color_i = index( color, begin);
 	const double* color_end = index( color, end);
-	
+
 	rgb first_color( color_i[0], color_i[1], color_i[2]);
 	color_i += 3;
-	
+
 	while (color_i < color_end) {
 		if (color_i[0] != first_color.red)
 			return false;
@@ -485,7 +485,7 @@ curve::monochrome( size_t begin, size_t end)
 			return false;
 		color_i += 3;
 	}
-	
+
 	return true;
 }
 
@@ -506,17 +506,17 @@ eq_frac( double lhs, double rhs, double frac)
 bool
 curve::closed_path() const
 {
-	// Determines if the curve follows a closed path or not.  The case where 
+	// Determines if the curve follows a closed path or not.  The case where
 	// this fails is when the beginning and end are:
 	//   very close together.
 	//   and very close to the origin.
-	//   and the scope of the entire curve is large relative to the points' 
+	//   and the scope of the entire curve is large relative to the points'
 	//     proximity to the origin.
 	// In this case, it returns false when it should be true.
 	vector begin( index(pos, 0));
 	vector end( index(pos, count-1));
-	return eq_frac(begin.x, end.x, 1e-5) 
-		&& eq_frac(begin.y, end.y, 1e-5) 
+	return eq_frac(begin.x, end.x, 1e-5)
+		&& eq_frac(begin.y, end.y, 1e-5)
 		&& eq_frac(begin.z, end.z, 1e-5);
 }
 
@@ -583,7 +583,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 	// that their memory will be valid when rendering the body below.
 	double (*spos)[3] = NULL;
 	double (*tcolor)[3] = NULL;
-	
+
 	if (scene.gcf != 1.0) {
 		// Must scale the pos data.
 		spos = new double[end-begin][3];
@@ -617,7 +617,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 		if (scene.anaglyph) {
 			// Must desaturate or grayscale the color.
 			tcolor = new double[end-begin][3];
-			
+
 			const double* color_i = index( color, begin);
 			const double* color_end = index( color, end);
 			for (size_t i = 0; i < end-begin && color_i < color_end; ++i, color_i += 3) {
@@ -636,7 +636,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 			glColorPointer( 3, GL_DOUBLE, 0, index( color, begin));
 	}
 	glDrawArrays( GL_LINE_STRIP, 0, end-begin);
-	
+
 	if (!segment_monochrome)
 		glDisableClientState( GL_COLOR_ARRAY);
 	if (spos)
@@ -658,7 +658,7 @@ void
 curve::thickline( const view& scene, size_t begin, size_t end)
 {
 	assert( end > begin);
-	
+
 	size_t curve_around = sides;
 	std::vector<vector> projected;
 	std::vector<vector> normals;
@@ -668,7 +668,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	float *sint = cost + curve_around;
 
 	vector lastx(1, 0, 0), lasty(0, 1, 0);
-	
+
 	// pos and color iterators
 	const double* v_i = index( pos, begin);
 	const double* c_i = index( color, begin);
@@ -688,7 +688,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			}
 		}
 	}
-	
+
 	size_t count = end - begin;
 	bool first = true;
 	for(size_t corner=0; corner < count; ++corner, v_i += 3, c_i += 3 ) {
@@ -716,7 +716,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		 * e) array rvect = (x,y,z) defines radius in x and y frame directions, z coordinate is not used
 		 *    this allows radius to vary along curve and should be defined for each point in curve
 	Last change:  AWW  21 Aug 2004    1:12 pm
-	
+
 		Added to VPython-core2 16 May 2006
 		 */
 
@@ -740,14 +740,14 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 			x = lastx;
 		if (!y)
 			y = lasty;
-		
+
 		if (!x || !y || x == y) {
 			std::ostringstream msg;
 			msg << "Degenerate curve case! please report the following "
 				"information to visualpython-users@lists.sourceforge.net: ";
 			msg << "current:" << current << " next:" << next << " prev:" << prev
 		 		<< " A:" << A << " B:" << B << " x:" << x << " y:" << y
-		 		<< " lastx:" << lastx << " lasty:" << lasty << " first:" 
+		 		<< " lastx:" << lastx << " lasty:" << lasty << " first:"
 		 		<< first << std::endl;
 		 	VPYTHON_WARNING( msg.str());
 		}
@@ -765,7 +765,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		// scale radii
 		x *= radius;
 		y *= radius;
-		
+
 		if (!mono) {
 			// Manipulate colors when we are in stereo mode.
 			rendered_color = rgb( static_cast<float>( c_i[0]),
@@ -780,7 +780,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 				}
 			}
 		}
-		
+
 		for (size_t a=0; a < curve_around; a++) {
 			float c = cost[a];
 			float s = sint[a];
@@ -800,7 +800,7 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	}
 	else
 		glEnableClientState( GL_COLOR_ARRAY);
-	
+
 	int *ind = curve_slice;
 	for (size_t a=0; a < curve_around; a++) {
 		size_t ai = a;
@@ -824,13 +824,13 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		glDisableClientState( GL_COLOR_ARRAY);
 }
 
-void 
+void
 curve::gl_render( const view& scene)
 {
 	if (degenerate())
 		return;
 	const size_t true_size = count;
-	// Set up the leading and trailing points for the joins.  See 
+	// Set up the leading and trailing points for the joins.  See
 	// glePolyCylinder() for details.  The intent is to create joins that are
 	// perpendicular to the path at the last segment.  When the path appears
 	// to be closed, it should be rendered that way on-screen.
@@ -854,7 +854,7 @@ curve::gl_render( const view& scene)
 		pos_begin[0] = pos_begin[0+3] - (pos_begin[0+6]-pos_begin[0+3]);
 		pos_begin[1] = pos_begin[1+3] - (pos_begin[1+6]-pos_begin[1+3]);
 		pos_begin[2] = pos_begin[2+3] - (pos_begin[2+6]-pos_begin[2+3]);
-		
+
 		double* pos_end = index( pos, true_size);
 		double* pos_last = index( pos, true_size-1);
 		pos_end[0] = pos_last[0] + (pos_last[0] - pos_last[0-3]);
@@ -863,7 +863,7 @@ curve::gl_render( const view& scene)
 	}
 
 	clear_gl_error();
-	
+
 	size_t size = std::min(c_cache::items, true_size);
 	size_t begin = 0;
 	cache_iterator c = cache.begin();
@@ -876,7 +876,7 @@ curve::gl_render( const view& scene)
 		if (antialias) {
 			glEnable( GL_BLEND);
 			glEnable( GL_LINE_SMOOTH);
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 	}
 	else {
@@ -920,7 +920,7 @@ curve::gl_render( const view& scene)
 		shiny_complete();
 		lighting_complete();
 	}
-	
+
 	check_gl_error();
 
 }

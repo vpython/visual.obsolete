@@ -67,7 +67,7 @@ while 1:
   length = (band.pos[1:] - band.pos[:-1])
   dist = sqrt(sum(length*length,-1))
   force = k * ( dist - restlength )
-  force = length/dist[:,NewAxis] * force[:,NewAxis]
+  force = length/dist[:,newaxis] * force[:,newaxis]
 
   band.p[:-1] = band.p[:-1] + force*dt
   band.p[1:] = band.p[1:] - force*dt
@@ -81,7 +81,7 @@ while 1:
   band.blue[1:] = where( less(c,1), 1, 2-c )
 
   for s in spheres:
-    dist = mag( band.pos - s.pos )[:,NewAxis]
+    dist = mag( band.pos - s.pos )[:,newaxis]
     inside = less( dist, s.radius )
     if sometrue(inside):
         R = ( band.pos - s.pos ) / dist
@@ -90,4 +90,4 @@ while 1:
         band.pos = surface*inside + band.pos*(1-inside)
 
         pdotR = sum(asarray(band.p)*asarray(R),-1)
-        band.p = band.p - R*pdotR[:,NewAxis]*inside
+        band.p = band.p - R*pdotR[:,newaxis]*inside

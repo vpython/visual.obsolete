@@ -60,9 +60,9 @@ class Model:
         for i in range( len(pos) ):
             tp = tuple(pos[i])
             if dot(vertex_map[tp], normal[i]) >= 0:
-                normal[i] = vertex_map[tp] and norm( vertex_map[ tp ] )
+                normal[i] = vector(vertex_map[tp]) and norm( vertex_map[ tp ] )
             else:
-                normal[i] = vertex_map_backface[tp] and norm(vertex_map_backface[tp] )
+                normal[i] = vector(vertex_map_backface[tp]) and norm(vertex_map_backface[tp] )
 
     def DrawNormal(self, scale):
         pos = self.model.pos
@@ -74,7 +74,7 @@ class Mesh (Model):
     def __init__(self, xvalues, yvalues, zvalues):
         Model.__init__(self)
 
-        points = zeros( xvalues.shape + (3,), Float )
+        points = zeros( xvalues.shape + (3,), float )
         points[...,0] = xvalues
         points[...,1] = yvalues
         points[...,2] = zvalues
@@ -88,8 +88,8 @@ class Mesh (Model):
 x = arange(-1,1,2./20)
 y = arange(-1,1,2./20)
 
-z = zeros( (len(x),len(y)), Float )
-x,y = x[:,NewAxis]+z, y+z
+z = zeros( (len(x),len(y)), float )
+x,y = x[:,None]+z, y+z
 
 m = Mesh( x, (sin(x*pi)+sin(y*pi))*0.2, y )
 m.DoSmoothShading()

@@ -32,12 +32,12 @@ s_text=label(pos=(0,12,0), text="Yellow = Red x Green",
 fixlength = 0
 fixtheta = 0
 
-avector = vector (0,0,-3.5)
+avector = array ([0,0,-3.5])
 bvector = vector (0,3,2)
 
-a = arrow(pos=(0,0,0), axis=avector, shaftwidth=R, color=crayola.red)
+a = arrow(pos=(0,0,0), shaftwidth=R, color=crayola.red)
 b = arrow(pos=(0,0,0), axis=bvector, shaftwidth=R, color=crayola.green)
-
+a.axis =avector
 cvector = cross(avector,bvector)
 c = arrow(pos=(0,0,0), axis=cvector, shaftwidth=R, color=crayola.yellow)
 

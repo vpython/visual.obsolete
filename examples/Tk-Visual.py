@@ -34,15 +34,15 @@ class ProgClass:
         thread.start_new_thread(self.box_anim,())
 
     def set_red(self,rstr): # set red component of color
-        self.rr = string.atoi(rstr)/100.0
+        self.rr = int(rstr)/100.0
         self.sphere1.color = (self.rr,self.gg,self.bb)
         
     def set_green(self,gstr): # set green component of color
-        self.gg = string.atoi(gstr)/100.0
+        self.gg = int(gstr)/100.0
         self.sphere1.color = (self.rr,self.gg,self.bb)
         
     def set_blue(self,bstr): # set blue component of color
-        self.bb = string.atoi(bstr)/100.0
+        self.bb = int(bstr)/100.0
         self.sphere1.color = (self.rr,self.gg,self.bb)
         
     def box_anim(self):
@@ -75,7 +75,8 @@ pp.run = "stop" # stop annimation
 while pp.run == "stop":
     time.sleep(0.1) # give annimation thread time to respond "stopped"
 
-scene.hide() # close visual
+##scene.hide not yet available
+##scene.hide() # close visual
 
 
 

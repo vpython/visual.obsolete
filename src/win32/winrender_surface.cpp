@@ -3,8 +3,8 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "win32/render_surface.hpp"
-#include "win32/display.hpp"
+#include "render_surface.hpp"
+#include "display.hpp"
 #include "util/errors.hpp"
 #include "vpython-config.h"
 
@@ -98,9 +98,6 @@ win32_write_critical(
 }
 
 /**************** render_surface implementation  *****************/
-
-// Note: This should really be called "display" for clarity.
-// The fact that it is a display is the reason we can refer directly to zoom and spin.
 
 // A lookup-table for the default widget procedure to use to find the actual
 // widget that should handle a particular callback message.

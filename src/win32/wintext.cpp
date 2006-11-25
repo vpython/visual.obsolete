@@ -1,5 +1,5 @@
-#include "win32/text.hpp"
-#include "win32/render_surface.hpp"
+#include "text.hpp"
+#include "render_surface.hpp"
 #include "util/errors.hpp"
 #include "util/gl_free.hpp"
 #include "wrap_gl.hpp"

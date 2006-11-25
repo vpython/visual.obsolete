@@ -19,7 +19,7 @@ bands = [ curve( x = arange(-50,50), display=g[0], color=color.red, k = 6., mass
 
 for band in bands:
     band.radius = 0.5
-    band.momentum = zeros((100,3),Float)
+    band.momentum = zeros((100,3),float)
 
     ### Uncomment exactly one of the following lines: ###
 

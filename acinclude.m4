@@ -224,42 +224,16 @@ AC_DEFUN([VISUAL_DOCS],
 AC_DEFUN([VISUAL_NUMERICLIBS],
 [
 	AC_REQUIRE([AM_PATH_PYTHON])
-	AC_ARG_WITH([numeric],
-		AC_HELP_STRING([--without-numeric], 
-			[Do not include support for Numeric, even if it is available.]),
-		[visual_use_numeric=$withval],
-		[visual_use_numeric="yes"])		
-	AC_ARG_WITH([numarray],
-		AC_HELP_STRING([--without-numarray], 
-			[Do not include support for Numarray, even if it is available.]),
-		[visual_use_numarray=$withval],
-		[visual_use_numarray="yes"])		
-
 	
-	PY_CHECK_MOD( [Numeric], [array], 
+	PY_CHECK_MOD( [numpy], [array], 
 	[
-		if test "x"$visual_use_numeric != "xno"; then
-			AC_DEFINE([VISUAL_HAVE_NUMERIC], [1])
-			visual_have_numeric="yes"
-		else
-			AC_MSG_NOTICE([Numeric Python was found, but I am disabling support for it as you requested.])
-			visual_have_numeric="no"
-		fi
-	], 
-	[visual_have_numeric="no"])
+		AC_DEFINE([VISUAL_HAVE_NUMPY], [1])
+		visual_have_numpy="yes"
+		numpyincludedir=${pythondir}/numpy/core/include
+	], [visual_have_numpy="no"])
 	
-	PY_CHECK_MOD( [numarray], [array], 
-	[
-		if test "x$visual_use_numarray" != "xno"; then
-			AC_DEFINE([VISUAL_HAVE_NUMARRAY], [1])
-			visual_have_numarray="yes"
-		else
-			AC_MSG_NOTICE([Numarray was found, but I am disabling support for it as you requested.])
-			visual_have_numarray="no"
-		fi
-	], [visual_have_numarray="no"])
-	if test $visual_have_numarray = "no" && test $visual_have_numeric = "no"; then
-		AC_MSG_ERROR( [Neither the Numeric nor Numarray Python modules could be found. 	At least one of them is required.  See numpy.sourceforge.net for downloads.])
+	if test $visual_have_numpy = "no"; then
+		AC_MSG_ERROR( [The numpy module could not be found but is required. See numpy.sourceforge.net for downloads.])
 	fi
 ])
 
@@ -334,6 +308,7 @@ AC_DEFUN([AM_CHECK_PYTHON_HEADERS],
 	dnl deduce PYTHON_INCLUDES (modified by Jonathan Brandmeyer to get the info
 	dnl directly from Python itself).
 	PYTHON_INCLUDES=-I`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_inc()"`
+	PYTHON_INCLUDES="$PYTHON_INCLUDES -I$numpyincludedir"
 	AC_SUBST(PYTHON_INCLUDES)
 	dnl check if the headers exist:
 	save_CPPFLAGS="$CPPFLAGS"

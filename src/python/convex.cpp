@@ -1,6 +1,6 @@
 // Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
 // Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
-// See the file license.txt for complete license terms.
+// See the file license.txt for complete license terms. 
 // See the file authors.txt for a complete list of contributors.
 
 #include "python/convex.hpp"
@@ -13,7 +13,7 @@
 
 namespace cvisual { namespace python {
 
-namespace {	
+namespace {
 // returns a pointer to the ith vector in the array.
 double* index( const array& a, size_t i)
 {
@@ -23,7 +23,7 @@ double* index( const array& a, size_t i)
 	// raw cast vice a static_cast<>.
 	return ((double*)data(a)) + i * 3;
 }
-	
+
 } // !namespace (unnamed)
 
 
@@ -113,7 +113,7 @@ convex::add_point( size_t n, vector pv)
 convex::convex()
 	: pos(0), preallocated_size(256), count(0), last_checksum(0)
 {
-	std::vector<int> dims(2);
+	std::vector<npy_intp> dims(2);
 	dims[0] = 256;
 	dims[1] = 3;
 	this->pos = makeNum( dims);
@@ -122,8 +122,8 @@ convex::convex()
 }
 
 convex::convex( const convex& other)
-	: renderable( other), pos( other.pos), 
-	preallocated_size( other.preallocated_size), count( other.count), 
+	: renderable( other), pos( other.pos),
+	preallocated_size( other.preallocated_size), count( other.count),
 	last_checksum(0)
 {
 }
@@ -137,18 +137,18 @@ convex::get_pos()
 {
 	return pos[slice(0, count)];
 }
-	
+
 void
 convex::set_pos( array n_pos)
 {
 	using namespace boost::python;
 	using python::slice;
-	
-	python::array_types t = type( n_pos);
-	if (t != double_t) {
-		n_pos = astype(n_pos, double_t);
+
+	NPY_TYPES t = type( n_pos);
+	if (t != NPY_DOUBLE) {
+		n_pos = astype(n_pos, NPY_DOUBLE);
 	}
-	std::vector<int> dims = shape( n_pos);
+	std::vector<npy_intp> dims = shape( n_pos);
 	if (dims.size() == 1 && count == 0) {
 		// perform a single append
 		lock L(mtx);
@@ -171,7 +171,7 @@ convex::set_pos( array n_pos)
 		lock L(mtx);
 		set_length(dims[0]);
 		pos[slice(0, count)] = n_pos;
-		
+
 	}
 	else
 		throw std::invalid_argument( "pos must be an Nx3 or Nx2 array");
@@ -204,10 +204,10 @@ convex::set_length( size_t length)
 		npoints = length;
 	if (npoints == 0)
 		npoints = 1;
-		
+
 	if (length > preallocated_size) {
 		VPYTHON_NOTE( "Reallocating buffers for a convex object");
-		std::vector<int> dims(2);
+		std::vector<npy_intp> dims(2);
 		dims[0] = 2 * length;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
@@ -242,7 +242,7 @@ convex::append( vector nv_pos)
 	pos_data[2] = nv_pos.get_z();
 }
 
-void 
+void
 convex::gl_render( const view& scene)
 {
 	if (degenerate())
@@ -256,7 +256,7 @@ convex::gl_render( const view& scene)
 	glShadeModel(GL_FLAT);
 	gl_enable cull_face( GL_CULL_FACE);
 	color.gl_set();
-	
+
 	glBegin(GL_TRIANGLES);
 	for (std::vector<face>::const_iterator f = hull.begin(); f != hull.end(); ++f) {
 		f->normal.gl_normal();
@@ -268,39 +268,39 @@ convex::gl_render( const view& scene)
 	glShadeModel( GL_SMOOTH);
 }
 
-vector 
+vector
 convex::get_center() const
 {
 	if (degenerate())
 		return vector();
-	
+
 	vector ret;
 	for (std::vector<face>::const_iterator f = hull.begin(); f != hull.end(); ++f) {
 		ret += f->center;
 	}
 	ret /= hull.empty() ? 1 : hull.size();
-	
+
 	return ret;
 }
 
-void 
+void
 convex::gl_pick_render( const view& scene)
 {
 	gl_render( scene);
 }
 
-void 
+void
 convex::grow_extent( extent& world)
 {
 	if (degenerate())
 		return;
-	
+
 	long check = checksum();
 	if (check != last_checksum) {
 		recalc();
 	}
 	assert( hull.size() != 0);
-	
+
 	for (std::vector<face>::const_iterator f = hull.begin(); f != hull.end(); ++f) {
 		world.add_point( f->corner[0]);
 		world.add_point( f->corner[1]);

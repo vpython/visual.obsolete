@@ -1,6 +1,6 @@
 from __future__ import division
 from visual import *
-
+import pickle
 # Bruce Sherwood, August 2006
 # Demonstration of transparency (opacity), surface textures, and sophisticated lighting
 #  in the new version 4 of VPython created by Jonathan Brandmeyer
@@ -9,7 +9,7 @@ scene.width = scene.height = 800
 scene.forward = (-0.2,-0.2,-1)
 # Read wood-like surface texture from a file.
 # See vpython.org contributed programs for how this texture was created.
-wood = texture(data=pickle.load(open('wood256lum.vpt', 'rU')))
+wood = texture(data=array(pickle.load(open('wood256lum.vpt', 'rU'))))
 width = 10 # of wood table
 thick = 0.5 # thickness of wood
 depth = 7 # of wood table
@@ -48,7 +48,7 @@ scene.range = 0.45*H
 
 # Create a surface texture for the ball
 M = N = 32
-t = zeros([M,N,4], UnsignedInt8)
+t = zeros([M,N,4], uint8)
 colors = [color.blue, color.cyan, color.green, color.yellow]
 for i in range(0,M,4):
      for j in range(0,N):

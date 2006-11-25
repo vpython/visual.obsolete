@@ -15,40 +15,40 @@ namespace cvisual { namespace python {
 
 /**
  * Python users can specify a texture as NxMxC, where N and M are preferred to
- * be powers of 2.  C is the number of color channels, and must be one of 
+ * be powers of 2.  C is the number of color channels, and must be one of
  * 1, 2, 3, or 4.  The meaning of the texture is determined by its channels:
  * 1: luminance or opacity map (default: luminance)
  * 2: luminance-opacity
  * 3: RGB
  * 4: RGBA
- * 
- * 
+ *
+ *
  */
 class numeric_texture : public texture
 {
  private:
 	boost::python::numeric::array texdata;
-	
+
 	// A texture is data_width x data_height x data_channels
 	size_t data_width;
 	size_t data_height;
 	size_t data_channels;
-	array_types data_type; // The type of C data in the memory object
+	NPY_TYPES data_type; // The type of C data in the memory object
 	GLenum data_textype; // The type of GL texture object (GL_ALPHA, GL_RGB, etc)
 	bool data_mipmapped; // true if the data should be mipmapped
 	bool data_antialias;
-	
+
 	size_t tex_width;
 	size_t tex_height;
 	size_t tex_channels;
-	array_types tex_type;
+	NPY_TYPES  tex_type;
 	GLenum tex_textype;
 	bool tex_mipmapped;
 	bool tex_antialias;
 	// Types of damage: those that change the array's type and/or dimensions,
 	// and those that change its contents
 	uint32_t checksum;
-	
+
 	bool degenerate() const;
 	bool should_reinitialize() const;
 
@@ -60,16 +60,16 @@ class numeric_texture : public texture
  public:
 	numeric_texture();
 	virtual ~numeric_texture();
-	
+
 	void set_data( boost::python::numeric::array data);
 	boost::python::numeric::array get_data();
-	
+
 	void set_type( std::string requested_type);
 	std::string get_type() const;
-	
+
 	void set_mipmapped( bool);
 	bool is_mipmapped( void);
-	
+
 	void set_antialias( bool);
 	bool is_antialiased( void);
 };

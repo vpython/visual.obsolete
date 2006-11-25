@@ -5,8 +5,6 @@ Drag or click to show the magnetic field interactively.
 Mark the magnetic field vector at the end of the drag.
 """
 
-# Bruce Sherwood
-
 scene.width = 600
 scene.height = 600
 Rbig = 0.6
@@ -34,7 +32,7 @@ def BField(obs):
     r = obs-center
     rmag = mag(r)
     rmag.shape = (-1,1)
-    return sum(k*I*cross(delta, r)/rmag**3)
+    return (k*I*cross(delta, r)/rmag**3).sum(axis=0)
 
 Bvector = arrow(axis=(0,0,0), shaftwidth=vwidth, color=(0,1,1))
 drag = 0
@@ -51,10 +49,10 @@ while 1:
         if m.drag:
             drag = 1
             obs = None # force update of position
-            # scene.cursor.visible = 0 # not yet implemented
+##            scene.cursor.visible = 0
         if m.drop:
             drag = 0
-            # scene.cursor.visible = 1
+##            scene.cursor.visible = 1
             arrow(pos=obs, axis=Bscale*BField(obs), shaftwidth=vwidth, color=(0,1,1))
         elif m.click:
             arrow(pos=m.pos, axis=Bscale*BField(m.pos), shaftwidth=vwidth, color=(0,1,1))

@@ -10,7 +10,7 @@ box( size=(0.5,0.5,0.5) )
 
 N = 20
 
-model = faces( pos = zeros( (N*3,3), Float ), frame = f )
+model = faces( pos = zeros( (N*3,3), float ), frame = f )
 
 t = arange(0,2*pi+2*pi/N,2*pi/N)
 
