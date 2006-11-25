@@ -85,25 +85,17 @@ I.  Prerequisites:
 		Download latest Boost (1.33.1) from www.boost.org.
 		> tar -xjf boost_1_33_1.tar.bz2
 		> cd boost_1_33_1
-		> bjam -sTOOLS=mingw -sPYTHON_ROOT=/c/Python25 -sPYTHON_VERSION=2.5 stage
+		> bjam -sTOOLS=mingw -sMINGW_BIN_DIRECTORY=/c/MinGW/bin -sPYTHON_ROOT=/c/Python25 -sPYTHON_VERSION=2.5 stage
 		May take about an hour to build everything.
 		Copy boost_1_33_1/boost folder to mingw/include:
 		> cp -r boost/ /mingw/include/
 		
 		> cp stage/lib/boost_thread-mgw-mt-1_33_1.dll /mingw/bin
 		> cp stage/lib/boost_thread-mgw-mt-1_33_1.lib /mingw/lib/libboost_thread.a
-		
 		> cd bin/boost/libs/python/build/boost_python.dll/mingw/release/threading-multi/
-		If you execute "nm boost_python-mgw-mt-1_33_1.lib > nm-lib.txt" and inspect
-		the output file, you will find there are no mentions of numeric, which leads
-		to failure of the build of Visual.
-		
-		To get the references to the numeric module into the library:
-		> g++ -shared -o boost_python-mgw-mt-1_33_1.dll *.obj -Wl,--out-implib,boost_python-mgw-mt-1_33_1.lib /c/WINDOWS/system32/python25.dll 
 		> cp boost_python-mgw-mt-1_33_1.dll /mingw/bin
 		> cp boost_python-mgw-mt-1_33_1.lib /mingw/lib/libboost_python25.a 
-		If you again run "nm" you'll now find lots of mentions of numeric.
-		
+				
 		Note: The Boost files that start with "libboost" are static libraries that we don't use.	
 		
 		Download pkg-config-0.20 in zip format and unzip. A library such as sigc++, see below,
