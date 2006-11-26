@@ -7,8 +7,6 @@
 
 #include <algorithm>
 
-#include <iostream>
-
 namespace cvisual {
 
 frame::frame()
@@ -223,13 +221,13 @@ void
 frame::remove_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
-	if (obj->color.opacity != 1.0) {
-		std::remove( trans_children.begin(), trans_children.end(), obj);
-		trans_children.pop_back();
-	}
-	else {
+	if (obj->color.opacity == 1.0) {
 		std::remove( children.begin(), children.end(), obj);
 		children.pop_back();
+	}
+	else {
+		std::remove( trans_children.begin(), trans_children.end(), obj);
+		trans_children.pop_back();
 	}
 }
 

@@ -608,12 +608,14 @@ display_kernel::remove_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
 	lock L(mtx);
-	// Choice of removal algorithms:  For containers that support their own
-	// removal methods (list, set), use the member function.  Else, use 
-	// std::remove.
-	layer_world.remove( obj);
-	std::remove( 
-		layer_world_transparent.begin(), layer_world_transparent.end(),	obj);
+	if (obj->color.opacity == 1.0) {
+		std::remove( layer_world.begin(), layer_world.end(), obj);
+		layer_world.pop_back();
+	}
+	else {
+		std::remove( layer_world_transparent.begin(), layer_world_transparent.end(), obj);
+		layer_world_transparent.pop_back();
+	}
 }
 
 bool
