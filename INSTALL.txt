@@ -67,11 +67,7 @@ I.  Prerequisites:
 		Download and install Python 2.5.x from www.python.org.
 		OpenGL is provided with the standard Windows installation.
 		
-		The last Numeric binary for Windows went with Python 2.4, so you need to
-		compile Numeric from source. After unpacking the source, cd into the directory
-		and execute this to install Numeric for Python 2.5:
-		
-		> /c/python25/python.exe setup.py build –compiler=mingw32 install
+		Download and install the new numpy (http://numpy.scipy.org).
 		
 		From an MSYS shell run the following:
 		> pexports /c/windows/system32/python25.dll > libpython25.def
