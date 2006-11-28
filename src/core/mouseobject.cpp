@@ -193,7 +193,7 @@ mouse_t::pop_click()
 {
 	// TODO: Need to find a way to punt the Python interpreter out of here
 	// during a shutdown
-	shared_ptr<event> ret = events.pop();
+	shared_ptr<event> ret = events.py_pop();
 	while (!ret->is_click()) {
 		ret = events.pop();
 	}
