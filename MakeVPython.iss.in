@@ -1,6 +1,6 @@
 ; Create installer for VPython using Inno Setup Compiler Version 5.
 ; Tested with Inno Setup 5.1.4 (www.innosetup.com)
-; Assumes Python is already installed.
+; Assumes Python and numpy already installed.
 
 ; This file is edited by config.status, which replaces all of the @...@ variables.
 ; PYTHON_VERSION is the major.minor version of Python.
@@ -43,11 +43,8 @@ Source: "@WIN32_SRCDIR@\license.txt"; DestDir: "{app}\Lib\site-packages\visual\"
 ; Uncomment the following line after compiling .pyc files, and rebuild installer:
 ;Source: "Lib\site-packages\visual\*.pyc"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 ; 
-;Source: "include\Numeric\*.h"; DestDir: "{app}\include\Numeric\"; Components: Numeric
-;Source: "Lib\site-packages\Numeric.pth"; DestDir: "{app}\Lib\site-packages\"; Components: Numeric
-;Source: "Lib\site-packages\Numeric\*.py"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: ;Numeric; Flags: recursesubdirs
-;Source: "Lib\site-packages\Numeric\*.pyc"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: ;Numeric; Flags: recursesubdirs
-;Source: "Lib\site-packages\Numeric\*.pyd"; DestDir: "{app}\Lib\site-packages\Numeric\"; Components: ;Numeric; Flags: recursesubdirs
+Source: "Lib\site-packages\numpy*egg-info"; DestDir: "{app}\Lib\site-packages\"; Components: numpy
+Source: "Lib\site-packages\numpy\*"; DestDir: "{app}\Lib\site-packages\numpy\"; Components: numpy; Flags: recursesubdirs
 ;
 Source: "@WIN32_SRCDIR@\examples\*.py"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
 Source: "@WIN32_SRCDIR@\examples\*.vpt"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
@@ -59,15 +56,11 @@ Source: "@WIN32_SRCDIR@\docs\visual\*.css"; DestDir: "{app}\Lib\site-packages\vi
 Source: "@WIN32_SRCDIR@\docs\visual\*.txt"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "@WIN32_SRCDIR@\docs\visual\icons\*.gif"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\icons\"; Components: Documentation
 
-; Source: "C:\msys\1.0\local\gtkrun\*"; DestDir: "{app}\Lib\site-packages\gtkrun\"; Components: Gtk; Flags: recursesubdirs
-
 [Components]
 Name: Visual; Description: "The Visual extension modue to Python"; Types: full compact custom; Flags: fixed
-; Name: Gtk; Description: "The Gimp Tool Kit runtime (version 2.8)"; Types: full compact custom; Flags: fixed
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
-;Name: Numeric; Description: "Numeric Python 24.2 {code:NumericStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumeric( 'C:\Python@WIN32_PYTHON_VERSION@' )
-;Name: numarray; Description: "Python Numarray 1.5.2 {code:NumarrayStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumarray( 'C:\Python@WIN32_PYTHON_VERSION@' )
+Name: numpy; Description: "numpy 1.0 {code:NumpyStatus|C:\Python@WIN32_PYTHON_VERSION@}"; Types: full; Check: CheckNumpy( 'C:\Python@WIN32_PYTHON_VERSION@' )
 
 [Tasks]
 Name: desktopicon; Description: "Create a desktop icon";
