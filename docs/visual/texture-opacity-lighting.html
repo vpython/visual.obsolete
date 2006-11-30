@@ -60,8 +60,9 @@
   start with zeros([M,N,3], Float), and entries into this array would be the usual 
   (red,green,blue) triples, with values for each color in the range 0-1 inclusive.</p>
 <p>See the <a href="http://vpython.org/contributed.html" target="_blank">contributed</a> 
-  section of vpython.org for an example of a program to create, save, and use 
-  a wood-grain texture.</p>
+  section of vpython.org for an example of a program to create, save, and use
+     a wood-grain texture. Such a texture is included in the examples and used
+    by the program texture_and_lighting.py.</p>
 <h3>Lighting</h3>
 <p>Some objects now have a &quot;shininess&quot; attribute which by default is 
   0.5 (box, sphere, cylinder, cone, ring). A shininess of 0 means no specular 
@@ -111,14 +112,13 @@
 <h3>Specifying a gray</h3>
 <p>For convenience you can now say color=0.7 to mean color=(0.7,0.7,0.7).</p>
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
-<p>There are three major known bugs:</p>
+<p>There are three major known bugs still being worked on::</p>
 <blockquote>
-  <p>1) Mouse interactions on Windows, including scene.mouse.getclick(), are associated 
-    with crashes. A tight loop without a rate() statement may crash or be hard 
-    to kill.</p>
-  <p>2) Some animations run in a jerky manner due to slow rendering of the scene. 
-    The program gas.py is an example. The issue may be that the detail level on 
-    spheres needs to be decreased.</p>
+  <p>1) On Windows, programs that process mouse events may leave a copy
+    of python running after clicking the close box. The example
+    program toroid_drag.py has this problem.</p>
+  <p>2) On some Windows machines, the animation in the program gas.py is 
+    very jerky; this is the only example program affected in this way.</p>
   <p>3) Graphing (from visual.graph import *) works well for many simple uses, 
     but if the axes must be continually adjusted it can be very slow. If you know 
     the extent of your variables and can specify xmax and ymax for the graph, 
