@@ -303,7 +303,6 @@ void
 label::gl_render( const view& scene)
 {
 	if (text_changed) {
-		std::cerr << "text_changed" << text << "\n";
 		boost::shared_ptr<font> texmap_font = 
 			font::find_font( font_description, int(font_size));
 		if (text == string_t())
