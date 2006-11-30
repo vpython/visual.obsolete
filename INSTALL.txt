@@ -69,10 +69,7 @@ I.  Prerequisites:
 		
 		Download and install the new numpy (http://numpy.scipy.org).
 		
-		From an MSYS shell run the following:
-		> pexports /c/windows/system32/python25.dll > libpython25.def
-		> dlltool --input-def libpython25.def --output-lib libpython25.a
-		> cp libpython25.a /mingw/lib
+		Copy Python25's libs/libpython25.a to /mingw/lib.
 		See http://www.python.org/doc/current/inst/tweak-flags.html for discussion.
 		
 		Download a precompiled version of the 'bjam' tool from www.boost.org 
