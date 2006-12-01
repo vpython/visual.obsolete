@@ -589,13 +589,10 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 		// Must scale the pos data.
 		spos = new double[end-begin][3];
 		const double* pos_i = index( pos, begin);
-		std::cerr << "---------" << std::endl;
 		for (size_t i = 0; i < end-begin; ++i, pos_i += 3) {
 			spos[i][0] = pos_i[0] * scene.gcfvec[0];
 			spos[i][1] = pos_i[1] * scene.gcfvec[1];
 			spos[i][2] = pos_i[2] * scene.gcfvec[2];
-			std::cerr << "<" << pos_i[0] << "," << pos_i[1] << "> -> "
-			   << "<" << spos[i][0] << "," << spos[i][1] << ">" << std::endl;
 		}
 		glVertexPointer( 3, GL_DOUBLE, 0, spos);
 	}
