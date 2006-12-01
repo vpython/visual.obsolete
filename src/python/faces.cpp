@@ -367,12 +367,12 @@ faces::gl_render( const view& scene)
 
 	glNormalPointer( GL_DOUBLE, 0, index( normal, 0));
 
-	if (scene.gcf != 1.0) {
+	if (scene.gcf != 1.0 or (scene.gcfvec[0] != scene.gcfvec[1])) {
 		std::vector<vector> tmp( count);
 		spos.swap( tmp);
 		const double* pos_i = index(pos, 0);
 		for (std::vector<vector>::iterator i = spos.begin(); i != spos.end(); ++i) {
-			*i = scene.gcf * vector(pos_i);
+			*i = vector(pos_i).scale(scene.gcfvec);
 			pos_i += 3;
 		}
 		glVertexPointer( 3, GL_DOUBLE, 0, &*spos.begin());

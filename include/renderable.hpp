@@ -84,6 +84,8 @@ struct view
 	bool forward_changed;
 	/// The Global Scaling Factor
 	double& gcf;
+	/// The vector version of the Global Scaling Factor, for scene.uniform=0
+	vector& gcfvec;
 	/// True if gcf changed since the last render cycle.
 	bool gcf_changed;
 	/// The user adjustment to the level-of-detail.
@@ -96,7 +98,8 @@ struct view
 	double tan_hfov_y; ///< The tangent of half the vertical field of view.
 	
 	view( const vector& n_forward, vector& n_center, float& n_width, 
-		float& n_height, bool n_forward_changed, double& n_gcf, 
+		float& n_height, bool n_forward_changed, 
+		double& n_gcf, vector& n_gcfvec,
 		bool n_gcf_changed);
 	
     /** Create a new view object in the coordinate system of a (sub-)frame.

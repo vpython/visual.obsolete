@@ -8,11 +8,12 @@
 namespace cvisual {
 	
 view::view( const vector& n_forward, vector& n_center, float& n_width, 
-	float& n_height, bool n_forward_changed, double& n_gcf, 
+	float& n_height, bool n_forward_changed, 
+	double& n_gcf, vector& n_gcfvec,
 	bool n_gcf_changed)
 	: forward( n_forward), center(n_center), window_width( n_width), 
 	window_height( n_height), forward_changed( n_forward_changed), 
-	gcf( n_gcf), gcf_changed( n_gcf_changed), lod_adjust(0),
+	gcf( n_gcf), gcfvec( n_gcfvec), gcf_changed( n_gcf_changed), lod_adjust(0),
 	anaglyph(false), coloranaglyph(false), tan_hfov_x(0), tan_hfov_y(0),
 	screen_objects( z_comparator( forward))
 {
@@ -27,6 +28,7 @@ view::view( const view& other, const tmatrix& wft)
 	window_height( other.window_height),
 	forward_changed( true),
 	gcf( other.gcf),
+	gcfvec( other.gcfvec),
 	gcf_changed( other.gcf_changed),
 	lod_adjust( other.lod_adjust),
 	anaglyph( other.anaglyph),

@@ -323,7 +323,7 @@ label::gl_render( const view& scene)
 	vector text_pos( border, box_height - border);
 
 	clear_gl_error();
-	vector label_pos = pos * scene.gcf;
+	vector label_pos = pos.scale(scene.gcfvec);
 	tmatrix lst = tmatrix().gl_projection_get() * tmatrix().gl_modelview_get();
 	{
 		tmatrix translate;

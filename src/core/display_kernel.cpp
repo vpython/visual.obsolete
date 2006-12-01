@@ -147,6 +147,7 @@ display_kernel::display_kernel()
 	camera(0,0,0),
 	user_scale(1.0),
 	gcf(1.0),
+	gcfvec(vector(1.0,1.0,1.0)),
 	mingcf(1e100),
 	lastgcf(1.0),
 	gcf_changed(false),
@@ -564,7 +565,7 @@ display_kernel::recalc_extent(void)
 		// Move the camera to accomodate the new center of the scene
         // assert( mtx.locked()); // TODO: Implement this feature.
 		center.assign_locked( world_extent.center());
-	}
+	}	
 	if (autoscale) {
 		// Compute range such that the three axes, centered at center,
 		// will contain the entire scene.
@@ -587,8 +588,17 @@ display_kernel::recalc_extent(void)
 		if (newgcf < mingcf)
 			mingcf = newgcf;
 		gcf = newgcf;
+		gcfvec = vector(gcf,gcf,gcf);
 		gcf_changed = true;
 	}
+		
+	if (!uniform) {
+		gcf_changed = true;
+		double width = (stereo_mode == PASSIVE_STEREO)
+			? window_width*0.5 : window_width;
+		gcfvec = vector(1.0/range.x, (window_height/width)/range.y, 0.001/range.z);
+	}
+			
 	lastgcf = newgcf;
 }
 
@@ -710,7 +720,7 @@ display_kernel::render_scene(void)
 		fps.start();
 		recalc_extent();
 		view scene_geometry( forward.norm(), center, window_width, 
-			window_height, forward_changed, gcf, gcf_changed);
+			window_height, forward_changed, gcf, gcfvec, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
 		gl_begin();
 		clear_gl_error();
@@ -920,7 +930,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 		glLoadIdentity();
 		gluPickMatrix( x, window_height - y, d_pixels, d_pixels, viewport_bounds);
 		view scene_geometry( forward.norm(), center, window_width, window_height, 
-			forward_changed, gcf, gcf_changed);
+			forward_changed, gcf, gcfvec, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
 		world_to_view_transform( scene_geometry, 0, true);
 	

@@ -598,12 +598,12 @@ points::gl_render( const view& scene)
 	// Now conditionally apply transformations for gcf and anaglyph color
 	if (translucent_points.size())
 		renderable::color.opacity = 0.5;
-	if (scene.gcf != 1.0) {
+	if (scene.gcf != 1.0 or (scene.gcfvec[0] != scene.gcfvec[1])) {
 		for (opaque_iterator i = opaque_points.begin(); i != opaque_points.end(); ++i) {
-			i->center *= scene.gcf;
+			i->center = (i->center).scale(scene.gcfvec);
 		}
 		for (translucent_iterator i = translucent_points.begin(); i != translucent_points.end(); ++i) {
-			i->center *= scene.gcf;
+			i->center = (i->center).scale(scene.gcfvec);
 		}
 	}
 	if (scene.anaglyph) {

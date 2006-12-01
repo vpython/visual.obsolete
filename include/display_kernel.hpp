@@ -69,10 +69,14 @@ class display_kernel
 	bool uniform;
 	/** A scaling factor determined by middle mouse button scrolling. */
 	double user_scale;
-	/** The global scaling factor.  It is used to ensure that objects with 
-	 large dimensions are rendered properly.  See the .cpp file for details.
+	/** The global scaling factor. It is used to ensure that objects with 
+	 large dimensions are rendered properly. See the .cpp file for details.
 	*/
 	double gcf;
+	/** Vector version of the global scaling factor used when scene.uniform=0.
+	 Affects just curve, points, faces, label, and frame.
+	*/
+	vector gcfvec;
 	/** Previous computed gcf; if new computed gcf only slightly larger, don't zoom in
 	 so that the display doesn't fibrillate with a bounce.
 	 */
