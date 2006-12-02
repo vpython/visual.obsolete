@@ -374,7 +374,7 @@ display_kernel::world_to_view_transform(
 	// See http://www.stereographics.com/support/developers/pcsdk.htm for a
 	// discussion regarding the design basis for the frustum offset code.
 	
-	vector scene_center = center * gcf;
+	vector scene_center = center.scale(gcfvec);
 	vector scene_up = up.norm();
     vector scene_forward = forward.norm();
 
@@ -384,15 +384,19 @@ display_kernel::world_to_view_transform(
 	tan_hfov( &tan_hfov_x, &tan_hfov_y);
 
 	// The cotangent of half of the wider field of view.
-	double cot_hfov = 1.0 / std::max(tan_hfov_x, tan_hfov_y);
+	double cot_hfov;
+	if (!uniform) // We force width to be 2.0 (range.x 1.0)
+		cot_hfov = 1.0 /tan_hfov_x;
+	else
+		cot_hfov = 1.0 / std::max(tan_hfov_x, tan_hfov_y);
 	
 	// gcf chosen so gcf*world -> scene fits in a 2 by 2 by 2 cube.
 	// scene_camera  is theposition used in gluLookAt to observe this cube.
 	
 	double nearest, farthest; // nearest and farthest points relative to <0,0,0> when projected onto forward
 	world_extent.near_and_far(forward, nearest, farthest);
-	nearest *= gcf;
-	farthest *= gcf;
+	nearest *= gcfvec[0];
+	farthest *= gcfvec[0];
 
 	// Position camera so that a 2 by 2 by 2 cube will have all its front face showing, with some border.
 	vector scene_camera = scene_center-1.05*(cot_hfov+1.0)*user_scale*scene_forward;
@@ -433,16 +437,6 @@ display_kernel::world_to_view_transform(
 	glMatrixMode( GL_MODELVIEW);
 	glLoadIdentity();
 
-	if (!uniform) {
-		// A scale based on the aspect ratio.
-		double width = (stereo_mode == PASSIVE_STEREO) 
-			? window_width*0.5 : window_width;
-		if (width > window_height) // wide
-			glScaled( 1.0, (window_height/width)*(range.x/range.y), 1.0);
-		else // tall
-			glScaled( (width/window_height)*(range.y/range.x), 1.0, 1.0);
-		
-	}
 	#if 0
 	// Enable this to peek at the actual scene geometry.
 	int max_proj_stack_depth = -1;
@@ -506,40 +500,6 @@ display_kernel::world_to_view_transform(
 		// gluLookAt().
 		geometry.up = forward.cross_b_cross_c(up, forward).norm();
 	}
-#if 0
-	else {
-		// There has got to be a better way to do this in the non-uniform case,
-		// but lacking one, I am using this technique instead.
-		tmatrix modelview;
-		modelview.gl_modelview_get();
-		tmatrix projection;
-		projection.gl_projection_get();
-		tmatrix ctm_inv; //< The inverse of the current transformation matrix
-		inverse( ctm_inv, projection*modelview);
-		vector origin = ctm_inv.project(vector());
-		vector back_origin = ctm_inv.project( vector(0,0,1));
-		vector near_right = ctm_inv.project( vector(1,0,0));
-		vector near_top = ctm_inv.project( vector(0,1,0));
-		
-		geometry.up = (near_top-origin).norm();
-		geometry.forward = (back_origin - origin).norm();
-
-		vector near_left = ctm_inv.project( vector(-1,0,0));
-		vector far_left = ctm_inv.project( vector(-1,0,1));
-		vector far_right = ctm_inv.project( vector(1,0,1));
-		double fov_x = (far_left-near_left).diff_angle(far_right-near_right);
-		geometry.tan_hfov_x = std::tan(fov_x*0.5);
-		
-		vector near_bottom = ctm_inv.project( vector(0,-1,0));
-		vector far_top = ctm_inv.project( vector(0,1,1));
-		vector far_bottom = ctm_inv.project( vector(0,-1,1));
-		geometry.tan_hfov_y = 
-			std::tan((far_bottom-near_bottom).diff_angle(far_top-near_top)*.5);
-		double dist = std::sin((M_PI-fov_x)*0.5)*(near_right-far_right).mag()
-			/std::sin(fov_x);
-		geometry.camera = (near_left-far_left).norm()*dist + near_left;
-	}
-#endif
 }
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
