@@ -29,14 +29,15 @@ deltav = 100. # binning for v histogram
 vdist = gdisplay(x=0, y=win, ymax = Natoms*deltav/1000.,
              width=win, height=win/2, xtitle='v', ytitle='dN')
 theory = gcurve(color=color.cyan)
-observation = ghistogram(bins=arange(0.,3000.,deltav),
-                        accumulate=1, average=1, color=color.red)
 
 dv = 10.
 for v in arange(0.,3001.+dv,dv): # theoretical prediction
     theory.plot(pos=(v,
         (deltav/dv)*Natoms*4.*pi*((Matom/(2.*pi*k*T))**1.5)
                      *exp((-0.5*Matom*v**2)/(k*T))*v**2*dv))
+
+observation = ghistogram(bins=arange(0.,3000.,deltav),
+                        accumulate=1, average=1, color=color.red)
 
 xaxis = curve(pos=[(0,0,0), (L,0,0)], color=gray, radius=Raxes)
 yaxis = curve(pos=[(0,0,0), (0,L,0)], color=gray, radius=Raxes)
