@@ -556,7 +556,7 @@ display_kernel::recalc_extent(void)
 		gcf_changed = true;
 		double width = (stereo_mode == PASSIVE_STEREO)
 			? window_width*0.5 : window_width;
-		gcfvec = vector(1.0/range.x, (window_height/width)/range.y, 0.001/range.z);
+		gcfvec = vector(1.0/range.x, (window_height/width)/range.y, 0.1/range.z);
 	}
 			
 	lastgcf = newgcf;
