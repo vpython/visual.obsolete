@@ -94,7 +94,7 @@ I.  Prerequisites:
 		Download pkg-config-0.20 in zip format and unzip. A library such as sigc++, see below,
 		registers its version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
 		possible for the build process to find the installed version of the library.
-		There is some ambiguity about where to put the pkk-config pieces, as some components need
+		There is some ambiguity about where to put the pkg-config pieces, as some components need
 		to be in msys. Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
 		but also to msys/share/aclocal.
 		You probably also need to set an environment variable for pkg-config:
