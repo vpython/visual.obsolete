@@ -877,8 +877,8 @@ gui_main::shutdown()
 		return;
 	self->returned = false;
 	self->signal_shutdown();
-	while (!self->returned)
-		self->call_complete.py_wait(L);
+//	while (!self->returned)
+//		self->call_complete.py_wait(L);
 }
 
 void
@@ -904,8 +904,12 @@ gui_main::report_window_delete( display* window)
 		self->displays.remove( window);
 		display_empty = self->displays.empty();
 	}
-	if (display_empty && self->waiting_allclosed)
-		gui_main::quit();
+	if (display_empty){
+		if  (self->waiting_allclosed)
+			gui_main::quit();
+		else
+			gui_main::shutdown();
+	}
 }
 
 void
