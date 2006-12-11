@@ -18,10 +18,10 @@
 <h3>Opacity</h3>
 <p>You can make most objects be partially transparent by specifying a value from 
   0-1 inclusive for the attribute &quot;opacity&quot;. For example, box(color=color.red, 
-  opacity=0.8) is slightly transparent. An opacity value of 0 means totally transparent, 
+  alpha=0.8) is slightly transparent. An opacity value of 0 means totally transparent, 
   and 1 means totally opaque. Currently curves and helixes do not allow transparency. 
   (Currently you can use the synonym &quot;alpha&quot; for &quot;opacity&quot;, 
-  but &quot;opacity&quot; is the preferred term.)</p>
+  but &quot;alpha&quot; is deprecated.)</p>
 <h3>Surface textures</h3>
 <p>You can create a texture object and then apply it to the surface of an object. 
   This capability is currently limited to boxes and spheres. A surface texture 
@@ -117,13 +117,11 @@
 <h3>Specifying a gray</h3>
 <p>For convenience you can now say color=0.7 to mean color=(0.7,0.7,0.7).</p>
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
-<p>There are two major known bugs still being worked on::</p>
+<p>There is one major known bug still being worked on::</p>
 <blockquote>
-  <p>1) On Windows, programs that process mouse events may leave a copy
-    of python running after clicking the close box. The example
-    program toroid_drag.py has this problem.</p>
-  <p>2) On some Windows machines, the animation in the program gas.py is 
-    very jerky. This is the only example program affected in this way.</p>
+  <p>On some Windows machines, the animation in the program gas.py is 
+    very jerky. This is the only example program affected in this way, but other
+    programs have shown this behavior. This problem is absent on Linux.</p>
 </blockquote>
 <p>Here are known bugs that are less serious:</p>
 <blockquote>
