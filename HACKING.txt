@@ -9,15 +9,14 @@ development is taking place in the "vpython-core2" module at this time.
 Set the version number appropriately in configure.ac, 
 and in the first line of __init__.py.
 
-Makefile.in, configure, and the helper programs for them are not maintained in
-CVS. You will have to run the autogen.sh script after a fresh checkout to 
-create configure. Except on Windows, you need to execute "chmod +x autogen.sh" in order
-to be able execute ./autogen.sh. 
+Makefile.in, configure, and the helper programs for them are not maintained
+in CVS. You will have to run the autogen.sh script after a fresh checkout to 
+create configure. Except on Windows, you need to execute "chmod +x autogen.sh"
+in order to be able execute ./autogen.sh. 
 
 If you are using Windows, you will need MinGW, MSYS, and the 
-MSYS-DTK from www.mingw.org, and you will need to copy share/aclocal/* (from
-our CVS) to /share/aclocal (in MSYS) prior to running autogen.sh. You will
-also need to install msys-automake, msys-autoconf, and msys-libtool.
+MSYS-DTK from www.mingw.org. You will also need to install 
+msys-automake, msys-autoconf, and msys-libtool.
 
 The source distribution is built with "make dist-bzip2"  "make bzip" is also
 supported.
