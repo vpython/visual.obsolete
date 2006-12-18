@@ -86,6 +86,7 @@ pos = pos+(p/m)*(dt/2.) # initial half-step
 time = clock()
 
 while 1:
+    rate(200)
     observation.plot(data=mag(p/m))
 
     # Update all positions
