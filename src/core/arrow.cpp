@@ -288,9 +288,13 @@ arrow::update_cache( const view& scene)
 	double eff_length;
 	double eff_headwidth;
 	double eff_headlength;
+	double eff_halfwidth;
+	double eff_halfheadwidth;
 	effective_geometry( eff_headwidth, eff_shaftwidth, eff_length, 
 		eff_headlength, scene.gcf);
 	eff_shaftlength = eff_length - eff_headlength;
+	eff_halfwidth = 0.5*eff_shaftwidth;
+	eff_halfheadwidth = 0.5*eff_headwidth;
 	
 	if (color.opacity != 1.0) {
 		if (!sorted_model) {
@@ -308,10 +312,10 @@ arrow::update_cache( const view& scene)
 		{			
 			const vector tip( eff_length, 0, 0);
 			const vector backface[4] = { 
-				vector(0, eff_shaftwidth, -eff_shaftwidth), 
-				vector(0, eff_shaftwidth, eff_shaftwidth),
-				vector(0, -eff_shaftwidth, eff_shaftwidth),
-				vector(0, -eff_shaftwidth, -eff_shaftwidth) 
+				vector(0, eff_halfwidth, -eff_halfwidth), 
+				vector(0, eff_halfwidth, eff_halfwidth),
+				vector(0, -eff_halfwidth, eff_halfwidth),
+				vector(0, -eff_halfwidth, -eff_halfwidth) 
 			};
 			const vector side_corners[4] = {
 				backface[0] + vector(eff_shaftlength, 0, 0),
@@ -321,10 +325,10 @@ arrow::update_cache( const view& scene)
 			};
 			const vector head_corners[4] = {
 				// top, back, lower, front.
-				vector(eff_shaftlength, eff_headwidth, -eff_headwidth ),
-				vector(eff_shaftlength, eff_headwidth, eff_headwidth ),
-				vector(eff_shaftlength, -eff_headwidth, eff_headwidth ),
-				vector(eff_shaftlength, -eff_headwidth, -eff_headwidth )		
+				vector(eff_shaftlength, eff_halfheadwidth, -eff_halfheadwidth ),
+				vector(eff_shaftlength, eff_halfheadwidth, eff_halfheadwidth ),
+				vector(eff_shaftlength, -eff_halfheadwidth, eff_halfheadwidth ),
+				vector(eff_shaftlength, -eff_halfheadwidth, -eff_halfheadwidth )		
 			};
 			const vector head_normals[4] = {
 				// Normal vectors for each triangle: top, front, lower, back.
@@ -410,9 +414,9 @@ arrow::effective_geometry(
 	// shaftwidth, shaftlength, and fixedwidth.  This geometry is calculated
 	// in world space and multiplied
 	static const double min_sw = 0.02; // minimum shaftwidth
-	static const double def_sw = 0.05; // default shaftwidth
+	static const double def_sw = 0.1; // default shaftwidth
 	static const double def_hw = 2.0; // default headwidth multiplier. (x shaftwidth)
-	static const double def_aspect = 3.0; // default aspect ratio for the head.
+	static const double def_hl = 3.0; // default headlength multiplier. (x shaftwidth)
 	// maximum fraction of the total arrow length allocated to the head.
 	static const double max_headlength = 0.5;
 	
@@ -430,7 +434,7 @@ arrow::effective_geometry(
 	if (headlength)
 		eff_headlength = headlength * gcf;
 	else
-		eff_headlength = eff_headwidth * def_aspect;
+		eff_headlength = eff_shaftwidth * def_hl;
 	
 	if (fixedwidth) {
 		if (eff_headlength > max_headlength * eff_length)
