@@ -126,10 +126,12 @@ wrap_primitive()
 
 	class_< cylinder, bases<axial> >( "cylinder")
 		.def( init<const cylinder&>())
+		.add_property( "length", &cylinder::get_length, &cylinder::set_length)
 		;
 	
 	class_< cone, bases<axial> >( "cone")
 		.def( init<const cone&>())
+		.add_property( "length", &cone::get_length, &cone::set_length)
 		;
 		
 
