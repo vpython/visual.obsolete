@@ -155,9 +155,13 @@ rightstop = box(pos=(wide+rlog+tstop/2.,0.6*rlog,(zpos+zface)/2.),
 # Run a ball up and down the pole
 y1 = 0.4
 y2 = 0.8*h
-vball0 = 2.5*v0
+vball0 = v0
 vball = vball0
-ball = sphere(pos=(0,y1,0), radius=y1, color=color.blue)
+ball = frame(pos=(0,y1,0))
+sphere(frame=ball, radius=y1, color=color.blue)
+for nn in range(4):
+    cc = cone(frame=ball, pos=(0.8*y1,0,0), axis=(3*y1,0,0), radius=0.5*y1, color=color.yellow)
+    cc.rotate(angle=(0.25+.5*nn)*pi, axis=(0,1,0), origin=(0,0,0))
 rbaseball = 0.3
 vbaseball0 = 3*v0
 
