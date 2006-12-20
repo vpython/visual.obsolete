@@ -133,13 +133,16 @@ cone::gl_pick_render( const view& scene)
 	if (first)
 		update_cache( scene);
 	size_t lod = 2;
+	clear_gl_error();
 	gl_matrix_stackguard guard;
-	glTranslated( pos.x, pos.y, pos.z);
+	vector view_pos = pos * scene.gcf;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);
 	model_world_transform().gl_mult();
 	const double radial_scale = radius * scene.gcf;
 	const double axial_scale = axis.mag() * scene.gcf;
 	glScaled( axial_scale, radial_scale, radial_scale);
 	cone_simple_model[lod].gl_render();
+	check_gl_error();
 }
 
 void 
@@ -175,7 +178,8 @@ cone::gl_render( const view& scene)
 		lod = 5;
 	
 	gl_matrix_stackguard guard;
-	glTranslated( pos.x, pos.y, pos.z);
+	vector view_pos = pos * scene.gcf;
+	glTranslated( view_pos.x, view_pos.y, view_pos.z);
 	model_world_transform().gl_mult();
 	const double radial_scale = radius * scene.gcf;
 	const double axial_scale = axis.mag() * scene.gcf;
