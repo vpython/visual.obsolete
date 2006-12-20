@@ -59,7 +59,7 @@ h = 5.0
 
 # The floor, central post, and ball atop the post
 box(pos=(0,-0.1,0),length=24,height=0.2,width=24, color=(0,1,0))
-cylinder(pos=(0,0,0),axis=(0,h,0), radius=0.2, color=(1,0,0))
+pole= cylinder(pos=(0,0,0),axis=(0,h,0), radius=0.2, color=(1,0,0))
 sphere(pos=(0,h,0), radius=0.5, color=(1,0,0))
 
 # Set up the gray slabs, including a portal
@@ -153,15 +153,19 @@ rightstop = box(pos=(wide+rlog+tstop/2.,0.6*rlog,(zpos+zface)/2.),
     length=tstop, height=1.2*rlog, width=(zface-zpos), color=color.red)
 
 # Run a ball up and down the pole
-y1 = 0.4
-y2 = 0.8*h
-vball0 = v0
+y1 = 0.2*h
+y2 = 0.7*h
+rball = 0.4
+cylinder(pos=(0,y1-0.9*rball,0), axis=(0,0.1,0), radius=1.3*pole.radius, color=color.green)
+cylinder(pos=(0,y2+0.9*rball,0), axis=(0,0.1,0), radius=1.3*pole.radius, color=color.green)
+vball0 = 0.3*v0
 vball = vball0
+ballangle = 0.05*pi
 ball = frame(pos=(0,y1,0))
-sphere(frame=ball, radius=y1, color=color.blue)
+sphere(frame=ball, radius=rball, color=color.blue)
 for nn in range(4):
-    cc = cone(frame=ball, pos=(0.8*y1,0,0), axis=(3*y1,0,0), radius=0.5*y1, color=color.yellow)
-    cc.rotate(angle=(0.25+.5*nn)*pi, axis=(0,1,0), origin=(0,0,0))
+    cc = cone(frame=ball, pos=(0.8*rball,0,0), axis=(3*rball,0,0), radius=0.5*rball, color=color.yellow)
+    cc.rotate(angle=0.5*nn*pi, axis=(0,1,0), origin=(0,0,0))
 rbaseball = 0.3
 vbaseball0 = 3*v0
 
@@ -218,10 +222,13 @@ while 1:
 
     # Run the ball up and down
     ball.pos.y = ball.pos.y+vball*dt
+    ball.rotate(angle=ballangle, axis=(0,1,0), origin=(0,0,0))
     if ball.pos.y >= y2:
         vball = -vball0
+        ballangle = -ballangle
     if ball.pos.y <= y1:
         vball = +vball0
+        ballangle = -ballangle
 
     # Move the smoke rings
     for i in range(Nrings):
