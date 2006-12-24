@@ -37,17 +37,17 @@
   to a box that is red, any cyan region of the texture will display as black, 
   because the cyan (0,1,1) doesn't overlap at all with the red (1,0,0).</p>
 <p>You can create a numeric array of zeros in various formats, then assign values:</p>
-<p>zeros([...], UnsignedInt8) means an integer 0-255<br>
-  zeros([...], Int16) means an integer 0-32767<br>
-  zeros([...], Int) means an integer 0-2147483648<br>
-  zeros([...], Float) means a floating-point (fractional) number 0-1</p>
+<p>zeros([...], ubyte) means an 8-bit unsigned integer 0-255<br>
+  zeros([...], short) means a 16-bit iinteger plus or minus 0-32767<br>
+  zeros([...], int) means a 32-bit integer plus or minus 0-2147483648<br>
+  zeros([...], float) means a floating-point (fractional) number</p>
 <p>Here is an example program in which a checkerboard texture is created and applied 
   to a box:</p>
 <p>from visual import *<br>
   M=4 # must be a power of 2 (1, 2, 4, 8, 16, 32, etc.)<br>
   N=4 # must be a power of 2 (1, 2, 4, 8, 16, 32, etc.)<br>
-  checks = zeros([M,N], Float) # create a numeric array of floating-point zeros 
-  (0.0) <br>
+  checks = zeros([M,N], float) # create a numeric array of floating-point zeros
+   (0.0) <br>
   for i in range(M):<br>
   &nbsp;&nbsp;&nbsp;&nbsp; for j in range(N):<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ((i&amp;1) ^ (j&amp;1)): 
@@ -57,8 +57,9 @@
   print checks<br>
   lum = texture(data=checks, type=&quot;luminance&quot;)<br>
   box(color=color.cyan, texture=lum)</p>
-<p>If you wanted to create a texture containing &quot;rgb&quot; values, you would 
-  start with zeros([M,N,3], Float), and entries into this array would be the usual 
+<p>If you wanted to create a texture containing &quot;rgb&quot; values, you would
+   start with zeros([M,N,3], float), and entries into this array would be the
+  usual 
   (red,green,blue) triples, with values for each color in the range 0-1 inclusive.</p>
 <p>See the <a href="http://vpython.org/contributed.html" target="_blank">contributed</a> 
   section of vpython.org for an example of a program to create, save, and use
@@ -118,12 +119,9 @@
 <h3>Specifying a gray</h3>
 <p>For convenience you can now say color=0.7 to mean color=(0.7,0.7,0.7).</p>
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
-<p>There is one major known bug still being worked on::</p>
-<blockquote>
-  <p>On some Windows machines, the animation in the program gas.py is 
-    very jerky. This is the only example program affected in this way, but other
-    programs have shown this behavior. This problem is absent on Linux.</p>
-</blockquote>
+<p>There is one major known bug still being worked on: Depending on the graphics
+  card and driver, performance with some programs on Windows may be poor (but
+  performance may be okay on another computer). This problem is not yet understood.</p>
 <p>Here are known bugs that are less serious:</p>
 <blockquote>
   <p>Autoscaling is pretty good but occasionally positions the camera farther 
