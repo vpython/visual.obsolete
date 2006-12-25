@@ -32,7 +32,7 @@ frame::~frame()
 {
 }
 
-void 
+void
 frame::set_pos( const vector& n_pos)
 {
 	pos = n_pos;
@@ -80,7 +80,7 @@ frame::get_z()
 	return pos.z;
 }
 
-void 
+void
 frame::set_axis( const vector& n_axis)
 {
 	axis = n_axis;
@@ -92,7 +92,7 @@ frame::get_axis()
 	return axis;
 }
 
-void 
+void
 frame::set_up( const vector& n_up)
 {
 	up = n_up;
@@ -104,13 +104,13 @@ frame::get_up()
 	return up;
 }
 
-void 
+void
 frame::set_scale( const vector& n_scale)
 {
 	scale = n_scale;
 }
 
-shared_vector& 
+shared_vector&
 frame::get_scale()
 {
 	return scale;
@@ -134,7 +134,7 @@ frame::rotate( double angle, const vector& _axis, const vector& origin)
     }
 }
 
-tmatrix 
+tmatrix
 frame::frame_world_transform( const double gcf) const
 {
 	// Performs a reorientation transform.
@@ -151,15 +151,15 @@ frame::frame_world_transform( const double gcf) const
 	else {
 		z_axis = axis.cross( up).norm();
 	}
-	
+
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
-	
+
 	// I don't understand why removing gcf from the following 3 statements makes frames work (bas):
 	ret.x_column( x_axis * scale.x);
 	ret.y_column( y_axis * scale.y);
 	ret.z_column( z_axis * scale.z);
-	
+
 	ret.w_column( pos * gcf);
 	ret.w_row();
 	return ret;
@@ -172,7 +172,7 @@ frame::world_frame_transform() const
 	// ret = translation o reorientation o scale
 	// ret = iscale o ireorientation o itranslation.
 	tmatrix ret;
-	
+
 	// A unit vector along the z_axis.
 	vector z_axis = vector(0,0,1);
 	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
@@ -184,13 +184,13 @@ frame::world_frame_transform() const
 	else {
 		z_axis = axis.cross( up).norm();
 	}
-	
+
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
 	x_axis /= scale.x;
 	y_axis /= scale.y;
 	z_axis /= scale.z;
-	
+
 	ret(0,0) = x_axis.x;
 	ret(0,1) = x_axis.y;
 	ret(0,2) = x_axis.z;
@@ -203,11 +203,11 @@ frame::world_frame_transform() const
 	ret(2,1) = z_axis.y;
 	ret(2,2) = z_axis.z;
 	ret(2,3) = (pos * z_axis).sum();
-	
+
 	return ret;
 }
 
-void 
+void
 frame::add_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
@@ -216,8 +216,8 @@ frame::add_renderable( shared_ptr<renderable> obj)
 	else
 		trans_children.push_back( obj);
 }
-	
-void 
+
+void
 frame::remove_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
@@ -240,15 +240,15 @@ frame::get_objects()
 	return ret;
 }
 
-shared_ptr<renderable> 
-frame::lookup_name( 
+shared_ptr<renderable>
+frame::lookup_name(
 	const unsigned int* name_top,
 	const unsigned int* name_end)
 {
 	assert( name_top < name_end);
 	assert( *name_top < children.size() + trans_children.size());
 	using boost::dynamic_pointer_cast;
-	
+
 	shared_ptr<renderable> ret;
 	unsigned int size = 0;
 	const_child_iterator i( children.begin());
@@ -263,7 +263,7 @@ frame::lookup_name(
 	}
 	if (!ret)
 		ret = trans_children[*(name_top) - size];
-	
+
 	if (name_end - name_top > 1) {
 		frame* ref_frame = dynamic_cast<frame*>(ret.get());
 		assert( ref_frame != NULL);
@@ -276,7 +276,7 @@ frame::lookup_name(
 // TODO: Run some bench tests here.  The simplest solution may be to just use
 // pos as the 'center' of the frame, and warn that intersecting frames may not
 // be rendered in the right z-order.
-vector 
+vector
 frame::get_center() const
 {
 	if (trans_children.empty())
@@ -292,18 +292,18 @@ frame::get_center() const
 	ret /= trans_children.size();
 	return ret;
 }
-	
-void 
+
+void
 frame::update_cache( const view&)
 {
 }
 
-void 
+void
 frame::update_z_sort( const view&)
 {
 }
 
-void 
+void
 frame::gl_render( const view& v)
 {
 	//view local( v, world_frame_transform()); // this seems irrelevant....??
@@ -312,7 +312,7 @@ frame::gl_render( const view& v)
     model_damage();
 	{
 		gl_matrix_stackguard guard( fwt);
-		
+
 		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
 			if (i->color.opacity != 1.0) {
 				// See display_kernel::draw().
@@ -334,7 +334,7 @@ frame::gl_render( const view& v)
 			if (v.anaglyph)
 				i->color = actual_color;
 		}
-		
+
 		// Perform a depth sort of the transparent children from forward to backward.
 		if (!trans_children.empty()) {
 			color.opacity = 0.5;
@@ -342,8 +342,8 @@ frame::gl_render( const view& v)
 		if (trans_children.size() > 1)
 			std::stable_sort( trans_children.begin(), trans_children.end(),
 				z_comparator( (pos*v.gcf - v.camera).norm()));
-		
-		for (trans_child_iterator i = trans_children.begin(); 
+
+		for (trans_child_iterator i = trans_children.begin();
 			i != trans_child_iterator(trans_children.end());
 			++i) {
 			i->refresh_cache( local);
@@ -358,16 +358,17 @@ frame::gl_render( const view& v)
 			}
 			i->gl_render( local);
 			if (v.anaglyph)
-				i->color = actual_color;			
+				i->color = actual_color;
 		}
 	}
 	typedef std::multimap<vector, displaylist, z_comparator>::iterator screen_iterator;
 	screen_iterator i( local.screen_objects.begin());
 	screen_iterator i_end( local.screen_objects.end());
+    v.screen_objects.clear(); 
 	while (i != i_end) {
 		v.screen_objects.insert( std::make_pair( fwt*i->first, i->second));
 		++i;
-	}
+	} 
 }
 
 void
@@ -388,7 +389,7 @@ frame::gl_pick_render( const view& scene)
 			++i;
 			++name;
 		}
-		
+
 		trans_child_iterator j( trans_children.begin());
 		trans_child_iterator j_end( trans_children.end());
 		while (j != j_end) {
@@ -402,7 +403,7 @@ frame::gl_pick_render( const view& scene)
 	glPopName();
 }
 
-void 
+void
 frame::grow_extent( extent& world)
 {
 	world.push_frame();
