@@ -1,17 +1,19 @@
+from __future__ import division
 from visual import *
 from visual.text import *
 import time
+import pickle
 
 print """
 Press to enter roaming mode, release to exit roaming mode.
 In roaming mode, with the mouse button down, move the mouse
 above or below the center of the scene to move forward or
-backward; right or left rotates your direction.
+backward; right or left rotates your direction of motion.
 """
 
 # Bruce Sherwood
 
-# A surreal scene
+# A surreal scene that illustrates many of the features of VPython
 
 def hourminute():
     now = time.localtime(time.time())
@@ -31,8 +33,8 @@ class analog_clock:
             self.spheres.append(sphere(pos=self.pos+rotate(radius*scene.up,
                     axis=self.axis, angle=-2.*pi*n/12.), radius=radius/20.,
                     color=color.hsv_to_rgb((n/12.,1,1)) ))
-        self.hand = cone(pos=pos, axis=0.95*radius*scene.up,
-                    radius=radius/20., color=(0.7, 0.7, 0.7))
+        self.hand = arrow(pos=pos, axis=0.95*radius*scene.up,
+                    shaftwidth=radius/10., color=color.cyan)
         self.update()
         
     def update(self):
@@ -52,10 +54,11 @@ scene.range = (18,18,18)
 scene.center = (0,2,0)
 grey = (0.8, 0.8, 0.8)
 Nslabs = 8
-R = 10.0
-w = 5.0
+R = 10
+w = 5
 d = 0.5
-h = 5.0
+h = 5
+photocenter = 0.15*w
 
 # The floor, central post, and ball atop the post
 box(pos=(0,-0.1,0),length=24,height=0.2,width=24, color=(0,1,0))
@@ -79,16 +82,29 @@ for i in range(Nslabs):
         
     else:
         slab = box(pos=(R*c, h/2., R*s), axis=(c,0,s),
-                   length=d, height=h, width=w, color=grey)
+                   size=(d,h,w), color=grey)
+        if i == 0:
+            photodata = pickle.load(open("flower128.vpt", 'rU'))
+            photo = texture(data=photodata)
+        if i != 6:
+            for x in range(2):
+                for y in range(2):
+                    box(pos=slab.pos+vector(-s*photocenter*(2*x-1),photocenter*(2*y-1),c*photocenter*(2*x-1)),
+                        axis=slab.axis,
+                        size=(1.1*d,0.9*2*photocenter,0.9*2*photocenter),
+                        color=grey, texture=photo)
 
 # Decorate the front entrance slab
 text(pos=(0, 0.77*h, R+d/2), string="NO EXIT", color=color.yellow,
            depth=0.2, height=0.7, justify="center")
 
 # Decorate back slab with a gold box and a clock
-box(pos=(0,h/2.,-R+d/2+0.1), length=w/2.,height=w/2.,width=0.2, color=(1,0.8,0))
-clock = analog_clock(pos=(0,h/2.,-R+d/2+0.2+0.2*h/10.),
-                     radius=0.20*w, axis=(0,0,1))
+wooddata = pickle.load(open("wood256lum.vpt", 'rU'))
+wood = texture(data=wooddata)
+box(pos=(0,h/2,-R+d/2+0.1), length=w/2,height=w/2,width=0.2,
+    color=(1,0.8,0), texture=wood, shininess=1)
+clock = analog_clock(pos=(0,h/2.,-R+d/2+0.2+0.2*h/10),
+                     radius=0.2*w, axis=(0,0,1))
                      
 # Draw guy wires from the top of the central post
 Nwires = 32
@@ -114,10 +130,10 @@ Nrings = 20
 x0, y0, z0 = -5, 1.5, -2
 r0 = 0.1
 spacing = 0.2
-thick = r0/4.
+thick = r0/4
 dr = 0.015
 dthick = thick/Nrings
-gray = 1.0
+gray = 1
 cylinder(pos=(x0,0,z0), axis=(0,y0+r0,0), radius=1.5*r0, color=color.black)
 
 # Create the smoke rings
@@ -129,10 +145,10 @@ dy = spacing/20
 top = Nrings-1
 
 # Roll a log back and forth
-rlog = 1.
-wide = 4.
-zpos = 2.
-zface = 5.
+rlog = 1
+wide = 4
+zpos = 2
+zface = 5
 tlogend = 0.2
 v0 = 1
 v = v0
@@ -142,14 +158,16 @@ dt = 0.1
 tstop = 0.3
 log = frame(pos=(-wide,rlog,zpos), axis=(0,0,1))
 cylinder(frame=log,
-               pos=(0,0,0), axis=(zface-zpos,0,0), color=(0.8,0.5,0))
+         pos=(0,0,0), axis=(zface-zpos,0,0),
+         color=(0.8,0.5,0), opacity=0.5)
 box(frame=log,
-             pos=(zface-zpos+tlogend/2.,0,0), axis=(0,0,1),
-             length=rlog, height=rlog, width=tlogend, color=color.yellow)
+    pos=(zface-zpos+tlogend/2.,0,0), axis=(0,0,1),
+    length=rlog, height=rlog, width=tlogend,
+    color=color.yellow, opacity=0.5)
 
-leftstop = box(pos=(-wide-rlog-tstop/2.,0.6*rlog,(zpos+zface)/2.),
+leftstop = box(pos=(-wide-rlog-tstop/2,0.6*rlog,(zpos+zface)/2),
     length=tstop, height=1.2*rlog, width=(zface-zpos), color=color.red)
-rightstop = box(pos=(wide+rlog+tstop/2.,0.6*rlog,(zpos+zface)/2.),
+rightstop = box(pos=(wide+rlog+tstop/2,0.6*rlog,(zpos+zface)/2),
     length=tstop, height=1.2*rlog, width=(zface-zpos), color=color.red)
 
 # Run a ball up and down the pole
@@ -172,10 +190,11 @@ vbaseball0 = 3*v0
 # Display an ellipsoid
 Rcloud = 0.8*R
 omegacloud = v0/Rcloud
-cloud = ellipsoid(pos=(0,0.7*h,-Rcloud), size=(5,2,2), color=(0.4,0.4,0.4))
+cloud = ellipsoid(pos=(0,0.7*h,-Rcloud), size=(5,2,2),
+                  color=(1,0.5,0.5), opacity=0.7)
 
 rhairs = 0.025 # half-length of crosshairs
-dhairs = 2. # how far away the crosshairs are
+dhairs = 2 # how far away the crosshairs are
 maxcosine = dhairs/sqrt(rhairs**2+dhairs**2) # if ray inside crosshairs, don't move
 haircolor = color.black
 roam = 0
@@ -193,7 +212,7 @@ while 1:
         if abs(dot(ray,scene.forward)) < maxcosine: # do something only if outside crosshairs
             newray = norm(vector(ray.x, 0, ray.z))
             angle = arcsin(dot(cross(scene.forward,newray),scene.up))
-            newforward = rotate(scene.forward, axis=scene.up, angle=angle/100.)
+            newforward = rotate(scene.forward, axis=scene.up, angle=angle/100)
             scene.center = scene.mouse.camera+newforward*mag(scene.center-scene.mouse.camera)
             scene.forward = newforward
             scene.center = scene.center+scene.forward*ray.y/2.
@@ -205,14 +224,14 @@ while 1:
     if log.x >= wide:
         v = -v0
         omega = -v/rlog
-        if rightstop.color == (1,0,0):
+        if rightstop.color == (1,0,0,1):
             rightstop.color = (0,0,1)
         else:
             rightstop.color = (1,0,0)
     if log.x <= -wide:
         v = +v0
         omega = -v/rlog
-        if leftstop.color == (1,0,0):
+        if leftstop.color == (1,0,0,1):
             leftstop.color = (0,0,1)
         else:
             leftstop.color = (1,0,0)
