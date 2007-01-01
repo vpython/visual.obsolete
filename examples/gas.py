@@ -15,7 +15,6 @@ Natoms = 50  # change this to have more or fewer atoms
 # Typical values
 L = 1. # container is a cube L on a side
 gray = (0.7,0.7,0.7) # color of edges of container
-Raxes = 0.005 # radius of lines drawn on edges of cube
 Matom = 4E-3/6E23 # helium mass
 Ratom = 0.03 # wildly exaggerated size of helium atom
 k = 1.4E-23 # Boltzmann constant
@@ -39,12 +38,12 @@ for v in arange(0.,3001.+dv,dv): # theoretical prediction
 observation = ghistogram(bins=arange(0.,3000.,deltav),
                         accumulate=1, average=1, color=color.red)
 
-xaxis = curve(pos=[(0,0,0), (L,0,0)], color=gray, radius=Raxes)
-yaxis = curve(pos=[(0,0,0), (0,L,0)], color=gray, radius=Raxes)
-zaxis = curve(pos=[(0,0,0), (0,0,L)], color=gray, radius=Raxes)
-xaxis2 = curve(pos=[(L,L,L), (0,L,L), (0,0,L), (L,0,L)], color=gray, radius=Raxes)
-yaxis2 = curve(pos=[(L,L,L), (L,0,L), (L,0,0), (L,L,0)], color=gray, radius=Raxes)
-zaxis2 = curve(pos=[(L,L,L), (L,L,0), (0,L,0), (0,L,L)], color=gray, radius=Raxes)
+xaxis = curve(pos=[(0,0,0), (L,0,0)], color=gray)
+yaxis = curve(pos=[(0,0,0), (0,L,0)], color=gray)
+zaxis = curve(pos=[(0,0,0), (0,0,L)], color=gray)
+xaxis2 = curve(pos=[(L,L,L), (0,L,L), (0,0,L), (L,0,L)], color=gray)
+yaxis2 = curve(pos=[(L,L,L), (L,0,L), (L,0,0), (L,L,0)], color=gray)
+zaxis2 = curve(pos=[(L,L,L), (L,L,0), (0,L,0), (0,L,L)], color=gray)
 
 Atoms = []
 colors = [color.red, color.green, color.blue,
