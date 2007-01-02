@@ -74,6 +74,7 @@ while 1:
                 else:
                     s_theta.color = (0.6, 1.0, 0.6)
     if drag:
+        rate(100)
         newobs=scene.mouse.project(normal=vector(1,0,0), d=0)
         if newobs and (newobs != obs):
             obs = newobs

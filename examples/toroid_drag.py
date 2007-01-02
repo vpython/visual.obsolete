@@ -39,6 +39,7 @@ drag = 0
 
 while 1:
     if drag:
+        rate(100)
         newobs = scene.mouse.pos
         if newobs != obs:
             obs = newobs
