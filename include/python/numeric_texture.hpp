@@ -9,7 +9,11 @@
 #include "util/texture.hpp"
 #include "python/num_util.hpp"
 #include "wrap_gl.hpp"
-#include <inttypes.h>
+
+//AS removed include added typedef for VC++ compatibility.
+
+//#include <inttypes.h>
+typedef unsigned   uint32_t;
 
 namespace cvisual { namespace python {
 

@@ -101,7 +101,7 @@ wrap_arrayobjects()
 		.def( "set_pos", &convex::set_pos)
 		.def( "set_pos", &convex::set_pos_l)
 		.def( "get_pos", &convex::get_pos)
-		;
+		;  
 
 	using python::points;
 

@@ -3,8 +3,8 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "render_surface.hpp"
-#include "display.hpp"
+#include "win32/render_surface.hpp"
+#include "win32/display.hpp"
 #include "util/errors.hpp"
 #include "vpython-config.h"
 
@@ -27,7 +27,7 @@ using boost::lexical_cast;
 // to process events.
 // This function dispatches incoming messages to the particular message-handler.
 extern "C" {
-LRESULT CALLBACK 
+LRESULT CALLBACK
 render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	using namespace cvisual;
@@ -77,12 +77,12 @@ namespace cvisual {
 /**************************** Utilities ************************************/
 // Extracts and decodes a Win32 error message.
 void
-win32_write_critical( 
+win32_write_critical(
 	std::string file, int line, std::string func, std::string msg)
 {
 	DWORD code = GetLastError();
 	char* message = 0;
-	FormatMessage( 
+	FormatMessage(
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
 		0, // Ignored parameter
 		code, // Error code to be decoded.
@@ -90,7 +90,7 @@ win32_write_critical(
 		(char*)&message, // The output buffer to fill the message
 		512, // Allocate at least one byte in order to free something below.
 		0); // No additional arguments.
-	
+
 	std::cerr << "VPython ***Win32 Critical Error*** " << file << ":" << line << ": "
 		<< func << ": " << msg << ": " << message;
 	LocalFree(message);
@@ -113,7 +113,7 @@ render_surface::register_win32_class()
 		return;
 	else {
 		std::memset( &win32_class, 0, sizeof(win32_class));
-		
+
 		win32_class.lpszClassName = "vpython_win32_render_surface";
 		win32_class.lpfnWndProc = &render_surface_dispatch_messages;
 		win32_class.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
@@ -126,7 +126,7 @@ render_surface::register_win32_class()
 	}
 }
 
-LRESULT 
+LRESULT
 render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 {
 	UINT id = 1;
@@ -150,7 +150,7 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-LRESULT  
+LRESULT
 render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 {
 	// TODO: Modify this implementation to make the mouse disappear and lock
@@ -166,7 +166,7 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 	bool buttondown = left_down || middle_down || right_down;
 	float mouse_x = LOWORD(lParam);
 	float mouse_y = HIWORD(lParam);
-	
+
 	float dx = mouse_x - last_mousepos_x;
 	float dy = mouse_y - last_mousepos_y;
 	// bool mouselocked = false;
@@ -180,7 +180,7 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 	}
 	if (!buttondown)
 		report_mouse_motion( dx, dy, display_kernel::NONE);
-	
+
 	mouse.set_shift( wParam & MK_SHIFT);
 	mouse.set_ctrl( wParam & MK_CONTROL);
 	mouse.set_alt( GetKeyState( VK_MENU) < 0);
@@ -192,22 +192,22 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 	last_mousepos_y = mouse_y;
 	// }
 	mouse.cam = calc_camera();
-	
+
 	if (left_button.is_dragging())
 		mouse.push_event( drag_event( 1, mouse));
 	if (!zoom_is_allowed() && middle_button.is_dragging())
 		mouse.push_event( drag_event( 2, mouse));
 	if (!spin_is_allowed() && right_button.is_dragging())
 		mouse.push_event( drag_event( 3, mouse));
-	
+
 	return 0;
 }
 
-LRESULT  
+LRESULT
 render_surface::on_size( WPARAM, LPARAM)
 {
 	RECT dims;
-	// The following calls report the fact that the widget area has been 
+	// The following calls report the fact that the widget area has been
 	// repainted to the windowing system.
 	GetClientRect( widget_handle, &dims);
 	if (dims.right != window_width || dims.bottom != window_height) {
@@ -236,21 +236,21 @@ render_surface::on_getminmaxinfo( WPARAM, LPARAM lParam)
 	return 0;
 }
 
-LRESULT  
+LRESULT
 render_surface::on_paint( WPARAM, LPARAM)
 {
 	if (window_width < 1 || window_height < 1)
 		return 0;
-	
+
 	bool sat = render_scene();
 	if (!sat)
 		return 1;
-	
-	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
+
+	boost::tie( mouse.pick, mouse.pickpos, mouse.position) =
 		pick( last_mousepos_x, last_mousepos_y);
 	// TODO: Add timer cycle time munging (or at least consider it)
 	RECT dims;
-	// The following calls report the fact that the widget area has been 
+	// The following calls report the fact that the widget area has been
 	// repainted to the windowing system.
 	GetClientRect( widget_handle, &dims);
 	ValidateRect( widget_handle, &dims);
@@ -284,10 +284,10 @@ render_surface::on_buttondown( WPARAM wParam, LPARAM lParam)
 	mouse.set_shift( wParam & MK_SHIFT);
 	mouse.set_ctrl( wParam & MK_CONTROL);
 	mouse.set_alt( GetKeyState( VK_MENU) < 0);
-	
+
 	float x = (float)GET_X_LPARAM(lParam);
 	float y = (float)GET_Y_LPARAM(lParam);
-	
+
 	int button_id = 0;
 	if (wParam & MK_LBUTTON && left_button.press(x, y)) {
 		button_id = 1;
@@ -298,7 +298,7 @@ render_surface::on_buttondown( WPARAM wParam, LPARAM lParam)
 	else if (wParam & MK_RBUTTON && right_button.press( x, y)) {
 		button_id = 3;
 	}
-	
+
 	if (button_id)
 		mouse.push_event( press_event( button_id, mouse));
 	return 0;
@@ -310,15 +310,15 @@ render_surface::on_buttonup( WPARAM wParam, LPARAM lParam)
 	mouse.set_shift( wParam & MK_SHIFT);
 	mouse.set_ctrl( wParam & MK_CONTROL);
 	mouse.set_alt( GetKeyState( VK_MENU) < 0);
-	
+
 	// float x = (float)GET_X_LPARAM(lParam);
 	// float y = (float)GET_Y_LPARAM(lParam);
-	
+
 	int button_id = 0;
 	std::pair<bool, bool> unique_drop( false, false);
 	#define unique unique_drop.first
 	#define drop unique_drop.second
-	
+
 	if (!(wParam & ~MK_LBUTTON)) {
 		unique_drop = left_button.release();
 		if (unique) {
@@ -355,7 +355,7 @@ found:
 WNDCLASS render_surface::win32_class;
 
 // Callbacks provided to the display_kernel object.
-void 
+void
 render_surface::on_gl_begin()
 {
 	saved_dc = wglGetCurrentDC();
@@ -365,7 +365,7 @@ render_surface::on_gl_begin()
 	current = this;
 }
 
-void 
+void
 render_surface::on_gl_end()
 {
 	wglMakeCurrent( saved_dc, saved_glrc);
@@ -374,7 +374,7 @@ render_surface::on_gl_end()
 	current = 0;
 }
 
-void 
+void
 render_surface::on_gl_swap_buffers()
 {
 	SwapBuffers( dev_context);
@@ -387,14 +387,14 @@ render_surface::render_surface()
 	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
 	saved_dc(0), saved_glrc(0),
 	last_mousepos_x(0), last_mousepos_y(0), mouselocked( false), active(false)
-{	
+{
 	// Connect callbacks from the display_kernel to this object.  These will not
 	// be called back from the core until report_realize is called.
-	gl_begin.connect( 
+	gl_begin.connect(
 		sigc::mem_fun( *this, &render_surface::on_gl_begin));
-	gl_end.connect( 
+	gl_end.connect(
 		sigc::mem_fun( *this, &render_surface::on_gl_end));
-	gl_swap_buffers.connect( 
+	gl_swap_buffers.connect(
 		sigc::mem_fun( *this, &render_surface::on_gl_swap_buffers));
 }
 
@@ -402,7 +402,7 @@ void
 render_surface::create()
 {
 	register_win32_class();
-	
+
 	RECT screen;
 	SystemParametersInfo( SPI_GETWORKAREA, 0, &screen, 0);
 	int style = -1;
@@ -410,7 +410,7 @@ render_surface::create()
 	int real_y = static_cast<int>(y);
 	int real_width = static_cast<int>(window_width);
 	int real_height = static_cast<int>(window_height);
-	
+
 	if (fullscreen) {
 		real_x = screen.left;
 		real_y = screen.top;
@@ -421,22 +421,22 @@ render_surface::create()
 	else if (real_x < 0 && real_y < 0 || real_x > screen.right || real_y > screen.bottom) {
 		real_x = CW_USEDEFAULT;
 		real_y = CW_USEDEFAULT;
-	} 
+	}
 	else if (real_x < screen.left) {
 		real_x = screen.left;
-	} 
+	}
 	else if (real_y < screen.top) {
 		real_y = screen.top;
 	}
-	
-	if (real_x + real_width > screen.right) 
+
+	if (real_x + real_width > screen.right)
 		real_width = screen.right - real_x;
-	if (real_y + real_height > screen.bottom) 
+	if (real_y + real_height > screen.bottom)
 		real_height = screen.bottom - real_y;
-	
+
 	if (!fullscreen)
 		style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-		
+
 	widget_handle = CreateWindow(
 		win32_class.lpszClassName,
 		title.c_str(),
@@ -452,42 +452,42 @@ render_surface::create()
 
 	// The first OpenGL Rendering Context, used to share displaylists.
 	static HGLRC root_glrc = 0;
-	
+
 	dev_context = GetDC(widget_handle);
 	if (!dev_context)
 		WIN32_CRITICAL_ERROR( "GetDC()");
-	
-	PIXELFORMATDESCRIPTOR pfd = { 
-		sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd 
-		1,                               // version number 
-		PFD_DRAW_TO_WINDOW |             // output to screen (not an image) 
-		PFD_SUPPORT_OPENGL |             // support OpenGL 
+
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd
+		1,                               // version number
+		PFD_DRAW_TO_WINDOW |             // output to screen (not an image)
+		PFD_SUPPORT_OPENGL |             // support OpenGL
 		PFD_DOUBLEBUFFER,                // double buffered
-		PFD_TYPE_RGBA,                   // RGBA type 
-		24,                              // 24-bit color depth 
-		0, 0, 0, 0, 0, 0,                // color bits ignored 
-		0,                               // no opacity buffer 
-		0,                               // shift bit ignored 
-		0,                               // no accumulation buffer 
-		0, 0, 0, 0,                      // accum bits ignored 
-		32,                              // 32-bit z-buffer 
-		0,                               // no stencil buffer 
-		0,                               // no auxiliary buffer 
-		PFD_MAIN_PLANE,                  // main layer 
-		0,                               // reserved 
-		0, 0, 0                          // layer masks ignored 
+		PFD_TYPE_RGBA,                   // RGBA type
+		24,                              // 24-bit color depth
+		0, 0, 0, 0, 0, 0,                // color bits ignored
+		0,                               // no opacity buffer
+		0,                               // shift bit ignored
+		0,                               // no accumulation buffer
+		0, 0, 0, 0,                      // accum bits ignored
+		32,                              // 32-bit z-buffer
+		0,                               // no stencil buffer
+		0,                               // no auxiliary buffer
+		PFD_MAIN_PLANE,                  // main layer
+		0,                               // reserved
+		0, 0, 0                          // layer masks ignored
 	};
-	
+
 	int pixelformat = ChoosePixelFormat( dev_context, &pfd);
-	
+
 	DescribePixelFormat( dev_context, pixelformat, sizeof(pfd), &pfd);
 	SetPixelFormat( dev_context, pixelformat, &pfd);
-	
+
 	gl_context = wglCreateContext( dev_context);
 	if (!gl_context)
 		WIN32_CRITICAL_ERROR("wglCreateContext()");
-	
-	if (!root_glrc) 
+
+	if (!root_glrc)
 		root_glrc = gl_context;
 	else
 		wglShareLists( root_glrc, gl_context);
@@ -507,7 +507,7 @@ render_surface::~render_surface()
 {
 }
 
-void 
+void
 render_surface::set_x( float n_x)
 {
 	lock L(mtx);
@@ -517,13 +517,13 @@ render_surface::set_x( float n_x)
 	else
 		x = n_x;
 }
-float 
+float
 render_surface::get_x()
 {
 	return x;
 }
- 
-void 
+
+void
 render_surface::set_y( float n_y)
 {
 	lock L(mtx);
@@ -533,13 +533,13 @@ render_surface::set_y( float n_y)
 	else
 		y = n_y;
 }
-float 
+float
 render_surface::get_y()
 {
 	return y;
 }
- 
-void 
+
+void
 render_surface::set_width( float w)
 {
 	lock L(mtx);
@@ -549,13 +549,13 @@ render_surface::set_width( float w)
 	else
 		window_width = w;
 }
-float 
+float
 render_surface::get_width()
 {
 	return window_width;
 }
- 
-void 
+
+void
 render_surface::set_height( float h)
 {
 	lock L(mtx);
@@ -565,13 +565,13 @@ render_surface::set_height( float h)
 	else
 		window_height = h;;
 }
-float 
+float
 render_surface::get_height()
 {
 	return window_height;
 }
-	
-void 
+
+void
 render_surface::set_visible( bool vis)
 {
 	if (vis && !active) {
@@ -584,7 +584,7 @@ render_surface::set_visible( bool vis)
 	}
 	visible = vis;
 }
-bool 
+bool
 render_surface::get_visible()
 {
 	if (!active)
@@ -592,7 +592,7 @@ render_surface::get_visible()
 	return visible;
 }
 
-void 
+void
 render_surface::set_title( std::string n_title)
 {
 	lock L(mtx);
@@ -602,18 +602,18 @@ render_surface::set_title( std::string n_title)
 	else
 		title = n_title;
 }
-std::string 
+std::string
 render_surface::get_title()
 {
 	return title;
 }
- 
-bool 
+
+bool
 render_surface::is_fullscreen()
 {
 	return fullscreen;
 }
-void 
+void
 render_surface::set_fullscreen( bool fs)
 {
 	lock L(mtx);
@@ -648,7 +648,7 @@ render_surface::get_mouse()
 		visible = true;
 	if (!active)
 		gui_main::add_display( this);
-	
+
 	return &mouse;
 }
 
@@ -659,11 +659,11 @@ render_surface::get_kb()
 		visible = true;
 	if (!active)
 		gui_main::add_display( this);
-	
+
 	return &keys;
 }
 
-void 
+void
 render_surface::set_selected( shared_ptr<display> d)
 {
 	selected = d;
@@ -684,8 +684,8 @@ sigc::signal0<void> gui_main::on_shutdown;
 
 
 gui_main::gui_main()
-	: idThread(GetCurrentThreadId()), 
-	caller( 0), returned( false), waiting_allclosed(false), 
+	: idThread(GetCurrentThreadId()),
+	caller( 0), returned( false), waiting_allclosed(false),
 	thread_exited(false), shutting_down( false)
 {
 	// Force the create of a message queue
@@ -693,19 +693,19 @@ gui_main::gui_main()
 	PeekMessage( &message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 }
 
-void 
+void
 gui_main::signal_add_display()
 {
 	PostThreadMessage( idThread, VPYTHON_ADD_DISPLAY, 0, 0);
 }
 
-void 
+void
 gui_main::signal_remove_display()
 {
 	PostThreadMessage( idThread, VPYTHON_REMOVE_DISPLAY, 0, 0);
 }
 
-void 
+void
 gui_main::signal_shutdown()
 {
 	PostThreadMessage( idThread, VPYTHON_SHUTDOWN, 0, 0);
@@ -722,7 +722,7 @@ gui_main::run()
 				VPYTHON_NOTE( "WM_QUIT recieved");
 				goto quit;
 			}
-			
+
 			if (message.hwnd ==0) { // One of the threaded callbacks
 				switch (message.message) {
 					case VPYTHON_ADD_DISPLAY:
@@ -746,7 +746,7 @@ gui_main::run()
 		if (!WaitMessage())
 			WIN32_CRITICAL_ERROR( "WaitMessage()");
 	}
-	
+
 quit:
 	lock L(call_lock);
 	if (waiting_allclosed) {
@@ -756,7 +756,7 @@ quit:
 	thread_exited = true;
 }
 
-void 
+void
 gui_main::thread_proc(void)
 {
 	assert( init_lock);
@@ -820,7 +820,7 @@ gui_main::add_display( display* d)
 	if (self->shutting_down) {
 		return;
 	}
-	VPYTHON_NOTE( std::string("Adding new display object at address ") 
+	VPYTHON_NOTE( std::string("Adding new display object at address ")
 		+ lexical_cast<std::string>(d));
 	self->caller = d;
 	self->returned = false;
@@ -844,9 +844,9 @@ void
 gui_main::remove_display( display* d)
 {
 	assert( self);
-	VPYTHON_NOTE( std::string("Removing existing display object at address ") 
+	VPYTHON_NOTE( std::string("Removing existing display object at address ")
 		+ lexical_cast<std::string>(d));
-	
+
 	lock L(self->call_lock);
 	self->caller = d;
 	self->returned = false;
@@ -918,7 +918,7 @@ gui_main::quit()
 	assert( self != 0);
 	lock L(self->call_lock);
 	self->shutting_down = true;
-	for (std::list<display*>::iterator i = self->displays.begin(); 
+	for (std::list<display*>::iterator i = self->displays.begin();
 			i != self->displays.end(); ++i) {
 		(*i)->destroy();
 	}

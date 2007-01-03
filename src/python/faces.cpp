@@ -166,8 +166,8 @@ faces::append( vector n_pos, vector n_normal)
 // Define an ordering for the stl-sorting criteria.
 struct stl_cmp_vector
 {
-	bool operator()( const vector& lhs, const vector& rhs)
-	{
+	//AS added "const" to allow template match for VC++ build
+ 	bool operator()( const vector& lhs, const vector& rhs) const	{
 		if (lhs.x < rhs.x)
 			return true;
 		else if (lhs.x > rhs.x)
@@ -367,7 +367,7 @@ faces::gl_render( const view& scene)
 
 	glNormalPointer( GL_DOUBLE, 0, index( normal, 0));
 
-	if (scene.gcf != 1.0 or (scene.gcfvec[0] != scene.gcfvec[1])) {
+	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
 		std::vector<vector> tmp( count);
 		spos.swap( tmp);
 		const double* pos_i = index(pos, 0);

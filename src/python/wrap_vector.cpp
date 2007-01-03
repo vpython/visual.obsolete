@@ -27,6 +27,9 @@ using py::numeric::array;
 using py::object;
 using py::extract;
 
+//AS add
+using py::allow_null;
+
 // Operations on Numeric arrays
 namespace {
 
@@ -346,8 +349,11 @@ wrap_vector()
 	py::def( "rotate", rotate, args("angle"), "Rotate a vector about an axis vector"
 		" through and angle.");
 
-	vector (vector::* truediv)( double) const = &vector::operator/;
-	const vector& (vector::* itruediv)( double) = &vector::operator/=;
+
+	//AS added throw()
+
+	vector (vector::* truediv)( double) const throw()= &vector::operator/;
+	const vector& (vector::* itruediv)( double) throw() = &vector::operator/=;
 
 	// The vector class, constructable from 0, one, two or three doubles.
 	py::class_<vector>("vector", py::init< py::optional<double, double, double> >())

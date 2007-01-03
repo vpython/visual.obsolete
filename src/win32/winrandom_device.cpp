@@ -10,14 +10,14 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: winrandom_device.cpp,v 1.1 2006/03/23 16:34:00 bsherwood Exp $
+ * $Id: winrandom_device.cpp,v 1.2 2007/01/03 14:36:34 aj_siegel Exp $
  *
  */
- 
+
 /* Changes:
  *    Replace impl with a version that uses the MS Crypto API to generate random
  *       numbers for use on MS Windows. -JDB
- * 
+ *
  */
 
 #include <boost/nondet_random.hpp>
@@ -34,6 +34,10 @@ const boost::random_device::result_type boost::random_device::max_value;
 #endif
 
 #define WIN32_LEAN_AND_MEAN 1
+#if defined(_MSC_VER)
+    #define NOMINMAX
+#endif
+
 #include <windows.h>
 #include <wincrypt.h>
 
@@ -48,12 +52,12 @@ class boost::random_device::impl
 		if (!CryptAcquireContext( &handle, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
 			error();
 	}
-	
+
 	~impl()
 	{
 		CryptReleaseContext( handle, 0);
 	}
-	
+
 	unsigned int next()
 	{
 		unsigned int ret = 0;
@@ -64,7 +68,7 @@ class boost::random_device::impl
 
  private:
 	HCRYPTPROV handle;
-	
+
 	void error()
 	{
 		throw std::runtime_error( "CryptAquireContext() failed");

@@ -23,7 +23,8 @@ using boost::python::object;
 
 namespace cvisual { namespace python {
 
-const size_t curve::c_cache::items;
+    //VC++ complaining on link AS commented out 
+	//const size_t curve::c_cache::items;
 
 namespace {
 
@@ -261,7 +262,7 @@ void
 curve::set_pos_v( const vector& npos)
 {
 	using namespace boost::python;
-	tuple t_pos = make_tuple( make_tuple( npos.x, npos.y, npos.z));
+	tuple t_pos = make_tuple( npos.x, npos.y, npos.z);
 	set_pos( array(t_pos));
 }
 
@@ -585,7 +586,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 	double (*spos)[3] = NULL;
 	double (*tcolor)[3] = NULL;
 
-	if (scene.gcf != 1.0 or (scene.gcfvec[0] != scene.gcfvec[1])) {
+	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
 		// Must scale the pos data.
 		spos = new double[end-begin][3];
 		const double* pos_i = index( pos, begin);
@@ -890,7 +891,7 @@ curve::gl_render( const view& scene)
 		// if the checksum has been constant for some predetermined number of
 		// rendering cycles.
 		long check = checksum( begin, begin+size);
-		if (check == c->checksum and not scene.gcf_changed) {
+		if (check == c->checksum && !scene.gcf_changed) {
 			c->gl_cache.gl_render();
 		}
 		else {
