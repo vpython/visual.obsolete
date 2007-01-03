@@ -6,13 +6,13 @@
 #include "renderable.hpp"
 
 namespace cvisual {
-	
-view::view( const vector& n_forward, vector& n_center, float& n_width, 
-	float& n_height, bool n_forward_changed, 
+
+view::view( const vector& n_forward, vector& n_center, float& n_width,
+	float& n_height, bool n_forward_changed,
 	double& n_gcf, vector& n_gcfvec,
 	bool n_gcf_changed)
-	: forward( n_forward), center(n_center), window_width( n_width), 
-	window_height( n_height), forward_changed( n_forward_changed), 
+	: forward( n_forward), center(n_center), window_width( n_width),
+	window_height( n_height), forward_changed( n_forward_changed),
 	gcf( n_gcf), gcfvec( n_gcfvec), gcf_changed( n_gcf_changed), lod_adjust(0),
 	anaglyph(false), coloranaglyph(false), tan_hfov_x(0), tan_hfov_y(0),
 	screen_objects( z_comparator( forward))
@@ -46,7 +46,7 @@ double
 view::pixel_coverage( const vector& pos, double radius) const
 {
 	// The distance from the camera to this position, in the direction of the
-	// camera.  This is the distance to the viewing plane that the coverage 
+	// camera.  This is the distance to the viewing plane that the coverage
 	// circle lies in.
 	double dist = (pos - camera).dot(forward);
 	// Half of the width of the viewing plane at this distance.
@@ -55,11 +55,11 @@ view::pixel_coverage( const vector& pos, double radius) const
 	double coverage_fraction = radius / apparent_hwidth;
 	// Convert from fraction to pixels.
 	return coverage_fraction * window_width;
-	
+
 }
 
 renderable::renderable()
-	: model_damaged(true), z_damaged(true), visible(true), lit(true), 
+	: model_damaged(true), z_damaged(true), visible(true), lit(true),
 		shininess(0.0)
 {
 }
@@ -93,7 +93,7 @@ renderable::grow_extent( extent&)
 
 // A function that must be overridden if an object wants to cache its state
 // for rendering optimization.
-void 
+void
 renderable::update_cache(const view&)
 {
 	return;
@@ -106,7 +106,7 @@ renderable::update_z_sort( const view&)
 	return;
 }
 
-void 
+void
 renderable::refresh_cache(const view& geometry)
 {
 	if (color.opacity != 1.0 && (z_damaged || geometry.forward_changed)) {
@@ -179,11 +179,15 @@ renderable::lighting_prepare( void)
 void
 renderable::shiny_prepare( void)
 {
+
 	if (shiny()) {
+
 		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
 		glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 		int gl_shininess = std::min( 127, static_cast<int>(shininess * 128));
-		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( .8, .8, .8).red);
+		//AS changes to &color.red from &rgba(.8,.8,.8).red
+
+		glMaterialfv( GL_FRONT, GL_SPECULAR, &color.red);
 		glMateriali( GL_FRONT, GL_SHININESS, gl_shininess);
 	}
 }
@@ -194,7 +198,9 @@ renderable::shiny_complete( void)
 	if (shiny()) {
 		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
 		glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
-		glMaterialfv( GL_FRONT, GL_SPECULAR, &rgba( 0, 0, 0).red);
+		//AS changes to &color.red from &rgba(.8,.8,.8).red
+
+		glMaterialfv( GL_FRONT, GL_SPECULAR, &color.red);
 	}
 }
 

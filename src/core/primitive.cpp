@@ -8,7 +8,11 @@
 
 #include <typeinfo>
 #include <cmath>
+
+#ifndef _MSC_VER
 #include <cxxabi.h>
+#endif
+
 #include <sstream>
 
 namespace cvisual {

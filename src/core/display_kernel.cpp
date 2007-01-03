@@ -8,8 +8,11 @@
 #include "util/tmatrix.hpp"
 #include "util/gl_enable.hpp"
 #include "frame.hpp"
-#include "text.hpp"
-
+#if defined _WIN32
+#include "win32/text.hpp"
+#else
+#include "gtk2/text.hpp"
+#endif
 #include "wrap_gl.hpp"
 
 #include <cassert>
@@ -28,7 +31,7 @@ std::string display_kernel::vendor;
 std::string display_kernel::version;
 std::string display_kernel::renderer;
 
-void 
+void
 display_kernel::enable_lights()
 {
 	glEnable( GL_LIGHTING);
@@ -42,7 +45,7 @@ display_kernel::enable_lights()
 		GL_LIGHT4,
 		GL_LIGHT5,
 		GL_LIGHT6,
-		GL_LIGHT7		
+		GL_LIGHT7
 	};
 	GLenum* light_id = light_ids;
 	GLenum* light_end = light_id + 8;
@@ -66,7 +69,7 @@ display_kernel::disable_lights()
 		GL_LIGHT4,
 		GL_LIGHT5,
 		GL_LIGHT6,
-		GL_LIGHT7		
+		GL_LIGHT7
 	};
 	GLenum* light_id = light_ids;
 	GLenum* light_end = light_id + 8;
@@ -78,10 +81,10 @@ display_kernel::disable_lights()
 	}
 	glDisable( GL_LIGHTING);
 	check_gl_error();
-}	
+}
 
 
-void 
+void
 display_kernel::add_light( shared_ptr<light> n_light)
 {
 	lock L(mtx);
@@ -90,7 +93,7 @@ display_kernel::add_light( shared_ptr<light> n_light)
 	lights.push_back( n_light);
 }
 
-void 
+void
 display_kernel::remove_light( shared_ptr<light> old_light)
 {
 	lock L(mtx);
@@ -98,7 +101,7 @@ display_kernel::remove_light( shared_ptr<light> old_light)
 }
 
 // Compute the horizontal and vertial tangents of half the field-of-view.
-void 
+void
 display_kernel::tan_hfov( double* x, double* y)
 {
 	// tangent of half the field of view.
@@ -121,7 +124,7 @@ display_kernel::tan_hfov( double* x, double* y)
 vector
 display_kernel::calc_camera()
 {
-	return camera; 
+	return camera;
 	/* old scheme not necessary?
 	double tan_hfov_x = 0.0;
 	double tan_hfov_y = 0.0;
@@ -171,41 +174,41 @@ void
 display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 {
 	// This stuff handles automatic movement of the camera in responce to user
-	// input.  See also view_to_world_transform for how the affected variables 
+	// input.  See also view_to_world_transform for how the affected variables
 	// are used to actually position the camera.
-	
+
 	// Scaling conventions:
-	// the full width of the widget rotates the scene horizontally by 120 
+	// the full width of the widget rotates the scene horizontally by 120
 	//     degrees.
-	// the full height of the widget rotates the scene vertically by 120 
+	// the full height of the widget rotates the scene vertically by 120
 	//     degrees.
 	// the full height of the widget zooms the scene by a factor of 10
-	
+
 	// Panning conventions:
-	// The full height or width of the widget pans the scene by the eye 
+	// The full height or width of the widget pans the scene by the eye
 	//     distance.
-	
+
 	// Locking:
 	// center and forward are already synchronized.  The only variable that
 	// remains to be synchronized is user_scale.
-	
-	// The vertical and horizontal fractions of the window's height that the 
+
+	// The vertical and horizontal fractions of the window's height that the
 	// mouse has traveled for this event.
 	// TODO: Implement ZOOM_ROLL modes.
 	float vfrac = dy / window_height;
-	float hfrac = dx 
+	float hfrac = dx
 		/ ((stereo_mode == PASSIVE_STEREO) ? (window_width*0.5) : window_width);
-	
+
 	// The amount by which the scene should be shifted in response to panning
 	// motion.
-	// TODO: Keep this synchronized with the eye_dist calc in 
+	// TODO: Keep this synchronized with the eye_dist calc in
 	// world_view_transform
 	double tan_hfov_x = 0.0;
 	double tan_hfov_y = 0.0;
 	tan_hfov( &tan_hfov_x, &tan_hfov_y);
-	double pan_rate = (center - calc_camera()).mag() 
+	double pan_rate = (center - calc_camera()).mag()
 		* std::min( tan_hfov_x, tan_hfov_y);
-	
+
 	switch (button) {
 		case NONE: case LEFT:
 			break;
@@ -250,7 +253,7 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 						// First perform the rotation about the up vector.
 						tmatrix R = rotation( -hfrac * 2.0, up.norm());
 						forward = R * forward;
-						
+
 						// Then perform rotation about an axis orthogonal to up and
 						// forward.
 						double vertical_angle = vfrac * 2.0;
@@ -290,20 +293,20 @@ display_kernel::report_realize()
 		VPYTHON_NOTE( "Querying the list of OpenGL extensions.");
 		extensions.reset( new set<string>());
 		istringstream strm( string( (const char*)(glGetString( GL_EXTENSIONS))));
-		copy( istream_iterator<string>(strm), istream_iterator<string>(), 
+		copy( istream_iterator<string>(strm), istream_iterator<string>(),
 			inserter( *extensions, extensions->begin()));
-			
+
 		vendor = std::string((const char*)glGetString(GL_VENDOR));
 		version = std::string((const char*)glGetString(GL_VERSION));
 		renderer = std::string((const char*)glGetString(GL_RENDERER));
 	}
-	
-	// Those features of OpenGL that are always used are set up here.	
+
+	// Those features of OpenGL that are always used are set up here.
 	// Depth buffer properties
 	glClearDepth( 1.0);
 	glEnable( GL_DEPTH_TEST);
 	glDepthFunc( GL_LEQUAL);
-	
+
 	// Lighting model properties
 	glShadeModel( GL_SMOOTH);
 	// TODO: Figure out what the concrete costs/benefits of these commands are.
@@ -318,14 +321,14 @@ display_kernel::report_realize()
 	// ever.
 	glEnable( GL_ALPHA_TEST);
 	glAlphaFunc( GL_GREATER, 0.0);
-	
+
 	// FSAA.  Doesn't seem to have much of an effect on my TNT2 card.  Grrr.
 	if (extensions->find( "GL_ARB_multisample") != extensions->end()) {
 		glEnable( GL_MULTISAMPLE_ARB);
 		int n_samples, n_buffers;
 		glGetIntegerv( GL_SAMPLES_ARB, &n_samples);
 		glGetIntegerv( GL_SAMPLE_BUFFERS_ARB, &n_buffers);
-		VPYTHON_NOTE( "Using GL_ARB_multisample extension: samples:" 
+		VPYTHON_NOTE( "Using GL_ARB_multisample extension: samples:"
 			+ boost::lexical_cast<std::string>(n_samples)
 			+ " buffers: " + boost::lexical_cast<std::string>(n_buffers));
 	}
@@ -362,18 +365,18 @@ display_kernel::world_to_view_transform(
 	// is determined by the total extent of the scene (render_surface::world_scale).
 	// The second applies the scaling factor applied to the object coordinates
 	// by multiplying the camera distance by gcf.  The third is the interactive
-	// scaling factor (render_surface::user_scale), initialized to 1.0, and 
+	// scaling factor (render_surface::user_scale), initialized to 1.0, and
 	// changed by dragging the mouse middle button across the viewing area up/down.
 	// Finally, the product of those scaling factors approximates the maximum
 	// apparent width of the scene in the display, it is divided by tan(fov/2)
 	// to correctly determine the distance from the center that encompasses the
 	// calculated width.  This algorithm is stable for objects up to about
-	// 1e+/-150, whereas vpython's original algorithm was stable to a range of 
+	// 1e+/-150, whereas vpython's original algorithm was stable to a range of
 	// about 1e-38 - 1e45, which was deemed acceptable before.
-	
+
 	// See http://www.stereographics.com/support/developers/pcsdk.htm for a
 	// discussion regarding the design basis for the frustum offset code.
-	
+
 	vector scene_center = center.scale(gcfvec);
 	vector scene_up = up.norm();
     vector scene_forward = forward.norm();
@@ -389,10 +392,10 @@ display_kernel::world_to_view_transform(
 		cot_hfov = 1.0 /tan_hfov_x;
 	else
 		cot_hfov = 1.0 / std::max(tan_hfov_x, tan_hfov_y);
-	
+
 	// gcf chosen so gcf*world -> scene fits in a 2 by 2 by 2 cube.
 	// scene_camera  is theposition used in gluLookAt to observe this cube.
-	
+
 	double nearest, farthest; // nearest and farthest points relative to <0,0,0> when projected onto forward
 	world_extent.near_and_far(forward, nearest, farthest);
 	nearest *= gcfvec[0];
@@ -405,20 +408,20 @@ display_kernel::world_to_view_transform(
 	double farclip = (scene_center-scene_camera).mag()+1.1*farthest-scene_center.dot(scene_forward);
 	if (farclip <= nearclip) // if camera is beyond the objects, facing away from them
 		farclip = (scene_center-scene_camera).mag()-0.9*nearest+scene_center.dot(scene_forward);
-	
+
 	// The true camera position, in world space.
 	camera = scene_camera/gcf;
 
 	// The true distance between the camera and the visual center of the scene,
 	// in scaled world space.
 	double eye_length = (center-camera).mag() * gcf;
-    
+
 	// Translate camera left/right 2% of the viewable width of the scene at
 	// the distance of its center.
 	double camera_stereo_offset = tan_hfov_x * eye_length * 0.02;
 	// TODO: This should be doable with a simple glTranslated() call, but I haven't
 	// found the magic formula for it.
-	vector camera_stereo_delta = camera_stereo_offset 
+	vector camera_stereo_delta = camera_stereo_offset
 		* up.cross( scene_camera).norm() * whicheye;
 	scene_camera += camera_stereo_delta;
 	scene_center += camera_stereo_delta;
@@ -428,7 +431,7 @@ display_kernel::world_to_view_transform(
 	// The distance from the camera to the zero-parallax plane.
 	double focallength = eye_length * stereodepth;
 	// The amount to translate the frustum to the left and right.
-	double frustum_stereo_offset = camera_stereo_offset * nearclip 
+	double frustum_stereo_offset = camera_stereo_offset * nearclip
 		/ focallength * whicheye;
 
 	// Finally, the OpenGL transforms based on the geometry just calculated.
@@ -447,12 +450,12 @@ display_kernel::world_to_view_transform(
 	glGetIntegerv( GL_MAX_MODELVIEW_STACK_DEPTH, &max_mv_stack_depth);
 	glGetIntegerv( GL_PROJECTION_STACK_DEPTH, &proj_stack_depth);
 	glGetIntegerv( GL_MODELVIEW_STACK_DEPTH, &mv_stack_depth);
-	std::cerr << "scene_geometry: camera:" << scene_camera 
+	std::cerr << "scene_geometry: camera:" << scene_camera
         << " true camera:" << camera
 		<< " center:" << scene_center << " true center:" << center
 		<< " forward:" << scene_forward << " true forward:" << forward
-		<< " up:" << scene_up << " range:" << range 
-		<< " gcf:" << gcf << " nearclip:" << nearclip 
+		<< " up:" << scene_up << " range:" << range
+		<< " gcf:" << gcf << " nearclip:" << nearclip
 		<< " farclip:" << farclip << " farthest:" << farthest << " user_scale:" << user_scale
         << " cot_hfov:" << cot_hfov << " tan_hfov_x:" << tan_hfov_x
         << " tan_hfov_y: " << tan_hfov_y
@@ -462,8 +465,8 @@ display_kernel::world_to_view_transform(
 	world_extent.dump_extent();
 	std::cerr << std::endl;
 	#endif
-	
-	gluLookAt( 
+
+	gluLookAt(
 		scene_camera.x, scene_camera.y, scene_camera.z,
 		scene_center.x, scene_center.y, scene_center.z,
 		scene_up.x, scene_up.y, scene_up.z);
@@ -480,17 +483,17 @@ display_kernel::world_to_view_transform(
 	else if (whicheye == 0) {
 		frustum_stereo_offset = 0;
 	}
-	glFrustum( 
+	glFrustum(
 		-nearclip * tan_hfov_x + frustum_stereo_offset,
 		nearclip * tan_hfov_x + frustum_stereo_offset,
-		-nearclip * tan_hfov_y, 
+		-nearclip * tan_hfov_y,
 		nearclip * tan_hfov_y,
 		nearclip,
 		farclip );
-	
+
 	glMatrixMode( GL_MODELVIEW);
 	check_gl_error();
-	
+
 	// Finish initializing the view object.
 	if (1) {  // (uniform && range.x == range.y && range.x == range.z) {
 		geometry.camera = camera;
@@ -525,7 +528,7 @@ display_kernel::recalc_extent(void)
 		// Move the camera to accomodate the new center of the scene
         // assert( mtx.locked()); // TODO: Implement this feature.
 		center.assign_locked( world_extent.center());
-	}	
+	}
 	if (autoscale) {
 		// Compute range such that the three axes, centered at center,
 		// will contain the entire scene.
@@ -551,18 +554,18 @@ display_kernel::recalc_extent(void)
 		gcfvec = vector(gcf,gcf,gcf);
 		gcf_changed = true;
 	}
-		
+
 	if (!uniform) {
 		gcf_changed = true;
 		double width = (stereo_mode == PASSIVE_STEREO)
 			? window_width*0.5 : window_width;
 		gcfvec = vector(1.0/range.x, (window_height/width)/range.y, 0.1/range.z);
 	}
-			
+
 	lastgcf = newgcf;
 }
 
-void 
+void
 display_kernel::add_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
@@ -572,8 +575,8 @@ display_kernel::add_renderable( shared_ptr<renderable> obj)
 	else
 		layer_world_transparent.push_back( obj);
 }
-	
-void 
+
+void
 display_kernel::remove_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
@@ -589,12 +592,12 @@ display_kernel::remove_renderable( shared_ptr<renderable> obj)
 }
 
 bool
-display_kernel::draw( 
+display_kernel::draw(
 	view& scene_geometry, int whicheye, bool anaglyph, bool coloranaglyph)
 {
 	// Set up the base modelview and projection matricies
 	world_to_view_transform( scene_geometry, whicheye);
-	
+
 	// Render all opaque objects in the world space layer
 	enable_lights();
 	world_iterator i( layer_world.begin());
@@ -626,13 +629,13 @@ display_kernel::draw(
 			i->color = actual_color;
 		++i;
 	}
-	
+
 	// Perform a depth sort of the transparent world from back to front.
 	if (layer_world_transparent.size() > 1)
-		std::stable_sort( 
+		std::stable_sort(
 			layer_world_transparent.begin(), layer_world_transparent.end(),
 			z_comparator( forward.norm()));
-	
+
 	// Render translucent objects in world space.
 	world_trans_iterator j( layer_world_transparent.begin());
 	world_trans_iterator j_end( layer_world_transparent.end());
@@ -653,7 +656,7 @@ display_kernel::draw(
 			j->color = actual_color;
 		++j;
 	}
-	
+
 	// Render all objects in screen space.
 	disable_lights();
 	gl_disable depth_test( GL_DEPTH_TEST);
@@ -666,7 +669,7 @@ display_kernel::draw(
 		++k;
 	}
 	scene_geometry.screen_objects.clear();
-	
+
 	return true;
 }
 
@@ -679,7 +682,7 @@ display_kernel::render_scene(void)
 	try {
 		fps.start();
 		recalc_extent();
-		view scene_geometry( forward.norm(), center, window_width, 
+		view scene_geometry( forward.norm(), center, window_width,
 			window_height, forward_changed, gcf, gcfvec, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
 		gl_begin();
@@ -690,7 +693,7 @@ display_kernel::render_scene(void)
 			case NO_STEREO:
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
-				glViewport( 0, 0, static_cast<int>(window_width), 
+				glViewport( 0, 0, static_cast<int>(window_width),
 					static_cast<int>(window_height));
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				draw(scene_geometry, 0);
@@ -698,7 +701,7 @@ display_kernel::render_scene(void)
 			case ACTIVE_STEREO:
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
-				glViewport( 0, 0, static_cast<int>(window_width), 
+				glViewport( 0, 0, static_cast<int>(window_width),
 					static_cast<int>(window_height));
 				glDrawBuffer( GL_BACK_LEFT);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -712,7 +715,7 @@ display_kernel::render_scene(void)
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = false;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, static_cast<int>(window_width), 
+				glViewport( 0, 0, static_cast<int>(window_width),
 					static_cast<int>(window_height));
 				glColorMask( GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, false);
@@ -728,7 +731,7 @@ display_kernel::render_scene(void)
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, static_cast<int>(window_width), 
+				glViewport( 0, 0, static_cast<int>(window_width),
 					static_cast<int>(window_height));
 				glColorMask( GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, true);
@@ -744,7 +747,7 @@ display_kernel::render_scene(void)
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, static_cast<int>(window_width), 
+				glViewport( 0, 0, static_cast<int>(window_width),
 					static_cast<int>(window_height));
 				glColorMask( GL_TRUE, GL_TRUE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, true);
@@ -760,7 +763,7 @@ display_kernel::render_scene(void)
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, static_cast<int>(window_width), 
+				glViewport( 0, 0, static_cast<int>(window_width),
 					static_cast<int>(window_height));
 				glColorMask( GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, true);
@@ -783,7 +786,7 @@ display_kernel::render_scene(void)
 					static_cast<int>(window_height));
 				draw( scene_geometry, -1);
 				// Right eye
-				glViewport( stereo_width+1, 0, stereo_width, 
+				glViewport( stereo_width+1, 0, stereo_width,
 					static_cast<int>(window_height));
 				draw( scene_geometry, 1);
 				break;
@@ -794,7 +797,7 @@ display_kernel::render_scene(void)
 			fps_msg << "Cycle time: ";
 			fps_msg.precision(4);
 			fps_msg << fps.read();
-			glColor3f( 
+			glColor3f(
 				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 
 			glMatrixMode( GL_PROJECTION);
@@ -804,8 +807,8 @@ display_kernel::render_scene(void)
 			glMatrixMode( GL_MODELVIEW);
 			glPushMatrix();
 			glLoadIdentity();
-			
-			{ 
+
+			{
 				gl_disable depth_test(GL_DEPTH_TEST);
 				boost::shared_ptr<font> default_font = font::find_font();
 				boost::shared_ptr<layout> lay_out = default_font->lay_out( fps_msg.str());
@@ -818,14 +821,14 @@ display_kernel::render_scene(void)
 			glMatrixMode( GL_MODELVIEW);
 		}
 
-		
+
 		// Cleanup
 		gl_swap_buffers();
 		check_gl_error();
 		gl_end();
 		fps.stop();
 		cycles_since_extent++;
-		//gcf_changed = false;
+		gcf_changed = false;
 		forward_changed = false;
 	}
 	catch (gl_error e) {
@@ -841,7 +844,7 @@ boost::tuple< shared_ptr<renderable>, vector, vector>
 display_kernel::pick( float x, float y, float d_pixels)
 {
 	using boost::scoped_array;
-	
+
 	lock L(mtx);
 	shared_ptr<renderable> best_pick;
     vector pickpos;
@@ -851,24 +854,24 @@ display_kernel::pick( float x, float y, float d_pixels)
 		clear_gl_error();
 		// Notes:
 		// culled polygons don't count.  glRasterPos() does count.
-	
+
 		// Allocate a selection buffer of uints.  Format for returned hits is:
 		// {uint32: n_names}{uint32: minimunm depth}{uint32: maximum depth}
 		// {unit32[n_names]: name_stack}
 		// n_names is the depth of the name stack at the time of the hit.
-		// minimum and maximum depth are the minimum and maximum values in the 
+		// minimum and maximum depth are the minimum and maximum values in the
 		// depth buffer scaled between 0 and 2^32-1. (source is [0,1])
 		// name_stack is the full contents of the name stack at the time of the
 		// hit.
-		
+
 		size_t hit_buffer_size = std::max(
 				(layer_world.size()+layer_world_transparent.size())*4,
 				world_extent.get_select_buffer_depth());
 		// Allocate an exception-safe buffer for the GL to talk back to us.
-		scoped_array<unsigned int> hit_buffer( 
+		scoped_array<unsigned int> hit_buffer(
 			new unsigned int[hit_buffer_size]);
 		// unsigned int hit_buffer[hit_buffer_size];
-		
+
 		// Allocate a std::vector<shared_ptr<renderable> > to lookup names
 		// as they are rendered.
 		std::vector<shared_ptr<renderable> > name_table;
@@ -881,19 +884,19 @@ display_kernel::pick( float x, float y, float d_pixels)
 		// stack with glPushName() exactly once.
 		glInitNames();
 		glPushName(0);
-		
+
 		// Initialize the picking matrix.
-		int viewport_bounds[4] = { 
+		int viewport_bounds[4] = {
 			0, 0, static_cast<int>(window_width), static_cast<int>(window_height)
 		};
 		glMatrixMode( GL_PROJECTION);
 		glLoadIdentity();
 		gluPickMatrix( x, window_height - y, d_pixels, d_pixels, viewport_bounds);
-		view scene_geometry( forward.norm(), center, window_width, window_height, 
+		view scene_geometry( forward.norm(), center, window_width, window_height,
 			forward_changed, gcf, gcfvec, gcf_changed);
 		scene_geometry.lod_adjust = lod_adjust;
 		world_to_view_transform( scene_geometry, 0, true);
-	
+
 		// Iterate across the world, rendering each body for picking.
 		std::list<shared_ptr<renderable> >::iterator i = layer_world.begin();
 		std::list<shared_ptr<renderable> >::iterator i_end = layer_world.end();
@@ -906,9 +909,9 @@ display_kernel::pick( float x, float y, float d_pixels)
 			}
 			++i;
 		}
-		std::vector<shared_ptr<renderable> >::iterator j 
+		std::vector<shared_ptr<renderable> >::iterator j
 			= layer_world_transparent.begin();
-		std::vector<shared_ptr<renderable> >::iterator j_end 
+		std::vector<shared_ptr<renderable> >::iterator j_end
 			= layer_world_transparent.end();
 		while (j != j_end) {
 			glLoadName( name_table.size());
@@ -921,12 +924,12 @@ display_kernel::pick( float x, float y, float d_pixels)
 		}
 		// Return the name stack to the bottom with glPopName() exactly once.
 		glPopName();
-	
+
 		// Exit selection mode, return to normal rendering rendering. (collects
 		// the number of hits at this time).
 		size_t n_hits = glRenderMode( GL_RENDER);
 		check_gl_error();
-		
+
 		// Lookup the name to get the shared_ptr<renderable> associated with it.
 		// The farthest point away in the depth buffer.
 		double best_pick_depth = 1.0;
@@ -936,7 +939,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 			unsigned int n_names = hit_record[0];
 			if (hit_record + 3 + n_names > hit_buffer_end)
 				break;
-			double min_hit_depth = static_cast<double>(hit_record[1]) 
+			double min_hit_depth = static_cast<double>(hit_record[1])
 				/ 0xffffffffu;
 			if (min_hit_depth < best_pick_depth) {
 				best_pick_depth = min_hit_depth;
@@ -953,15 +956,15 @@ display_kernel::pick( float x, float y, float d_pixels)
 			n_hits--;
 		}
 		if (hit_record > hit_buffer_end)
-			VPYTHON_CRITICAL_ERROR( 
+			VPYTHON_CRITICAL_ERROR(
 				"More objects were picked than could be reported by the GL."
 				"  The hit buffer size was too small.");
-        
+
         tmatrix modelview;
         modelview.gl_modelview_get();
         tmatrix projection;
         projection.gl_projection_get();
-        gluUnProject( 
+        gluUnProject(
             x, window_height - y, best_pick_depth,
             modelview.matrix_addr(),
             projection.matrix_addr(),
@@ -975,7 +978,7 @@ display_kernel::pick( float x, float y, float d_pixels)
             projection.matrix_addr(),
             viewport_bounds,
             &center.x, &center.y, &center.z);
-        	
+
         gluUnProject(
         	x, window_height - y, center.z,
         	modelview.matrix_addr(),
@@ -1004,7 +1007,7 @@ display_kernel::gl_free()
 		check_gl_error();
 	}
 	catch (gl_error& error) {
-		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: " 
+		VPYTHON_CRITICAL_ERROR( "Caught OpenGL error during shutdown: "
 			+ std::string(error.what())
 			+ "; Continuing with the shutdown.");
 	}
@@ -1012,27 +1015,27 @@ display_kernel::gl_free()
 	VPYTHON_NOTE( "GL resource release complete");
 }
 
-void 
+void
 display_kernel::allow_spin(bool b)
 {
 	lock L(mtx);
 	spin_allowed = b;
 }
 
-bool 
+bool
 display_kernel::spin_is_allowed(void) const
 {
 	return spin_allowed;
 }
-	
-void 
+
+void
 display_kernel::allow_zoom(bool b)
 {
 	lock L(mtx);
 	zoom_allowed = b;
 }
 
-bool 
+bool
 display_kernel::zoom_is_allowed(void) const
 {
 	return zoom_allowed;
@@ -1069,7 +1072,7 @@ void
 display_kernel::set_scale( const vector& n_scale)
 {
 	if (n_scale.x == 0.0 || n_scale.y == 0.0 || n_scale.z == 0.0)
-		throw std::invalid_argument( 
+		throw std::invalid_argument(
 			"The scale of each axis must be non-zero.");
 
 	vector n_range = vector( 1.0/n_scale.x, 1.0/n_scale.y, 1.0/n_scale.z);
@@ -1116,14 +1119,29 @@ display_kernel::get_fov()
 	return fov;
 }
 
-void 
+void
+display_kernel::set_lod(int n_lod)
+{
+  if (n_lod > 0 || n_lod < -6 )
+		throw std::invalid_argument(
+		       "attribute visual.display.lod must be between -6 and 0");
+  lod_adjust = n_lod;
+}
+
+int
+display_kernel::get_lod()
+{
+	return lod_adjust;
+}
+
+void
 display_kernel::set_uniform( bool n_uniform)
 {
 	lock L(mtx);
 	uniform = n_uniform;
 }
 
-bool 
+bool
 display_kernel::is_uniform()
 {
 	return uniform;
@@ -1194,7 +1212,7 @@ display_kernel::set_show_renderspeed( bool show)
 bool
 display_kernel::is_showing_renderspeed()
 {
-	return show_renderspeed;	
+	return show_renderspeed;
 }
 
 double
@@ -1204,29 +1222,29 @@ display_kernel::get_renderspeed()
 	return fps.read();
 }
 
-void 
+void
 display_kernel::set_range_d( double r)
 {
 	if (r == 0.0)
-		throw std::invalid_argument( 
+		throw std::invalid_argument(
 			"attribute visual.display.range may not be zero.");
 	lock L(mtx);
 	autoscale = false;
 	range = vector( r, r, r);
 }
 
-void 
+void
 display_kernel::set_range( const vector& n_range)
 {
 	if (n_range.x == 0.0 || n_range.y == 0.0 || n_range.z == 0.0)
-		throw std::invalid_argument( 
+		throw std::invalid_argument(
 			"attribute visual.display.range may not be zero.");
 	lock L(mtx);
 	autoscale = false;
 	range = n_range;
 }
 
-vector 
+vector
 display_kernel::get_range()
 {
 	lock L(mtx);
@@ -1251,7 +1269,7 @@ display_kernel::set_stereomode( std::string mode)
 		stereo_mode = YELLOWBLUE_STEREO;
 	else if (mode == "greenmagenta")
 		stereo_mode = GREENMAGENTA_STEREO;
-	else 
+	else
 		throw std::invalid_argument( "Unimplemented or invalid stereo mode");
 }
 
@@ -1280,18 +1298,18 @@ display_kernel::get_stereomode()
 	}
 }
 
-std::list<shared_ptr<renderable> > 
+std::list<shared_ptr<renderable> >
 display_kernel::get_objects() const
 {
 	lock L(mtx);
 	std::list<shared_ptr<renderable> > ret = layer_world;
-	ret.insert( ret.end(), 
+	ret.insert( ret.end(),
 		layer_world_transparent.begin(), layer_world_transparent.end());
 	return ret;
 }
 
-std::string 
-display_kernel::info() 
+std::string
+display_kernel::info()
 {
 	lock L(mtx);
 	if (!extensions)
@@ -1303,10 +1321,10 @@ display_kernel::info()
 		  + "\n  Version: " + version
 		  + "\n  Renderer: " + renderer
 		  + "\n  Extensions: ";
-		
+
 		// this->extensions is a list of extensions
 		std::ostringstream buffer;
-		std::copy( extensions->begin(), extensions->end(), 
+		std::copy( extensions->begin(), extensions->end(),
 			std::ostream_iterator<std::string>( buffer, "\n"));
 		s += buffer.str();
 		return s;
