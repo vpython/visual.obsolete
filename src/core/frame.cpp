@@ -306,8 +306,8 @@ frame::update_z_sort( const view&)
 void
 frame::gl_render( const view& v)
 {
-	//view local( v, world_frame_transform()); // this seems irrelevant....??
-	view local = v;
+	view local( v, world_frame_transform()); // this seems irrelevant....??
+//	view local = v;
     tmatrix fwt = frame_world_transform(v.gcf);
     model_damage();
 	{
@@ -364,7 +364,7 @@ frame::gl_render( const view& v)
 	typedef std::multimap<vector, displaylist, z_comparator>::iterator screen_iterator;
 	screen_iterator i( local.screen_objects.begin());
 	screen_iterator i_end( local.screen_objects.end());
-    v.screen_objects.clear(); 
+  //  v.screen_objects.clear(); 
 	while (i != i_end) {
 		v.screen_objects.insert( std::make_pair( fwt*i->first, i->second));
 		++i;
