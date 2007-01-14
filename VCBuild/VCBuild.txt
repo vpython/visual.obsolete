@@ -1,0 +1,52 @@
+Building vpython with from Visual Studio C++ 		
+	
+	a)Vpython cvs
+	        Check-out the vpython-core2 module from
+		:pserver:anonymous@visualpython.cvs.sourceforge.net:/cvsroot/visualpython
+	b)Python25	
+		Install Python 2.5.x via the Windows Installer at http://www.python.org/download/.
+	c)Boost libraries	
+		EITHER:
+			Install the Boost libraries via the Windows installer @
+			http://sourceforge.net/project/showfiles.php?group_id=7586&package_id=8041
+		        
+		        Rename root directory to "boost"  (e.g "C:\boost_1_33_1" becomes "c:\boost"
+		OR:
+                	Check-out the Boost cvs at
+                	
+                	:pserver:anonymous@boost.cvs.sourceforge.net:/cvsroot/boost
+                	
+                	to root drive, so that e.g. "c:\boost" is the root directory for the libaries.
+        
+        d) Download the source for libsigc++-2.0.17 from http://ftp.gnome.org/pub/GNOME/sources/libsigc++/2.0/.
+           Extract to root directory, so that .e.g "C:\libsigc++-2.0.17" is the root directory for the
+           library
+        
+        
+        e)Install Visual C++ 2005 Express Edition and platform SDK as per the instructions at
+        	http://msdn.microsoft.com/vstudio/express/visualc/download/
+        	
+        f)Build extension and dynamic link libraries
+             If using boost_1_33_1 (as opposed to the cvs veriosn) replace compressed_pair.hpp
+             header (now at /boost/boost/detail) with the cvs version of the header provided
+             with in the PCBuild directory of vython-core2
+             See:.
+             	http://thread.gmane.org/gmane.comp.python.c++/10728/focus=10728
+        
+             Open the cvisual.sln project file in Visual Studio Express, make Release the active 
+             configuration, and build
+         
+         g) Install
+		Copy
+		       cvisual.pyd    
+		       boost_thread.dll
+		       boost_python.dll
+		       sigc-2.0.dll
+		       
+	       to the site-packages/visual folder under the vpython-core2 directory
+	       
+	       Copy the  visual folder to /python25/lib/site-packages
+	       
+Issues/problems/questions to ajsiegel@optonline.com
+
+                    
