@@ -27,9 +27,9 @@ Building vpython with from Visual Studio C++
         	http://msdn.microsoft.com/vstudio/express/visualc/download/
         	
         f)Build extension and dynamic link libraries
-             If using boost_1_33_1 (as opposed to the cvs veriosn) replace compressed_pair.hpp
+             If using boost_1_33_1 (as opposed to the cvs version) replace compressed_pair.hpp
              header (now at /boost/boost/detail) with the cvs version of the header provided
-             with in the PCBuild directory of vython-core2
+             with in the VCBuild directory of vython-core2
              See:.
              	http://thread.gmane.org/gmane.comp.python.c++/10728/focus=10728
         
