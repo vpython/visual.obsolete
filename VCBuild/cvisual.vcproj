@@ -56,7 +56,7 @@
 				PrecompiledHeaderFile=".\debug-obj/vpython.pch"
 				AssemblerListingLocation=".\cvisual\debug-obj/"
 				ObjectFile=".\cvisual\debug-obj/"
-				ProgramDataBaseFileName=".\cvsiaul\debug-obj/"
+				ProgramDataBaseFileName=".\cvisaul\debug-obj/"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="1"

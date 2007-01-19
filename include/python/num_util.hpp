@@ -64,7 +64,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 #include <boost/python/numeric.hpp>
-#include <boost/python.hpp>
+#include <boost/python/extract.hpp>
 #include <numpy/arrayobject.h>
 //#include <iostream>
 //#include <sstream>

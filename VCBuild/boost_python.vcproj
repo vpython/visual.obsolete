@@ -218,67 +218,63 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\barrier.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\barrier.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\condition.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\condition.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\exceptions.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\exceptions.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\mutex.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\mutex.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\mutex.inl"
+				RelativePath="..\..\..\boost\libs\thread\src\once.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\once.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\read_write_mutex.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\read_write_mutex.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\recursive_mutex.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\recursive_mutex.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\thread.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\thread.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\timeconv.inl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\timeconv.inl"
+				RelativePath="..\..\..\boost\libs\thread\src\tss.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\tss.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\tss_dll.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\tss_dll.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\tss_hooks.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\tss_hooks.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\tss_null.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\tss_null.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\tss_pe.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\libs\thread\src\tss_pe.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Boost\libs\thread\src\xtime.cpp"
+				RelativePath="..\..\..\boost\libs\thread\src\xtime.cpp"
 				>
 			</File>
 		</Filter>
@@ -287,70 +283,70 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\Boost\boost\thread\barrier.hpp"
+				RelativePath="..\..\..\boost\boost\thread\barrier.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\condition.hpp"
+				RelativePath="..\..\..\boost\boost\thread\condition.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\exceptions.hpp"
+				RelativePath="..\..\..\boost\boost\thread\exceptions.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\mutex.hpp"
+				RelativePath="..\..\..\boost\boost\thread\mutex.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\once.hpp"
+				RelativePath="..\..\..\boost\boost\thread\once.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\read_write_mutex.hpp"
+				RelativePath="..\..\..\boost\boost\thread\read_write_mutex.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\recursive_mutex.hpp"
+				RelativePath="..\..\..\boost\boost\thread\recursive_mutex.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\thread.hpp"
+				RelativePath="..\..\..\boost\boost\thread\thread.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\tss.hpp"
+				RelativePath="..\..\..\boost\boost\thread\tss.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Boost\boost\thread\xtime.hpp"
+				RelativePath="..\..\..\boost\boost\thread\xtime.hpp"
 				>
 			</File>
 			<Filter
 				Name="detail"
 				>
 				<File
-					RelativePath="..\..\Boost\boost\thread\detail\config.hpp"
+					RelativePath="..\..\..\boost\boost\thread\detail\config.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Boost\boost\thread\detail\force_cast.hpp"
+					RelativePath="..\..\..\boost\boost\thread\detail\force_cast.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Boost\boost\thread\detail\lock.hpp"
+					RelativePath="..\..\..\boost\boost\thread\detail\lock.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Boost\boost\thread\detail\read_write_lock.hpp"
+					RelativePath="..\..\..\boost\boost\thread\detail\read_write_lock.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Boost\boost\thread\detail\singleton.hpp"
+					RelativePath="..\..\..\boost\boost\thread\detail\singleton.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\Boost\boost\thread\detail\tss_hooks.hpp"
+					RelativePath="..\..\..\boost\boost\thread\detail\tss_hooks.hpp"
 					>
 				</File>
 			</Filter>
