@@ -123,7 +123,7 @@ light::get_spot_cutoff()
 
 
 void
-light::set_attenuation( double constant, double linear, double quadratic)
+light::set_attenuation( float constant, float linear, float quadratic)
 {
 	if (!local)
 		throw std::invalid_argument( "Only local lights may be attenuated.");
@@ -175,9 +175,9 @@ light::gl_begin( GLenum id, double gcf) const
 
 	glEnable( id);
 	if (attenuated()) {
-		glLightf( id, GL_CONSTANT_ATTENUATION, constant_attenuation*gcf);
-		glLightf( id, GL_LINEAR_ATTENUATION, linear_attenuation*gcf);
-		glLightf( id, GL_QUADRATIC_ATTENUATION, quadratic_attenuation*gcf);
+		glLightf( id, GL_CONSTANT_ATTENUATION, (GLfloat) (constant_attenuation*gcf));
+		glLightf( id, GL_LINEAR_ATTENUATION, (GLfloat)(linear_attenuation*gcf));
+		glLightf( id, GL_QUADRATIC_ATTENUATION, (GLfloat)(quadratic_attenuation*gcf));
 	}
 	
 	glLightfv( id, GL_DIFFUSE, &diffuse.red);
@@ -187,7 +187,7 @@ light::gl_begin( GLenum id, double gcf) const
 	if (!local) {
 		_pos = _pos.norm();
 	}
-	float pos[] = { _pos.x*gcf, _pos.y*gcf, _pos.z*gcf, 
+	float pos[] = { (float) (_pos.x*gcf),(float) (_pos.y*gcf), (float) (_pos.z*gcf), 
 		local ? 1.0f : 0.0f
 	};
 	glLightfv( id, GL_POSITION, pos);
@@ -198,9 +198,9 @@ light::gl_begin( GLenum id, double gcf) const
 		if (spot_cutoff != 180) {
 			vector _spot_direction = spot_direction.norm();
 			float spot_dir[] = { 
-				_spot_direction.x * gcf,
-				_spot_direction.y * gcf,
-				_spot_direction.z * gcf,
+				(float) (_spot_direction.x * gcf),
+				(float)(_spot_direction.y * gcf),
+				(float)(_spot_direction.z * gcf),
 				1.0f
 			};
 			glLightfv( id, GL_SPOT_DIRECTION, spot_dir);

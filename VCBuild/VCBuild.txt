@@ -6,18 +6,12 @@ Building vpython with from Visual Studio C++
 	b)Python25	
 		Install Python 2.5.x via the Windows Installer at http://www.python.org/download/.
 	c)Boost libraries	
-		EITHER:
-			Install the Boost libraries via the Windows installer @
-			http://sourceforge.net/project/showfiles.php?group_id=7586&package_id=8041
+		
+		Install the Boost libraries via the Windows installer @
+		http://sourceforge.net/project/showfiles.php?group_id=7586&package_id=8041
 		        
-		        Rename root directory to "boost"  (e.g "C:\boost_1_33_1" becomes "c:\boost"
-		OR:
-                	Check-out the Boost cvs at
-                	
-                	:pserver:anonymous@boost.cvs.sourceforge.net:/cvsroot/boost
-                	
-                	to root drive, so that e.g. "c:\boost" is the root directory for the libaries.
-        
+		Rename root directory to "boost"  (e.g "C:\boost_1_33_1" becomes "c:\boost"
+	        
         d) Download the source for libsigc++-2.0.17 from http://ftp.gnome.org/pub/GNOME/sources/libsigc++/2.0/.
            Extract to root directory, so that .e.g "C:\libsigc++-2.0.17" is the root directory for the
            library

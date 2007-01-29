@@ -13,13 +13,13 @@ namespace cvisual {
 /** A helper class for texture coordinates. */
 struct tcoord
 {
-	float s;
-	float t;
-	inline tcoord( float s_ = 0, float t_ = 0) : s(s_), t(t_) {}
+	GLfloat s;
+	GLfloat t;
+	inline tcoord( GLfloat s_ = 0, GLfloat t_ = 0) : s(s_), t(t_) {}
 	inline explicit tcoord( const vector& v)
-	 : s(v.x), t(v.y) {}
+	 : s((GLfloat) v.x), t((GLfloat) v.y) {}
 	inline void gl_render() const
-	{ glTexCoord2f( s, t); }
+	{ glTexCoord2f( s,t); } 
 };
 
 /** A single triangular face whose corners are ordered counterclockwise in the

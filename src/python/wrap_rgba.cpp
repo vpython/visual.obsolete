@@ -163,9 +163,9 @@ void
 set_light_attenuation( light* This, py::object a)
 {
 	This->set_attenuation( 
-		py::extract<double>(a[0]),
-		py::extract<double>(a[1]),
-		py::extract<double>(a[2]));
+		py::extract<float>(a[0]),
+		py::extract<float>(a[1]),
+		py::extract<float>(a[2]));
 }
 
 py::tuple

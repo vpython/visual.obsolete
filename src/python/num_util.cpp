@@ -4,6 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include "python/num_util.hpp"
+#include <boost/python/extract.hpp>
 #include <cassert>
 
 #define PY_ARRAY_UNIQUE_SYMBOL visual_PyArrayHandle
@@ -47,7 +48,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 namespace {
-	const char* rcsid = "$Id: num_util.cpp,v 1.5 2006/11/25 04:52:01 bsherwood Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.6 2007/01/29 20:00:00 aj_siegel Exp $";
 }
 
   // Local function prototypes

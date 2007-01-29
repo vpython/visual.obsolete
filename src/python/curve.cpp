@@ -70,8 +70,8 @@ curve::curve()
 	int curve_around = sides;
 
 	for (int i=0; i<curve_around; i++) {
-		curve_sc[i]  = std::cos(i * 2 * M_PI / curve_around);
-		curve_sc[i+curve_around] = std::sin(i * 2 * M_PI / curve_around);
+		curve_sc[i]  = (float) std::cos(i * 2 * M_PI / curve_around);
+		curve_sc[i+curve_around] = (float) std::sin(i * 2 * M_PI / curve_around);
 	}
 
 	for (int i=0; i<128; i++) {
@@ -91,8 +91,8 @@ curve::curve( const curve& other)
 	int curve_around = sides;
 
 	for (int i=0; i<curve_around; i++) {
-		curve_sc[i]  = std::cos(i * 2 * M_PI / curve_around);
-		curve_sc[i+curve_around] = std::sin(i * 2 * M_PI / curve_around);
+		curve_sc[i]  = (float) std::cos(i * 2 * M_PI / curve_around);
+		curve_sc[i+curve_around] = (float) std::sin(i * 2 * M_PI / curve_around);
 	}
 
 	for (int i=0; i<128; i++) {
@@ -475,7 +475,7 @@ curve::monochrome( size_t begin, size_t end)
 	const double* color_i = index( color, begin);
 	const double* color_end = index( color, end);
 
-	rgb first_color( color_i[0], color_i[1], color_i[2]);
+	rgb first_color( (float) color_i[0], (float) color_i[1],(float) color_i[2]);
 	color_i += 3;
 
 	while (color_i < color_end) {
@@ -604,7 +604,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 	if (segment_monochrome) {
 		// We can get away without using a color array.
 		const double* c_i = index( color, begin);
-		rgb scolor( c_i[0], c_i[1], c_i[2]);
+		rgb scolor( (float) c_i[0], (float) c_i[1], (float) c_i[2]);
 		if (scene.anaglyph) {
 			if (scene.coloranaglyph)
 				scolor.desaturate().gl_set();
@@ -623,7 +623,7 @@ curve::thinline( const view& scene, size_t begin, size_t end)
 			const double* color_i = index( color, begin);
 			const double* color_end = index( color, end);
 			for (size_t i = 0; i < end-begin && color_i < color_end; ++i, color_i += 3) {
-				rgb scolor( color_i[0], color_i[1], color_i[2]);
+				rgb scolor( (float) color_i[0], (float) color_i[1],(float) color_i[2]);
 				if (scene.coloranaglyph)
 					scolor = scolor.desaturate();
 				else

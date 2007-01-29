@@ -26,7 +26,7 @@ label::label()
 	box_enabled(true),
 	line_enabled(true),
 	linecolor( color),
-	opacity(0.66),
+	opacity(0.66f),
 	text_changed(true)
 {
 }
@@ -115,7 +115,7 @@ label::get_color()
 }
 
 void
-label::set_red( double r)
+label::set_red( float r)
 {
 	lock L(mtx);
 	color.red = r;
@@ -128,7 +128,7 @@ label::get_red()
 }
 
 void
-label::set_green( double g)
+label::set_green( float g)
 {
 	lock L(mtx);
 	color.green = g;
@@ -141,7 +141,7 @@ label::get_green()
 }
 
 void
-label::set_blue( double b)
+label::set_blue( float b)
 {
 	lock L(mtx);
 	color.blue = b;
@@ -160,7 +160,7 @@ label::get_opacity()
 }
 
 void
-label::set_opacity( double o)
+label::set_opacity( float o)
 {
 	lock L(mtx);
 	opacity = o;

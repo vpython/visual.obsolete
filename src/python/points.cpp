@@ -30,8 +30,8 @@ index( const array& a, size_t i)
 	return ((double*)data(a)) + (i) * 3;
 }
 
-double gl_aliased_radius_range[2] = {-1, -1};
-double gl_smooth_radius_range[2] = {-1, -1};
+float gl_aliased_radius_range[2] = {-1, -1};
+float gl_smooth_radius_range[2] = {-1, -1};
 int world_scale_points_supported = -1;
 
 #if defined( _WIN32) || defined (_MSC_VER)
@@ -61,8 +61,8 @@ init_pointparam_extension(void)
 	else
 		world_scale_points_supported = 0;
 
-	glGetDoublev( GL_ALIASED_POINT_SIZE_RANGE, gl_aliased_radius_range);
-	glGetDoublev( GL_SMOOTH_POINT_SIZE_RANGE, gl_smooth_radius_range);
+	glGetFloatv( GL_ALIASED_POINT_SIZE_RANGE, gl_aliased_radius_range);
+	glGetFloatv( GL_SMOOTH_POINT_SIZE_RANGE, gl_smooth_radius_range);
 }
 
 } // !namespace (anon)
@@ -232,7 +232,7 @@ points::set_antialias( bool aa)
 }
 
 void
-points::set_size( double size)
+points::set_size( float size)
 {
 	lock L(mtx);
 	this->size = size;
@@ -688,7 +688,7 @@ points::gl_render( const view& scene)
 		// The size of the sphere at this distance from the camera
 		double scale = (center_screen - right_screen).mag() * scene.window_width * 0.5f;
 
-		float attenuation_eqn[] = { 0, 0, 1.0f/std::pow( (scale * dist), 2.0) };
+		float attenuation_eqn[] =  { 0, 0, 1.0f/std::pow( ((float) scale * (float)dist), 2.0f) };
 		glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);
 		glPointSize( size);
 	}
@@ -702,7 +702,7 @@ points::gl_render( const view& scene)
 			glPointSize( clamp( gl_smooth_radius_range[0], size, gl_smooth_radius_range[1]));
 		}
 		else {
-			glPointSize( clamp( gl_aliased_radius_range[0], size, gl_aliased_radius_range[1]));
+			glPointSize( clamp( gl_aliased_radius_range[0],  size, gl_aliased_radius_range[1]));
 		}
 	}
 	// Finish GL state prep

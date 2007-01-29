@@ -154,7 +154,7 @@ display_kernel::display_kernel()
 	mingcf(1e100),
 	lastgcf(1.0),
 	gcf_changed(false),
-	ambient( 0.2, 0.2, 0.2),
+	ambient( 0.2f, 0.2f, 0.2f),
 	fps( 3e-3), // Ambitiously initialize to 3 ms per cycle.
 	show_renderspeed( false),
 	background(0, 0, 0, 0), //< Transparent black.
@@ -197,7 +197,7 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 	// TODO: Implement ZOOM_ROLL modes.
 	float vfrac = dy / window_height;
 	float hfrac = dx
-		/ ((stereo_mode == PASSIVE_STEREO) ? (window_width*0.5) : window_width);
+		/ ((stereo_mode == PASSIVE_STEREO) ? (window_width*0.5f) : window_width);
 
 	// The amount by which the scene should be shifted in response to panning
 	// motion.
@@ -776,7 +776,7 @@ display_kernel::render_scene(void)
 				break;
 			case PASSIVE_STEREO: {
 				// Also handle viewport modifications.
-				scene_geometry.window_width = window_width * 0.5;
+				scene_geometry.window_width =  window_width * 0.5f;
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
 				int stereo_width = int(scene_geometry.window_width);

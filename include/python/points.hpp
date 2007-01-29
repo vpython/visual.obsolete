@@ -43,7 +43,7 @@ class points : public renderable
 	// True if points should be antialiased (drawn rounded)
 	bool antialias;
 	// The size of the points
-	double size;
+	float size;
 	
 	
 	bool degenerate() const;
@@ -68,8 +68,8 @@ class points : public renderable
 	void set_antialias( bool);
 	inline bool get_antialias( void) { return antialias; }
 	
-	void set_size( double r);
-	inline double get_size( void) { return size; }
+	void set_size( float r);
+	inline float get_size( void) { return size; }
 	
 	void set_size_type( const std::string& n_type);
 	std::string get_size_type( void);

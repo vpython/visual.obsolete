@@ -115,7 +115,7 @@ quadric::render_cylinder( double radius, double height, int slices, int stacks)
 }
 
 void 
-quadric::render_disk( double radius, int slices, int rings, int rotation)
+quadric::render_disk( double radius, int slices, int rings, GLfloat rotation)
 {
 	gl_matrix_stackguard guard;
 	glRotatef( 90, 0, rotation, 0);

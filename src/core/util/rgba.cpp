@@ -52,9 +52,9 @@ desaturate( const rgb& c)
 		if (c.red == cmax)
 			h = ( c.green - c.blue ) / delta;		// between yellow & magenta
 		else if (c.green == cmax)
-			h = 2.0 + ( c.blue - c.red ) / delta;	// between cyan & yellow
+			h = 2.0f + ( c.blue - c.red ) / delta;	// between cyan & yellow
 		else
-			h = 4.0 + ( c.red - c.green ) / delta;	// between magenta & cyan
+			h = 4.0f + ( c.red - c.green ) / delta;	// between magenta & cyan
 
 		if (h < 0.0)
 			h += 6.0;  // make it 0 <= h < 6
@@ -70,9 +70,9 @@ desaturate( const rgb& c)
 	else {
 		i = static_cast<int>( h);  // h represents sector 0 to 5
 		f = h - i;                 // fractional part of h
-		p = v * ( 1.0 - s );
-		q = v * ( 1.0 - s * f );
-		t = v * ( 1.0 - s * ( 1.0 - f ) );
+		p = v * ( 1.0f - s );
+		q = v * ( 1.0f - s * f );
+		t = v * ( 1.0f - s * ( 1.0f - f ) );
 
 		switch (i) {
 			case 0:
@@ -119,7 +119,7 @@ grayscale( const rgb& c)
 	const float black = std::pow( 0.299 * std::pow( c.red, GAMMA) 
 		+ 0.587* std::pow( c.green, GAMMA) 
 		+ 0.114* std::pow( c.blue, GAMMA)
-		, 1.0/GAMMA);
+		, 1.0f/GAMMA);
 	return rgb( black, black, black);
 }
 

@@ -38,16 +38,16 @@ class label : public renderable
 	void set_color( const rgba& n_color);
 	rgba get_color();
 
-	void set_red( double x);
+	void set_red( float x);
 	double get_red();
 
-	void set_green( double x);
+	void set_green( float x);
 	double get_green();
 
-	void set_blue( double x);
+	void set_blue( float x);
 	double get_blue();
 
-	void set_opacity( double);
+	void set_opacity( float);
 	double get_opacity();
 
 	void set_text( string_t t);
@@ -100,7 +100,7 @@ class label : public renderable
 
 	// bitmap_font* font;
 	rgba linecolor; ///< The color of the lines in the label. (color is for text)
-	double opacity; ///< The opacity of the background for the text.
+	float opacity; ///< The opacity of the background for the text.
 
 	// Text strings in python may be specified by the """ ... """ syntax in python.
 	// This case is handled by the layout code

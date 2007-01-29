@@ -92,6 +92,8 @@ class texture : public sigc::trackable
 	void gl_free();
 };
 
+
+
 #ifdef __GNUC__
 #define PURE __attribute__((pure))
 #else

@@ -5,7 +5,7 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-struct GLUquadric;
+class GLUquadric;
 
 namespace cvisual {
 
@@ -87,7 +87,7 @@ class quadric
 		@param rings The number of circumferential subdivisions for the disk.
 		@param rotation +1 for right end of cylinder, -1 for left end (or base of cone)
 	*/
-	void render_disk( double radius, int slices, int rings, int rotation);
+	void render_disk( double radius, int slices, int rings, GLfloat rotation);
 };
 
 } // !namespace cvisual

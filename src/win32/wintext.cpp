@@ -3,6 +3,7 @@
 #include "util/errors.hpp"
 #include "util/gl_free.hpp"
 #include "wrap_gl.hpp"
+#include "windows.h"
 
 #include <boost/lexical_cast.hpp>
 #include <sstream>
@@ -60,8 +61,8 @@ font::font( const std::string& desc, int size)
 	SelectObject( dev_context, font_handle);
 	TEXTMETRIC tm;
 	GetTextMetrics( dev_context, &tm);
-	ascent = tm.tmAscent;
-	height = tm.tmAscent + tm.tmDescent;
+	ascent = (float) tm.tmAscent;
+	height = (float) tm.tmAscent + (float) tm.tmDescent;
 	wglUseFontBitmaps( dev_context, 0, 255, listbase);
 }
 
@@ -90,8 +91,8 @@ font::lay_out( const std::string& new_text )
 		GetTextExtentPoint32(
 			render_surface::current->dev_context, 
 			i->c_str(), i->size(), &size);
-		total_height += std::min( float(size.cy), height);
-		maxwidth = std::max( float(size.cx), maxwidth);
+		total_height += std::min( (float)size.cy, height);
+		maxwidth = std::max( (float)size.cx, maxwidth);
 	}
 	
 	return boost::shared_ptr<layout>( 

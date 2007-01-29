@@ -218,7 +218,7 @@ primitive::set_color( const rgba& n_color)
 }
 
 void
-primitive::set_red( double r)
+primitive::set_red( float r)
 {
 	lock L(mtx);
 	color.red = r;
@@ -231,7 +231,7 @@ primitive::get_red()
 }
 
 void
-primitive::set_green( double g)
+primitive::set_green( float g)
 {
 	lock L(mtx);
 	color.green = g;
@@ -244,7 +244,7 @@ primitive::get_green()
 }
 
 void
-primitive::set_blue( double b)
+primitive::set_blue( float b)
 {
 	lock L(mtx);
 	color.blue = b;
@@ -257,7 +257,7 @@ primitive::get_blue()
 }
 
 void
-primitive::set_opacity( double a)
+primitive::set_opacity( float a)
 {
 	lock L(mtx);
 	color.opacity = a;

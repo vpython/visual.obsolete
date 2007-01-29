@@ -23,9 +23,9 @@ class light
 	float spot_exponent; // defaults to 0
 	float spot_cutoff; //< defaults to 180.
  
-	double constant_attenuation; //< defaults to 1
-	double linear_attenuation; //< defaults to 0
-	double quadratic_attenuation; //< defaults to 0
+	float constant_attenuation; //< defaults to 1
+	float linear_attenuation; //< defaults to 0
+	float quadratic_attenuation; //< defaults to 0
 	
 	bool attenuated() const;
 	bool spotlight() const;
@@ -49,7 +49,7 @@ class light
 	void set_spot_cutoff( float e);
 	float get_spot_cutoff();
 
-	void set_attenuation( double constant=1.0, double linear=0.0, double quadratic=0.0);
+	void set_attenuation( float constant=1.0f, float linear=0.0f, float quadratic=0.0f);
 	vector get_attentuation();
 	
 	void set_diffuse_color( const rgba& color);

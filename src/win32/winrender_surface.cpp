@@ -6,7 +6,6 @@
 #include "win32/render_surface.hpp"
 #include "win32/display.hpp"
 #include "util/errors.hpp"
-#include "vpython-config.h"
 
 // For GET_X_LPARAM, GET_Y_LPARAM
 #include <windowsx.h>
@@ -211,8 +210,8 @@ render_surface::on_size( WPARAM, LPARAM)
 	// repainted to the windowing system.
 	GetClientRect( widget_handle, &dims);
 	if (dims.right != window_width || dims.bottom != window_height) {
-		window_width = dims.right;
-		window_height = dims.bottom;
+		window_width = (float) dims.right;
+		window_height = (float) dims.bottom;
 		report_resize( window_width, window_height);
 	}
 	return 0;

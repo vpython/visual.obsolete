@@ -19,6 +19,8 @@
 #include <boost/python/extract.hpp>
 #include "python/num_util.hpp"
 
+
+
 namespace cvisual {
 namespace py = boost::python;
 using namespace cvisual::python;
@@ -322,7 +324,9 @@ void
 wrap_vector()
 {
 	vector (*rotate_vector)( vector, double, const vector) = rotate;
-	vector (*rotate)(vector, double) = rotate;
+
+ //   AS commented out, constructor has not been defined	
+//	vector (*rotate)(vector, double) = rotate;
 
 	// Numeric versions for some of the above
 	// TODO: round out the set.
@@ -403,7 +407,7 @@ wrap_vector()
 		.def( "__itruediv__", itruediv, return_value_policy<copy_const_reference>())
 		// Same as self /= double, when "from __future__ import division" is in effect.
 		.def( "__truediv__",  truediv)
-		.def( self_ns::str(self))        // Support ">>> print foo"
+    	.def( self_ns::str(self))        // Support ">>> print foo"
 		.def( "__repr__", &vector::repr) // Support ">>> foo"
 		;
 

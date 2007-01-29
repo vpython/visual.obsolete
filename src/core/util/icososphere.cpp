@@ -58,7 +58,7 @@ inline void
 normalize(float v[3])
 {
     float n = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-    float m = 1.0 / std::sqrt( n );
+    float m = 1.0f / std::sqrt( n );
 
     v[0] *= m;
     v[1] *= m;
