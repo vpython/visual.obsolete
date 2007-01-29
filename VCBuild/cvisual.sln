@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sigc-2.0", "libsigc++2.vcpr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boost_thread", "boost_python.vcproj", "{0A997224-17D2-4B02-A0CC-BB63DE42D1BC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boost_python", "boost_thread.vcproj", "{8BFC5A6E-7DA9-4629-B837-3B191A6BF5A7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boost_python", "boost_thread_cvs.vcproj", "{8BFC5A6E-7DA9-4629-B837-3B191A6BF5A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

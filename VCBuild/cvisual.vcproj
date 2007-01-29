@@ -53,10 +53,10 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\debug-obj/vpython.pch"
+				PrecompiledHeaderFile=".\cvisual\debug-obj/vpython.pch"
 				AssemblerListingLocation=".\cvisual\debug-obj/"
 				ObjectFile=".\cvisual\debug-obj/"
-				ProgramDataBaseFileName=".\cvisaul\debug-obj/"
+				ProgramDataBaseFileName=".\cvisual\debug-obj/"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="1"
@@ -74,7 +74,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="python25.lib opengl32.lib glu32.lib sigc-2.0-debug.lib boost_thread_debug.lib user32.lib advapi32.lib gdi32.lib boost_python_debug.lib"
+				AdditionalDependencies="python25.lib opengl32.lib glu32.lib sigc-2.0-debug.lib user32.lib advapi32.lib gdi32.lib boost_python_debug.lib"
 				OutputFile="dlls/cvisual_debug.pyd"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="libs;\Python25\libs"

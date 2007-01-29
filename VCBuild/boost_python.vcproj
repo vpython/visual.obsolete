@@ -161,7 +161,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				CompileAs="0"
-				ForcedIncludeFiles="BoostDefines.hpp"
+				ForcedIncludeFiles=""
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -238,19 +238,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\boost\libs\thread\src\read_write_mutex.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\boost\libs\thread\src\recursive_mutex.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\boost\libs\thread\src\thread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\libs\thread\src\timeconv.inl"
 				>
 			</File>
 			<File
