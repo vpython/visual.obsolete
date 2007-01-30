@@ -115,10 +115,10 @@ grayscale( const rgb& c)
 {
 	// The constants 0.299, 0.587, and 0.114 are intended to account for the 
 	// relative intensity of each color to the human eye.
-	static const float GAMMA = 2.5;
-	const float black = std::pow( 0.299 * std::pow( c.red, GAMMA) 
-		+ 0.587* std::pow( c.green, GAMMA) 
-		+ 0.114* std::pow( c.blue, GAMMA)
+	static const float GAMMA = 2.5f;
+	const float black = std::pow( 0.299f * std::pow( c.red, GAMMA) 
+		+ 0.587f* std::pow( c.green, GAMMA) 
+		+ 0.114f* std::pow( c.blue, GAMMA)
 		, 1.0f/GAMMA);
 	return rgb( black, black, black);
 }

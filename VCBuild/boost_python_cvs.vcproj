@@ -228,6 +228,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Boost\libs\python\src\exec.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Boost\libs\python\src\import.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Boost\libs\python\src\list.cpp"
 				>
 			</File>
@@ -320,6 +328,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Boost\libs\python\src\object\pickle_support.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Boost\libs\python\src\object\stl_iterator.cpp"
 					>
 				</File>
 			</Filter>

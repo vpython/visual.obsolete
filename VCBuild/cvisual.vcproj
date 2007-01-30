@@ -43,7 +43,7 @@
 				Optimization="0"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\include\win32;..\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;\Boost;\Python25\include;&quot;\libsigc++-2.0.17&quot;;.;$(NOINHERIT)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;BOOST_PYTHON_DYNAMIC_LIB;BOOST_PYTHON_SOURCE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;BOOST_PYTHON_DYNAMIC_LIB;BOOST_PYTHON_SOURCE;BOOST_AUTO_LINK_NOMANGLE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,7 +61,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="1"
 				CompileAs="0"
-				ForcedIncludeFiles="vpython-config.h;BoostDefines.hpp"
+				ForcedIncludeFiles="vpython-config.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -137,7 +137,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\include\win32;&quot;\libsigc++-2.0.17&quot;;..\include;C:\Boost;\Python25\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;."
-				PreprocessorDefinitions="WIN32;_USRDLL;BOOST_PYTHON_DYNAMIC_LIB;BOOST_PYTHON_SOURCE;MSC"
+				PreprocessorDefinitions="WIN32;_USRDLL;BOOST_PYTHON_DYNAMIC_LIB;BOOST_PYTHON_SOURCE;MSC;BOOST_AUTO_LINK_NOMANGLE"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -153,7 +153,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				ForcedIncludeFiles="vpython-config.h;BoostDefines.hpp"
+				ForcedIncludeFiles="vpython-config.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
