@@ -28,7 +28,7 @@ Building vpython with from Visual Studio C++
              	http://thread.gmane.org/gmane.comp.python.c++/10728/focus=10728
         
              Open the cvisual.sln project file in Visual Studio Express, make Release the active 
-             configuration, and build
+             configuration, then on the Build menu choose "Build Solution".
          
          g) Install
 		Copy
