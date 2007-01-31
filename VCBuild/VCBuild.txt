@@ -31,7 +31,7 @@ Building vpython with from Visual Studio C++
              configuration, then on the Build menu choose "Build Solution".
          
          g) Install
-		Copy
+		From VCBuild/dlls, copy
 		       cvisual.pyd    
 		       boost_thread.dll
 		       boost_python.dll
