@@ -24,7 +24,7 @@ I.  Prerequisites:
 		GNU G++ 3.4.0 or higher to build the suite.
 	GtkGLExtmm 1.2.x (gtkglext.sourceforge.net); not needed for Windows.
 	libglademm (www.gtkmm.org); not needed for Windows.
-	Numeric Python AND/OR the Python Numarray library (numpy.sourceforge.net).
+	numpy (numpy.sourceforge.net).
 	An implementation of OpenGL.
 	
 	On Microsoft Windows, MinGW and MSYS are required to build VPython from 
