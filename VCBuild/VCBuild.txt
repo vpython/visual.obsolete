@@ -41,6 +41,5 @@ Building vpython with from Visual Studio C++
 	       
 	       Copy the  visual folder to /python25/lib/site-packages
 	       
-Issues/problems/questions to ajsiegel@optonline.com
 
                     
