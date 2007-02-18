@@ -23,7 +23,7 @@ using boost::python::object;
 
 namespace cvisual { namespace python {
 
-//Arthur Siegel commented out the line below (...c_cache::itmes;), due to VC++ link error: 
+//Arthur Siegel commented out the line below (...c_cache::items;), due to VC++ link error: 
 // wrap_arrayobjects.obj : error LNK2005: 
 //     "public: static unsigned int const cvisual::python::curve::c_cache::items" 
 //     (?items@c_cache@curve@python@cvisual@@2IB) already defined in curve.obj
