@@ -23,8 +23,10 @@ using boost::python::object;
 
 namespace cvisual { namespace python {
 
-    //VC++ complaining on link AS commented out 
-	//const size_t curve::c_cache::items;
+//Arthur Siegel commented out the following line, with this accompanying note: 
+//VC++ complaining on link AS commented out
+//But with MinGW, the link fails without this.
+const size_t curve::c_cache::items;
 
 namespace {
 
