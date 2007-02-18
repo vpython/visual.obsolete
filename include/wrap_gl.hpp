@@ -7,20 +7,22 @@
 // See the file authors.txt for a complete list of contributors.
 
 //A header file to wrap around GL/gl.h on *nix and Windows.
-#if defined _MSC_VER
+#if defined(_MSC_VER)
     #define NOMINMAX
     #include <GL/glaux.h>
 	#include "win32/win_glext.hpp"
+	#define GL_GLEXT_PROTOTYPES 1
+	#include <GL/gl.h>
+#elif defined(_WIN32)
+	#define WIN32_LEAN_AND_MEAN 1
+	#include <windows.h>
+	#include <GL/gl.h>
+	#include <GL/glext.h>
 #else
+	#define GL_GLEXT_PROTOTYPES 1
+	#include <GL/gl.h>
 	#include <GL/glext.h>
 #endif
 
-#if defined _WIN32
-	#define WIN32_LEAN_AND_MEAN 1
-	#include <windows.h>
-#else
-	#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include <GL/gl.h>
 #include <GL/glu.h>
 #endif // !defined VPYTHON_WRAP_GL_HPP
