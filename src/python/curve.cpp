@@ -28,7 +28,7 @@ namespace cvisual { namespace python {
 //     "public: static unsigned int const cvisual::python::curve::c_cache::items" 
 //     (?items@c_cache@curve@python@cvisual@@2IB) already defined in curve.obj
 //But with MinGW, the link fails without this. 
-//Also, Linux compiles okay with it in; haven't tried with it commented out.
+//Linux builds with it in; with it out, it builds with no errors but won't run.
 const size_t curve::c_cache::items;
 
 namespace {
