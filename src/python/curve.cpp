@@ -23,13 +23,10 @@ using boost::python::object;
 
 namespace cvisual { namespace python {
 
-//Arthur Siegel commented out the line below (...c_cache::items;), due to VC++ link error: 
-// wrap_arrayobjects.obj : error LNK2005: 
-//     "public: static unsigned int const cvisual::python::curve::c_cache::items" 
-//     (?items@c_cache@curve@python@cvisual@@2IB) already defined in curve.obj
-//But with MinGW, the link fails without this. 
-//Linux builds with it in; with it out, it builds with no errors but won't run.
+// Visual Studio chokes on this line in the link phase, but MinGW and Linux need it.
+#ifndef _MSC_VER
 const size_t curve::c_cache::items;
+#endif
 
 namespace {
 
