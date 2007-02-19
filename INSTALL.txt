@@ -96,10 +96,10 @@ I.  Prerequisites:
 		possible for the build process to find the installed version of the library.
 		There is some ambiguity about where to put the pkg-config pieces, as some components need
 		to be in msys. Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
-		but also to msys/share/aclocal.
+		but also to msys/1.0/share/aclocal.
 		You probably also need to set an environment variable for pkg-config:
 		Right click My Computer > Properties > Advanced > Environment Variables and
-		add a new entry PKG_CONFIG_PATH is c:\mingw\lib\pkgconfig.
+		add a new entry: name PKG_CONFIG_PATH, value c:\mingw\lib\pkgconfig.
 		
 		Download the source for libsigc++-2.0.17 from libsigc.sourceforge.net.
 		> tar -xjf libsigc++-2.0.17.tar.bz2
