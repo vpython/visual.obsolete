@@ -18,9 +18,9 @@ I.  Prerequisites:
 	GNU g++ version 3.2.x or >= 3.3.1 (3.4.6 reccomended) (gcc.gnu.org).
 	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org).
 	The Boost C++ libraries version 1.31 and higher (1.33.1 reccomended)
-		(www.boost.org).  Note that 1.31 is required if you are using Python 
-		2.3 or higher, and is reccomended in any case due to getting much
-		better error messages.  1.32.0 or higher is required if you want to use
+		(www.boost.org). Note that 1.31 is required if you are using Python 
+		2.3 or higher, and is recommended in any case due to getting much
+		better error messages. 1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
 	GtkGLExtmm 1.2.x (gtkglext.sourceforge.net); not needed for Windows.
 	libglademm (www.gtkmm.org); not needed for Windows.
@@ -92,7 +92,12 @@ I.  Prerequisites:
 				
 		Note: The Boost files that start with "libboost" are static libraries that we don't use.	
 		
-		Download pkg-config-0.20 in zip format and unzip. A library such as sigc++, see below,
+		Download pkg-config-0.20 in zip format and unzip.
+		One place to get it is http://www.gimp.org/~tml/gimp/win32/downloads.html.
+		Note that you also need glib-2.1.27.zip available at the same location.
+		And glib in turn requires libiconv and gettext, also available at the same location.
+		
+		A library such as sigc++, see below,
 		registers its version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
 		possible for the build process to find the installed version of the library.
 		There is some ambiguity about where to put the pkg-config pieces, as some components need
