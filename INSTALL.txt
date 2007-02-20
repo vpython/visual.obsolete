@@ -96,6 +96,8 @@ I.  Prerequisites:
 		One place to get it is http://www.gimp.org/~tml/gimp/win32/downloads.html.
 		Note that you also need glib-2.1.27.zip available at the same location.
 		And glib in turn requires libiconv and gettext, also available at the same location.
+		These are binary distributions; after unzipping, copy files to the corresponding
+		locations in mingw.
 		
 		A library such as sigc++, see below,
 		registers its version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
@@ -114,7 +116,7 @@ I.  Prerequisites:
 		> make
 		> make install
 		Can test that pkg-config is correctly installed by executing this:
-		> pkg-config --cflags sigc++-2.0
+		> pkg-config --cflags sigc++-2.0cd
 		
 	C.  GNU/Linux
 		Please note that these package lists are my best-guess based on 
