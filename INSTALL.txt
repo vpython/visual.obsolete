@@ -60,9 +60,10 @@ I.  Prerequisites:
 	# TODO: include directions for building Boost.Python on OSX(gulp).
 	
 	B.  Microsoft Windows
-		Download and install the MinGW 3.1 and MSYS 1.0.9 packages from
-		www.mingw.org.  Also download the MinGW Utils package (version 0.1 or
-		higher).  You may need to add C:\mingw\bin to your PATH.
+		Download and install MinGW, MSYS, and MSYS-DTK packages from
+		www.mingw.org. Also download the MinGW Utils package (version 0.1 or
+		higher). You may need to add C:\mingw\bin to your PATH.
+		You will also need to install msys-automake, msys-autoconf, and msys-libtool.
 		
 		Download and install Python 2.5.x from www.python.org.
 		OpenGL is provided with the standard Windows installation.
