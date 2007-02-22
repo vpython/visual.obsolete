@@ -12,7 +12,7 @@ and in the first line of __init__.py.
 Makefile.in, configure, and the helper programs for them are not maintained
 in CVS. You will have to run the autogen.sh script after a fresh checkout to 
 create configure. Except on Windows, you need to execute "chmod +x autogen.sh"
-in order to be able execute ./autogen.sh. 
+in order to be able to execute ./autogen.sh. 
 
 The source distribution is built with "make dist-bzip2"  "make bzip" is also
 supported.
