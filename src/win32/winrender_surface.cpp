@@ -53,6 +53,11 @@ render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			return This->on_buttondown( wParam, lParam);
 		case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
 			return This->on_buttonup( wParam, lParam);
+		//TODO: implement the difference between keyUP and keyDOWN events
+		//case WM_KEYUP:
+		//case WM_KEYLAST:
+		case WM_KEYDOWN:
+			return This->on_keypress(uMsg, wParam, lParam);
 		case WM_GETMINMAXINFO:
 			return This->on_getminmaxinfo( wParam, lParam);
 		default:
@@ -349,6 +354,111 @@ found:
 	return 0;
 	#undef unique
 	#undef drop
+}
+
+LRESULT
+render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	// Note that this algorithm will proably fail if the user is using anything 
+	// other than a US keyboard.
+	std::string ctrl_str;
+	
+	//TODO: Shift, Ctrl, Alt
+	
+	// Specials, try to match those in wgl.cpp
+	int k = (int)wParam;
+	std::string key_str;
+	switch (k) {
+		case VK_F1:
+		case VK_F2:
+		case VK_F3:
+		case VK_F4:
+		case VK_F5:
+		case VK_F6:
+		case VK_F7:
+		case VK_F8:
+		case VK_F9:
+		case VK_F10:
+		case VK_F11:
+		case VK_F12: {
+			// Use braces to destroy s.
+			std::ostringstream s;
+			s << key_str << 'f' << k-VK_F1 + 1;
+			key_str = s.str();
+		}   break;
+		case VK_PRIOR:
+			key_str += "page up";
+			break;
+		case VK_NEXT:
+			key_str += "page down";
+			break;
+		case VK_END:
+			key_str += "end";
+			break;
+		case VK_HOME:
+			key_str += "home";
+			break;
+		case VK_LEFT:
+			key_str += "left";
+			break;
+		case VK_UP:
+			key_str += "up";
+			break;
+		case VK_RIGHT:
+			key_str += "right";
+			break;
+		case VK_DOWN:
+			key_str += "down";
+			break;	
+		case VK_PRINT:
+			key_str += "print screen";
+			break;
+		case VK_INSERT:
+			key_str += "insert";
+			break;
+		case VK_DELETE:
+			key_str += "delete";
+			break;
+		case VK_NUMLOCK:
+			key_str += "numlock";
+			break;
+		case VK_SCROLL:
+			key_str += "scrlock";
+			break;
+		case VK_BACK:
+			key_str += "backspace";
+			break;
+		case VK_TAB:
+			key_str += "\t";
+			break;
+		case VK_RETURN:
+			key_str += "\n";
+			break;
+		case VK_ESCAPE:
+			// TODO: Allow the user to delete a fullscreen window this way
+			key_str += "escape";
+			break;
+	}
+  
+	if (!key_str.empty()) {
+		// A special key.
+		ctrl_str += key_str;
+		keys.push( ctrl_str);
+	}
+	else if ( isprint(k) && !ctrl_str.empty()) {
+		// A control character
+		ctrl_str += static_cast<char>( k);
+		keys.push(ctrl_str);
+	}
+	else if (k) {
+		// Anything else.
+		std::ostringstream s;
+		s << (char)k;
+		key_str = s.str();
+		keys.push( key_str);
+	}
+	
+	return 0;
 }
 
 WNDCLASS render_surface::win32_class;
@@ -738,9 +848,12 @@ gui_main::run()
 				}
 				continue;
 			}
-			// Destined for the primary window procedure above
-			TranslateMessage( &message);
-			DispatchMessage( &message);
+			if(!self->shutting_down)
+			{
+				// Destined for the primary window procedure above
+				TranslateMessage( &message);
+				DispatchMessage( &message);
+			}
 		}
 		if (!WaitMessage())
 			WIN32_CRITICAL_ERROR( "WaitMessage()");
@@ -875,6 +988,7 @@ gui_main::shutdown()
 	if (self->thread_exited)
 		return;
 	self->returned = false;
+	self->shutting_down = true;
 	self->signal_shutdown();
 //	while (!self->returned)
 //		self->call_complete.py_wait(L);
@@ -902,13 +1016,14 @@ gui_main::report_window_delete( display* window)
 		lock L(self->call_lock);
 		self->displays.remove( window);
 		display_empty = self->displays.empty();
+		gui_main::shutdown();
 	}
-	if (display_empty){
-		if  (self->waiting_allclosed)
-			gui_main::quit();
-		else
-			gui_main::shutdown();
-	}
+//	if (display_empty){
+//		if  (self->waiting_allclosed)
+//			gui_main::quit();
+//		else
+//			gui_main::shutdown();
+//	}
 }
 
 void
@@ -922,7 +1037,7 @@ gui_main::quit()
 		(*i)->destroy();
 	}
 	self->displays.clear();
-	PostQuitMessage( 0);
+	//PostQuitMessage( 0);
 }
 
 } // !namespace cvisual;
