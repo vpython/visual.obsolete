@@ -79,7 +79,7 @@ class render_surface : public display_kernel
 	LRESULT on_buttondown( WPARAM, LPARAM);
 	LRESULT on_buttonup( WPARAM, LPARAM);
 	LRESULT on_getminmaxinfo( WPARAM, LPARAM);
-	// LRESULT on_keypress( UINT, WPARAM, LPARAM);
+	LRESULT on_keypress( UINT, WPARAM, LPARAM);
 	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_move( WPARAM, LPARAM);
 
