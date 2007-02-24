@@ -38,8 +38,9 @@ phi = 1./( ((I*abs(omega))/(M*Lshaft/2.))**2/(g*Lshaft/2.)-(Lspring+s)/(Lshaft/2
 # Refine again:
 s = M*g/(ks*cos(phi))
 phi = 1./( ((I*abs(omega))/(M*Lshaft/2.))**2/(g*Lshaft/2.)-(Lspring+s)/(Lshaft/2.) )
+pprecess = vector(0,-1,M*precession*(Lshaft/2.+(Lspring+s)*sin(phi)))
 # Momentum required for completely smooth precession:
-pprecess = vector(0,0,M*precession*(Lshaft/2.+(Lspring+s)*sin(phi)))
+##pprecess = vector(0,0,M*precession*(Lshaft/2.+(Lspring+s)*sin(phi)))
 if omega < 0:
     pprecess = -pprecess
 
