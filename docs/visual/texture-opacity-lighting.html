@@ -11,7 +11,7 @@
 <h3>Beta release</h3>
 <p>This beta release is experimental in the sense that there are known bugs described 
   <a href="#bugs">below</a>. Feel free to play with the exciting new features, 
-  but be aware that you may encounter problems.</p>
+  but be aware that you may encounter problems, especially on Windows.</p>
 <p>There is a new example program texture_and_lighting.py that displays many of 
   the new features: a swinging spotlight illuminates a translucent beach ball 
   that rolls on a wood-texture table.</p>
@@ -119,9 +119,14 @@
 <h3>Specifying a gray</h3>
 <p>For convenience you can now say color=0.7 to mean color=(0.7,0.7,0.7).</p>
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
-<p>There is one major known bug still being worked on: Depending on the graphics
-  card and driver, performance with some programs on Windows may be poor (but
-  performance may be okay on another computer). This problem is not yet understood.</p>
+<p>There is one major known bug still being worked on: Depending on the graphics 
+  card and driver, performance with some programs on Windows may be so poor that 
+  the program hardly runs (but performance may be okay on another computer). This 
+  problem is not yet understood.</p>
+<p>Another rather serious bug is that on some Windows machines mouse dragging 
+  is very sluggish, but putting a &quot;rate(100)&quot; statement in the drag 
+  loop fixes the problem.</p>
+<p>Some animations on some Windows machines continually pause for short times.</p>
 <p>Here are known bugs that are less serious:</p>
 <blockquote>
   <p>Autoscaling is pretty good but occasionally positions the camera farther 
