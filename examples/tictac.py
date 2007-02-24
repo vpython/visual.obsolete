@@ -70,6 +70,7 @@ while len(balls) < 4*4*4:
         nballs=nballs+1
         b=sphere(pos=point, radius=0.3, color=bcolor)
         while not scene.mouse.events:
+            rate(100)
             y=scene.mouse.pos.y
             if y > 1.: y=1.
             if y < -yo: y=-yo
