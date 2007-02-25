@@ -54,8 +54,7 @@ render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
 			return This->on_buttonup( wParam, lParam);
 		//TODO: implement the difference between keyUP and keyDOWN events
-		//case WM_KEYUP:
-		//case WM_KEYLAST:
+		case WM_KEYUP:
 		case WM_KEYDOWN:
 			return This->on_keypress(uMsg, wParam, lParam);
 		case WM_GETMINMAXINFO:
@@ -362,12 +361,26 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	// Note that this algorithm will proably fail if the user is using anything 
 	// other than a US keyboard.
 	std::string ctrl_str;
-	
-	//TODO: Shift, Ctrl, Alt
-	
-	// Specials, try to match those in wgl.cpp
 	int k = (int)wParam;
 	std::string key_str;
+	
+	if(uMsg == WM_KEYUP)
+	{
+		switch (k) {
+			case VK_SHIFT:
+				shiftDown = false;
+				break;
+			case VK_CONTROL:
+				ctrlDown = false;
+				break;
+			case VK_MENU:
+				altDown = false;
+				break;
+		}
+		return 0;
+	}
+	
+	// Specials, try to match those in wgl.cpp
 	switch (k) {
 		case VK_F1:
 		case VK_F2:
@@ -386,6 +399,15 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			s << key_str << 'f' << k-VK_F1 + 1;
 			key_str = s.str();
 		}   break;
+		case VK_SHIFT:
+			shiftDown = true;
+			return 0;
+		case VK_CONTROL:
+			ctrlDown = true;
+			return 0;
+		case VK_MENU:
+			altDown = true;
+			return 0;
 		case VK_PRIOR:
 			key_str += "page up";
 			break;
@@ -435,9 +457,22 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			key_str += "\n";
 			break;
 		case VK_ESCAPE:
-			// TODO: Allow the user to delete a fullscreen window this way
-			key_str += "escape";
-			break;
+			destroy();
+			gui_main::report_window_delete(this);
+			if (exit)
+				gui_main::quit();
+			return false;
+	}
+	
+	// First trap for shift, ctrl, and alt.
+	if (shiftDown) {
+		ctrl_str += "shift+";
+	}
+	if (ctrlDown) {
+		ctrl_str += "ctrl+";
+	}
+	if (altDown) {
+		ctrl_str += "alt+";
 	}
   
 	if (!key_str.empty()) {
@@ -447,13 +482,14 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	else if ( isprint(k) && !ctrl_str.empty()) {
 		// A control character
-		ctrl_str += static_cast<char>( k);
+		ctrl_str += static_cast<char>(shiftDown? k : k+32);
 		keys.push(ctrl_str);
 	}
 	else if (k) {
 		// Anything else.
 		std::ostringstream s;
-		s << (char)k;
+		s << (char)(shiftDown? k : k+32);
+		//s << (char)k;
 		key_str = s.str();
 		keys.push( key_str);
 	}
@@ -492,6 +528,7 @@ render_surface::on_gl_swap_buffers()
 render_surface::render_surface()
 	: x(-1), y(-1),
 	exit(true), visible(true), fullscreen(false), title( "VPython"),
+	shiftDown(false), ctrlDown(false), altDown(false),
 	window_width(430), window_height(430),
 	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
 	saved_dc(0), saved_glrc(0),
