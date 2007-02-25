@@ -82,6 +82,11 @@ class render_surface : public display_kernel
 	LRESULT on_keypress( UINT, WPARAM, LPARAM);
 	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_move( WPARAM, LPARAM);
+	
+	//boolean variables keeping track of Shift, Ctrl and Alt
+	bool shiftDown;
+	bool ctrlDown;
+	bool altDown;
 
 	// Callbacks provided to the display_kernel object.
 	void on_gl_begin();
