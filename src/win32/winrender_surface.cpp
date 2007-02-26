@@ -355,6 +355,11 @@ found:
 	#undef drop
 }
 
+static bool isLetter(int k)
+{
+	return ((k >= 65) && (k <= 90));
+}
+
 LRESULT
 render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -408,6 +413,39 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case VK_MENU:
 			altDown = true;
 			return 0;
+		case VK_MULTIPLY:
+			key_str += "*";
+			break;
+		case 191: //slash
+			key_str += "/";
+			break;
+		case 220: //backslash
+			key_str += "\\";
+			break;
+		case 219: //left braket
+			key_str += "[";
+			break;
+		case 221: //right braket
+			key_str += "]";
+			break;
+		case 222: //apostrophe
+			key_str += "'";
+			break;
+		case 186: //semicolon
+			key_str += ";";
+			break;
+		case 0xBB: //plus
+			key_str += "+";
+			break;
+		case 0xBD: //minus
+			key_str += "-";
+			break;
+		case 0xBE: //period
+			key_str += ".";
+			break;
+		case 0xBC: //comma
+			key_str += ",";
+			break;
 		case VK_PRIOR:
 			key_str += "page up";
 			break;
@@ -464,7 +502,7 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return false;
 	}
 	
-	// First trap for shift, ctrl, and alt.
+	// Now trap for shift, ctrl, and alt.
 	if (shiftDown) {
 		ctrl_str += "shift+";
 	}
@@ -482,14 +520,14 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	else if ( isprint(k) && !ctrl_str.empty()) {
 		// A control character
-		ctrl_str += static_cast<char>(shiftDown? k : k+32);
+		ctrl_str += static_cast<char>((shiftDown || !isLetter(k))? k : k+32);
 		keys.push(ctrl_str);
 	}
 	else if (k) {
 		// Anything else.
 		std::ostringstream s;
-		s << (char)(shiftDown? k : k+32);
-		//s << (char)k;
+		s << (char)((shiftDown || !isLetter(k))? k : k+32);
+		//s << k;
 		key_str = s.str();
 		keys.push( key_str);
 	}
