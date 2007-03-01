@@ -267,7 +267,7 @@ render_surface::on_close( WPARAM, LPARAM)
 	UINT id = 1;
 	KillTimer( widget_handle, id);
 	if (exit) {
-		gl_free();
+		//gl_free();
 	}
 	gui_main::report_window_delete(this);
 	wglDeleteContext( gl_context);
@@ -923,7 +923,8 @@ gui_main::run()
 				}
 				continue;
 			}
-			if(!self->shutting_down)
+			//if(!self->shutting_down)
+			//if(!(self->shutting_down && (message.message == WM_PAINT)))
 			{
 				// Destined for the primary window procedure above
 				TranslateMessage( &message);
@@ -1091,14 +1092,14 @@ gui_main::report_window_delete( display* window)
 		lock L(self->call_lock);
 		self->displays.remove( window);
 		display_empty = self->displays.empty();
-		gui_main::shutdown();
+		//gui_main::shutdown();
 	}
-//	if (display_empty){
-//		if  (self->waiting_allclosed)
-//			gui_main::quit();
-//		else
-//			gui_main::shutdown();
-//	}
+	if (display_empty){
+		if  (self->waiting_allclosed)
+			gui_main::quit();
+		else
+			gui_main::shutdown();
+	}//*/
 }
 
 void
@@ -1112,7 +1113,7 @@ gui_main::quit()
 		(*i)->destroy();
 	}
 	self->displays.clear();
-	//PostQuitMessage( 0);
+	PostQuitMessage( 0);
 }
 
 } // !namespace cvisual;
