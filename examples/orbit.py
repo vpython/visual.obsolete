@@ -18,9 +18,10 @@ for a in [giant, dwarf]:
   a.orbit = curve(color=a.color, radius = 2e9)
 
 dt = 86400
+i = 0
 
 while 1:
-  rate(100)
+  #rate(1000)
 
   dist = dwarf.pos - giant.pos
   force = 6.7e-11 * giant.mass * dwarf.mass * dist / mag(dist)**3
@@ -29,5 +30,7 @@ while 1:
 
   for a in [giant, dwarf]:
     a.pos = a.pos + a.p/a.mass * dt
-    a.orbit.append(pos=a.pos)
+    if i < 2000:
+        a.orbit.append(pos=a.pos)
+        i += 1
 
