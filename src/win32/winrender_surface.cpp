@@ -504,13 +504,13 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	
 	// Now trap for shift, ctrl, and alt.
 	if (shiftDown) {
-		ctrl_str += "shift+";
+		//ctrl_str += "shift+";
 	}
 	if (ctrlDown) {
-		ctrl_str += "ctrl+";
+		//ctrl_str += "ctrl+";
 	}
 	if (altDown) {
-		ctrl_str += "alt+";
+		//ctrl_str += "alt+";
 	}
   
 	if (!key_str.empty()) {
