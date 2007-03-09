@@ -360,7 +360,200 @@ static bool isLetter(int k)
 	return ((k >= 65) && (k <= 90));
 }
 
+static bool isNumber(int k)
+{
+	return ((k >= 0x30) && (k <= 0x39));
+}
+
+// Given a VK_... value, returns the ascii character value as would
+// appear on a US keyboard
+static char vkToAscii(int k, bool shiftOn)
+{
+	if(isLetter(k))
+		return (char)((shiftOn || !isLetter(k))? k : k+32);
+	if(isNumber(k))
+	{
+		if(shiftOn)
+		{
+			switch(k)
+			{
+			case 0x31:
+				return '!';
+			case 0x32:
+				return '@';
+			case 0x33:
+				return '#';
+			case 0x34:
+				return '$';
+			case 0x35:
+				return '%';
+			case 0x36:
+				return '^';
+			case 0x37:
+				return '&';
+			case 0x38:
+				return '*';
+			case 0x39:
+				return '(';
+			case 0x30:
+				return ')';
+			}
+		}
+		return (char)k;
+	}
+	//in all other cases...
+	switch(k)
+	{
+	case 191: //slash
+		return shiftOn? '?' : '/';
+	case 220: //backslash
+		return shiftOn? '|' : '\\';
+	case 219: //left braket
+		return shiftOn? '{' : '[';
+	case 221: //right braket
+		return shiftOn? '}' : ']';
+	case 222: //apostrophe
+		return shiftOn? '"' : '\'';
+	case 186: //semicolon
+		return shiftOn? ':' : ';';
+	case 0xBB: //plus
+		return shiftOn? '+' : '=';
+	case 0xBD: //minus
+		return shiftOn? '_' : '-';
+	case 0xBE: //period
+		return shiftOn? '>' : '.';
+	case 0xBC: //comma
+		return shiftOn? '<' : ',';
+	case VK_SPACE:
+		return ' ';
+	}
+	return 0;
+}
+
 LRESULT
+render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	// Note that this algorithm will proably fail if the user is using anything 
+	// other than a US keyboard.
+	std::ostringstream s;
+	std::string key_str;
+	int k = (int)wParam;
+	
+	if(uMsg == WM_KEYUP)
+	{
+		switch (k) {
+			case VK_SHIFT:
+				shiftDown = false;
+				break;
+			case VK_CONTROL:
+				ctrlDown = false;
+				break;
+			case VK_MENU:
+				altDown = false;
+				break;
+		}
+		return 0;
+	}
+	//now it is WM_KEYDOWN
+	
+	char the_char = vkToAscii(k, shiftDown);
+	if(the_char)
+	{
+		s << the_char;
+		keys.push(s.str());
+		return 0;
+	}
+	
+	// Specials, try to match those in wgl.cpp
+	switch (k) {
+		case VK_F1:
+		case VK_F2:
+		case VK_F3:
+		case VK_F4:
+		case VK_F5:
+		case VK_F6:
+		case VK_F7:
+		case VK_F8:
+		case VK_F9:
+		case VK_F10:
+		case VK_F11:
+		case VK_F12: {
+			// Use braces to destroy s.
+			std::ostringstream s;
+			s << key_str << 'f' << k-VK_F1 + 1;
+			key_str = s.str();
+		}   break;
+		case VK_SHIFT:
+			shiftDown = true;
+			return 0;
+		case VK_CONTROL:
+			ctrlDown = true;
+			return 0;
+		case VK_MENU:
+			altDown = true;
+			return 0;
+		case VK_PRIOR:
+			key_str += "page up";
+			break;
+		case VK_NEXT:
+			key_str += "page down";
+			break;
+		case VK_END:
+			key_str += "end";
+			break;
+		case VK_HOME:
+			key_str += "home";
+			break;
+		case VK_LEFT:
+			key_str += "left";
+			break;
+		case VK_UP:
+			key_str += "up";
+			break;
+		case VK_RIGHT:
+			key_str += "right";
+			break;
+		case VK_DOWN:
+			key_str += "down";
+			break;	
+		case VK_PRINT:
+			key_str += "print screen";
+			break;
+		case VK_INSERT:
+			key_str += "insert";
+			break;
+		case VK_DELETE:
+			key_str += "delete";
+			break;
+		case VK_NUMLOCK:
+			key_str += "numlock";
+			break;
+		case VK_SCROLL:
+			key_str += "scrlock";
+			break;
+		case VK_BACK:
+			key_str += "backspace";
+			break;
+		case VK_TAB:
+			key_str += "tab";
+			break;
+		case VK_RETURN:
+			key_str += "\n";
+			break;
+		case VK_ESCAPE:
+			destroy();
+			gui_main::report_window_delete(this);
+			if (exit)
+				gui_main::quit();
+			return false;	
+	}
+
+	keys.push(key_str);
+	
+	return 0;
+}
+
+/*LRESULT
 render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	// Note that this algorithm will proably fail if the user is using anything 
@@ -533,7 +726,7 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	
 	return 0;
-}
+}//*/
 
 WNDCLASS render_surface::win32_class;
 
