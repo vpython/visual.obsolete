@@ -12,7 +12,7 @@ namespace cvisual {
 displaylist box::simple_model;
 displaylist box::textured_model;
 z_sorted_model<quad, 6> box::sorted_model;
-z_sorted_model<tquad, 6> box::textured_sorted_model;
+z_sorted_model<tquad, 405> box::textured_sorted_model;
 bool box::first = true;
 
 bool
@@ -221,39 +221,53 @@ box::calc_sorted_model()
 }
 
 void
-box::calc_textured_sorted_model()
+box::calc_textured_sorted_model(tquad *faces, int level)
 {
-	// Calculate the textured, sorted model.
-	textured_sorted_model.faces[0] = tquad( // Right face
+	faces[0] = tquad( // Right face
 		vector( 0.5, 0.5, 0.5), tcoord( 0, 1),
 		vector( 0.5, -0.5, 0.5), tcoord( 0, 0),
 		vector( 0.5, -0.5, -0.5), tcoord( 1, 0),
 		vector( 0.5, 0.5, -0.5), tcoord( 1, 1));
-	textured_sorted_model.faces[1] = tquad( // Top face
-		vector( 0.5, 0.5, 0.5), tcoord( 1, 0),
-		vector( 0.5, 0.5, -0.5), tcoord( 1, 1),
-		vector( -0.5, 0.5, -0.5), tcoord( 0, 1),
-		vector( -0.5, 0.5, 0.5), tcoord( 0, 0));
-	textured_sorted_model.faces[2] = tquad( // Left face
+	faces[1] = tquad( // Left face
 		vector( -0.5, 0.5, -0.5), tcoord( 0, 1),
 		vector( -0.5, -0.5, -0.5), tcoord( 0, 0),
 		vector( -0.5, -0.5, 0.5), tcoord( 1, 0), 
 		vector( -0.5, 0.5, 0.5), tcoord( 1, 1));
-	textured_sorted_model.faces[3] = tquad( // Bottom face
+	faces[2] = tquad( // Bottom face
 		vector( -0.5, -0.5, 0.5), tcoord( 0, 1),
 		vector( -0.5, -0.5, -0.5), tcoord( 0, 0),
 		vector( 0.5, -0.5, -0.5), tcoord( 1, 0),
 		vector( 0.5, -0.5, 0.5), tcoord( 1, 1));
-	textured_sorted_model.faces[4] = tquad( // Front face
+	faces[3] = tquad( // Front face
 		vector( 0.5, 0.5, 0.5), tcoord( 1, 1),
 		vector( -0.5, 0.5, 0.5), tcoord( 0, 1),
 		vector( -0.5, -0.5, 0.5), tcoord( 0, 0), 
 		vector( 0.5, -0.5, 0.5), tcoord( 1, 0));
-	textured_sorted_model.faces[5] = tquad( // Back face
+	faces[4] = tquad( // Back face
 		vector( 0.5, 0.5, -0.5), tcoord( 0, 1),
 		vector( 0.5, -0.5, -0.5), tcoord( 0, 0),
 		vector( -0.5, -0.5, -0.5), tcoord( 1, 0), 
 		vector( -0.5, 0.5, -0.5), tcoord( 1, 1));
+	double spacing = 1.0/level;
+	// Calculate the textured, sorted model.
+	for(size_t i = 0; i < level; i++)
+	{
+		for(size_t j = 0; j < level; j++)
+		{
+			faces[i*level+j+5] = tquad( // Top face
+				vector( -0.5+(j+1)*spacing, 0.5, 0.5-    i*spacing), tcoord((j+1)*spacing,     i*spacing),
+				vector( -0.5+(j+1)*spacing, 0.5, 0.5-(i+1)*spacing), tcoord((j+1)*spacing, (i+1)*spacing),
+				vector( -0.5+    j*spacing, 0.5, 0.5-(i+1)*spacing), tcoord(    j*spacing, (i+1)*spacing),
+				vector( -0.5+    j*spacing, 0.5, 0.5-    i*spacing), tcoord(    j*spacing,     i*spacing));
+		}
+	}
+} 
+
+void
+box::calc_textured_sorted_model()
+{
+	// Calculate the textured, sorted model.
+	calc_textured_sorted_model(textured_sorted_model.faces, 10);
 }
 
 PRIMITIVE_TYPEINFO_IMPL(box)

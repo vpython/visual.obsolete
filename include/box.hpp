@@ -18,7 +18,7 @@ class box : public rectangular
 	// A model to be used for rendering transparent objects.
 	static z_sorted_model<quad, 6> sorted_model;
 	// A model to be used for transparent and textured objects.
-	static z_sorted_model<tquad, 6> textured_sorted_model;
+	static z_sorted_model<tquad, 405> textured_sorted_model;
 	// The global model to use for simple quad objects.
 	static displaylist simple_model;
 	// The global model to use for opaque textured objects.
@@ -30,6 +30,10 @@ class box : public rectangular
 	
 	// Calculates the textured_sorted_model (only done once, hopefully).
 	void calc_textured_sorted_model();
+	
+	// Calculates the textured_sorted_model, based on the subdivision level
+	// (only done once, hopefully).
+	void calc_textured_sorted_model(tquad *faces, int level);
 	
 	// True if the box should not be rendered.
 	bool degenerate();
