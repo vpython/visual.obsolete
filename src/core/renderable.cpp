@@ -21,7 +21,7 @@ view::view( const vector& n_forward, vector& n_center, float& n_width,
 
 view::view( const view& other, const tmatrix& wft)
 	: camera( other.camera),
-	forward( wft.times_v(forward)),
+	forward( wft.times_v(other.forward)),
 	center( wft * other.center),
 	up( wft.times_v(other.up)),
 	window_width( other.window_width),
@@ -48,6 +48,7 @@ view::pixel_coverage( const vector& pos, double radius) const
 	// The distance from the camera to this position, in the direction of the
 	// camera.  This is the distance to the viewing plane that the coverage
 	// circle lies in.
+	
 	double dist = (pos - camera).dot(forward);
 	// Half of the width of the viewing plane at this distance.
 	double apparent_hwidth = tan_hfov_x * dist;
