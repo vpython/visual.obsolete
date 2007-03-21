@@ -49,6 +49,7 @@ render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			return This->on_mousemove( wParam, lParam);
 		case WM_SHOWWINDOW:
 			return This->on_showwindow( wParam, lParam);
+		//case WM_LBUTTONDBLCLK:
 		case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN:
 			return This->on_buttondown( wParam, lParam);
 		case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
@@ -455,12 +456,22 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 	//now it is WM_KEYDOWN
+
+	if(ctrlDown)
+	{
+		key_str += "ctrl+";
+	}
+	if(altDown)
+	{
+		key_str += "alt+";
+	}
 	
 	char the_char = vkToAscii(k, shiftDown);
 	if(the_char)
 	{
 		s << the_char;
-		keys.push(s.str());
+		key_str += s.str();
+		keys.push(key_str);
 		return 0;
 	}
 	
@@ -492,6 +503,8 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case VK_MENU:
 			altDown = true;
 			return 0;
+			//key_str += "ALDDDDDDD";
+			//break;
 		case VK_PRIOR:
 			key_str += "page up";
 			break;
@@ -552,181 +565,6 @@ render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	
 	return 0;
 }
-
-/*LRESULT
-render_surface::on_keypress(UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	// Note that this algorithm will proably fail if the user is using anything 
-	// other than a US keyboard.
-	std::string ctrl_str;
-	int k = (int)wParam;
-	std::string key_str;
-	
-	if(uMsg == WM_KEYUP)
-	{
-		switch (k) {
-			case VK_SHIFT:
-				shiftDown = false;
-				break;
-			case VK_CONTROL:
-				ctrlDown = false;
-				break;
-			case VK_MENU:
-				altDown = false;
-				break;
-		}
-		return 0;
-	}
-	
-	// Specials, try to match those in wgl.cpp
-	switch (k) {
-		case VK_F1:
-		case VK_F2:
-		case VK_F3:
-		case VK_F4:
-		case VK_F5:
-		case VK_F6:
-		case VK_F7:
-		case VK_F8:
-		case VK_F9:
-		case VK_F10:
-		case VK_F11:
-		case VK_F12: {
-			// Use braces to destroy s.
-			std::ostringstream s;
-			s << key_str << 'f' << k-VK_F1 + 1;
-			key_str = s.str();
-		}   break;
-		case VK_SHIFT:
-			shiftDown = true;
-			return 0;
-		case VK_CONTROL:
-			ctrlDown = true;
-			return 0;
-		case VK_MENU:
-			altDown = true;
-			return 0;
-		case VK_MULTIPLY:
-			key_str += "*";
-			break;
-		case 191: //slash
-			key_str += "/";
-			break;
-		case 220: //backslash
-			key_str += "\\";
-			break;
-		case 219: //left braket
-			key_str += "[";
-			break;
-		case 221: //right braket
-			key_str += "]";
-			break;
-		case 222: //apostrophe
-			key_str += "'";
-			break;
-		case 186: //semicolon
-			key_str += ";";
-			break;
-		case 0xBB: //plus
-			key_str += "+";
-			break;
-		case 0xBD: //minus
-			key_str += "-";
-			break;
-		case 0xBE: //period
-			key_str += ".";
-			break;
-		case 0xBC: //comma
-			key_str += ",";
-			break;
-		case VK_PRIOR:
-			key_str += "page up";
-			break;
-		case VK_NEXT:
-			key_str += "page down";
-			break;
-		case VK_END:
-			key_str += "end";
-			break;
-		case VK_HOME:
-			key_str += "home";
-			break;
-		case VK_LEFT:
-			key_str += "left";
-			break;
-		case VK_UP:
-			key_str += "up";
-			break;
-		case VK_RIGHT:
-			key_str += "right";
-			break;
-		case VK_DOWN:
-			key_str += "down";
-			break;	
-		case VK_PRINT:
-			key_str += "print screen";
-			break;
-		case VK_INSERT:
-			key_str += "insert";
-			break;
-		case VK_DELETE:
-			key_str += "delete";
-			break;
-		case VK_NUMLOCK:
-			key_str += "numlock";
-			break;
-		case VK_SCROLL:
-			key_str += "scrlock";
-			break;
-		case VK_BACK:
-			key_str += "backspace";
-			break;
-		case VK_TAB:
-			key_str += "\t";
-			break;
-		case VK_RETURN:
-			key_str += "\n";
-			break;
-		case VK_ESCAPE:
-			destroy();
-			gui_main::report_window_delete(this);
-			if (exit)
-				gui_main::quit();
-			return false;
-	}
-	
-	// Now trap for shift, ctrl, and alt.
-	if (shiftDown) {
-		//ctrl_str += "shift+";
-	}
-	if (ctrlDown) {
-		//ctrl_str += "ctrl+";
-	}
-	if (altDown) {
-		//ctrl_str += "alt+";
-	}
-  
-	if (!key_str.empty()) {
-		// A special key.
-		ctrl_str += key_str;
-		keys.push( ctrl_str);
-	}
-	else if ( isprint(k) && !ctrl_str.empty()) {
-		// A control character
-		ctrl_str += static_cast<char>((shiftDown || !isLetter(k))? k : k+32);
-		keys.push(ctrl_str);
-	}
-	else if (k) {
-		// Anything else.
-		std::ostringstream s;
-		s << (char)((shiftDown || !isLetter(k))? k : k+32);
-		//s << k;
-		key_str = s.str();
-		keys.push( key_str);
-	}
-	
-	return 0;
-}//*/
 
 WNDCLASS render_surface::win32_class;
 
