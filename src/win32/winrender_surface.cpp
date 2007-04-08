@@ -54,11 +54,8 @@ render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			return This->on_buttondown( wParam, lParam);
 		case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
 			return This->on_buttonup( wParam, lParam);
-		//TODO: implement the difference between keyUP and keyDOWN events
-		case WM_SYSKEYUP:
     	case WM_KEYUP:
 			return This->on_keyUp(uMsg, wParam, lParam);
-		case WM_SYSKEYDOWN:
     	case WM_KEYDOWN:
     		return This->on_keyDown(uMsg, wParam, lParam);
     	case WM_CHAR:
