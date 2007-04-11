@@ -360,6 +360,8 @@ faces::gl_render( const view& scene)
 
 	std::vector<vector> spos;
 	std::vector<rgb> tcolor;
+	
+	lock L(mtx);
 
 	gl_enable_client vertexes( GL_VERTEX_ARRAY);
 	gl_enable_client normals( GL_NORMAL_ARRAY);
