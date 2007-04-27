@@ -213,15 +213,16 @@ IV.  Install
 	with a program like `sudo` or `su`
 	On Apple OSX, run `sudo make install`
 	
-	On MS Windows, you need to install innosetup (www.jrsoftware.org/isinfo.php).
-	Make sure that C:\Python25\Lib\idlelib\config-main.def has edit startup and 
+	On MS Windows, you CANNOT use "make install".
+	Instead, you need to install innosetup (www.jrsoftware.org/isinfo.php).
+	1) Make sure that C:\Python25\Lib\idlelib\config-main.def has edit startup and 
 	autosave set to 1 and that help is set for Visual before building the package.
-	Double-click MakeVPython.iss in the make directory. 
-	Near the start of the file, update AppVerName if necessary.
-	Do Build > Compile to produce a Windows installer.
-	Run the installer, then run compilevisual.py from the Visual source package to
+	2) Double-click MakeVPython.iss in the make directory. 
+	3) Near the start of the file, update AppVerName if necessary.
+	4) Do Build > Compile to produce a Windows installer.
+	5) Run the installer, then run compilevisual.py from the Visual source package to
 	Python-compile all the Visual .py files (produces .pyc files).
-	Run inno setup again, but uncomment the line that copies .pyc files.
+	6) Run inno setup again, but uncomment the line that copies .pyc files.
 	This produces a Windows installer that can be used by an administrator to
 	install a fully-compiled Visual into a protected area that users can't write
 	to. Without this second inno setup to get the .pyc files, every user would
