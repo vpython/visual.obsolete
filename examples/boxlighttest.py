@@ -1,6 +1,8 @@
 from visual import *
 import pickle
 
+# Mikhail Temkine, University of Toronto, April 2007
+
 print """
 Box lighting test
 Correct surfaces should appear shiny and polished; incorrect are dull ones
