@@ -955,6 +955,15 @@ gui_main::thread_proc(void)
 		self = new gui_main();
 		init_signal->notify_all();
 	}
+	/* Brandmeyer suggestion:
+	if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST)) {
+		VPYTHON_WARNING("Could not raise the rendering thread priority");
+	}
+	else
+	{
+		VPYTHON_NOTE("Raised the rendering thread priority to THREAD_PRIORITY_HIGHEST");
+	}
+	*/
 	self->run();
 	VPYTHON_NOTE( "Terminating GUI thread.");
 	gui_main::on_shutdown();
