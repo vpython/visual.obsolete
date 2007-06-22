@@ -6,8 +6,9 @@ srcdir = @srcdir@
 VPATH = @srcdir@
 
 if BUILD_EXAMPLES
-examplefiles = bounce.py bounce2.py colorsliders.py controlstest.py \
-	convex.py crossproduct.py crystal.py dipole.py doublependulum.py \
+examplefiles = bounce.py bounce2.py boxlighttest.py colorsliders.py \
+	controlstest.py \
+	convex.py crossproduct.py crystal.py dipole.py doublependuum.py \
 	drape.py faces_cone.py faces_heightfield.py gas.py glinfo.py \
 	graphtest.py gyro.py gyro2.py hanoi.py labels.py lathe.py \
 	lorenz.py orbit.py planar.py randombox.py stars.py \
