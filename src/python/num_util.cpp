@@ -48,7 +48,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 namespace {
-	const char* rcsid = "$Id: num_util.cpp,v 1.6 2007/01/29 20:00:00 aj_siegel Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.7 2007/06/22 17:21:59 bsherwood Exp $";
 }
 
   // Local function prototypes
@@ -231,7 +231,7 @@ std::vector<npy_intp> shape(numeric::array arr){
     PyErr_SetString(PyExc_ValueError, "expected a PyArrayObject");
     throw_error_already_set();
   }
-  int* dims_ptr = PyArray_DIMS(arr.ptr());
+  npy_intp* dims_ptr = PyArray_DIMS(arr.ptr());
   int the_rank = rank(arr);
   for (int i = 0; i < the_rank; i++){
     out_dims.push_back(*(dims_ptr + i));
