@@ -50,7 +50,7 @@ class ProgClass:
             self.angle = self.angle+pi/32.0
             self.sphere2.pos = (sin(self.angle),cos(self.angle),0)
             rate(30)
-        pp.run = "stopped" # indicate annimation has stopped
+        self.run = "stopped" # indicate animation has stopped
 
 tkr = Tk() 
 pp = ProgClass(tkr) 
@@ -74,6 +74,8 @@ tkr.mainloop() # Tk event loop
 pp.run = "stop" # stop annimation
 while pp.run == "stop":
     time.sleep(0.1) # give annimation thread time to respond "stopped"
+
+print "Closed Tk window"
 
 ##scene.hide not yet available
 ##scene.hide() # close visual
