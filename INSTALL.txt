@@ -22,7 +22,7 @@ I.  Prerequisites:
 		2.3 or higher, and is recommended in any case due to getting much
 		better error messages. 1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
-	The autoconf, automake, libtool, and pkg-config packages.
+	The autoconf, automake, libtool, pkg-config, and gtkglext packages.
 	GtkGLExtmm 1.2.x (sourceforge.net/projects/gtkglext); not needed for Windows.
 	libglademm (www.gtkmm.org); not needed for Windows.
 	numpy (numpy.sourceforge.net).
