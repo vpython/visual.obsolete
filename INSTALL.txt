@@ -18,7 +18,7 @@ I.  Prerequisites:
 	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
 		the development (dev) package.
 	numpy (numpy.sourceforge.net).
-		An implementation of OpenGL.
+	An implementation of OpenGL.
 	The Boost C++ libraries version 1.31 and higher (1.33.1 reccomended)
 		(www.boost.org). Note that 1.31 is required if you are using Python 
 		2.3 or higher, and is recommended in any case due to getting much
