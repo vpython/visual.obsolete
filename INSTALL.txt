@@ -23,7 +23,14 @@ I.  Prerequisites:
 		better error messages. 1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
 	The autoconf, automake, libtool, pkg-config, and gtkglext packages.
-	GtkGLExtmm 1.2.x (sourceforge.net/projects/gtkglext); not needed for Windows.
+	gtkglextmm 1.2.x (sourceforge.net/projects/gtkglext); not needed for Windows.
+		To install gtkglextmm:
+		1) Download the bz2 file.
+		2) Unpack the file: tar -xjf gtkglextmm-1.2.0.tar.bz2
+		3) cd to the unpacked directory
+		4) ./configure
+		5) make
+		6) sudo make install
 	libglademm (www.gtkmm.org); not needed for Windows.
 	numpy (numpy.sourceforge.net).
 	An implementation of OpenGL.
@@ -210,10 +217,9 @@ III.  Build
 		It also makes getting a backtrace impossible on most platforms. 
 
 IV.  Install
-	You must have write privaleges to the installation directory to proceed.  Unless
+	You must have write privileges to the installation directory to proceed.  Unless
 	you are installing into your home directory, that generally means becoming root
-	with a program like `sudo` or `su`
-	On Apple OSX, run `sudo make install`
+	with a program like `sudo` or `su`. Just run `sudo make install`.
 	
 	On MS Windows, you CANNOT use "make install".
 	Instead, you need to install innosetup (www.jrsoftware.org/isinfo.php).
