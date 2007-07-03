@@ -33,7 +33,7 @@ I.  Prerequisites:
 		4) ./configure
 		5) make
 		6) sudo make install
-	libglademm (www.gtkmm.org); not needed for Windows.
+	libglademm (there may be a package, or www.gtkmm.org); not needed for Windows.
 	
 	On Microsoft Windows, MinGW and MSYS are required to build VPython from 
 	source.
