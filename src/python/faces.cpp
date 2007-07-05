@@ -361,7 +361,10 @@ faces::gl_render( const view& scene)
 	std::vector<vector> spos;
 	std::vector<rgb> tcolor;
 	
-	lock L(mtx);
+	// The following lock was introduced 2007/4/10 by Mikhail Temkhine 
+	// to address a problem with heightfield on Windows. 
+	// But it blocks forever on Linux, so commented out by Bruce Sherwood 2007/7/5
+	// lock L(mtx); 
 
 	gl_enable_client vertexes( GL_VERTEX_ARRAY);
 	gl_enable_client normals( GL_NORMAL_ARRAY);
