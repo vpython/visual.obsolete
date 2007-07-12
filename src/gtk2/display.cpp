@@ -419,10 +419,10 @@ display::on_key_pressed( GdkEventKey* key)
 	if ((key->state & GDK_SHIFT_MASK) || (key->state & GDK_LOCK_MASK)) {
 		ctrl_str += "shift+";
 	}
-	else if (key->state & GDK_CONTROL_MASK) {
+	if (key->state & GDK_CONTROL_MASK) {
 		ctrl_str += "ctrl+";
 	}
-	else if (key->state & GDK_MOD1_MASK) {
+	if (key->state & GDK_MOD1_MASK) {
 		ctrl_str += "alt+";
 	}
 	
@@ -509,13 +509,80 @@ display::on_key_pressed( GdkEventKey* key)
 		ctrl_str += key_str;
 		keys.push( ctrl_str);
 	}
-	else if ( isprint(k) && !ctrl_str.empty()) {
+	else if ( isprint(k) && !ctrl_str.empty() && (ctrl_str != "shift+") ) {
 		// A control character
 		ctrl_str += static_cast<char>( k);
 		keys.push(ctrl_str);
 	}
-	else if ( strlen(key->string) && isprint( key->string[0])) {
+	else if ( isprint(k) ) {
 		// Anything else.
+		if ( ctrl_str == "shift+" ) {
+			switch (k) {
+				case ',':
+					key->string = "<";
+					break; 
+				case '.':
+					key->string = ">";
+					break; 
+				case '/':
+					key->string = "?";
+					break; 
+				case ';':
+					key->string = ":";
+					break; 
+				case '\'':
+					key->string = "\"";
+					break; 
+				case '[':
+					key->string = "{";
+					break; 
+				case ']':
+					key->string = "}";
+					break; 
+				case '\\':
+					key->string = "|";
+					break; 
+				case '`':
+					key->string = "~";
+					break; 
+				case '1':
+					key->string = "!";
+					break; 
+				case '2':
+					key->string = "@";
+					break; 
+				case '3':
+					key->string = "#";
+					break;
+				case '4':
+					key->string = "$";
+					break; 
+				case '5':
+					key->string = "%";
+					break; 
+				case '6':
+					key->string = "^";
+					break; 
+				case '7':
+					key->string = "&";
+					break; 
+				case '8':
+					key->string = "*";
+					break; 
+				case '9':
+					key->string = "(";
+					break; 
+				case '0':
+					key->string = ")";
+					break; 
+				case '-':
+					key->string = "_";
+					break; 
+				case '=':
+					key->string = "+";
+					break;
+			}
+		}
 		keys.push( std::string( key->string));
 	}
 	
