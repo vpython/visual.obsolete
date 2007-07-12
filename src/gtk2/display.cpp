@@ -15,7 +15,6 @@ using boost::lexical_cast;
 #include <gtkmm/main.h>
 #include <gdk/gdkkeysyms.h>
 
-
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/radiotoolbutton.h>
 
@@ -510,7 +509,7 @@ display::on_key_pressed( GdkEventKey* key)
 		ctrl_str += key_str;
 		keys.push( ctrl_str);
 	}
-	else if ( isprint(k) && !ctrl_str.empty() && (ctrl_str != "shift+") ) {
+	else if ( isprint(k) && !ctrl_str.empty() ) {
 		// A control character
 		ctrl_str += static_cast<char>( k);
 		keys.push(ctrl_str);
