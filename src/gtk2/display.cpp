@@ -414,20 +414,21 @@ display::on_key_pressed( GdkEventKey* key)
 {
 	// Note that this algorithm will proably fail if the user is using anything 
 	// other than a US keyboard.
+	guint k = key->keyval;
 	std::string ctrl_str;
 	// First trap for shift, ctrl, and alt.
-	if ((key->state & GDK_SHIFT_MASK) || (key->state & GDK_LOCK_MASK)) {
-		ctrl_str += "shift+";
-	}
 	if (key->state & GDK_CONTROL_MASK) {
 		ctrl_str += "ctrl+";
 	}
 	if (key->state & GDK_MOD1_MASK) {
 		ctrl_str += "alt+";
 	}
+	if ((key->state & GDK_SHIFT_MASK) || (key->state & GDK_LOCK_MASK)) {
+		if ( !isprint(k) )
+			ctrl_str += "shift+";
+	}
 	
 	// Specials, try to match those in wgl.cpp
-	guint k = key->keyval;
 	std::string key_str;
 	switch (k) {
 		case GDK_F1:
@@ -516,73 +517,6 @@ display::on_key_pressed( GdkEventKey* key)
 	}
 	else if ( isprint(k) ) {
 		// Anything else.
-		if ( ctrl_str == "shift+" ) {
-			switch (k) {
-				case ',':
-					key->string = "<";
-					break; 
-				case '.':
-					key->string = ">";
-					break; 
-				case '/':
-					key->string = "?";
-					break; 
-				case ';':
-					key->string = ":";
-					break; 
-				case '\'':
-					key->string = "\"";
-					break; 
-				case '[':
-					key->string = "{";
-					break; 
-				case ']':
-					key->string = "}";
-					break; 
-				case '\\':
-					key->string = "|";
-					break; 
-				case '`':
-					key->string = "~";
-					break; 
-				case '1':
-					key->string = "!";
-					break; 
-				case '2':
-					key->string = "@";
-					break; 
-				case '3':
-					key->string = "#";
-					break;
-				case '4':
-					key->string = "$";
-					break; 
-				case '5':
-					key->string = "%";
-					break; 
-				case '6':
-					key->string = "^";
-					break; 
-				case '7':
-					key->string = "&";
-					break; 
-				case '8':
-					key->string = "*";
-					break; 
-				case '9':
-					key->string = "(";
-					break; 
-				case '0':
-					key->string = ")";
-					break; 
-				case '-':
-					key->string = "_";
-					break; 
-				case '=':
-					key->string = "+";
-					break;
-			}
-		}
 		keys.push( std::string( key->string));
 	}
 	
