@@ -24,15 +24,19 @@ I.  Prerequisites:
 		2.3 or higher, and is recommended in any case due to getting much
 		better error messages. 1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
-	The autoconf, automake, libtool, pkg-config, and gtkglext packages.
-	gtkglextmm 1.2.x (sourceforge.net/projects/gtkglext); not needed for Windows.
-		To install gtkglextmm:
-		1) Download the bz2 file.
-		2) Unpack the file: tar -xjf gtkglextmm-1.2.0.tar.bz2
-		3) cd to the unpacked directory
-		4) ./configure
-		5) make
-		6) sudo make install
+	The autoconf, automake, libtool, and pkg-config packages.
+	gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
+	    (gtkmm and gtk2 not needed on Windows)
+	gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net); not needed for Windows.
+
+	To install gtkglextmm:
+	1) Download the bz2 file.
+	2) Unpack the file: tar -xjf gtkglextmm-1.2.0.tar.bz2
+	3) cd to the unpacked directory
+	4) ./configure
+	5) make
+	6) sudo make install
+	
 	libglademm (there may be a package, or www.gtkmm.org); not needed for Windows.
 	
 	On Microsoft Windows, MinGW and MSYS are required to build VPython from 
