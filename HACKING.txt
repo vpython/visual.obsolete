@@ -14,6 +14,11 @@ in CVS. You will have to run the autogen.sh script after a fresh checkout to
 create configure. Except on Windows, you need to execute "chmod +x autogen.sh"
 in order to be able to execute ./autogen.sh. 
 
+The result of executing autogen.sh is to produce the following files:
+	configure (from configure.ac)
+	Makefile.in (from Makefile.am)
+	aclocal.m4
+
 The source distribution is built with "make dist-bzip2"  "make bzip" is also
 supported.
 
