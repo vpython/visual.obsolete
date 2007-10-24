@@ -15,9 +15,10 @@ create configure. Except on Windows, you need to execute "chmod +x autogen.sh"
 in order to be able to execute ./autogen.sh. 
 
 The result of executing autogen.sh is to produce the following files:
-	configure (from configure.ac)
+	configure (from configure.ac and acinclude.m4)
 	Makefile.in (from Makefile.am)
 	aclocal.m4
+	config.guess, config.sub, ltmain.sh, missing
 
 The source distribution is built with "make dist-bzip2"  "make bzip" is also
 supported.
