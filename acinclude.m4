@@ -307,6 +307,8 @@ AC_DEFUN([AM_CHECK_PYTHON_HEADERS],
 	AC_MSG_CHECKING(for headers required to compile python extensions)
 	dnl deduce PYTHON_INCLUDES (modified by Jonathan Brandmeyer to get the info
 	dnl directly from Python itself).
+	dnl The following loses backslashes on Windows and gives -Ic:Python25include,
+	dnl but src/Makefile.in does produce the right include statement for Windows.
 	PYTHON_INCLUDES=-I`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_inc()"`
 	PYTHON_INCLUDES="$PYTHON_INCLUDES -I$numpyincludedir"
 	AC_SUBST(PYTHON_INCLUDES)
