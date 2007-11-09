@@ -4,7 +4,7 @@ from visual.graph import *
 from random import random
 
 # A model of an ideal gas with hard-sphere collisions
-# Program uses Numeric Python arrays for high speed computations
+# Program uses numpy arrays for high speed computations
 
 # Bruce Sherwood
 

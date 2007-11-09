@@ -21,7 +21,7 @@ dt = 86400
 i = 0
 
 while 1:
-  #rate(1000)
+  rate(600)
 
   dist = dwarf.pos - giant.pos
   force = 6.7e-11 * giant.mass * dwarf.mass * dist / mag(dist)**3

@@ -3,7 +3,7 @@ from time import clock
 from random import random
 
 # Stars interacting gravitationally
-# Program uses Numeric Python arrays for high speed computations
+# Program uses numpy arrays for high speed computations
 
 win=600
 

@@ -1,8 +1,11 @@
 from visual import *
 
 print """
-Right button drag to rotate camera to view scene.
-Middle button drag up or down to zoom in or out.
+Right button drag to rotate "camera" to view scene.
+  On a one-button mouse, right is Command + mouse.
+Middle button to drag up or down to zoom in or out.
+  On a two-button mouse, middle is left + right.
+  On a one-button mouse, middle is Option + mouse.
 """
 scene.title = "Lorenz differential equation"
 scene.center = vector(25,0,0)
