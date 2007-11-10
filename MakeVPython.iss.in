@@ -33,16 +33,25 @@ Source: "C:\MinGW\bin\mingwm10.dll"; DestDir: "{app}\Lib\site-packages\visual\";
 Source: "C:\MinGW\bin\boost_python-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual 
 Source: "C:\MinGW\bin\boost_thread-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\libsigc-2.0-0.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+; Get stripped versions of the many gtk-related dll's, which were placed in C:\MinGW\stripped:
+Source: "C:\MinGW\stripped\*.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "@WIN32_SRCDIR@\site-packages\visual\*.py"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "C:\MinGW\etc\fonts\*"; DestDir: "{app}\Lib\site-packages\visual\etc\fonts"; Components: Visual; Flags: recursesubdirs
+Source: "C:\MinGW\etc\gtk-2.0\*"; DestDir: "{app}\Lib\site-packages\visual\etc\gtk-2.0"; Components: Visual; Flags: recursesubdirs
+Source: "C:\MinGW\etc\pango\*"; DestDir: "{app}\Lib\site-packages\visual\etc\pango"; Components: Visual; Flags: recursesubdirs
+Source: "C:\MinGW\lib\gtk-2.0\*"; DestDir: "{app}\Lib\site-packages\visual\lib\gtk-2.0"; Components: Visual; Flags: recursesubdirs
+Source: "C:\MinGW\lib\pango\*"; DestDir: "{app}\Lib\site-packages\visual\lib\pango"; Components: Visual; Flags: recursesubdirs
+
 Source: "@WIN32_SRCDIR@\LIBSIGC_COPYING.txt"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "@WIN32_SRCDIR@\license.txt"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-; Source: "@WIN32_SRCDIR@\site-packages\visual\*.gif"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-; Source: "@WIN32_SRCDIR@\site-packages\visual\*.glade"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-; Source: "@WIN32_SRCDIR@\site-packages\visual\*.png"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_SRCDIR@\site-packages\visual\*.gif"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_SRCDIR@\site-packages\visual\*.glade"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "@WIN32_SRCDIR@\site-packages\visual\*.png"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 ;
 ; Uncomment the following line after compiling .pyc files, and rebuild installer:
 ;Source: "Lib\site-packages\visual\*.pyc"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 ; 
+; Need to have installed numpy before building Visual, so components available in site-packages:
 Source: "Lib\site-packages\numpy*egg-info"; DestDir: "{app}\Lib\site-packages\"; Components: numpy
 Source: "Lib\site-packages\numpy\*"; DestDir: "{app}\Lib\site-packages\numpy\"; Components: numpy; Flags: recursesubdirs
 ;

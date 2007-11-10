@@ -8,11 +8,14 @@
 #include "util/tmatrix.hpp"
 #include "util/gl_enable.hpp"
 #include "frame.hpp"
+/* This was relevant when we were using Windows-specific text processing:
 #if defined _WIN32
 #include "win32/text.hpp"
 #else
 #include "gtk2/text.hpp"
 #endif
+*/
+#include "gtk2/text.hpp"
 #include "wrap_gl.hpp"
 
 #include <cassert>

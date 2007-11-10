@@ -101,9 +101,12 @@ BOOST_PYTHON_MODULE( cvisual)
 	wrap_arrayobjects();
 	python::wrap_vector_array();
 	python::wrap_scalar_array();
+/* The following was relevant when we used Windows-specific text processing:
 #if !(defined(_WIN32) || defined(_MSC_VER))
 	wrap_glib_ustring();
 #endif
+*/
+	wrap_glib_ustring();
 }
 
 } // !namespace cvisual

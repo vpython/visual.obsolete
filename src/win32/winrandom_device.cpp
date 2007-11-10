@@ -1,3 +1,5 @@
+This file was used when there was significant Windows-specific code (pre Nov. 2007).
+
 /* boost random_device.cpp implementation
  *
  * Copyright Jens Maurer 2000
@@ -10,7 +12,7 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: winrandom_device.cpp,v 1.2 2007/01/03 14:36:34 aj_siegel Exp $
+ * $Id: winrandom_device.cpp,v 1.3 2007/11/10 17:16:01 bsherwood Exp $
  *
  */
 

@@ -1,8 +1,8 @@
 
 # Process this file with Autoconf to produce a configure script
 
-AC_INIT( [Visual Python], [4.beta16], [visualpython-users@lists.sourceforge.net])
-AM_INIT_AUTOMAKE( visual, 4.beta16)
+AC_INIT( [Visual Python], [4.beta20], [visualpython-users@lists.sourceforge.net])
+AM_INIT_AUTOMAKE( visual, 4.beta20)
 
 AC_CONFIG_SRCDIR(src/core/arrow.cpp)
 
@@ -42,21 +42,16 @@ if test $platform_win32 = yes; then
 	AC_SUBST([WIN32_SRCDIR], [`cd $srcdir ; pwd -W | sed -e "s/\\//\\\\\/g"`])
 	# The major.minor version of Python, with the "." stripped out.
 	AC_SUBST([WIN32_PYTHON_VERSION], [`echo $PYTHON_VERSION | sed -e "s/\.//"`])
-	PKG_CHECK_MODULES( GTK, sigc++-2.0, ,
-		[AC_MSG_ERROR( sigc++ 2.x is required in Windows)])
-	AC_SUBST([GTK_LIBS])
-	AC_SUBST([GTK_CFLAGS])
-else
-	PKG_CHECK_MODULES( GTK, [gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4 libglademm-2.4 freetype2], ,
-		[AC_MSG_ERROR([gtkglextmm 1.2, pangoft2, glibmm-2.4, and pangomm-1.4 libglademm-2.4 are required on Unix-like systems])])
-	AC_SUBST([GTK_LIBS])
-	AC_SUBST([GTK_CFLAGS])
-	
-	PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
-		[AC_MSG_ERROR(GThread 2.0+ is required on Unix-like systems)])
-	AC_SUBST([GTHREAD_CFLAGS])
-	AC_SUBST([GTHREAD_LIBS])
 fi
+PKG_CHECK_MODULES( GTK, [gtkglextmm-1.2 >= 1.2 pangoft2 glibmm-2.4 pangomm-1.4 libglademm-2.4 freetype2], ,
+		[AC_MSG_ERROR([gtkglextmm 1.2, pangoft2, glibmm-2.4, and pangomm-1.4 libglademm-2.4 are required on Unix-like systems])])
+AC_SUBST([GTK_LIBS])
+AC_SUBST([GTK_CFLAGS])
+	
+PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
+		[AC_MSG_ERROR(GThread 2.0+ is required on Unix-like systems)])
+AC_SUBST([GTHREAD_CFLAGS])
+AC_SUBST([GTHREAD_LIBS])
 
 # Enable documentation and visualdocdir if desired
 VISUAL_DOCS()

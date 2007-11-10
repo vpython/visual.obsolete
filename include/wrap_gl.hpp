@@ -7,6 +7,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 //A header file to wrap around GL/gl.h on *nix and Windows.
+// The MSC_VER stuff refers to an effort in early 2007 to use MS Visual Studio
 #if defined(_MSC_VER)
     #define NOMINMAX
     #include <GL/glaux.h>

@@ -35,7 +35,8 @@ BOOST_INCLUDES = # @BOOST_INCLUDES@
 WIN32_PYTHON_VERSION = $(subst .,"",$(PYTHON_VERSION))
 WIN32_LIBS = -lpython$(WIN32_PYTHON_VERSION) \
 	-lboost_python$(WIN32_PYTHON_VERSION) -lgdi32 -lopengl32 -lglu32
-WIN32_CPPFLAGS = -mthreads -mms-bitfields -I$(top_srcdir)/include/win32 \
+WIN32_CPPFLAGS = -mthreads -mms-bitfields -I$(top_srcdir)/include/win32
+WIN32_CPPFLAGS = -mthreads -mms-bitfields \
 	-IC:/Python$(WIN32_PYTHON_VERSION)/include
 WIN32_LDFLAGS = -mthreads
 
@@ -64,13 +65,13 @@ CPPFLAGS = @CPPFLAGS@
 CVISUAL_OBJS = arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
 	ellipsoid.lo frame.lo label.lo mouseobject.lo primitive.lo \
 	pyramid.lo rectangular.lo renderable.lo ring.lo sphere.lo \
-	convex.lo curve.lo cvisualmodule.lo faces.lo \
+	display.lo render_surface.lo convex.lo curve.lo cvisualmodule.lo faces.lo \
 	num_util.lo \
 	scalar_array.lo slice.lo vector_array.lo wrap_arrayobjects.lo \
 	wrap_display_kernel.lo wrap_primitive.lo wrap_rgba.lo wrap_vector.lo \
 	clipping_plane.lo displaylist.lo errors.lo extent.lo gl_free.lo lighting.lo \
-	quadric.lo rgba.lo texture.lo tmatrix.lo vector.lo icososphere.lo \
-	numeric_texture.lo points.lo atomic_queue.lo
+	quadric.lo rgba.lo texture.lo tmatrix.lo vector.lo icososphere.lo text.lo \
+	wrap_ustring.lo numeric_texture.lo points.lo atomic_queue.lo
 
 # Distribution file list.
 DISTFILES = linux-symbols.map osx-symbols.txt core gtk2 python win32
@@ -171,8 +172,7 @@ ifeq ($(PYTHON_PLATFORM),win32)
   CVISUAL_LIBS += $(WIN32_LIBS) $(GTK_LIBS) $(GTHREAD_LIBS) -lboost_thread
   CVISUAL_LDFLAGS += $(WIN32_LDFLAGS)
   PLATFORM_TARGET = cvisual.pyd
-  PLATFORM_OBJS = winrandom_device.lo winrate.lo wintimer.lo wintext.lo \
-  	winrender_surface.lo
+  PLATFORM_OBJS = winrate.lo wintimer.lo
   INSTALL_RULE = $(GENERIC_INSTALLRULE)
 else 
   # These options are common to both Linux and OSX.
@@ -186,8 +186,7 @@ else
   CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTHREAD_CFLAGS) $(PYTHON_INCLUDES)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
-  PLATFORM_OBJS = random_device.lo rate.lo timer.lo text.lo render_surface.lo \
-  	display.lo wrap_ustring.lo
+  PLATFORM_OBJS = rate.lo timer.lo
 
   ifeq ($(PYTHON_PLATFORM),darwin)
     # Special rules for OSX

@@ -1,3 +1,5 @@
+This file was used when there was significant Windows-specific code (pre Nov. 2007).
+
 // Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
 // Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
 // See the file license.txt for complete license terms.

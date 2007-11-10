@@ -58,6 +58,8 @@ into a directory, and do this:
 		> make
 		> make install
 
+See INSTALL.txt for further information on the build process itself.
+
 Some of the following is probably is now installed by the gtk2 and gtkmm installers.
 After installing gtk2 and gtkmm, check to see whether you have these packages.
  		Download pkg-config-0.20 in zip format and unzip.

@@ -5,11 +5,14 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
+/* This was relevant when we used Windows-specific window management:
 #if defined(_WIN32)
 #include "win32/display.hpp"
 #else
 #include "gtk2/display.hpp"
 #endif
+*/
+#include "gtk2/display.hpp"
 #include "mouseobject.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"

@@ -1,3 +1,5 @@
+This file was used when there was significant Windows-specific code (pre Nov. 2007).
+
 #include "win32/text.hpp"
 #include "win32/render_surface.hpp"
 #include "util/errors.hpp"

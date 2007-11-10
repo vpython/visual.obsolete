@@ -7,11 +7,14 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "renderable.hpp"
+/* The following was relevant when we had Windows-specific text processing:
 #if defined(_WIN32) || defined(_MSC_VER)
 	#include "win32/text.hpp"
 #else
 	#include "gtk2/text.hpp"
 #endif
+*/
+#include "gtk2/text.hpp"
 #include <vector>
 
 namespace cvisual {

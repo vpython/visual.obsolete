@@ -14,6 +14,8 @@ I.  Prerequisites:
 	of the packages to ensure that the required header files are 
 	available.
 
+	See the file MSWINDOWS.txt for details on how to build Visual on Windows.
+	
 	GNU g++ version 3.2.x or >= 3.3.1 (3.4.6 reccomended) (gcc.gnu.org).
 	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
 		the development (dev) package.
@@ -26,8 +28,7 @@ I.  Prerequisites:
 		GNU G++ 3.4.0 or higher to build the suite.
 	The autoconf, automake, libtool, and pkg-config packages.
 	gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
-	    (gtkmm and gtk2 not needed on Windows)
-	gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net); not needed for Windows.
+	gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net).
 
 	To install gtkglextmm:
 	1) Download the bz2 file.
@@ -37,12 +38,9 @@ I.  Prerequisites:
 	5) make
 	6) sudo make install
 	
-	libglademm (there may be a package, or www.gtkmm.org); not needed for Windows.
-	
-	On Microsoft Windows, MinGW and MSYS are required to build VPython from 
-	source.
-	
-	A.  Apple OSX (Version 10.2.x) WARNING: This is woefully out of date
+	libglademm (there may be a package, or www.gtkmm.org).
+		
+	Apple OSX (Version 10.2.x) WARNING: This is woefully out of date
 		- Go to www.apple.com/macosx/features/x11/download and download
 		both X11 and the X11 SDK.
 		- Install fink from fink.sourceforge.net.  Answer 'y' when asked
@@ -70,66 +68,6 @@ I.  Prerequisites:
 		Download
 		OpenGL is provided with the standard OS installation.
 	# TODO: include directions for building Boost.Python on OSX(gulp).
-	
-	B.  Microsoft Windows
-		Download and install MinGW, MSYS, and MSYS-DTK packages from
-		www.mingw.org. Also download the MinGW Utils package (version 0.1 or
-		higher). You may need to add C:\mingw\bin to your PATH.
-		You will also need to install msys-automake, msys-autoconf, and msys-libtool.
-		
-		Download and install Python 2.5.x from www.python.org.
-		OpenGL is provided with the standard Windows installation.
-		
-		Download and install the new numpy (http://numpy.scipy.org).
-		
-		Copy Python25's libs/libpython25.a to /mingw/lib.
-		See http://www.python.org/doc/current/inst/tweak-flags.html for discussion.
-		
-		Download a precompiled version of the 'bjam' tool from www.boost.org 
-		and place it into C:\mingw\bin (or anywhere else on your PATH).
-		
-		Download latest Boost (1.33.1) from www.boost.org.
-		> tar -xjf boost_1_33_1.tar.bz2
-		> cd boost_1_33_1
-		> bjam -sTOOLS=mingw -sMINGW_BIN_DIRECTORY=/c/MinGW/bin -sPYTHON_ROOT=/c/Python25 -sPYTHON_VERSION=2.5 stage
-		May take about an hour to build everything.
-		Copy boost_1_33_1/boost folder to mingw/include:
-		> cp -r boost/ /mingw/include/
-		
-		> cp stage/lib/boost_thread-mgw-mt-1_33_1.dll /mingw/bin
-		> cp stage/lib/boost_thread-mgw-mt-1_33_1.lib /mingw/lib/libboost_thread.a
-		> cd bin/boost/libs/python/build/boost_python.dll/mingw/release/threading-multi/
-		> cp boost_python-mgw-mt-1_33_1.dll /mingw/bin
-		> cp boost_python-mgw-mt-1_33_1.lib /mingw/lib/libboost_python25.a 
-				
-		Note: The Boost files that start with "libboost" are static libraries that we don't use.	
-		
-		Download pkg-config-0.20 in zip format and unzip.
-		One place to get it is http://www.gimp.org/~tml/gimp/win32/downloads.html.
-		Note that you also need glib-2.1.27.zip available at the same location.
-		And glib in turn requires libiconv and gettext, also available at the same location.
-		These are binary distributions; after unzipping, copy files to the corresponding
-		locations in mingw.
-		
-		A library such as sigc++, see below,
-		registers its version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
-		possible for the build process to find the installed version of the library.
-		There is some ambiguity about where to put the pkg-config pieces, as some components need
-		to be in msys. Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
-		but also to msys/1.0/share/aclocal.
-		You probably also need to set an environment variable for pkg-config:
-		Right click My Computer > Properties > Advanced > Environment Variables and
-		add a new entry: name PKG_CONFIG_PATH, value c:\mingw\lib\pkgconfig.
-		NOTE: You can run "env" in an MSYS terminal to check that the path is appropriate. 
-		
-		Download the source for libsigc++-2.0.17 from libsigc.sourceforge.net.
-		> tar -xjf libsigc++-2.0.17.tar.bz2
-		cd to the new directory, execute 
-		> ./configure --prefix=/mingw
-		> make
-		> make install
-		Can test that pkg-config is correctly installed by executing this:
-		> pkg-config --cflags sigc++-2.0cd
 
 II.   Configuration 
 	On most systems, configuration should be automatic.  Just run './configure'.

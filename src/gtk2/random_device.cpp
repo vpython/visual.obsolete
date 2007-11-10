@@ -10,7 +10,7 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: random_device.cpp,v 1.1 2004/07/31 18:20:28 jbrandmeyer Exp $
+ * $Id: random_device.cpp,v 1.2 2007/11/10 17:16:01 bsherwood Exp $
  *
  */
  
@@ -32,7 +32,7 @@ const boost::random_device::result_type boost::random_device::max_value;
 #endif
 
 // Known to be supported for GNU/Linux and Apple OSX.  Probably others as well.
-#if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__))
+//#if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__))
 
 // the default is the unlimited capacity device, using some secure hash
 // try "/dev/random" for blocking when the entropy pool has drained
@@ -100,7 +100,7 @@ private:
   int fd;
 };
 
-#endif // __linux__
+//#endif // __linux__
 
 
 boost::random_device::random_device(const std::string& token)
