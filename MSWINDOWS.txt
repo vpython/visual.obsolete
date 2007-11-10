@@ -1,4 +1,4 @@
-How to build Visual for Microsoft Windows
+HOW TO BUILD VISUAL ON MICROSOFT WINDOWS
 
 If you find gaps in this information, please tell Bruce_Sherwood@ncsu.edu.
 
@@ -88,5 +88,69 @@ After installing gtk2 and gtkmm, check to see whether you have these packages.
 		> make install
 		Can test that pkg-config is correctly installed by executing this:
 		> pkg-config --cflags sigc++-2.0cd
+
+HOW TO CREATE AN INSTALLER FOR VISUAL FOR MICROSOFT WINDOWS
+
+You need InnoSetup (www.jrsoftware.org) to create an installer for end users.
+
+In addition to mingw10.dll and a couple of Boost dll's, I included the files listed below 
+in the same directory as the main application (a .pyd file for a 3D visualization module 
+for Python, written in C++; see vpython.org). I stripped the files to save a lot of space
+and put the stripped versions in c:\MinGW\stripped. The installer, made with InnoSetup, 
+is 8.5 MB (the non-gtkmm version was 2.5 MB).
+
+I determined which dll's I needed by repeatedly running the application and one-by-one 
+getting error messages saying I was missing a dll. And then to make sure I'd gotten 
+everything, I changed the name of c:\MinGW to c:\xxxMinGW and ran again, to prevent 
+accessing dll's from the developer directories.
+
+The only Windows-specific code remaining is a substitute for gettimeofday. I see in 
+surfing the web that lots of people keep reinventing this routine for use on Windows. 
+Seems like it would make sense for it to be part of gtk for Windows.
+
+A colleague is attempting to use the new gtkmm-to-Quartz machinery on the Mac to make 
+a native Mac version of VPython with a simple installation procedure, because many of 
+our end users find it a difficult hassle installing X11 and Xcode and fink and finally 
+VPython. Hopefully we'll have essentially one set of C++ code that works on all platforms.
+
+List of gtk2-related files:
+
+MinGW/etc/fonts
+MinGW/etc/gtk-2.0
+MinGW/etc/pango
+MinGW/lib/gtk-2.0
+MinGW/lib/pango
+
+iconv.dll
+intl.dll
+libatk-1.0-0.dll
+libatkmm-1.6-1.dll
+libcairo-2.dll
+libcairomm-1.0-1.dll
+libfontconfig-1.dll
+libfreetype-6.dll
+libgdk-win32-2.0-0.dll
+libgdk_pixbuf-2.0-0.dll
+libgdkglext-win32-1.0-0.dll
+libgdkmm-2.4-1.dll
+libglade-2.0-0.dll
+libglademm-2.4-1.dll
+libglib-2.0-0.dll
+libglibmm-2.4-1.dll
+libgmodule-2.0-0.dll
+libgobject-2.0-0.dll
+libgthread-2.0-0.dll
+libgtk-win32-2.0-0.dll
+libgtkglext-win32-1.0-0.dll
+libgtkmm-2.4-1.dll
+libpango-1.0-0.dll
+libpangocairo-1.0-0.dll
+libpangoft2-1.0-0.dll
+libpangomm-1.4-1.dll
+libpangowin32-1.0-0.dll
+libpng12.dll
+libsigc-2.0-0.dll
+libxml2.dll
+zlib1.dll
 
 
