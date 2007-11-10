@@ -227,10 +227,18 @@ curve::set_pos( array n_pos)
 		n_pos = astype(n_pos, NPY_DOUBLE);
 	}
 	std::vector<npy_intp> dims = shape( n_pos);
-	if (dims.size() == 1 && !dims[0]) {
-		lock L(mtx);
-		set_length(0);
+	if (dims.size() == 1) {
+		if (!dims[0]) {
+			lock L(mtx);
+			set_length(0);
+			return;
+		}
+		else {
+			lock L(mtx);
+			set_length( dims[0]);
+			pos[make_tuple(slice(1, count+1), slice())] = n_pos;
 		return;
+		}
 	}
 	if (dims.size() != 2) {
 		throw std::invalid_argument( "pos must be an Nx3 array");
