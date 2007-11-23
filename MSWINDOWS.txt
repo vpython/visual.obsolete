@@ -47,18 +47,8 @@ such things as glib, atk, pango, cairo, glade, and fontconfig.
 
 Download the binary installer for the development version of gtkmm and install into C:\MinGW.
 At http://ftp.gnome.org/pub/gnome/binaries/win32 in the gtkmm directory, you
-need gtkmm-win32-devel-xxxx.exe.
-
-gtk+ (also called gtk2) is written in C; gtkmm is a "wrapper" of these C routines to make gtk+
+need gtkmm-win32-devel-xxxx.exe. gtk+ (also called gtk2) is written in C; gtkmm is a "wrapper" of these C routines to make gtk+
 functionality accessible to C++ programmers.
-
-Download the zip files for gtkglext and gtkglextmm and unzip them. To build them, go
-into a directory, and do this:
-		> ./configure --prefix=/mingw
-		> make
-		> make install
-
-See INSTALL.txt for further information on the build process itself.
 
 Some of the following is probably is now installed by the gtk2 and gtkmm installers.
 After installing gtk2 and gtkmm, check to see whether you have these packages.
@@ -88,6 +78,20 @@ After installing gtk2 and gtkmm, check to see whether you have these packages.
 		> make install
 		Can test that pkg-config is correctly installed by executing this:
 		> pkg-config --cflags sigc++-2.0cd
+
+Download the binary windows installer gtkglext-win32-1.2.0.exe and install gtkglext.
+
+Download the zip file for gtkglextmm-1.2.0 and unzip the source files. To build, go
+into the directory, and do this:
+		> ./configure
+		> make
+		> make install
+For some unknown reason, the build process sometimes fails, on some Windows machines.
+For that reason, the needed binaries are avalable in the developer's section of
+vpython.org.
+
+See INSTALL.txt for further information on the build process itself.
+
 
 HOW TO CREATE AN INSTALLER FOR VISUAL FOR MICROSOFT WINDOWS
 
