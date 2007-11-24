@@ -8,6 +8,7 @@
 #include "util/gl_free.hpp"
 #include "vpython-config.h"
 
+// The following are part of the gtkglextmm package:
 #include <gtkmm/gl/init.h>
 #include <gdkmm/gl/pixmap.h>
 #include <gdkmm/gl/pixmapext.h>
@@ -203,7 +204,7 @@ render_surface::forward_render_scene()
 	if (elapsed > double(cycle_time + 5)/1000) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
-		cycle_time = int(elapsed * 1000) + 5;
+		cycle_time += 5;
 		timer = Glib::signal_timeout().connect( 
 			sigc::mem_fun( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
@@ -215,8 +216,9 @@ render_surface::forward_render_scene()
 	}
 	if (elapsed < double(cycle_time-5)/1000 && cycle_time > 30) {
 		timer.disconnect();
-		// Try to give the user process some minimal execution time.
-		cycle_time = int(elapsed * 1000) + 5;
+		// Can render again sooner than current cycle_time.
+		cycle_time -= 5;
+		if (cycle_time < 30) cycle_time = 30;
 		timer = Glib::signal_timeout().connect( 
 			sigc::mem_fun( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
