@@ -1,3 +1,5 @@
+No longer used (Nov. 2007)
+
 #ifndef VPYTHON_UTIL_TIMER_HPP
 #define VPYTHON_UTIL_TIMER_HPP
 

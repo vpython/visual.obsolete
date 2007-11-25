@@ -18,6 +18,8 @@
 #include "gtk2/text.hpp"
 #include "wrap_gl.hpp"
 
+#include <glibmm/timer.h>
+
 #include <cassert>
 #include <algorithm>
 #include <iterator>
@@ -158,7 +160,6 @@ display_kernel::display_kernel()
 	lastgcf(1.0),
 	gcf_changed(false),
 	ambient( 0.2f, 0.2f, 0.2f),
-	fps( 3e-3), // Ambitiously initialize to 3 ms per cycle.
 	show_renderspeed( false),
 	background(0, 0, 0, 0), //< Transparent black.
 	spin_allowed(true),
@@ -682,8 +683,9 @@ bool
 display_kernel::render_scene(void)
 {
 	lock L(mtx);
+	// Time rendering of scene; on Windows, seems to have 1/60th sec accuracy.
+	Glib::Timer render_timer;
 	try {
-		fps.start();
 		recalc_extent();
 		view scene_geometry( forward.norm(), center, window_width,
 			window_height, forward_changed, gcf, gcfvec, gcf_changed);
@@ -796,10 +798,9 @@ display_kernel::render_scene(void)
 			}
 		}
 		if (show_renderspeed) {
-			std::ostringstream fps_msg;
-			fps_msg << "Cycle time: ";
-			fps_msg.precision(4);
-			fps_msg << fps.read();
+			std::ostringstream render_msg;
+			render_msg.precision(3);
+			render_msg << " render_time: " << render_timer.elapsed();
 			glColor3f(
 				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 
@@ -814,7 +815,7 @@ display_kernel::render_scene(void)
 			{
 				gl_disable depth_test(GL_DEPTH_TEST);
 				boost::shared_ptr<font> default_font = font::find_font();
-				boost::shared_ptr<layout> lay_out = default_font->lay_out( fps_msg.str());
+				boost::shared_ptr<layout> lay_out = default_font->lay_out( render_msg.str());
 				lay_out->gl_render( vector(5, lay_out->extent().y + 3));
 			}
 
@@ -829,7 +830,6 @@ display_kernel::render_scene(void)
 		gl_swap_buffers();
 		check_gl_error();
 		gl_end();
-		fps.stop();
 		cycles_since_extent++;
 		gcf_changed = false;
 		forward_changed = false;
@@ -1216,13 +1216,6 @@ bool
 display_kernel::is_showing_renderspeed()
 {
 	return show_renderspeed;
-}
-
-double
-display_kernel::get_renderspeed()
-{
-	lock L(mtx);
-	return fps.read();
 }
 
 void

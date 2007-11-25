@@ -11,7 +11,6 @@
 #include "util/rgba.hpp"
 #include "util/extent.hpp"
 #include "util/lighting.hpp"
-#include "util/timer.hpp"
 #include "util/thread.hpp"
 
 #include <sigc++/signal.h>
@@ -99,11 +98,8 @@ class display_kernel
 	/** Called at the end of a render cycle to complete lighting. */
 	void disable_lights();
 
-	/** A historesis timer to calculate the time to render each frame. */
-	hist_timer fps;
-
 	/** Whether or not we should display the speed of the renderer.
-	 * Default: true.
+	 * Default: false.
 	 */
 	bool show_renderspeed;
 	rgba background; ///< The background color of the scene.
@@ -285,7 +281,6 @@ public: // Public Data.
 
 	void set_show_renderspeed( bool);
 	bool is_showing_renderspeed();
-	double get_renderspeed();
 
 	void set_range_d( double);
 	void set_range( const vector&);
