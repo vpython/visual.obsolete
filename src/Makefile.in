@@ -172,7 +172,7 @@ ifeq ($(PYTHON_PLATFORM),win32)
   CVISUAL_LIBS += $(WIN32_LIBS) $(GTK_LIBS) $(GTHREAD_LIBS) -lboost_thread
   CVISUAL_LDFLAGS += $(WIN32_LDFLAGS)
   PLATFORM_TARGET = cvisual.pyd
-  PLATFORM_OBJS = winrate.lo wintimer.lo
+  PLATFORM_OBJS = winrate.lo
   INSTALL_RULE = $(GENERIC_INSTALLRULE)
 else 
   # These options are common to both Linux and OSX.
@@ -186,7 +186,7 @@ else
   CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTHREAD_CFLAGS) $(PYTHON_INCLUDES)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
-  PLATFORM_OBJS = rate.lo timer.lo
+  PLATFORM_OBJS = rate.lo
 
   ifeq ($(PYTHON_PLATFORM),darwin)
     # Special rules for OSX
