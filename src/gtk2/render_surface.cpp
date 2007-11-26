@@ -23,6 +23,7 @@
 #include <gtkmm/radiotoolbutton.h>
 
 #include <algorithm>
+#include <sstream>
 #include <iostream>
 #include <cassert>
 
@@ -185,6 +186,7 @@ render_surface::forward_render_scene()
 {
 	Glib::Timer time;
 	bool sat = core.render_scene();
+	// double scene_elapsed = time.elapsed();
 	if (!sat)
 		return sat;
 	// TODO: Figure out an optimzation to avoid performing this extra pick
@@ -201,6 +203,8 @@ render_surface::forward_render_scene()
 	 * Python thread some more CPU time.  If it is more than 5 ms less than the
 	 * timeout value, than the timeout is reduced by 5 ms, not to go below 30 ms.
 	 */
+	 
+	// std::cout << scene_elapsed << " " << (elapsed-scene_elapsed) << " " << cycle_time << std::endl;
 	if (elapsed > double(cycle_time + 5)/1000) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
