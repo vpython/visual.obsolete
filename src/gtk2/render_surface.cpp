@@ -29,6 +29,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+const long TIMEOUT = 30; // delay before next rendering
+
 namespace cvisual {
 
 namespace {
@@ -38,7 +40,7 @@ namespace {
 render_surface::render_surface( display_kernel& _core, bool activestereo)
 	: last_mousepos_x(0),
 	last_mousepos_y(0),
-	cycle_time(30),
+	cycle_time(TIMEOUT),
 	core( _core)
 {
 	Glib::RefPtr<Gdk::GL::Config> config;
@@ -201,7 +203,7 @@ render_surface::forward_render_scene()
 	 * the Python working thread.  If the time for one render pulse is
 	 * greater than the timeout value, we raise the timeout by 5 ms to give the
 	 * Python thread some more CPU time.  If it is more than 5 ms less than the
-	 * timeout value, than the timeout is reduced by 5 ms, not to go below 30 ms.
+	 * timeout value, than the timeout is reduced by 5 ms, not to go below TIMEOUT ms.
 	 */
 	 
 	// std::cout << scene_elapsed << " " << (elapsed-scene_elapsed) << " " << cycle_time << std::endl;
@@ -218,11 +220,11 @@ render_surface::forward_render_scene()
 			+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
 		return false;
 	}
-	if (elapsed < double(cycle_time-5)/1000 && cycle_time > 30) {
+	if (elapsed < double(cycle_time-5)/1000 && cycle_time > TIMEOUT) {
 		timer.disconnect();
 		// Can render again sooner than current cycle_time.
 		cycle_time -= 5;
-		if (cycle_time < 30) cycle_time = 30;
+		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
 		timer = Glib::signal_timeout().connect( 
 			sigc::mem_fun( *this, &render_surface::forward_render_scene),
 			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
