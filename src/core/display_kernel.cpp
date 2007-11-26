@@ -18,8 +18,6 @@
 #include "gtk2/text.hpp"
 #include "wrap_gl.hpp"
 
-#include <glibmm/timer.h>
-
 #include <cassert>
 #include <algorithm>
 #include <iterator>
@@ -683,8 +681,10 @@ bool
 display_kernel::render_scene(void)
 {
 	lock L(mtx);
-	// Time rendering of scene; on Windows, seems to have 1/60th sec accuracy.
-	Glib::Timer render_timer;
+	double comp_time; // computational time since end of previous rendering
+	if (show_renderspeed) {
+		comp_time = render_timer.elapsed();
+	}
 	try {
 		recalc_extent();
 		view scene_geometry( forward.norm(), center, window_width,
@@ -800,7 +800,10 @@ display_kernel::render_scene(void)
 		if (show_renderspeed) {
 			std::ostringstream render_msg;
 			render_msg.precision(3);
-			render_msg << " render_time: " << render_timer.elapsed();
+			render_msg << "comp_time: " << comp_time;
+			render_msg << " render_time: " << render_timer.elapsed()-comp_time;
+			render_timer.reset();
+			render_timer.start(); // time the next computational segment starting now
 			glColor3f(
 				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 

@@ -19,6 +19,8 @@
 #include <set>
 #include <string>
 
+#include <glibmm/timer.h>
+
 #include <boost/iterator/indirect_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
 
@@ -140,7 +142,6 @@ class display_kernel
 	// Compute the tangents of half the vertical and half the horizontal
 	// true fields-of-view.
 	void tan_hfov( double* x, double* y);
-
 
 public: // Public Data.
 	enum mouse_mode_t { ZOOM_ROTATE, ZOOM_ROLL, PAN, FIXED } mouse_mode;
@@ -281,6 +282,8 @@ public: // Public Data.
 
 	void set_show_renderspeed( bool);
 	bool is_showing_renderspeed();
+	
+	Glib::Timer render_timer;
 
 	void set_range_d( double);
 	void set_range( const vector&);
