@@ -29,7 +29,7 @@ public:
 		:x(a), y(b), z(c) {}
 
 	inline explicit vector( const double* v)
-		: x( v[0]), y(v[1]), z(v[2]) {}
+		: x(v[0]), y(v[1]), z(v[2]) {}
 
 	// Overloaded binary +, -, *, and /
 	inline vector
@@ -42,12 +42,12 @@ public:
 
 	inline vector
 	operator*( const double s) const throw()
-	{ return vector( s*x, y*s, z*s); }
+	{ return vector( s*x, s*y, s*z); }
 
-	// Element-wise multiplication
+	// Element-wise multiplication (WHAT IS THIS FOR? AND DOESN'T SEEM TO WORK....)
 	inline vector
 	operator*( const vector& v) const throw()
-	{ return vector(x * v.x, y*v.y, z*v.z); }
+	{ return vector(x*v.x, y*v.y, z*v.z); }
 
 	inline vector
 	operator/( const double s) const throw()
