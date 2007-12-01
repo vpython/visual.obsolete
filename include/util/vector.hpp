@@ -26,7 +26,7 @@ public:
 
 public:
 	explicit vector( double a = 0.0, double b = 0.0, double c = 0.0) throw()
-		:x(a), y(b), z(c) {}
+		: x(a), y(b), z(c) {}
 
 	inline explicit vector( const double* v)
 		: x(v[0]), y(v[1]), z(v[2]) {}
@@ -47,7 +47,7 @@ public:
 	// Element-wise multiplication (WHAT IS THIS FOR? AND DOESN'T SEEM TO WORK....)
 	inline vector
 	operator*( const vector& v) const throw()
-	{ return vector(x*v.x, y*v.y, z*v.z); }
+	{ return vector( x*v.x, y*v.y, z*v.z); }
 
 	inline vector
 	operator/( const double s) const throw()
