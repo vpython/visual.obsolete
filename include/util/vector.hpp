@@ -45,6 +45,7 @@ public:
 	{ return vector( s*x, s*y, s*z); }
 
 	// Element-wise multiplication (WHAT IS THIS FOR? AND DOESN'T SEEM TO WORK....)
+	// Yet it seems to be used in frame.cpp
 	inline vector
 	operator*( const vector& v) const throw()
 	{ return vector( x*v.x, y*v.y, z*v.z); }
