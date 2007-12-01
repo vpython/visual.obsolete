@@ -1,7 +1,12 @@
 #include "util/rate.hpp"
 
-#include <sys/time.h>
-#include <time.h>
+#if defined(_WIN32)
+	#include "win32/timeval.h"
+#else
+	#include <sys/time.h>
+	#include <time.h>
+#endif
+
 #include <math.h>
 #include <unistd.h>
 
