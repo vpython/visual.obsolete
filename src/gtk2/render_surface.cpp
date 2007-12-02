@@ -186,7 +186,7 @@ render_surface::on_realize()
 bool
 render_surface::forward_render_scene()
 {
-	//std::cout << "]" << std::endl;
+	long old_cycle_time = cycle_time;
 	Glib::Timer time;
 	bool sat = core.render_scene();
 	double scene_elapsed = time.elapsed();
@@ -197,7 +197,6 @@ render_surface::forward_render_scene()
 	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
 		core.pick( last_mousepos_x, last_mousepos_y);
 
-#if 1
 	double elapsed = time.elapsed();
 	/* Scheduling logic for the rendering pulse.  This code is intended to make
 	 * the rendering loop a better citizen with regard to sharing CPU time with
@@ -206,6 +205,11 @@ render_surface::forward_render_scene()
 	 * Python thread some more CPU time.  If it is more than 5 ms less than the
 	 * timeout value, than the timeout is reduced by 5 ms, not to go below TIMEOUT ms.
 	 */
+	 
+#if 0
+	std::cout << scene_elapsed << " " << (elapsed-scene_elapsed) <<
+	     " " << cycle_time << std::endl;
+#endif
 	 
 	if (elapsed > double(cycle_time + 5)/1000) {
 		timer.disconnect();
@@ -217,24 +221,19 @@ render_surface::forward_render_scene()
 		// Can render again sooner than current cycle_time.
 		cycle_time -= 5;
 		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
-		
-	timer = Glib::signal_timeout().connect( 
-		sigc::mem_fun( *this, &render_surface::forward_render_scene),
-		cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
-	
-	VPYTHON_NOTE( 
-		std::string("Changed rendering cycle time to ") 
-		+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
-		
-#if 0
-	std::cout << scene_elapsed << " " << (elapsed-scene_elapsed) <<
-	     " " << cycle_time << std::endl << "[";
-#endif
-
-	return false;
-		
 	}
-#endif
+	
+	if (cycle_time != old_cycle_time) {	
+		timer = Glib::signal_timeout().connect( 
+			sigc::mem_fun( *this, &render_surface::forward_render_scene),
+			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
+		
+		VPYTHON_NOTE( 
+			std::string("Changed rendering cycle time to ") 
+			+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
+		return false;
+	}
+				
 	return sat;
 }
 
