@@ -186,9 +186,10 @@ render_surface::on_realize()
 bool
 render_surface::forward_render_scene()
 {
+	//std::cout << "]" << std::endl;
 	Glib::Timer time;
 	bool sat = core.render_scene();
-	// double scene_elapsed = time.elapsed();
+	double scene_elapsed = time.elapsed();
 	if (!sat)
 		return sat;
 	// TODO: Figure out an optimzation to avoid performing this extra pick
@@ -206,33 +207,31 @@ render_surface::forward_render_scene()
 	 * timeout value, than the timeout is reduced by 5 ms, not to go below TIMEOUT ms.
 	 */
 	 
-	// std::cout << scene_elapsed << " " << (elapsed-scene_elapsed) << " " << cycle_time << std::endl;
 	if (elapsed > double(cycle_time + 5)/1000) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
 		cycle_time += 5;
-		timer = Glib::signal_timeout().connect( 
-			sigc::mem_fun( *this, &render_surface::forward_render_scene),
-			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
-		
-		VPYTHON_NOTE( 
-			std::string("Changed rendering cycle time to ") 
-			+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
-		return false;
 	}
 	if (elapsed < double(cycle_time-5)/1000 && cycle_time > TIMEOUT) {
 		timer.disconnect();
 		// Can render again sooner than current cycle_time.
 		cycle_time -= 5;
 		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
-		timer = Glib::signal_timeout().connect( 
-			sigc::mem_fun( *this, &render_surface::forward_render_scene),
-			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
 		
-		VPYTHON_NOTE( 
-			std::string("Changed rendering cycle time to ") 
-			+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
-		return false;
+	timer = Glib::signal_timeout().connect( 
+		sigc::mem_fun( *this, &render_surface::forward_render_scene),
+		cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
+	
+	VPYTHON_NOTE( 
+		std::string("Changed rendering cycle time to ") 
+		+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
+		
+#if 0
+	std::cout << scene_elapsed << " " << (elapsed-scene_elapsed) <<
+	     " " << cycle_time << std::endl << "[";
+#endif
+
+	return false;
 		
 	}
 #endif
