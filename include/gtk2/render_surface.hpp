@@ -34,6 +34,9 @@ class render_surface : public Gtk::GL::DrawingArea
 	long cycle_time;
 	// Used to disconnect the timer when resetting the time.
 	sigc::connection timer;
+	
+	Glib::Timer stopwatch; // a diagnostic tool as well as a mechanism for adjusing TIMEOUT
+	double last_time; // the last time render_surface was run
  	
  public:
 	render_surface( display_kernel& _core, bool activestereo = false);

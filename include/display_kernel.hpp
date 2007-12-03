@@ -40,6 +40,8 @@ class display_kernel
  	static std::string renderer;
  	static std::string version;
  	static std::string vendor;
+ 	double last_time;
+
  protected:
 	mutable mutex mtx;
  private:

@@ -159,6 +159,7 @@ display_kernel::display_kernel()
 	gcf_changed(false),
 	ambient( 0.2f, 0.2f, 0.2f),
 	show_renderspeed( false),
+	last_time(0),
 	background(0, 0, 0, 0), //< Transparent black.
 	spin_allowed(true),
 	zoom_allowed(true),
@@ -681,9 +682,11 @@ bool
 display_kernel::render_scene(void)
 {
 	lock L(mtx);
-	double comp_time; // computational time since end of previous rendering
+	double start_time, cycle;
 	if (show_renderspeed) {
-		comp_time = render_timer.elapsed();
+		start_time = render_timer.elapsed();
+		cycle = start_time - last_time;
+		last_time = start_time;
 	}
 	try {
 		recalc_extent();
@@ -800,10 +803,9 @@ display_kernel::render_scene(void)
 		if (show_renderspeed) {
 			std::ostringstream render_msg;
 			render_msg.precision(3);
-			render_msg << "comp_time: " << comp_time;
-			render_msg << " render_time: " << render_timer.elapsed()-comp_time;
-			render_timer.reset();
-			render_timer.start(); // time the next computational segment starting now
+			// (render + pick) is approximately 2*rendering
+			render_msg << "cycle: " << int(1000*cycle) << 
+			   " render*2: " << int(2000*(render_timer.elapsed()-start_time));
 			glColor3f(
 				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 

@@ -7,6 +7,7 @@
 #include "util/errors.hpp"
 #include "util/gl_free.hpp"
 #include "vpython-config.h"
+#include "python/gil.hpp"
 
 // The following are part of the gtkglextmm package:
 #include <gtkmm/gl/init.h>
@@ -41,6 +42,7 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 	: last_mousepos_x(0),
 	last_mousepos_y(0),
 	cycle_time(TIMEOUT),
+	last_time(0),
 	core( _core)
 {
 	Glib::RefPtr<Gdk::GL::Config> config;
@@ -186,18 +188,22 @@ render_surface::on_realize()
 bool
 render_surface::forward_render_scene()
 {
-	long old_cycle_time = cycle_time;
-	Glib::Timer time;
-	bool sat = core.render_scene();
-	double scene_elapsed = time.elapsed();
+	//python::gil_lock L; // An experiment....
+	
+	double start_time = stopwatch.elapsed();
+	double cycle = start_time - last_time;
+	last_time = start_time;
+	bool sat = core.render_scene(); // render the scene
+	double rendering = stopwatch.elapsed()-start_time; // time to render scene
+
 	if (!sat)
 		return sat;
 	// TODO: Figure out an optimzation to avoid performing this extra pick
 	// rendering cycle when the user isn't looking at scene.mouse[.{pick,pickpos,pos}]
 	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
 		core.pick( last_mousepos_x, last_mousepos_y);
+	double total = stopwatch.elapsed()-start_time; // time for render + pick
 
-	double elapsed = time.elapsed();
 	/* Scheduling logic for the rendering pulse.  This code is intended to make
 	 * the rendering loop a better citizen with regard to sharing CPU time with
 	 * the Python working thread.  If the time for one render pulse is
@@ -207,16 +213,19 @@ render_surface::forward_render_scene()
 	 */
 	 
 #if 0
-	std::cout << scene_elapsed << " " << (elapsed-scene_elapsed) <<
-	     " " << cycle_time << std::endl;
+	// cycle_time, one actual cycle, (render+pick), estimate of computation during cycle
+	std::cout << cycle_time << " " << int(1000*cycle) << " " << 
+		int(1000*total) << " " << int(1000*(cycle-total)) << std::endl;
 #endif
-	 
-	if (elapsed > double(cycle_time + 5)/1000) {
+	
+	double old_cycle_time = cycle_time;
+	
+	if (total > double(cycle_time + 5)/1000) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
 		cycle_time += 5;
 	}
-	if (elapsed < double(cycle_time-5)/1000 && cycle_time > TIMEOUT) {
+	if (total < double(cycle_time-5)/1000 && cycle_time > TIMEOUT) {
 		timer.disconnect();
 		// Can render again sooner than current cycle_time.
 		cycle_time -= 5;
@@ -231,9 +240,9 @@ render_surface::forward_render_scene()
 		VPYTHON_NOTE( 
 			std::string("Changed rendering cycle time to ") 
 			+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
+			
 		return false;
 	}
-				
 	return sat;
 }
 
