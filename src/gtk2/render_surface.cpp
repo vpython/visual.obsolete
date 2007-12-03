@@ -218,17 +218,18 @@ render_surface::forward_render_scene()
 		int(1000*total) << " " << int(1000*(cycle-total)) << std::endl;
 #endif
 	
-	double old_cycle_time = cycle_time;
+	long old_cycle_time = cycle_time;
 	
-	if (total > double(cycle_time + 5)/1000) {
+	if ((1000*cycle) > (cycle_time+5)) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
-		cycle_time += 5;
+		cycle_time = 2000*total;
+		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
 	}
-	if (total < double(cycle_time-5)/1000 && cycle_time > TIMEOUT) {
+	if (((1000*cycle) < (cycle_time-5)) && cycle_time > TIMEOUT) {
 		timer.disconnect();
 		// Can render again sooner than current cycle_time.
-		cycle_time -= 5;
+		cycle_time = 2000*total;
 		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
 	}
 	
