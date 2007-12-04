@@ -188,7 +188,7 @@ render_surface::on_realize()
 bool
 render_surface::forward_render_scene()
 {
-	//python::gil_lock L; // An experiment....
+	python::gil_lock L; // Must lock out Python computation while rendering
 	
 	double start_time = stopwatch.elapsed();
 	double cycle = start_time - last_time;
