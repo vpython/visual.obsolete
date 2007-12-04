@@ -193,6 +193,7 @@ render_surface::forward_render_scene()
 	double start_time = stopwatch.elapsed();
 	double cycle = start_time - last_time;
 	last_time = start_time;
+	//std::cout << "R";
 	bool sat = core.render_scene(); // render the scene
 
 	if (!sat)
@@ -211,7 +212,7 @@ render_surface::forward_render_scene()
 	 * timeout value, than the timeout is reduced by 5 ms, not to go below TIMEOUT ms.
 	 */
 	 
-#if 1
+#if 0
 	// cycle_time, one actual cycle, (render+pick), estimate of computation during cycle
 	std::cout << cycle_time << " " << int(1000*cycle) << " " << 
 		int(1000*total) << " " << int(1000*(cycle-total)) << std::endl;
@@ -219,17 +220,17 @@ render_surface::forward_render_scene()
 	
 	long old_cycle_time = cycle_time;
 	
-	if ((1000*cycle) > (cycle_time+5)) {
+	if ((2*total) > (cycle+.005)) {
 		timer.disconnect();
 		// Try to give the user process some minimal execution time.
-		cycle_time = 2000*total;
+		cycle_time += 5;
 		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
 	}
 
-	if (((1000*cycle) < (cycle_time-5)) && cycle_time > TIMEOUT) {
+	if (((2*total) < (cycle-.005)) && cycle_time > TIMEOUT) {
 		timer.disconnect();
 		// Can render again sooner than current cycle_time.
-		cycle_time = 2000*total;
+		cycle_time -= 5;
 		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
 	}
 	
