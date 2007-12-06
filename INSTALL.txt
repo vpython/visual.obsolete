@@ -27,6 +27,7 @@ I.  Prerequisites:
 		2.3 or higher, and is recommended in any case due to getting much
 		better error messages. 1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
+		Specifically, you need libboost-python-dev and libboost-threads-dev.
 	The autoconf, automake, libtool, and pkg-config packages.
 	gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
 	gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net).
