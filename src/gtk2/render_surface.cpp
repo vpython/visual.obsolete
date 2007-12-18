@@ -215,7 +215,7 @@ render_surface::forward_render_scene()
 	long irender = int(1000*(render_time+pick_time));
 	long icycle = int(1000*cycle);
 
-#if 1
+#if 0
 	// cycle_time, one actual cycle, 
 	// render_time, pick_time, render+pick, estimate of computation during cycle
 	std::cout << cycle_time << " " << icycle << " " << 
