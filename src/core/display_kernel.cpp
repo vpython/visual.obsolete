@@ -801,11 +801,12 @@ display_kernel::render_scene(void)
 			}
 		}
 		if (show_renderspeed) {
+			double render_time = render_timer.elapsed()-start_time;
 			std::ostringstream render_msg;
 			render_msg.precision(3);
-			// (render + pick) is approximately 2*rendering
+			// render time does not include pick time, which may be negligible
 			render_msg << "cycle: " << int(1000*cycle) << 
-			   " render*2: " << int(2000*(render_timer.elapsed()-start_time));
+			   " render: " << int(1000*(render_time));
 			glColor3f(
 				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 
