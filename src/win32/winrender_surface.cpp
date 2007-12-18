@@ -958,7 +958,7 @@ gui_main::thread_proc(void)
 		init_signal->notify_all();
 	}
 	
-	// Brandmeyer suggestion:
+	// Brandmeyer suggestion: (http://msdn2.microsoft.com/en-us/library/ms685100.aspx)
 	/*
 	if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST)) {
 		VPYTHON_WARNING("Could not raise the rendering thread priority");
