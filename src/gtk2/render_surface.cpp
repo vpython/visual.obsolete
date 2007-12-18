@@ -30,7 +30,11 @@
 
 #include <boost/lexical_cast.hpp>
 
-const long TIMEOUT = 30; // delay before next rendering
+#if defined(_WIN32) || defined(_MSC_VER)
+	#include <windows.h>
+#endif
+
+const long TIMEOUT = 50; // delay before next rendering
 
 namespace cvisual {
 
@@ -182,19 +186,24 @@ render_surface::on_realize()
 	// priority over user-initiated GUI events, like mouse clicks and such.
 	timer = Glib::signal_timeout().connect( 
 		sigc::mem_fun( *this, &render_surface::forward_render_scene),
-		cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
+		//cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
+		cycle_time, Glib::PRIORITY_HIGH);
 }
 
 bool
 render_surface::forward_render_scene()
 {
-	python::gil_lock L; // Must lock out Python computation while rendering
+#if defined(_WIN32) || defined(_MSC_VER)
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+#endif
+
+	//python::gil_lock L; // Experiment: lock out Python computation while rendering
 	
 	double start_time = stopwatch.elapsed();
 	double cycle = start_time - last_time;
 	last_time = start_time;
-	//std::cout << "R";
 	bool sat = core.render_scene(); // render the scene
+	double render_time = stopwatch.elapsed() - start_time;
 
 	if (!sat)
 		return sat;
@@ -202,42 +211,45 @@ render_surface::forward_render_scene()
 	// rendering cycle when the user isn't looking at scene.mouse[.{pick,pickpos,pos}]
 	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
 		core.pick( last_mousepos_x, last_mousepos_y);
-	double total = stopwatch.elapsed()-start_time; // time for render + pick
+	double pick_time = stopwatch.elapsed() - start_time - render_time;
+	long irender = int(1000*(render_time+pick_time));
+	long icycle = int(1000*cycle);
 
-	/* Scheduling logic for the rendering pulse.  This code is intended to make
-	 * the rendering loop a better citizen with regard to sharing CPU time with
-	 * the Python working thread.  If the time for one render pulse is
-	 * greater than the timeout value, we raise the timeout by 5 ms to give the
-	 * Python thread some more CPU time.  If it is more than 5 ms less than the
-	 * timeout value, than the timeout is reduced by 5 ms, not to go below TIMEOUT ms.
+#if 1
+	// cycle_time, one actual cycle, 
+	// render_time, pick_time, render+pick, estimate of computation during cycle
+	std::cout << cycle_time << " " << icycle << " " << 
+		int(1000*render_time) << " " << int(1000*pick_time) << " " <<
+		irender << " " << 
+		(icycle-irender) << std::endl;
+#endif
+
+	/* Scheduling logic for the rendering pulse. This code is intended to make
+	 * the rendering loop a good citizen with regard to sharing CPU time with
+	 * the Python computational thread. If the time for one render pulse is
+	 * large (small) compared to the most recent cycle_time specification, 
+	 * we increase (decrease) the timeout, not to go below TIMEOUT ms or 
+	 * above 500 ms. 
+	 * 
+	 * A refinement would be to run rendering full-time if computation has
+	 * stopped (e.g. at the end of a program, or when waiting for an event).
 	 */
 	 
-#if 0
-	// cycle_time, one actual cycle, (render+pick), estimate of computation during cycle
-	std::cout << cycle_time << " " << int(1000*cycle) << " " << 
-		int(1000*total) << " " << int(1000*(cycle-total)) << std::endl;
-#endif
-	
 	long old_cycle_time = cycle_time;
-	
-	if ((2*total) > (cycle+.005)) {
-		timer.disconnect();
-		// Try to give the user process some minimal execution time.
-		cycle_time += 5;
-		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
-	}
-
-	if (((2*total) < (cycle-.005)) && cycle_time > TIMEOUT) {
-		timer.disconnect();
-		// Can render again sooner than current cycle_time.
-		cycle_time -= 5;
-		if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
-	}
-	
+	if ((icycle-irender) < (TIMEOUT/2))
+		cycle_time += 16;
+	else if ((icycle-irender) > TIMEOUT) 
+		cycle_time = irender+16;
+	if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
+	if (cycle_time > 500) cycle_time = 500;
 	if (cycle_time != old_cycle_time) {	
+		// Adjust last_time because next cycle starts now:
+		last_time += render_time+pick_time;
+		timer.disconnect();
 		timer = Glib::signal_timeout().connect( 
 			sigc::mem_fun( *this, &render_surface::forward_render_scene),
-			cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
+			//cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
+			cycle_time, Glib::PRIORITY_HIGH);
 		
 		VPYTHON_NOTE( 
 			std::string("Changed rendering cycle time to ") 
@@ -245,6 +257,7 @@ render_surface::forward_render_scene()
 			
 		return false;
 	}
+
 	return sat;
 }
 
