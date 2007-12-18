@@ -86,7 +86,7 @@ display::set_dataroot( Glib::ustring _dataroot)
 
 display::display()
 	: active( false),
-	x( -1),
+	x(-1),
 	y(-1),
 	width( 430),
 	height( 430),
@@ -309,17 +309,18 @@ display::create()
 	
 	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
 	window->show_all();
-	if (x > 0 || y > 0) {
-		// Accept the defaults allocated by the window manager when none
-		// was requested by the user.
-		int init_x = 0, init_y = 0;
-		window->get_position( init_x, init_y);
+	int init_x, init_y;
+	window->get_position( init_x, init_y);
+	if (x >= 0 || y >= 0) { // if user specified x or y
 		if (x < 0)
 			x = init_x;
 		if (y < 0)
 			y = init_y;
-		
 		window->move( (int)x, (int)y);
+	}
+	else {
+		x = init_x;
+		y = init_y;
 	}
 	if (fullscreen)
 		window->fullscreen();
