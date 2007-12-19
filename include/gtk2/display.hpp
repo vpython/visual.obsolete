@@ -47,10 +47,14 @@ class display : public display_kernel,
 	bool exit; ///< True when Visual should shutdown on exit.
 	bool visible; ///< True when the user has requested this window to be visible.
 	bool fullscreen; ///< True when the display is in fullscreen mode.
+	bool show_toolbar; ///< True when toolbar is displayed (pan, etc).
 	std::string title;
  
 	// The 'selected' display.
 	static shared_ptr<display> selected;
+	
+	static int titlebar_height;
+	static int toolbar_height;
 	
 	// The interface for reading keyboard presses from this display in Python.
 	atomic_queue<std::string> keys;
@@ -79,12 +83,18 @@ class display : public display_kernel,
  
 	bool is_fullscreen();
 	void set_fullscreen( bool);
+ 
+	bool is_showing_toolbar();
+	void set_show_toolbar( bool);
 
 	virtual void add_renderable( shared_ptr<renderable>);
 	virtual void add_renderable_screen( shared_ptr<renderable>);
 	
 	static void set_selected( shared_ptr<display> d);
 	static shared_ptr<display> get_selected();
+	
+	static int get_titlebar_height();
+	static int get_toolbar_height();
 	
 	static void set_dataroot( Glib::ustring dataroot);
 	
@@ -103,10 +113,11 @@ class display : public display_kernel,
 	void on_rotate_clicked();
 	bool on_window_delete( GdkEventAny*);
 	void on_quit_clicked();
+	void on_zoom_clicked();
 	bool on_key_pressed( GdkEventKey*);
 };
 
-// A singlton.  This class provides all of the abstraction from the Gtk::Main
+// A singleton.  This class provides all of the abstraction from the Gtk::Main
 // object, in addition to providing asynchronous communication channels between
 // threads.
 class gui_main : public sigc::trackable

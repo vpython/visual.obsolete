@@ -138,8 +138,8 @@ display_kernel::calc_camera()
 }
 
 display_kernel::display_kernel()
-	: window_width(384),
-	window_height(256),
+	: window_width(430),
+	window_height(430),
 	center(mtx, 0, 0, 0),
 	forward(mtx, 0, 0, -1),
 	up(mtx, 0, 1, 0),

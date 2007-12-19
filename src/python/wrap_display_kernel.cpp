@@ -309,10 +309,16 @@ wrap_display_kernel(void)
 		.add_property( "title", &display::get_title, &display::set_title)
 		.add_property( "fullscreen", &display::is_fullscreen,
 			&display::set_fullscreen)
+		.add_property( "toolbar", &display::is_showing_toolbar,
+			&display::set_show_toolbar)
 		.def( "set_selected", &display::set_selected)
 		.staticmethod( "set_selected")
 		.def( "get_selected", &display::get_selected)
 		.staticmethod( "get_selected")
+		.def( "get_titlebar_height", &display::get_titlebar_height)
+		.staticmethod( "get_titlebar_height")
+		.def( "get_toolbar_height", &display::get_toolbar_height)
+		.staticmethod( "get_toolbar_height")
 		.add_property( "visible", &display::get_visible, &display::set_visible)
 		.add_property( "kb", py::make_function(
 			&display::get_kb, py::return_internal_reference<>()))

@@ -73,6 +73,8 @@ using boost::thread;
 	
 
 shared_ptr<display> display::selected;
+int display::titlebar_height;
+int display::toolbar_height;
 
 namespace {
 Glib::ustring dataroot = "";
@@ -93,6 +95,7 @@ display::display()
 	exit(true),
 	visible(true),
 	fullscreen(false),
+	show_toolbar(true),
 	title( "VPython")
 {
 }
@@ -241,6 +244,18 @@ display::get_selected()
 	return selected;
 }
 
+int
+display::get_titlebar_height()
+{
+	return 23;
+}
+
+int
+display::get_toolbar_height()
+{
+	return 37;
+}
+
 bool
 display::is_fullscreen()
 {
@@ -254,6 +269,21 @@ display::set_fullscreen( bool fs)
 		throw std::runtime_error( 
 			"Cannot change the window's state after initialization.");
 	fullscreen = fs;
+}
+
+bool
+display::is_showing_toolbar()
+{
+	return show_toolbar;
+}
+
+void
+display::set_show_toolbar( bool fs)
+{
+	if (active)
+		throw std::runtime_error( 
+			"Cannot change the window's state after initialization.");
+	show_toolbar = fs;
 }
 
 namespace {
@@ -292,23 +322,33 @@ display::create()
 		sigc::mem_fun( *this, &display::on_key_pressed));
 	
 	// Glade-based UI.
-	glade_file = Gnome::Glade::Xml::create( dataroot + "vpython.glade");
-	get_widget<Gtk::ToolButton>(glade_file, "quit_button")->signal_clicked().connect(
-		sigc::mem_fun( *this, &display::on_quit_clicked));
-	get_widget<Gtk::ToolButton>(glade_file, "fullscreen_button")->signal_clicked().connect(
-		sigc::mem_fun( *this, &display::on_fullscreen_clicked));
-	get_widget<Gtk::ToolButton>(glade_file, "rotate_zoom_button")->signal_clicked().connect(
-		sigc::mem_fun( *this, &display::on_rotate_clicked));
-	get_widget<Gtk::ToolButton>(glade_file, "pan_button")->signal_clicked().connect(
-		sigc::mem_fun( *this, &display::on_pan_clicked));
-	window = get_widget<Gtk::Window>(glade_file, "window1");
-	get_widget<Gtk::VBox>( glade_file, "vbox1")->pack_start( *area);
-
+	if (show_toolbar) {
+		glade_file = Gnome::Glade::Xml::create( dataroot + "vpython.glade");
+		get_widget<Gtk::ToolButton>(glade_file, "quit_button")->signal_clicked().connect(
+			sigc::mem_fun( *this, &display::on_quit_clicked));
+		get_widget<Gtk::ToolButton>(glade_file, "fullscreen_button")->signal_clicked().connect(
+			sigc::mem_fun( *this, &display::on_fullscreen_clicked));
+		get_widget<Gtk::ToolButton>(glade_file, "rotate_zoom_button")->signal_clicked().connect(
+			sigc::mem_fun( *this, &display::on_rotate_clicked));
+		get_widget<Gtk::ToolButton>(glade_file, "pan_button")->signal_clicked().connect(
+			sigc::mem_fun( *this, &display::on_pan_clicked));
+		get_widget<Gtk::ToolButton>(glade_file, "zoom_to_fit_button")->signal_clicked().connect(
+			sigc::mem_fun( *this, &display::on_zoom_clicked));
+		window = get_widget<Gtk::Window>(glade_file, "window1");
+		get_widget<Gtk::VBox>( glade_file, "vbox1")->pack_start( *area);
+	}
+	else { // this does not work; it crashes:
+		glade_file = Gnome::Glade::Xml::create( dataroot + "vpython_notoolbar.glade");
+		window = get_widget<Gtk::Window>(glade_file, "window1");
+		get_widget<Gtk::VBox>( glade_file, "vbox1")->pack_start( *area);
+	}
 
 	window->set_title( title);
 	
 	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
+	
 	//window->set_position(Gtk::WIN_POS_NONE); // seems not needed
+	
 	// It would make more sense to show_all after move, to avoid possible
 	// flashing of the window from an initial position to its final
 	// position. But at least on Windows this causes problems, at least
@@ -370,6 +410,14 @@ display::on_fullscreen_clicked()
 		window->fullscreen();
 		fullscreen = true;
 	}
+}
+
+void
+display::on_zoom_clicked()
+{
+	set_center(vector(0, 0, 0));
+	set_forward(vector(0, 0, -1));
+	set_up(vector(0, 1, 0));
 }
 
 void
