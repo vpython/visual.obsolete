@@ -6,7 +6,7 @@
 </head>
 
 <body>
-<h2 align="center">Summary of new features in the VPython 4.0 beta release </h2>
+<h2 align="center">Summary of new features in the VPython version 4 beta release </h2>
 <p align="center"><a href="index.html">Back to contents</a></p>
 <h3>Beta release</h3>
 <p>This beta release is experimental in the sense that there are known bugs described 
@@ -14,13 +14,13 @@
   but be aware that you may encounter problems, especially on Windows.</p>
 <p>There is a new example program texture_and_lighting.py that displays many of 
   the new features: a swinging spotlight illuminates a translucent beach ball 
-  that rolls on a wood-texture table.</p>
-<h3>New &quot;pan&quot; mode </h3>
-<p>At the top of a graphics window is a new icon to change right-button dragging
+  that rolls on a wood-texture table. Also see the
+  example program boxlighttest.py.</p>
+<h3>New toolbar with &quot;pan&quot; mode </h3>
+<p>At the top of a graphics window is a toolbar with an icon to change right-button dragging
   to &quot;pan&quot; rather than rotate (and another icon to switch back). There are also
   icons to exit the program, switch
-  to or from full-screen mode, and  reset to the original camera position (this
-  reset option is not yet working).</p>
+  to or from full-screen mode, and  reset to the original camera position. At the moment this toolbar is always present, but it will be made optional with the toolbar absent by default, for window positioning compatibility with existing programs. (The problem is that the height of the window is increased by the toolbar.) </p>
 <h3>Opacity</h3>
 <p>You can make most objects be partially transparent by specifying a value from
    0-1 inclusive for the attribute &quot;opacity&quot;. For example, box(color=color.red,
@@ -124,6 +124,8 @@
 </p>
 <h3>Specifying a gray</h3>
 <p>For convenience you can now say color=0.7 to mean color=(0.7,0.7,0.7).</p>
+<h3>Titlebar and toolbar heights </h3>
+<p>The height in pixels of the titlebar is given by display.get_titlebar_height(), and the height of the (to be optional) toolbar is given by display.get_toolbar_height(). These values are true for all windows, and these functions are associated with the display class of objects, not with individual displays such as the standard scene. So scene.get_titlebar_height() won't work..</p>
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
 <p>There is one major known bug still being worked on: Depending on the graphics 
   card and driver, performance with some programs on Windows may be so poor that 
