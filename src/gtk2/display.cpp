@@ -308,6 +308,11 @@ display::create()
 	window->set_title( title);
 	
 	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
+	//window->set_position(Gtk::WIN_POS_NONE); // seems not needed
+	// It would make more sense to show_all after move, to avoid possible
+	// flashing of the window from an initial position to its final
+	// position. But at least on Windows this causes problems, at least
+	// with multiple physical displays (extended desktop).
 	window->show_all();
 	int init_x, init_y;
 	window->get_position( init_x, init_y);
