@@ -70,11 +70,8 @@ using boost::thread;
  * as normal without any objects within it.  When an object is explicitly made
  * invisible, the owning window is hidden and destoyed.  It is recreated as needed.
  */
-	
 
 shared_ptr<display> display::selected;
-int display::titlebar_height;
-int display::toolbar_height;
 
 namespace {
 Glib::ustring dataroot = "";

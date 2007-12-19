@@ -52,10 +52,7 @@ class display : public display_kernel,
  
 	// The 'selected' display.
 	static shared_ptr<display> selected;
-	
-	static int titlebar_height;
-	static int toolbar_height;
-	
+		
 	// The interface for reading keyboard presses from this display in Python.
 	atomic_queue<std::string> keys;
 	
