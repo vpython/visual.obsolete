@@ -9,6 +9,11 @@
 #include "vpython-config.h"
 #include "python/gil.hpp"
 
+#if !(defined(_WIN32) || defined(_MSC_VER))
+#include <sys/time.h>
+#include <sys/resource.h>
+#endif
+
 // The following are part of the gtkglextmm package:
 #include <gtkmm/gl/init.h>
 #include <gdkmm/gl/pixmap.h>
@@ -193,8 +198,12 @@ render_surface::on_realize()
 bool
 render_surface::forward_render_scene()
 {
+// Make sure this rendering thread has high priority:
 #if defined(_WIN32) || defined(_MSC_VER)
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+#else
+	int default_prio = getpriority(PRIO_PROCESS, getpid());
+	setpriority(PRIO_PROCESS, getpid(), std::max(default_prio -5, -20));
 #endif
 
 	//python::gil_lock L; // Experiment: lock out Python computation while rendering
