@@ -43,7 +43,7 @@ class curve : public renderable
 	void set_length( size_t new_length);
 	
 	// Returns true if the object is single-colored.
-	bool monochrome( size_t begin, size_t end);
+	bool monochrome();
 	
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;
@@ -120,8 +120,8 @@ class curve : public renderable
 	
  private:
 	
-	void thinline( const view&, size_t begin, size_t end);
-	void thickline( const view&, size_t begin, size_t end);
+	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
+	void thickline( const view&, const float* spos, float* tcolor, size_t pcount);
 
 };
 

@@ -480,10 +480,10 @@ curve::degenerate() const
 
 
 bool
-curve::monochrome( size_t begin, size_t end)
+curve::monochrome()
 {
-	const double* color_i = index( color, begin);
-	const double* color_end = index( color, end);
+	const double* color_i = index( color, 0);
+	const double* color_end = index( color, count);
 
 	rgb first_color( (float) color_i[0], (float) color_i[1],(float) color_i[2]);
 	color_i += 3;
@@ -587,74 +587,41 @@ curve::grow_extent( extent& world)
 	world.add_body();
 }
 
-void
-curve::thinline( const view& scene, size_t begin, size_t end)
+bool
+curve::adjust_colors( const view& scene, float* tcolor, size_t pcount)
 {
-	assert( end > begin);
-	// The following may be empty, but they are kept at this scope to ensure
-	// that their memory will be valid when rendering the body below.
-	double (*spos)[3] = NULL;
-	double (*tcolor)[3] = NULL;
-
-	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
-		// Must scale the pos data.
-		spos = new double[end-begin][3];
-		const double* pos_i = index( pos, begin);
-		for (size_t i = 0; i < end-begin; ++i, pos_i += 3) {
-			spos[i][0] = pos_i[0] * scene.gcfvec[0];
-			spos[i][1] = pos_i[1] * scene.gcfvec[1];
-			spos[i][2] = pos_i[2] * scene.gcfvec[2];
-		}
-		glVertexPointer( 3, GL_DOUBLE, 0, spos);
-	}
-	else {
-		glVertexPointer( 3, GL_DOUBLE, 0, index(pos, begin));
-	}
-	bool segment_monochrome = monochrome( begin, end);
-	if (segment_monochrome) {
+	rgb rendered_color;
+	bool mono = monochrome();
+	if (mono) {
 		// We can get away without using a color array.
-		const double* c_i = index( color, begin);
-		rgb scolor( (float) c_i[0], (float) c_i[1], (float) c_i[2]);
+		rendered_color = rgb( tcolor[0], tcolor[1], tcolor[2]);
 		if (scene.anaglyph) {
 			if (scene.coloranaglyph)
-				scolor.desaturate().gl_set();
+				rendered_color.desaturate().gl_set();
 			else
-				scolor.grayscale().gl_set();
+				rendered_color.grayscale().gl_set();
 		}
 		else
-			scolor.gl_set();
+			rendered_color.gl_set();
 	}
 	else {
 		glEnableClientState( GL_COLOR_ARRAY);
 		if (scene.anaglyph) {
 			// Must desaturate or grayscale the color.
-			tcolor = new double[end-begin][3];
 
-			const double* color_i = index( color, begin);
-			const double* color_end = index( color, end);
-			for (size_t i = 0; i < end-begin && color_i < color_end; ++i, color_i += 3) {
-				rgb scolor( (float) color_i[0], (float) color_i[1],(float) color_i[2]);
+			for (size_t i = 0; i < pcount; ++i) {
+				rendered_color = rgb( tcolor[3*i], tcolor[3*i+1], tcolor[3*i+2]);
 				if (scene.coloranaglyph)
-					scolor = scolor.desaturate();
+					rendered_color = rendered_color.desaturate();
 				else
-					scolor = scolor.grayscale();
-				tcolor[i][0] = scolor.red;
-				tcolor[i][1] = scolor.green;
-				tcolor[i][2] = scolor.blue;
+					rendered_color = rendered_color.grayscale();
+				tcolor[3*i] = rendered_color.red;
+				tcolor[3*i+1] = rendered_color.green;
+				tcolor[3*i+2] = rendered_color.blue;
 			}
-			glColorPointer( 3, GL_FLOAT, 0, tcolor);
 		}
-		else
-			glColorPointer( 3, GL_DOUBLE, 0, index( color, begin));
 	}
-	glDrawArrays( GL_LINE_STRIP, 0, end-begin);
-
-	if (!segment_monochrome)
-		glDisableClientState( GL_COLOR_ARRAY);
-	if (spos)
-		delete[] spos;
-	if (tcolor)
-		delete[] tcolor;
+	return mono;
 }
 
 namespace {
@@ -667,10 +634,8 @@ struct converter
 
 
 void
-curve::thickline( const view& scene, size_t begin, size_t end)
+curve::thickline( const view& scene, const float* spos, float* tcolor, size_t pcount)
 {
-	assert( end > begin);
-
 	size_t curve_around = sides;
 	std::vector<vector> projected;
 	std::vector<vector> normals;
@@ -682,26 +647,10 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 	vector lastx(1, 0, 0), lasty(0, 1, 0);
 
 	// pos and color iterators
-	const double* v_i = index( pos, begin);
-	const double* c_i = index( color, begin);
-	bool mono = monochrome( begin, end);
-	rgb rendered_color;
-	if (mono) {
-		// Manipulate colors when we are in stereo mode.
-		rendered_color = rgb( static_cast<float>( c_i[0]),
-		                     static_cast<float>( c_i[1]),
-		                     static_cast<float>( c_i[2]));
-		if (scene.anaglyph) {
-			if (scene.coloranaglyph) {
-				rendered_color = rendered_color.desaturate();
-			}
-			else {
-				rendered_color = rendered_color.grayscale();
-			}
-		}
-	}
+	const float* v_i = spos;
+	const float* c_i = tcolor;
+	bool mono = adjust_colors( scene, tcolor, pcount);
 
-	size_t count = end - begin;
 	bool first = true;
 	for(size_t corner=0; corner < count; ++corner, v_i += 3, c_i += 3 ) {
 		// The vector to which v_i currently points towards.
@@ -778,40 +727,22 @@ curve::thickline( const view& scene, size_t begin, size_t end)
 		x *= radius;
 		y *= radius;
 
-		if (!mono) {
-			// Manipulate colors when we are in stereo mode.
-			rendered_color = rgb( static_cast<float>( c_i[0]),
-			                     static_cast<float>( c_i[1]),
-			                     static_cast<float>( c_i[2]));
-			if (scene.anaglyph) {
-				if (scene.coloranaglyph) {
-					rendered_color = rendered_color.desaturate();
-				}
-				else {
-					rendered_color = rendered_color.grayscale();
-				}
-			}
-		}
-
 		for (size_t a=0; a < curve_around; a++) {
 			float c = cost[a];
 			float s = sint[a];
 			normals.push_back( (x*c + y*s).norm());
-			projected.push_back( (current + x*c + y*s)*scene.gcf);
+			projected.push_back( current + x*c + y*s);
 			if (!mono) {
-				light.push_back( rendered_color);
+				light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
 			}
 		}
 	}
 	size_t npoints = normals.size() / curve_around;
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
-	if (mono) {
-		rendered_color.gl_set();
-		glDisableClientState( GL_COLOR_ARRAY);
-	}
-	else
+	if (!mono) {
 		glEnableClientState( GL_COLOR_ARRAY);
+	}
 
 	int *ind = curve_slice;
 	for (size_t a=0; a < curve_around; a++) {
@@ -873,7 +804,39 @@ curve::gl_render( const view& scene)
 		pos_end[1] = pos_last[1] + (pos_last[1] - pos_last[1-3]);
 		pos_end[2] = pos_last[2] + (pos_last[2] - pos_last[2-3]);
 	}
+	
+	// The maximum number of points to display.
+	const int LINE_LENGTH = 5000;
+	// Data storage for the position and color data.
+	float spos[3*LINE_LENGTH];
+	float tcolor[3*LINE_LENGTH];
+	float fstep = ( ((float) count)-1.0)/(LINE_LENGTH-1.0);
+	if (fstep < 1.0) fstep = 1.0;
+	size_t iptr=0, iptr3, pcount=0;
 
+	const double* p_i = (double*)( data(this->pos));
+	const double* c_i = (double*)( data(this->color));
+	
+	// Choose which points to display
+	for (float fptr=0.0; iptr < count; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
+		iptr3 = 3*(iptr+1); // first real point is the second in the data array
+		spos[3*pcount] = p_i[iptr3];
+		spos[3*pcount+1] = p_i[iptr3+1];
+		spos[3*pcount+2] = p_i[iptr3+2];
+		tcolor[3*pcount] = c_i[iptr3];
+		tcolor[3*pcount+1] = c_i[iptr3+1];
+		tcolor[3*pcount+2] = c_i[iptr3+2];
+	}
+	
+	// Do scaling if necessary
+	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
+		for (size_t i = 0; i < pcount; ++i) {
+			spos[3*i] *= scene.gcfvec[0];
+			spos[3*i+1] *= scene.gcfvec[1];
+			spos[3*i+2] *= scene.gcfvec[2];
+		}
+	}
+		
 	clear_gl_error();
 
 	size_t size = std::min(c_cache::items, true_size);
@@ -895,42 +858,38 @@ curve::gl_render( const view& scene)
 		lighting_prepare();
 		shiny_prepare();
 	}
-	while (size > 1) {
-		assert( c != c_end);
-		// TODO: Make a smarter caching algorithm.  Should only make a cache
-		// if the checksum has been constant for some predetermined number of
-		// rendering cycles.
-		long check = checksum( begin, begin+size);
-		if (check == c->checksum && !scene.gcf_changed) {
-			c->gl_cache.gl_render();
-		}
-		else {
-			c->gl_cache.gl_compile_begin();
-			if (do_thinline)
-				thinline( scene, begin, begin+size);
-			else
-				thickline( scene, begin, begin+size);
-			c->gl_cache.gl_compile_end();
-			c->checksum = check;
-			c->gl_cache.gl_render();
-		}
-		begin += size-1;
-		size = (begin + 256 < true_size)
-			? 256 : true_size-begin;
-		++c;
-	}
-	if (do_thinline) {
-		glDisableClientState( GL_VERTEX_ARRAY);
-		glDisableClientState( GL_COLOR_ARRAY);
-		glEnable( GL_LIGHTING);
-		if (antialias) {
-			glDisable( GL_BLEND);
-			glDisable( GL_LINE_SMOOTH);
-		}
+	assert( c != c_end);
+	// TODO: Make a smarter caching algorithm.  Should only make a cache
+	// if the checksum has been constant for some predetermined number of
+	// rendering cycles.
+	long check = checksum( begin, begin+size);
+	if (check == c->checksum && !scene.gcf_changed) {
+		c->gl_cache.gl_render();
 	}
 	else {
-		shiny_complete();
-		lighting_complete();
+		c->gl_cache.gl_compile_begin();
+		if (do_thinline) {
+			//thinline( scene, spos, tcolor, pcount);
+			glVertexPointer( 3, GL_FLOAT, 0, spos);
+			bool mono = adjust_colors( scene, tcolor, pcount);
+			if (!mono) glColorPointer( 3, GL_FLOAT, 0, tcolor);
+			glDrawArrays( GL_LINE_STRIP, 0, pcount);
+			glDisableClientState( GL_VERTEX_ARRAY);
+			glDisableClientState( GL_COLOR_ARRAY);
+			glEnable( GL_LIGHTING);
+			if (antialias) {
+				glDisable( GL_BLEND);
+				glDisable( GL_LINE_SMOOTH);
+			}
+		}
+		else {
+			thickline( scene, spos, tcolor, pcount);
+			shiny_complete();
+			lighting_complete();
+		}
+		c->gl_cache.gl_compile_end();
+		c->checksum = check;
+		c->gl_cache.gl_render();
 	}
 
 	check_gl_error();
