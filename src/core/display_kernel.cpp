@@ -801,7 +801,6 @@ display_kernel::render_scene(void)
 			}
 		}
 		if (show_renderspeed) {
-			double render_time = render_timer.elapsed()-start_time;
 			std::ostringstream render_msg;
 			render_msg.precision(3);
 			// render time does not include pick time, which may be negligible
@@ -845,6 +844,9 @@ display_kernel::render_scene(void)
 		msg << "OpenGL error: " << e.what() << ", aborting.\n";
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
+	}
+	if (show_renderspeed) {
+		render_time = render_timer.elapsed()-start_time;
 	}
 	return true;
 }

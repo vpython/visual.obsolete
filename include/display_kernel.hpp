@@ -41,10 +41,13 @@ class display_kernel
  	static std::string version;
  	static std::string vendor;
  	double last_time;
+ 	double render_time;
 
  protected:
 	mutable mutex mtx;
  private:
+	
+	Glib::Timer render_timer; // for timing the render pulse
 
 	float window_width; ///< The last reported width of the window.
 	float window_height; ///< The last reported height of the window.
@@ -284,8 +287,6 @@ public: // Public Data.
 
 	void set_show_renderspeed( bool);
 	bool is_showing_renderspeed();
-	
-	Glib::Timer render_timer;
 
 	void set_range_d( double);
 	void set_range( const vector&);
