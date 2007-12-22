@@ -87,14 +87,16 @@ display::display()
 	: active( false),
 	x(-1),
 	y(-1),
-	width( 430),
-	height( 430),
 	exit(true),
 	visible(true),
 	fullscreen(false),
 	show_toolbar(true),
 	title( "VPython")
 {
+	width = 600;
+	// set full window height to be 600 (or very close)
+	height = 600-get_titlebar_height()-2;
+	if (show_toolbar) height -= get_toolbar_height();
 }
 
 display::~display()
@@ -151,14 +153,17 @@ display::set_height( float _height)
 {
 	if (active)
 		throw std::invalid_argument( "Cannot move the window once it is active.");
-	height = _height;
+	height = _height-get_titlebar_height()-2;
+	if (show_toolbar) height -= get_toolbar_height();
 }
 
 float
 display::get_height()
 {
 	lock L(mtx);
-	return height;
+	float h = height+get_titlebar_height()+2;
+	if (show_toolbar) h += get_toolbar_height();
+	return h;
 }
 
 void
@@ -244,7 +249,11 @@ display::get_selected()
 int
 display::get_titlebar_height()
 {
+#if !(defined(_WIN32) || defined(_MSC_VER))
 	return 23;
+#else
+	return 25; // Ubuntu Linux; unknown what situation is on Mac
+#endif
 }
 
 int
