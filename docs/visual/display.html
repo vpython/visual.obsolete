@@ -173,7 +173,7 @@
       <span class="attribute">scene.cursor.visible = 0</span>, the mouse cursor 
       becomes invisible. This is often appropriate while dragging an object using 
       the mouse. Restore the cursor with <span class="attribute">scene.cursor.visible 
-      = 1</span>.</P>
+      = 1</span>.  NOT YET IMPLEMENTED IN VISUAL 4. </P>
     <P CLASS="attributes"><span class="attribute">objects</span> A list of all 
       the visible objects in the display; invisible objects are not listed. For 
       example, this makes all boxes in the scene red: </P>
@@ -208,7 +208,7 @@
 
     <P CLASS="attributes"> <span class="attribute">width</span>, <span class="attribute">height</span> 
 
-      Width and height of the display area in pixels: scene.height = 200</P>
+      Width and height of the display area in pixels: scene.height = 200 (includes title bar and tool bar). The height in pixels of the titlebar is given by display.get_titlebar_height(), and the height of the (to be optional) toolbar is given by display.get_toolbar_height(). These values are true for all windows, and these functions are associated with the display class of objects, not with individual displays such as the standard scene. So scene.get_titlebar_height() won't work.. </P>
 
     <P CLASS="attributes"> <span class="attribute">title</span> Text in the window's 
 
@@ -303,26 +303,20 @@
     <P CLASS="attributes"> <span class="attribute">uniform = 0</span> (useful
       for 2D displays of graphs) each axis 
 
-      has different units and scales</P>
-
-    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;only
+      has different units and scales only
       curve, points, faces, and label are supported; use scene.range to set the
       scale factors</P>
 
     <P CLASS="attributes"> <span class="attribute">uniform = 1</span> (default)
       each axis 
 
-      has the same scale</P>
+      has the same scale; autoscale scales 
 
-    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;autoscale scales 
-
-      axes together</P>
-
-    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the aspect 
+      axes together; the aspect 
 
       ratio of the window does not affect scaling</P>
 
-    <P CLASS="attributes"> <span class="attribute">up</span> A vector representing 
+    <P CLASS="attributes"> &nbsp;<span class="attribute">up</span> A vector representing 
 
       world-space up. This vector will always project to a vertical line on the 
 
@@ -332,7 +326,7 @@
 
       this axis when the user rotates &quot;horizontally&quot;. By default the 
 
-      y axis is the <span class="attribute">up</span> vector.</P>
+    y axis is the <span class="attribute">up</span> vector.</P>
 
     <P CLASS="attributes"> There is an interaction between <span class="attribute">up</span> 
 
@@ -354,13 +348,9 @@
 
     <P CLASS="attributes"> <span class="attribute">autoscale = 0</span> no automatic 
 
-      scaling (set range or scale explicitly)</P>
+      scaling (set range or scale explicitly);<span class="attribute">&nbsp;autoscale 
 
-    <P CLASS="attributes"> <span class="attribute">&nbsp;&nbsp;&nbsp;&nbsp;autoscale 
-
-      = 1</span> automatic scaling (default)</P>
-
-    <P CLASS="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;It is often useful to let Visual 
+      = 1</span> automatic scaling (default). It is often useful to let Visual 
 
       make an initial display with autoscaling, then turn autoscaling off to prevent 
 

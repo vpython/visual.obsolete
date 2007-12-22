@@ -20,7 +20,7 @@
 <p>At the top of a graphics window is a toolbar with an icon to change right-button dragging
   to &quot;pan&quot; rather than rotate (and another icon to switch back). There are also
   icons to exit the program, switch
-  to or from full-screen mode, and  reset to the original camera position. At the moment this toolbar is always present, but it will be made optional with the toolbar absent by default, for window positioning compatibility with existing programs. (The problem is that the height of the window is increased by the toolbar.) </p>
+  to or from full-screen mode, and  reset to a standard camera position. </p>
 <h3>Opacity</h3>
 <p>You can make most objects be partially transparent by specifying a value from
    0-1 inclusive for the attribute &quot;opacity&quot;. For example, box(color=color.red,
@@ -114,6 +114,9 @@
 <p>You can now make a frame visible or invisible, and all objects in the frame 
   will be affected. And you can set the vector &quot;scale&quot; attribute of 
   a frame to change the size of the combined object.</p>
+<h3>New aspects of curves </h3>
+<p>In older versions of VPython, no matter how many points were in a curve, only 1000 were displayed, selected evenly over the full set of points, in order that the display of a very long curve doesn't slow down unacceptably. In the new version this is still true but the number of points displayed is 10000. </p>
+<p>The new option curve.retain = 500 means that only the 500 most recently added points of a curve will be displayed; the earlier ones are deleted. This is a nice option for having a moving object leave a tail behind itself. </p>
 <h3>Nonuniform axes</h3>
 <p>The option  scene.uniform = False now facilitates making graphs of functions
   and is used by the module visual.graph. The option is useful for making 2D
@@ -127,16 +130,9 @@
 <h3>Titlebar and toolbar heights </h3>
 <p>The height in pixels of the titlebar is given by display.get_titlebar_height(), and the height of the (to be optional) toolbar is given by display.get_toolbar_height(). These values are true for all windows, and these functions are associated with the display class of objects, not with individual displays such as the standard scene. So scene.get_titlebar_height() won't work..</p>
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
-<p>There is one major known bug still being worked on: Depending on the graphics 
-  card and driver, performance with some programs on Windows may be so poor that 
-  the program hardly runs (but performance may be okay on another computer). This 
-  problem is not yet understood.</p>
-<p>Another rather serious bug is that on some Windows machines mouse dragging 
-  is very sluggish, but putting a &quot;rate(100)&quot; statement in the drag 
-  loop fixes the problem.</p>
-<p>Some animations on some Windows machines continually pause for short times.</p>
-<p>Here are known bugs that are less serious:</p>
+<p>Here are known bugs:</p>
 <blockquote>
+  <p>Some scenes display more slowly than desired, or the animation is jerky. </p>
   <p>Autoscaling is pretty good but occasionally positions the camera farther 
     from the scene than you would prefer.</p>
   <p>In a column of many rings along the x axis, at least on Windows, occasionally 

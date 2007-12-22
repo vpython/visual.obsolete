@@ -127,6 +127,7 @@ Color components of points in the curve</p>
 <p class="attributes"> <span class="attribute">radius</span> Radius of
 cross-section of curve<br>
 The default radius=0 makes a thin curve</p>
+<p class="attributes"><span class="attribute">retain</span> The  option curve.retain = 500 means that only the 500 most recently added points of a curve will be displayed; the earlier ones are deleted  (curve.retain = 0 is the default and means that all points are retained). This is a nice option for having a moving object leave a tail behind itself</p>
 <p class="Normal">&nbsp; </p>
 <p class="Normal"><font color="#0000a0">Adding more points to a curve</font></p>
 <p class="Normal"> Curves can be created incrementally with the <span
@@ -186,7 +187,7 @@ c.append( pos=(0,1,0) ) # add blue point</p>
 </div>
 </div>
 <div>
-<h1 class="Heading-1">&nbsp; </h1>
+  <p class="Heading-1">Technical note: No matter how many points are in a curve, only 10000 are displayed, selected evenly over the full set of points, in order that the display of a very long curve doesn't slow down unacceptably. </p>
 </div>
 <hr>
 <div class="navigation">
