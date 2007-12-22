@@ -28,6 +28,7 @@ class curve : public renderable
 	array color;
 	bool antialias;
 	double radius;
+	int retain; // how many recent points to retain
 	// the space allocated for storage so far
 	size_t preallocated_size;
 	// the number of vectors currently occupying the allocated storage.
@@ -89,6 +90,7 @@ class curve : public renderable
 	
 	inline bool get_antialias( void) { return antialias; }
 	inline double get_radius( void) { return radius; }
+	inline int get_retain( void) { return retain; }
 
 	void set_pos( array pos); // An Nx3 array
 	void set_pos_l( const list& pos); // A list of vector
@@ -99,6 +101,8 @@ class curve : public renderable
 	
 	void set_antialias( bool);
 	void set_radius( const double& r);
+	void set_retain( int);
+	
 	void set_red( const array& red);
 	void set_red_l( const list& red);
 	void set_red_d( const double red);

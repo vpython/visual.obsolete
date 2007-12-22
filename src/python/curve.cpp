@@ -51,6 +51,7 @@ float* findex( const array& a, size_t i)
 curve::curve()
 	: pos( 0), color( 0), antialias( true),
 	radius(0.0),
+	retain(0),
 	preallocated_size(257),
 	count(0), sides(4)
 {
@@ -86,7 +87,7 @@ curve::curve()
 
 curve::curve( const curve& other)
 	: renderable( other), pos( other.pos), color( other.color),
-	antialias( other.antialias),
+	antialias( other.antialias), retain( other.retain),
 	radius( other.radius), preallocated_size( other.preallocated_size),
 	count( other.count)
 {
@@ -126,8 +127,26 @@ curve::set_length( size_t length)
 {
 	// The number of points that are valid.
 	size_t npoints = count;
-	if (npoints > length) // A shrink operation - never done by VPython.
-		npoints = length;
+	if (length < npoints) { // A shrink operation
+		const size_t shift = (npoints-length);
+		double* pos_i = index( pos, shift);
+		double* pos_end = index( pos, npoints);
+		while (pos_i < pos_end) {
+			pos_i[0-3*shift] = pos_i[0];
+			pos_i[1-3*shift] = pos_i[1];
+			pos_i[2-3*shift] = pos_i[2];
+			pos_i += 3;
+		}
+
+		double* color_i = index( color, shift);
+		double* color_end = index( color, npoints);
+		while (color_i < color_end) {
+			color_i[0-3*shift] = color_i[0];
+			color_i[1-3*shift] = color_i[1];
+			color_i[2-3*shift] = color_i[2];
+			color_i += 3;
+		}
+	}
 	if (npoints == 0)
 		// The first allocation.
 		npoints = 1;
@@ -179,6 +198,9 @@ void
 curve::append_rgb( vector npos, double red, double blue, double green)
 {
 	lock L(mtx);
+	if (retain > 0 and count >= retain) {
+		set_length( retain-1); //move pos and color lists down
+	}
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
 	double* last_color = index( color, count-1);
@@ -197,6 +219,9 @@ void
 curve::append( vector npos)
 {
 	lock L(mtx);
+	if (retain > 0 and count >= retain) {
+		set_length( retain-1); //move pos and color lists down
+	}
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
 	last_pos[0] = npos.x;
@@ -208,6 +233,9 @@ void
 curve::append( vector npos, rgb ncolor)
 {
 	lock L(mtx);
+	if (retain > 0 and count >= retain) {
+		set_length( retain-1); //move pos and color lists down
+	}
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
 	double* last_color = index( color, count-1);
@@ -237,7 +265,8 @@ curve::set_pos( array n_pos)
 			lock L(mtx);
 			set_length( dims[0]);
 			pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-		return;
+			if (count > retain) set_length( retain);
+			return;
 		}
 	}
 	if (dims.size() != 2) {
@@ -248,12 +277,14 @@ curve::set_pos( array n_pos)
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice(0,2))] = n_pos;
 		pos[make_tuple(slice(1, count+1), 2)] = 0.0;
+		if (count > retain) set_length( retain);
 		return;
 	}
 	else if (dims[1] == 3) {
 		lock L(mtx);
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice())] = n_pos;
+		if (count > retain) set_length( retain);
 		return;
 	}
 	else {
@@ -289,6 +320,7 @@ curve::set_color( array n_color)
 		int npoints = (count) ? count : 1;
 		lock L(mtx);
 		color[slice(1,npoints+1)] = n_color;
+		if (count > retain) set_length( retain);
 		return;
 	}
 	if (dims.size() == 2 && dims[1] == 3) {
@@ -297,6 +329,7 @@ curve::set_color( array n_color)
 		}
 		lock L(mtx);
 		color[slice(1, count+1)] = n_color;
+		if (count > retain) set_length( retain);
 		return;
 	}
 	throw std::invalid_argument( "color must be an Nx3 array");
@@ -470,6 +503,16 @@ curve::set_antialias( bool aa)
 {
 	lock L(mtx);
 	this->antialias = aa;
+}
+
+void
+curve::set_retain( int retain)
+{
+	lock L(mtx);
+	if (retain > 0 and count > retain) {
+		set_length( retain); //move pos and color lists down
+	}
+	this->retain = retain;
 }
 
 bool
@@ -806,7 +849,7 @@ curve::gl_render( const view& scene)
 	}
 	
 	// The maximum number of points to display.
-	const int LINE_LENGTH = 5000;
+	const int LINE_LENGTH = 10000;
 	// Data storage for the position and color data.
 	float spos[3*LINE_LENGTH];
 	float tcolor[3*LINE_LENGTH];
@@ -862,6 +905,7 @@ curve::gl_render( const view& scene)
 	// TODO: Make a smarter caching algorithm.  Should only make a cache
 	// if the checksum has been constant for some predetermined number of
 	// rendering cycles.
+
 	long check = checksum( begin, begin+size);
 	if (check == c->checksum && !scene.gcf_changed) {
 		c->gl_cache.gl_render();

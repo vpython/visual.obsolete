@@ -37,6 +37,7 @@ wrap_arrayobjects()
 		.def( init<const curve&>())
 		.add_property( "radius", &curve::get_radius, &curve::set_radius)  // AKA thickness.
 		.add_property( "antialias", &curve::get_antialias, &curve::set_antialias)
+		.add_property( "retain", &curve::get_retain, &curve::set_retain)
 		.def( "get_color", &curve::get_color)
 		.def( "set_color", &curve::set_color_l)
 		.def( "set_color", &curve::set_color)
