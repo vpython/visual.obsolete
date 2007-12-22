@@ -3,7 +3,6 @@ import pickle
 ## ruth chabay, carnegie mellon university, 2000-06
 ## rings may be dragged through stuff - a little surreal
 
-scene.y=0
 scene.width=800
 scene.title="Tower of Hanoi"
 print "Move the stack to the white pole."

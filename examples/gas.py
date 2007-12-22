@@ -26,7 +26,7 @@ scene = display(title="Gas", width=win, height=win, x=0, y=0,
 
 deltav = 100. # binning for v histogram
 vdist = gdisplay(x=0, y=win, ymax = Natoms*deltav/1000.,
-             width=win, height=win/2, xtitle='v', ytitle='dN')
+             width=win, height=0.6*win, xtitle='v', ytitle='dN')
 theory = gcurve(color=color.cyan)
 
 dv = 10.

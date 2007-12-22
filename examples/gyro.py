@@ -13,7 +13,6 @@ Click again on rotor to hide these arrows.
 arrowsvisible = 0  # angular momentum and angular impulse arrows
 
 scene.title = 'Gyroscope'
-scene.height = scene.width = 500
 scene.visible = 0
 top = vector(0,1.,0) # where top of spring is held
 ks = 100. # spring stiffness

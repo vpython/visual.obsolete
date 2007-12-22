@@ -39,7 +39,7 @@ for x in arange(-2, 2,1):
         bars[(x,-yo,z)]=cyl
 
 # set reasonable viewing angle
-scene.center=(-.5,0,-.5)
+scene.center=(-.5,-.5,-.5)
 scene.forward = (0,-0.05,-1)
 scene.autoscale=0
 

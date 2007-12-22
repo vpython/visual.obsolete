@@ -9,18 +9,14 @@ Middle button to drag up or down to zoom in or out.
 """
 scene.title = "Lorenz differential equation"
 scene.center = vector(25,0,0)
-##scene.lights = [ ((0.25, 0.5, 1.0, 0.), (0.6,0.6,0.6)),
-##                 ((-1.0, 0.25, -0.5), (0.2,0.2,0.2)) ]
 
 lorenz = curve( color = color.black, radius=0.3 )
 
 # Draw grid
 for x in arange(0,51,10):
-    curve( pos = [ (x,0,-25), (x,0,25) ], color = (0,0.5,0), radius = 0.3 )
-    #box(pos=(x,0,0), axis=(0,0,50), height=0.4, width=0.4)
+    box(pos=(x,0,0), axis=(0,0,50), height=0.4, width=0.4, color=0.6)
 for z in arange(-25,26,10):
-    curve( pos = [ (0,0,z), (50,0,z) ], color = (0,0.5,0), radius = 0.3 )
-    #box(pos=(25,0,z), axis=(50,0,0), height=0.4, width=0.4 )
+    box(pos=(25,0,z), axis=(50,0,0), height=0.4, width=0., color=0.6 )
 
 dt = 0.01
 y = vector(35, -10, -7)
