@@ -677,7 +677,7 @@ struct converter
 
 
 void
-curve::thickline( const view& scene, const float* spos, float* tcolor, size_t pcount)
+curve::thickline( const view& scene, const float* spos, float* tcolor, size_t pcount, double scaled_radius)
 {
 	size_t curve_around = sides;
 	std::vector<vector> projected;
@@ -767,8 +767,8 @@ curve::thickline( const view& scene, const float* spos, float* tcolor, size_t pc
 		lasty = y;
 
 		// scale radii
-		x *= radius;
-		y *= radius;
+		x *= scaled_radius;
+		y *= scaled_radius;
 
 		for (size_t a=0; a < curve_around; a++) {
 			float c = cost[a];
@@ -872,7 +872,9 @@ curve::gl_render( const view& scene)
 	}
 	
 	// Do scaling if necessary
+	double scaled_radius = radius;
 	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
+		scaled_radius = radius*scene.gcfvec[0];
 		for (size_t i = 0; i < pcount; ++i) {
 			spos[3*i] *= scene.gcfvec[0];
 			spos[3*i+1] *= scene.gcfvec[1];
@@ -913,7 +915,6 @@ curve::gl_render( const view& scene)
 	else {
 		c->gl_cache.gl_compile_begin();
 		if (do_thinline) {
-			//thinline( scene, spos, tcolor, pcount);
 			glVertexPointer( 3, GL_FLOAT, 0, spos);
 			bool mono = adjust_colors( scene, tcolor, pcount);
 			if (!mono) glColorPointer( 3, GL_FLOAT, 0, tcolor);
@@ -927,7 +928,7 @@ curve::gl_render( const view& scene)
 			}
 		}
 		else {
-			thickline( scene, spos, tcolor, pcount);
+			thickline( scene, spos, tcolor, pcount, scaled_radius);
 			shiny_complete();
 			lighting_complete();
 		}

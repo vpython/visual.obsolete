@@ -125,7 +125,7 @@ class curve : public renderable
  private:
 	
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
-	void thickline( const view&, const float* spos, float* tcolor, size_t pcount);
+	void thickline( const view&, const float* spos, float* tcolor, size_t pcount, double scaled_radius);
 
 };
 
