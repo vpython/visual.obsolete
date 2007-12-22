@@ -265,7 +265,7 @@ curve::set_pos( array n_pos)
 			lock L(mtx);
 			set_length( dims[0]);
 			pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-			if (count > retain) set_length( retain);
+			if (retain > 0 and count >= retain) set_length( retain);
 			return;
 		}
 	}
@@ -277,14 +277,14 @@ curve::set_pos( array n_pos)
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice(0,2))] = n_pos;
 		pos[make_tuple(slice(1, count+1), 2)] = 0.0;
-		if (count > retain) set_length( retain);
+		if (retain > 0 and count >= retain) set_length( retain);
 		return;
 	}
 	else if (dims[1] == 3) {
 		lock L(mtx);
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-		if (count > retain) set_length( retain);
+		if (retain > 0 and count >= retain) set_length( retain);
 		return;
 	}
 	else {
@@ -320,7 +320,7 @@ curve::set_color( array n_color)
 		int npoints = (count) ? count : 1;
 		lock L(mtx);
 		color[slice(1,npoints+1)] = n_color;
-		if (count > retain) set_length( retain);
+		if (retain > 0 and count >= retain) set_length( retain);
 		return;
 	}
 	if (dims.size() == 2 && dims[1] == 3) {
@@ -329,7 +329,7 @@ curve::set_color( array n_color)
 		}
 		lock L(mtx);
 		color[slice(1, count+1)] = n_color;
-		if (count > retain) set_length( retain);
+		if (retain > 0 and count >= retain) set_length( retain);
 		return;
 	}
 	throw std::invalid_argument( "color must be an Nx3 array");
