@@ -20,6 +20,7 @@ using boost::lexical_cast;
 
 #include <cstdlib>
 #include <sstream>
+#include <iostream>
 
 namespace cvisual {
 using boost::thread;
@@ -451,8 +452,9 @@ display::on_window_delete(GdkEventAny*)
 	gui_main::report_window_delete( this);
 	if (exit) {
 		VPYTHON_NOTE( "Initiating shutdown from window closure");
-		if (area)
+		if (area) {
 			gl_free();
+		}
 		gui_main::quit();
 	}
 		

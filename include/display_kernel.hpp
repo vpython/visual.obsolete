@@ -108,7 +108,7 @@ class display_kernel
 	/** Whether or not we should display the speed of the renderer.
 	 * Default: false.
 	 */
-	bool show_renderspeed;
+	bool show_rendertime;
 	rgba background; ///< The background color of the scene.
 	rgba forground; ///< The default color for objects to be rendered into the scene.
 
@@ -285,8 +285,8 @@ public: // Public Data.
 	void set_autocenter( bool);
 	bool get_autocenter();
 
-	void set_show_renderspeed( bool);
-	bool is_showing_renderspeed();
+	void set_show_rendertime( bool);
+	bool is_showing_rendertime();
 
 	void set_range_d( double);
 	void set_range( const vector&);

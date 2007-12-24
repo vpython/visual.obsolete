@@ -201,6 +201,7 @@ render_surface::forward_render_scene()
 // Make sure this rendering thread has high priority:
 #if defined(_WIN32) || defined(_MSC_VER)
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 #else
 	int default_prio = getpriority(PRIO_PROCESS, getpid());
 	setpriority(PRIO_PROCESS, getpid(), std::max(default_prio -5, -20));

@@ -158,7 +158,7 @@ display_kernel::display_kernel()
 	lastgcf(1.0),
 	gcf_changed(false),
 	ambient( 0.2f, 0.2f, 0.2f),
-	show_renderspeed( false),
+	show_rendertime( false),
 	last_time(0),
 	background(0, 0, 0, 0), //< Transparent black.
 	spin_allowed(true),
@@ -683,7 +683,7 @@ display_kernel::render_scene(void)
 {
 	lock L(mtx);
 	double start_time, cycle;
-	if (show_renderspeed) {
+	if (show_rendertime) {
 		start_time = render_timer.elapsed();
 		cycle = start_time - last_time;
 		last_time = start_time;
@@ -800,7 +800,7 @@ display_kernel::render_scene(void)
 				break;
 			}
 		}
-		if (show_renderspeed) {
+		if (show_rendertime) {
 			std::ostringstream render_msg;
 			render_msg.precision(3);
 			// render time does not include pick time, which may be negligible
@@ -845,7 +845,7 @@ display_kernel::render_scene(void)
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
 	}
-	if (show_renderspeed) {
+	if (show_rendertime) {
 		render_time = render_timer.elapsed()-start_time;
 	}
 	return true;
@@ -1214,16 +1214,16 @@ display_kernel::set_autocenter( bool n_autocenter)
 }
 
 void
-display_kernel::set_show_renderspeed( bool show)
+display_kernel::set_show_rendertime( bool show)
 {
 	lock L(mtx);
-	show_renderspeed = show;
+	show_rendertime = show;
 }
 
 bool
-display_kernel::is_showing_renderspeed()
+display_kernel::is_showing_rendertime()
 {
-	return show_renderspeed;
+	return show_rendertime;
 }
 
 void
