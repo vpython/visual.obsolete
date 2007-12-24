@@ -33,6 +33,7 @@ scene.autoscale=0
 moves=0
 
 while 1:
+    rate(100)
     if scene.mouse.events:
         m = scene.mouse.getevent()
         if m.drag:  # identify pole clicked on

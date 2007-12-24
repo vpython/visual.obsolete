@@ -38,8 +38,8 @@ Bvector = arrow(axis=(0,0,0), shaftwidth=vwidth, color=(0,1,1))
 drag = 0
 
 while 1:
+    rate(100)
     if drag:
-        rate(100)
         newobs = scene.mouse.pos
         if newobs != obs:
             obs = newobs

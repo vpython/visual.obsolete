@@ -53,6 +53,7 @@ won=None
 
 while len(balls) < 4*4*4:
     while 1:
+        rate(100)
         if scene.mouse.events:
             p = scene.mouse.getevent()
             if p.drag:
