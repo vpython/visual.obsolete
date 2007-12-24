@@ -1,8 +1,8 @@
 from visual import *
 
-# The type of the texture is inferred from its number of dimentions.  1 is 
-# either a luminance or alpha map (default:luminance), 2 is luminance-alpha,
-# 3 is RGB, 4 is RGBA
+# The type of the texture is inferred from its number of dimensions.  1 is 
+# either a luminance or opacity map (default:luminance), 2 is luminance-opacity,
+# 3 is RGB, 4 is RGB-opacity.
 # The primitive data type can be a char, int, long, short, float, or double.
 # however, int types are converted from 0-255 -> 0.->1.
 
