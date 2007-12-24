@@ -129,20 +129,22 @@
 <p>For convenience you can now say color=0.7 to mean color=(0.7,0.7,0.7).</p>
 <h3>Titlebar and toolbar heights </h3>
 <p>The height in pixels of the titlebar is given by display.get_titlebar_height(), and the height of the (to be optional) toolbar is given by display.get_toolbar_height(). These values are true for all windows, and these functions are associated with the display class of objects, not with individual displays such as the standard scene. So scene.get_titlebar_height() won't work..</p>
+<h3>Render time  </h3>
+<p>If you say scene.show_rendertime = True, in the lower left os the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene. This can be a useful diagnostic of performance issues. .</p>
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
 <p>Here are known bugs:</p>
 <blockquote>
   <p>Some scenes display more slowly than desired, or the animation is jerky. </p>
+  <p>A program loop containing essentially no computation at all may be difficult to quit on Windows. The cure is<br>
+  to insert a rate statement, for example, rate(100). </p>
   <p>Autoscaling is pretty good but occasionally positions the camera farther 
     from the scene than you would prefer.</p>
-  <p>In a column of many rings along the x axis, at least on Windows, occasionally 
-    a ring is briefly rendered wrong.</p>
   <p>Rendering of curves isn't quite right. This can be seen in the example program 
     tictac.py, where one of the grid lines doesn't show until you rotate the view.</p>
   <p>Spotlights created in a frame don't change with changes in the frame orientation.</p>
-  <p>scene.cursor is not implemented and gives an error (used in old programs 
+  <p>scene.cursor is not implemented yet and gives an error (used in old programs 
     to make cursor visible/invisible).</p>
-  <p>Stereo modes &quot;active&quot; and &quot;crosseyed&quot; are not implemented.</p>
+  <p>Stereo modes &quot;active&quot; and &quot;crosseyed&quot; are not implemented yet.</p>
 </blockquote>
 <p><a href="index.html">Back to contents</a><br>
 </p>
