@@ -94,10 +94,8 @@ display::display()
 	show_toolbar(true),
 	title( "VPython")
 {
-	width = 600;
-	// set full window height to be 600 (or very close)
-	height = 600-get_titlebar_height()-2;
-	if (show_toolbar) height -= get_toolbar_height();
+	set_width(600);
+	set_height(600);
 }
 
 display::~display()
@@ -140,30 +138,54 @@ display::set_width( float _width)
 {
 	if (active)
 		throw std::invalid_argument( "Cannot move the window once it is active.");
+#if (defined(_WIN32) || defined(_MSC_VER))
 	width = _width;
+#else
+	// Ubuntu Linux; unknown what situation is on Mac
+	width = _width-9;
+#endif
 }
 
 float
 display::get_width()
 {
 	lock L(mtx);
+#if (defined(_WIN32) || defined(_MSC_VER))
 	return width;
+#else
+	// Ubuntu Linux; unknown what situation is on Mac
+	return (width+9);
+#endif
 }
+
 void 
 display::set_height( float _height)
 {
 	if (active)
 		throw std::invalid_argument( "Cannot move the window once it is active.");
+#if (defined(_WIN32) || defined(_MSC_VER))
 	height = _height-get_titlebar_height()-2;
 	if (show_toolbar) height -= get_toolbar_height();
+#else
+	// Ubuntu Linux; unknown what situation is on Mac
+	height = _height-get_titlebar_height()-6;
+	if (show_toolbar) height -= get_toolbar_height();
+#endif
 }
 
 float
 display::get_height()
 {
 	lock L(mtx);
-	float h = height+get_titlebar_height()+2;
+	float h;
+#if (defined(_WIN32) || defined(_MSC_VER))
+	h = height+get_titlebar_height()+2;
 	if (show_toolbar) h += get_toolbar_height();
+#else
+	// Ubuntu Linux; unknown what situation is on Mac
+	h = height+get_titlebar_height()+6;
+	if (show_toolbar) h += get_toolbar_height();
+#endif
 	return h;
 }
 
