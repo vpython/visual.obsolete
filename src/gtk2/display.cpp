@@ -139,7 +139,7 @@ display::set_width( float _width)
 	if (active)
 		throw std::invalid_argument( "Cannot move the window once it is active.");
 #if (defined(_WIN32) || defined(_MSC_VER))
-	width = _width;
+	width = _width-8;
 #else
 	// Ubuntu Linux; unknown what situation is on Mac
 	width = _width-9;
@@ -151,7 +151,7 @@ display::get_width()
 {
 	lock L(mtx);
 #if (defined(_WIN32) || defined(_MSC_VER))
-	return width;
+	return (width+8);
 #else
 	// Ubuntu Linux; unknown what situation is on Mac
 	return (width+9);
@@ -163,13 +163,13 @@ display::set_height( float _height)
 {
 	if (active)
 		throw std::invalid_argument( "Cannot move the window once it is active.");
-#if (defined(_WIN32) || defined(_MSC_VER))
-	height = _height-get_titlebar_height()-2;
+	height = _height-get_titlebar_height();
 	if (show_toolbar) height -= get_toolbar_height();
+#if (defined(_WIN32) || defined(_MSC_VER))
+	height -= 3;
 #else
 	// Ubuntu Linux; unknown what situation is on Mac
-	height = _height-get_titlebar_height()-6;
-	if (show_toolbar) height -= get_toolbar_height();
+	height -= 6;
 #endif
 }
 
@@ -178,13 +178,13 @@ display::get_height()
 {
 	lock L(mtx);
 	float h;
-#if (defined(_WIN32) || defined(_MSC_VER))
-	h = height+get_titlebar_height()+2;
+	h = height+get_titlebar_height();
 	if (show_toolbar) h += get_toolbar_height();
+#if (defined(_WIN32) || defined(_MSC_VER))
+	h += 3;
 #else
 	// Ubuntu Linux; unknown what situation is on Mac
-	h = height+get_titlebar_height()+6;
-	if (show_toolbar) h += get_toolbar_height();
+	h += 6;
 #endif
 	return h;
 }
