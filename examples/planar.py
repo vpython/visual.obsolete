@@ -36,6 +36,7 @@ box(pos=(0,-0.6,0),width=20,length=20,height=1,color=(0,0,0.1))
 # Drag and drop loop
 drag = None
 while 1:
+  rate(100)
   if scene.mouse.events:
     c = scene.mouse.getevent()
     if drag and (c.drop or c.click):   # drop the selected object
