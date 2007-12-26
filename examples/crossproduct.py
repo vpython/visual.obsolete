@@ -47,6 +47,7 @@ scene.forward = (-1,-.5,-1)
 drag = 0
 
 while 1:
+    rate(100)
     if scene.mouse.events:
         m = scene.mouse.getevent()
         if m.drag:
