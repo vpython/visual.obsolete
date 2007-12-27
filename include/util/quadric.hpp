@@ -59,20 +59,22 @@ class quadric
 	
 	/** Draw a sphere centered at the origin, with the N pole pointing along the
 		y axis.
-		@param radius The radius of the generated sphere.
-		@param slices The number of radial slices to subdivide the sphere.
-		@param stacks The number of longintudinal stacks to subdivide the sphere.
+		radius The radius of the generated sphere.
+		slices The number of subdivisions around the y axis
+		          (similar to lines of longitude).
+	    stacks The number of subdivisions along the y axis
+		          (similar to lines of latitude).
 	*/
 	void render_sphere( double radius, int slices, int stacks);
 	
 	/** Draw a cylinder with these properties.  The cylinder's base is centered
 		at the origin, pointing along the +x axis.  Only the outer curve
 		of the cylinder is rendered, not the ends.
-		@param base_radius The radius of the base end.
-		@param top_radius The radius of the top end.
-		@param height The distance along +x between the top and bottom.
-		@param slices The number of radial slices to subdivide the cylinder.
-		@param stacks The number of longintudinal stacks to subdivide the cylinder.
+		base_radius The radius of the base end.
+		top_radius The radius of the top end.
+		height The distance along +x between the top and bottom.
+		slices The number of subdivisions around the x axis.
+	    stacks The number of subdivisions along the x axis.
 	*/
 	void render_cylinder( double base_radius, double top_radius, double height,
 		int slices, int stacks);
