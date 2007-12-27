@@ -199,11 +199,12 @@ sphere::grow_extent( extent& e)
 // spheres, and look
 // at the most distinct terminator (between the most bright part and the
 // darkest part).
-// The #3 model is good for objects < .25 in in apparent diameter.
-// The #2 model is good for objects less than .75 inch apparent diameter.
+// The #1 model is good for objects less than .25 inch apparent diameter.
+// The #2 model is good for objects less than .6 inch apparent diameter.
+// The #3 model is good for objects less than 1.5 inch apparent diameter.
 // TODO: perhaps another model should be right about here?
-// The #1 model goes for up to 3 inches apparent diameter.
-// The #0 sphere survives extremely close scrutiny, at a stiff performance
+// The #4 model goes for up to 4 inches apparent diameter.
+// The #5 sphere survives extremely close scrutiny, at a stiff performance
 // penalty.
 void
 sphere::update_cache( const view&)
