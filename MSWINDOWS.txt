@@ -27,6 +27,12 @@ The Boost libraries are extensions to C++. Among the libraries
 are python and thread libraries used by Visual. The python library
 makes connections between Python and C++.
 
+The following instructions can be used to build from source those 
+Boost libraries needed by Visual. However, the process takes a long
+time, so precompiled files are available in the Developers section
+of python.org, which makes the following procedure unnecessary.
+
+BUILDING BOOST FROM SOURCE
 Download a precompiled version of the 'bjam' tool from www.boost.org 
 and place it into C:\mingw\bin (or anywhere else on your executable PATH).
 
@@ -51,8 +57,9 @@ Switch to Msys and cd to boost_1_34_1.
 > cp boost_python-mgw34-mt-1_34_1.a /mingw/lib/libboost_python25.a 
 
 Another possibility would be to configure the boost build with a config file:
-boost_1_34_1/tools/build/v2/user-config.jam is the user configuration file
-Your home directory can be found by typing: ECHO %HOMEDRIVE%%HOMEPATH%
+boost_1_34_1/tools/build/v2/user-config.jam is the user configuration file.
+It should be placed in your home directory.
+Your home directory can be found by executing ECHO %HOMEDRIVE%%HOMEPATH%
 
 GTK+ AND OTHERS
 Download the binary installer for the development version of gtk+ and install into C:\MinGW.
