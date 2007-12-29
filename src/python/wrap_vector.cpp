@@ -403,6 +403,14 @@ wrap_vector()
 		.def( self / double())
 		.def( self /= double())
 		.def( double() * self)
+		
+		// This doesn't work either (NPY_FLOAT not recognized as a type):
+		//.def( other<NPY_FLOAT>() * self)
+		
+		// Suggestion from Jonathan Brandmeyer, which doesn't compile:
+		//.def( "__mul__", &vector::operator*(double), "Multiply vector times scalar")
+		//.def( "__rmul__", &operator*(const double&, const vector&), "Multiply scalar times vector")
+
 		// Same as self / double, when "from __future__ import division" is in effect.
 		.def( "__itruediv__", itruediv, return_value_policy<copy_const_reference>())
 		// Same as self /= double, when "from __future__ import division" is in effect.
