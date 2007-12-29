@@ -30,8 +30,8 @@ Source: "Lib\idlelib\config-main.def"; DestDir: "{app}\Lib\idlelib\"; Flags: uni
 ;
 Source: "@WIN32_CWD@\site-packages\cvisual.pyd"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\mingwm10.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "C:\MinGW\bin\boost_python-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual 
-Source: "C:\MinGW\bin\boost_thread-mgw-mt-1_33_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "C:\MinGW\bin\boost_python-mgw34-mt-1_34_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual 
+Source: "C:\MinGW\bin\boost_thread-mgw34-mt-1_34_1.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "C:\MinGW\bin\libsigc-2.0-0.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 ; Get stripped versions of the many gtk-related dll's, which were placed in C:\MinGW\stripped:
 Source: "C:\MinGW\stripped\*.dll"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
