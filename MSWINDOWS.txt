@@ -22,35 +22,49 @@ Download and install numpy (http://numpy.scipy.org).
 Copy Python25's libs/libpython25.a to /mingw/lib.
 See http://www.python.org/doc/current/inst/tweak-flags.html for discussion.
 
+BUILDING BOOST
+The Boost libraries are extensions to C++. Among the libraries
+are python and thread libraries used by Visual. The python library
+makes connections between Python and C++.
+
 Download a precompiled version of the 'bjam' tool from www.boost.org 
-and place it into C:\mingw\bin (or anywhere else on your PATH).
+and place it into C:\mingw\bin (or anywhere else on your executable PATH).
 
-Download latest Boost (1.33.1) from www.boost.org.
-> tar -xjf boost_1_33_1.tar.bz2
-> cd boost_1_33_1
-> bjam -sTOOLS=mingw -sMINGW_BIN_DIRECTORY=/c/MinGW/bin -sPYTHON_ROOT=/c/Python25 -sPYTHON_VERSION=2.5 stage
-May take about an hour to build everything.
-Copy boost_1_33_1/boost folder to mingw/include:
-> cp -r boost/ /mingw/include/
+Download latest Boost (1.34.1) from www.boost.org.
+> tar -xjf boost_1_34_1.tar.bz2
 
-> cp stage/lib/boost_thread-mgw-mt-1_33_1.dll /mingw/bin
-> cp stage/lib/boost_thread-mgw-mt-1_33_1.lib /mingw/lib/libboost_thread.a
-> cd bin/boost/libs/python/build/boost_python.dll/mingw/release/threading-multi/
-> cp boost_python-mgw-mt-1_33_1.dll /mingw/bin
-> cp boost_python-mgw-mt-1_33_1.lib /mingw/lib/libboost_python25.a 
+The following must be done from a Windows typescript, NOT from Msys.
+(From Start/Run, execute cmd.)
+> cd boost_1_34_1
+(-a means rebuild all)
 
-Note: The Boost files that start with "libboost" are static libraries that we don't use.
+Make sure that Python 2.5 is the only Python installed, then (takes a long time):
+> bjam --toolset=gcc --with-python --with-thread stage
 
+Copy the directory named "boost" to /mingw/include.
+
+Switch to Msys and cd to boost_1_34_1.
+> cp stage/lib/boost_thread-mgw34-mt-1_34_1.dll /mingw/bin
+> cp stage/lib/boost_thread-mgw34-mt-1_34_1.a /mingw/lib/libboost_thread.a
+> cd bin.v2/libs/python/build/gcc-mingw-3.4.2/release/threading-multi
+> cp boost_python-mgw34-mt-1_34_1.dll /mingw/bin
+> cp boost_python-mgw34-mt-1_34_1.a /mingw/lib/libboost_python25.a 
+
+Another possibility would be to configure the boost build with a config file:
+boost_1_34_1/tools/build/v2/user-config.jam is the user configuration file
+Your home directory can be found by typing: ECHO %HOMEDRIVE%%HOMEPATH%
+
+GTK+ AND OTHERS
 Download the binary installer for the development version of gtk+ and install into C:\MinGW.
 At http://gladewin32.sourceforge.net, you need the development version, which includes
 such things as glib, atk, pango, cairo, glade, and fontconfig.
 
 Download the binary installer for the development version of gtkmm and install into C:\MinGW.
-At http://ftp.gnome.org/pub/gnome/binaries/win32 in the gtkmm directory, you
-need gtkmm-win32-devel-xxxx.exe. gtk+ (also called gtk2) is written in C; gtkmm is a "wrapper" of these C routines to make gtk+
-functionality accessible to C++ programmers.
+At http://ftp.gnome.org/pub/gnome/binaries/win32 in the gtkmm directory, you need
+gtkmm-win32-devel-xxxx.exe. gtk+ (also called gtk2) is written in C; gtkmm is a "wrapper"
+of these C routines to make gtk+ functionality accessible to C++ programmers.
 
-Some of the following is probably is now installed by the gtk2 and gtkmm installers.
+Some of the following is probably now installed by the gtk2 and gtkmm installers.
 After installing gtk2 and gtkmm, check to see whether you have these packages.
  		Download pkg-config-0.20 in zip format and unzip.
 		One place to get it is http://www.gimp.org/~tml/gimp/win32/downloads.html.
@@ -92,9 +106,13 @@ vpython.org.
 
 See INSTALL.txt for further information on the build process itself.
 
+DEBUGGING
+From a typescript, the following will print all VPYTHON_NOTEs:
+env VPYTHON_DEBUG=1 python test.py
+(This assumes you've executed cd /c/python25 and that test.py as
+well as python.exe is in that directory.)
 
 HOW TO CREATE AN INSTALLER FOR VISUAL FOR MICROSOFT WINDOWS
-
 You need InnoSetup (www.jrsoftware.org) to create an installer for end users.
 
 In addition to mingw10.dll and a couple of Boost dll's, I included the files listed below 
