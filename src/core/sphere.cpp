@@ -70,39 +70,36 @@ sphere::gl_render( const view& geometry)
 	// coverage is the radius of this sphere in pixels:
 	double coverage = geometry.pixel_coverage( pos, radius);
 	int lod = 0;
+	
 	if (shiny()) {
 		if (coverage < 0) // Behind the camera, but still visible.
+			lod = 5;
+		else if (coverage < 25)
 			lod = 0;
-		else if (coverage < 2)
-			lod = 0;
-		else if (coverage < 10)
+		else if (coverage < 60)
 			lod = 1;
-		else if (coverage < 50)
+		else if (coverage < 150)
 			lod = 2;
-		else if (coverage < 300)
+		else if (coverage < 400)
 			lod = 3;
-		else if (coverage < 500)
+		else if (coverage < 1000)
 			lod = 4;
 		else
 			lod = 5;
 	}
 	else {
 		if (coverage < 0) // Behind the camera, but still visible.
-			lod = 0;
-		else if (coverage < 2)
-			lod = 0;
-		else if (coverage < 10)
-			lod = 1;
-		else if (coverage < 50)
-			lod = 2;
-		else if (coverage < 300)
 			lod = 3;
-		else if (coverage < 500)
-			lod = 4;
+		else if (coverage < 30)
+			lod = 0;
+		else if (coverage < 100)
+			lod = 1;
+		else if (coverage < 300)
+			lod = 2;
 		else
-			lod = 5;
+			lod = 3;
 	}
-	lod += geometry.lod_adjust;
+	lod += geometry.lod_adjust; // allow user to reduce level of detail
 	if (lod > 5)
 		lod = 5;
 	else if (lod < 0)
@@ -185,8 +182,7 @@ sphere::gl_render( const view& geometry)
 	}
 	else {
 		// Render a simple sphere.
-	//	lod_cache[lod].gl_render();
-		models[lod].gl_render();
+		lod_cache[lod].gl_render();
 	}
 	shiny_complete();
 	lighting_complete();
@@ -213,11 +209,6 @@ sphere::grow_extent( extent& e)
 // The #5 sphere survives extremely close scrutiny, at a stiff performance
 // penalty.
 
-// December 2007, Bruce Sherwood: On my Windows laptop the choices made
-// by Brandmeyer don't seem right, and I've made new ones. I find that
-// excellent spheres are made with far fewer sphere slices and stacks,
-// which I don't entirely understand.
-
 void
 sphere::update_cache( const view&)
 	{	if (first)
@@ -236,34 +227,6 @@ sphere::create_cache()
 
 		sph.do_textures( true);
 		
-		// Choices by Bruce Sherwood
-		lod_cache[0].gl_compile_begin();
-		sph.render_sphere( 1.0, 2, 2);
-		lod_cache[0].gl_compile_end();
-
-		lod_cache[1].gl_compile_begin();
-		sph.render_sphere( 1.0, 4, 4);
-		lod_cache[1].gl_compile_end();
-
-		lod_cache[2].gl_compile_begin();
-		sph.render_sphere( 1.0, 4, 4);
-		lod_cache[2].gl_compile_end();
-
-		lod_cache[3].gl_compile_begin();
-		sph.render_sphere( 1.0, 6, 6);
-		lod_cache[3].gl_compile_end();
-
-		lod_cache[4].gl_compile_begin();
-		sph.render_sphere( 1.0, 8, 8);
-		lod_cache[4].gl_compile_end();
-
-		// Only for the very largest bodies.
-		lod_cache[5].gl_compile_begin();
-		sph.render_sphere( 1.0, 10, 10);
-		lod_cache[5].gl_compile_end();
-		
-		/*
-		// The following were the choices of Jonathan Brandmeyer:
 		lod_cache[0].gl_compile_begin();
 		sph.render_sphere( 1.0, 13, 7);
 		lod_cache[0].gl_compile_end();
@@ -287,7 +250,7 @@ sphere::create_cache()
 		// Only for the very largest bodies.
 		lod_cache[5].gl_compile_begin();
 		sph.render_sphere( 1.0, 140, 69);
-		lod_cache[5].gl_compile_end();*/
+		lod_cache[5].gl_compile_end();
 		
 		check_gl_error();
 	}
