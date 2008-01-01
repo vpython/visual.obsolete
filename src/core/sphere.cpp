@@ -14,8 +14,6 @@
 namespace cvisual {
 
 bool sphere::first = true;
-// The first four cached descriptions are used for non-textured spheres, and the
-// last four include texture data.
 
 displaylist sphere::lod_cache[6];
 
@@ -42,15 +40,13 @@ sphere::gl_pick_render( const view& geometry)
 	if (first)
     	create_cache();
 	clear_gl_error();
-	size_t lod = 0;
 	gl_matrix_stackguard guard;
 	const vector view_pos = pos * geometry.gcf;
 	glTranslated( view_pos.x, view_pos.y, view_pos.z);
 	model_world_transform().gl_mult();
 	const vector scale = get_scale() * geometry.gcf;
 	glScaled( scale.x, scale.y, scale.z);
-	//lod_cache[lod].gl_render();
-	models[lod].gl_render();
+	lod_cache[0].gl_render();
 	check_gl_error();
 }
 
@@ -163,6 +159,7 @@ sphere::gl_render( const view& geometry)
 	}
 	else if (tex) { // Render a textured body
 		// Shift to the textured sphere model set.
+		// Currently this is not different from the untextured set.
 		size_t tex_lod = lod;
 
 		// Set up the texturing
