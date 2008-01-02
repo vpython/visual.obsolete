@@ -9,10 +9,23 @@
 
 namespace cvisual {
 
-displaylist box::simple_model;
-displaylist box::textured_model;
-z_sorted_model<quad, 600> box::sorted_model;
-z_sorted_model<tquad, 600>  box::textured_sorted_model;
+displaylist box::lod_cache[6];
+displaylist box::lod_textured_cache[6];
+
+// Models to be used for rendering opaque objects.
+z_sorted_model<quad, 6*box_L0*box_L0> box::simple_model_0;
+z_sorted_model<quad, 6*box_L1*box_L1> box::simple_model_1;
+z_sorted_model<quad, 6*box_L2*box_L2> box::simple_model_2;
+z_sorted_model<quad, 6*box_L3*box_L3> box::simple_model_3;
+z_sorted_model<quad, 6*box_L4*box_L4> box::simple_model_4;
+z_sorted_model<quad, 6*box_L5*box_L5> box::simple_model_5;
+// Models to be used for transparent and textured objects.
+z_sorted_model<tquad, 6*box_L0*box_L0> box::textured_model_0;
+z_sorted_model<tquad, 6*box_L1*box_L1> box::textured_model_1;
+z_sorted_model<tquad, 6*box_L2*box_L2> box::textured_model_2;
+z_sorted_model<tquad, 6*box_L3*box_L3> box::textured_model_3;
+z_sorted_model<tquad, 6*box_L4*box_L4> box::textured_model_4;
+z_sorted_model<tquad, 6*box_L5*box_L5> box::textured_model_5;
 
 bool box::first = true;
 
@@ -32,7 +45,7 @@ box::degenerate()
 }
 
 box::box()
-{	
+{
 }
 
 box::box( const box& other)
@@ -57,8 +70,7 @@ box::gl_pick_render( const view& scene)
 	glTranslated( view_pos.x, view_pos.y, view_pos.z);
 	model_world_transform().gl_mult();
 	glScaled( axis.mag() * gcf, height * gcf, width * gcf);
-
-	simple_model.gl_render();
+	lod_cache[0].gl_render();
 }
 
 void 
@@ -68,22 +80,64 @@ box::update_cache( const view&)
 		// glPolygonOffset( 0, 2);
 		clear_gl_error();
 		first = false;
-		// First set up the non-textured model.
-		calc_sorted_model();
-		simple_model.gl_compile_begin();
-		glBegin( GL_QUADS);
-			sorted_model.gl_render();
-		glEnd();
-		simple_model.gl_compile_end();
-
-		// Same geometry, but this time adds texture coordinates.  The texture
-		// is mapped directly to each face of the box objects.
-		calc_textured_sorted_model();
-		textured_model.gl_compile_begin();
-		glBegin( GL_QUADS);
-		textured_sorted_model.gl_render();
-		glEnd();
-		textured_model.gl_compile_end();
+		
+        for(size_t j = 0; j < 6; j++) {
+        	int d; // each face of box divided into d x d regions
+			if (j == 0) { 
+				d = box_L0;
+				calc_simple_model(simple_model_0.faces, d);
+				calc_textured_model(textured_model_0.faces, d);  
+			}
+			else if (j == 1) { 
+				d = box_L1;
+				calc_simple_model(simple_model_1.faces, d);
+				calc_textured_model(textured_model_1.faces, d); 
+			}
+			else if (j == 2) {  
+				d = box_L2;
+				calc_simple_model(simple_model_2.faces, d);
+				calc_textured_model(textured_model_2.faces, d);  
+			}
+			else if (j == 3) {  
+				d = box_L3;
+				calc_simple_model(simple_model_3.faces, d);
+				calc_textured_model(textured_model_3.faces, d);   
+			}
+			else if (j == 4) {
+				d = box_L4;
+				calc_simple_model(simple_model_4.faces, d);
+				calc_textured_model(textured_model_4.faces, d);    
+			}
+			else if (j == 5) {  
+				d = box_L5;
+				calc_simple_model(simple_model_5.faces, d);
+				calc_textured_model(textured_model_5.faces, d);   
+			}
+        	// First set up the non-textured model.
+			lod_cache[j].gl_compile_begin();
+			glBegin( GL_QUADS);
+			if (j == 0) simple_model_0.gl_render();
+			else if (j == 1) simple_model_1.gl_render();
+			else if (j == 2) simple_model_2.gl_render();
+			else if (j == 3) simple_model_3.gl_render();
+			else if (j == 4) simple_model_4.gl_render();
+			else if (j == 5) simple_model_5.gl_render();
+			glEnd();
+			lod_cache[j].gl_compile_end();
+			
+			// Same geometry, but this time adds texture coordinates. The
+			// texture is mapped directly to each face of the box objects.
+			lod_textured_cache[j].gl_compile_begin();
+			glBegin( GL_QUADS);
+			if (j == 0) textured_model_0.gl_render();
+			else if (j == 1) textured_model_1.gl_render();
+			else if (j == 2) textured_model_2.gl_render();
+			else if (j == 3) textured_model_3.gl_render();
+			else if (j == 4) textured_model_4.gl_render();
+			else if (j == 5) textured_model_5.gl_render();
+			glEnd();
+			lod_textured_cache[j].gl_compile_end();
+		}
 		
 		check_gl_error();
 	}
@@ -119,6 +173,17 @@ box::gl_render( const view& scene)
 		model_world_transform().gl_mult();
 		glScaled( axis.mag() * gcf, height * gcf, width*gcf);
 		
+		// coverage is number of pixels corresponding to size of box
+		double coverage = scene.pixel_coverage( pos, 500*size);
+		int lod = 0;
+		if (coverage < 0) lod = 5;
+		else if (coverage < 10) lod = 0;
+		else if (coverage < 25) lod = 1;
+		else if (coverage < 100) lod = 2;
+		else if (coverage < 200) lod = 3;
+		else if (coverage < 600) lod = 4;
+		else lod = 5;
+		
 		if (tex && (color.opacity < 1.0 || tex->has_opacity())) {
 			// Render the textured and transparent box.
 			vector object_forward = (pos - scene.camera).norm();
@@ -131,21 +196,31 @@ box::gl_render( const view& scene)
 			if (width < 0)
 				model_forward.z *= -1;
 			
-			textured_sorted_model.sort( model_forward);
+			if (lod == 0) textured_model_0.sort( model_forward);
+			else if (lod == 1) textured_model_1.sort( model_forward);
+			else if (lod == 2) textured_model_2.sort( model_forward);
+			else if (lod == 3) textured_model_3.sort( model_forward);
+			else if (lod == 4) textured_model_4.sort( model_forward);
+			else if (lod == 5) textured_model_5.sort( model_forward);
 			gl_enable blend( GL_BLEND);
 			gl_enable tex2d( GL_TEXTURE_2D);
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			tex->gl_activate();
 			
 			glBegin( GL_QUADS);
-			textured_sorted_model.gl_render();
+			if (lod == 0) textured_model_0.gl_render();
+			else if (lod == 1) textured_model_1.gl_render();
+			else if (lod == 2) textured_model_2.gl_render();
+			else if (lod == 3) textured_model_3.gl_render();
+			else if (lod == 4) textured_model_4.gl_render();
+			else if (lod == 5) textured_model_5.gl_render();
 			glEnd();
 		}
 		else if (tex) {
 			// Render the textured box
 			gl_enable tex2D( GL_TEXTURE_2D);
 			tex->gl_activate();
-			textured_model.gl_render();
+			lod_textured_cache[lod].gl_render();
 		}
 		else if (color.opacity < 1.0) {
 			// Render the transparent box
@@ -158,18 +233,28 @@ box::gl_render( const view& scene)
 				model_forward.y *= -1;
 			if (width < 0)
 				model_forward.z *= -1;
-			sorted_model.sort( model_forward);
-
+			if (lod == 0) simple_model_0.sort( model_forward);
+			else if (lod == 1) simple_model_1.sort( model_forward);
+			else if (lod == 2) simple_model_2.sort( model_forward);
+			else if (lod == 3) simple_model_3.sort( model_forward);
+			else if (lod == 4) simple_model_4.sort( model_forward);
+			else if (lod == 5) simple_model_5.sort( model_forward);
+			
 			gl_enable blend( GL_BLEND);
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			
 			glBegin( GL_QUADS);
-			sorted_model.gl_render();
+			if (lod == 0) simple_model_0.gl_render();
+			else if (lod == 1) simple_model_1.gl_render();
+			else if (lod == 2) simple_model_2.gl_render();
+			else if (lod == 3) simple_model_3.gl_render();
+			else if (lod == 4) simple_model_4.gl_render();
+			else if (lod == 5) simple_model_5.gl_render();
 			glEnd();
 		}
 		else {
 			// Render the simple opaque box		
-			simple_model.gl_render();
+			lod_cache[lod].gl_render();
 		}
 	}
 	shiny_complete();
@@ -198,9 +283,10 @@ box::grow_extent( extent& e)
 }
 
 void
-box::calc_sorted_model(quad *faces, int level)
+box::calc_simple_model(quad *faces, int level)
 {
-	// Calculate the textured, sorted model.
+	// Calculate the non-textured, sorted model.
+	// There are level*level squares on each of the 6 sides of the box.
 	double spacing = 1.0/level;
 	for(size_t i = 0; i < level; i++)
 	{
@@ -241,16 +327,10 @@ box::calc_sorted_model(quad *faces, int level)
 }
 
 void
-box::calc_sorted_model()
-{	
-	// Calculate the sorted model. 
-	calc_sorted_model(sorted_model.faces, 10);
-}
-
-void
-box::calc_textured_sorted_model(tquad *faces, int level)
+box::calc_textured_model(tquad *faces, int level)
 {
 	// Calculate the textured, sorted model.
+	// There are level*level squares on each of the 6 sides of the box.
 	double spacing = 1.0/level;
 	for(size_t i = 0; i < level; i++)
 	{
@@ -290,12 +370,6 @@ box::calc_textured_sorted_model(tquad *faces, int level)
 	}
 }
 
-void
-box::calc_textured_sorted_model()
-{
-	// Calculate the textured, sorted model.
-	calc_textured_sorted_model(textured_sorted_model.faces, 10);
-}
 
 PRIMITIVE_TYPEINFO_IMPL(box)
 

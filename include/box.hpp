@@ -10,36 +10,58 @@
 #include "util/sorted_model.hpp"
 #include "util/displaylist.hpp"
 
+// Levels of detail for boxes. box_Ln = 8 means a face has 8*8 subdivisions
+#define box_L0 2
+#define box_L1 3
+#define box_L2 5
+#define box_L3 10
+#define box_L4 15
+#define box_L5 20
+
 namespace cvisual {
 
 class box : public rectangular
 {
  private:
-	// A model to be used for rendering transparent objects.
-	static z_sorted_model<quad, 600> sorted_model;
-	// A model to be used for transparent and textured objects.
-	static z_sorted_model<tquad, 600> textured_sorted_model;
-	// The global model to use for simple quad objects.
-	static displaylist simple_model;
-	// The global model to use for opaque textured objects.
-	static displaylist textured_model;
+	/** The level-of-detail caches.  They are stored for the life of the program,
+		and initialized when the first box is rendered. 
+	*/
+ 	static displaylist lod_cache[6];
+ 	static displaylist lod_textured_cache[6];
+ 	
+ 	// The following kludge is hopefully temporary,
+ 	// in order to try out the basic scheme. This
+ 	// needs to be cleaned up eventually. The problem
+ 	// is that z_sorted_model definitions require
+ 	// literal numeric values.
+ 	
+ 	// Models to be used for rendering opaque objects.
+	static z_sorted_model<quad, 6*box_L0*box_L0> simple_model_0;
+	static z_sorted_model<quad, 6*box_L1*box_L1> simple_model_1;
+	static z_sorted_model<quad, 6*box_L2*box_L2> simple_model_2;
+	static z_sorted_model<quad, 6*box_L3*box_L3> simple_model_3;
+	static z_sorted_model<quad, 6*box_L4*box_L4> simple_model_4;
+	static z_sorted_model<quad, 6*box_L5*box_L5> simple_model_5;
+	// Models to be used for transparent and textured objects.
+	static z_sorted_model<tquad, 6*box_L0*box_L0> textured_model_0;
+	static z_sorted_model<tquad, 6*box_L1*box_L1> textured_model_1;
+	static z_sorted_model<tquad, 6*box_L2*box_L2> textured_model_2;
+	static z_sorted_model<tquad, 6*box_L3*box_L3> textured_model_3;
+	static z_sorted_model<tquad, 6*box_L4*box_L4> textured_model_4;
+	static z_sorted_model<tquad, 6*box_L5*box_L5> textured_model_5;
+	
+	// Calculates the sorted_model, based on the subdivision level
+	// (only done once, hopefully).
+	void calc_simple_model(quad *faces, int level);
+	
+	// Calculates the textured_sorted_model, based on the subdivision level
+	// (only done once, hopefully).
+	void calc_textured_model(tquad *faces, int level);
+ 	
 	// A flag to determine if the static models have been initialized.
 	static bool first;
 	
-	// Calculates the sorted_model object (only done once).
-	void calc_sorted_model();
-	// Calculates the sorted_model, based on the subdivision level
-	// (only done once, hopefully).
-	void calc_sorted_model(quad *faces, int level);
-	
-	
-	// Calculates the textured_sorted_model (only done once, hopefully).
-	void calc_textured_sorted_model();
-	// Calculates the textured_sorted_model, based on the subdivision level
-	// (only done once, hopefully).
-	void calc_textured_sorted_model(tquad *faces, int level);
-	
-	// True if the box should not be rendered.
+	// True if the box should not be rendered. 
 	bool degenerate();
 	
  public:
