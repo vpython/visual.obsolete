@@ -17,8 +17,9 @@ class sphere : public axial
 {
  private:
 	/** The level-of-detail cache.  It is stored for the life of the program, and
-		initialized when the first sphere is rendered.  The last six use the
-		same detail level as the first six, but also include texture coordinates.
+		initialized when the first sphere is rendered. At one time there were
+		going to be additional entries for the textured case, but that was
+		not implemented.
 	*/
  	static displaylist lod_cache[6];
 	/// True until the first sphere is rendered, then false.
