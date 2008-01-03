@@ -68,8 +68,9 @@ class curve : public renderable
  	bool degenerate() const;
 	// Returns true if the cuve follows a closed path.
  	bool closed_path() const;
-	// Compute a checksum over the elements of the specified [begin,end) range.
-	long checksum( size_t begin, size_t end);
+	// Compute a checksum over the pcount elements of the temporary
+	// position and color arrays.
+	long checksum( float* spos, float* tcolor, size_t pcount);
 
 	static const int MAX_SIDES = 20;
 	size_t sides;

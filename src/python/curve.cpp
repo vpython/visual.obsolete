@@ -576,12 +576,12 @@ curve::closed_path() const
 }
 
 long
-curve::checksum( size_t begin, size_t end)
+curve::checksum( float* spos, float* tcolor, size_t pcount)
 {
 	boost::crc_32_type engine;
-	engine.process_block( &radius, &radius + sizeof(radius));
-	engine.process_block( index( pos, begin-1), index( pos, end+1));
-	engine.process_block( index( color, begin), index( color, end));
+	engine.process_bytes( &radius, sizeof(radius));
+	engine.process_bytes( spos, 3*sizeof(float)*pcount);
+	engine.process_bytes( tcolor, 3*sizeof(float)*pcount);
 	return engine.checksum();
 }
 
@@ -883,11 +883,7 @@ curve::gl_render( const view& scene)
 	}
 		
 	clear_gl_error();
-
-	size_t size = std::min(c_cache::items, true_size);
-	size_t begin = 0;
-	cache_iterator c = cache.begin();
-	cache_iterator c_end = cache.end();
+	
 	const bool do_thinline = (radius == 0.0);
 	if (do_thinline) {
 		glEnableClientState( GL_VERTEX_ARRAY);
@@ -903,16 +899,19 @@ curve::gl_render( const view& scene)
 		lighting_prepare();
 		shiny_prepare();
 	}
-	assert( c != c_end);
-	// TODO: Make a smarter caching algorithm.  Should only make a cache
-	// if the checksum has been constant for some predetermined number of
-	// rendering cycles.
 
-	long check = checksum( begin, begin+size);
-	if (check == c->checksum && !scene.gcf_changed) {
-		c->gl_cache.gl_render();
-	}
-	else {
+	size_t size = std::min(c_cache::items, true_size);
+	size_t begin = 0;
+	cache_iterator c = cache.begin();
+	cache_iterator c_end = cache.end();
+	assert( c != c_end);
+	
+	// TODO: Make a smarter caching algorithm. Should only make a cache
+	// if the checksum has been constant for some predetermined number of
+	// rendering cycles. Also note that there's no reason to compute a
+	// checksum if pcount has changed since last render.
+	long check = checksum( spos, tcolor, pcount);
+	if (check != c->checksum || scene.gcf_changed) {
 		c->gl_cache.gl_compile_begin();
 		if (do_thinline) {
 			glVertexPointer( 3, GL_FLOAT, 0, spos);
@@ -934,9 +933,9 @@ curve::gl_render( const view& scene)
 		}
 		c->gl_cache.gl_compile_end();
 		c->checksum = check;
-		c->gl_cache.gl_render();
 	}
 
+	c->gl_cache.gl_render();
 	check_gl_error();
 
 }
