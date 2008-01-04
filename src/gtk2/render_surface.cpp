@@ -191,17 +191,19 @@ render_surface::on_realize()
 	// priority over user-initiated GUI events, like mouse clicks and such.
 	timer = Glib::signal_timeout().connect( 
 		sigc::mem_fun( *this, &render_surface::forward_render_scene),
-		//cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
-		cycle_time, Glib::PRIORITY_HIGH);
+		cycle_time, Glib::PRIORITY_HIGH_IDLE);
+		//cycle_time, Glib::PRIORITY_DEFAULT_IDLE-10);
+		//cycle_time, Glib::PRIORITY_HIGH);
 }
 
 bool
 render_surface::forward_render_scene()
 {
+
 // Make sure this rendering thread has high priority:
 #if defined(_WIN32) || defined(_MSC_VER)
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 #else
 	int default_prio = getpriority(PRIO_PROCESS, getpid());
 	setpriority(PRIO_PROCESS, getpid(), std::max(default_prio -5, -20));
@@ -258,8 +260,9 @@ render_surface::forward_render_scene()
 		timer.disconnect();
 		timer = Glib::signal_timeout().connect( 
 			sigc::mem_fun( *this, &render_surface::forward_render_scene),
-			//cycle_time, Glib::PRIORITY_DEFAULT_IDLE);
-			cycle_time, Glib::PRIORITY_HIGH);
+			cycle_time, Glib::PRIORITY_HIGH_IDLE);
+			//cycle_time, Glib::PRIORITY_DEFAULT_IDLE-10);
+			//cycle_time, Glib::PRIORITY_HIGH);
 		
 		VPYTHON_NOTE( 
 			std::string("Changed rendering cycle time to ") 
