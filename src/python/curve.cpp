@@ -51,7 +51,7 @@ float* findex( const array& a, size_t i)
 curve::curve()
 	: pos( 0), color( 0), antialias( true),
 	radius(0.0),
-	retain(0),
+	retain(0), last_pcount(0),
 	preallocated_size(257),
 	count(0), sides(4)
 {
@@ -91,6 +91,7 @@ curve::curve( const curve& other)
 	radius( other.radius), preallocated_size( other.preallocated_size),
 	count( other.count)
 {
+	last_pcount = 0;
 	int curve_around = sides;
 
 	for (int i=0; i<curve_around; i++) {
@@ -610,8 +611,10 @@ curve::get_center() const
 void
 curve::gl_pick_render( const view& scene)
 {
-	// Aack, I can't think of any obvious optimizations here
-	gl_render( scene);
+	// Aack, I can't think of any obvious optimizations here.
+	// But since Visual 3 didn't permit picking of curves, omit for now.
+	// We can't afford it; serious impact on performance.
+	//gl_render( scene);
 }
 
 void
@@ -909,10 +912,26 @@ curve::gl_render( const view& scene)
 	// TODO: Make a smarter caching algorithm. Should only make a cache
 	// if the checksum has been constant for some predetermined number of
 	// rendering cycles. Also note that there's no reason to compute a
-	// checksum if pcount has changed since last render.
-	long check = checksum( spos, tcolor, pcount);
-	if (check != c->checksum || scene.gcf_changed) {
-		c->gl_cache.gl_compile_begin();
+	// checksum if pcount or final position has changed since last render;
+	// this is likely to be the case of a trail of a moving object.
+	// (A sophisticated scheme would be to append the new part of a
+	// trail to the cached older part.)
+	bool could_cache = (pcount == last_pcount && !scene.gcf_changed && \
+		last_pos[0] == spos[3*pcount] && \
+		last_pos[1] == spos[3*pcount+1] && \
+		last_pos[2] == spos[3*pcount+2]);
+	// If could_cache, worth calculating a checksum, and caching if necessary
+	bool checksum_ok = false;
+	long check = 0;
+	if (could_cache) {
+		check = checksum( spos, tcolor, pcount);
+		checksum_ok = (check == c->checksum);
+	}
+	if (checksum_ok) {
+		c->gl_cache.gl_render();
+	}
+	else {
+		if (could_cache) c->gl_cache.gl_compile_begin();
 		if (do_thinline) {
 			glVertexPointer( 3, GL_FLOAT, 0, spos);
 			bool mono = adjust_colors( scene, tcolor, pcount);
@@ -931,12 +950,17 @@ curve::gl_render( const view& scene)
 			shiny_complete();
 			lighting_complete();
 		}
-		c->gl_cache.gl_compile_end();
-		c->checksum = check;
+		if (could_cache) {
+			c->gl_cache.gl_compile_end();
+			c->checksum = check;
+			c->gl_cache.gl_render();
+		}
 	}
-
-	c->gl_cache.gl_render();
 	check_gl_error();
+	last_pcount = pcount;
+	last_pos[0] = spos[3*pcount];
+	last_pos[1] = spos[3*pcount+1];
+	last_pos[2] = spos[3*pcount+2];
 
 }
 
