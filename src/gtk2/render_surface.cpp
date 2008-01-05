@@ -39,7 +39,7 @@
 	#include <windows.h>
 #endif
 
-const long TIMEOUT = 50; // delay before next rendering
+const long TIMEOUT = 35; // delay before next rendering
 
 namespace cvisual {
 
