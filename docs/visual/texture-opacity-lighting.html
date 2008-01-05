@@ -11,7 +11,7 @@
 <h3>Beta release</h3>
 <p>This beta release is experimental in the sense that there are known bugs described 
   <a href="#bugs">below</a>. Feel free to play with the exciting new features, 
-  but be aware that you may encounter problems, especially on Windows.</p>
+  but be aware that you may encounter problems.</p>
 <p>There is a new example program texture_and_lighting.py that displays many of 
   the new features: a swinging spotlight illuminates a translucent beach ball 
   that rolls on a wood-texture table. Also see the
@@ -134,13 +134,14 @@
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
 <p>Here are known bugs:</p>
 <blockquote>
-  <p>Some scenes display more slowly than desired, or the animation is jerky. </p>
+  <p>Can drag a window to be larger, but not smaller. </p>
   <p>A program loop containing essentially no computation at all may be difficult to quit on Windows. The cure is<br>
-  to insert a rate statement, for example, rate(100). </p>
+    to insert a rate statement, for example, rate(100). </p>
   <p>Autoscaling is pretty good but occasionally positions the camera farther 
     from the scene than you would prefer.</p>
   <p>Rendering of curves isn't quite right. This can be seen in the example program 
     tictac.py, where one of the grid lines doesn't show until you rotate the view.</p>
+  <p>Unicode text in labels works properly on Linux but not on Windows. </p>
   <p>Spotlights created in a frame don't change with changes in the frame orientation.</p>
   <p>scene.cursor is not implemented yet and gives an error (used in old programs 
     to make cursor visible/invisible).</p>
