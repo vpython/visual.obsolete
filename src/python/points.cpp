@@ -229,6 +229,8 @@ points::set_antialias( bool aa)
 {
 	lock L(mtx);
 	this->antialias = aa;
+	if (aa) this->points_shape = ROUND;
+	else this->points_shape = SQUARE;
 }
 
 void
@@ -239,8 +241,37 @@ points::set_size( float size)
 }
 
 void
+points::set_points_shape( const std::string& n_type)
+{
+	if (n_type == "round") {
+		points_shape = ROUND;
+		this->antialias = true;
+	}
+	else if (n_type == "square") {
+		points_shape = SQUARE;
+		this->antialias = false;
+	}
+	else
+		throw std::invalid_argument( "Unrecognized shape type");
+}
+
+std::string
+points::get_points_shape( void)
+{
+	switch (points_shape) {
+		case ROUND:
+			return "round";
+		case SQUARE:
+			return "square";
+		default:
+			return "";
+	}
+}
+
+void
 points::set_size_type( const std::string& n_type)
 {
+	lock L(mtx);
 	if (n_type == "screen") {
 		size_type = SCREEN;
 	}
@@ -263,7 +294,6 @@ points::get_size_type( void)
 			return "";
 	}
 }
-
 
 void
 points::set_pos( array n_pos)

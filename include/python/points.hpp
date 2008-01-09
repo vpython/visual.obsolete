@@ -39,6 +39,10 @@ class points : public renderable
 	// Specifies whether or not the size of the points should scale with the
 	// world or with the screen.
 	enum { WORLD, SCREEN } size_type;
+	
+	// Specifies the shape of the point. Future candidates are triangles,
+	// diamonds, etc. Currently antialias means ROUND, else SQUARE.
+	enum { ROUND, SQUARE } points_shape;
 
 	// True if points should be antialiased (drawn rounded)
 	bool antialias;
@@ -64,6 +68,9 @@ class points : public renderable
 	
 	boost::python::object get_pos(void);
 	boost::python::object get_color(void);
+	
+	void set_points_shape( const std::string& n_type);
+	std::string get_points_shape( void);
 	
 	void set_antialias( bool);
 	inline bool get_antialias( void) { return antialias; }

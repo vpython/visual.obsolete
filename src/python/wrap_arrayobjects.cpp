@@ -115,6 +115,7 @@ wrap_arrayobjects()
 		.def( init<const points&>())
 		.add_property( "size", &points::get_size, &points::set_size)  // AKA thickness.
 		.add_property( "antialias", &points::get_antialias, &points::set_antialias)
+		.add_property( "shape", &points::get_points_shape, &points::set_points_shape)
 		.add_property( "type", &points::get_size_type, &points::set_size_type)
 		.def( "get_color", &points::get_color)
 		.def( "set_color", &points::set_color_l)
