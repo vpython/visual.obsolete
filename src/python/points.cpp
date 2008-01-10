@@ -67,11 +67,10 @@ init_pointparam_extension(void)
 
 } // !namespace (anon)
 
-
 points::points()
 	: pos(0), color(0), preallocated_size(256), count(0),
 	size_type(SCREEN),
-	antialias(true),
+	points_shape(ROUND),
 	size( 1.5)
 {
 	std::vector<npy_intp> dims(2);
@@ -105,7 +104,7 @@ points::points( const points& other)
 	preallocated_size( other.preallocated_size),
 	count( other.count),
 	size_type( other.size_type),
-	antialias( other.antialias),
+	points_shape( other.points_shape),
 	size( other.size)
 {
 }
@@ -225,15 +224,6 @@ points::get_color()
 }
 
 void
-points::set_antialias( bool aa)
-{
-	lock L(mtx);
-	this->antialias = aa;
-	if (aa) this->points_shape = ROUND;
-	else this->points_shape = SQUARE;
-}
-
-void
 points::set_size( float size)
 {
 	lock L(mtx);
@@ -245,11 +235,9 @@ points::set_points_shape( const std::string& n_type)
 {
 	if (n_type == "round") {
 		points_shape = ROUND;
-		this->antialias = true;
 	}
 	else if (n_type == "square") {
 		points_shape = SQUARE;
-		this->antialias = false;
 	}
 	else
 		throw std::invalid_argument( "Unrecognized shape type");
@@ -375,7 +363,7 @@ points::set_color( array n_color)
 		return;
 	}
 	if (dims.size() == 2 && dims[1] == 3) {
-		// An RGBA chunk of color
+		// An RGB chunk of color
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
@@ -384,7 +372,7 @@ points::set_color( array n_color)
 		return;
 	}
 	if (dims.size() == 2 && dims[1] == 4) {
-		// An RGBA chunk of color
+		// An RGB-opacity chunk of color
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
@@ -612,7 +600,7 @@ points::gl_render( const view& scene)
 	const float* color_end = findex( color, count);
 
 	// First classify each point based on whether or not it is translucent
-	if (antialias) { // Every point must be depth sorted
+	if (points_shape == ROUND) { // Every point must be depth sorted
 		for ( ; pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 4) {
 			translucent_points.push_back( point_coord( vector(pos_i), rgba(color_i)));
 		}
@@ -665,7 +653,7 @@ points::gl_render( const view& scene)
 		init_pointparam_extension();
 	}
 
-	if (antialias)
+	if (points_shape == ROUND)
 		glEnable( GL_POINT_SMOOTH);
 
 	if (size_type == WORLD && world_scale_points_supported > 0) {
@@ -728,7 +716,7 @@ points::gl_render( const view& scene)
 			float attenuation_eqn[] = {1.0f, 0.0f, 0.0f};
 			glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);
 		}
-		if (antialias) {
+		if (points_shape == ROUND) {
 			glPointSize( clamp( gl_smooth_radius_range[0], size, gl_smooth_radius_range[1]));
 		}
 		else {
@@ -771,7 +759,7 @@ points::gl_render( const view& scene)
 		}
 	}
 
-	if (!antialias) {
+	if (!(points_shape == ROUND)) {
 		glDisable( GL_POINT_SMOOTH);
 	}
 	check_gl_error();
@@ -788,7 +776,7 @@ points::get_center() const
 	const float* color_i = findex( color, 0);
 	const float* color_end = findex( color, count);
 	for ( ;pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 4) {
-		if (antialias || color_i[3] != 1.0)
+		if (points_shape == ROUND || color_i[3] != 1.0)
 			ret += vector(pos_i);
 	}
 	ret /= count;

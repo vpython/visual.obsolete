@@ -41,11 +41,9 @@ class points : public renderable
 	enum { WORLD, SCREEN } size_type;
 	
 	// Specifies the shape of the point. Future candidates are triangles,
-	// diamonds, etc. Currently antialias means ROUND, else SQUARE.
+	// diamonds, etc. 
 	enum { ROUND, SQUARE } points_shape;
 
-	// True if points should be antialiased (drawn rounded)
-	bool antialias;
 	// The size of the points
 	float size;
 	
@@ -71,9 +69,6 @@ class points : public renderable
 	
 	void set_points_shape( const std::string& n_type);
 	std::string get_points_shape( void);
-	
-	void set_antialias( bool);
-	inline bool get_antialias( void) { return antialias; }
 	
 	void set_size( float r);
 	inline float get_size( void) { return size; }

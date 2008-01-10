@@ -36,7 +36,6 @@ wrap_arrayobjects()
 	class_<curve, bases<renderable> >( "curve")
 		.def( init<const curve&>())
 		.add_property( "radius", &curve::get_radius, &curve::set_radius)  // AKA thickness.
-		.add_property( "antialias", &curve::get_antialias, &curve::set_antialias)
 		.add_property( "retain", &curve::get_retain, &curve::set_retain)
 		.def( "get_color", &curve::get_color)
 		// The order of set_color specifications matters.
@@ -115,7 +114,6 @@ wrap_arrayobjects()
 	class_<points, bases<renderable> >( "points")
 		.def( init<const points&>())
 		.add_property( "size", &points::get_size, &points::set_size)  // AKA thickness.
-		.add_property( "antialias", &points::get_antialias, &points::set_antialias)
 		.add_property( "shape", &points::get_points_shape, &points::set_points_shape)
 		.add_property( "type", &points::get_size_type, &points::set_size_type)
 		.def( "get_color", &points::get_color)
