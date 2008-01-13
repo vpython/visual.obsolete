@@ -21,7 +21,7 @@ for y0 in arange(YMIN, YMAX, r): # range over all pixel positions
         z = z0 = complex(x0,y0)
         iteration = 0
         while ( abs(z) < 2 and iteration < max_iteration):
-            z = z**2+z0
+            z = z*z+z0
             iteration += 1
         # Leave points black if the iteration quickly escapes:
         if (.1 < iteration/max_iteration < 1):
