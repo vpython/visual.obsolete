@@ -44,30 +44,20 @@ if test $platform_win32 = yes; then
 	# The major.minor version of Python, with the "." stripped out.
 	AC_SUBST([WIN32_PYTHON_VERSION], [`echo $PYTHON_VERSION | sed -e "s/\.//"`])
 fi
+
+# Check whether key libraries are available and give feedback.
 PKG_CHECK_MODULES( GTKGLEXTMM, gtkglextmm-1.2 >= 1.2, ,
 		[AC_MSG_ERROR([gtkglextmm 1.2 is required])])
-#AC_SUBST([GTKGLEXTMM_LIBS])
-#AC_SUBST([GTKGLEXTMM_CFLAGS])
 PKG_CHECK_MODULES( GLIBMM, glibmm-2.4, ,
 		[AC_MSG_ERROR([glibmm-2.4 is required])])
-#AC_SUBST([GLIBMM_LIBS])
-#AC_SUBST([GLIBMM_CFLAGS])
 PKG_CHECK_MODULES( PANGOMM, pangomm-1.4, ,
 		[AC_MSG_ERROR([pangomm-1.4 is required])])
-#AC_SUBST([PANGOMM_LIBS])
-#AC_SUBST([PANGOMM_CFLAGS])
 PKG_CHECK_MODULES( LIBGLADEMM, libglademm-2.4, ,
 		[AC_MSG_ERROR([libglademm-2.4 is required])])
-#AC_SUBST([LIBGLADEMM_LIBS])
-#AC_SUBST([LIBGLADEMM_CFLAGS])
 PKG_CHECK_MODULES( FREETYPE2, freetype2, ,
 		[AC_MSG_ERROR([freetyp2 is required])])
-#AC_SUBST([FREETYPE2_LIBS])
-#AC_SUBST([FREETYPE2_CFLAGS])
 PKG_CHECK_MODULES( PANGOFT2, pangoft2, ,
 		[AC_MSG_ERROR([pangoft2 is required])])
-#AC_SUBST([PANGOFT2_LIBS])
-#AC_SUBST([PANGOFT2_CFLAGS])
 
 # Having checked various libraries individually, now repeat the check for the
 # whole set of them, and this information will be used for compilation and linking.
