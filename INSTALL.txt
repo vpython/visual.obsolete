@@ -43,33 +43,12 @@ I.  Prerequisites:
 	libglademm (there may be a package, or www.gtkmm.org).
 		
 	Apple OSX (Version 10.2.x) WARNING: This is woefully out of date
-		- Go to www.apple.com/macosx/features/x11/download and download
-		both X11 and the X11 SDK.
-		- Install fink from fink.sourceforge.net.  Answer 'y' when asked
-		about adding a line to ~/.cshrc.  You do not need to run
-		'dselect'.
-		- In a terminal editor run the following:
-		rehash
-		sudo apt-get update
-		sudo apt-get install pkgconfig gtk+ gtkglarea python22
-		rehash
-		which python2.2 (Verify this reports /sw/bin/python2.2)
-		Install GCC from source using version 3.3.1 or higher.  First
-		install the Apple Developer's Tools (called XCode in 10.3)
-		including an installation of GCC 3.3.  Download and unpack
-		the sources for GCC from gcc.gnu.org.  This creates a directory 
-		named like 'gcc-3.3.3'.  Make a new directory alongside this 
-		directory, such as 'buildgcc3.3.3'. cd into the new directory and
-		 run: 
-		`../gcc-3.3.3/configure --enable-languages=c,c++ --disable-shared \
-		--enable-version-specific-runtime-libs --program-suffix=-3.3.3 \
-		--enable-threads=posix`
-		Build the new compiler with `make bootstrap`.  Optionally, to save
-		some disk space, build with `make CXXFLAGS=-O2`, instead.
-		install the compiler with `sudo make install`
-		Download
-		OpenGL is provided with the standard OS installation.
-	# TODO: include directions for building Boost.Python on OSX(gulp).
+		Make sure X11 and Xcode are installed (found on the installation DVD).
+		Install fink from fink.sourceforge.net. 
+		Use fink to install the components listed above for Linux.
+		Jan. 2008: could not get freetype2 to install using fink and had to do this:
+		   sudo cp /usr/local/lib/pkgconfig/freetyp2 /sw/lib/pkgconfig
+		   sudo cp -R /usr/local/include/freetype2 /sw/lib/include
 
 II.   Configuration 
 	On most systems, configuration should be automatic.  Just run './configure'.
