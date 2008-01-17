@@ -28,17 +28,23 @@ I.  Prerequisites:
 		better error messages. 1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
 		Specifically, you need libboost-python-dev and libboost-threads-dev.
+		*** It is an unfortunate fact of life that the Boost libraries that
+		*** deal with Python have names that do not reflect what version of
+		*** Python they were built for and with. You have to be careful to
+		*** install Boost Python libraries for your version of Python.
 	The autoconf, automake, libtool, and pkg-config packages.
-	gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
-	gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net).
-	
+		
 	Here is a hopefully complete list of all the libraries involved. 
 	In many cases a library is automatically installed by a package manager 
 	when a requested library depends on it:
-	gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, gtk2, 
-	gtkmm-2.4, gdkmm-2.4, glib-2.0, glibmm-2.4, 
-	pango-1.0, pangomm-1.4, freetype2,  
-	gtkglext-1.0, gtkglextmm-1.2, cairo, cariomm, libglade-2.0, libglademm
+	   gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, gtk2, 
+	   gtkmm-2.4, gdkmm-2.4, glib-2.0, glibmm-2.4, 
+	   pango-1.0, pangomm-1.4, freetype2,  
+	   gtkglext-1.0, gtkglextmm-1.2, cairo, cariomm, libglade-2.0, libglademm
+	
+	More generically, key libraries are these:
+		gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
+		gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net).
 
 	To install gtkglextmm:
 	1) Download the bz2 file.
@@ -54,6 +60,10 @@ I.  Prerequisites:
 		Make sure X11 and Xcode are installed (found on the installation DVD).
 		Install fink from fink.sourceforge.net. 
 		Use fink to install the components listed above for Linux.
+		   Currently (Jan. 2008) you will find 10 entries for Boost; you
+		   need to look at Tools > Show Package Info (command-I) to see which
+		   boostN.N.pyth packages go with your chosen version of Python (you also
+		   need the non-Python libraries, boostN.N.nopy and boostN.N.syste).
 		Shouldn't be necessary, but you might have to add this to .profile in
 		your home directory: export PKG_CONFIG_PATH=/sw/lib/pkgconfig
 		You can test this by executing the following:
