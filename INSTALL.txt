@@ -34,17 +34,19 @@ I.  Prerequisites:
 		*** install Boost Python libraries for your version of Python.
 	The autoconf, automake, libtool, and pkg-config packages.
 		
-	Here is a hopefully complete list of all the libraries involved. 
-	In many cases a library is automatically installed by a package manager 
-	when a requested library depends on it:
-	   gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, gtk2, 
+	Here is a list of all the additional libraries involved. In many cases a library is 
+	automatically installed by a package manager when a requested library depends on it:
+	   gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, 
 	   gtkmm-2.4, gdkmm-2.4, glib-2.0, glibmm-2.4, 
 	   pango-1.0, pangomm-1.4, freetype2,  
-	   gtkglext-1.0, gtkglextmm-1.2, cairo, cariomm, libglade-2.0, libglademm
+	   gtkglext-1.0, gtkglextmm-1.2, cairo, cariomm-1.0, libglade-2.0, libglademm-2.4
 	
 	More generically, key libraries are these:
 		gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
 		gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net).
+	GTK2 (sometimes called GTK+) is a platform-independent library for creating
+	graphical user interfaces. It is designed for programs written in C. 
+	GTKMM is a "wrapper" to make GTK2 accessible to programs written in C++.
 
 	To install gtkglextmm:
 	1) Download the bz2 file.
