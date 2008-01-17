@@ -110,7 +110,7 @@ display_kernel::tan_hfov( double* x, double* y)
 	// tangent of half the field of view.
 	double tan_hfov = std::tan( fov*0.5);
 	double aspect_ratio = window_height / window_width;
-	if (stereo_mode == PASSIVE_STEREO)
+	if (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
 		aspect_ratio *= 2.0;
 	if (aspect_ratio > 1.0) {
 		// Tall window
@@ -200,7 +200,8 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 	// TODO: Implement ZOOM_ROLL modes.
 	float vfrac = dy / window_height;
 	float hfrac = dx
-		/ ((stereo_mode == PASSIVE_STEREO) ? (window_width*0.5f) : window_width);
+		/ ((stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO) ? 
+		     (window_width*0.5f) : window_width);
 
 	// The amount by which the scene should be shifted in response to panning
 	// motion.
@@ -560,7 +561,7 @@ display_kernel::recalc_extent(void)
 
 	if (!uniform) {
 		gcf_changed = true;
-		double width = (stereo_mode == PASSIVE_STEREO)
+		double width = (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
 			? window_width*0.5 : window_width;
 		gcfvec = vector(1.0/range.x, (window_height/width)/range.y, 0.1/range.z);
 	}
@@ -797,6 +798,23 @@ display_kernel::render_scene(void)
 				glViewport( stereo_width+1, 0, stereo_width,
 					static_cast<int>(window_height));
 				draw( scene_geometry, 1);
+				break;
+			}
+			case CROSSEYED_STEREO: {
+				// Also handle viewport modifications.
+				scene_geometry.window_width =  window_width * 0.5f;
+				scene_geometry.anaglyph = false;
+				scene_geometry.coloranaglyph = false;
+				int stereo_width = int(scene_geometry.window_width);
+				// Left eye
+				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+				glViewport( 0, 0, stereo_width,
+					static_cast<int>(window_height));
+				draw( scene_geometry, 1);
+				// Right eye
+				glViewport( stereo_width+1, 0, stereo_width,
+					static_cast<int>(window_height));
+				draw( scene_geometry, -1);
 				break;
 			}
 		}
@@ -1265,6 +1283,8 @@ display_kernel::set_stereomode( std::string mode)
 		stereo_mode = ACTIVE_STEREO;
 	else if (mode == "passive")
 		stereo_mode = PASSIVE_STEREO;
+	else if (mode == "crosseyed")
+		stereo_mode = CROSSEYED_STEREO;
 	else if (mode == "redblue")
 		stereo_mode = REDBLUE_STEREO;
 	else if (mode == "redcyan")
@@ -1287,6 +1307,8 @@ display_kernel::get_stereomode()
 			return "active";
 		case PASSIVE_STEREO:
 			return "passive";
+		case CROSSEYED_STEREO:
+			return "crosseyed";
 		case REDBLUE_STEREO:
 			return "redblue";
 		case REDCYAN_STEREO:

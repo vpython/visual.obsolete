@@ -343,7 +343,7 @@ display::create()
 {
 	area.reset( new render_surface(*this, stereo_mode == ACTIVE_STEREO));
 	
-	if (stereo_mode == PASSIVE_STEREO)
+	if (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
 		area->set_size_request( (int)(width * 2.0), (int)height);
 	else
 		area->set_size_request( (int)width, (int)height);

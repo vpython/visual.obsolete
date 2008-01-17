@@ -151,7 +151,7 @@ class display_kernel
 public: // Public Data.
 	enum mouse_mode_t { ZOOM_ROTATE, ZOOM_ROLL, PAN, FIXED } mouse_mode;
 	enum mouse_button { NONE, LEFT, RIGHT, MIDDLE };
-	enum stereo_mode_t { NO_STEREO, PASSIVE_STEREO, ACTIVE_STEREO,
+	enum stereo_mode_t { NO_STEREO, PASSIVE_STEREO, ACTIVE_STEREO, CROSSEYED_STEREO,
 		REDBLUE_STEREO, REDCYAN_STEREO, YELLOWBLUE_STEREO, GREENMAGENTA_STEREO
 	} stereo_mode;
 
