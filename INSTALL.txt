@@ -32,7 +32,7 @@ I.  Prerequisites:
 	gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
 	gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net).
 	
-	Here is a hopefully complet list of all the libraries involved. 
+	Here is a hopefully complete list of all the libraries involved. 
 	In many cases a library is automatically installed by a package manager 
 	when a requested library depends on it:
 	gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, gtk2, 
