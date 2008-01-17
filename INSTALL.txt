@@ -31,6 +31,14 @@ I.  Prerequisites:
 	The autoconf, automake, libtool, and pkg-config packages.
 	gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
 	gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net).
+	
+	Here is a hopefully complet list of all the libraries involved. 
+	In many cases a library is automatically installed by a package manager 
+	when a requested library depends on it:
+	gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, gtk2, 
+	gtkmm-2.4, gdkmm-2.4, glib-2.0, glibmm-2.4, 
+	pango-1.0, pangomm-1.4, freetype2,  
+	gtkglext-1.0, gtkglextmm-1.2, cairo, cariomm, libglade-2.0, libglademm
 
 	To install gtkglextmm:
 	1) Download the bz2 file.
@@ -42,10 +50,14 @@ I.  Prerequisites:
 	
 	libglademm (there may be a package, or www.gtkmm.org).
 		
-	Apple OSX (Version 10.2.x) WARNING: This is woefully out of date
+	Apple OSX (Version 10.2.x) WARNING: This is woefully out of date.
 		Make sure X11 and Xcode are installed (found on the installation DVD).
 		Install fink from fink.sourceforge.net. 
 		Use fink to install the components listed above for Linux.
+		Shouldn't be necessary, but you might have to add this to .profile in
+		your home directory: export PKG_CONFIG_PATH=/sw/lib/pkgconfig
+		You can test this by executing the following:
+		   pkg-config --libs gtkmm-2.4
 		Jan. 2008: could not get freetype2 to install using fink and had to do this:
 		   sudo cp /usr/local/lib/pkgconfig/freetyp2 /sw/lib/pkgconfig
 		   sudo cp -R /usr/local/include/freetype2 /sw/lib/include
@@ -80,6 +92,8 @@ II.   Configuration
 	On Linux, do this: which python
 	Make a note of the prefix preceding /bin/python, typically /usr or /usr/local.
 	
+	It is useful to place the visual folder and a folder named "build" at the same level,
+	and configure and make in the build folder by "cd build", then doing this:	
 	(a) If prefix is /usr/local, execute
      	../visual-x.x.x/configure
 	(b) If prefix is something else, and Visual can go into prefix/lib/python/site-packages, execute
@@ -91,6 +105,11 @@ II.   Configuration
 	directory to Python's module search path. For details, at www.python.org read section 4.1
 	(Modifying Python's Search Path) in the section Installing Python Modules of the Python
 	on-line documentation.
+	
+	Here is a specific example of case (c):
+	PYTHON=/usr/bin/python ../visual-x.x.x/configure --prefix=/usr/local
+	(This would make sense only if python has /usr/local/lib/site-packages on its 
+	search path.)
 	
 	If you are only building VPython once, you may pass the option
 	--disable-dependancy-tracking to make the build itself go a little faster.
