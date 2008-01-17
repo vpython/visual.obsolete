@@ -55,7 +55,7 @@ PKG_CHECK_MODULES( PANGOMM, pangomm-1.4, ,
 PKG_CHECK_MODULES( LIBGLADEMM, libglademm-2.4, ,
 		[AC_MSG_ERROR([libglademm-2.4 is required])])
 PKG_CHECK_MODULES( FREETYPE2, freetype2, ,
-		[AC_MSG_ERROR([freetyp2 is required])])
+		[AC_MSG_ERROR([freetype2 is required])])
 PKG_CHECK_MODULES( PANGOFT2, pangoft2, ,
 		[AC_MSG_ERROR([pangoft2 is required])])
 
