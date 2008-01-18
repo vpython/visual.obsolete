@@ -31,7 +31,7 @@ I.  Prerequisites:
 		*** It is an unfortunate fact of life that the Boost libraries that
 		*** deal with Python have names that do not reflect what version of
 		*** Python they were built for and with. You have to be careful to
-		*** install Boost Python libraries for your version of Python.
+		*** install Boost Python libraries that were built for your version of Python.
 	The autoconf, automake, libtool, and pkg-config packages.
 		
 	Here is a list of all the additional libraries involved. In many cases a library is 
@@ -58,21 +58,50 @@ I.  Prerequisites:
 	
 	libglademm (there may be a package, or www.gtkmm.org).
 		
-	Apple OSX (Version 10.2.x) WARNING: This is woefully out of date.
+	Apple OSX (Version 10.4.x)
 		Make sure X11 and Xcode are installed (found on the installation DVD).
-		Install fink from fink.sourceforge.net. 
+		X11 is automatically installed on 10.5.
+		
+		To do a clean install of fink, I deleted /sw and started from scratch.
+		Install fink from fink.sourceforge.net. Probably best to install from source?
+		I use Fink Commander as a GUI to fink, but you can use the command line.
+		
 		Use fink to install the components listed above for Linux.
 		   Currently (Jan. 2008) you will find 10 entries for Boost; you
-		   need to look at Tools > Show Package Info (command-I) to see which
+		   need to expand the package name field enough to be able to see which
 		   boostN.N.pyth packages go with your chosen version of Python (you also
 		   need the non-Python libraries, boostN.N.nopy and boostN.N.syste).
-		Shouldn't be necessary, but you might have to add this to .profile in
+		I installed Python2.5, numpy, the boost libraries, then install these:
+		
+		gtkmm-2.4, which installs many other packages on which it depends, including
+		gtk+2, glib, glibmm, libsig++, atk, pango, automake, autoconf, libtool, pkgconfig 
+		
+		libglademm2.4, libglademm2.4-shlibs
+		
+		cairomm1, cairomm1-shlibs (takes a LONG time)
+		
+		gtkglextmm, getkglextmm-shlibs
+		
+		freetype2
+		
+		This seems to be all the fink installs necessary, but there are problems with freetype2.
+		See below.
+
+		Shouldn't be necessary, but to configure you might have to add this to .profile in
 		your home directory: export PKG_CONFIG_PATH=/sw/lib/pkgconfig
 		You can test this by executing the following:
 		   pkg-config --libs gtkmm-2.4
-		Jan. 2008: could not get freetype2 to install using fink and had to do this:
+		
+		Couldn't configure due to not finding freetype2, which indeed is missing despite
+		the fink install, so I put this in .profile in my home directory to try to pick
+		up freetype2 from /usr or /usr/local
+		   export PKG_CONFIG_PATH=/sw/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig
+		Could configure and make, but VPython didn't run.
+		   
+		In an earlier attempt (before clean install of fink), I tried this:
 		   sudo cp /usr/local/lib/pkgconfig/freetyp2 /sw/lib/pkgconfig
 		   sudo cp -R /usr/local/include/freetype2 /sw/lib/include
+		That made it possible to configure and make, but VPython didn't run.
 
 II.   Configuration 
 	On most systems, configuration should be automatic.  Just run './configure'.
@@ -138,7 +167,7 @@ II.   Configuration
 	
 	The prebuilt binary for Apple OSX is configured with (in Bash):
 	CXX=/usr/local/bin/g++-3.3.3 CXXFLAGS="-O2 -finline-functions" \
-	PYTHON=/sw/bin/python CPPFLAGS=-I/sw/include ../visual-2.9/configure \
+	PYTHON=/sw/bin/python2.5 CPPFLAGS=-I/sw/include ../visual-2.9/configure \
 	--prefix=/sw
 	
 	Another interesting configuration is to install VPython into a prefix other than
