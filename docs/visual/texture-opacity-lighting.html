@@ -112,7 +112,11 @@
 <h3>New frame capabilities</h3>
 <p>You can now make a frame visible or invisible, and all objects in the frame 
   will be affected. And you can set the vector &quot;scale&quot; attribute of 
-  a frame to change the size of the combined object.</p>
+  a frame to change the size of the combined object. For example, someframe.scale = (2,.5,4)
+  will make objects in the frame display as though you had doubled all the x components 
+  of objects in the frame (relative to the frame), halved the y components, and quadrupled
+  the z components, with respect to their original values; initially a frame has scale = (1,1,1). 
+  As with other vector attributes, you can refer to the x component as someframe.scale.x.</p>
 <h3>New aspects of curves </h3>
 <p>In older versions of VPython, no matter how many points were in a curve, only 1000 were displayed, selected evenly over the full set of points, in order that the display of a very long curve doesn't slow down unacceptably. In the new version this is still true but the number of points displayed is 10000. </p>
 <p>The new option curve.retain = 500 means that only the 500 most recently added points of a curve will be displayed; the earlier ones are deleted. This is a nice option for having a moving object leave a tail behind itself. </p>
