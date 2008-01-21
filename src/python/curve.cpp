@@ -37,12 +37,17 @@ double* index( const array& a, size_t i)
 	// goes up for the cast.  It is made safe by padding actions within the Numeric
 	// library itself, but the compiler doesn't know that, so I am just using a
 	// raw cast vice a static_cast<>.
-	return ((double*)data(a)) + (i+1) * 3;
+	return ((double*)data(a)) + (i+1) * 3; // (x,y,z)
 }
 
 float* findex( const array& a, size_t i)
 {
-	return ((float*)data(a)) + (i+1)*3;
+	return ((float*)data(a)) + (i+1)*4; // (red,green,blue,opacity)
+}
+
+float* findex3( const array& a, size_t i)
+{
+	return ((float*)data(a)) + (i+1)*3; // (red,green,blue)
 }
 
 } // !namespace visual::(unnamed)
@@ -55,20 +60,22 @@ curve::curve()
 	preallocated_size(257),
 	count(0), sides(4)
 {
-	// Perform initial allocation of storage space for the buggar.
+	// Perform initial allocation of storage space.
 	std::vector<npy_intp> dims(2);
 	dims[0] = preallocated_size;
 	dims[1] = 3;
 	pos = makeNum( dims);
-	color = makeNum( dims);
+	dims[1] = 4;
+	color = makeNum( dims, NPY_FLOAT);
 	double* pos_i = index( pos, 0);
-	double* color_i = index( color, 0);
+	float* color_i = findex( color, 0);
 	pos_i[0] = 0;
 	pos_i[1] = 0;
 	pos_i[2] = 0;
 	color_i[0] = 1;
 	color_i[1] = 1;
 	color_i[2] = 1;
+	color_i[3] = 1;
 
 	int curve_around = sides;
 
@@ -139,13 +146,14 @@ curve::set_length( size_t length)
 			pos_i += 3;
 		}
 
-		double* color_i = index( color, shift);
-		double* color_end = index( color, npoints);
+		float* color_i = findex( color, shift);
+		float* color_end = findex( color, npoints);
 		while (color_i < color_end) {
-			color_i[0-3*shift] = color_i[0];
-			color_i[1-3*shift] = color_i[1];
-			color_i[2-3*shift] = color_i[2];
-			color_i += 3;
+			color_i[0-4*shift] = color_i[0];
+			color_i[1-4*shift] = color_i[1];
+			color_i[2-4*shift] = color_i[2];
+			color_i[3-4*shift] = color_i[3];
+			color_i += 4;
 		}
 	}
 	if (npoints == 0)
@@ -160,7 +168,7 @@ curve::set_length( size_t length)
 		array n_pos = makeNum( dims);
 		array n_color = makeNum( dims);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints + 1));
-		std::memcpy( data( n_color), data( color), sizeof(double) * 3 * (npoints + 1));
+		std::memcpy( data( n_color), data( color), sizeof(float) * 4 * (npoints + 1));
 		pos = n_pos;
 		color = n_color;
 		preallocated_size = dims[0];
@@ -177,14 +185,15 @@ curve::set_length( size_t length)
 			pos_i += 3;
 		}
 
-		const double* last_color = index( color, npoints-1);
-		double* color_i = index( color, npoints);
-		double* color_end = index( color, length);
+		const float* last_color = findex( color, npoints-1);
+		float* color_i = findex( color, npoints);
+		float* color_end = findex( color, length);
 		while (color_i < color_end) {
 			color_i[0] = last_color[0];
 			color_i[1] = last_color[1];
 			color_i[2] = last_color[2];
-			color_i += 3;
+			color_i[3] = last_color[3];
+			color_i += 4;
 		}
 	}
 	count = length;
@@ -196,7 +205,7 @@ curve::set_length( size_t length)
 }
 
 void
-curve::append_rgb( vector npos, double red, double blue, double green)
+curve::append_rgba( vector npos, float red, float blue, float green, float opacity)
 {
 	lock L(mtx);
 	if (retain > 0 and count >= retain) {
@@ -204,7 +213,7 @@ curve::append_rgb( vector npos, double red, double blue, double green)
 	}
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
-	double* last_color = index( color, count-1);
+	float* last_color = findex( color, count-1);
 	last_pos[0] = npos.x;
 	last_pos[1] = npos.y;
 	last_pos[2] = npos.z;
@@ -214,6 +223,8 @@ curve::append_rgb( vector npos, double red, double blue, double green)
 		last_color[1] = green;
 	if (blue != -1)
 		last_color[2] = blue;
+	if (opacity != -1)
+		last_color[3] = opacity;
 }
 
 void
@@ -231,7 +242,7 @@ curve::append( vector npos)
 }
 
 void
-curve::append( vector npos, rgb ncolor)
+curve::append( vector npos, rgba ncolor)
 {
 	lock L(mtx);
 	if (retain > 0 and count >= retain) {
@@ -312,28 +323,56 @@ void
 curve::set_color( array n_color)
 {
 	NPY_TYPES t = type(n_color);
-	if (t != NPY_DOUBLE) {
-		n_color = astype(n_color, NPY_DOUBLE);
+	if (t != NPY_FLOAT) {
+		n_color = astype(n_color, NPY_FLOAT);
 	}
     std::vector<npy_intp> dims = shape( n_color);
-	if (dims.size() == 1 && dims[0] == 3) {
+    if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
 		lock L(mtx);
-		color[slice(1,npoints+1)] = n_color;
-		if (retain > 0 and count >= retain) set_length( retain);
+		color[slice(1,npoints+1), slice(0, 3)] = n_color;
+		return;
+	}
+	if (dims.size() == 1 && dims[0] == 4) {
+		// A single color, broadcast across the entire (used) array.
+		int npoints = (count) ? count : 1;
+		lock L(mtx);
+		color[slice( 1, npoints+1)] = n_color;
 		return;
 	}
 	if (dims.size() == 2 && dims[1] == 3) {
+		// An RGB chunk of color
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
 		lock L(mtx);
-		color[slice(1, count+1)] = n_color;
-		if (retain > 0 and count >= retain) set_length( retain);
+		// The following doesn't work; I don't know why. 
+		// Note that it works with a single color above.
+		//color[slice(1, count+1), slice(0, 3)] = n_color;
+		// So instead do it by brute force:
+		float* color_i = findex( color, 1);
+		float* color_end = findex( color, count+1);
+		float* n_color_i = findex3( n_color,0);
+		while (color_i < color_end) {
+			color_i[0] = n_color_i[0];
+			color_i[1] = n_color_i[1];
+			color_i[2] = n_color_i[2];
+			color_i += 4;
+			n_color_i += 3;
+		}
 		return;
 	}
-	throw std::invalid_argument( "color must be an Nx3 array");
+	if (dims.size() == 2 && dims[1] == 4) {
+		// An RGB-opacity chunk of color
+		if (dims[0] != (long)count) {
+			throw std::invalid_argument( "color must be the same length as pos.");
+		}
+		lock L(mtx);
+		color[slice( 1, count+1)] = n_color;
+		return;
+	}
+	throw std::invalid_argument( "color must be an Nx3 or Nx4 array");
 }
 
 void
@@ -343,9 +382,9 @@ curve::set_color_l( const list& color)
 }
 
 void
-curve::set_color_t( const rgb& color)
+curve::set_color_t( const rgba& color)
 {
-	this->set_color( array( make_tuple(color.red, color.green, color.blue)));
+	this->set_color( array( make_tuple(color.red, color.green, color.blue, color.opacity)));
 }
 
 void
@@ -855,23 +894,24 @@ curve::gl_render( const view& scene)
 	const int LINE_LENGTH = 10000;
 	// Data storage for the position and color data.
 	float spos[3*LINE_LENGTH];
-	float tcolor[3*LINE_LENGTH];
+	float tcolor[3*LINE_LENGTH]; // opacity not yet implemented for curves
 	float fstep = ( ((float) count)-1.0)/(LINE_LENGTH-1.0);
 	if (fstep < 1.0) fstep = 1.0;
-	size_t iptr=0, iptr3, pcount=0;
+	size_t iptr=0, iptr3, cptr, pcount=0;
 
 	const double* p_i = (double*)( data(this->pos));
-	const double* c_i = (double*)( data(this->color));
+	const float* c_i = (float*)( data(this->color));
 	
 	// Choose which points to display
 	for (float fptr=0.0; iptr < count; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
 		iptr3 = 3*(iptr+1); // first real point is the second in the data array
+		cptr = 4*(iptr+1); // color is rgb-opacity (4 floats)
 		spos[3*pcount] = p_i[iptr3];
 		spos[3*pcount+1] = p_i[iptr3+1];
 		spos[3*pcount+2] = p_i[iptr3+2];
-		tcolor[3*pcount] = c_i[iptr3];
-		tcolor[3*pcount+1] = c_i[iptr3+1];
-		tcolor[3*pcount+2] = c_i[iptr3+2];
+		tcolor[3*pcount] = c_i[cptr];
+		tcolor[3*pcount+1] = c_i[cptr+1];
+		tcolor[3*pcount+2] = c_i[cptr+2]; // ignore opacity for now
 	}
 	
 	// Do scaling if necessary

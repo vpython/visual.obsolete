@@ -30,7 +30,7 @@ wrap_arrayobjects()
 	using namespace boost::python;
 	using python::curve;
 
-	void (curve::*append_v_r)( vector, rgb) = &curve::append;
+	void (curve::*append_v_r)( vector, rgba) = &curve::append;
 	void (curve::*append_v)( vector) = &curve::append;
 	
 	class_<curve, bases<renderable> >( "curve")
@@ -65,9 +65,55 @@ wrap_arrayobjects()
 		.def( "set_z", &curve::set_z_d)
 		.def( "set_z", &curve::set_z)
 		.def( "append", append_v_r, args( "pos", "color"))
-		.def( "append", &curve::append_rgb,
-			(args("pos"), args("r")=-1, args("g")=-1, args("b")=-1))
+		.def( "append", &curve::append_rgba,
+			(args("pos"), args("r")=-1, args("g")=-1, args("b")=-1, args("o")=-1))
 		.def( "append", append_v, args("pos"))
+		;
+
+	using python::points;
+
+	void (points::*pappend_v_r)( vector, rgba) = &points::append;
+	void (points::*pappend_v)( vector) = &points::append;
+	
+	class_<points, bases<renderable> >( "points")
+		.def( init<const points&>())
+		.add_property( "size", &points::get_size, &points::set_size)  // AKA thickness.
+		.add_property( "shape", &points::get_points_shape, &points::set_points_shape)
+		.add_property( "type", &points::get_size_type, &points::set_size_type)
+		.def( "get_color", &points::get_color)
+		// The order of set_color specifications matters.
+		.def( "set_color", &points::set_color_t)
+		.def( "set_color", &points::set_color_l)
+		.def( "set_color", &points::set_color)
+		.def( "set_red", &points::set_red_l)
+		.def( "set_red", &points::set_red_d)
+		.def( "set_red", &points::set_red)
+		.def( "set_green", &points::set_green_l)
+		.def( "set_green", &points::set_green_d)
+		.def( "set_green", &points::set_green)
+		.def( "set_blue", &points::set_blue_l)
+		.def( "set_blue", &points::set_blue_d)
+		.def( "set_blue", &points::set_blue)
+		.def( "set_opacity", &points::set_opacity_l)
+		.def( "set_opacity", &points::set_opacity_d)
+		.def( "set_opacity", &points::set_opacity)
+		.def( "set_pos", &points::set_pos_v)
+		.def( "get_pos", &points::get_pos)
+		.def( "set_pos", &points::set_pos_l)
+		.def( "set_pos", &points::set_pos)
+		.def( "set_x", &points::set_x_l)
+		.def( "set_x", &points::set_x_d)
+		.def( "set_x", &points::set_x)
+		.def( "set_y", &points::set_y_l)
+		.def( "set_y", &points::set_y_d)
+		.def( "set_y", &points::set_y) 
+		.def( "set_z", &points::set_z_l)
+		.def( "set_z", &points::set_z_d)
+		.def( "set_z", &points::set_z)
+		.def( "append", pappend_v_r, args( "pos", "color"))
+		.def( "append", &points::append_rgba,
+			(args("pos"), args("r")=-1, args("g")=-1, args("b")=-1, args("o")=-1))
+		.def( "append", pappend_v, args("pos"))
 		;
 
 	using python::faces;
@@ -105,52 +151,6 @@ wrap_arrayobjects()
 		.def( "set_pos", &convex::set_pos_l)
 		.def( "get_pos", &convex::get_pos)
 		;  
-
-	using python::points;
-
-	void (points::*pappend_v_r)( vector, rgba) = &points::append;
-	void (points::*pappend_v)( vector) = &points::append;
-	
-	class_<points, bases<renderable> >( "points")
-		.def( init<const points&>())
-		.add_property( "size", &points::get_size, &points::set_size)  // AKA thickness.
-		.add_property( "shape", &points::get_points_shape, &points::set_points_shape)
-		.add_property( "type", &points::get_size_type, &points::set_size_type)
-		.def( "get_color", &points::get_color)
-		// The order of set_color specifications matters.
-		.def( "set_color", &points::set_color_t)
-		.def( "set_color", &points::set_color_l)
-		.def( "set_color", &points::set_color)
-		.def( "set_red", &points::set_red_l)
-		.def( "set_red", &points::set_red_d)
-		.def( "set_red", &points::set_red)
-		.def( "set_green", &points::set_green_l)
-		.def( "set_green", &points::set_green_d)
-		.def( "set_green", &points::set_green)
-		.def( "set_blue", &points::set_blue_l)
-		.def( "set_blue", &points::set_blue_d)
-		.def( "set_blue", &points::set_blue)
-		.def( "set_opacit", &points::set_opacity_l)
-		.def( "set_opacity", &points::set_opacity_d)
-		.def( "set_opacity", &points::set_opacity)
-		.def( "set_pos", &points::set_pos_v)
-		.def( "get_pos", &points::get_pos)
-		.def( "set_pos", &points::set_pos_l)
-		.def( "set_pos", &points::set_pos)
-		.def( "set_x", &points::set_x_l)
-		.def( "set_x", &points::set_x_d)
-		.def( "set_x", &points::set_x)
-		.def( "set_y", &points::set_y_l)
-		.def( "set_y", &points::set_y_d)
-		.def( "set_y", &points::set_y) 
-		.def( "set_z", &points::set_z_l)
-		.def( "set_z", &points::set_z_d)
-		.def( "set_z", &points::set_z)
-		.def( "append", pappend_v_r, args( "pos", "color"))
-		.def( "append", &points::append_rgba,
-			(args("pos"), args("r")=-1, args("g")=-1, args("b")=-1, args("a")=-1))
-		.def( "append", pappend_v, args("pos"))
-		;
 
 }
 

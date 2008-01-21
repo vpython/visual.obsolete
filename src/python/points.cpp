@@ -21,7 +21,12 @@ namespace {
 float*
 findex( const array& a, size_t i)
 {
-	return ((float*)data(a)) + (i) * 4;
+	return ((float*)data(a)) + (i) * 4; // (red,green,blue,opacity)
+}
+
+float* findex3( const array& a, size_t i)
+{
+	return ((float*)data(a)) + (i)*3; // (red,green,blue)
 }
 
 double*
@@ -342,11 +347,6 @@ points::set_color( array n_color)
 		n_color = astype(n_color, NPY_FLOAT);
 	}
 
-
-//	python::array_types t = type(n_color);
-//	if (t != float_t) {
-//		n_color = astype( n_color, float_t);
-//	}
 	std::vector<npy_intp> dims = shape( n_color);
 	if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
@@ -368,7 +368,20 @@ points::set_color( array n_color)
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
 		lock L(mtx);
-		color[slice( 0, count), slice(0, 3)] = n_color;
+		// The following doesn't work; I don't know why. 
+		// Note that it works with a single color above.
+		//color[slice(1, count+1), slice(0, 3)] = n_color;
+		// So instead do it by brute force:
+		float* color_i = findex( color, 0);
+		float* color_end = findex( color, count);
+		float* n_color_i = findex3( n_color,0);
+		while (color_i < color_end) {
+			color_i[0] = n_color_i[0];
+			color_i[1] = n_color_i[1];
+			color_i[2] = n_color_i[2];
+			color_i += 4;
+			n_color_i += 3;
+		}
 		return;
 	}
 	if (dims.size() == 2 && dims[1] == 4) {
