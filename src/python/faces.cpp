@@ -53,14 +53,14 @@ faces::faces()
 	dims[0] = 256;
 	dims[1] = 3;
 	pos = makeNum(dims);
-	normal = makeNum(dims, NPY_FLOAT);
+	normal = makeNum(dims);
 	dims[1] = 4;
 	color = makeNum(dims, NPY_FLOAT);
 	double* i = index( pos, 0);
 	i[0] = i[1] = i[2] = 0.0;
 	float* j = findex( color,0);
 	j[0] = j[1] = j[2] = j[3] = 1.0;
-	float* k = findex3( normal,0);
+	double* k = index( normal,0);
 	k[0] = k[1] = k[2] = 0.0;
 }
 
@@ -90,11 +90,11 @@ faces::set_length( int length)
 		dims[0] = 2 * length;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
-		array n_normal = makeNum( dims, NPY_FLOAT);
+		array n_normal = makeNum( dims);
 		dims[1] = 4;
 		array n_color = makeNum( dims, NPY_FLOAT);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * npoints);
-		std::memcpy( data( n_normal), data( normal), sizeof(float) * 3 * npoints);
+		std::memcpy( data( n_normal), data( normal), sizeof(double) * 3 * npoints);
 		std::memcpy( data( n_color), data( color), sizeof(float) * 4 * npoints);
 		pos = n_pos;
 		color = n_color;
@@ -113,9 +113,9 @@ faces::set_length( int length)
 			element_i += 3;
 		}
 
-		const float* last_normal = findex3( normal, npoints-1);
-		float* normal_i = findex3( normal, npoints);
-		float* normal_end = findex3( normal, length);
+		const double* last_normal = index( normal, npoints-1);
+		double* normal_i = index( normal, npoints);
+		double* normal_end = index( normal, length);
 		while (normal_i < normal_end) {
 			normal_i[0] = last_normal[0];
 			normal_i[1] = last_normal[1];
@@ -143,7 +143,7 @@ faces::append_rgba( vector nv_pos, vector nv_normal, float red, float green, flo
 	lock L(mtx);
 	set_length( count+1);
 	double* pos_data = index( pos, count-1);
-	float* norm_data = findex3(normal, count-1);
+	double* norm_data = index(normal, count-1);
 	float* last_color = findex( color, count-1);
 	pos_data[0] = nv_pos.get_x();
 	pos_data[1] = nv_pos.get_y();
@@ -167,7 +167,7 @@ faces::append( vector nv_pos, vector nv_normal, rgba nv_color)
 	lock L(mtx);
 	set_length( count+1);
 	double* pos_data = index( pos, count-1);
-	float* norm_data = findex3(normal, count-1);
+	double* norm_data = index(normal, count-1);
 	float* color_data = findex(color, count-1);
 	pos_data[0] = nv_pos.get_x();
 	pos_data[1] = nv_pos.get_y();
@@ -187,7 +187,7 @@ faces::append( vector n_pos, vector n_normal)
 	lock L(mtx);
 	set_length( count+1);
 	double* pos_data = index( pos, count-1);
-	float* norm_data = findex3(normal, count-1);
+	double* norm_data = index(normal, count-1);
 	pos_data[0] = n_pos.get_x();
 	pos_data[1] = n_pos.get_y();
 	pos_data[2] = n_pos.get_z();
@@ -231,30 +231,30 @@ faces::smooth_shade(bool doublesided)
 	std::map< const vector, vector, stl_cmp_vector> vertices_backface;
 
 	const double* pos_i = index(pos, 0);
-	float* norm_i = findex3(normal, 0);
+	double* norm_i = index(normal, 0);
 	const double* pos_end = index( pos, count);
 	for ( ; pos_i < pos_end; pos_i+=3, norm_i+=3) {
 		// If there isn't a normal at the specified position, it will be default
 		// initialized to zero.  If there already is one, it will be returned.
 		if (doublesided) {
-			if (vertices[vector(pos_i)].dot( vector((double*)norm_i)) >= 0.0) {
-				vertices[vector(pos_i)] += vector((double*)norm_i);
+			if (vertices[vector(pos_i)].dot( vector(norm_i)) >= 0.0) {
+				vertices[vector(pos_i)] += vector(norm_i);
 			}
 			else {
-				vertices_backface[vector(pos_i)] += vector((double*)norm_i);
+				vertices_backface[vector(pos_i)] += vector(norm_i);
 			}
 		}
 		else {
-			vertices[vector(pos_i)] += vector((double*)norm_i);
+			vertices[vector(pos_i)] += vector(norm_i);
 		}
 	}
 
 	pos_i = index(pos, 0);
-	norm_i = findex3(normal, 0);
+	norm_i = index(normal, 0);
 	vector tmp;
 	for ( ; pos_i < pos_end; pos_i+=3, norm_i+=3) {
 		if (doublesided) {
-			if (vertices[vector(pos_i)].dot( vector((double*)norm_i)) >= 0.0) {
+			if (vertices[vector(pos_i)].dot( vector(norm_i)) >= 0.0) {
 				tmp = vertices[vector(pos_i)].norm();
 			}
 			else {
@@ -442,7 +442,7 @@ faces::gl_render( const view& scene)
 	gl_enable_client normals( GL_NORMAL_ARRAY);
 	gl_enable_client colors( GL_COLOR_ARRAY);
 
-	glNormalPointer( GL_FLOAT, 0, index( normal, 0));
+	glNormalPointer( GL_DOUBLE, 0, index( normal, 0));
 
 	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
 		std::vector<vector> tmp( count);
