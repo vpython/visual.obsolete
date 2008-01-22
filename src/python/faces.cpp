@@ -90,11 +90,11 @@ faces::set_length( int length)
 		dims[0] = 2 * length;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
-		array n_normal = makeNum( dims);
+		array n_normal = makeNum( dims, NPY_FLOAT);
 		dims[1] = 4;
 		array n_color = makeNum( dims, NPY_FLOAT);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * npoints);
-		std::memcpy( data( n_normal), data( normal), sizeof(double) * 3*npoints);
+		std::memcpy( data( n_normal), data( normal), sizeof(float) * 3 * npoints);
 		std::memcpy( data( n_color), data( color), sizeof(float) * 4 * npoints);
 		pos = n_pos;
 		color = n_color;
@@ -325,25 +325,64 @@ faces::get_normal()
 	return normal[slice(0, count)];
 }
 
-
 void
 faces::set_color( array n_color)
 {
 	using namespace boost::python;
 	using cvisual::python::slice;
-
-	std::vector<npy_intp> n_dims = shape(n_color);
-
-	if (n_dims.size() != 2 && !(n_dims[1] == 3 || n_dims[1] == 4))
-		throw std::invalid_argument( "color must be an Nx3 or Nx4 array.");
-	if (n_dims[0] != count)
-		throw std::invalid_argument( "color must be the same size as pos.");
-
-	if (type(n_color) != NPY_FLOAT) {
-		n_color = astype( n_color, NPY_FLOAT);
+	
+	NPY_TYPES t = type(n_color);
+	if (t != NPY_FLOAT) {
+		n_color = astype(n_color, NPY_FLOAT);
 	}
-	lock L(mtx);
-	color[slice(0, count)] = n_color;
+
+	std::vector<npy_intp> dims = shape( n_color);
+	if (dims.size() == 1 && dims[0] == 3) {
+		// A single color, broadcast across the entire (used) array.
+		int npoints = (count) ? count : 1;
+		lock L(mtx);
+		color[slice( 0,npoints), slice(0, 3)] = n_color;
+		return;
+	}
+	if (dims.size() == 1 && dims[0] == 4) {
+		// A single color, broadcast across the entire (used) array.
+		int npoints = (count) ? count : 1;
+		lock L(mtx);
+		color[slice( 0, npoints)] = n_color;
+		return;
+	}
+	if (dims.size() == 2 && dims[1] == 3) {
+		// An RGB chunk of color
+		if (dims[0] != (long)count) {
+			throw std::invalid_argument( "color must be the same length as pos.");
+		}
+		lock L(mtx);
+		// The following doesn't work; I don't know why. 
+		// Note that it works with a single color above.
+		//color[slice(1, count+1), slice(0, 3)] = n_color;
+		// So instead do it by brute force:
+		float* color_i = findex( color, 0);
+		float* color_end = findex( color, count);
+		float* n_color_i = findex3( n_color,0);
+		while (color_i < color_end) {
+			color_i[0] = n_color_i[0];
+			color_i[1] = n_color_i[1];
+			color_i[2] = n_color_i[2];
+			color_i += 4;
+			n_color_i += 3;
+		}
+		return;
+	}
+	if (dims.size() == 2 && dims[1] == 4) {
+		// An RGB-opacity chunk of color
+		if (dims[0] != (long)count) {
+			throw std::invalid_argument( "color must be the same length as pos.");
+		}
+		lock L(mtx);
+		color[slice( 0, count)] = n_color;
+		return;
+	}
+	throw std::invalid_argument( "color must be an Nx4 array");
 }
 
 void
