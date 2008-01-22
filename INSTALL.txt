@@ -109,6 +109,56 @@ I.  Prerequisites:
 		   sudo cp /usr/local/lib/pkgconfig/freetyp2 /sw/lib/pkgconfig
 		   sudo cp -R /usr/local/include/freetype2 /sw/lib/include
 		That made it possible to configure and make, but VPython didn't run.
+		
+		Answers to questions sent to Martin Costabel (Jan. 2008):
+
+Q: I'm trying to learn how to build (and then try to debug) the beta version of Visual on a Mac. 
+I happen to be using OS X 10.4.11. The immediate sticking point was freetype2. 
+I've used fink to get everything, including freetype2 and anything else that seems 
+to have a similar name, but the build choked because there don't seem to be any files installed. 
+There isn't even a freetype2.pc file in lib/pkgconfig.
+
+I saw your name on some web notes about this, but I don't know enough about that 
+part of the world to be able to follow what I should do. Can you offer any specific suggestions?
+
+A: I while ago I made a Fink package description for visual 4 beta 16. This built OK, but the 
+result was rather crash-prone, so I didn't pursue it very actively. I am attaching the 2 files 
+below. If you put them into /sw/fink/dists/local/main/finkinfo/ (create it if it doesn't exist), 
+you should in principle be able to simply say "fink install visual-beta-py25" and Fink will take 
+care of everything. This supposes that you have enabled the unstable tree in Fink.
+
+But you can also read the *.info file as a list of build instructions. In particular it uses 
+the version of freetype in Fink that is in the package "freetype219" which these days corresponds 
+to freetype2 version 2.2.1. In order to use it (and correspondingly also Fink's fontconfig), 
+there is a line
+
+ export PKG_CONFIG_PATH=%p/lib/fontconfig2/lib/pkgconfig:%p/lib/xft2/lib/pkgconfig:%p/lib/freetype219/lib/pkgconfig
+
+in which "%p" means "/sw". This shows the place where the pc file is hiding.
+
+Q: I tried the expedient of copying /usr/local/lib/pkgconfig/freetype2.pc to /sw/lib/pkgconfig, 
+and that lets the configure and make proceed, but I'm not confident this is an appropriate approach.
+
+Alas, even after building, it doesn't run. I get the message about possible mismatch of versions, 
+as though when I build against /sw/bin/python2.5 and then run /sw/bin/python2.5 the system thinks 
+these are different pythons. Or something. Any advice on that? I made sure to install your Python25 
+versions of the Python Boost libraries.
+
+A: I am getting this, too, when using the dynamic boost-python library, but not with the static 
+libboost_python-mt.a. This is certainly a bug with the libboost_python-mt.dylib, but I haven't 
+yet found a combination of build flags to build it correctly, in particular in a way that would 
+also work on OSX 10.5.
+
+Q: Some time ago you mentioned that you had built Visual 4 but it didn't run. What was the symptom 
+in your case? And what command line did you use for configure?
+
+A: The symptom was a bus error very early, sometimes during startup, sometimes after a few seconds 
+of use, but I don't remember exactly now.
+
+Here are the two files. They would need some obvious changes to build beta24 instead of beta16, 
+and maybe some other adaptations, too, but I often found it simpler to modify a Fink package 
+description than to do a build by hand and then to remember afterwards everything I had been doing.
+
 
 II.   Configuration 
 	On most systems, configuration should be automatic.  Just run './configure'.
