@@ -170,7 +170,7 @@ points::set_length( size_t length)
 }
 
 void
-points::append_rgba( vector npos, float red, float blue, float green, float opacity)
+points::append_rgba( vector npos, float red, float green, float blue, float opacity)
 {
 	lock L(mtx);
 	set_length( count+1);
@@ -190,17 +190,6 @@ points::append_rgba( vector npos, float red, float blue, float green, float opac
 }
 
 void
-points::append( vector npos)
-{
-	lock L(mtx);
-	set_length( count+1);
-	double* last_pos = index( pos, count-1);
-	last_pos[0] = npos.x;
-	last_pos[1] = npos.y;
-	last_pos[2] = npos.z;
-}
-
-void
 points::append( vector npos, rgba ncolor)
 {
 	lock L(mtx);
@@ -213,7 +202,18 @@ points::append( vector npos, rgba ncolor)
 	last_color[0] = ncolor.red;
 	last_color[1] = ncolor.green;
 	last_color[2] = ncolor.blue;
-	last_color[3] = ncolor.opacity;
+	last_color[3] = ncolor.opacity; // this is 1.0 if ncolor is an rgb triple
+}
+
+void
+points::append( vector npos)
+{
+	lock L(mtx);
+	set_length( count+1);
+	double* last_pos = index( pos, count-1);
+	last_pos[0] = npos.x;
+	last_pos[1] = npos.y;
+	last_pos[2] = npos.z;
 }
 
 object

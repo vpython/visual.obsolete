@@ -66,7 +66,7 @@ wrap_arrayobjects()
 		.def( "set_z", &curve::set_z)
 		.def( "append", append_v_r, args( "pos", "color"))
 		.def( "append", &curve::append_rgba,
-			(args("pos"), args("r")=-1, args("g")=-1, args("b")=-1, args("o")=-1))
+			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1, args("opacity")=-1))
 		.def( "append", append_v, args("pos"))
 		;
 
@@ -112,13 +112,13 @@ wrap_arrayobjects()
 		.def( "set_z", &points::set_z)
 		.def( "append", pappend_v_r, args( "pos", "color"))
 		.def( "append", &points::append_rgba,
-			(args("pos"), args("r")=-1, args("g")=-1, args("b")=-1, args("o")=-1))
+			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1, args("opacity")=-1))
 		.def( "append", pappend_v, args("pos"))
 		;
 
 	using python::faces;
 
-	void (faces::* append_all_vectors)(vector, vector, rgb) = &faces::append;
+	void (faces::* append_all_vectors)(vector, vector, rgba) = &faces::append;
 	void (faces::* append_default_color)( vector, vector) = &faces::append;
 
 	class_<faces, bases<renderable> >("faces")
@@ -139,6 +139,8 @@ wrap_arrayobjects()
 		.def( "smooth_shade", &faces::smooth_shade, 
 			faces_smooth_shade( args("doublesided"),
 			"Average normal vectors at coincident vertexes."))
+		.def( "append", &faces::append_rgba,
+			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1, args("opacity")=-1))
 		;
 	
 	using python::convex;

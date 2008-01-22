@@ -205,7 +205,7 @@ curve::set_length( size_t length)
 }
 
 void
-curve::append_rgba( vector npos, float red, float blue, float green, float opacity)
+curve::append_rgba( vector npos, float red, float green, float blue, float opacity)
 {
 	lock L(mtx);
 	if (retain > 0 and count >= retain) {
@@ -228,6 +228,25 @@ curve::append_rgba( vector npos, float red, float blue, float green, float opaci
 }
 
 void
+curve::append( vector npos, rgba ncolor)
+{
+	lock L(mtx);
+	if (retain > 0 and count >= retain) {
+		set_length( retain-1); //move pos and color lists down
+	}
+	set_length( count+1);
+	double* last_pos = index( pos, count-1);
+	float* last_color = findex( color, count-1);
+	last_pos[0] = npos.x;
+	last_pos[1] = npos.y;
+	last_pos[2] = npos.z;
+	last_color[0] = ncolor.red;
+	last_color[1] = ncolor.green;
+	last_color[2] = ncolor.blue;
+	last_color[3] = ncolor.opacity; // this will be 1.0 if appending an rgb triple
+}
+
+void
 curve::append( vector npos)
 {
 	lock L(mtx);
@@ -239,24 +258,6 @@ curve::append( vector npos)
 	last_pos[0] = npos.x;
 	last_pos[1] = npos.y;
 	last_pos[2] = npos.z;
-}
-
-void
-curve::append( vector npos, rgba ncolor)
-{
-	lock L(mtx);
-	if (retain > 0 and count >= retain) {
-		set_length( retain-1); //move pos and color lists down
-	}
-	set_length( count+1);
-	double* last_pos = index( pos, count-1);
-	double* last_color = index( color, count-1);
-	last_pos[0] = npos.x;
-	last_pos[1] = npos.y;
-	last_pos[2] = npos.z;
-	last_color[0] = ncolor.red;
-	last_color[1] = ncolor.green;
-	last_color[2] = ncolor.blue;
 }
 
 void

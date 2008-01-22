@@ -86,7 +86,7 @@ class curve : public renderable
 	curve( const curve& other);
 	virtual ~curve();
 
-	void append_rgba( vector, float r=-1, float g=-1, float b=-1, float a=-1);
+	void append_rgba( vector, float red=-1, float green=-1, float blue=-1, float opacity=-1);
 	void append( vector _pos, rgba _color); // Append a single position with new color.
 	void append( vector _pos); // Append a single position element, extend color.
 	
