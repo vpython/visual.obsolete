@@ -38,16 +38,14 @@ py_quit( void*)
 }
 
 // The callback function that is invoked from the display class when
-// shutting-down.
+// shutting-down. Prior to Jan. 23, 2008, force_py_exit locked and posted
+// a callback to py_quit, but this failed if the program was sitting
+// at scene.mouse.getclick(). Simply calling py_quit directly seems
+// to work fine.
 static void
 force_py_exit(void)
 {
-	VPYTHON_NOTE("Inserting the pending shutdown call...");
-	{
-		python::gil_lock L;
-		Py_AddPendingCall( &py_quit, 0);
-	}
-	VPYTHON_NOTE( "The pending shutdown call has been entered.");
+	py_quit(0);
 }
 
 static void
