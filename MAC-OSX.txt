@@ -1,0 +1,186 @@
+HOW TO BUILD VISUAL ON Apple OSX (Version 10.4.x)
+
+If you find gaps in this information, please tell Bruce_Sherwood@ncsu.edu.
+
+Make sure X11 and Xcode are installed (found on the installation DVD).
+X11 is automatically installed on 10.5.
+	
+To do a clean install of fink (www.finkproject.org), I deleted /sw and started from scratch.
+Install fink from fink.sourceforge.net. Probably best to install from source?
+I use Fink Commander as a GUI to fink, but you can use the command line.
+	
+Use fink to install the components listed for Linux in INSTALL.txt (details repeated here).
+	Currently (Jan. 2008) you will find 10 entries for Boost; you
+	need to expand the package name field enough to be able to see which
+	boostN.N.pyth packages go with your chosen version of Python (you also
+	need the non-Python libraries, boostN.N.nopy and boostN.N.syste).
+	I installed Python2.5, numpy, the boost libraries, then install these:
+	
+	gtkmm-2.4, which installs many other packages on which it depends, including
+	gtk+2, glib, glibmm, libsig++, atk, pango, automake, autoconf, libtool, pkgconfig 
+	
+	libglademm2.4, libglademm2.4-shlibs
+	
+	cairomm1, cairomm1-shlibs (takes a LONG time)
+	
+	gtkglextmm, getkglextmm-shlibs
+	
+	freetype2
+	
+	This seems to be all the fink installs necessary, but there are problems with freetype2.
+	See below.
+
+Shouldn't be necessary, but to configure you might have to add this to .profile in
+your home directory: export PKG_CONFIG_PATH=/sw/lib/pkgconfig
+	You can test this by executing the following:
+	   pkg-config --libs gtkmm-2.4
+	
+	Earlier: Couldn't configure due to not finding freetype2, which I thought was missing despite
+	the fink install, so I put this in .profile in my home directory to try to pick
+	up freetype2 from /usr or /usr/local
+	   export PKG_CONFIG_PATH=/sw/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig
+	Could configure and make, but VPython didn't run.
+	But looking again I do find /sw/lib/freetype2 but no freetype2.pc in /sw/lib/pkgconfig
+	nor any freetype2 in /sw/include.
+	I find /usr/local/lib/pkgconfig/freetype2.pc, which refers to /usr/local.
+	There exists /usr/local/include/freetype2.
+	So change .profile to contain simply export PKG_CONFIG_PATH=/sw/lib/pkgconfig and try
+	the experiment of copying /usr/local/lib/pkgconfig/freetype2.pc to /sw/lib/pkgconfig.
+	Again, this enables configure and make, but we die in trying to import cvisual.
+	   
+	In an earlier attempt (before clean install of fink), I tried this:
+	   sudo cp /usr/local/lib/pkgconfig/freetyp2 /sw/lib/pkgconfig
+	   sudo cp -R /usr/local/include/freetype2 /sw/lib/include
+	That made it possible to configure and make, but VPython didn't run.
+	
+Answers to questions sent to Martin Costabel (Jan. 2008):
+Q: I'm trying to learn how to build (and then try to debug) the beta version of Visual on a Mac. 
+I happen to be using OS X 10.4.11. The immediate sticking point was freetype2. 
+I've used fink to get everything, including freetype2 and anything else that seems 
+to have a similar name, but the build choked because there don't seem to be any files installed. 
+There isn't even a freetype2.pc file in lib/pkgconfig.
+I saw your name on some web notes about this, but I don't know enough about that 
+part of the world to be able to follow what I should do. Can you offer any specific suggestions?
+
+A: I while ago I made a Fink package description for visual 4 beta 16. This built OK, but the 
+result was rather crash-prone, so I didn't pursue it very actively. I am attaching the 2 files 
+below. If you put them into /sw/fink/dists/local/main/finkinfo/ (create it if it doesn't exist), 
+you should in principle be able to simply say "fink install visual-beta-py25" and Fink will take 
+care of everything. This supposes that you have enabled the unstable tree in Fink.
+
+But you can also read the *.info file as a list of build instructions. In particular it uses 
+the version of freetype in Fink that is in the package "freetype219" which these days corresponds 
+to freetype2 version 2.2.1. In order to use it (and correspondingly also Fink's fontconfig), 
+there is a line
+
+ export PKG_CONFIG_PATH=%p/lib/fontconfig2/lib/pkgconfig:%p/lib/xft2/lib/pkgconfig:%p/lib/freetype219/lib/pkgconfig
+
+in which "%p" means "/sw". This shows the place where the pc file is hiding.
+
+Q: I tried the expedient of copying /usr/local/lib/pkgconfig/freetype2.pc to /sw/lib/pkgconfig, 
+and that lets the configure and make proceed, but I'm not confident this is an appropriate approach.
+Alas, even after building, it doesn't run. I get the message about possible mismatch of versions, 
+as though when I build against /sw/bin/python2.5 and then run /sw/bin/python2.5 the system thinks 
+these are different pythons. Or something. Any advice on that? I made sure to install your Python25 
+versions of the Python Boost libraries.
+
+A: I am getting this, too, when using the dynamic boost-python library, but not with the static 
+libboost_python-mt.a. This is certainly a bug with the libboost_python-mt.dylib, but I haven't 
+yet found a combination of build flags to build it correctly, in particular in a way that would 
+also work on OSX 10.5.
+
+Q: Some time ago you mentioned that you had built Visual 4 but it didn't run. What was the symptom 
+in your case? And what command line did you use for configure?
+
+A: The symptom was a bus error very early, sometimes during startup, sometimes after a few seconds 
+of use, but I don't remember exactly now. Here are the two files. They would need some obvious changes 
+to build beta24 instead of beta16, and maybe some other adaptations, too, but I often found it simpler 
+to modify a Fink package description than to do a build by hand and then to remember afterwards 
+everything I had been doing.
+
+---------------------------------------------------------
+File visual-beta-py.info.txt:
+
+Info2: <<
+Package: visual-beta-py%type_pkg[python]
+Version: 4.beta16
+Revision: 1002
+Distribution: (%type_pkg[python] = 23) 10.3, (%type_pkg[python] = 23) 10.4
+Type: python (2.3 2.4 2.5)
+Source: mirror:sourceforge:visualpython/visual-%v.tar.bz2
+Source-MD5: 562f9da52cae5dd77578a4315d7b1864
+SourceDirectory: visual-%v
+License: BSD
+GCC: 4.0i
+Depends: x11-shlibs, gtk+-shlibs, python%type_pkg[python], scipy-py%type_pkg[python], boost1.34.nopython-shlibs, boost1.34.python%type_pkg[python]-shlibs, libglademm2.4-shlibs, gtkglextmm-shlibs 
+BuildDepends: glib, x11-dev, pkgconfig, gtkglarea, libgettext3-dev, boost1.34.nopython, boost1.34.python%type_pkg[python], libglademm2.4, gtkglextmm
+Conflicts: visual-py%type_pkg[python]
+Replaces: visual-py%type_pkg[python]
+PatchScript: <<
+ sed -e 's|@N@|%n|g;s|@XY@|%type_raw[python]|g' %a/%{ni}.patch | patch -p1
+# perl -pi -e 's| \-lboost_python (\-lboost_thread)| %p/lib/libboost_python-d.a \1-d|g' src/Makefile.in
+ perl -pi -e 's| \-lboost_python \-lboost_thread| %p/lib/libboost_python-mt.a -lboost_thread-mt|g' src/Makefile.in
+# perl -pi -e 's| \-lboost_python \-lboost_thread| -lboost_python-mt -lboost_thread-mt|g' src/Makefile.in
+<<
+SetCPPFLAGS: -Wno-long-double
+CompileScript: <<
+#!/bin/sh -ex
+ export PKG_CONFIG_PATH=%p/lib/fontconfig2/lib/pkgconfig:%p/lib/xft2/lib/pkgconfig:%p/lib/freetype219/lib/pkgconfig
+ export PYTHON=%p/bin/python%type_raw[python]
+ export CXXFLAGS="-O2 -g -finline-functions"
+ export CFLAGS='-O3 -g ' 
+ ./configure --prefix=%p --disable-dependency-tracking
+ make
+<<
+InstallScript: <<
+#!/bin/sh -ex
+ mkdir -p %i/bin
+ make install DESTDIR=%d 
+ mv %i/bin/vpython %i/bin/vpython%type_raw[python]
+ mkdir -p %i/share/doc/%n
+ mv %i/lib/python%type_raw[python]/site-packages/visual/docs/* %i/share/doc/%n
+ rmdir %i/lib/python%type_raw[python]/site-packages/visual/docs
+ cat > %i/share/doc/%n/config-main.cfg <<EOF
+# Copy this file to your ~/.idlerc directory if it is not yet there
+[HelpFiles]
+1 = Visual;%p/share/doc/%n/index.html
+
+[EditorWindow]
+font-size = 12 
+EOF
+<<
+Description: VPython - 3D Programming for Ordinary Mortals
+DescDetail: <<
+ VPython uses Python with the IDLE interactive development environment
+ It includes "Visual", a Python module that offers real-time 3D output, 
+ and is easily usable by novice programmers
+ It also uses "Numeric", a Python module for fast processing of arrays
+<<
+DescUsage: <<
+ Start X11 first, then run the "vpython%type_raw[python]" command.
+<<
+Maintainer: Martin Costabel <costabel@wanadoo.fr>
+Homepage: http://vpython.org/index.html
+<<
+
+---------------------------------------------------------
+File visual-beta-py.patch.txt:
+
+--- visual-3.2.1/bin/vpython.in~	2005-02-25 21:39:38.000000000 +0100
++++ visual-3.2.1/bin/vpython.in	2005-07-14 18:24:19.000000000 +0200
+@@ -1,8 +1,14 @@
+ #! /bin/sh
+ # Variables determined by configure.
+ PYTHON=@PYTHON@
++
++prefix=@prefix@
++[ -d ~/.idlerc ] || mkdir ~/.idlerc
++[ -r ~/.idlerc/config-main.cfg ] || cp @prefix@/share/doc/@N@/config-main.cfg ~/.idlerc/
++export BROWSER=${BROWSER:-open}
++
+ visualexampledir=@visualexampledir@
+-IDLE=idle
++IDLE=@prefix@/bin/idle@XY@
+ PYTHONPATH=@PYTHONPATH@
+ export PYTHONPATH
+ 
