@@ -166,7 +166,8 @@ curve::set_length( size_t length)
 		dims[0] = 2*length + 2;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
-		array n_color = makeNum( dims);
+		dims[1] = 4;
+		array n_color = makeNum( dims, NPY_FLOAT);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints + 1));
 		std::memcpy( data( n_color), data( color), sizeof(float) * 4 * (npoints + 1));
 		pos = n_pos;
