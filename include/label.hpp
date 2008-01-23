@@ -54,7 +54,11 @@ class label : public renderable
 	double get_opacity();
 
 	void set_text( string_t t);
+#if (defined(_WIN32) || defined(_MSC_VER))
+	std::string get_text();
+#else
 	string_t get_text();
+#endif
 
 	void set_space( double space);
 	double get_space();
