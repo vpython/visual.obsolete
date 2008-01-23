@@ -37,17 +37,6 @@ py_quit( void*)
 	return 0;
 }
 
-// The callback function that is invoked from the display class when
-// shutting-down. Prior to Jan. 23, 2008, force_py_exit locked and posted
-// a callback to py_quit, but this failed if the program was sitting
-// at scene.mouse.getclick(). Simply calling py_quit directly seems
-// to work fine.
-static void
-force_py_exit(void)
-{
-	py_quit(0);
-}
-
 static void
 wrap_shutdown(void)
 {
@@ -58,6 +47,18 @@ static void
 wrap_waitclosed(void)
 {
 	gui_main::waitclosed();
+}
+
+// The callback function that is invoked from the display class when
+// shutting-down. Prior to Jan. 23, 2008, force_py_exit locked and posted
+// a callback to py_quit, but this failed if the program was sitting
+// at scene.mouse.getclick(). Simply calling py_quit directly seems
+// to work fine.
+static void
+force_py_exit(void)
+{
+	wrap_shutdown(); // destroy graphics displays before trying to quit
+	py_quit(0);
 }
 
 namespace py = boost::python;
