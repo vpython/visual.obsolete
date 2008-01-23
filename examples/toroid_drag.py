@@ -17,14 +17,14 @@ Bscale = (2.*Rsmall)/(4*pi*1E-7*Ncoils*I/L)
 
 dphi = 2.*pi/Ncoils/15.
 phi = arange(0,2*pi+dphi,dphi)
-helix=curve(x = Rbig*cos(phi)+Rsmall*cos(Ncoils*phi)*cos(phi),
+toroid=curve(x = Rbig*cos(phi)+Rsmall*cos(Ncoils*phi)*cos(phi),
             y = Rbig*sin(phi)+Rsmall*cos(Ncoils*phi)*sin(phi),
             z = -Rsmall*sin(Ncoils*phi))
-helix.color = (1,0.7,0.2)
-helix.radius = 0.01
+toroid.color = (1,0.7,0.2)
+toroid.radius = 0.01
 
-delta = helix.pos[1:] - helix.pos[:-1]
-center = (helix.pos[:-1] + helix.pos[1:])/2.
+delta = toroid.pos[1:] - toroid.pos[:-1]
+center = (toroid.pos[:-1] + toroid.pos[1:])/2.
 scene.range = 1.3*(Rbig+Rsmall)
 vwidth = L/100
 
@@ -38,7 +38,7 @@ Bvector = arrow(axis=(0,0,0), shaftwidth=vwidth, color=(0,1,1))
 drag = 0
 
 while 1:
-    rate(100)
+##    rate(100)
     if drag:
         newobs = scene.mouse.pos
         if newobs != obs:
@@ -50,10 +50,10 @@ while 1:
         if m.drag:
             drag = 1
             obs = None # force update of position
-##            scene.cursor.visible = 0
+##            scene.cursor.visible = 0 # not yet implemented
         if m.drop:
             drag = 0
-##            scene.cursor.visible = 1
+##            scene.cursor.visible = 1 # not yet implemented
             arrow(pos=obs, axis=Bscale*BField(obs), shaftwidth=vwidth, color=(0,1,1))
         elif m.click:
             arrow(pos=m.pos, axis=Bscale*BField(m.pos), shaftwidth=vwidth, color=(0,1,1))
