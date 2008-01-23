@@ -26,9 +26,15 @@
    0-1 inclusive for the attribute &quot;opacity&quot;. For example, box(color=color.red,
     opacity=0.8) is slightly transparent. An opacity value of 0 means totally
    transparent, 
-  and 1 means totally opaque. Currently curve, convex, face, and helix objects
-   do not allow transparency. (Currently you can use the synonym &quot;alpha&quot; for &quot;opacity&quot;,
-     but &quot;alpha&quot; is deprecated.)</p>
+  and 1 means totally opaque. Currently curve, convex, faces, and helix objects
+   do not allow transparency. </p>
+<p>You can also specify opacity as a 4th component of a color: <br>
+  box(color=(1, 0, 0, 0.8))
+  is the same as box(color=color.red,
+  opacity=0.8).</p>
+<p>In preparation for wider use of transparency, curve, faces, and points objects
+  accept color arrays whose elements are either red-green-blue (rgb) such as
+  (1, 1, 0) or red-green-blue-opacity (rgbo) such as (1, 1, 0, 0.8). </p>
 <h3>Surface textures</h3>
 <p>You can create a texture object and then apply it to the surface of an object. 
   This capability is currently limited to boxes and spheres. A surface texture 
@@ -94,6 +100,15 @@
   to permit a minimum of seven lights.</p>
 <p>If you want to disable all of the old lights, say scene.lights = [], making 
   an empty list of old lights.</p>
+<h3>New frame capabilities</h3>
+<p>You can now make a frame visible or invisible, and all objects in the frame
+  will be affected. And you can set the vector &quot;scale&quot; attribute of
+  a frame to change the size of the combined object. For example, someframe.scale
+  = (2,.5,4) will make objects in the frame display as though you had doubled
+  all the x components of objects in the frame (relative to the frame), halved
+  the y components, and quadrupled the z components, with respect to their original
+  values; initially a frame has scale = (1,1,1). As with other vector attributes,
+  you can refer to the x component as someframe.scale.x.</p>
 <h3>Points object</h3>
 <p>A new points object can be plotted in &quot;screen&quot; size as well as the 
   usual &quot;world&quot; coordinates. Like curve, the pos attribute is a list 
@@ -109,14 +124,6 @@
   not easily visible to programs at this time. Specifying a size outside this 
   range will cause it to be silently clamped internally to whatever range that 
   the hardware supports.</p>
-<h3>New frame capabilities</h3>
-<p>You can now make a frame visible or invisible, and all objects in the frame 
-  will be affected. And you can set the vector &quot;scale&quot; attribute of 
-  a frame to change the size of the combined object. For example, someframe.scale = (2,.5,4)
-  will make objects in the frame display as though you had doubled all the x components 
-  of objects in the frame (relative to the frame), halved the y components, and quadrupled
-  the z components, with respect to their original values; initially a frame has scale = (1,1,1). 
-  As with other vector attributes, you can refer to the x component as someframe.scale.x.</p>
 <h3>New aspects of curves </h3>
 <p>In older versions of VPython, no matter how many points were in a curve, only 1000 were displayed, selected evenly over the full set of points, in order that the display of a very long curve doesn't slow down unacceptably. In the new version this is still true but the number of points displayed is 10000. </p>
 <p>The new option curve.retain = 500 means that only the 500 most recently added points of a curve will be displayed; the earlier ones are deleted. This is a nice option for having a moving object leave a tail behind itself. </p>
@@ -138,16 +145,17 @@
 <p>Here are known bugs:</p>
 <blockquote>
   <p>Can drag a window to be larger, but not smaller. </p>
-  <p>A program loop containing essentially no computation at all may be difficult to quit on Windows. The cure is<br>
-    to insert a rate statement, for example, rate(100). </p>
   <p>Autoscaling is pretty good but occasionally positions the camera farther 
-    from the scene than you would prefer.</p>
+    <br>
+    from the scene than one would prefer.</p>
   <p>Rendering of curves isn't quite right. This can be seen in the example program 
+    <br>
     tictac.py, where one of the grid lines doesn't show until you rotate the view.</p>
-  <p>Unicode text in labels works properly on Linux but not on Windows. </p>
+  <p>Unicode text in labels works properly on Linux but not on Windows. <br>
+    As
+  a temporary measure, Windows handles only simple English text. </p>
   <p>Spotlights created in a frame don't change with changes in the frame orientation.</p>
-  <p>scene.cursor is not implemented yet and gives an error (used in old programs 
-    to make cursor visible/invisible).</p>
+  <p>scene.cursor.visible is not implemented yet and gives an error.</p>
 </blockquote>
 <p><a href="index.html">Back to contents</a><br>
 </p>
