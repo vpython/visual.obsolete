@@ -178,10 +178,8 @@ mouse_t::num_clicks() const
 }
 
 shared_ptr<event>
-mouse_t::pop_event()
+mouse_t::pop_event() // this is scene.mouse.getevent()
 {
-	// TODO: Need to find a way to punt the Python interpreter out of here
-	// during a shutdown
 	shared_ptr<event> ret = events.py_pop();
 	if (ret->is_click())
 		click_count--;
@@ -189,10 +187,8 @@ mouse_t::pop_event()
 }
 
 shared_ptr<event>
-mouse_t::pop_click()
+mouse_t::pop_click() // this is scene.mouse.getclick()
 {
-	// TODO: Need to find a way to punt the Python interpreter out of here
-	// during a shutdown
 	shared_ptr<event> ret = events.py_pop();
 	while (!ret->is_click()) {
 		ret = events.pop();
