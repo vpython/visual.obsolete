@@ -68,7 +68,7 @@ normalize(float v[3])
 inline float*
 avgptr( float* a, float* b)
 {
-	return (float*)( int(a) + ((int(b)-int(a))>>1) );
+	return (float*)( long(a) + ((long(b)-long(a))>>1) );
 }
 
 } // !namespace anonymous
