@@ -54,10 +54,10 @@ PKG_CHECK_MODULES( PANGOMM, pangomm-1.4, ,
 		[AC_MSG_ERROR([pangomm-1.4 is required])])
 PKG_CHECK_MODULES( LIBGLADEMM, libglademm-2.4, ,
 		[AC_MSG_ERROR([libglademm-2.4 is required])])
-PKG_CHECK_MODULES( FREETYPE2, freetype2, ,
-		[AC_MSG_ERROR([freetype2 is required])])
 PKG_CHECK_MODULES( PANGOFT2, pangoft2, ,
 		[AC_MSG_ERROR([pangoft2 is required])])
+PKG_CHECK_MODULES( FREETYPE2, freetype2, ,
+		[AC_MSG_ERROR([freetype2 is required])])
 
 # Having checked various libraries individually, now repeat the check for the
 # whole set of them, and this information will be used for compilation and linking.
