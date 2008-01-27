@@ -16,7 +16,12 @@ You will also need to install msys-automake, msys-autoconf, and msys-libtool.
 
 The latest binaries are found at http://ftp.gnome.org/pub/GNOME/binaries/win32.
 
-Vista problem: See the following note about why msys/bin/install fails.
+If you are building on Windows Vista, execute "gcc --version" and note
+the version number (e.g. 3.4.2). Then in msys/etc/profile, change the
+PATH setting to include /mingw/bin:/mingw/libexec/gcc/mingw32/3.4.2 (otherwise
+the configure step will fail due to a failure of gcc to find a file).
+
+Vista problem: See the following note about why msys/bin/install can fail.
 Downloading and installing the updated coreutils for msys did the trick.
 
 http://sourceforge.net/tracker/index.php?func=detail&aid=1711379&group_id=2435&atid=102435
