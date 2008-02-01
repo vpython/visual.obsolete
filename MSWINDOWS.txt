@@ -112,19 +112,37 @@ boost_1_34_1/tools/build/v2/user-config.jam is the user configuration file.
 It should be placed in your home directory.
 Your home directory can be found by executing ECHO %HOMEDRIVE%%HOMEPATH%
 
+GTK+ AND FRIENDS
+gtk+ (also called gtk2) is written in C; gtkmm is a "wrapper" of these C routines 
+to make gtk+ functionality accessible to C++ programmers.
 
--> Now ready to do the following on Vista:
-GTK+ AND OTHERS
-Download the binary installer for the development version of gtk+ and install into C:\MinGW.
+Go to http://ftp.gnome.org/pub/GNOME/binaries/win32 and download and
+install into C:\MinGW the latest versions of the following components:
+
+gtk+-dev
+  (Don't think I need gtk+)
+gtkmm-win32-devel
+  (Don't think I need gtkmm-win32-runtime)
+libglade-dev
+pango-dev
+atk-dev
+glib-dev
+  (Do I need libiconv and gettext, available at www.gimp.org/~tml/gimp/win32/downloads.html?)
+
+At sourceforge.net/projects/gtkglext download the zip files for gtkglext and gtkglextmm.
+Unzip the source files. To build, go into a directory, and do this:
+		> ./configure
+		> make
+		> make install
+For some unknown reason, the build process for gtkglextmm sometimes fails, 
+on some Windows machines. For that reason, the needed binaries are avalable 
+in the developer's section of vpython.org.
+
+See INSTALL.txt for further information on the build process itself.
+
+------------------------------------
 At http://gladewin32.sourceforge.net, you need the development version, which includes
 such things as glib, atk, pango, cairo, glade, and fontconfig.
-
-The latest binaries are found at http://ftp.gnome.org/pub/GNOME/binaries/win32.
-
-Download the binary installer for the development version of gtkmm and install into C:\MinGW.
-At http://ftp.gnome.org/pub/gnome/binaries/win32 in the gtkmm directory, you need
-gtkmm-win32-devel-xxxx.exe. gtk+ (also called gtk2) is written in C; gtkmm is a "wrapper"
-of these C routines to make gtk+ functionality accessible to C++ programmers.
 
 Some of the following is probably now installed by the gtk2 and gtkmm installers.
 After installing gtk2 and gtkmm, check to see whether you have these packages.
@@ -154,19 +172,7 @@ After installing gtk2 and gtkmm, check to see whether you have these packages.
 		> make install
 		Can test that pkg-config is correctly installed by executing this:
 		> pkg-config --cflags sigc++-2.0cd
-
-Download the binary windows installer gtkglext-win32-1.2.0.exe and install gtkglext.
-
-Download the zip file for gtkglextmm-1.2.0 and unzip the source files. To build, go
-into the directory, and do this:
-		> ./configure
-		> make
-		> make install
-For some unknown reason, the build process sometimes fails, on some Windows machines.
-For that reason, the needed binaries are avalable in the developer's section of
-vpython.org.
-
-See INSTALL.txt for further information on the build process itself.
+-------------------------------------
 
 DEBUGGING
 From a typescript, the following will print all VPYTHON_NOTEs:
