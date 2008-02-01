@@ -9,6 +9,7 @@ and _MSC_VER is a flag set by the Microsoft Visual Studio compiler.
 to build Visual, but this is not being used at present. See the
 VCBuild directory.)
 
+*************************************************************
 INSTALL PYTHON AND NUMPY
 Download and install Python 2.5.x from www.python.org.
 OpenGL is provided with the standard Windows installation.
@@ -18,6 +19,7 @@ Download and install numpy (http://numpy.scipy.org).
 Copy Python25's libs/libpython25.a to /mingw/lib.
 See http://www.python.org/doc/current/inst/tweak-flags.html for discussion.
 
+*************************************************************
 INSTALL UNIX-LIKE MACHINERY FOR BUILDING VISUAL
 You need to download and install MinGW, then MSYS, then MSYS-DTK.
 
@@ -26,29 +28,33 @@ Download and install the automated MinGW installer, currently MinGW-5.1.3.
 Run this exe installer. Specify that you want the g++ compiler (for C++).
 The installer will also install gcc-core, mingw-runtime, and w32api.
 
-From help obtained in mingw-msys-bounces@lists.sourceforge.net (2008/01/31):
-"For Windows Vista, Microsoft changed how msvcrt.dll reacts to access(), 
-normally in XP and 2000, X_OK parameter is ignored, but Vista pukes on it. 
-The MinGW gcc is affected by it. The patched version is found at
-http://dessent.net/tmp/gcc-vista-3.4.5-20060117-1.tar.gz"
-
-So get this file, start up MSYS, cd to the folder where the gz file is located.
-If this folder is (say) C:\installers\msys_stuff, in the MSYS application you
-type cd /c/installers/msys_stuff. Note that the TAB key will complete an 
-incomplete address. The up arrow retrieves an earlier command type-in.
-
-Execute gunzip gcc-vista-3.4.5-20060117-1.tar.gz. This will produce folders
-bin and libexec. Copy the files in these folders to the corresponding locations
-in c:/MinGW.
-
 From the same sourceforge.net site, download and install MSYS.
 You must click on MSYS Base System in the left column in order to find
 and download the current release (currently MSYS-1.0.10.exe). Install,
-and when asked tell where MinGW is located (normally c:/MinGW).
+and when asked, tell where MinGW is located (normally c:/MinGW). As a check
+you should find "c:/mingw /mingw" in the mount table for MSYS, which is
+c:\msys\1.0\etc\fstab.
 
 Back on the main sourceforge page, click on MSYS Supplementary Tools
-in the left column in order to find and download the current release of
-the developer's toolkit (currently msysDTK-1.0.1.exe).
+in the left column in order to find and download and install the current
+release of the developer's toolkit (currently msysDTK-1.0.1.exe).
+
+If a folder is (say) C:\installers\msys_stuff, in the MSYS application you type 
+cd /c/installers/msys_stuff. Note that the TAB key will complete an incomplete 
+file name. The up arrow retrieves an earlier command type-in.
+
+From help obtained in mingw-msys-bounces@lists.sourceforge.net (2008/01/31):
+  "For Windows Vista, Microsoft changed how msvcrt.dll reacts to access(), 
+  normally in XP and 2000, X_OK parameter is ignored, but Vista pukes on it. 
+  The MinGW gcc is affected by it. The patched version is found at
+  http://dessent.net/tmp/gcc-vista-3.4.5-20060117-1.tar.gz"
+
+  If you're using Vista, get this file, start up MSYS, cd to the folder where 
+  the gz file is located. 
+
+  Execute gunzip gcc-vista-3.4.5-20060117-1.tar.gz. This will produce folders
+  bin and libexec. Copy the files in these folders to the corresponding locations
+  in c:/MinGW.
 
 -------------Need to check whether the following stuff is necessary
 You may need to add C:\mingw\bin to your PATH.
@@ -73,6 +79,7 @@ the security policy editor is included in home editions, but there should
 be a registry hack which would have the same effect."
 --------------
 
+*************************************************************
 BUILDING BOOST
 The Boost libraries are extensions to C++. Among the libraries
 are python and thread libraries used by Visual. The python library
@@ -112,30 +119,38 @@ boost_1_34_1/tools/build/v2/user-config.jam is the user configuration file.
 It should be placed in your home directory.
 Your home directory can be found by executing ECHO %HOMEDRIVE%%HOMEPATH%
 
+*************************************************************
 GTK+ AND FRIENDS
 gtk+ (also called gtk2) is written in C; gtkmm is a "wrapper" of these C routines 
 to make gtk+ functionality accessible to C++ programmers.
 
-Go to http://ftp.gnome.org/pub/GNOME/binaries/win32 and download and
-install into C:\MinGW the latest versions of the following components:
+Go to http://ftp.gnome.org/pub/GNOME/binaries/win32 and download the following components.
+In the zip files are folders containing files to be copied to the corresponding folders 
+in c:\MinGW. Note that Windows merges on copy, so you can simply double-click the zip file
+and drag the folders to c:\MinGW; this will place the files in the correct locations. You
+don't need to copy make or manifest folders.
 
 gtk+-dev
-  (Don't think I need gtk+)
-gtkmm-win32-devel
-  (Don't think I need gtkmm-win32-runtime)
-libglade-dev
-pango-dev
-atk-dev
+gtkmm-win32-devel (this is an exe installer)
 glib-dev
   (Do I need libiconv and gettext, available at www.gimp.org/~tml/gimp/win32/downloads.html?)
+atk-dev
+libglade-dev
+pango-dev
 
-At sourceforge.net/projects/gtkglext download the zip files for gtkglext and gtkglextmm.
-Unzip the source files. To build, go into a directory, and do this:
+At http://www.gimp.org/~tml/gimp/win32/downloads.html, download the pkg-config zip file.
+Double-click the zip file and drag the folders to c:\MinGW.
+
+At sourceforge.net/projects/gtkglext download the zip files for these components:
+gtkglext
+gtkglextmm
+
+Unzip the zip files. To build, run MSYS, cd into a directory, and do this:
 		> ./configure
 		> make
 		> make install
 For some unknown reason, the build process for gtkglextmm sometimes fails, 
-on some Windows machines. For that reason, the needed binaries are avalable 
+on some Windows machines. For that reason, the needed built files are avalable 
 in the developer's section of vpython.org.
 
 See INSTALL.txt for further information on the build process itself.
@@ -153,7 +168,7 @@ After installing gtk2 and gtkmm, check to see whether you have these packages.
 		These are binary distributions; after unzipping, copy files to the corresponding
 		locations in mingw.
 		
-		A library such as sigc++, see below,
+		A library such as sigc++
 		registers its version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
 		possible for the build process to find the installed version of the library.
 		There is some ambiguity about where to put the pkg-config pieces, as some components need
@@ -171,15 +186,17 @@ After installing gtk2 and gtkmm, check to see whether you have these packages.
 		> make
 		> make install
 		Can test that pkg-config is correctly installed by executing this:
-		> pkg-config --cflags sigc++-2.0cd
+		> pkg-config --cflags sigc++-2.0
 -------------------------------------
 
+*************************************************************
 DEBUGGING
 From a typescript, the following will print all VPYTHON_NOTEs:
 env VPYTHON_DEBUG=1 python test.py
 (This assumes you've executed cd /c/python25 and that test.py as
 well as python.exe is in that directory.)
 
+*************************************************************
 HOW TO CREATE AN INSTALLER FOR VISUAL FOR MICROSOFT WINDOWS
 You need InnoSetup (www.jrsoftware.org) to create an installer for end users.
 
