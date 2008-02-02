@@ -28,6 +28,9 @@ Download and install the automated MinGW installer, currently MinGW-5.1.3.
 Run this exe installer. Specify that you want the g++ compiler (for C++).
 The installer will also install gcc-core, mingw-runtime, and w32api.
 
+Note that detailed installation instructions are available at mingw.org
+by clicking on MinGWiki in the left column and choosing "Getting started".
+
 From the same sourceforge.net site, download and install MSYS.
 You must click on MSYS Base System in the left column in order to find
 and download the current release (currently MSYS-1.0.10.exe). Install,
@@ -147,6 +150,8 @@ freetype, freetype-dev
 gettest-runtime, gettext-runtime-dev
 libiconv
 libpng
+   Need to install into MinGW zlib binaries and development files from
+      http://gnuwin32.sourceforge.net/packages/zlib.htm
 pkg-config
    You need to set an environment variable for pkg-config:
    Right click My Computer > Properties > Advanced > Environment Variables and
@@ -163,6 +168,13 @@ pkg-config
    pkg-config pieces, as some components need to be in msys. 
    Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
    but also to msys/1.0/share/aclocal.")
+   
+At http://gnuwin32.sourceforge.net/packages/libpng.htm download the zip files 
+for libpng Binaries and Developer files, and copy to c:\MinGW.
+AARGH! This gives libpng12, but configure looks for libpng13.
+So try version 1.2.25 as being newer. Try to configure. Fails for lack of zlib.
+Go to zlib.net, download zip compiled DLL version, move files to c:\MinGW (the
+file zlib.dll goes in the bin folder).
 
 At sourceforge.net/projects/gtkglext download the zip files for these components:
 gtkglext
