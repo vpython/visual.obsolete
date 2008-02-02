@@ -146,6 +146,7 @@ cairo, cairo-dev
 freetype, freetype-dev
 gettest-runtime, gettext-runtime-dev
 libiconv
+libpng
 pkg-config
    You need to set an environment variable for pkg-config:
    Right click My Computer > Properties > Advanced > Environment Variables and
