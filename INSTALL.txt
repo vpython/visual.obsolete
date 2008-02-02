@@ -40,7 +40,7 @@ I.  Prerequisites:
 	   gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, 
 	   gtkmm-2.4, gdkmm-2.4, glib-2.0, glibmm-2.4, 
 	   pango-1.0, pangomm-1.4, freetype2,  
-	   gtkglext-1.0, gtkglextmm-1.2, cairo, cariomm-1.0, libglade-2.0, libglademm-2.4
+	   gtkglext-1.0, gtkglextmm-1.2, cairo, cairomm-1.0, libglade-2.0, libglademm-2.4
 	
 	More generically, key libraries are these:
 		gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
