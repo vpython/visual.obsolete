@@ -121,8 +121,9 @@ Your home directory can be found by executing ECHO %HOMEDRIVE%%HOMEPATH%
 
 *************************************************************
 GTK+ AND FRIENDS
-gtk+ (also called gtk2) is written in C; gtkmm is a "wrapper" of these C routines 
-to make gtk+ functionality accessible to C++ programmers.
+gtk+ (also called gtk2), written in C, is a toolkit for building graphical user interface
+programs; gtkmm is a "wrapper" of these C routines to make gtk+ functionality accessible 
+to C++ programmers.
 
 Go to http://ftp.gnome.org/pub/GNOME/binaries/win32 and download the following components.
 In the zip files are folders containing files to be copied to the corresponding folders 
@@ -130,16 +131,25 @@ in c:\MinGW. Note that Windows merges on copy, so you can simply double-click th
 and drag the folders to c:\MinGW; this will place the files in the correct locations. You
 don't need to copy make or manifest folders.
 
-gtk+-dev
+gtk, gtk+-dev
 gtkmm-win32-devel (this is an exe installer)
-glib-dev
+  Includes atkmm, cairomm, gdkmm, glade--, glibmm, gtkmm, 
+  libglademm, libsigc++, libxml++, pangomm
+glib, glib-dev
   (Do I need libiconv and gettext, available at www.gimp.org/~tml/gimp/win32/downloads.html?)
-atk-dev
-libglade-dev
-pango-dev
+atk, atk-dev
+libglade, libglade-dev
+pango, pango-dev
 
-At http://www.gimp.org/~tml/gimp/win32/downloads.html, download the pkg-config zip file.
-Double-click the zip file and drag the folders to c:\MinGW.
+From the dependencies section:
+
+cairo, cairo-dev
+freetype, freetype-dev
+pkg-config
+		
+	Here is a list of all the additional libraries involved. In many cases a library is 
+	automatically installed by a package manager when a requested library depends on it:
+	   gtkglext-1.0, gtkglextmm-1.2
 
 At sourceforge.net/projects/gtkglext download the zip files for these components:
 gtkglext
