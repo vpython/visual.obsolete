@@ -136,7 +136,6 @@ gtkmm-win32-devel (this is an exe installer)
   Includes atkmm, cairomm, gdkmm, glade--, glibmm, gtkmm, 
   libglademm, libsigc++, libxml++, pangomm
 glib, glib-dev
-  (Do I need libiconv and gettext, available at www.gimp.org/~tml/gimp/win32/downloads.html?)
 atk, atk-dev
 libglade, libglade-dev
 pango, pango-dev
@@ -145,11 +144,24 @@ From the dependencies section:
 
 cairo, cairo-dev
 freetype, freetype-dev
+gettest-runtime, gettext-runtime-dev
+libiconv
 pkg-config
-		
-	Here is a list of all the additional libraries involved. In many cases a library is 
-	automatically installed by a package manager when a requested library depends on it:
-	   gtkglext-1.0, gtkglextmm-1.2
+   You need to set an environment variable for pkg-config:
+   Right click My Computer > Properties > Advanced > Environment Variables and
+   add a new user variable: name PKG_CONFIG_PATH, value c:\mingw\lib\pkgconfig.
+   NOTE: You can run "env" in an MSYS terminal to check that the path is appropriate. 
+   A library such as sigc++ registers its version number in 
+   mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it possible for the build process 
+   to find the installed version of the library.
+   
+   Can test that pkg-config is correctly installed by executing this:
+		> pkg-config --cflags sigc++-2.0
+   
+   (Not sure about the following: "There is some ambiguity about where to put the 
+   pkg-config pieces, as some components need to be in msys. 
+   Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
+   but also to msys/1.0/share/aclocal.")
 
 At sourceforge.net/projects/gtkglext download the zip files for these components:
 gtkglext
@@ -164,40 +176,6 @@ on some Windows machines. For that reason, the needed built files are avalable
 in the developer's section of vpython.org.
 
 See INSTALL.txt for further information on the build process itself.
-
-------------------------------------
-At http://gladewin32.sourceforge.net, you need the development version, which includes
-such things as glib, atk, pango, cairo, glade, and fontconfig.
-
-Some of the following is probably now installed by the gtk2 and gtkmm installers.
-After installing gtk2 and gtkmm, check to see whether you have these packages.
- 		Download pkg-config-0.20 in zip format and unzip.
-		One place to get it is http://www.gimp.org/~tml/gimp/win32/downloads.html.
-		Note that if you don't already have it, you  need glib-2.1.27.zip available here.
-		And glib in turn requires libiconv and gettext, also available at the same location.
-		These are binary distributions; after unzipping, copy files to the corresponding
-		locations in mingw.
-		
-		A library such as sigc++
-		registers its version number in mingw/lib/pkgconfig/sigc++-2.0.pc, which makes it
-		possible for the build process to find the installed version of the library.
-		There is some ambiguity about where to put the pkg-config pieces, as some components need
-		to be in msys. Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
-		but also to msys/1.0/share/aclocal.
-		You probably also need to set an environment variable for pkg-config:
-		Right click My Computer > Properties > Advanced > Environment Variables and
-		add a new entry: name PKG_CONFIG_PATH, value c:\mingw\lib\pkgconfig.
-		NOTE: You can run "env" in an MSYS terminal to check that the path is appropriate. 
-		
-		Download the source for libsigc++-2.0.17 from libsigc.sourceforge.net.
-		> tar -xjf libsigc++-2.0.17.tar.bz2
-		cd to the new directory, execute 
-		> ./configure --prefix=/mingw
-		> make
-		> make install
-		Can test that pkg-config is correctly installed by executing this:
-		> pkg-config --cflags sigc++-2.0
--------------------------------------
 
 *************************************************************
 DEBUGGING
