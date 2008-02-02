@@ -147,11 +147,8 @@ From the dependencies section:
 
 cairo, cairo-dev
 freetype, freetype-dev
-gettest-runtime, gettext-runtime-dev
+gettext-runtime, gettext-runtime-dev
 libiconv
-libpng
-   Need to install into MinGW zlib binaries and development files from
-      http://gnuwin32.sourceforge.net/packages/zlib.htm
 pkg-config
    You need to set an environment variable for pkg-config:
    Right click My Computer > Properties > Advanced > Environment Variables and
@@ -168,20 +165,59 @@ pkg-config
    pkg-config pieces, as some components need to be in msys. 
    Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
    but also to msys/1.0/share/aclocal.")
+
+########  The following was probably unnecessary (see next step)
+In order to make and install libpng, need to install into MinGW zlib binaries 
+and development files from http://gnuwin32.sourceforge.net/packages/zlib.htm.
+Do this before the next step (libpng installation).
+
+At http://sourceforge.net/projects/libpng choose the libpng-devel package
+and download a recent zip file of libpng, and unzip. In MSYS, cd to the libpng
+folder and do this:
+		> ./configure --prefix=/c/MinGW
+		> make
+		> make install
+   (If you don't specify --prefix=/c/MinGW, make install will install into
+   c:\msys\1.0\local\lib and c:\msys\1.0\local\bin.)
+########
    
-At http://gnuwin32.sourceforge.net/packages/libpng.htm download the zip files 
-for libpng Binaries and Developer files, and copy to c:\MinGW.
-AARGH! This gives libpng12, but configure looks for libpng13.
-So try version 1.2.25 as being newer. Try to configure. Fails for lack of zlib.
-Go to zlib.net, download zip compiled DLL version, move files to c:\MinGW (the
-file zlib.dll goes in the bin folder).
+At gnuwin32.sourceforge.net/packages.html get binaries and developer files for
+LibPng (these are binary files, making the previous make instructions unneeded)
+LibJpeg (get dependencies, too)
+LibTiff (get dependencies, too)
+Libtool (the msys version is said to be too old)
+
+Noted on the web is some confusion over the name of libpng, which is sometimes 
+referred to as libpng12 and sometimes as libpng13. To deal with this:
+   In c:\MinGW\lib\pkgconfig, copy libpng12.pc -> libpng13.pc
 
 At sourceforge.net/projects/gtkglext download the zip files for these components:
 gtkglext
 gtkglextmm
 
+For instructions on how to build gtkglext on Windows:
+http://mail.gnome.org/archives/gtkglext-list/2006-March/msg00017.html
+
+In the gtkglext folder, edit configure to delete the many references to pangox,
+which has to do with the X11 window manager on Linux.
+
+./configure --prefix=/c/MinGW --build=i386-pc-mingw32
+  checking for GTK+ - version >= 2.0.0... no
+  conftest.exe failed because jpeg62.dll was not found.
+*** Could not run GTK+ test program, checking why...
+*** The test program compiled, but did not run. This usually means
+*** that the run-time linker is not finding GTK+ or finding the wrong
+*** version of GTK+. If it is not finding GTK+, you'll need to set your
+*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point
+*** to the installed location  Also, make sure you have run ldconfig if that
+*** is required on your system
+***
+*** If you have an old version installed, it is best to remove it, although
+*** you may also be able to get things to work by modifying LD_LIBRARY_PATH
+configure: error: GTK+ 2.0 not found
+
 Unzip the zip files. To build, run MSYS, cd into a directory, and do this:
-		> ./configure
+		> ./configure --prefix=/c/MinGW --build=i386-pc-mingw32
 		> make
 		> make install
 For some unknown reason, the build process for gtkglextmm sometimes fails, 
@@ -260,5 +296,3 @@ libpng12.dll
 libsigc-2.0-0.dll
 libxml2.dll
 zlib1.dll
-
-
