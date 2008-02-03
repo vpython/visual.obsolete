@@ -191,17 +191,36 @@ Noted on the web is some confusion over the name of libpng, which is sometimes
 referred to as libpng12 and sometimes as libpng13. To deal with this:
    In c:\MinGW\lib\pkgconfig, copy libpng12.pc -> libpng13.pc
 
-At sourceforge.net/projects/gtkglext download the zip files for these components:
+At sourceforge.net/projects/gtkglext you can download zip files 
+containing the source for the following components, which add to gtk2
+a drawingarea widget for displaying OpenGL graphics:
 gtkglext
 gtkglextmm
 
+However, these components are very difficult to build, due to complex
+dependencies (see below for an unsuccessful attempt). For gtkglext, go to
+http://www.k-3d.org/gtkglext and click on Downloads, Binaries. Download
+the GtkGLExt exe installer for Windows and run the installer. It will
+place the components into c:\GtkGLExt. Go there and copy the bin, include,
+lib, and share folders to c:\MinGW (merge copy, as usual).
+
+The build process for gtkglextmm also sometimes fails, on some Windows machines, 
+so binary files are available in the developer's section of vpython.org.
+
+############### Here are instructions on how to attempt to build
+############### gtkglext from source, though I didn't succeed.
 For instructions on how to build gtkglext on Windows:
 http://mail.gnome.org/archives/gtkglext-list/2006-March/msg00017.html
 
 In the gtkglext folder, edit configure to delete the many references to pangox,
 which has to do with the X11 window manager on Linux.
 
-./configure --prefix=/c/MinGW --build=i386-pc-mingw32
+Unzip the zip files. To build, run MSYS, cd into a directory, and do this:
+		> ./configure --prefix=/c/MinGW --build=i386-pc-mingw32
+		> make
+		> make install./configure --prefix=/c/MinGW --build=i386-pc-mingw32
+
+This fails in the configure attempts:
   checking for GTK+ - version >= 2.0.0... no
   conftest.exe failed because jpeg62.dll was not found.
 *** Could not run GTK+ test program, checking why...
@@ -215,16 +234,12 @@ which has to do with the X11 window manager on Linux.
 *** If you have an old version installed, it is best to remove it, although
 *** you may also be able to get things to work by modifying LD_LIBRARY_PATH
 configure: error: GTK+ 2.0 not found
+######################################
 
-Unzip the zip files. To build, run MSYS, cd into a directory, and do this:
-		> ./configure --prefix=/c/MinGW --build=i386-pc-mingw32
-		> make
-		> make install
-For some unknown reason, the build process for gtkglextmm sometimes fails, 
-on some Windows machines. For that reason, the needed built files are avalable 
-in the developer's section of vpython.org.
-
-See INSTALL.txt for further information on the build process itself.
+*************************************************************
+MORE ON INSTALLATION
+See INSTALL.txt for details on building Visual on Windows, after installing
+all the underlying components described above.
 
 *************************************************************
 DEBUGGING
