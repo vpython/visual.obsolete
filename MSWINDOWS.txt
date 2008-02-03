@@ -46,6 +46,20 @@ If a folder is (say) C:\installers\msys_stuff, in the MSYS application you type
 cd /c/installers/msys_stuff. Note that the TAB key will complete an incomplete 
 file name. The up arrow retrieves an earlier command type-in.
 
+After installing msysDTK-1.0.1.exe, you need to download and install from
+the same source the following updates:
+   msys-autoconf-2.59.2.59.tar.bz2
+   msys-automake-1.8.2.tar.bz2
+   msys-libtool-1.5.tar.bz2
+Run MSYS, and cd to the folder where you have downloaded these .bz2 files and
+execute
+   tar -xjf msys-autoconf-2.59.2.59.tar.bz2
+   tar -xjf msys-automake-1.8.2.tar.bz2
+   tar -xjf msys-libtool-1.5.tar.bz2
+This will produce a bunch of folders (bin, lib, and so on). Copy these folders
+to c:\msys\1.0. Note that Windows merges on copy, so you can simply drag all 
+the folders to c:\msys\1.0.
+
 From help obtained in mingw-msys-bounces@lists.sourceforge.net (2008/01/31):
   "For Windows Vista, Microsoft changed how msvcrt.dll reacts to access(), 
   normally in XP and 2000, X_OK parameter is ignored, but Vista pukes on it. 
@@ -161,11 +175,6 @@ pkg-config
    Can test that pkg-config is correctly installed by executing this:
 		> pkg-config --cflags sigc++-2.0
    
-   (Not sure about the following: "There is some ambiguity about where to put the 
-   pkg-config pieces, as some components need to be in msys. 
-   Copy pkg-config.exe to mingw/bin and pkg.m4 to mingw/share/aclocal
-   but also to msys/1.0/share/aclocal.")
-
 ########  The following was probably unnecessary (see next step)
 In order to make and install libpng, need to install into MinGW zlib binaries 
 and development files from http://gnuwin32.sourceforge.net/packages/zlib.htm.
@@ -240,6 +249,23 @@ configure: error: GTK+ 2.0 not found
 MORE ON INSTALLATION
 See INSTALL.txt for details on building Visual on Windows, after installing
 all the underlying components described above.
+
+When I tried to run autogen.sh, it failed because mingw/bin/libtoolize
+had an incorrect reference prefix=c:/progra~1/LibTool instead of prefix=/usr.
+Note that this VERSION=1.5.8, whereas what I had been using was 1.5.
+I edited libtoolize to specify prefix=/usr. Now what happens is this:
+
+$ ./autogen.sh
+Can't locate object method "path" via package "Autom4te::Request" 
+(perhaps you forgot to load "Autom4te::Request"?) at /usr/bin/autom4te line 81.
+configure.ac: `AM_INIT_AUTOMAKE' must be used
+automake: your implementation of AM_INIT_AUTOMAKE comes from an
+automake: old Automake version.  You should recreate aclocal.m4
+automake: with aclocal and run automake again.
+automake: no `Makefile.am' found or specified
+Can't locate object method "path" via package "Autom4te::Request" 
+(perhaps you forgot to load "Autom4te::Request"?) at /usr/bin/autom4te line 81.
+One or more generated files was not created properly.
 
 *************************************************************
 DEBUGGING
