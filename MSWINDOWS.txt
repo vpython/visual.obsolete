@@ -246,26 +246,34 @@ configure: error: GTK+ 2.0 not found
 ######################################
 
 *************************************************************
-MORE ON INSTALLATION
+BUILDING VISUAL
 See INSTALL.txt for details on building Visual on Windows, after installing
 all the underlying components described above.
 
 When I tried to run autogen.sh, it failed because mingw/bin/libtoolize
-had an incorrect reference prefix=c:/progra~1/LibTool instead of prefix=/usr.
+had an incorrect reference prefix=c:/progra~1/LibTool instead of prefix=/usr
+(which means in the MSYS context c:\msys\1.0).
 Note that this VERSION=1.5.8, whereas what I had been using was 1.5.
 I edited libtoolize to specify prefix=/usr. Now what happens is this:
 
 $ ./autogen.sh
-Can't locate object method "path" via package "Autom4te::Request" 
-(perhaps you forgot to load "Autom4te::Request"?) at /usr/bin/autom4te line 81.
-configure.ac: `AM_INIT_AUTOMAKE' must be used
-automake: your implementation of AM_INIT_AUTOMAKE comes from an
-automake: old Automake version.  You should recreate aclocal.m4
-automake: with aclocal and run automake again.
-automake: no `Makefile.am' found or specified
-Can't locate object method "path" via package "Autom4te::Request" 
-(perhaps you forgot to load "Autom4te::Request"?) at /usr/bin/autom4te line 81.
-One or more generated files was not created properly.
+/usr/share/aclocal/autoopts.m4:22: warning: underquoted definition of AG_PATH_AUTOOPTS
+  run info '(automake)Extending aclocal'
+  or see http://sources.redhat.com/automake/automake.html#Extending%20aclocal
+configure.ac: installing `./missing'
+Makefile.am:6: directory should not contain `/'
+configure.ac:34: error: possibly undefined macro: AC_MSG_ERROR
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+Completed successfully
+
+Without trying to debug this, I tried doing the make:
+PYTHON=/c/Python25/python.exe CXXFLAGS="-O2 -march=i686" ./configure
+.........
+checking for array in python module numpy... yes
+checking for headers required to compile python extensions... found
+../vpython-core2/configure: line 19278: syntax error near unexpected token `if'
+../vpython-core2/configure: line 19278: `if test $platform_win32 = yes; then'
 
 *************************************************************
 DEBUGGING
