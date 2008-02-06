@@ -25,19 +25,26 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	
 	gtkglextmm, getkglextmm-shlibs
 	
-	freetype2
+	Need freetype2, but install freetype219 and freetype219-shlibs instead.
+	Because this does not put freetype2.pc into the usual place (/sw/lib/pkgconfig),
+	put this in your .profile file in your home directory, and then restart a terminal:
+	export PKG_CONFIG_PATH=/sw/lib/pkgconfig:/sw/lib/fontconfig2/lib/pkgconfig:/sw/lib/xft2/lib/pkgconfig:/sw/lib/freetype219/lib/pkgconfig
 	
-	This seems to be all the fink installs necessary, but there are problems with freetype2.
-	See below.
-	
-I tried executing PYTHON=/sw/bin/python2.5 ../vpython-core2/configure --prefix=/sw
-(I don't know why the PYTHON= is required, but it is.)
-The configure fails with "freetype2 is required".
+Here is what happens when I run autogen.sh: 
+/sw/share/aclocal/gtkglextmm-1.2.m4:225: warning: 
+          underquoted definition of AC_GTKGLEXTMM_SUPPORTS_MULTIHEAD
+  run info '(automake)Extending aclocal'
+  or see http://sources.redhat.com/automake/automake.html#Extending-aclocal
+configure.ac: installing `./missing'
+Completed successfully
 
 Shouldn't be necessary, but to configure you might have to add this to .profile in
 your home directory: export PKG_CONFIG_PATH=/sw/lib/pkgconfig
 	You can test this by executing the following:
 	   pkg-config --libs gtkmm-2.4
+	
+I tried PYTHON=/sw/bin/python2.5 ../vpython-core2/configure --prefix=/sw
+(I don't know why the PYTHON= is required, but it is.)
 	
 	Earlier: Couldn't configure due to not finding freetype2, which I thought was missing despite
 	the fink install, so I put this in .profile in my home directory to try to pick
