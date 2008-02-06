@@ -11,7 +11,7 @@ I use Fink Commander as a GUI to fink, but you can use the command line.
 	
 Use fink to install the components listed for Linux in INSTALL.txt (details repeated here).
 	Currently (Jan. 2008) you will find 10 entries for Boost; you
-	need to expand the package name field enough to be able to see which
+	need to expand the package name field wide enough to be able to see which
 	boostN.N.pyth packages go with your chosen version of Python (you also
 	need the non-Python libraries, boostN.N.nopy and boostN.N.syste).
 	I installed Python2.5, numpy, the boost libraries, then install these:
@@ -29,6 +29,10 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	
 	This seems to be all the fink installs necessary, but there are problems with freetype2.
 	See below.
+	
+I tried executing PYTHON=/sw/bin/python2.5 ../vpython-core2/configure --prefix=/sw
+(I don't know why the PYTHON= is required, but it is.)
+The configure fails with "freetype2 is required".
 
 Shouldn't be necessary, but to configure you might have to add this to .profile in
 your home directory: export PKG_CONFIG_PATH=/sw/lib/pkgconfig
