@@ -29,7 +29,10 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	Because this does not put freetype2.pc into the usual place (/sw/lib/pkgconfig),
 	put this in your .profile file in your home directory, and then restart a terminal:
 	export PKG_CONFIG_PATH=/sw/lib/pkgconfig:/sw/lib/fontconfig2/lib/pkgconfig:/sw/lib/xft2/lib/pkgconfig:/sw/lib/freetype219/lib/pkgconfig
-	
+	You can test this by executing the following:
+	   pkg-config --libs freetype2
+	The output should be -L/sw/lib/freetype219/lib -lfreetype -lz 
+	   
 Here is what happens when I run autogen.sh: 
 /sw/share/aclocal/gtkglextmm-1.2.m4:225: warning: 
           underquoted definition of AC_GTKGLEXTMM_SUPPORTS_MULTIHEAD
@@ -37,32 +40,9 @@ Here is what happens when I run autogen.sh:
   or see http://sources.redhat.com/automake/automake.html#Extending-aclocal
 configure.ac: installing `./missing'
 Completed successfully
-
-Shouldn't be necessary, but to configure you might have to add this to .profile in
-your home directory: export PKG_CONFIG_PATH=/sw/lib/pkgconfig
-	You can test this by executing the following:
-	   pkg-config --libs gtkmm-2.4
 	
 I tried PYTHON=/sw/bin/python2.5 ../vpython-core2/configure --prefix=/sw
 (I don't know why the PYTHON= is required, but it is.)
-	
-	Earlier: Couldn't configure due to not finding freetype2, which I thought was missing despite
-	the fink install, so I put this in .profile in my home directory to try to pick
-	up freetype2 from /usr or /usr/local
-	   export PKG_CONFIG_PATH=/sw/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig
-	Could configure and make, but VPython didn't run.
-	But looking again I do find /sw/lib/freetype2 but no freetype2.pc in /sw/lib/pkgconfig
-	nor any freetype2 in /sw/include.
-	I find /usr/local/lib/pkgconfig/freetype2.pc, which refers to /usr/local.
-	There exists /usr/local/include/freetype2.
-	So change .profile to contain simply export PKG_CONFIG_PATH=/sw/lib/pkgconfig and try
-	the experiment of copying /usr/local/lib/pkgconfig/freetype2.pc to /sw/lib/pkgconfig.
-	Again, this enables configure and make, but we die in trying to import cvisual.
-	   
-	In an earlier attempt (before clean install of fink), I tried this:
-	   sudo cp /usr/local/lib/pkgconfig/freetyp2 /sw/lib/pkgconfig
-	   sudo cp -R /usr/local/include/freetype2 /sw/lib/include
-	That made it possible to configure and make, but VPython didn't run.
 	
 Answers to questions sent to Martin Costabel (Jan. 2008):
 Q: I'm trying to learn how to build (and then try to debug) the beta version of Visual on a Mac. 
