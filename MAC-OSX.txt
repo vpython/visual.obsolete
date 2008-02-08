@@ -27,11 +27,11 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	
 	Need freetype2, but install freetype219 and freetype219-shlibs instead.
 	Because this does not put freetype2.pc into the usual place (/sw/lib/pkgconfig),
-	put this in your .profile file in your home directory, and then restart a terminal:
-	export PKG_CONFIG_PATH=/sw/lib/pkgconfig:/sw/lib/fontconfig2/lib/pkgconfig:/sw/lib/xft2/lib/pkgconfig:/sw/lib/freetype219/lib/pkgconfig
-	You can test this by executing the following:
-	   pkg-config --libs freetype2
-	The output should be -L/sw/lib/freetype219/lib -lfreetype -lz 
+	PKG_CONFIG_PATH is set in the configure script to find it.
+
+You can test the pkgconfig machinery by executing the following:
+	   pkg-config --libs pango
+The output should be -L/sw/lib -lpango-1.0 -lm -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lintl -liconv 
 	   
 Here is what happens when I run autogen.sh: 
 /sw/share/aclocal/gtkglextmm-1.2.m4:225: warning: 
@@ -42,9 +42,9 @@ configure.ac: installing `./missing'
 Completed successfully
 
 Apparently the warning about AC_GTKGLEXTMM_SUPPORTS_MULTIHEAD isn't fatal, as it was possible
-to build Visual,
+to build Visual.
 	
-After important help from Martin Costabel, I was able to make, install, run successfully.
+After important help from Martin Costabel, I was able to make, install, and run successfully.
 I placed this file in a build directory at the same level as vpython-core2:
 #!/bin/sh -ex
 export CPPFLAGS="-Wno-long-double"
@@ -68,5 +68,5 @@ libraries. But then I got this error message in the link phase of the make:
 
 /usr/bin/ld: table of contents for archive: /sw/lib/libboost_python-mt.a is out of date; rerun ranlib(1) (can't load from it) 
 
-So I executed ranlib /sw/lib/libboost_python-mt.a, redid the make, executed make install, and it works!
+So I executed ranlib /sw/lib/libboost_python-mt.a, redid the make, executed make install, and it worked.
 
