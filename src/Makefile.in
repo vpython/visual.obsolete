@@ -181,8 +181,6 @@ else
   # size of the final binary) by about 1 MB, and makes Python's "import" go 
   # _much_ faster at runtime.
   _FILTER_OUT = "-Wl,--export-dynamic"
-  CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
-  	$(GTHREAD_LIBS) -lboost_python -lboost_thread)
   CVISUAL_CPPFLAGS += $(GTK_CFLAGS) $(GTHREAD_CFLAGS) $(PYTHON_INCLUDES)
   CVISUAL_CXXFLAGS += -fpic -DPIC
 
@@ -190,6 +188,8 @@ else
 
   ifeq ($(PYTHON_PLATFORM),darwin)
     # Special rules for OSX
+    CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
+       $(GTHREAD_LIBS) /sw/lib/libboost_python-mt.a -lboost_thread-mt)
     CXX_RULE = $(DEFAULT_CXX_RULE)
     LINK_RULE = $(OSX_SORULE)
     PLATFORM_TARGET = cvisualmodule.so
@@ -197,6 +197,8 @@ else
     INSTALL_RULE = $(GENERIC_INSTALLRULE)
  else
     # Libtoolish rules.  These should apply to all POSIX-like systems.
+    CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
+       $(GTHREAD_LIBS) -lboost_python -lboost_thread)
     CXX_RULE = $(LT_CXX_RULE)
     LINK_RULE = $(LT_LINKRULE)
     PLATFORM_TARGET = cvisualmodule.la
