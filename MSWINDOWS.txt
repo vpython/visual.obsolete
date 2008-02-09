@@ -267,6 +267,10 @@ configure.ac:34: error: possibly undefined macro: AC_MSG_ERROR
       See the Autoconf documentation.
 Completed successfully
 
+AC_MSG_ERROR appears several times in acinclude.m4 and configure.ac.
+AG_PATH_AUTOOPTS does not appear in the Visual project but rather
+in c:\msys\1.0\share\aclocal in the context of AC_DEFUN(AG_PATH_AUTOOPTS, .....
+
 Without trying to debug this, I tried doing the make:
 PYTHON=/c/Python25/python.exe CXXFLAGS="-O2 -march=i686" ./configure
 .........
