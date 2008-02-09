@@ -81,15 +81,18 @@ obj = label(text='hello')
 obj.visible = 0
 obj = 35
 The implication is that the label destructor fails on Mac (works okay on Windows and Linux).
+The rule is that if you make an object invisible, then reassign the only name for that 
+object (obj = 35), Python is free to destroy the object and reuse the memory, 
+because there is no longer any way for your program to get at that object.
 
 2) rotate(v, angle=something, axis=something) crashes. This free function is in vector.hpp.
 The form v.rotate(angle=something, axis=something) works fine. This is in vector.cpp.
 Note that in wrap_vector.cpp there are 5 different references to rotate.
-One wonders whether this is a Boost problem? Words fine on Windows and Linux.
+One wonders whether this is a Boost problem? Works fine on Windows and Linux.
 
 3) Programs that append to a faces object crash (for example, faces_heightfield.py, graphs
 that use gvbars or ghistogram). No problem on Windows and Linux. 
 
-A non-fatal bug is that orbits.py and stars.py have dim or strange lighting.
+4) A non-fatal bug is that orbits.py and stars.py have dim or strange lighting.
 
 
