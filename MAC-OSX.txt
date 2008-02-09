@@ -53,6 +53,10 @@ export PYTHON=/sw/bin/python2.5
 export CXXFLAGS="-O2 -g -finline-functions"
 export CFLAGS='-O3 -g ' 
 ../vpython-core2/configure --prefix=/sw --disable-dependency-tracking
+
+If you call this file config.txt, in the build directory you need to execute
+   chmod +x config.txt
+to make the file be executable by "./config.txt".
 	
 Before making a change to src/Makefile.in, I got a message about possible mismatch of versions, 
 as though when I build against /sw/bin/python2.5 and then run /sw/bin/python2.5 the system thinks 
@@ -69,4 +73,23 @@ libraries. But then I got this error message in the link phase of the make:
 /usr/bin/ld: table of contents for archive: /sw/lib/libboost_python-mt.a is out of date; rerun ranlib(1) (can't load from it) 
 
 So I executed ranlib /sw/lib/libboost_python-mt.a, redid the make, executed make install, and it worked.
+
+However, there are significant bugs which show up when running the example programs:
+
+1) The following sequence crashes if the object is a label, but not with other objects:
+obj = label(text='hello')
+obj.visible = 0
+obj = 35
+The implication is that the label destructor fails on Mac (works okay on Windows and Linux).
+
+2) rotate(v, angle=something, axis=something) crashes. This free function is in vector.hpp.
+The form v.rotate(angle=something, axis=something) works fine. This is in vector.cpp.
+Note that in wrap_vector.cpp there are 5 different references to rotate.
+One wonders whether this is a Boost problem? Words fine on Windows and Linux.
+
+3) Programs that append to a faces object crash (for example, faces_heightfield.py, graphs
+that use gvbars or ghistogram). No problem on Windows and Linux. 
+
+A non-fatal bug is that orbits.py and stars.py have dim or strange lighting.
+
 
