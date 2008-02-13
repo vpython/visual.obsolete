@@ -40,7 +40,8 @@ Source: "C:\MinGW\etc\fonts\*"; DestDir: "{app}\Lib\site-packages\visual\etc\fon
 Source: "C:\MinGW\etc\gtk-2.0\*"; DestDir: "{app}\Lib\site-packages\visual\etc\gtk-2.0"; Components: Visual; Flags: recursesubdirs
 Source: "C:\MinGW\etc\pango\*"; DestDir: "{app}\Lib\site-packages\visual\etc\pango"; Components: Visual; Flags: recursesubdirs
 Source: "C:\MinGW\lib\gtk-2.0\*"; DestDir: "{app}\Lib\site-packages\visual\lib\gtk-2.0"; Components: Visual; Flags: recursesubdirs
-Source: "C:\MinGW\lib\pango\*"; DestDir: "{app}\Lib\site-packages\visual\lib\pango"; Components: Visual; Flags: recursesubdirs
+;The following seems to be no longer relevant with more recent installations of mingw:
+;Source: "C:\MinGW\lib\pango\*"; DestDir: "{app}\Lib\site-packages\visual\lib\pango"; Components: Visual; Flags: recursesubdirs
 
 Source: "@WIN32_SRCDIR@\LIBSIGC_COPYING.txt"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "@WIN32_SRCDIR@\license.txt"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
