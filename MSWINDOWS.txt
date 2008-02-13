@@ -160,10 +160,11 @@ pango, pango-dev
 From the dependencies section:
 
 cairo, cairo-dev
-libxml2-dev
+fontconfig-dev
 freetype, freetype-dev
 gettext-runtime, gettext-runtime-dev
 libiconv
+libxml2-dev
 pkg-config
    You need to set an environment variable for pkg-config:
    Right click My Computer > Properties > Advanced > Environment Variables and
@@ -286,7 +287,7 @@ PYTHON=/c/Python25/python.exe CXXFLAGS="-O2 -march=i686" ./vpyton-core2/configur
 cd into the build directory and run ./conf.bat
 
 After a successful configure, execute "make".
-
+The make files in the final link phase with "cannot find -lpython25" which is very odd.
 
 *************************************************************
 DEBUGGING
