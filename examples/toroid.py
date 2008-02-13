@@ -13,7 +13,7 @@ smallradius=0.03
 I=1.
 muthing=1e-7
 nturns=75.  # number of loops in helix
-nsteps=10.  # number of straight segments to approximate 1 turn
+nsteps=20.  # number of straight segments to approximate 1 turn
 Bideal=muthing*2.*nturns*I/bigradius        # Ampere's law, inside helix
 bscale = bigradius/(Bideal*4.)
 
