@@ -260,13 +260,13 @@ cd to the CVS directory of Visual files and run ./autogen.sh.
 It failed because mingw/bin/libtoolize had an incorrect reference 
 prefix=c:/progra~1/LibTool instead of prefix=/usr
 (which means in the MSYS context c:\msys\1.0).
-I edited libtoolize to specify prefix=/usr. 
-(Note that this VERSION=1.5.8, whereas what I had been using was 1.5.)
+I edited c:\MinGW\bin\libtoolize to specify prefix=/usr. 
 
-When I compare with the older mingw-msys environment on an XP machine, I find
-that libtoolize is in C:\msys\1.0\bin, and has prefix=/usr. This highlights an
-issue that may be important, that I've never been clear on what goes into msys
-and what goes into mingw.
+I find that there is also a libtoolize in C:\msys\1.0\bin, with prefix=/usr. 
+This highlights an issue that may be important, that I've never been clear 
+on what goes into msys and what goes into mingw. Clearly, mingw/bin is taking
+precedence over /msys/1.0/bin. With my earlier installation on XP, there
+was no libtoolize in /mingw/bin, and the msys version was invoked.
 
 Now what happens is this:
 $ ./autogen.sh
@@ -281,13 +281,13 @@ AG_PATH_AUTOOPTS does not appear in the Visual project but rather
 in c:\msys\1.0\share\aclocal in the context of AC_DEFUN(AG_PATH_AUTOOPTS, .....
 
 Without trying to debug this, I tried doing the make.
-I created a build directory parallel to the CVS directory.
+I created a directory named "build" parallel to the CVS directory (vpython-core2).
 For convenience, I created in the build directory a conf.bat file containing this;
 PYTHON=/c/Python25/python.exe CXXFLAGS="-O2 -march=i686" ./vpyton-core2/configure
-cd into the build directory and run ./conf.bat
 
+cd into the build directory and execute ./conf.bat
 After a successful configure, execute "make".
-The make files in the final link phase with "cannot find -lpython25" which is very odd.
+The make fails in the final link phase with "cannot find -lpython25", which is very odd.
 
 *************************************************************
 DEBUGGING
