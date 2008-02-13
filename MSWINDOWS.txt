@@ -197,6 +197,7 @@ LibPng (these are binary files, making the previous make instructions unneeded)
 LibJpeg (get dependencies, too)
 LibTiff (get dependencies, too)
 Libtool (the msys version is said to be too old)
+   It is possible that the Libtool files should have gone into msys; see below.
 
 Noted on the web is some confusion over the name of libpng, which is sometimes 
 referred to as libpng12 and sometimes as libpng13. To deal with this:
@@ -261,6 +262,9 @@ It failed because mingw/bin/libtoolize had an incorrect reference
 prefix=c:/progra~1/LibTool instead of prefix=/usr
 (which means in the MSYS context c:\msys\1.0).
 I edited c:\MinGW\bin\libtoolize to specify prefix=/usr. 
+Note the earlier comment about getting from gnuwin32.sourceforge.net/packages.html
+   "Libtool (the msys version is said to be too old)"
+Perhaps I was supposed to put this in msys, not mingw.
 
 I find that there is also a libtoolize in C:\msys\1.0\bin, with prefix=/usr. 
 This highlights an issue that may be important, that I've never been clear 
@@ -287,7 +291,7 @@ PYTHON=/c/Python25/python.exe CXXFLAGS="-O2 -march=i686" ./vpyton-core2/configur
 
 cd into the build directory and execute ./conf.bat
 After a successful configure, execute "make".
-The make fails in the final link phase with "cannot find -lpython25", which is very odd.
+The make fails in the final link phase with "cannot find -lpython25", which is odd.
 
 *************************************************************
 DEBUGGING
