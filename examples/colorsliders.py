@@ -71,7 +71,7 @@ while 1:
     if scene.mouse.events:
         m = scene.mouse.getevent()
         if m.click == "left" and m.pick in [panel, ball, cube]:
-            print "RGBA = (%0.3f,%0.3f,%0.3f,%0.3f)" % (ctrl[0].value,ctrl[1].value,ctrl[2].value,ctrl[3].value)
+            print "RGBO = (%0.3f,%0.3f,%0.3f,%0.3f)" % (ctrl[0].value,ctrl[1].value,ctrl[2].value,ctrl[3].value)
             print "HSV = (%0.3f,%0.3f,%0.3f)" % (ctrl[4].value,ctrl[5].value,ctrl[6].value)
             continue
         elif m.drop == "left":
