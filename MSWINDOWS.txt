@@ -173,21 +173,13 @@ pkg-config
    
    Can test that pkg-config is correctly installed by executing this:
 		> pkg-config --cflags sigc++-2.0
-   
-########  The following was probably unnecessary (see next step)
-In order to make and install libpng, need to install into MinGW zlib binaries 
-and development files from http://gnuwin32.sourceforge.net/packages/zlib.htm.
-Do this before the next step (libpng installation).
-
-At http://sourceforge.net/projects/libpng choose the libpng-devel package
-and download a recent zip file of libpng, and unzip. In MSYS, cd to the libpng
-folder and do this:
-		> ./configure --prefix=/c/MinGW
-		> make
-		> make install
-   (If you don't specify --prefix=/c/MinGW, make install will install into
-   c:\msys\1.0\local\lib and c:\msys\1.0\local\bin.)
-########
+		
+See http://sourceforge.net/projects/expat, where one finds that this is a piece
+of interpreting xml files. This seems irrelevant for Visual, but in order to
+satisfy dependencies I found a copy of libexpat.dll here (copy to mingw/bin):
+http://www.dll-files.com/dllindex/dll-files.shtml?libexpat
+A related issue is we shouldn't need libxml2.dll, either. At some point one
+should figure out where this xml dependency is coming from.
    
 At gnuwin32.sourceforge.net/packages.html get binaries and developer files for
 LibPng (these are binary files, making the previous make instructions unneeded)
@@ -204,7 +196,7 @@ In the MSYS context, /usr means c:\msys\1.0
 Noted on the web is some confusion over the name of libpng, which is sometimes 
 referred to as libpng12 and sometimes as libpng13. To deal with this:
    In c:\MinGW\lib\pkgconfig, copy libpng12.pc -> libpng13.pc
-
+   
 At sourceforge.net/projects/gtkglext you can download zip files 
 containing the source for the following components, which add to gtk2
 a drawingarea widget for displaying OpenGL graphics:
@@ -295,54 +287,41 @@ PYTHON=/c/Python25/python.exe CXXFLAGS="-O2 -march=i686" ./vpyton-core2/configur
 
 cd into the build directory and execute ./conf.bat
 After a successful configure, execute "make".
-The make fails in the final link phase with "cannot find -lpython25", which is odd.
-
-I moved the newer libtool files from mingw to msys. Try again.
-
-*************************************************************
-DEBUGGING
-From a typescript, the following will print all VPYTHON_NOTEs:
-env VPYTHON_DEBUG=1 python test.py
-(This assumes you've executed cd /c/python25 and that test.py as
-well as python.exe is in that directory.)
+After a successful make, and create an installer as discussed next, it works.
 
 *************************************************************
 HOW TO CREATE AN INSTALLER FOR VISUAL FOR MICROSOFT WINDOWS
 You need InnoSetup (www.jrsoftware.org) to create an installer for end users.
+The configure and make produce build/MakeVPython.iss, which you run to create
+an installer. But first you need to set up a directory of dll's.
 
-In addition to mingw10.dll and a couple of Boost dll's, I included the files listed below 
-in the same directory as the main application (a .pyd file for a 3D visualization module 
-for Python, written in C++; see vpython.org). I stripped the files to save a lot of space
-and put the stripped versions in c:\MinGW\stripped. The installer, made with InnoSetup, 
-is 8.5 MB (the non-gtkmm version was 2.5 MB). To strip the files, cd to the stripped
-directory and execute "strip *".
+The following dll's are included in the same directory as the main application
+cvisual.pyd, namely c:\Python25\Lib\site-packages\visual. Also included are
+boost_python-mgw34-mt-1_34_1.dll
+boost_thread-mgw34-mt-1_34_1.dll
+mingw10.dll
+
+In addition, I included the files listed below in this directory. I stripped the files
+to save a lot of space and put the stripped versions in c:\MinGW\stripped. The installer, 
+made with InnoSetup, is 8.5 MB (the non-gtkmm version was 2.5 MB). To strip the files, 
+cd to the stripped directory and execute "strip *", but do NOT strip iconv.dll, 
+libexpat.dll, or libxml2.dll. Visual fails to run if you strip these.
 
 I determined which dll's I needed by repeatedly running the application from a command
 line and one-by-one getting error messages saying I was missing a dll. And then to make
 sure I'd gotten everything, I changed the name of c:\MinGW to c:\xxxMinGW and ran again, 
 to prevent accessing dll's from the developer directories.
 
-This testing gave an error saying that libexpat.dll is needed.
-See http://sourceforge.net/projects/expat, where one finds that this is a piece
-of interpreting xml files. This seems irrelevant for Visual, but in order to
-satisfy the dependencies I found a copy of libexpat.dll here:
-http://www.dll-files.com/dllindex/dll-files.shtml?libexpat
-
-A related issue is we shouldn't need libxml2.dll, either. At some point one
-should figure out where this xml dependency is coming from.
-
-iconv.dll
+freetype6.dll (This was libfreetype-6.dll with an older mingw installation)
+iconv.dll (do not strip this file)
 intl.dll
+jpeg62.dll
 libatk-1.0-0.dll
 libatkmm-1.6-1.dll
 libcairo-2.dll
 libcairomm-1.0-1.dll
-libexpat.dll (See comment above)
+libexpat.dll (See comment above; also, do not strip this file)
 libfontconfig-1.dll
-
-libfreetype-6.dll # with new mingw installation on Vista, there is no such file
- (but there is a file mingw/bin/freetype6.dll which seems to work)
-
 libgdk_pixbuf-2.0-0.dll
 libgdkglext-win32-1.0-0.dll
 libgdkmm-2.4-1.dll
@@ -362,9 +341,10 @@ libpangocairo-1.0-0.dll
 libpangoft2-1.0-0.dll
 libpangomm-1.4-1.dll
 libpangowin32-1.0-0.dll
-libpng12.dll (This is libpng13.dll with the new mingw installation)
+libpng13.dll (This was libpng1.dll with an older mingw installation)
 libsigc-2.0-0.dll
-libxml2.dll (See comment above)
+libtiff3.dll
+libxml2.dll (See comment above; also, do not strip this file)
 zlib1.dll
 
 The creation of the installer for Windows also includes these GTK2-related files:
@@ -373,7 +353,6 @@ C:\MinGW\etc\fonts\*
 C:\MinGW\etc\gtk-2.0\*
 C:\MinGW\etc\pango\*
 C:\MinGW\lib\gtk-2.0\*
-C:\MinGW\lib\pango\*
 
 The only Windows-specific code remaining is a substitute for gettimeofday. I see in 
 surfing the web that lots of people keep reinventing this routine for use on Windows. 
@@ -383,4 +362,12 @@ A colleague is attempting to use the new gtkmm-to-Quartz machinery on the Mac to
 a native Mac version of VPython with a simple installation procedure, because many of 
 our end users find it a difficult hassle installing X11 and Xcode and fink and finally 
 VPython. Hopefully we'll have essentially one set of C++ code that works on all platforms.
+
+*************************************************************
+DEBUGGING
+From a typescript, the following will print all VPYTHON_NOTEs:
+env VPYTHON_DEBUG=1 python test.py
+(This assumes you've executed cd /c/python25 and that test.py as
+well as python.exe is in that directory.)
+
 
