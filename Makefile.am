@@ -9,7 +9,7 @@ SUBDIRS = site-packages/visual src
 # compilevisual.py and MakeVPython.iss are included for building
 # on MSWindows starting from the Linux tarball.
 EXTRA_DIST = include HACKING.txt INSTALL.txt MSWINDOWS.txt \
-	authors.txt license.txt \
+	MAC-OSX.txt authors.txt license.txt \
 	compilevisual.py MakeVPython.iss.in \
 	mkdist_osx.sh NEWS.txt
 dist-hook:
