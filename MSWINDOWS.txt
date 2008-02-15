@@ -1,5 +1,18 @@
 HOW TO BUILD VISUAL ON MICROSOFT WINDOWS
 
+----------
+Reverting back to not using gtk2 with Windows, here are the changed files:
+configure.ac
+src/Makefile.in
+src/win32/winrandom_device.cpp, winrend_surface.cpp, wintext.cpp, wintimer.cpp
+src/core/display_kernel.cpp
+src/core/label.cpp
+src/core/label.cpp
+include/label.hpp
+include/util/timer.hpp
+include/display_kernel.hpp
+----------
+
 If you find gaps in this information, please tell Bruce_Sherwood@ncsu.edu.
 
 Note: In source code, _WIN32 is a flag set by the MinGW compiler,
@@ -175,11 +188,10 @@ pkg-config
 		> pkg-config --cflags sigc++-2.0
 		
 See http://sourceforge.net/projects/expat, where one finds that this is a piece
-of interpreting xml files. This seems irrelevant for Visual, but in order to
-satisfy dependencies I found a copy of libexpat.dll here (copy to mingw/bin):
+of interpreting xml files, apparently part of the glade machinery which reads
+a data file which specifies the layout of the window, including the toolbar.
+I found a copy of libexpat.dll here (copy to mingw/bin):
 http://www.dll-files.com/dllindex/dll-files.shtml?libexpat
-A related issue is we shouldn't need libxml2.dll, either. At some point one
-should figure out where this xml dependency is coming from.
    
 At gnuwin32.sourceforge.net/packages.html get binaries and developer files for
 LibPng (these are binary files, making the previous make instructions unneeded)
