@@ -1,7 +1,7 @@
 HOW TO BUILD VISUAL ON MICROSOFT WINDOWS
 
 ----------
-Reverting back to not using gtk2 with Windows, here are the changed files:
+To revert back to not using gtk2 with Windows, here are the files to change:
 configure.ac
 src/Makefile.in
 src/win32/winrandom_device.cpp, winrend_surface.cpp, wintext.cpp, wintimer.cpp
@@ -11,6 +11,8 @@ src/core/label.cpp
 include/label.hpp
 include/util/timer.hpp
 include/display_kernel.hpp
+I made and tested such files in a separate local project. The right way to do this
+would be to have build flag that determines whether to use gtk2 on Windows or not.
 ----------
 
 If you find gaps in this information, please tell Bruce_Sherwood@ncsu.edu.
