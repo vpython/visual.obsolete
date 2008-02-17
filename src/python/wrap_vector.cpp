@@ -59,6 +59,7 @@ validate_array( const array& arr)
 
 // Numeric doens't support the Sequence protocol, so I have to use this hack
 // instead.
+// 2008/2/16 BAS asks, "What is the situation with numpy?" Should look into this.
 inline int
 length(boost::python::object seq)
 {
@@ -339,7 +340,7 @@ wrap_vector()
 	def( "norm", norm_a);
 
 	// Free functions for vectors
-	py::def( "det3",a_dot_b_cross_c, "The determiant of the mtix of 3 vectors.");
+	py::def( "det3",a_dot_b_cross_c, "The determinant of the matrix of 3 vectors.");
 	py::def( "cross3",a_cross_b_cross_c, "The vector triple product.");
 	py::def( "dot", dot, "The dot product between two vectors.");
 	py::def( "cross", cross, "The cross product between two vectors.");
@@ -351,7 +352,7 @@ wrap_vector()
 	py::def( "diff_angle", diff_angle, "The angle between two vectors, in radians.");
 	py::def( "rotate", rotate_vector, args("angle", "axis"));
 	py::def( "rotate", rotate, args("angle"), "Rotate a vector about an axis vector"
-		" through and angle.");
+		" through an angle.");
 
 
 	//AS added throw()
