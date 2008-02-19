@@ -52,7 +52,8 @@ c:\msys\1.0\etc\fstab.
 
 Back on the main sourceforge page, click on MSYS Supplementary Tools
 in the left column in order to find and download and install the current
-release of the developer's toolkit (currently msysDTK-1.0.1.exe).
+release of the developer's toolkit (currently msysDTK-1.0.1.exe). Scroll 
+down past the "Technology Preview" stuff to the "Current Release" section.
 
 If a folder is (say) C:\installers\msys_stuff, in the MSYS application you type 
 cd /c/installers/msys_stuff. Note that the TAB key will complete an incomplete 
