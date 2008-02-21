@@ -175,6 +175,7 @@ public:
 
 protected:
 	friend class display_kernel;
+	friend class frame;
 	renderable();
 	renderable( const renderable& other);
 	mutex mtx;

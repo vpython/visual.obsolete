@@ -314,6 +314,8 @@ frame::gl_render( const view& v)
 		gl_matrix_stackguard guard( fwt);
 
 		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
+			lock L(i->mtx);
+			
 			if (i->color.opacity != 1.0) {
 				// See display_kernel::draw().
 				trans_children.push_back( *i.base());
@@ -345,7 +347,9 @@ frame::gl_render( const view& v)
 
 		for (trans_child_iterator i = trans_children.begin();
 			i != trans_child_iterator(trans_children.end());
-			++i) {
+			++i) 
+		{
+			lock L(i->mtx);
 			i->refresh_cache( local);
 			rgba actual_color = i->color;
 			if (v.anaglyph) {
@@ -384,6 +388,7 @@ frame::gl_pick_render( const view& scene)
 		// The unique integer to pass to OpenGL.
 		unsigned int name = 0;
 		while (i != i_end) {
+			lock L(i->mtx);
 			glLoadName(name);
 			i->gl_pick_render( scene);
 			++i;
@@ -393,6 +398,7 @@ frame::gl_pick_render( const view& scene)
 		trans_child_iterator j( trans_children.begin());
 		trans_child_iterator j_end( trans_children.end());
 		while (j != j_end) {
+			lock L(j->mtx);
 			glLoadName(name);
 			j->gl_pick_render(scene);
 			++j;
