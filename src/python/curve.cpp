@@ -209,7 +209,7 @@ void
 curve::append_rgba( vector npos, float red, float green, float blue, float opacity)
 {
 	lock L(mtx);
-	if (retain > 0 and count >= retain) {
+	if (retain > 0 && count >= retain) {
 		set_length( retain-1); //move pos and color lists down
 	}
 	set_length( count+1);
@@ -232,7 +232,7 @@ void
 curve::append( vector npos, rgba ncolor)
 {
 	lock L(mtx);
-	if (retain > 0 and count >= retain) {
+	if (retain > 0 && count >= retain) {
 		set_length( retain-1); //move pos and color lists down
 	}
 	set_length( count+1);
@@ -251,7 +251,7 @@ void
 curve::append( vector npos)
 {
 	lock L(mtx);
-	if (retain > 0 and count >= retain) {
+	if (retain > 0 && count >= retain) {
 		set_length( retain-1); //move pos and color lists down
 	}
 	set_length( count+1);
@@ -279,7 +279,7 @@ curve::set_pos( array n_pos)
 			lock L(mtx);
 			set_length( dims[0]);
 			pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-			if (retain > 0 and count >= retain) set_length( retain);
+			if (retain > 0 && count >= retain) set_length( retain);
 			return;
 		}
 	}
@@ -291,14 +291,14 @@ curve::set_pos( array n_pos)
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice(0,2))] = n_pos;
 		pos[make_tuple(slice(1, count+1), 2)] = 0.0;
-		if (retain > 0 and count >= retain) set_length( retain);
+		if (retain > 0 && count >= retain) set_length( retain);
 		return;
 	}
 	else if (dims[1] == 3) {
 		lock L(mtx);
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-		if (retain > 0 and count >= retain) set_length( retain);
+		if (retain > 0 && count >= retain) set_length( retain);
 		return;
 	}
 	else {
@@ -551,7 +551,7 @@ void
 curve::set_retain( int retain)
 {
 	lock L(mtx);
-	if (retain > 0 and count > retain) {
+	if (retain > 0 && count > retain) {
 		set_length( retain); //move pos and color lists down
 	}
 	this->retain = retain;
