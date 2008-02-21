@@ -42,11 +42,11 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\include\win32;..\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;\Boost;\Python25\include;&quot;\libsigc++-2.0.17&quot;;.;$(NOINHERIT)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;BOOST_PYTHON_DYNAMIC_LIB;BOOST_PYTHON_SOURCE;BOOST_AUTO_LINK_NOMANGLE"
+				AdditionalIncludeDirectories="..\include\win32;..\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;..\dependencies\boost_1_34_1;\Python25\include;.;$(NOINHERIT)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;BOOST_PYTHON_STATIC_LIB"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="true"
@@ -74,10 +74,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="python25.lib opengl32.lib glu32.lib sigc-2.0-debug.lib user32.lib advapi32.lib gdi32.lib boost_python_debug.lib"
-				OutputFile="dlls/cvisual_debug.pyd"
+				AdditionalDependencies="python25.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
+				OutputFile="\Python25\lib\site-packages\visual\cvisual.pyd"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="libs;\Python25\libs"
+				AdditionalLibraryDirectories="libs;\Python25\libs;..\dependencies\boost_1_34_1\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="libs/cvisual-debug.pdb"
 				SubSystem="0"
@@ -136,10 +136,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\include\win32;&quot;\libsigc++-2.0.17&quot;;..\include;C:\Boost;\Python25\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;."
-				PreprocessorDefinitions="WIN32;_USRDLL;BOOST_PYTHON_DYNAMIC_LIB;BOOST_PYTHON_SOURCE;MSC;BOOST_AUTO_LINK_NOMANGLE"
+				AdditionalIncludeDirectories="..\include\win32;..\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;..\dependencies\boost_1_34_1;\Python25\include;.;$(NOINHERIT)"
+				PreprocessorDefinitions="WIN32;_USRDLL;MSC;BOOST_PYTHON_STATIC_LIB"
 				StringPooling="true"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				TreatWChar_tAsBuiltInType="true"
 				ForceConformanceInForLoopScope="true"
@@ -166,14 +166,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="python25.lib opengl32.lib glu32.lib boost_python.lib user32.lib advapi32.lib gdi32.lib"
+				AdditionalDependencies="python25.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
 				ShowProgress="0"
-				OutputFile="dlls/cvisual.pyd"
+				OutputFile="\Python25\lib\site-packages\visual\cvisual.pyd"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="libs;\Python25\libs"
-				GenerateDebugInformation="false"
-				ProgramDatabaseFile=""
+				AdditionalLibraryDirectories="libs;\Python25\libs;..\dependencies\boost_1_34_1\lib"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="libs/cvisual-release.pdb"
 				SubSystem="0"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
@@ -238,10 +238,6 @@
 					RelativePath="..\src\win32\wintimer.cpp"
 					>
 				</File>
-				<Filter
-					Name="Resource Files"
-					>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="core"
@@ -446,10 +442,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\BoostDefines.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\include\box.hpp"
 				>
 			</File>
@@ -541,7 +533,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\win32\glext.h"
+					RelativePath="..\include\win32\GL\glext.h"
 					>
 				</File>
 				<File
@@ -550,10 +542,6 @@
 				</File>
 				<File
 					RelativePath="..\include\win32\text.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\include\win32\win_glext.hpp"
 					>
 				</File>
 			</Filter>
