@@ -15,7 +15,11 @@ Building vpython with from Visual Studio C++
         d)Install Visual C++ 2005 Express Edition and platform SDK as per the instructions at
         	http://msdn.microsoft.com/vstudio/express/visualc/download/
         
-	e)Install package (might be optional)
+        e)Unzip Boost
+                Extract the files in vpython-core2/dependencies/boost_1_34_1.zip so that there
+                is a folder vpython-core2/dependencies/boost_1_34_1.
+        
+	f)Install package (might be optional)
                 Delete the /Python25/lib/site-packages/visual folder and replace it with:
                     vpython-core2/site-packages/visual
                     vpython-core2/docs
@@ -24,7 +28,7 @@ Building vpython with from Visual Studio C++
 		(You installed VPython already, but the CVS version might have changes to files other than 
                 cvisual.pyd)
 
-        f)Build cvisual.pyd
+        g)Build cvisual.pyd
              Open the cvisual.sln project file in Visual Studio Express, make Release the active 
              configuration, then on the Build menu choose "Build Solution".
 
