@@ -1,5 +1,3 @@
-This file was used when there was significant Windows-specific code (pre Nov. 2007).
-
 // Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
 // Copyright (c) 2003, 2004 by Jonathan Brandmeyer and others.
 // See the file license.txt for complete license terms.
@@ -12,13 +10,12 @@ This file was used when there was significant Windows-specific code (pre Nov. 20
 // For GET_X_LPARAM, GET_Y_LPARAM
 #include <windowsx.h>
 
-#include <sigc++/sigc++.h>
-
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
 #include <iostream>
 
+#include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 using boost::thread;
 #include <boost/lexical_cast.hpp>
@@ -577,11 +574,11 @@ render_surface::render_surface()
 	// Connect callbacks from the display_kernel to this object.  These will not
 	// be called back from the core until report_realize is called.
 	gl_begin.connect(
-		sigc::mem_fun( *this, &render_surface::on_gl_begin));
+		boost::bind(&render_surface::on_gl_begin, this));
 	gl_end.connect(
-		sigc::mem_fun( *this, &render_surface::on_gl_end));
+		boost::bind(&render_surface::on_gl_end, this));
 	gl_swap_buffers.connect(
-		sigc::mem_fun( *this, &render_surface::on_gl_swap_buffers));
+		boost::bind(&render_surface::on_gl_swap_buffers, this));
 }
 
 void
@@ -810,6 +807,37 @@ render_surface::set_fullscreen( bool fs)
 		fullscreen = fs;
 }
 
+int
+render_surface::get_titlebar_height()
+{
+#if !(defined(_WIN32) || defined(_MSC_VER))
+	return 23;
+#else
+	return 25; // Ubuntu Linux; unknown what situation is on Mac
+#endif
+}
+
+int
+render_surface::get_toolbar_height()
+{
+	return 37;
+}
+
+bool
+render_surface::is_showing_toolbar()
+{
+	return show_toolbar;
+}
+
+void
+render_surface::set_show_toolbar( bool fs)
+{
+	if (active)
+		throw std::runtime_error( 
+			"Cannot change the window's state after initialization.");
+	show_toolbar = fs;
+}
+
 void
 render_surface::add_renderable( shared_ptr<renderable> obj)
 {
@@ -866,7 +894,7 @@ render_surface::get_selected()
 gui_main* gui_main::self = 0;
 mutex* volatile gui_main::init_lock = 0;
 condition* volatile gui_main::init_signal = 0;
-sigc::signal0<void> gui_main::on_shutdown;
+boost::signal<void()> gui_main::on_shutdown;
 
 
 gui_main::gui_main()

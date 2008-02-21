@@ -5,18 +5,12 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
-/* This was relevant when we used Windows-specific window management:
-#if defined(_WIN32)
-#include "win32/display.hpp"
-#else
-#include "gtk2/display.hpp"
-#endif
-*/
-#include "gtk2/display.hpp"
+#include "display.hpp"
 #include "mouseobject.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"
 
+#include <boost/bind.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/overloads.hpp>
@@ -96,7 +90,7 @@ struct lights_to_py_list
 };
 
 // The purpose of this class is to expose the signal-handling methods to Python.
-class py_display_kernel : public display_kernel, public sigc::trackable
+class py_display_kernel : public display_kernel, public boost::signals::trackable
 {
  private:
 	py::object gl_begin_cb;
@@ -145,11 +139,11 @@ class py_display_kernel : public display_kernel, public sigc::trackable
 		: display_kernel()
 	{
 		gl_begin.connect(
-			sigc::mem_fun( *this, &py_display_kernel::on_gl_begin));
+			boost::bind(&py_display_kernel::on_gl_begin, this));
 		gl_end.connect(
-			sigc::mem_fun( *this, &py_display_kernel::on_gl_end));
+			boost::bind(&py_display_kernel::on_gl_end, this));
 		gl_swap_buffers.connect(
-			sigc::mem_fun( *this, &py_display_kernel::on_gl_swap_buffers));
+			boost::bind(&py_display_kernel::on_gl_swap_buffers, this));
 	}
 
 	void set_gl_begin_cb( py::object obj)
@@ -345,7 +339,7 @@ wrap_display_kernel(void)
 	def( "waitclose", wrap_waitclosed,
 		"Blocks until all of the Displays are closed by the user.");
 
-	gui_main::on_shutdown.connect( sigc::ptr_fun( &force_py_exit));
+	gui_main::on_shutdown.connect( &force_py_exit );
 
 	class_<mousebase>( "clickbase", no_init)
 		.def( "project", &mousebase::project2,

@@ -1,5 +1,3 @@
-No longer used (Nov. 2007)
-
 // Copyright (c) 2004 by Jonathan Brandmeyer.
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
@@ -19,6 +17,16 @@ static double inv_tick_count = 0;
 timer::timer()
 	: last_start(0)
 {
+}
+
+double
+timer::elapsed()
+{
+	LARGE_INTEGER count;
+	QueryPerformanceCounter( &count);
+	double delta_time = static_cast<double>(count.QuadPart)*inv_tick_count 
+		- last_start;
+	return delta_time;
 }
 
 void

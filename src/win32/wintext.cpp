@@ -1,5 +1,3 @@
-This file was used when there was significant Windows-specific code (pre Nov. 2007).
-
 #include "win32/text.hpp"
 #include "win32/render_surface.hpp"
 #include "util/errors.hpp"
@@ -7,6 +5,7 @@ This file was used when there was significant Windows-specific code (pre Nov. 20
 #include "wrap_gl.hpp"
 #include "windows.h"
 
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sstream>
 
@@ -59,7 +58,7 @@ font::font( const std::string& desc, int size)
 		VPYTHON_NOTE( "Allocated 255 displaylists, starting with number "
 			+ boost::lexical_cast<std::string>( listbase));
 	}
-	on_gl_free.connect( sigc::mem_fun( *this, &font::gl_free));
+	on_gl_free.connect( boost::bind(&font::gl_free, this));
 	SelectObject( dev_context, font_handle);
 	TEXTMETRIC tm;
 	GetTextMetrics( dev_context, &tm);
