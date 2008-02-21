@@ -1,18 +1,9 @@
 HOW TO BUILD VISUAL ON MICROSOFT WINDOWS
 
-----------
-To revert back to not using gtk2 with Windows, here are the files to change:
-configure.ac
-src/Makefile.in
-src/win32/winrandom_device.cpp, winrend_surface.cpp, wintext.cpp, wintimer.cpp
-src/core/display_kernel.cpp
-src/core/label.cpp
-src/core/label.cpp
-include/label.hpp
-include/util/timer.hpp
-include/display_kernel.hpp
-I made and tested such files in a separate local project. The right way to do this
-would be to have build flag that determines whether to use gtk2 on Windows or not.
+1.  Read the below steps
+2.  Thank your lucky stars you don't have to follow them
+3.  Follow the instructions in VCBuild/VCBuild.txt instead
+
 ----------
 
 If you find gaps in this information, please tell Bruce_Sherwood@ncsu.edu.
@@ -52,8 +43,7 @@ c:\msys\1.0\etc\fstab.
 
 Back on the main sourceforge page, click on MSYS Supplementary Tools
 in the left column in order to find and download and install the current
-release of the developer's toolkit (currently msysDTK-1.0.1.exe). Scroll 
-down past the "Technology Preview" stuff to the "Current Release" section.
+release of the developer's toolkit (currently msysDTK-1.0.1.exe).
 
 If a folder is (say) C:\installers\msys_stuff, in the MSYS application you type 
 cd /c/installers/msys_stuff. Note that the TAB key will complete an incomplete 
