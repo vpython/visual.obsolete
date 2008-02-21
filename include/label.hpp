@@ -7,14 +7,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "renderable.hpp"
-/* The following was relevant when we had Windows-specific text processing:
-#if defined(_WIN32) || defined(_MSC_VER)
-	#include "win32/text.hpp"
-#else
-	#include "gtk2/text.hpp"
-#endif
-*/
-#include "gtk2/text.hpp"
+#include "text.hpp"
 #include <vector>
 
 namespace cvisual {
@@ -52,13 +45,9 @@ class label : public renderable
 
 	void set_opacity( float);
 	double get_opacity();
-
+	
 	void set_text( string_t t);
-#if (defined(_WIN32) || defined(_MSC_VER))
-	std::string get_text();
-#else
 	string_t get_text();
-#endif
 
 	void set_space( double space);
 	double get_space();
@@ -112,6 +101,7 @@ class label : public renderable
 	// Text strings in python may be specified by the """ ... """ syntax in python.
 	// This case is handled by the layout code
 	string_t text;
+
 	bool text_changed;
 	boost::shared_ptr<layout> text_layout;
 

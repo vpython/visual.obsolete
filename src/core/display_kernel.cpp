@@ -8,14 +8,7 @@
 #include "util/tmatrix.hpp"
 #include "util/gl_enable.hpp"
 #include "frame.hpp"
-/* This was relevant when we were using Windows-specific text processing:
-#if defined _WIN32
-#include "win32/text.hpp"
-#else
-#include "gtk2/text.hpp"
-#endif
-*/
-#include "gtk2/text.hpp"
+#include "text.hpp"
 #include "wrap_gl.hpp"
 
 #include <cassert>
@@ -696,6 +689,7 @@ display_kernel::render_scene(void)
 		scene_geometry.lod_adjust = lod_adjust;
 		gl_begin();
 		clear_gl_error();
+
 		glClearColor( background.red, background.green, background.blue, 0);
 		// Control which type of stereo to perform.
 		switch (stereo_mode) {
@@ -819,6 +813,7 @@ display_kernel::render_scene(void)
 			}
 		}
 		if (show_rendertime) {
+			double render_time = render_timer.elapsed()-start_time;
 			std::ostringstream render_msg;
 			render_msg.precision(3);
 			// render time does not include pick time, which may be negligible

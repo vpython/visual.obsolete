@@ -29,7 +29,9 @@ void wrap_rgba();
 void wrap_light(); // Also defined in wrap_rgba.cpp
 void wrap_vector();
 void wrap_arrayobjects();
-void wrap_glib_ustring();
+#if !defined(_WIN32)
+	wrap_glib_ustring();
+#endif
 
 namespace python {
 	void wrap_vector_array();
@@ -101,12 +103,10 @@ BOOST_PYTHON_MODULE( cvisual)
 	wrap_arrayobjects();
 	python::wrap_vector_array();
 	python::wrap_scalar_array();
-/* The following was relevant when we used Windows-specific text processing:
-#if !(defined(_WIN32) || defined(_MSC_VER))
+#if !defined(_WIN32)
 	wrap_glib_ustring();
 #endif
-*/
-	wrap_glib_ustring();
+
 }
 
 } // !namespace cvisual

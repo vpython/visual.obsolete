@@ -175,24 +175,11 @@ label::set_text( string_t t)
 }
 
 
-#if (defined(_WIN32) || defined(_MSC_VER))
-std::string
-label::get_text()
-{
-	// Kludge to get at least basic ascii working on Windows.
-	// The text for "abc" is fffe, 6100, 6200, 6300.
-	std::cout << text.length() << " " << text.bytes() << std::endl;
-	std::cout << text.raw() << std::endl;
-	return text.raw();
-}
-
-#else
 string_t
 label::get_text()
 {
 	return text;
 }
-#endif
 
 void 
 label::set_space( double n_space)

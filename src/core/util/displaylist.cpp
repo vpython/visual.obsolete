@@ -7,7 +7,7 @@
 #include "util/displaylist.hpp"
 #include "util/errors.hpp"
 #include <cassert>
-#include <sigc++/object_slot.h>
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 using boost::lexical_cast;
 
@@ -43,7 +43,7 @@ displaylist::gl_compile_begin()
 		*handle = glGenLists(1);
 		VPYTHON_NOTE( "Allocated displaylist number " 
 			+ lexical_cast<std::string>(*handle));
-		on_gl_free.connect( sigc::mem_fun(*this, &displaylist::gl_free));
+		on_gl_free.connect( boost::bind(&displaylist::gl_free, this));
 	}
 	glNewList( *handle, GL_COMPILE);
 }

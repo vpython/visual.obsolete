@@ -5,7 +5,6 @@
 #include "wrap_gl.hpp"
 #include "util/texture.hpp"
 #include "util/errors.hpp"
-#include <sigc++/object_slot.h>
 #include <boost/lexical_cast.hpp>
 using boost::lexical_cast;
 

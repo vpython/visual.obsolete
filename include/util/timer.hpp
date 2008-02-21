@@ -1,5 +1,3 @@
-No longer used (Nov. 2007)
-
 #ifndef VPYTHON_UTIL_TIMER_HPP
 #define VPYTHON_UTIL_TIMER_HPP
 
@@ -24,6 +22,8 @@ class timer
  public:
 	/** Construct a new timer. */
 	timer();
+	/** Time elapsed since timer was created. */
+	double elapsed();
 	/** Begin timing a single iteration. */
 	void lap_start();
 	/** Complete one iteration. */

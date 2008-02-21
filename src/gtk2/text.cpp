@@ -5,6 +5,7 @@
 #include "util/texture.hpp"
 #include "wrap_gl.hpp"
 
+#include <boost/signals.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_array.hpp>
@@ -25,7 +26,7 @@ namespace cvisual {
 /******************************************************************************/
 // ft2_texture implementation
 
-class ft2_texture : public sigc::trackable, public boost::noncopyable
+class ft2_texture : public boost::signals::trackable, public boost::noncopyable
 {
  private:
 	unsigned int handle;
@@ -46,7 +47,7 @@ ft2_texture::ft2_texture( FT_Bitmap& bitmap)
 	glGenTextures(1, &handle);
 	VPYTHON_NOTE( "Allocated texture number " 
 		+ boost::lexical_cast<std::string>(handle));
-	on_gl_free.connect( sigc::mem_fun( *this, &ft2_texture::gl_free));
+	on_gl_free.connect( boost::bind( &ft2_texture::gl_free, this ) );
 	
 	// TODO: Write an optimized code path that uses GL_TEXTURE_RECTANGLE_ARB
 	glBindTexture( GL_TEXTURE_2D, handle);

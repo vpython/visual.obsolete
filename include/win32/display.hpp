@@ -72,7 +72,7 @@ class gui_main
 	// This signal is invoked when the gui thread exits on shutdown.
 	// wrap_display_kernel() connects a signal handler that forces Python to
 	// exit upon shutdown of the render loop.
-	static sigc::signal0<void> on_shutdown;
+	static boost::signal<void()> on_shutdown;
 };
 
 } // !namespace cvisual

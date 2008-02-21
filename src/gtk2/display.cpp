@@ -803,6 +803,6 @@ gui_main::quit()
 	self->kit.quit();
 }
 
-sigc::signal0<void> gui_main::on_shutdown;
+boost::signal<void()> gui_main::on_shutdown;
 
 } // !namespace cvisual

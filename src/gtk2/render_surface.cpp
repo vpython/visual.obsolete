@@ -108,10 +108,11 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 		| Gdk::BUTTON2_MOTION_MASK
 		| Gdk::BUTTON3_MOTION_MASK);
 	set_size_request( 384, 256);
-	core.gl_begin.connect( sigc::mem_fun( *this, &render_surface::gl_begin));
-	core.gl_end.connect( sigc::mem_fun( *this, &render_surface::gl_end));
-	core.gl_swap_buffers.connect( 
-		sigc::mem_fun( *this, &render_surface::gl_swap_buffers));
+
+	gl_begin.connect(boost::bind(&render_surface::gl_begin, this));
+	gl_end.connect(boost::bind(&render_surface::gl_end, this));
+	gl_swap_buffers.connect(boost::bind(&render_surface::gl_swap_buffers, this));
+
 	set_flags( get_flags() | Gtk::CAN_FOCUS);
 }
 

@@ -6,6 +6,7 @@
 #include "util/gl_enable.hpp"
 #include "util/errors.hpp"
 
+#include <boost/bind.hpp>
 #include <boost/crc.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_array.hpp>
@@ -87,7 +88,7 @@ numeric_texture::gl_init(void)
 	gl_enable tex2D( GL_TEXTURE_2D);
 	if (!handle) {
 		glGenTextures(1, &handle);
-		on_gl_free.connect( sigc::mem_fun(*this, &texture::gl_free));
+		on_gl_free.connect( boost::bind(&texture::gl_free, this) );
 		VPYTHON_NOTE( "Allocated texture number " + boost::lexical_cast<std::string>(handle));
 	}
 	glBindTexture(GL_TEXTURE_2D, handle);

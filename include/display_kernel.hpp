@@ -11,16 +11,15 @@
 #include "util/rgba.hpp"
 #include "util/extent.hpp"
 #include "util/lighting.hpp"
+#include "util/timer.hpp"
 #include "util/thread.hpp"
 
-#include <sigc++/signal.h>
 #include <list>
 #include <vector>
 #include <set>
 #include <string>
 
-#include <glibmm/timer.h>
-
+#include <boost/signals.hpp>
 #include <boost/iterator/indirect_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
 
@@ -46,8 +45,12 @@ class display_kernel
  protected:
 	mutable mutex mtx;
  private:
-	
+
+#if defined(_WIN32) || defined(_MSC_VER)
+	timer render_timer;
+#else
 	Glib::Timer render_timer; // for timing the render pulse
+#endif
 
 	float window_width; ///< The last reported width of the window.
 	float window_height; ///< The last reported height of the window.
@@ -303,7 +306,7 @@ public: // Public Data.
 	// properties setter will not change the mode if the new one is invalid.
 	void set_stereomode( std::string mode);
 	std::string get_stereomode();
-
+	
 	// A list of all objects rendered into this display_kernel.  Modifying it
 	// does not propogate to the owning display_kernel.
 	std::list<shared_ptr<renderable> > get_objects() const;
@@ -311,15 +314,15 @@ public: // Public Data.
 	/** A signal that makes the wrapping widget's rendering context
 		active.  The wrapping object must connect to it.
 	*/
-	sigc::signal0<void> gl_begin;
+	boost::signal<void()> gl_begin;
 	/** A signal that deactivates the wrapping widget's rendering context.
 		The wrapping object must connect to it.
 	*/
-	sigc::signal0<void> gl_end;
+	boost::signal<void()> gl_end;
 	/** A signal that swaps the buffers for its rendering context.  The wrapping
 		object must connect to it.
 	*/
-	sigc::signal0<void> gl_swap_buffers;
+	boost::signal<void()> gl_swap_buffers;
 
 	std::string info( void);
 };

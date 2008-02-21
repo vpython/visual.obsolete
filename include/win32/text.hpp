@@ -2,9 +2,9 @@
 #define VPYTHON_WIN32_TEXT_HPP
 
 #include <boost/shared_ptr.hpp>
+#include <boost/signals.hpp>
 #include <string>
 #include <vector>
-#include <sigc++/object.h>
 #include "util/vector.hpp"
 #include "wrap_gl.hpp"
 
@@ -15,7 +15,7 @@ typedef std::string string_t;
 
 class layout;
 
-class font : public sigc::trackable
+class font : public boost::signals::trackable
 {
  private:
 	float ascent;

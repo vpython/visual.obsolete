@@ -30,7 +30,7 @@ using boost::shared_ptr;
 	well as be immutable.  It is possible that the base class is so abstract as
 	to be non-constructable from Python (simmilar to cvisual.displayobject now).
 */
-class texture : public sigc::trackable
+class texture : public boost::signals::trackable
 {
  private:
 	bool damaged;

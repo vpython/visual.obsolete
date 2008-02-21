@@ -13,7 +13,7 @@ namespace cvisual {
 using boost::shared_ptr;
 
 /** A manager for OpenGL displaylists */
-class displaylist : public sigc::trackable
+class displaylist : public boost::signals::trackable
 {
  private:
 	/// A unique identifier for objects of this type

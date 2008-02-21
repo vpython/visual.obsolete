@@ -8,112 +8,157 @@
 
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
+
 #define _WIN32_IE 0x400
 #include <commctrl.h>
 
 #include "display_kernel.hpp"
+#include "mouseobject.hpp"
+#include "util/thread.hpp"
 #include <map>
 #include <string>
-#include <sigc++/object.h>
+
+extern "C" {
+VOID CALLBACK
+render_surface_timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+
+// A callback function to dispatch normal messages from the system.
+LRESULT CALLBACK
+render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+} // !extern "C"
+
 
 namespace cvisual {
 
 // NOTE: This implementation might require Windows 98 (For the timer callback).
+class font;
 
-class basic_app;
-class bitmap_font;
-
-class render_surface : public sigc::renderable
+class render_surface : public display_kernel
 {
  private:
-	friend class basic_app;
-	friend class bitmap_font;
+	friend class font;
+	friend VOID CALLBACK
+		::render_surface_timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+	friend LRESULT CALLBACK
+		::render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static render_surface* current;
 
- 	float last_mousepos_x;
- 	float last_mousepos_y;
-	
+	// Properties of the main window.
+	float x;
+	float y;
+	bool exit; ///< True when Visual should shutdown on window close.
+	bool visible; ///< True when the user has requested this window to be visible.
+	bool fullscreen; ///< True when the display is in fullscreen mode.
+	bool show_toolbar; ///< True when toolbar is displayed (pan, etc).
+	std::string title;
+
 	// For the benefit of win32::bitmap_font.
 	float window_width;
 	float window_height;
-	
+
  	HWND widget_handle;
  	UINT_PTR timer_handle;
  	HDC dev_context;
  	HGLRC gl_context;
- 	
- 	// A callback function to dispatch normal messages from the system.
-	static LRESULT CALLBACK 
-	dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam,	LPARAM lParam);
-	
+
+ 	HDC saved_dc;
+ 	HGLRC saved_glrc;
+
 	// A callback function to handle the render pulse.
-	static VOID CALLBACK
-	timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
-	
+
 	static void register_win32_class();
 	static WNDCLASS win32_class;
 	static std::map<HWND, render_surface*> widgets;
-	
+
 	// Procedures used to process messages.
-	LRESULT on_create( WPARAM, LPARAM);
 	LRESULT on_showwindow( WPARAM, LPARAM);
 	LRESULT on_mousemove( WPARAM, LPARAM);
-	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_paint( WPARAM, LPARAM);
-	LRESULT on_destroy( WPARAM, LPARAM);
+	LRESULT on_close( WPARAM, LPARAM);
+	LRESULT on_buttondown( WPARAM, LPARAM);
+	LRESULT on_buttonup( WPARAM, LPARAM);
+	LRESULT on_getminmaxinfo( WPARAM, LPARAM);
+	LRESULT on_keyUp( UINT, WPARAM, LPARAM);
+	LRESULT on_keyDown( UINT, WPARAM, LPARAM);
+	LRESULT on_keyChar( UINT, WPARAM, LPARAM);
+	LRESULT on_size( WPARAM, LPARAM);
+	LRESULT on_move( WPARAM, LPARAM);
 	
+	//boolean variables keeping track of Shift, Ctrl and Alt
+	bool Kshift;
+	bool Kalt;
+	bool Kctrl;
+
 	// Callbacks provided to the display_kernel object.
-	void gl_begin();
-	void gl_end();
-	void gl_swap_buffers();
-	
-	void create_window( HWND);
-	
+	void on_gl_begin();
+	void on_gl_end();
+	void on_gl_swap_buffers();
+
+	mousebutton left_button, right_button, middle_button;
+	mouse_t mouse;
+	float last_mousepos_x;
+ 	float last_mousepos_y;
+ 	bool mouselocked;
+
+ 	bool active; ///< True when the display is actually visible
+
+
+	// The interface for reading keyboard presses from this display in Python.
+	atomic_queue<std::string> keys;
+
  public:
 	render_surface();
-	~render_surface();
-	display_kernel core;
+	virtual ~render_surface();
 
-	// Signal fired by button down + button up
-	sigc::signal1<void, shared_ptr<renderable> > object_clicked;
-	static render_surface* current;
-};
+	// Called by the gui_main class below when this window needs to create
+	// or destroy itself.
+	void create();
+	void destroy();
 
-#if 0
-class basic_app
-{
- private:
-	// Handles to various Windows resources
- 	HWND window_handle;
- 	HWND toolbar;
- 	HANDLE tb_image[4];
- 	HIMAGELIST tb_imlist;
- 	int tb_imlist_idx[4];
- 	
-	static LRESULT CALLBACK 
-	dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	
-	static void register_win32_class();
-	static WNDCLASS win32_class;
-	static std::map<HWND, basic_app*> windows;
-	
-	// Message handlers
-	LRESULT on_size( WPARAM, LPARAM);
-	LRESULT on_create( WPARAM, LPARAM);
-	LRESULT on_command( WPARAM, LPARAM);
-	LRESULT on_getminmaxinfo( WPARAM, LPARAM);
-	
-	std::string title;
-	
- public:
-	basic_app( std::string title = std::string("VPython rendering core 2"));
-	~basic_app();
-	render_surface scene;
+	void set_x( float x);
+	float get_x();
+
+	void set_y( float y);
+	float get_y();
+
+	void set_width( float w);
+	float get_width();
+
+	void set_height( float h);
+	float get_height();
+
+	void set_visible( bool v);
+	bool get_visible();
+
+	void set_title( std::string n_title);
+	std::string get_title();
+
+	bool is_fullscreen();
+	void set_fullscreen( bool);
  
-	// Shows the main window and enters the message loop, returning when done.
-	void run();
-};
-#endif
+	bool is_showing_toolbar();
+	void set_show_toolbar( bool);
+	
+	static int get_titlebar_height();
+	static int get_toolbar_height();
 
+	virtual void add_renderable( shared_ptr<renderable>);
+	virtual void add_renderable_screen( shared_ptr<renderable>);
+
+	// Tells the application where it can find its data.  Win32 doesn't
+	// use this information;
+	static void set_dataroot( std::string) {};
+
+	atomic_queue<std::string>* get_kb();
+	mouse_t* get_mouse();
+
+	// The 'selected' display.
+ private:
+	static shared_ptr<render_surface> selected;
+ public:
+	static void set_selected( shared_ptr<render_surface> d);
+	static shared_ptr<render_surface> get_selected();
+};
 } // !namespace cvisual
 
 #endif // !defined VPYTHON_WIN32_RENDER_SURFACE_HPP
