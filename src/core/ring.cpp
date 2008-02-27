@@ -115,7 +115,7 @@ ring::grow_extent( extent& world)
 }
 
 void 
-ring::band_prepare( const view& scene, size_t rings, size_t bands)
+ring::band_prepare( const view& scene, size_t rings, size_t bands, scoped_array<vector> & vertexes, scoped_array<vector>& normals)
 {
 	// Implementation.  In software, I create a pair of arrays for vertex and
 	// normal data, filling them with the coordinates for one band of 
@@ -134,8 +134,8 @@ ring::band_prepare( const view& scene, size_t rings, size_t bands)
 	// interleaved rings, the first (in the xz plane) is stored at the even indexes;
 	// the second (rotated slightly above the first) is stored at the odd indexes.
 	const size_t n_verts = bands*2+2;
-	scoped_array<vector> vertexes( new vector[n_verts]);
-	scoped_array<vector> normals( new vector[n_verts]);
+	vertexes.reset( new vector[n_verts] );
+	normals.reset( new vector[n_verts] );
 	vertexes[0] = vertexes[ bands * 2] = 
 		vector( 0, 0, scaled_radius + scaled_thickness);
 	normals[0] = normals[bands * 2] = vertexes[0].norm();
@@ -181,7 +181,8 @@ ring::gl_draw( const view& scene, size_t rings, size_t bands)
 void 
 ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 {
-	band_prepare( scene, rings, bands);
+	scoped_array<vector> vertexes, normals;
+	band_prepare( scene, rings, bands, vertexes, normals );
 	gl_draw( scene, rings, bands);
 	return;
 }
@@ -189,7 +190,8 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 void
 ring::do_render_translucent( const view& scene, size_t rings, size_t bands)
 {
-	band_prepare( scene, rings, bands);
+	scoped_array<vector> vertexes, normals;
+	band_prepare( scene, rings, bands, vertexes, normals );
 	
 	gl_enable clip0( GL_CLIP_PLANE0);
 	gl_enable cull_face( GL_CULL_FACE);
