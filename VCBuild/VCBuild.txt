@@ -14,7 +14,18 @@ Building vpython with from Visual Studio C++
 
         d)Install Visual C++ 2005 Express Edition and platform SDK as per the instructions at
         	http://msdn.microsoft.com/vstudio/express/visualc/download/
+			
 			Note that you need to go to the bottom of the SDK page to get the 2003 download.
+			
+			Also, it is very important to follow all of the special instructions after
+			installing the platform SDK components. One of the complexities of this is that
+			you must update the executable (bin), include, and lib directory pointer in Visual Studio
+			to point to the SDK directories in Program Files. You go to the Projects and Solutions
+			section in the Options dialog box. It isn't entirely obvious how you are supposed
+			to add these paths: double-click an entry that has "SDK" in its name, and a "..."
+			will show up indicating that you are to use a file menu to browse to the appropriate
+			location in C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2 (\Bin,
+			\Include, \Lib).
         
         e)Unzip Boost
                 Extract the files in vpython-core2/dependencies/boost_1_34_1.zip so that there
