@@ -14,6 +14,12 @@
 #include "util/timer.hpp"
 #include "util/thread.hpp"
 
+#if defined(_WIN32) || defined(_MSC_VER)
+	#include "util/timer.hpp"
+#else
+	#include <glibmm/timer.h>
+#endif
+
 #include <list>
 #include <vector>
 #include <set>

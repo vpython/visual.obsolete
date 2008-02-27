@@ -34,6 +34,7 @@
 #include <cassert>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/bind.hpp>
 
 #if defined(_WIN32) || defined(_MSC_VER)
 	#include <windows.h>
@@ -109,9 +110,9 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 		| Gdk::BUTTON3_MOTION_MASK);
 	set_size_request( 384, 256);
 
-	gl_begin.connect(boost::bind(&render_surface::gl_begin, this));
-	gl_end.connect(boost::bind(&render_surface::gl_end, this));
-	gl_swap_buffers.connect(boost::bind(&render_surface::gl_swap_buffers, this));
+	core.gl_begin.connect(boost::bind(&render_surface::gl_begin, this));
+	core.gl_end.connect(boost::bind(&render_surface::gl_end, this));
+	core.gl_swap_buffers.connect(boost::bind(&render_surface::gl_swap_buffers, this));
 
 	set_flags( get_flags() | Gtk::CAN_FOCUS);
 }

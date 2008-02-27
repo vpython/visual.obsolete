@@ -9,6 +9,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/bind.hpp>
 
 #include <gtkmm/style.h>
 #include <gtkmm/settings.h>

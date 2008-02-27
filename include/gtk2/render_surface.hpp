@@ -60,7 +60,7 @@ class render_surface : public Gtk::GL::DrawingArea
 	virtual bool on_button_release_event( GdkEventButton*);
  
  private:
-	// Functions to be used as callbacks for connections via SigC::slots.
+	// Functions to be used as callbacks for connections via boost::signal slots.
 	void gl_begin();
 	void gl_end();
 	void gl_swap_buffers();
