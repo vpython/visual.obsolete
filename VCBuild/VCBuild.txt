@@ -22,8 +22,8 @@ Building vpython with from Visual Studio C++
 	f)Install package (might be optional)
                 Delete the /Python25/lib/site-packages/visual folder and replace it with:
                     vpython-core2/site-packages/visual
-                    vpython-core2/docs
-                    vpython-core2/examples
+                    vpython-core2/visual/docs
+                    vpython-core2/visual/examples
 
 		(You installed VPython already, but the CVS version might have changes to files other than 
                 cvisual.pyd)
