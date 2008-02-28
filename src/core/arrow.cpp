@@ -191,6 +191,8 @@ arrow::is_fixedwidth()
 void
 arrow::set_length( double l)
 {
+	lock L(mtx);
+	model_damage();
 	axis = axis.norm() * l;
 }
 
