@@ -36,6 +36,7 @@ class numeric_texture : public texture
 	// A texture is data_width x data_height x data_channels
 	size_t data_width;
 	size_t data_height;
+	size_t data_depth;
 	size_t data_channels;
 	NPY_TYPES data_type; // The type of C data in the memory object
 	GLenum data_textype; // The type of GL texture object (GL_ALPHA, GL_RGB, etc)
@@ -44,24 +45,23 @@ class numeric_texture : public texture
 
 	size_t tex_width;
 	size_t tex_height;
+	size_t tex_depth;
 	size_t tex_channels;
 	NPY_TYPES  tex_type;
 	GLenum tex_textype;
 	bool tex_mipmapped;
 	bool tex_antialias;
-	// Types of damage: those that change the array's type and/or dimensions,
-	// and those that change its contents
-	uint32_t checksum;
 
 	bool degenerate() const;
 	bool should_reinitialize() const;
 
  protected:
-	virtual void damage_check(void);
-	virtual void gl_init(void);
+	virtual void gl_init(const struct view&);
 	virtual void gl_transform(void);
 
  public:
+	virtual int enable_type() const;
+ 
 	numeric_texture();
 	virtual ~numeric_texture();
 

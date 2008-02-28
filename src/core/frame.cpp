@@ -322,19 +322,8 @@ frame::gl_render( const view& v)
 				i = children.erase(i.base());
 				continue;
 			}
-			i->refresh_cache(local);
-			rgba actual_color = i->color;
-			if (v.anaglyph) {
-				if (v.coloranaglyph) {
-					i->color = actual_color.desaturate();
-				}
-				else {
-					i->color = actual_color.grayscale();
-				}
-			}
-			i->gl_render( local);
-			if (v.anaglyph)
-				i->color = actual_color;
+			
+			i->outer_render(local);
 		}
 
 		// Perform a depth sort of the transparent children from forward to backward.
@@ -350,19 +339,7 @@ frame::gl_render( const view& v)
 			++i) 
 		{
 			lock L(i->mtx);
-			i->refresh_cache( local);
-			rgba actual_color = i->color;
-			if (v.anaglyph) {
-				if (v.coloranaglyph) {
-					i->color = actual_color.desaturate();
-				}
-				else {
-					i->color = actual_color.grayscale();
-				}
-			}
-			i->gl_render( local);
-			if (v.anaglyph)
-				i->color = actual_color;
+			i->outer_render(local);
 		}
 	}
 	typedef std::multimap<vector, displaylist, z_comparator>::iterator screen_iterator;

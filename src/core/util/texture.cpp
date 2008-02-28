@@ -6,6 +6,7 @@
 #include "util/texture.hpp"
 #include "util/errors.hpp"
 #include <boost/lexical_cast.hpp>
+#include <boost/bind.hpp>
 using boost::lexical_cast;
 
 namespace cvisual {
@@ -17,7 +18,7 @@ texture::texture()
 
 texture::~texture()
 {
-	gl_free();
+	if (handle) on_gl_free.free( boost::bind( &gl_free, handle ) );
 }
 
 #if 0
@@ -27,22 +28,25 @@ texture::operator bool() const
 }
 #endif
 
+int
+texture::enable_type() const {
+	 return GL_TEXTURE_2D;
+}
+
 void
-texture::gl_activate()
+texture::gl_activate(const view& v)
 {
 	lock L(mtx);
 	damage_check();
-	if (!handle || damaged) {
-		gl_init();
+	if (damaged) {
+		gl_init(v);
 		damaged = false;
-		// Verify gl_init()'s postcondition.
-		assert(handle != 0);
 	}
-	// Verify execution flowpath
-	assert( handle != 0);
+	if (!handle) return;
 	
-	glBindTexture( GL_TEXTURE_2D, handle);
+	glBindTexture( enable_type(), handle );
 	this->gl_transform();
+	check_gl_error();
 }
 
 bool
@@ -52,14 +56,11 @@ texture::has_opacity() const
 }
 
 void
-texture::gl_free()
+texture::gl_free(unsigned handle)
 {
-	if (handle) {
-		VPYTHON_NOTE( "Deleting texture number " 
-			+ lexical_cast<std::string>(handle));
-		glDeleteTextures(1, &handle);
-		handle = 0;
-	}
+	VPYTHON_NOTE( "Deleting texture number " 
+		+ lexical_cast<std::string>(handle));
+	glDeleteTextures(1, &handle);
 }
 
 void

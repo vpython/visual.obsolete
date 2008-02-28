@@ -57,6 +57,9 @@ class sphere : public axial
 	 * zero radius, or visible is false.  (overridden by the ellipsoid class). 
 	 */
 	virtual bool degenerate();
+	
+	virtual void get_material_matrix( const view&, tmatrix& out );
+	
 	PRIMITIVE_TYPEINFO_DECL;
 };
 

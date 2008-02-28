@@ -11,6 +11,7 @@
 #include "util/thread.hpp"
 #include "util/displaylist.hpp"
 #include "util/texture.hpp"
+#include "util/gl_extensions.hpp"
 #include <boost/shared_ptr.hpp>
 
 #include <map>
@@ -97,10 +98,15 @@ struct view
 	double tan_hfov_x; ///< The tangent of half the horzontal field of view.
 	double tan_hfov_y; ///< The tangent of half the vertical field of view.
 	
+	gl_extensions& glext;
+	
+	tmatrix camera_world;
+	
 	view( const vector& n_forward, vector& n_center, float& n_width, 
 		float& n_height, bool n_forward_changed, 
 		double& n_gcf, vector& n_gcfvec,
-		bool n_gcf_changed);
+		bool n_gcf_changed,
+		gl_extensions& glext);
 	
     /** Create a new view object in the coordinate system of a (sub-)frame.
      * @param other  The view of the parent coordinate system.
@@ -138,11 +144,12 @@ public:
 	/** Default base constructor.  Creates a white, model_damaged object. */
 	virtual ~renderable();
 	
-	/** Called by the render cycle when drawing to the screen.  The default
-	 * is to do nothing.
-	 */
-	virtual void gl_render(const view&);
+	/** Applies materials and other general features and calls gl_render(). 
+	 * For now, also calls refresh_cache(), but that might be moved back in
+	 * order to make that function compute center. */
+	virtual void outer_render(const view&);
 	
+
 	/** Called when rendering for mouse hit testing.  Since the result is not
 	 *  visible, subclasses should not perform texture mapping or blending,
 	 * and should use the lowest-quality level of detail that covers the
@@ -170,8 +177,14 @@ public:
 	void set_shininess( float);
 	float get_shininess();
 	
+	// xxx get rid of this:
 	void set_texture( shared_ptr<texture> t);
 	shared_ptr<texture> get_texture();
+	
+	void set_material( shared_ptr<class material> m );
+	shared_ptr<class material> get_material();
+	
+	virtual void get_material_matrix( const view&, tmatrix& out ) {};  // object coordinates -> material coordinates
 
 protected:
 	friend class display_kernel;
@@ -179,9 +192,16 @@ protected:
 	renderable();
 	renderable( const renderable& other);
 	mutex mtx;
+
+	shared_ptr<class material> mat;
 	
 	// Some objects may be textured.
-	shared_ptr<texture> tex;
+	shared_ptr<texture> tex;  // xxx get rid of this
+
+	/** Called by outer_render when drawing to the screen.  The default
+	 * is to do nothing.
+	 */
+	virtual void gl_render(const view&);
 	
 	/** If a subclass changes a property that affects its cached state, it must
 		call this function to ensure that its cache is updated on the next render

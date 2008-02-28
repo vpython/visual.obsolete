@@ -1006,4 +1006,30 @@ curve::gl_render( const view& scene)
 
 }
 
+void 
+curve::get_material_matrix( const view& v, tmatrix& out ) {
+	if (degenerate()) return;
+	
+	// xxx note this code is identical to faces::get_material_matrix, except for considering radius
+	
+	// xxx Add some caching for extent with grow_extent etc; once locking changes so we can trust the primitive not to change during rendering
+	vector min_extent, max_extent;
+	double* pos_i = index( pos, 0);
+	double* pos_end = index( pos, count );
+	min_extent = max_extent = vector( pos_i ); pos_i += 3;
+	while (pos_i < pos_end)
+		for(int j=0; j<3; j++) {
+			if (*pos_i < min_extent[j]) min_extent[j] = *pos_i;
+			else if (*pos_i > max_extent[j]) max_extent[j] = *pos_i;
+			pos_i++;
+		}
+		
+	min_extent -= vector(radius,radius,radius);
+	max_extent += vector(radius,radius,radius);
+	
+	out.translate( vector(.5,.5,.5) );
+	out.scale( vector(1,1,1) * (.999 / (v.gcf * std::max(max_extent.x-min_extent.x, std::max(max_extent.y-min_extent.y, max_extent.z-min_extent.z)))) );
+	out.translate( -.5 * v.gcf * (min_extent + max_extent) );
+}
+
 } } // !namespace cvisual::python

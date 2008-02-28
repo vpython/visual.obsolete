@@ -4,18 +4,19 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "renderable.hpp"
+#include "material.hpp"
 
 namespace cvisual {
 
 view::view( const vector& n_forward, vector& n_center, float& n_width,
 	float& n_height, bool n_forward_changed,
 	double& n_gcf, vector& n_gcfvec,
-	bool n_gcf_changed)
+	bool n_gcf_changed, gl_extensions& glext)
 	: forward( n_forward), center(n_center), window_width( n_width),
 	window_height( n_height), forward_changed( n_forward_changed),
 	gcf( n_gcf), gcfvec( n_gcfvec), gcf_changed( n_gcf_changed), lod_adjust(0),
 	anaglyph(false), coloranaglyph(false), tan_hfov_x(0), tan_hfov_y(0),
-	screen_objects( z_comparator( forward))
+	screen_objects( z_comparator( forward)), glext(glext)
 {
 }
 
@@ -38,7 +39,8 @@ view::view( const view& other, const tmatrix& wft)
 	// frustum in a different way entirely.
 	tan_hfov_x( other.tan_hfov_x),
 	tan_hfov_y( other.tan_hfov_y),
-	screen_objects( z_comparator( forward))
+	screen_objects( z_comparator( forward)),
+	glext(other.glext)
 {
 }
 
@@ -73,6 +75,28 @@ renderable::renderable( const renderable& other)
 
 renderable::~renderable()
 {
+}
+
+void 
+renderable::outer_render( const view& v ) 
+{
+	refresh_cache( v );
+	
+	rgba actual_color = color;
+	if (v.anaglyph) {
+		if (v.coloranaglyph)
+			color = actual_color.desaturate();
+		else
+			color = actual_color.grayscale();
+	}
+
+	tmatrix material_matrix;
+	get_material_matrix(v, material_matrix);
+	apply_material mat( v, mat.get(), material_matrix );
+	gl_render(v);
+
+	if (v.anaglyph)
+		color = actual_color;
 }
 
 void
@@ -164,10 +188,23 @@ renderable::get_texture()
 	return tex;
 }
 
+void 
+renderable::set_material( shared_ptr<class material> m )
+{
+	lock L(mtx);
+	model_damage();
+	mat = m;
+}
+
+shared_ptr<class material> 
+renderable::get_material() {
+	return mat;
+}
+
 bool
 renderable::shiny( void)
 {
-	return shininess != 0.0;
+	return !mat && shininess != 0.0;
 }
 
 void

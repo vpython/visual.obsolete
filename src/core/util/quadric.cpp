@@ -86,11 +86,17 @@ quadric::render_sphere( double radius, int slices, int stacks)
 	// GLU orients the quadrics along the +z axis.  Since VPython's default
 	// orientation places up along the y-axis, I am applying a simple rotation
 	// transform to make this happen.
-	gl_matrix_stackguard guard;
+	
+	// xxx commenting this out to test new 3D materials... it could be compensated for
+	//     in sphere::get_material_matrix(), but sometimes sphere uses icososphere for rendering,
+	//     and I don't want to deal with this now.
+	
+	/*gl_matrix_stackguard guard;
 	// Start texture coordinate generation at +x vice +z.
 	glRotatef( 90, 0, 1, 0);
 	// Point the pole along +y
-	glRotatef( 90, -1, 0, 0);
+	glRotatef( 90, -1, 0, 0);*/
+	
 	gluSphere( q, radius, slices, stacks);
 }
 

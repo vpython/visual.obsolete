@@ -264,7 +264,17 @@ arrow::grow_extent( extent& world)
 	world.add_body();
 }
 
-void 
+void
+arrow::get_material_matrix(const view& v, tmatrix& out)
+{
+	double hl, hw, len, sw;
+	effective_geometry( hw, sw, len, hl, v.gcf);
+
+	out.translate( vector(0,.5,.5) );
+	out.scale( vector(1,1,1) * (1 / std::max( axis.mag()*v.gcf, hw )) );
+}
+
+void
 arrow::update_z_sort( const view& scene)
 {
 	if (!sorted_model) {

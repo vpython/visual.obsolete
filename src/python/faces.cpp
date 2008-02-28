@@ -433,11 +433,6 @@ faces::gl_render( const view& scene)
 	std::vector<vector> spos;
 	std::vector<rgba> tcolor;
 	
-	// The following lock was introduced 2007/4/10 by Mikhail Temkhine 
-	// to address a problem with heightfield on Windows. 
-	// But it blocks forever on Linux, so commented out by Bruce Sherwood 2007/7/5
-	// lock L(mtx); 
-
 	gl_enable_client vertexes( GL_VERTEX_ARRAY);
 	gl_enable_client normals( GL_NORMAL_ARRAY);
 	gl_enable_client colors( GL_COLOR_ARRAY);
@@ -491,7 +486,7 @@ faces::get_center() const
 {
 	vector ret;
 	double* pos_i = index( pos, 0);
-	double* pos_end = index( pos, count);
+	double* pos_end = index( pos, count - count%3);
 	while (pos_i < pos_end) {
 		ret += vector(pos_i);
 		pos_i += 3; // 3 doubles per vector point
@@ -505,12 +500,33 @@ void
 faces::grow_extent( extent& world)
 {
 	double* pos_i = index( pos, 0);
-	double* pos_end = index( pos, count);
+	double* pos_end = index( pos, count - count%3);
 	while (pos_i < pos_end) {
 		world.add_point( vector(pos_i));
 		pos_i += 3; // 3 doubles per vector point
 	}
 	world.add_body();
+}
+
+void 
+faces::get_material_matrix( const view& v, tmatrix& out ) {
+	if (degenerate()) return;
+	
+	// xxx Add some caching for extent with grow_extent etc; once locking changes so we can trust the primitive not to change during rendering
+	vector min_extent, max_extent;
+	double* pos_i = index( pos, 0);
+	double* pos_end = index( pos, count - count%3);
+	min_extent = max_extent = vector( pos_i ); pos_i += 3;
+	while (pos_i < pos_end)
+		for(int j=0; j<3; j++) {
+			if (*pos_i < min_extent[j]) min_extent[j] = *pos_i;
+			else if (*pos_i > max_extent[j]) max_extent[j] = *pos_i;
+			pos_i++;
+		}
+	
+	out.translate( vector(.5,.5,.5) );
+	out.scale( vector(1,1,1) * (.999 / (v.gcf * std::max(max_extent.x-min_extent.x, std::max(max_extent.y-min_extent.y, max_extent.z-min_extent.z)))) );
+	out.translate( -.5 * v.gcf * (min_extent + max_extent) );
 }
 
 } } // !namespace cvisual::python

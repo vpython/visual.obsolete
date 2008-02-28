@@ -1,5 +1,5 @@
 #include "win32/text.hpp"
-#include "win32/render_surface.hpp"
+#include "win32/display.hpp"
 #include "util/errors.hpp"
 #include "util/gl_free.hpp"
 #include "wrap_gl.hpp"
@@ -26,7 +26,7 @@ font::font( const std::string& desc, int size)
 	: ascent(0), font_handle(0), listbase(0)
 {
 	size = 12;
-	HDC dev_context = render_surface::current->dev_context;
+	HDC dev_context = display::current->dev_context;
 	if (desc == std::string() && size < 0) {
 		VPYTHON_NOTE( "Allocating default system font");
 		font_handle = (HFONT)GetStockObject( SYSTEM_FONT);
@@ -90,7 +90,7 @@ font::lay_out( const std::string& new_text )
 	for (layout::text_iter i = text.begin(); i != text.end(); ++i) {
 		SIZE size;
 		GetTextExtentPoint32(
-			render_surface::current->dev_context, 
+			display::current->dev_context, 
 			i->c_str(), i->size(), &size);
 		total_height += std::min( (float)size.cy, height);
 		maxwidth = std::max( (float)size.cx, maxwidth);

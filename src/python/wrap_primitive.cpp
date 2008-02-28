@@ -5,6 +5,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "primitive.hpp"
+#include "material.hpp"
 #include "arrow.hpp"
 #include "sphere.hpp"
 #include "cylinder.hpp"
@@ -67,6 +68,56 @@ py_rotate( tuple args, dict kwargs)
     return object();
 }
 
+struct textures_to_list
+{
+	static PyObject* convert(std::vector<shared_ptr<texture> > const& a)
+	{
+		using namespace boost::python;
+		list result;
+		
+		for(int i=0; i<a.size(); i++)
+			result.append( a[i] );
+		
+		return incref(result.ptr()); 
+	}
+};
+
+// This is a "custom lvalue converter". See also: Boost.Python FAQ
+struct textures_from_list
+{
+	typedef std::vector<shared_ptr<texture> > V;
+
+	textures_from_list()
+	{
+	  boost::python::converter::registry::push_back(
+		&convertible,
+		&construct,
+		boost::python::type_id< V >());
+	}
+
+	static void* convertible(PyObject* obj_ptr)
+	{
+	  using namespace boost::python;
+	  return obj_ptr; // if the input object is convertible
+	}
+
+	static void construct(
+	  PyObject* obj_ptr,
+	  boost::python::converter::rvalue_from_python_stage1_data* data)
+	{
+		using namespace boost::python;
+		void* storage = ((converter::rvalue_from_python_storage<V>*)data)->storage.bytes;
+		new (storage) V();
+		data->convertible = storage;
+		V& result = *((V*)storage);
+
+		list l = extract< list >( obj_ptr );
+		result.resize( len(l) );
+		for(int i=0; i< result.size(); i++)
+			result[i] = extract< shared_ptr<texture> >( l[i] );
+	}
+};
+
 void
 wrap_primitive()
 {
@@ -74,6 +125,7 @@ wrap_primitive()
 		.add_property( "shininess", &renderable::get_shininess, &renderable::set_shininess)
 		.add_property( "lit", &renderable::is_lit, &renderable::set_lit)
 		.add_property( "texture", &renderable::get_texture, &renderable::set_texture)
+		.add_property( "material", &renderable::get_material, &renderable::set_material)
 		;
 
 	class_<primitive, bases<renderable>, noncopyable>( 
@@ -215,6 +267,14 @@ wrap_primitive()
 		.add_property( "type", &numeric_texture::get_type, &numeric_texture::set_type)
 		.add_property( "mipmap", &numeric_texture::is_mipmapped, &numeric_texture::set_mipmapped)
 		.add_property( "antialias", &numeric_texture::is_antialiased, &numeric_texture::set_antialias);
+		;
+
+	boost::python::to_python_converter< std::vector< shared_ptr<texture> >, textures_to_list>();
+	textures_from_list();
+	class_<material, shared_ptr<material>, noncopyable>( "material" )
+		.add_property( "textures", &material::get_textures, &material::set_textures )
+		.add_property( "shader", &material::get_shader, &material::set_shader )
+		.add_property( "shininess", &material::get_shininess, &material::set_shininess )
 		;
 }	
 	

@@ -4,9 +4,11 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
+#include "display.hpp"
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
 #include "util/gl_enable.hpp"
+#include "material.hpp"
 #include "frame.hpp"
 #include "text.hpp"
 #include "wrap_gl.hpp"
@@ -22,10 +24,7 @@
 
 namespace cvisual {
 
-shared_ptr<std::set<std::string> > display_kernel::extensions;
-std::string display_kernel::vendor;
-std::string display_kernel::version;
-std::string display_kernel::renderer;
+static const display_kernel::EXTENSION_FUNCTION notImplemented = (display_kernel::EXTENSION_FUNCTION)-1;
 
 void
 display_kernel::enable_lights()
@@ -158,7 +157,8 @@ display_kernel::display_kernel()
 	zoom_allowed(true),
 	mouse_mode( ZOOM_ROTATE),
 	stereo_mode( NO_STEREO),
-	lod_adjust(0)
+	lod_adjust(0),
+	realized(false)
 {
 }
 
@@ -296,6 +296,11 @@ display_kernel::report_realize()
 		vendor = std::string((const char*)glGetString(GL_VENDOR));
 		version = std::string((const char*)glGetString(GL_VERSION));
 		renderer = std::string((const char*)glGetString(GL_RENDERER));
+		
+		// The test is a hack so that subclasses not bothering to implement getProcAddress just
+		//   don't get any extensions.
+		if (static_cast<display*>(this)->getProcAddress("display_kernel::getProcAddress") != notImplemented)
+			glext.init( *static_cast<display*>( this ) );
 	}
 
 	// Those features of OpenGL that are always used are set up here.
@@ -320,7 +325,7 @@ display_kernel::report_realize()
 	glAlphaFunc( GL_GREATER, 0.0);
 
 	// FSAA.  Doesn't seem to have much of an effect on my TNT2 card.  Grrr.
-	if (extensions->find( "GL_ARB_multisample") != extensions->end()) {
+	if ( hasExtension( "GL_ARB_multisample" ) ) {
 		glEnable( GL_MULTISAMPLE_ARB);
 		int n_samples, n_buffers;
 		glGetIntegerv( GL_SAMPLES_ARB, &n_samples);
@@ -332,6 +337,8 @@ display_kernel::report_realize()
 
 	check_gl_error();
 	gl_end();
+	
+	realized = true;
 }
 
 // Set up matricies for transforms from world coordinates to view coordinates
@@ -467,6 +474,10 @@ display_kernel::world_to_view_transform(
 		scene_camera.x, scene_camera.y, scene_camera.z,
 		scene_center.x, scene_center.y, scene_center.z,
 		scene_up.x, scene_up.y, scene_up.z);
+		
+	tmatrix world_camera; world_camera.gl_modelview_get();
+	inverse( geometry.camera_world, world_camera );
+	
 	//vector scene_range = range * gcf;
 	//glScaled( 1.0/scene_range.x, 1.0/scene_range.y, 1.0/scene_range.z);
 
@@ -592,6 +603,8 @@ bool
 display_kernel::draw(
 	view& scene_geometry, int whicheye, bool anaglyph, bool coloranaglyph)
 {
+	use_shader_program using_global_shader( scene_geometry, global_shader.get() );
+
 	// Set up the base modelview and projection matricies
 	world_to_view_transform( scene_geometry, whicheye);
 
@@ -611,19 +624,8 @@ display_kernel::draw(
 			i = layer_world.erase(i.base());
 			continue;
 		}
-		i->refresh_cache( scene_geometry);
-		rgba actual_color = i->color;
-		if (anaglyph) {
-			if (coloranaglyph) {
-				i->color = actual_color.desaturate();
-			}
-			else {
-				i->color = actual_color.grayscale();
-			}
-		}
-		i->gl_render( scene_geometry);
-		if (anaglyph)
-			i->color = actual_color;
+		
+		i->outer_render( scene_geometry);
 		++i;
 	}
 
@@ -638,22 +640,10 @@ display_kernel::draw(
 	world_trans_iterator j_end( layer_world_transparent.end());
 	while (j != j_end) {
 		lock L(j->mtx);
-		j->refresh_cache( scene_geometry);
-		rgba actual_color = j->color;
-		if (anaglyph) {
-			if (coloranaglyph) {
-				j->color = actual_color.desaturate();
-			}
-			else {
-				j->color = actual_color.grayscale();
-			}
-		}
-		j->gl_render( scene_geometry);
-		if (anaglyph)
-			j->color = actual_color;
+		j->outer_render( scene_geometry );
 		++j;
 	}
-
+	
 	// Render all objects in screen space.
 	disable_lights();
 	gl_disable depth_test( GL_DEPTH_TEST);
@@ -676,6 +666,8 @@ bool
 display_kernel::render_scene(void)
 {
 	lock L(mtx);
+	if (!realized) 
+		return false;  // xxx This "fixes" problems with GL not being set up correctly on the first frame, but may be covering over a bug in win32 display - why can render_scene() get called before report_realize()?
 	double start_time, cycle;
 	if (show_rendertime) {
 		start_time = render_timer.elapsed();
@@ -685,10 +677,12 @@ display_kernel::render_scene(void)
 	try {
 		recalc_extent();
 		view scene_geometry( forward.norm(), center, window_width,
-			window_height, forward_changed, gcf, gcfvec, gcf_changed);
+			window_height, forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
 		gl_begin();
 		clear_gl_error();
+		
+		on_gl_free.frame();
 
 		glClearColor( background.red, background.green, background.blue, 0);
 		// Control which type of stereo to perform.
@@ -813,12 +807,20 @@ display_kernel::render_scene(void)
 			}
 		}
 		if (show_rendertime) {
-			double render_time = render_timer.elapsed()-start_time;
+			double render_time = render_timer.elapsed()-start_time, flush_time = -1;
+			
+			#if 1 // xxx Only for performance measurement; disable in shipping code
+			glFinish();
+			
+			flush_time = render_timer.elapsed() - start_time - render_time;
+			#endif
+			
 			std::ostringstream render_msg;
 			render_msg.precision(3);
 			// render time does not include pick time, which may be negligible
 			render_msg << "cycle: " << int(1000*cycle) << 
 			   " render: " << int(1000*(render_time));
+			if (flush_time>=0) render_msg << " flush: " << int(1000*flush_time);
 			glColor3f(
 				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
 
@@ -917,7 +919,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 		glLoadIdentity();
 		gluPickMatrix( x, window_height - y, d_pixels, d_pixels, viewport_bounds);
 		view scene_geometry( forward.norm(), center, window_width, window_height,
-			forward_changed, gcf, gcfvec, gcf_changed);
+			forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
 		world_to_view_transform( scene_geometry, 0, true);
 
@@ -1027,7 +1029,7 @@ display_kernel::gl_free()
 	gl_begin();
 	try {
 		clear_gl_error();
-		on_gl_free();
+		on_gl_free.shutdown();
 		check_gl_error();
 	}
 	catch (gl_error& error) {
@@ -1352,5 +1354,33 @@ display_kernel::info()
 	}
 }
 
+void 
+display_kernel::set_shader( std::string source ) {
+	lock L(mtx);
+	if (source.size())
+		global_shader.reset( new shader_program( source ) );
+	else
+		global_shader.reset( NULL );
+}
+
+std::string 
+display_kernel::get_shader() {
+	lock L(mtx);
+	if ( global_shader ) 
+		return global_shader->get_source();
+	else 
+		return std::string();
+}
+
+bool
+display_kernel::hasExtension( const std::string& ext ) {
+	return extensions->find( ext ) != extensions->end();
+}
+
+display_kernel::EXTENSION_FUNCTION
+display_kernel::getProcAddress( const char* x ) {
+	if ( !strcmp(x, "display_kernel::getProcAddress" ) ) return notImplemented;
+	return NULL;
+}
 
 } // !namespace cvisual

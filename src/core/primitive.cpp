@@ -22,6 +22,9 @@ primitive::model_world_transform() const
 {
 	// Performs a scale, reorientation, and translation transform in that order.
 	// ret = translation o reorientation o scale
+	// xxx Actually that is a lie.  This is only doing the rotation!  In light of its name, and the
+	//   fact that it isn't an inverse of world_model_transform(), I'm slightly disturbed.  --ds
+	
 	tmatrix ret;
 	// A unit vector along the z_axis.
 	vector z_axis = vector(0,0,1);
@@ -53,6 +56,7 @@ primitive::world_model_transform() const
 {
 	// this performs the inverse of the model_world_transform - 
 	// translate backwards, reorinetation, and inverse scale.
+	// xxx Except for the inverse scale part?
 	// ret = reorient^T o translate_backwards.
 	
 	tmatrix ret;

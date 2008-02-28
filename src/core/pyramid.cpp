@@ -181,4 +181,12 @@ pyramid::get_center() const
 	return pos + axis * 0.33333333333333;
 }
 
+void 
+pyramid::get_material_matrix( const view&, tmatrix& out )
+{
+	out.translate( vector(0,.5,.5) );
+	vector scale( axis.mag(), height, width );
+	out.scale( scale * (1.0 / std::max(scale.x, std::max(scale.y, scale.z))) );
+}
+
 } // !namespace cvisual

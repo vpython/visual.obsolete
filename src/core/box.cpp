@@ -176,13 +176,16 @@ box::gl_render( const view& scene)
 		// coverage is number of pixels corresponding to size of box
 		double coverage = scene.pixel_coverage( pos, 500*size);
 		int lod = 0;
-		if (coverage < 0) lod = 5;
-		else if (coverage < 10) lod = 0;
-		else if (coverage < 25) lod = 1;
-		else if (coverage < 100) lod = 2;
-		else if (coverage < 200) lod = 3;
-		else if (coverage < 600) lod = 4;
-		else lod = 5;
+		if (!mat && shininess) {
+			// "Level of detail" for boxes is needed for specular vertex lighitng
+			if (coverage < 0) lod = 5;
+			else if (coverage < 10) lod = 0;
+			else if (coverage < 25) lod = 1;
+			else if (coverage < 100) lod = 2;
+			else if (coverage < 200) lod = 3;
+			else if (coverage < 600) lod = 4;
+			else lod = 5;
+		}
 		
 		if (tex && (color.opacity < 1.0 || tex->has_opacity())) {
 			// Render the textured and transparent box.
@@ -203,9 +206,9 @@ box::gl_render( const view& scene)
 			else if (lod == 4) textured_model_4.sort( model_forward);
 			else if (lod == 5) textured_model_5.sort( model_forward);
 			gl_enable blend( GL_BLEND);
-			gl_enable tex2d( GL_TEXTURE_2D);
+			gl_enable tex2D( tex->enable_type() );
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			tex->gl_activate();
+			tex->gl_activate(scene);
 			
 			glBegin( GL_QUADS);
 			if (lod == 0) textured_model_0.gl_render();
@@ -218,8 +221,8 @@ box::gl_render( const view& scene)
 		}
 		else if (tex) {
 			// Render the textured box
-			gl_enable tex2D( GL_TEXTURE_2D);
-			tex->gl_activate();
+			gl_enable tex2D( tex->enable_type() );
+			tex->gl_activate(scene);
 			lod_textured_cache[lod].gl_render();
 		}
 		else if (color.opacity < 1.0) {
@@ -370,6 +373,12 @@ box::calc_textured_model(tquad *faces, int level)
 	}
 }
 
+void
+box::get_material_matrix(const view&, tmatrix& out) { 
+	out.translate( vector(.5,.5,.5) );
+	vector scale( axis.mag(), height, width );
+	out.scale( scale * (1.0 / std::max(scale.x, std::max(scale.y, scale.z))) );
+}
 
 PRIMITIVE_TYPEINFO_IMPL(box)
 

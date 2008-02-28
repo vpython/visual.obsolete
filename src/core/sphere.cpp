@@ -67,8 +67,8 @@ sphere::gl_render( const view& geometry)
 	double coverage = geometry.pixel_coverage( pos, radius);
 	int lod = 0;
 	
-	if (shiny()) {
-		if (coverage < 0) // Behind the camera, but still visible.
+	if (shiny() && !mat) {
+		if (coverage < 0) // Behind the camera, but still visible. xxx Who says visible?
 			lod = 5;
 		else if (coverage < 25)
 			lod = 0;
@@ -85,15 +85,17 @@ sphere::gl_render( const view& geometry)
 	}
 	else {
 		if (coverage < 0) // Behind the camera, but still visible.
-			lod = 3;
+			lod = 4;
 		else if (coverage < 30)
 			lod = 0;
 		else if (coverage < 100)
 			lod = 1;
-		else if (coverage < 300)
+		else if (coverage < 500)
 			lod = 2;
-		else
+		else if (coverage < 5000)
 			lod = 3;
+		else
+			lod = 4;
 	}
 	lod += geometry.lod_adjust; // allow user to reduce level of detail
 	if (lod > 5)
@@ -120,7 +122,7 @@ sphere::gl_render( const view& geometry)
 		// Setup for blending
 		gl_enable blend( GL_BLEND);
 		gl_enable cull_face( GL_CULL_FACE);
-		gl_enable tex2D( GL_TEXTURE_2D);
+		gl_enable tex2D( tex->enable_type() );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Set up the texturing
@@ -128,7 +130,7 @@ sphere::gl_render( const view& geometry)
 		// bring my poor system to a screaming halt.  It still looks good at
 		// this level of subdivision.
 		size_t tex_lod = std::max(lod, 4);
-		tex->gl_activate();
+		tex->gl_activate(geometry);
 
 		// Render the back half.
 		glCullFace( GL_FRONT);
@@ -163,8 +165,8 @@ sphere::gl_render( const view& geometry)
 		size_t tex_lod = lod;
 
 		// Set up the texturing
-		gl_enable tex2D( GL_TEXTURE_2D);
-		tex->gl_activate();
+		gl_enable tex2D( tex->enable_type() );
+		tex->gl_activate(geometry);
 
 		// Render the object, using culling of the backface if the camera is not
 		// within the space of the body.
@@ -264,6 +266,14 @@ sphere::degenerate()
 {
 	return !visible || radius == 0.0;
 }
+
+void
+sphere::get_material_matrix(const view&, tmatrix& out) { 
+	out.translate( vector(.5,.5,.5) ); 
+	vector scale = get_scale();
+	out.scale( scale * (.5 / std::max(scale.x, std::max(scale.y, scale.z))) ); 
+}
+
 
 PRIMITIVE_TYPEINFO_IMPL(sphere)
 

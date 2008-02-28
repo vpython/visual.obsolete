@@ -80,6 +80,7 @@ class convex : public renderable
 	void recalc();
 	void add_point( size_t, vector);
 	std::vector<face> hull;
+	vector min_extent, max_extent;
 	
  public:
 	convex();
@@ -100,6 +101,7 @@ class convex : public renderable
 	virtual vector get_center() const;
 	virtual void gl_pick_render( const view&);
 	virtual void grow_extent( extent&);
+	virtual void get_material_matrix( const view&, tmatrix& out );
 };
 
 } } // !namespace cvisual::python

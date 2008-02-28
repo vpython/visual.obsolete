@@ -7,19 +7,12 @@
 
 namespace cvisual {
 
-class timer
-{
- private:
-	double start; ///< The system time at the last lap_start() call.
-	double inv_tick_count;
- 
- public:
-	/** Construct a new timer. */
-	timer();
+// On this platform we just use Glib::Timer, which has the same interface 
+// as timer.  This file should override vpython-core2/include/util/timer.hpp.
 
-	/** Time elapsed since timer was created. */
-	double elapsed();
-};
+#include <gtkmm/main.h>
+
+typedef Glib::Timer render_timer;
 
 } // !namespace cvisual
 

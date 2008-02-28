@@ -30,7 +30,7 @@ using boost::shared_ptr;
 	well as be immutable.  It is possible that the base class is so abstract as
 	to be non-constructable from Python (simmilar to cvisual.displayobject now).
 */
-class texture : public boost::signals::trackable
+class texture
 {
  private:
 	bool damaged;
@@ -50,12 +50,17 @@ class texture : public boost::signals::trackable
  		continuous graphics memory penalty.  Precondition: an OpenGL context 
 		must be active.
 	*/
-	void gl_activate();
+	void gl_activate(const struct view& scene);
  
 	/** Determine whether or not this texture has an opacity channel.
 		@returns True iff there is an opacity channel for this texture.
 	*/
 	bool has_opacity() const;
+	
+	/** Returns e.g. GL_TEXTURE_2D - the thing to be enabled to make this texture
+	    work with the fixed function pipeline.
+	*/
+	virtual int enable_type() const;
  
  protected:
 	// A unique identifier for the texture, to be obtained from glGenTextures().
@@ -71,7 +76,7 @@ class texture : public boost::signals::trackable
  
 	// Called by gl_activate() on the first use and whenever damaged.
 	// Postcondition: handle refers to an initialized OpenGL texture object.
-	virtual void gl_init() = 0;
+	virtual void gl_init(const view&) = 0;
  
 	// Perform any texture transformation matrix initialization that might be
 	// required.  Default: do nothing.
@@ -89,7 +94,7 @@ class texture : public boost::signals::trackable
 
  public: 
  	// Should be protected; makeing this public works around a GCC 3.4.2 bug
-	void gl_free();
+	static void gl_free( unsigned handle );
 };
 
 

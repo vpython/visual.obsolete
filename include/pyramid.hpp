@@ -35,6 +35,7 @@ class pyramid : public rectangular
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
 	virtual vector get_center() const;
+	virtual void get_material_matrix( const view&, tmatrix& out );
 };
 
 } // !namespace cvisual

@@ -99,6 +99,8 @@ class arrow : public primitive
 	 * base. 
 	 */
 	virtual vector get_center() const;
+	virtual void get_material_matrix(const view&, tmatrix& out);
+	
 	PRIMITIVE_TYPEINFO_DECL;
 
 	/** Initializes these four variables with the effective geometry for the

@@ -74,6 +74,8 @@ class box : public rectangular
 	virtual void update_cache( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
+	virtual void get_material_matrix( const view&, tmatrix& out );
+
 	PRIMITIVE_TYPEINFO_DECL;
 };
 

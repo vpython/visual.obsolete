@@ -13,6 +13,7 @@
 #include "util/lighting.hpp"
 #include "util/timer.hpp"
 #include "util/thread.hpp"
+#include "util/gl_extensions.hpp"
 
 #if defined(_WIN32) || defined(_MSC_VER)
 	#include "util/timer.hpp"
@@ -41,22 +42,21 @@ using boost::indirect_iterator;
 class display_kernel
 {
  private: // Private data
- 	static shared_ptr<std::set<std::string> > extensions;
- 	static std::string renderer;
- 	static std::string version;
- 	static std::string vendor;
+ 	shared_ptr<std::set<std::string> > extensions;
+ 	std::string renderer;
+ 	std::string version;
+ 	std::string vendor;
  	double last_time;
  	double render_time;
+ 	bool realized;
+ 	
+ 	boost::scoped_ptr< class shader_program > global_shader;
 
  protected:
 	mutable mutex mtx;
  private:
 
-#if defined(_WIN32) || defined(_MSC_VER)
-	timer render_timer;
-#else
-	Glib::Timer render_timer; // for timing the render pulse
-#endif
+	timer render_timer;	// for timing the render pulse
 
 	float window_width; ///< The last reported width of the window.
 	float window_height; ///< The last reported height of the window.
@@ -158,6 +158,8 @@ class display_kernel
 	void tan_hfov( double* x, double* y);
 
 public: // Public Data.
+	gl_extensions glext;
+
 	enum mouse_mode_t { ZOOM_ROTATE, ZOOM_ROLL, PAN, FIXED } mouse_mode;
 	enum mouse_button { NONE, LEFT, RIGHT, MIDDLE };
 	enum stereo_mode_t { NO_STEREO, PASSIVE_STEREO, ACTIVE_STEREO, CROSSEYED_STEREO,
@@ -169,7 +171,7 @@ public: // Public Data.
 		when it is less than 0.
 	*/
 	int lod_adjust;
-
+	
 	/** Add an additional light source. */
 	void add_light( shared_ptr<light> n_light);
 	/** Change the background ambient lighting. */
@@ -317,6 +319,9 @@ public: // Public Data.
 	// does not propogate to the owning display_kernel.
 	std::list<shared_ptr<renderable> > get_objects() const;
 
+	void set_shader( std::string shader );
+	std::string get_shader();
+
 	/** A signal that makes the wrapping widget's rendering context
 		active.  The wrapping object must connect to it.
 	*/
@@ -331,6 +336,12 @@ public: // Public Data.
 	boost::signal<void()> gl_swap_buffers;
 
 	std::string info( void);
+	
+	bool hasExtension( const std::string& ext );
+
+	typedef void (APIENTRYP EXTENSION_FUNCTION)();
+	// display may override this (even though it isn't virtual!)
+	EXTENSION_FUNCTION getProcAddress( const char* );
 };
 
 } // !namespace cvisual

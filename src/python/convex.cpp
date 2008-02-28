@@ -57,6 +57,15 @@ convex::recalc()
 	for (size_t i = 3; i < count; ++i) {
 		add_point( i, vector(pos_i + i*3));
 	}
+	
+	// Calculate extents
+	min_extent = max_extent = vector( pos_i );
+	for(int i=1; i<count; i++)
+		for(int j=0; j<3; j++) {
+			if (*pos_i < min_extent[j]) min_extent[j] = *pos_i;
+			else if (*pos_i > max_extent[j]) max_extent[j] = *pos_i;
+			pos_i++;
+		}
 
 	last_checksum = checksum();
 }
@@ -295,6 +304,9 @@ convex::grow_extent( extent& world)
 	if (degenerate())
 		return;
 
+	// xxx use min_extent and max_extent, once locking mechanism is changed so that we
+	// can update_cache once per frame and trust that things haven't changed before gl_render!
+
 	long check = checksum();
 	if (check != last_checksum) {
 		recalc();
@@ -307,6 +319,15 @@ convex::grow_extent( extent& world)
 		world.add_point( f->corner[2]);
 	}
 	world.add_body();
+}
+
+void 
+convex::get_material_matrix( const view& v, tmatrix& out ) {
+	out.translate( vector(.5,.5,.5) );
+	
+	out.scale( vector(1,1,1) * (.999 / (v.gcf * std::max(max_extent.x-min_extent.x, std::max(max_extent.y-min_extent.y, max_extent.z-min_extent.z)))) );
+	
+	out.translate( -.5 * v.gcf * (min_extent + max_extent) );
 }
 
 } } // !namespace cvisual::python

@@ -3,7 +3,6 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "win32/render_surface.hpp"
 #include "win32/display.hpp"
 #include "util/errors.hpp"
 
@@ -21,15 +20,16 @@ using boost::thread;
 #include <boost/lexical_cast.hpp>
 using boost::lexical_cast;
 
+namespace cvisual {
+
 // TODO: Change mouse movement handling to lock the mouse in place and continue
 // to process events.
 // This function dispatches incoming messages to the particular message-handler.
-extern "C" {
 LRESULT CALLBACK
-render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	using namespace cvisual;
-	render_surface* This = render_surface::widgets[hwnd];
+	display* This = display::widgets[hwnd];
 	if (This == 0)
 		return DefWindowProc( hwnd, uMsg, wParam, lParam);
 
@@ -67,17 +67,14 @@ render_surface_dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 }
 
 VOID CALLBACK
-render_surface_timer_callback( HWND hwnd, UINT, UINT_PTR, DWORD)
+display::timer_callback( HWND hwnd, UINT, UINT_PTR, DWORD)
 {
 	using namespace cvisual;
-	render_surface* This = render_surface::widgets[hwnd];
+	display* This = display::widgets[hwnd];
 	if (0 == This)
 		return;
 	This->on_paint(0, 0);
 }
-} // !extern "C"
-
-namespace cvisual {
 
 /**************************** Utilities ************************************/
 // Extracts and decodes a Win32 error message.
@@ -102,16 +99,16 @@ win32_write_critical(
 	std::exit(1);
 }
 
-/**************** render_surface implementation  *****************/
+/**************** display implementation  *****************/
 
 // A lookup-table for the default widget procedure to use to find the actual
 // widget that should handle a particular callback message.
-std::map<HWND, render_surface*> render_surface::widgets;
-render_surface* render_surface::current = 0;
-shared_ptr<render_surface> render_surface::selected;
+std::map<HWND, display*> display::widgets;
+display* display::current = 0;
+shared_ptr<display> display::selected;
 
 void
-render_surface::register_win32_class()
+display::register_win32_class()
 {
 	static bool done = false;
 	if (done)
@@ -120,7 +117,7 @@ render_surface::register_win32_class()
 		std::memset( &win32_class, 0, sizeof(win32_class));
 
 		win32_class.lpszClassName = "vpython_win32_render_surface";
-		win32_class.lpfnWndProc = &render_surface_dispatch_messages;
+		win32_class.lpfnWndProc = &dispatch_messages;
 		win32_class.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
 		win32_class.hInstance = GetModuleHandle(0);
 		win32_class.hIcon = LoadIcon( NULL, IDI_APPLICATION );
@@ -132,14 +129,14 @@ render_surface::register_win32_class()
 }
 
 LRESULT
-render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
+display::on_showwindow( WPARAM wParam, LPARAM lParam)
 {
 	UINT id = 1;
 	switch (lParam) {
 		case 0:
 			// Opening for the first time.
 			report_realize();
-			SetTimer( widget_handle, id, 30, &render_surface_timer_callback);
+			SetTimer( widget_handle, id, 30, &timer_callback);
 			break;
 		case SW_PARENTCLOSING:
 			// Stop rendering when the window is minimized.
@@ -147,7 +144,7 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 			break;
 		case SW_PARENTOPENING:
 			// restart rendering when the window is restored.
-			SetTimer( widget_handle, id, 30, &render_surface_timer_callback);
+			SetTimer( widget_handle, id, 30, &timer_callback);
 			break;
 		default:
 			return DefWindowProc( widget_handle, WM_SHOWWINDOW, wParam, lParam);
@@ -156,7 +153,7 @@ render_surface::on_showwindow( WPARAM wParam, LPARAM lParam)
 }
 
 LRESULT
-render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
+display::on_mousemove( WPARAM wParam, LPARAM lParam)
 {
 	// TODO: Modify this implementation to make the mouse disappear and lock
 	// it to a particular position during mouse right-clicks.
@@ -209,7 +206,7 @@ render_surface::on_mousemove( WPARAM wParam, LPARAM lParam)
 }
 
 LRESULT
-render_surface::on_size( WPARAM, LPARAM)
+display::on_size( WPARAM, LPARAM)
 {
 	RECT dims;
 	// The following calls report the fact that the widget area has been
@@ -224,7 +221,7 @@ render_surface::on_size( WPARAM, LPARAM)
 }
 
 LRESULT
-render_surface::on_move( WPARAM, LPARAM lParam)
+display::on_move( WPARAM, LPARAM lParam)
 {
 	x = LOWORD( lParam);
 	y = HIWORD( lParam);
@@ -232,7 +229,7 @@ render_surface::on_move( WPARAM, LPARAM lParam)
 }
 
 LRESULT
-render_surface::on_getminmaxinfo( WPARAM, LPARAM lParam)
+display::on_getminmaxinfo( WPARAM, LPARAM lParam)
 {
 	MINMAXINFO* info = (MINMAXINFO*)lParam;
 	// Prevents making the window too small.
@@ -242,7 +239,7 @@ render_surface::on_getminmaxinfo( WPARAM, LPARAM lParam)
 }
 
 LRESULT
-render_surface::on_paint( WPARAM, LPARAM)
+display::on_paint( WPARAM, LPARAM)
 {
 	if (window_width < 1 || window_height < 1)
 		return 0;
@@ -263,7 +260,7 @@ render_surface::on_paint( WPARAM, LPARAM)
 }
 
 LRESULT
-render_surface::on_close( WPARAM, LPARAM)
+display::on_close( WPARAM, LPARAM)
 {
 	VPYTHON_NOTE( "Closing a window from the GUI");
 	UINT id = 1;
@@ -284,7 +281,7 @@ render_surface::on_close( WPARAM, LPARAM)
 }
 
 LRESULT
-render_surface::on_buttondown( WPARAM wParam, LPARAM lParam)
+display::on_buttondown( WPARAM wParam, LPARAM lParam)
 {
 	mouse.set_shift( wParam & MK_SHIFT);
 	mouse.set_ctrl( wParam & MK_CONTROL);
@@ -310,7 +307,7 @@ render_surface::on_buttondown( WPARAM wParam, LPARAM lParam)
 }
 
 LRESULT
-render_surface::on_buttonup( WPARAM wParam, LPARAM lParam)
+display::on_buttonup( WPARAM wParam, LPARAM lParam)
 {
 	mouse.set_shift( wParam & MK_SHIFT);
 	mouse.set_ctrl( wParam & MK_CONTROL);
@@ -358,7 +355,7 @@ found:
 }
 
 LRESULT
-render_surface::on_keyUp(UINT uMsg, WPARAM wParam, LPARAM lParam)
+display::on_keyUp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	Kshift = (GetKeyState(VK_SHIFT) < 0) ||
 		(GetKeyState(VK_CAPITAL) & 1);
@@ -369,7 +366,7 @@ render_surface::on_keyUp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 LRESULT
-render_surface::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
+display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	// Note that this algorithm will proably fail if the user is using anything 
 	// other than a US keyboard.
@@ -467,7 +464,7 @@ render_surface::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 LRESULT
-render_surface::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
+display::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	// Note that this algorithm will proably fail if the user is using anything 
 	// other than a US keyboard.
@@ -534,11 +531,11 @@ render_surface::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-WNDCLASS render_surface::win32_class;
+WNDCLASS display::win32_class;
 
 // Callbacks provided to the display_kernel object.
 void
-render_surface::on_gl_begin()
+display::on_gl_begin()
 {
 	saved_dc = wglGetCurrentDC();
 	saved_glrc = wglGetCurrentContext();
@@ -548,7 +545,7 @@ render_surface::on_gl_begin()
 }
 
 void
-render_surface::on_gl_end()
+display::on_gl_end()
 {
 	wglMakeCurrent( saved_dc, saved_glrc);
 	saved_dc = 0;
@@ -557,12 +554,12 @@ render_surface::on_gl_end()
 }
 
 void
-render_surface::on_gl_swap_buffers()
+display::on_gl_swap_buffers()
 {
 	SwapBuffers( dev_context);
 }
 
-render_surface::render_surface()
+display::display()
 	: x(-1), y(-1),
 	exit(true), visible(true), fullscreen(false), title( "VPython"),
 	Kshift(false), Kctrl(false), Kalt(false),
@@ -574,15 +571,15 @@ render_surface::render_surface()
 	// Connect callbacks from the display_kernel to this object.  These will not
 	// be called back from the core until report_realize is called.
 	gl_begin.connect(
-		boost::bind(&render_surface::on_gl_begin, this));
+		boost::bind(&display::on_gl_begin, this));
 	gl_end.connect(
-		boost::bind(&render_surface::on_gl_end, this));
+		boost::bind(&display::on_gl_end, this));
 	gl_swap_buffers.connect(
-		boost::bind(&render_surface::on_gl_swap_buffers, this));
+		boost::bind(&display::on_gl_swap_buffers, this));
 }
 
 void
-render_surface::create()
+display::create()
 {
 	register_win32_class();
 
@@ -680,18 +677,18 @@ render_surface::create()
 }
 
 void
-render_surface::destroy()
+display::destroy()
 {
 	CloseWindow( widget_handle);
 	// widget_handle = 0;
 }
 
-render_surface::~render_surface()
+display::~display()
 {
 }
 
 void
-render_surface::set_x( float n_x)
+display::set_x( float n_x)
 {
 	lock L(mtx);
 	if (active) {
@@ -701,13 +698,13 @@ render_surface::set_x( float n_x)
 		x = n_x;
 }
 float
-render_surface::get_x()
+display::get_x()
 {
 	return x;
 }
 
 void
-render_surface::set_y( float n_y)
+display::set_y( float n_y)
 {
 	lock L(mtx);
 	if (active) {
@@ -717,13 +714,13 @@ render_surface::set_y( float n_y)
 		y = n_y;
 }
 float
-render_surface::get_y()
+display::get_y()
 {
 	return y;
 }
 
 void
-render_surface::set_width( float w)
+display::set_width( float w)
 {
 	lock L(mtx);
 	if (active) {
@@ -733,13 +730,13 @@ render_surface::set_width( float w)
 		window_width = w;
 }
 float
-render_surface::get_width()
+display::get_width()
 {
 	return window_width;
 }
 
 void
-render_surface::set_height( float h)
+display::set_height( float h)
 {
 	lock L(mtx);
 	if (active) {
@@ -749,13 +746,13 @@ render_surface::set_height( float h)
 		window_height = h;;
 }
 float
-render_surface::get_height()
+display::get_height()
 {
 	return window_height;
 }
 
 void
-render_surface::set_visible( bool vis)
+display::set_visible( bool vis)
 {
 	if (vis && !active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
@@ -768,7 +765,7 @@ render_surface::set_visible( bool vis)
 	visible = vis;
 }
 bool
-render_surface::get_visible()
+display::get_visible()
 {
 	if (!active)
 		return false;
@@ -776,7 +773,7 @@ render_surface::get_visible()
 }
 
 void
-render_surface::set_title( std::string n_title)
+display::set_title( std::string n_title)
 {
 	lock L(mtx);
 	if (active) {
@@ -786,18 +783,18 @@ render_surface::set_title( std::string n_title)
 		title = n_title;
 }
 std::string
-render_surface::get_title()
+display::get_title()
 {
 	return title;
 }
 
 bool
-render_surface::is_fullscreen()
+display::is_fullscreen()
 {
 	return fullscreen;
 }
 void
-render_surface::set_fullscreen( bool fs)
+display::set_fullscreen( bool fs)
 {
 	lock L(mtx);
 	if (active) {
@@ -808,7 +805,7 @@ render_surface::set_fullscreen( bool fs)
 }
 
 int
-render_surface::get_titlebar_height()
+display::get_titlebar_height()
 {
 #if !(defined(_WIN32) || defined(_MSC_VER))
 	return 23;
@@ -818,19 +815,19 @@ render_surface::get_titlebar_height()
 }
 
 int
-render_surface::get_toolbar_height()
+display::get_toolbar_height()
 {
 	return 37;
 }
 
 bool
-render_surface::is_showing_toolbar()
+display::is_showing_toolbar()
 {
 	return show_toolbar;
 }
 
 void
-render_surface::set_show_toolbar( bool fs)
+display::set_show_toolbar( bool fs)
 {
 	if (active)
 		throw std::runtime_error( 
@@ -839,7 +836,7 @@ render_surface::set_show_toolbar( bool fs)
 }
 
 void
-render_surface::add_renderable( shared_ptr<renderable> obj)
+display::add_renderable( shared_ptr<renderable> obj)
 {
 	display_kernel::add_renderable( obj);
 	if (!active && visible) {
@@ -848,7 +845,7 @@ render_surface::add_renderable( shared_ptr<renderable> obj)
 }
 
 void
-render_surface::add_renderable_screen( shared_ptr<renderable> obj)
+display::add_renderable_screen( shared_ptr<renderable> obj)
 {
 	display_kernel::add_renderable( obj);
 	if (!active && visible)
@@ -856,7 +853,7 @@ render_surface::add_renderable_screen( shared_ptr<renderable> obj)
 }
 
 mouse_t*
-render_surface::get_mouse()
+display::get_mouse()
 {
 	if (!visible)
 		visible = true;
@@ -867,7 +864,7 @@ render_surface::get_mouse()
 }
 
 atomic_queue<std::string>*
-render_surface::get_kb()
+display::get_kb()
 {
 	if (!visible)
 		visible = true;
@@ -878,15 +875,20 @@ render_surface::get_kb()
 }
 
 void
-render_surface::set_selected( shared_ptr<display> d)
+display::set_selected( shared_ptr<display> d)
 {
 	selected = d;
 }
 
 shared_ptr<display>
-render_surface::get_selected()
+display::get_selected()
 {
 	return selected;
+}
+
+display::EXTENSION_FUNCTION
+display::getProcAddress(const char* name) {
+	return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
 }
 
 /******************************* gui_main implementatin **********************/

@@ -54,6 +54,7 @@ class curve : public renderable
 	virtual vector get_center() const;
 	virtual void gl_pick_render( const view&);
 	virtual void grow_extent( extent&);
+	void get_material_matrix( const view& v, tmatrix& out );
 	
  private:
 	// A type used to cache (in OpenGL memory) a displaylist for a chunk of the

@@ -34,6 +34,7 @@ class faces : public renderable
 	virtual void gl_pick_render( const view&);
 	virtual vector get_center() const;
 	virtual void grow_extent( extent&);
+	virtual void get_material_matrix( const view&, tmatrix& );
 
  public:
 	faces();

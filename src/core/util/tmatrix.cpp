@@ -269,6 +269,15 @@ tmatrix::scale( const vector& v, const double w)
 	M[3][3] *= w;
 }
 
+void
+tmatrix::translate( const vector& v )
+{
+	M[3][0] += v.x * M[0][0] + v.y * M[1][0] + v.z * M[2][0];
+	M[3][1] += v.x * M[0][1] + v.y * M[1][1] + v.z * M[2][1];
+	M[3][2] += v.x * M[0][2] + v.y * M[1][2] + v.z * M[2][2];
+	M[3][3] += v.x * M[0][3] + v.y * M[1][3] + v.z * M[2][3];
+}
+
 tmatrix&
 tmatrix::gl_modelview_get()
 {

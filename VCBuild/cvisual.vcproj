@@ -137,7 +137,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\include\win32;..\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;..\dependencies\boost_1_34_1;\Python25\include;.;$(NOINHERIT)"
-				PreprocessorDefinitions="WIN32;_USRDLL;MSC;BOOST_PYTHON_STATIC_LIB"
+				PreprocessorDefinitions="WIN32;_USRDLL;MSC;BOOST_PYTHON_STATIC_LIB;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -219,15 +219,15 @@
 				Name="win32"
 				>
 				<File
+					RelativePath="..\src\win32\windisplay.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\win32\winrandom_device.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\win32\winrate.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\win32\winrender_surface.cpp"
 					>
 				</File>
 				<File
@@ -276,6 +276,10 @@
 				</File>
 				<File
 					RelativePath="..\src\core\label.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\core\material.cpp"
 					>
 				</File>
 				<File
@@ -330,6 +334,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\core\util\gl_extensions.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\core\util\gl_free.cpp"
 						>
 					</File>
@@ -347,6 +355,10 @@
 					</File>
 					<File
 						RelativePath="..\src\core\util\rgba.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\core\util\shader_program.cpp"
 						>
 					</File>
 					<File
@@ -454,10 +466,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\convex.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\include\curve.hpp"
 				>
 			</File>
@@ -474,15 +482,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\faces.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\include\frame.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\include\label.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\material.hpp"
 				>
 			</File>
 			<File
@@ -625,6 +633,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\util\gl_extensions.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\util\gl_free.hpp"
 					>
 				</File>
@@ -646,6 +658,10 @@
 				</File>
 				<File
 					RelativePath="..\include\util\rgba.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\util\shader_program.hpp"
 					>
 				</File>
 				<File

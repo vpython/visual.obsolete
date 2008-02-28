@@ -18,6 +18,7 @@ class axial : public primitive
  	virtual ~axial();
  	void set_radius(double r);
  	double get_radius();
+	virtual void get_material_matrix( const view&, tmatrix& out );
 };
 
 } // !namespace cvisual

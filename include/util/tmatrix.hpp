@@ -45,7 +45,7 @@ public:
 	/** Returns the address of the first element in the matrix.  Ideally, this
 	 * function should not exist.
 	 */
-    inline double* matrix_addr() { return M[0]; }
+    inline const double* matrix_addr() const { return M[0]; }
 
 	/** Create a new tmatrix, initialized to the identity matrix. */
 	inline tmatrix() throw() { ident(); }
@@ -170,6 +170,9 @@ public:
 	
 	// Right-multiply this matrix by a scaling matrix.
 	void scale( const vector& v, const double w = 1);
+	
+	// Right multiply the matrix by a translation matrix
+	void translate( const vector& v );
 	
 	/** Postcondition: *this == *this * other */
 	const tmatrix&
