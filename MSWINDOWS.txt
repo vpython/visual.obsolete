@@ -1,4 +1,4 @@
-HOW TO BUILD VISUAL ON MICROSOFT WINDOWS
+HOW TO BUILD VISUAL USING GTK2 ON MICROSOFT WINDOWS
 
 1.  Read the below steps
 2.  Thank your lucky stars you don't have to follow them
@@ -130,6 +130,7 @@ Copy the directory named "boost" to /mingw/include.
 Switch to Msys and cd to boost_1_34_1.
 > cp stage/lib/boost_thread-mgw34-mt-1_34_1.dll /mingw/bin
 > cp stage/lib/boost_thread-mgw34-mt-1_34_1.a /mingw/lib/libboost_thread.a
+> similar for boost_signals
 > cd bin.v2/libs/python/build/gcc-mingw-3.4.2/release/threading-multi
 > cp boost_python-mgw34-mt-1_34_1.dll /mingw/bin
 > cp boost_python-mgw34-mt-1_34_1.a /mingw/lib/libboost_python25.a 
