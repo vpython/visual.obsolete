@@ -13,7 +13,7 @@ Building vpython with from Visual Studio C++
                 numpy(?) but this will tend to get you the latest dependencies.
 
         d)Install Visual C++ 2005 Express Edition and platform SDK as per the instructions at
-        	http://msdn.microsoft.com/vstudio/express/visualc/download/
+        	http://msdn2.microsoft.com/en-us/vstudio/aa700736.aspx
         	At least on Vista, you must do this in Internet Explorer, not some other browser.
 			
 			Note that you need to go to the bottom of the SDK page to get the 2003 download.
