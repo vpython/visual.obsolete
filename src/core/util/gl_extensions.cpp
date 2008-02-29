@@ -42,6 +42,10 @@ void gl_extensions::init( display& d ) {
 	if ( ARB_multitexture = d.hasExtension( "GL_ARB_multitexture" ) ) {
 		F( glActiveTexture );
 	}
+	
+	if ( ARB_point_parameters = d.hasExtension( "GL_ARB_point_parameters" ) ) {
+		F( glPointParameterfvARB );
+	}
 }
 
 } // namespace cvisual

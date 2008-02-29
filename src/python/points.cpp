@@ -35,41 +35,6 @@ index( const array& a, size_t i)
 	return ((double*)data(a)) + (i) * 3;
 }
 
-float gl_aliased_radius_range[2] = {-1, -1};
-float gl_smooth_radius_range[2] = {-1, -1};
-int world_scale_points_supported = -1;
-
-#if defined( _WIN32) || defined (_MSC_VER)
-void APIENTRY default_glPointParameterfvARB( GLenum, const GLfloat*)
-{
-	return;
-}
-PFNGLPOINTPARAMETERFVARBPROC glPointParameterfvARB = default_glPointParameterfvARB;
-#endif
-
-void
-init_pointparam_extension(void)
-{
-	// Determine if GLPointParameters is supported
-	using namespace std;
-	set<string> extensions;
-	istringstream strm( string( (const char*)(glGetString( GL_EXTENSIONS))));
-	copy( istream_iterator<string>(strm), istream_iterator<string>(),
-		inserter( extensions, extensions.begin()));
-	if (extensions.find("GL_ARB_point_parameters") != extensions.end()) {
-		VPYTHON_NOTE( "Using GL_ARB_point_parameters extension");
-		world_scale_points_supported = 1;
-		#if defined( _WIN32) || defined (_MSC_VER)
-		glPointParameterfvARB = (PFNGLPOINTPARAMETERFVARBPROC)wglGetProcAddress( "glPointParameterfvARB");
-		#endif
-	}
-	else
-		world_scale_points_supported = 0;
-
-	glGetFloatv( GL_ALIASED_POINT_SIZE_RANGE, gl_aliased_radius_range);
-	glGetFloatv( GL_SMOOTH_POINT_SIZE_RANGE, gl_smooth_radius_range);
-}
-
 } // !namespace (anon)
 
 points::points()
@@ -95,11 +60,6 @@ points::points()
 	color_i[1] = 1;
 	color_i[2] = 1;
 	color_i[3] = 1;
-
-	gl_aliased_radius_range[0] = -1;
-	gl_aliased_radius_range[1] = -1;
-	gl_smooth_radius_range[0] = -1;
-	gl_smooth_radius_range[1] = -1;
 }
 
 points::points( const points& other)
@@ -662,78 +622,44 @@ points::gl_render( const view& scene)
 	}
 
 	clear_gl_error();
-	if (world_scale_points_supported < 0) {
-		init_pointparam_extension();
-	}
 
 	if (points_shape == ROUND)
 		glEnable( GL_POINT_SMOOTH);
 
-	if (size_type == WORLD && world_scale_points_supported > 0) {
-		/* The coefficients of the point parameters equation are derived as
-		 * follows:
-		 *
-		 * Let |x-y| be the size of a unit-size point, such that x is the center
-		 * of a sphere, and y is a to the right, one unit distance away.
-		 * Let x' = modelview * x; x" = projection * x'
-		 *
-		 * The eye-coordinate distance of x is |x'|
-		 * The screen size of the sphere is equal to |x"-y"|*window_width
-		 *
-		 * The point attenuation equation is:
-		 * 	s_result = s_original * 1.0/sqrt(a + b*d + c* d^2)
-		 *  where d = |x'| (eye coordinate distance of the point)
-		 *
-		 * Since we only desire linear attenuation commisserate with distance
-		 * from the viewer, let a = b = 0
-		 * s_result = s_original * 1.0/(sqrt(c)*d)
-		 *
-		 * Substitue s_original == 2; s_result == |x"-y"|*window_width; d == |x'|
-		 * |x"-y"|*window_width = 2/(sqrt(c)*|x'|)
-		 *
-		 * Solve for c:
-		 * c = {2.0/(|x'| * |x"-y"| * window_width)}^2
-		 *
-		 * Note: There is almost certainly an easier way to get the same number
-		 * from the projection or modelview matrices directly.  Nonetheless, this
-		 * does work, and is implemented below.
-		 */
-		// World-to-eye transformation (modelview matrix)
-		tmatrix mv; mv.gl_modelview_get();
-		// Projection matrix
-		tmatrix proj; proj.gl_projection_get();
-		// Eye-to-world transform (inverse of modelview)
-		tmatrix mv_inv;	inverse( mv_inv, mv);
+	if (size_type == WORLD && scene.glext.ARB_point_parameters) {
+		// This is simpler and more robust than what was here before, but it's still
+		// a little tacky and probably not perfectly general.  I'm not sure that it 
+		// should work with stereo frustums, but I can't find a case where it's 
+		// obviously wrong.
+		// However, note that point attenuation (regardless of parameters) isn't a
+		// correct perspective calculation, because it divides by distance, not by Z.
+		// Points not at the center of the screen will be too small, particularly
+		// at high fields of view.  This is in addition to the implementation limits
+		// on point size, which will be a problem when points get too big or close.
+		
+		tmatrix proj; proj.gl_projection_get();  // Projection matrix
+		
+		vector p(proj * vertex(.5,0,1,1));  // eye coordinates .5,0,1 -> window coordinates
+		
+		// At an eye z of 1, a sphere of world-space diameter 1 is p.x * scene.window_width pixels wide,
+		// so a sphere of world-space diameter (size*scene.gcf) is
+		double point_radius_at_z_1 = size * scene.gcf * p.x * scene.window_width;
 
-		// Find the center of the universe, in eye coordinates
-		vector world_center;
-		vector eye_center = mv * world_center;
-		// Its eye distance from the viewer
-		double dist = eye_center.mag();
-		// Find a vector in the direction of the user's right, in world space,
-		// of unit length
-		vector world_right = (mv_inv * (eye_center + vector(0.1, 0))).norm();
-		// Compute position of the center and right vectors in screen space
-		vector center_screen = proj.project( mv * world_center);
-		vector right_screen = proj.project( mv * world_right);
-		// The size of the sphere at this distance from the camera
-		double scale = (center_screen - right_screen).mag() * scene.window_width * 0.5f;
-
-		float attenuation_eqn[] =  { 0, 0, 1.0f/std::pow( ((float) scale * (float)dist), 2.0f) };
-		glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);
-		glPointSize( size);
+		float attenuation_eqn[] =  { 0, 0, 1.0 / (point_radius_at_z_1*point_radius_at_z_1) };
+		scene.glext.glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);
+		glPointSize( 1 );
 	}
 	else if (size_type == SCREEN) {
 		// Restore to default (aka, disable attenuation)
-		if (world_scale_points_supported > 0) {
+		if (scene.glext.ARB_point_parameters) {
 			float attenuation_eqn[] = {1.0f, 0.0f, 0.0f};
-			glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);
+			scene.glext.glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);
 		}
 		if (points_shape == ROUND) {
-			glPointSize( clamp( gl_smooth_radius_range[0], size, gl_smooth_radius_range[1]));
+			glPointSize( size );
 		}
 		else {
-			glPointSize( clamp( gl_aliased_radius_range[0],  size, gl_aliased_radius_range[1]));
+			glPointSize( size );
 		}
 	}
 	// Finish GL state prep

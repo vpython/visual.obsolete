@@ -41,6 +41,9 @@ class gl_extensions {
 	bool ARB_multitexture;
 	PFNGLACTIVETEXTUREARBPROC		glActiveTexture;
 	
+	// Extension: ARB_point_parameters
+	bool ARB_point_parameters;
+	PFNGLPOINTPARAMETERFVARBPROC	glPointParameterfvARB;
 };
 
 }
