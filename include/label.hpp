@@ -7,7 +7,13 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "renderable.hpp"
-#include "text.hpp"
+
+#if defined(_WIN32) || defined(_MSC_VER)
+	#include "win32/text.hpp"
+#else
+	#include "gtk2/text.hpp"
+#endif
+
 #include <vector>
 
 namespace cvisual {
