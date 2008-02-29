@@ -402,16 +402,15 @@ display_kernel::world_to_view_transform(
 
 	double nearest, farthest; // nearest and farthest points relative to <0,0,0> when projected onto forward
 	world_extent.near_and_far(forward, nearest, farthest);
-	nearest *= gcfvec[0];
-	farthest *= gcfvec[0];
 
-	// Position camera so that a 2 by 2 by 2 cube will have all its front face showing, with some border.
+	// Position camera and clip planes so that a (2*user_scale)^3 cube will 
+	// have all its faces showing, with some border.
 	vector scene_camera = scene_center-1.05*(cot_hfov+1.0)*user_scale*scene_forward;
-	double nearclip = 0.1*(cot_hfov-1.0)*user_scale; // from camera to front face of cube
-	// Compute farclip to include all objects (assuming camera pointed at them).
-	double farclip = (scene_center-scene_camera).mag()+1.1*farthest-scene_center.dot(scene_forward);
-	if (farclip <= nearclip) // if camera is beyond the objects, facing away from them
-		farclip = (scene_center-scene_camera).mag()-0.9*nearest+scene_center.dot(scene_forward);
+	double cam_to_cube = (scene_center - scene_camera).mag() - user_scale;
+	double nearclip = 0.25 * cam_to_cube;  // partway from camera to front face of cube
+	double farclip = cam_to_cube + 2.1*user_scale;  // just beyond back face of cube
+	// ... but there might be objects far beyond the back of the cube, because we are zoomed in
+	farclip = std::max( farclip, cam_to_cube + user_scale + 1.05*farthest*gcf );
 
 	// The true camera position, in world space.
 	camera = scene_camera/gcf;
