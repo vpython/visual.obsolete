@@ -92,7 +92,7 @@ renderable::outer_render( const view& v )
 
 	tmatrix material_matrix;
 	get_material_matrix(v, material_matrix);
-	apply_material mat( v, mat.get(), material_matrix );
+	apply_material use_mat( v, mat.get(), material_matrix );
 	gl_render(v);
 
 	if (v.anaglyph)
