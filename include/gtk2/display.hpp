@@ -102,6 +102,8 @@ class display : public display_kernel,
 	
 	atomic_queue<std::string>& get_kb();
 	mouse_t* get_mouse();
+
+	EXTENSION_FUNCTION getProcAddress( const char* name );
 	
  private:
 	// Signal handlers for the various widgets.

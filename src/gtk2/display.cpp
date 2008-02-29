@@ -606,6 +606,10 @@ display::on_key_pressed( GdkEventKey* key)
 	return true;
 }
 
+display::EXTENSION_FUNCTION
+display::getProcAddress(const char* name) {
+	return (EXTENSION_FUNCTION)gdk_gl_get_proc_address( name );
+}
 
 ////////////////////////////////// gui_main implementation ////////////////////
 gui_main* gui_main::self = 0;
