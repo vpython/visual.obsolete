@@ -30,7 +30,7 @@ void wrap_light(); // Also defined in wrap_rgba.cpp
 void wrap_vector();
 void wrap_arrayobjects();
 #if !defined(_WIN32)
-	wrap_glib_ustring();
+	void wrap_glib_ustring();
 #endif
 
 namespace python {
