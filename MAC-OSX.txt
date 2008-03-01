@@ -92,7 +92,90 @@ One wonders whether this is a Boost problem? Works fine on Windows and Linux.
 
 3) Programs that append to a faces object crash (for example, faces_heightfield.py, graphs
 that use gvbars or ghistogram). No problem on Windows and Linux. 
+faces_heightfield.py has append(pos, color, normal) -- append_all_vectors in wrap_arrayobjects.cpp
+graph.py has append(pos, normal) -- this is append_default_color in wrap_arrayobjects.cpp
+There is also append_rgba in wrap_arrayobjects.cpp, for pattern append(pos, red, green, blue, opacity),
+  and this version also crashes.
+Note: Shouldn't we also accept append(pos)?
+We didn't in Visual 3, but we should have. The documentation doesn't even mention any append option.
+Putting in print statements in faces.cpp we see that append never gets to faces.cpp.
+Suggestive of a Boost problem.
 
 4) A non-fatal bug is that orbits.py and stars.py have dim or strange lighting.
 
+Because it looks like the problem could be Boost, try building Boost libraries from scratch:
 
+./configure --prefix=/sw --with-libraries=python,thread --with-python=/sw/bin/python2.5
+   (This creates user-config.jam)
+make
+   (apparently equivalent to bjam --user-config=user-config.jam --with-python --with-thread)
+sudo make install
+There's a name issue; the boost includes need to be available at /sw/include/boost, so do this:
+cd /sw/include/boost_1_34_1
+sudo cp -r boost /sw/include
+I don't understand how /sw/include/boost is found. Looking at our src/build.log, I don't see
+anything that specifies we should look generally in /sw/include. Yet when boost is buried in
+boost_1_34_1, we don't find header files, and when it is unburied into /sw/include/boost we do.
+
+After a successfull make and "make install" invoking dynamic libraries,
+copy these new boost files to /sw/lib/python2.5/site-packages:
+bin.v2/libs/python/build/darwin/release/libboost_python-1_34_1.dylib
+bin.v2/libs/python/build/darwin/release/threading-multi/libboost_python-mt-1_34_1.dylib
+bin.v2/libs/thread/build/darwin/release/threading-multi/libboost_thread-mt-1_34_1.dylib
+
+But cvisual can't find a dylib:
+
+Traceback (most recent call last):
+  File "/sw/lib/python2.5/site-packages/visual/examples/bounce2.py", line 1, in <module>
+    from visual import *
+  File "/sw/lib/python2.5/site-packages/visual/__init__.py", line 140, in <module>
+    import cvisual
+ImportError: dlopen(/sw/lib/python2.5/site-packages/cvisualmodule.so, 2): Library not loaded: bin.v2/libs/python/build/darwin/release/libboost_python-1_34_1.dylib
+  Referenced from: /sw/lib/python2.5/site-packages/cvisualmodule.so
+  Reason: image not found
+  
+I think I've seen stuff on the web about problems with locating dylibs.
+
+Tried changing src/Makefile.in to use only static boost libraries:
+
+  ifeq ($(PYTHON_PLATFORM),darwin)
+    # Special rules for OSX
+    CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
+       $(GTHREAD_LIBS) /sw/lib/libboost_python-mt.a /sw/lib/libboost_thread-mt.a)
+
+This happened on the make:
+
+/usr/bin/ld: table of contents for archive: /sw/lib/libboost_python-mt.a is out of date; rerun ranlib(1) (can't load from it)
+/usr/bin/ld: table of contents for archive: /sw/lib/libboost_thread-mt.a is out of date; rerun ranlib(1) (can't load from it)
+
+So I did this:
+
+bruce-sherwoods-computer:~/Documents/workspace/build brucesherwood$ cd /sw/lib
+bruce-sherwoods-computer:/sw/lib brucesherwood$ sudo ranlib libboost_python-mt.a
+Password:
+bruce-sherwoods-computer:/sw/lib brucesherwood$ sudo ranlib libboost_thread-mt.a
+ranlib: file: libboost_thread-mt.a(tss_hooks.o) has no symbols
+ranlib: file: libboost_thread-mt.a(tss_dll.o) has no symbols
+ranlib: file: libboost_thread-mt.a(tss_pe.o) has no symbols
+bruce-sherwoods-computer:/sw/lib brucesherwood$ 
+
+Still has same problems with faces.append and rotate(vector, angle, axis).
+
+-----------------
+Unsuccessful approach
+bjam --prefix=/sw --toolset=darwin --with-python-version=2.5 --with-thread stage
+
+Copy the directory named "boost" to /sw/include.
+
+> cp stage/lib/libboost_thread-mt.a /sw/lib
+> cp bin.v2/libs/python/build/darwin/release/link-static/threading-multi/libboost_python-mt-1_34_1.a /sw/lib/libboost_python.a
+
+After a successfull make and "make install" invoking dynamic libraries,
+copied these new boost files to /sw/lib/python2.5/site-packages:
+stage/lib/libboost_thread-mt-1_34_1.dylib
+bin.v2/libs/python/build/darwin/release/libboost_python-1_34_1.dylib
+bin.v2/libs/python/build/darwin/release/threading-multi/libboost_python-mt-1_34_1.dylib
+
+This attempt didn't help. Still get "Fatal Python error: Interpreter not initialized (version mismatch?).
+Is it possible that bjam worked against an old version of Python? Maybe /user/bin/python (which is the
+one I see with "which python" and which is version 2.3.5)? No reason bjam should look for python in /sw.
