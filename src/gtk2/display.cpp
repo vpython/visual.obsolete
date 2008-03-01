@@ -15,6 +15,8 @@ using boost::lexical_cast;
 #include <gtkmm/main.h>
 #include <gdk/gdkkeysyms.h>
 
+#include <gdkmm/gl/query.h>
+
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/radiotoolbutton.h>
 
@@ -608,7 +610,7 @@ display::on_key_pressed( GdkEventKey* key)
 
 display::EXTENSION_FUNCTION
 display::getProcAddress(const char* name) {
-	return (EXTENSION_FUNCTION)gdk_gl_get_proc_address( name );
+	return (EXTENSION_FUNCTION)Gdk::GL::get_proc_address( name );
 }
 
 ////////////////////////////////// gui_main implementation ////////////////////
