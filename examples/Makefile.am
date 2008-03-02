@@ -11,7 +11,7 @@ examplefiles = bounce.py bounce2.py boxlighttest.py colorsliders.py \
 	convex.py crossproduct.py crystal.py dipole.py doublependulum.py \
 	drape.py faces_cone.py faces_heightfield.py gas.py glinfo.py \
 	graphtest.py gyro.py gyro2.py hanoi.py labels.py lathe.py \
-	lorenz.py mandelbrot.py orbit.py planar.py randombox.py stars.py \
+	lorenz.py mandelbrot.py material_test.py orbit.py planar.py randombox.py stars.py \
 	stonehenge.py texttest.py texturetest.py tictac.py tictacdat.py \
 	texture_and_lighting.py wood256lum.vpt flower128.vpt \
 	Tk-Visual.py toroid_drag.py toroid.py wave.py
