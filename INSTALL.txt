@@ -18,36 +18,55 @@ I.  Prerequisites:
 	See the file MAC-OSX.txt for details on how to build Visual on Mac OS X.
 	This file is maintained in CVS at sourceforge.
 	
+	A convenient development environment on Linux (and other platforms) is
+	Eclipse. See help.ubuntu.com/community/EclipseIDE for how to get Eclipse
+	running on Ubuntu 7.10 (the Ubuntu Eclipse package does not run).
+	
 	GNU g++ version 3.2.x or >= 3.3.1 (3.4.6 reccomended) (gcc.gnu.org).
-	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
-		the development (dev) package.
-	numpy (numpy.sourceforge.net).
 	An implementation of OpenGL.
 	The Boost C++ libraries version 1.31 and higher (1.33.1 reccomended)
 		(www.boost.org). Note that 1.31 is required if you are using Python 
 		2.3 or higher, and is recommended in any case due to getting much
 		better error messages. 1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
-		Specifically, you need libboost-python-dev and libboost-threads-dev.
+		You need libboost-python-dev, libboost-signals-dev, and libboost-threads-dev.
 		*** It is an unfortunate fact of life that the Boost libraries that
 		*** deal with Python have names that do not reflect what version of
 		*** Python they were built for and with. You have to be careful to
 		*** install Boost Python libraries that were built for your version of Python.
-	The autoconf, automake, libtool, and pkg-config packages.
 		
-	Here is a list of all the additional libraries involved. In many cases a library is 
+	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
+		the development (dev) package.
+	numpy (numpy.sourceforge.net).
+	On Ubuntu 7.10, the only package for numpy was for Python 2.4, even though
+	it is Python 2.5 which is installed by default. So it was necessary to download
+	numpy (www.scipy.org/Download). And it was also necessary to install the
+	packages libboost-python-dev, libboost-signals-dv, and libboost-thread-dev
+	before executing in the numpy folder "python setup.py install".
+	
+	The autoconf, automake, libtool, and pkg-config packages.
+	
+	Generically, key libraries are these:
+		gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
+		gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net)
+	GTK2 (sometimes called GTK+) is a platform-independent library for creating
+	graphical user interfaces. It is designed for programs written in C. 
+	GTKMM is a "wrapper" to make GTK2 accessible to programs written in C++.
+		
+	Here is a list of all the libraries involved. In many cases a library is 
 	automatically installed by a package manager when a requested library depends on it:
 	   gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, 
 	   gtkmm-2.4, gdkmm-2.4, glib-2.0, glibmm-2.4, 
 	   pango-1.0, pangomm-1.4, freetype2,  
 	   gtkglext-1.0, gtkglextmm-1.2, cairo, cairomm-1.0, libglade-2.0, libglademm-2.4
+	On Ubuntu 7.10, installing libgtkmm-2.4-dev and libglademm-2.4-dev installs most
+	of these libraries, except for atkmm, gdkmm, pangomm, gtkglext, and gtkglextmm.
+	There is a gtkglext1-dev package, but no gtkglextmm.
 	
-	More generically, key libraries are these:
-		gtkmm (www.gtkmm.org), which depends on gtk2 (www.gtk.org)
-		gtkglext and gtkglextmm 1.2.x (gtkglext.sourceforge.net).
-	GTK2 (sometimes called GTK+) is a platform-independent library for creating
-	graphical user interfaces. It is designed for programs written in C. 
-	GTKMM is a "wrapper" to make GTK2 accessible to programs written in C++.
+	For Ubuntu, I was unable to install gtkglextmm from source. But at
+	packages.ubuntu.com/source/gtkglextmm, from the older "edgy" distribution get
+	libgtkglextmm1c2a (allow the default package manager to process the download), then
+	libgtkglextmm1-dev. 
 
 	To install gtkglextmm:
 	1) Download the bz2 file.
