@@ -1,5 +1,6 @@
 #include "util/gl_extensions.hpp"
 #include "display.hpp"
+#include "GL/glext.h"
 
 namespace cvisual {
 
