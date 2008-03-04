@@ -53,7 +53,8 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 	last_mousepos_y(0),
 	cycle_time(TIMEOUT),
 	last_time(0),
-	core( _core)
+	core( _core),
+	mouse( _core.mouse )
 {
 	Glib::RefPtr<Gdk::GL::Config> config;
 
@@ -110,17 +111,14 @@ render_surface::render_surface( display_kernel& _core, bool activestereo)
 		| Gdk::BUTTON3_MOTION_MASK);
 	set_size_request( 384, 256);
 
-	core.gl_begin.connect(boost::bind(&render_surface::gl_begin, this));
-	core.gl_end.connect(boost::bind(&render_surface::gl_end, this));
-	core.gl_swap_buffers.connect(boost::bind(&render_surface::gl_swap_buffers, this));
-
 	set_flags( get_flags() | Gtk::CAN_FOCUS);
 }
 
 bool 
 render_surface::on_motion_notify_event( GdkEventMotion* event)
 {
-	// Direct the core to perform rendering ops.
+	python::gil_lock L;
+
 #ifdef G_OS_WIN32
 	// Fake middle mouse events on Win32
 	if (event->state & GDK_BUTTON3_MASK && event->state & GDK_BUTTON1_MASK) {
@@ -152,7 +150,6 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 	last_mousepos_y = static_cast<float>(event->y);
 	mouse.cam = core.calc_camera();
 	
-	
 	if (left_button.is_dragging())
 		mouse.push_event( drag_event( 1, mouse));
 	if (!core.zoom_is_allowed() && middle_button.is_dragging())
@@ -165,6 +162,7 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 bool 
 render_surface::on_enter_notify_event( GdkEventCrossing* event)
 {
+	python::gil_lock L;
 	last_mousepos_x = event->x;
 	last_mousepos_y = event->y;
 	return true;
@@ -173,7 +171,9 @@ render_surface::on_enter_notify_event( GdkEventCrossing* event)
 bool 
 render_surface::on_configure_event( GdkEventConfigure* event)
 {
+	python::gil_lock L;
 	core.report_resize( 
+		x, y, 
 		static_cast<float>(event->width), 
 		static_cast<float>(event->height));
 	return true;
@@ -182,8 +182,9 @@ render_surface::on_configure_event( GdkEventConfigure* event)
 void
 render_surface::on_realize()
 {
+	python::gil_lock L;
 	Gtk::GL::DrawingArea::on_realize();
-	core.report_realize();
+
 	if (!share_list) {
 		share_list = get_gl_context();
 	}
@@ -201,6 +202,10 @@ render_surface::on_realize()
 bool
 render_surface::forward_render_scene()
 {
+	python::gil_lock L;
+
+	// TODO: Use the mouse motion signal hinting to poll its state at the end
+	// of a render cycle and pass a single mouse_motion event for it.
 
 // Make sure this rendering thread has high priority:
 #if defined(_WIN32) || defined(_MSC_VER)
@@ -211,20 +216,23 @@ render_surface::forward_render_scene()
 	setpriority(PRIO_PROCESS, getpid(), std::max(default_prio -5, -20));
 #endif
 
-	//python::gil_lock L; // Experiment: lock out Python computation while rendering
-	
 	double start_time = stopwatch.elapsed();
 	double cycle = start_time - last_time;
 	last_time = start_time;
+	gl_begin();
 	bool sat = core.render_scene(); // render the scene
+	gl_swap_buffers();
+	gl_end();
 	double render_time = stopwatch.elapsed() - start_time;
 
 	if (!sat)
 		return sat;
 	// TODO: Figure out an optimzation to avoid performing this extra pick
 	// rendering cycle when the user isn't looking at scene.mouse[.{pick,pickpos,pos}]
+	gl_begin();
 	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
 		core.pick( last_mousepos_x, last_mousepos_y);
+	gl_end();
 	double pick_time = stopwatch.elapsed() - start_time - render_time;
 	long irender = int(1000*(render_time+pick_time));
 	long icycle = int(1000*cycle);
@@ -279,13 +287,20 @@ render_surface::forward_render_scene()
 bool
 render_surface::on_expose_event( GdkEventExpose*)
 {
-	core.render_scene();
+	python::gil_lock L;
+	
+	gl_begin();
+	core.render_scene(); // render the scene
+	gl_swap_buffers();
+	gl_end();
+
 	return true;
 }
 
 bool 
 render_surface::on_button_press_event( GdkEventButton* event)
 {
+	python::gil_lock L;
 	if (event->type == GDK_BUTTON_RELEASE)
 		// Ignore erronious condition
 		return true;
@@ -317,6 +332,7 @@ render_surface::on_button_press_event( GdkEventButton* event)
 bool 
 render_surface::on_button_release_event( GdkEventButton* event)
 {
+	python::gil_lock L;
 	if (event->type != GDK_BUTTON_RELEASE)
 		// Ignore erronious condition
 		return true;
@@ -358,8 +374,6 @@ render_surface::on_button_release_event( GdkEventButton* event)
 void
 render_surface::gl_begin()
 {
-	// TODO: Use the mouse motion signal hinting to poll its state at the end
-	// of a render cycle and pass a single mouse_motion event for it.
 	assert( get_gl_window()->gl_begin(get_gl_context()));
 }
 

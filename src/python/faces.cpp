@@ -140,7 +140,6 @@ faces::set_length( int length)
 void
 faces::append_rgba( vector nv_pos, vector nv_normal, float red, float green, float blue, float opacity)
 {
-	lock L(mtx);
 	set_length( count+1);
 	double* pos_data = index( pos, count-1);
 	double* norm_data = index(normal, count-1);
@@ -164,7 +163,6 @@ faces::append_rgba( vector nv_pos, vector nv_normal, float red, float green, flo
 void
 faces::append( vector nv_pos, vector nv_normal, rgba nv_color)
 {
-	lock L(mtx);
 	set_length( count+1);
 	double* pos_data = index( pos, count-1);
 	double* norm_data = index(normal, count-1);
@@ -184,7 +182,6 @@ faces::append( vector nv_pos, vector nv_normal, rgba nv_color)
 void
 faces::append( vector n_pos, vector n_normal)
 {
-	lock L(mtx);
 	set_length( count+1);
 	double* pos_data = index( pos, count-1);
 	double* norm_data = index(normal, count-1);
@@ -223,8 +220,6 @@ faces::smooth_shade(bool doublesided)
 {
 	if (shape(pos) != shape(normal))
 		throw std::invalid_argument( "Dimension mismatch between pos and normal.");
-
-	lock L(mtx);
 
 	// positions -> normals
 	std::map< const vector, vector, stl_cmp_vector> vertices;
@@ -279,7 +274,6 @@ faces::set_pos( const array& n_pos)
 	std::vector<npy_intp> dims = shape(this->pos);
 
 	if (n_dims.size() == 1 && !n_dims[0]) {
-		lock L(mtx);
 		set_length(0);
 		return;
 	}
@@ -287,13 +281,11 @@ faces::set_pos( const array& n_pos)
 		throw std::invalid_argument( "Numeric.array members must be Nx3 arrays.");
 
 	if (n_dims[1] == 2) {
-		lock L(mtx);
 		set_length( n_dims[0]);
 		pos[make_tuple( slice(0,count), slice(0,2))] = n_pos;
 		pos[make_tuple( slice(0,count), 2)] = 0.0;
 	}
 	else if (n_dims[1] == 3) {
-		lock L(mtx);
 		set_length( n_dims[0]);
 		pos[slice(0, count)] = n_pos;
 	}
@@ -340,14 +332,12 @@ faces::set_color( array n_color)
 	if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
-		lock L(mtx);
 		color[slice( 0,npoints), slice(0, 3)] = n_color;
 		return;
 	}
 	if (dims.size() == 1 && dims[0] == 4) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
-		lock L(mtx);
 		color[slice( 0, npoints)] = n_color;
 		return;
 	}
@@ -356,7 +346,6 @@ faces::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		lock L(mtx);
 		// The following doesn't work; I don't know why. 
 		// Note that it works with a single color above.
 		//color[slice(1, count+1), slice(0, 3)] = n_color;
@@ -378,7 +367,6 @@ faces::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		lock L(mtx);
 		color[slice( 0, count)] = n_color;
 		return;
 	}
@@ -397,14 +385,12 @@ faces::set_color_t( rgba c)
 	using boost::python::make_tuple;
 	// Broadcast the new color across the array.
 	int npoints = count ? count : 1;
-	lock L(mtx);
 	color[slice(0, npoints)] = make_tuple( c.red, c.green, c.blue, c.opacity);
 }
 
 void
 faces::set_normal( const array& n_normal)
 {
-	lock L(mtx);
 	normal[slice(0, count)] = n_normal;
 }
 
@@ -420,7 +406,6 @@ faces::set_normal_v( vector v)
 	using boost::python::make_tuple;
 	// Broadcast the new normal across the array.
 	int npoints = count ? count : 1;
-	lock L(mtx);
 	normal[slice(0, npoints)] = make_tuple( v.x, v.y, v.z);
 }
 

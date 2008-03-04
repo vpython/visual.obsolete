@@ -14,13 +14,8 @@
 #include "util/timer.hpp"
 #include "util/thread.hpp"
 #include "util/gl_extensions.hpp"
-
-#if defined(_WIN32) || defined(_MSC_VER)
-	#include "util/timer.hpp"
-#else
-	#include <glibmm/timer.h>
-#endif
-
+#include "util/atomic_queue.hpp"
+#include "mouseobject.hpp"
 #include <list>
 #include <vector>
 #include <set>
@@ -29,7 +24,6 @@
 #include <boost/signals.hpp>
 #include <boost/iterator/indirect_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
-
 
 namespace cvisual {
 
@@ -51,15 +45,14 @@ class display_kernel
  	bool realized;
  	
  	boost::scoped_ptr< class shader_program > global_shader;
+ 	
+ 	static shared_ptr<display_kernel> selected;
+ 	
+ 	mutex realize_lock;
+ 	boost::condition realize_condition;
 
- protected:
-	mutable mutex mtx;
  private:
-
 	timer render_timer;	// for timing the render pulse
-
-	float window_width; ///< The last reported width of the window.
-	float window_height; ///< The last reported height of the window.
 
 	shared_vector center; ///< The observed center of the display, in world space.
 	shared_vector forward; ///< The direction of the camera, in world space.
@@ -156,6 +149,26 @@ class display_kernel
 	// Compute the tangents of half the vertical and half the horizontal
 	// true fields-of-view.
 	void tan_hfov( double* x, double* y);
+	
+	void realize();
+	void implicit_activate();
+
+protected:
+	// Mouse and keyboard objects
+	mouse_t mouse;
+	atomic_queue<std::string> keys;
+
+	// Properties of the main window.
+	float x;
+	float y;
+	float window_width; ///< The last reported width of the window.
+	float window_height; ///< The last reported height of the window.
+	bool exit; ///< True when Visual should shutdown on window close.
+	bool visible; ///< scene.visible
+	bool explicitly_invisible;  ///< true iff scene.visible has ever been set to 0 by the program, or by the user closing a window
+	bool fullscreen; ///< True when the display is in fullscreen mode.
+	bool show_toolbar; ///< True when toolbar is displayed (pan, etc).
+	std::string title;
 
 public: // Public Data.
 	gl_extensions glext;
@@ -175,7 +188,7 @@ public: // Public Data.
 	/** Add an additional light source. */
 	void add_light( shared_ptr<light> n_light);
 	/** Change the background ambient lighting. */
-	void set_ambient( const rgba& color) { lock L(mtx); ambient = color; }
+	void set_ambient( const rgba& color) { ambient = color; }
 	rgba get_ambient() { return ambient; }
 	/** Remove an existing light source. */
 	void remove_light( shared_ptr<light> old_light);
@@ -183,15 +196,15 @@ public: // Public Data.
 	std::list< shared_ptr<light> >
 	get_lights() const
 	{ return lights; }
-
+	
 	/** Add a normal renderable object to the list of objects to be rendered into
 	 *  world space.
 	 */
-	virtual void add_renderable( shared_ptr<renderable>);
+	void add_renderable( shared_ptr<renderable>);
 
 	/**  Remove a renderable object from this display, regardless of which layer
 	 *   it resides in.  */
-	virtual void remove_renderable( shared_ptr<renderable>);
+	void remove_renderable( shared_ptr<renderable>);
 
  public: // Public functions
 	// Compute the location of the camera based on the current geometry.
@@ -207,11 +220,10 @@ public: // Public Data.
 	*/
 	bool render_scene();
 
-	/** Inform this object that the window has been allocated.  This function
- 		performs once-only initialization tasks that can only be performed
- 		after the window has been allocated.
- 	*/
-	void report_realize();
+	/** Inform this object that the window has been closed (is no longer physically
+	    visible)
+	*/
+	void report_closed();
 
 	/** Report that the mouse moved with one mouse button down.
  		@param dx horizontal change in mouse position in pixels.
@@ -219,11 +231,14 @@ public: // Public Data.
 	*/
 	void report_mouse_motion( float dx, float dy, mouse_button button);
 
-	/** Report that the size of the widget has changed.
+	/** Report that the position and/or size of the widget has changed.
+		Some platforms might not know about position changes; they can pass (x,y,new_width,new_height)
+ 		@param x: The new upper-left x position of the window.
+ 		@param y: The new upper-left y position of the window.
  		@param new_width: The new width of the window.
  		@param new_height: The new height of the window.
  		*/
-	void report_resize( float new_width, float new_height);
+	void report_resize( float new_x, float new_y, float new_width, float new_height);
 
 	/** Determine which object (if any) was picked by the cursor.
  	    @param x the x-position of the mouse cursor, in pixels.
@@ -322,26 +337,49 @@ public: // Public Data.
 	void set_shader( std::string shader );
 	std::string get_shader();
 
-	/** A signal that makes the wrapping widget's rendering context
-		active.  The wrapping object must connect to it.
-	*/
-	boost::signal<void()> gl_begin;
-	/** A signal that deactivates the wrapping widget's rendering context.
-		The wrapping object must connect to it.
-	*/
-	boost::signal<void()> gl_end;
-	/** A signal that swaps the buffers for its rendering context.  The wrapping
-		object must connect to it.
-	*/
-	boost::signal<void()> gl_swap_buffers;
-
 	std::string info( void);
+
+	void set_x( float x);
+	float get_x();
+
+	void set_y( float y);
+	float get_y();
+
+	void set_width( float w);
+	float get_width();
+
+	void set_height( float h);
+	float get_height();
+
+	void set_visible( bool v);
+	bool get_visible();
+
+	void set_title( std::string n_title);
+	std::string get_title();
+
+	bool is_fullscreen();
+	void set_fullscreen( bool);
+	
+	bool get_exit();
+	void set_exit(bool);
+ 
+	bool is_showing_toolbar();
+	void set_show_toolbar( bool);
+
+	mouse_t* get_mouse();
+	atomic_queue<std::string>* get_kb();
+	
+	static void set_selected( shared_ptr<display_kernel> );
+	static shared_ptr<display_kernel> get_selected();
+	
+	static void waitWhileAnyDisplayVisible();
 	
 	bool hasExtension( const std::string& ext );
 
 	typedef void (APIENTRYP EXTENSION_FUNCTION)();
-	// display may override this (even though it isn't virtual!)
-	EXTENSION_FUNCTION getProcAddress( const char* );
+	virtual EXTENSION_FUNCTION getProcAddress( const char* );
+
+	virtual void activate( bool active ) = 0;
 };
 
 } // !namespace cvisual

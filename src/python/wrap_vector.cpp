@@ -420,26 +420,6 @@ wrap_vector()
 		.def( "__repr__", &vector::repr) // Support ">>> foo"
 		;
 
-
-	const shared_vector& (shared_vector::* sitruediv)( const double&) =
-	&shared_vector::operator/=;
-	py::class_<shared_vector, py::bases<vector>, boost::noncopyable>( "Vector", no_init)
-		.def( self += other<vector>())
-		.def( self -= other<vector>())
-		.def( self *= double())
-		.def( self /= double())
-		.def( "__itruediv__", sitruediv, return_value_policy<copy_const_reference>())
-		.def( "__setitem__", &shared_vector::py_setitem)
-		.add_property( "x", &shared_vector::get_x, &shared_vector::set_x)
-		.add_property( "y", &shared_vector::get_y, &shared_vector::set_y)
-		.add_property( "z", &shared_vector::get_z, &shared_vector::set_z)
-		.add_property( "mag", &shared_vector::mag, &shared_vector::py_scale)
-		.add_property( "mag2", &shared_vector::mag2, &shared_vector::py_scale2)
-		;
-
-	// Allow automagic conversions from shared_vector to vector.
-	py::implicitly_convertible<shared_vector, vector>();
-
 	// Pass a sequence to some functions that expect type visual::vector.
 	vector_from_seq();
 }

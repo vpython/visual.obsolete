@@ -12,8 +12,6 @@ namespace cvisual {
 class light
 {
  private:
-	mutable mutex mtx;
-
 	rgba diffuse;
 	rgba specular;
 	shared_vector position;
@@ -32,7 +30,6 @@ class light
 
  public:
 	light( const vector& position, rgba color=rgba(1,1,1));\
-	light( const light& other);
  
 	void set_pos( const vector& n_pos);
 	shared_vector& get_pos();

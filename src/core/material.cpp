@@ -4,19 +4,16 @@ namespace cvisual {
 
 void 
 material::set_textures( std::vector< boost::shared_ptr< texture > > tex ) {
-	lock L(mtx);
 	textures = tex;
 }
 
 std::vector< boost::shared_ptr< texture > > 
 material::get_textures() {
-	lock L(mtx);
 	return textures;
 }
 
 void 
 material::set_shader( const std::string& source ) {
-	lock L(mtx);
 	if (source.size())
 		shader.reset( new shader_program( source ) );
 	else
@@ -25,7 +22,6 @@ material::set_shader( const std::string& source ) {
 
 std::string
 material::get_shader() {
-	lock L(mtx);
 	if (shader)
 		return shader->get_source();
 	else
@@ -34,7 +30,6 @@ material::get_shader() {
 
 void 
 material::set_shininess( double s ) {
-	lock L(mtx);
 	shininess = clamp( 0.0, s, 1.0);
 }
 

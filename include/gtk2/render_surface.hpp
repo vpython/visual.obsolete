@@ -28,7 +28,7 @@ class render_surface : public Gtk::GL::DrawingArea
 	float last_mousepos_y;
 
 	mousebutton left_button, right_button, middle_button;
-	mouse_t mouse;
+	mouse_t& mouse;
     
 	// The length of the Glib::signal_timout, in milliseconds.
 	long cycle_time;
@@ -41,9 +41,6 @@ class render_surface : public Gtk::GL::DrawingArea
  public:
 	render_surface( display_kernel& _core, bool activestereo = false);
 	display_kernel& core;
-	
-	// Returns the mouse object, and updates some of its parameters.
-	mouse_t& get_mouse() { return mouse; }
  
  protected:
 	// Low-level signal handlers
@@ -60,11 +57,13 @@ class render_surface : public Gtk::GL::DrawingArea
 	virtual bool on_button_release_event( GdkEventButton*);
  
  private:
-	// Functions to be used as callbacks for connections via boost::signal slots.
+	// Timer function for rendering
+	bool forward_render_scene();
+
+	// Manage the current OpenGL context
 	void gl_begin();
 	void gl_end();
 	void gl_swap_buffers();
-	bool forward_render_scene();
 };
 
 } // !namespace cvisual

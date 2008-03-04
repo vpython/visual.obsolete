@@ -134,7 +134,6 @@ arrow::~arrow()
 void
 arrow::set_headwidth( double hw)
 {
-	lock L(mtx);
 	model_damage();
 	headwidth = hw;
 }
@@ -148,7 +147,6 @@ arrow::get_headwidth()
 void
 arrow::set_headlength( double hl)
 {
-	lock L(mtx);
 	model_damage();
 	headlength = hl;
 }
@@ -163,7 +161,6 @@ arrow::get_headlength()
 void
 arrow::set_shaftwidth( double sw)
 {
-	lock L(mtx);
 	model_damage();
 	shaftwidth = sw;
 }
@@ -177,7 +174,6 @@ arrow::get_shaftwidth()
 void
 arrow::set_fixedwidth( bool fixed)
 {
-	lock L(mtx);
 	model_damage();
 	fixedwidth = fixed;
 }
@@ -191,7 +187,6 @@ arrow::is_fixedwidth()
 void
 arrow::set_length( double l)
 {
-	lock L(mtx);
 	model_damage();
 	axis = axis.norm() * l;
 }

@@ -26,6 +26,16 @@ using boost::lexical_cast;
 
 namespace cvisual {
 using boost::thread;
+
+#if (defined(_WIN32) || defined(_MSC_VER))
+	const int border_width = 8;
+	const int border_height = 3;
+#else
+	// Ubuntu Linux; unknown what situation is on Mac
+	const int border_width = 9;
+	const int border_height = 6;
+#endif
+
 	
 /* Startup:  When the first display is created, from Python, set_selected is
 	called with itself as the argument.
@@ -74,8 +84,6 @@ using boost::thread;
  * invisible, the owning window is hidden and destoyed.  It is recreated as needed.
  */
 
-shared_ptr<display> display::selected;
-
 namespace {
 Glib::ustring dataroot = "";
 }
@@ -87,188 +95,23 @@ display::set_dataroot( Glib::ustring _dataroot)
 }
 
 display::display()
-	: active( false),
-	x(-1),
-	y(-1),
-	exit(true),
-	visible(true),
-	fullscreen(false),
-	show_toolbar(true),
-	title( "VPython")
 {
-	set_width(600);
-	set_height(600);
 }
 
 display::~display()
 {	
 }
 
-
-void 
-display::set_x( float _x)
-{
-	if (active)
-		throw std::invalid_argument( "Cannot move the window once it is active.");
-	x = _x;
-}
-
-float
-display::get_x()
-{
-	lock L(mtx);
-	return x;
-}
-
-void 
-display::set_y( float _y)
-{
-	if (active)
-		throw std::invalid_argument( "Cannot move the window once it is active.");
-	y = _y;
-}
-
-float
-display::get_y()
-{
-	lock L(mtx);
-	return y;
-}
-
-void 
-display::set_width( float _width)
-{
-	if (active)
-		throw std::invalid_argument( "Cannot move the window once it is active.");
-#if (defined(_WIN32) || defined(_MSC_VER))
-	width = _width-8;
-#else
-	// Ubuntu Linux; unknown what situation is on Mac
-	width = _width-9;
-#endif
-}
-
-float
-display::get_width()
-{
-	lock L(mtx);
-#if (defined(_WIN32) || defined(_MSC_VER))
-	return (width+8);
-#else
-	// Ubuntu Linux; unknown what situation is on Mac
-	return (width+9);
-#endif
-}
-
-void 
-display::set_height( float _height)
-{
-	if (active)
-		throw std::invalid_argument( "Cannot move the window once it is active.");
-	height = _height-get_titlebar_height();
-	if (show_toolbar) height -= get_toolbar_height();
-#if (defined(_WIN32) || defined(_MSC_VER))
-	height -= 3;
-#else
-	// Ubuntu Linux; unknown what situation is on Mac
-	height -= 6;
-#endif
-}
-
-float
-display::get_height()
-{
-	lock L(mtx);
-	float h;
-	h = height+get_titlebar_height();
-	if (show_toolbar) h += get_toolbar_height();
-#if (defined(_WIN32) || defined(_MSC_VER))
-	h += 3;
-#else
-	// Ubuntu Linux; unknown what situation is on Mac
-	h += 6;
-#endif
-	return h;
-}
-
 void
-display::set_visible( bool vis)
+display::activate( bool active )
 {
-	if (vis && !active) {
+	if (active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
 		gui_main::add_display( this);
-	}
-	else if (!vis && active) {
+	} else {
 		VPYTHON_NOTE( "Closing a window from Python.");
 		gui_main::remove_display(this);
 	}
-	visible = vis;
-}
-
-bool
-display::get_visible()
-{
-	if (!active)
-		return false;
-	return visible;
-}
-
-void
-display::set_title( std::string _title)
-{
-	if (active)
-		throw std::runtime_error( "Cannot change the window's title after it is active.");
-	title = _title;
-}
-
-std::string
-display::get_title()
-{
-	return title;
-}
-
-void
-display::add_renderable( shared_ptr<renderable> obj)
-{
-	display_kernel::add_renderable( obj);
-	if (!active && visible) {
-		gui_main::add_display(this);
-	}
-}
-
-mouse_t*
-display::get_mouse()
-{
-	if (!visible)
-		visible = true;
-	if (!active)
-		gui_main::add_display( this);
-	
-	if (!area) {
-		return 0;
-	}
-	else
-		return &area->get_mouse();
-}
-
-void
-display::add_renderable_screen( shared_ptr<renderable> obj)
-{
-	display_kernel::add_renderable( obj);
-	if (!active && visible)
-		gui_main::add_display(this);
-}
-
-void 
-display::set_selected( shared_ptr<display> d)
-{
-	selected = d;
-}
-
-shared_ptr<display>
-display::get_selected()
-{
-	return selected;
 }
 
 int
@@ -285,36 +128,6 @@ int
 display::get_toolbar_height()
 {
 	return 37;
-}
-
-bool
-display::is_fullscreen()
-{
-	return fullscreen;
-}
-
-void
-display::set_fullscreen( bool fs)
-{
-	if (active)
-		throw std::runtime_error( 
-			"Cannot change the window's state after initialization.");
-	fullscreen = fs;
-}
-
-bool
-display::is_showing_toolbar()
-{
-	return show_toolbar;
-}
-
-void
-display::set_show_toolbar( bool fs)
-{
-	if (active)
-		throw std::runtime_error( 
-			"Cannot change the window's state after initialization.");
-	show_toolbar = fs;
 }
 
 namespace {
@@ -345,10 +158,17 @@ display::create()
 {
 	area.reset( new render_surface(*this, stereo_mode == ACTIVE_STEREO));
 	
+	// width and height give the size of the window (including borders and such)
+	// determine the size of the render_surface
+	// xxx Some way to use less magic constants here?
+	int w = width, h = height;
+	w -= border_width; h -= border_height;
+	h -= get_titlebar_height();
+	if (show_toolbar) h -= get_toolbar_height();
 	if (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
-		area->set_size_request( (int)(width * 2.0), (int)height);
-	else
-		area->set_size_request( (int)width, (int)height);
+		w *= 2;
+	
+	area->set_size_request( w, h );
 	area->signal_key_press_event().connect(
 		sigc::mem_fun( *this, &display::on_key_pressed));
 	
@@ -416,17 +236,6 @@ display::destroy()
 	window = 0;
 	area.reset();
 	glade_file.clear();
-}
-
-atomic_queue<std::string>& 
-display::get_kb()
-{
-#if 0
-	// TODO: Figure out exactly how this should work...
-	if (!active && visible)
-		gui_main::add_display(this);
-#endif
-	return keys;
 }
 
 void
@@ -620,7 +429,7 @@ condition* gui_main::init_signal = 0;
 
 
 gui_main::gui_main()
-	: kit( 0, 0), caller( 0), returned( false), waiting_allclosed(false), 
+	: kit( 0, 0), caller( 0), returned( false), 
 	thread_exited(false), shutting_down( false)
 {
 	Gtk::GL::init( 0, 0);
@@ -636,10 +445,6 @@ gui_main::run()
 {
 	kit.run();
 	lock L(call_lock);
-	if (waiting_allclosed) {
-		returned = true;
-		call_complete.notify_all();
-	}
 	thread_exited = true;
 }
 
@@ -670,32 +475,6 @@ gui_main::init_thread(void)
 		thread gtk( &gui_main::thread_proc);
 		while (!self)
 			init_signal->wait(L);
-	}
-}
-
-// TODO: This may not be safe.  In fact, it might be easier to get notification
-// of shutdown via a truly joinable GUI thread.
-bool
-gui_main::allclosed()
-{
-	if (!self)
-		return true;
-	lock L(self->call_lock);
-	return self->displays.empty();
-}
-
-void
-gui_main::waitclosed()
-{
-	if (!self)
-		return;
-	lock L(self->call_lock);
-	if (self->thread_exited)
-		return;
-	self->waiting_allclosed = true;
-	self->returned = false;
-	while (!self->returned) {
-		self->call_complete.wait(L);
 	}
 }
 
@@ -791,8 +570,6 @@ gui_main::report_window_delete( display* window)
 		self->displays.remove( window);
 		display_empty = self->displays.empty();
 	}
-	if (display_empty && self->waiting_allclosed)
-		gui_main::quit();
 }
 
 void

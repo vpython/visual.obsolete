@@ -191,7 +191,7 @@ mouse_t::pop_click() // this is scene.mouse.getclick()
 {
 	shared_ptr<event> ret = events.py_pop();
 	while (!ret->is_click()) {
-		ret = events.pop();
+		ret = events.py_pop();
 	}
 	click_count--;
 	return ret;

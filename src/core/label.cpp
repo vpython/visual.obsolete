@@ -16,7 +16,7 @@ using boost::scoped_array;
 namespace cvisual {
 
 label::label()
-	: pos(mtx, 0, 0, 0),
+	: pos(0, 0, 0),
 	space(0),
 	xoffset(0),
 	yoffset(0),
@@ -33,7 +33,7 @@ label::label()
 
 label::label( const label& other)
 	: renderable( other),
-	pos( mtx, other.pos.x, other.pos.y, other.pos.z),
+	pos( other.pos.x, other.pos.y, other.pos.z),
 	space( other.space),
 	xoffset( other.xoffset),
 	yoffset( other.yoffset),
@@ -104,7 +104,6 @@ label::get_z()
 void 
 label::set_color( const rgba& n_color)
 {
-	lock L(mtx);
 	color = n_color;
 }
 
@@ -117,7 +116,6 @@ label::get_color()
 void
 label::set_red( float r)
 {
-	lock L(mtx);
 	color.red = r;
 }
 
@@ -130,7 +128,6 @@ label::get_red()
 void
 label::set_green( float g)
 {
-	lock L(mtx);
 	color.green = g;
 }
 
@@ -143,7 +140,6 @@ label::get_green()
 void
 label::set_blue( float b)
 {
-	lock L(mtx);
 	color.blue = b;
 }
 
@@ -162,14 +158,12 @@ label::get_opacity()
 void
 label::set_opacity( float o)
 {
-	lock L(mtx);
 	opacity = o;
 }
 
 void
 label::set_text( string_t t)
 {
-	lock L(mtx);
 	text = t;
 	text_changed = true;
 }
@@ -184,7 +178,6 @@ label::get_text()
 void 
 label::set_space( double n_space)
 {
-	lock L(mtx);
 	space = n_space;
 }
 
@@ -197,7 +190,6 @@ label::get_space()
 void 
 label::set_xoffset( double n_xoffset)
 {
-	lock L(mtx);
 	xoffset = n_xoffset;
 }
 
@@ -210,7 +202,6 @@ label::get_xoffset()
 void 
 label::set_yoffset( double n_yoffset)
 {
-	lock L(mtx);
 	yoffset = n_yoffset;
 }
 
@@ -223,7 +214,6 @@ label::get_yoffset()
 void 
 label::set_border( double n_border)
 {
-	lock L(mtx);
 	border = n_border;
 }
 
@@ -236,7 +226,6 @@ label::get_border()
 void 
 label::set_font_family( string_t name)
 {
-	lock L(mtx);
 	font_description = name;
 	text_changed = true;
 }
@@ -250,7 +239,6 @@ label::get_font_family()
 void
 label::set_font_size( double n_size)
 {
-	lock L(mtx);
 	font_size = n_size;
 	text_changed = true;
 }
@@ -264,7 +252,6 @@ label::get_font_size()
 void 
 label::render_box( bool enable)
 {
-	lock L(mtx);
 	box_enabled = enable;
 }
 
@@ -277,7 +264,6 @@ label::has_box()
 void 
 label::render_line( bool enable)
 {
-	lock L(mtx);
 	line_enabled = enable;
 }
 
@@ -290,7 +276,6 @@ label::has_line()
 void
 label::set_linecolor( const rgba& n_color)
 {
-	lock L(mtx);
 	linecolor = n_color;
 }
 

@@ -199,7 +199,6 @@ vector::py_setitem(int index, double value)
 	}    	
 }
 
-        
 bool 
 vector::stl_cmp( const vector& v) const
 {
@@ -211,99 +210,5 @@ vector::stl_cmp( const vector& v) const
 	}
 	else return this->z < v.z;
 }
-
-void
-shared_vector::set_x( const double& x)
-{
-	lock L(owner);
-	this->x = x;
-}
-
-void
-shared_vector::set_y( const double& y)
-{
-	lock L(owner);
-	this->y = y;
-}
-
-void
-shared_vector::set_z( const double& z)
-{
-	lock L( owner);
-	this->z = z;   	
-}
-	
-
-const shared_vector&
-shared_vector::operator=( const vector& v)
-{
-	lock L(owner);
-	this->x = v.x;
-	this->y = v.y;
-	this->z = v.z;
-	return *this;
-}
-
-const shared_vector&
-shared_vector::operator+=( const vector& v)
-{
-	lock L(owner);
-	this->x += v.x;
-	this->y += v.y;
-	this->z += v.z;
-	return *this;
-}
-
-const shared_vector&
-shared_vector::operator-=( const vector& v)
-{
-	lock L(owner);
-	this->x -= v.x;
-	this->y -= v.y;
-	this->z -= v.z;
-	return *this;
-}
-    
-const shared_vector&
-shared_vector::operator*=( const double& s)
-{
-	lock L(owner);
-	this->x *= s;
-	this->y *= s;
-	this->z *= s;
-	return *this;
-}
-    
-const shared_vector&
-shared_vector::operator/=( const double& s)
-{
-	lock L(owner);
-	this->x /= s;
-	this->y /= s;
-	this->z /= s;
-	return *this;
-}
-
-void
-shared_vector::py_setitem(int index, double value)
-{
-	lock L(owner);
-	vector::py_setitem(index, value);
-}
-
-void
-shared_vector::py_scale( double s)
-{
-	lock L(owner);
-	vector::set_mag(s);
-}
-
-void
-shared_vector::py_scale2( double s)
-{
-	lock L(owner);
-	vector::set_mag2(s);
-}
-
 
 } // !namespace cvisual

@@ -2,6 +2,7 @@
 #include "python/gil.hpp"
 
 #include <boost/thread/xtime.hpp>
+#include <boost/python/errors.hpp>
 #include <iostream>
 #include "util/errors.hpp"
 
@@ -13,16 +14,6 @@ atomic_queue_impl::push_notify()
 	empty = false;
 	if (waiting)
 		ready.notify_all();
-}
-
-void 
-atomic_queue_impl::pop_wait( lock& L)
-{
-	while (empty) {
-		waiting = true;
-		ready.wait(L);
-	}
-	waiting = false;
 }
 
 namespace {
@@ -46,18 +37,12 @@ atomic_queue_impl::py_pop_wait( lock& L)
 	
 	gil_release release;
 	
-	boost::xtime release_time;
-	xtime_get( &release_time, boost::TIME_UTC);
-	
+	// xxx I took the code to call Py_MakePendingCalls() out.  The internet leads
+	// me to believe that it is not necessary.  For example, Python time.sleep() 
+	// doesn't do it.
 	while (empty) {
 		waiting = true;
-		xtime_increment( release_time, 10);
-		if (!ready.timed_wait( L, release_time)) {
-			gil_lock py_lock;
-			Py_MakePendingCalls();
-		}
-		else
-			break;
+		ready.wait(L);
 	}
 	waiting = false;
 }

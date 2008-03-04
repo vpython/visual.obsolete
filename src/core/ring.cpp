@@ -37,7 +37,6 @@ ring::~ring()
 void
 ring::set_thickness( double t)
 {
-	lock L(mtx);
 	thickness = t;
 }
 

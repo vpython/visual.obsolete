@@ -5,6 +5,7 @@
 
 #include "win32/display.hpp"
 #include "util/errors.hpp"
+#include "python/gil.hpp"
 
 // For GET_X_LPARAM, GET_Y_LPARAM
 #include <windowsx.h>
@@ -21,60 +22,6 @@ using boost::thread;
 using boost::lexical_cast;
 
 namespace cvisual {
-
-// TODO: Change mouse movement handling to lock the mouse in place and continue
-// to process events.
-// This function dispatches incoming messages to the particular message-handler.
-LRESULT CALLBACK
-display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	using namespace cvisual;
-	display* This = display::widgets[hwnd];
-	if (This == 0)
-		return DefWindowProc( hwnd, uMsg, wParam, lParam);
-
-	switch (uMsg) {
-		// Handle the cases for the kinds of messages that we are listening for.
-		case WM_CLOSE:
-			return This->on_close( wParam, lParam);
-		case WM_SIZE:
-			return This->on_size( wParam, lParam);
-		case WM_MOVE:
-			return This->on_move( wParam, lParam);
-		case WM_PAINT:
-			return This->on_paint( wParam, lParam);
-		case WM_MOUSEMOVE:
-			// Handle mouse cursor movement.
-			return This->on_mousemove( wParam, lParam);
-		case WM_SHOWWINDOW:
-			return This->on_showwindow( wParam, lParam);
-		//case WM_LBUTTONDBLCLK:
-		case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN:
-			return This->on_buttondown( wParam, lParam);
-		case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
-			return This->on_buttonup( wParam, lParam);
-    	case WM_KEYUP:
-			return This->on_keyUp(uMsg, wParam, lParam);
-    	case WM_KEYDOWN:
-    		return This->on_keyDown(uMsg, wParam, lParam);
-    	case WM_CHAR:
-    		return This->on_keyChar(uMsg, wParam, lParam);
-		case WM_GETMINMAXINFO:
-			return This->on_getminmaxinfo( wParam, lParam);
-		default:
-			return DefWindowProc( hwnd, uMsg, wParam, lParam);
-	}
-}
-
-VOID CALLBACK
-display::timer_callback( HWND hwnd, UINT, UINT_PTR, DWORD)
-{
-	using namespace cvisual;
-	display* This = display::widgets[hwnd];
-	if (0 == This)
-		return;
-	This->on_paint(0, 0);
-}
 
 /**************************** Utilities ************************************/
 // Extracts and decodes a Win32 error message.
@@ -99,13 +46,81 @@ win32_write_critical(
 	std::exit(1);
 }
 
-/**************** display implementation  *****************/
+// The first OpenGL Rendering Context, used to share displaylists.
+static HGLRC root_glrc = 0;
+WNDCLASS display::win32_class;
 
 // A lookup-table for the default widget procedure to use to find the actual
 // widget that should handle a particular callback message.
 std::map<HWND, display*> display::widgets;
 display* display::current = 0;
-shared_ptr<display> display::selected;
+
+display::display()
+  : Kshift(false), Kctrl(false), Kalt(false),
+	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
+	saved_dc(0), saved_glrc(0),
+	last_mousepos_x(0), last_mousepos_y(0), mouselocked( false)
+{
+}
+
+// TODO: Change mouse movement handling to lock the mouse in place and continue
+// to process events.
+// This function dispatches incoming messages to the particular message-handler.
+LRESULT CALLBACK
+display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	{
+		python::gil_lock gil;
+
+		display* This = widgets[hwnd];
+		if (This == 0)
+			return DefWindowProc( hwnd, uMsg, wParam, lParam);
+
+		switch (uMsg) {
+			// Handle the cases for the kinds of messages that we are listening for.
+			case WM_CLOSE:
+				return This->on_close( wParam, lParam);
+			case WM_DESTROY:
+				return This->on_destroy( wParam, lParam );
+			case WM_SIZE:
+				return This->on_size( wParam, lParam);
+			case WM_MOVE:
+				return This->on_move( wParam, lParam);
+			case WM_PAINT:
+				return This->on_paint( wParam, lParam);
+			case WM_MOUSEMOVE:
+				// Handle mouse cursor movement.
+				return This->on_mousemove( wParam, lParam);
+			case WM_SHOWWINDOW:
+				return This->on_showwindow( wParam, lParam);
+			//case WM_LBUTTONDBLCLK:
+			case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN:
+				return This->on_buttondown( wParam, lParam);
+			case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
+				return This->on_buttonup( wParam, lParam);
+    		case WM_KEYUP:
+				return This->on_keyUp(uMsg, wParam, lParam);
+    		case WM_KEYDOWN:
+    			return This->on_keyDown(uMsg, wParam, lParam);
+    		case WM_CHAR:
+    			return This->on_keyChar(uMsg, wParam, lParam);
+			case WM_GETMINMAXINFO:
+				return This->on_getminmaxinfo( wParam, lParam);
+		}
+	}
+	return DefWindowProc( hwnd, uMsg, wParam, lParam);
+}
+
+VOID CALLBACK
+display::timer_callback( HWND hwnd, UINT, UINT_PTR, DWORD)
+{
+	python::gil_lock gil;
+	
+	display* This = widgets[hwnd];
+	if (0 == This)
+		return;
+	This->on_paint(0, 0);
+}
 
 void
 display::register_win32_class()
@@ -131,25 +146,260 @@ display::register_win32_class()
 LRESULT
 display::on_showwindow( WPARAM wParam, LPARAM lParam)
 {
-	UINT id = 1;
 	switch (lParam) {
 		case 0:
 			// Opening for the first time.
-			report_realize();
-			SetTimer( widget_handle, id, 30, &timer_callback);
+			SetTimer( widget_handle, 1, 30, &timer_callback);
 			break;
 		case SW_PARENTCLOSING:
 			// Stop rendering when the window is minimized.
-			KillTimer( widget_handle, id);
+			KillTimer( widget_handle, 1);
 			break;
 		case SW_PARENTOPENING:
 			// restart rendering when the window is restored.
-			SetTimer( widget_handle, id, 30, &timer_callback);
+			SetTimer( widget_handle, 1, 30, &timer_callback);
 			break;
 		default:
 			return DefWindowProc( widget_handle, WM_SHOWWINDOW, wParam, lParam);
 	}
 	return 0;
+}
+
+LRESULT
+display::on_size( WPARAM, LPARAM)
+{
+	RECT dims;
+	// The following calls report the fact that the widget area has been
+	// repainted to the windowing system.
+	GetClientRect( widget_handle, &dims);
+	report_resize( x, y, (float) dims.right, (float) dims.bottom );
+	return 0;
+}
+
+LRESULT
+display::on_move( WPARAM, LPARAM lParam)
+{
+	report_resize( LOWORD( lParam ), HIWORD( lParam ), window_width, window_height );
+	return 0;
+}
+
+LRESULT
+display::on_getminmaxinfo( WPARAM, LPARAM lParam)
+{
+	MINMAXINFO* info = (MINMAXINFO*)lParam;
+	// Prevents making the window too small.
+	info->ptMinTrackSize.x = 70;
+	info->ptMinTrackSize.y = 70;
+	return 0;
+}
+
+LRESULT
+display::on_paint( WPARAM, LPARAM)
+{
+	if (window_width < 1 || window_height < 1)
+		return 0;
+
+	gl_begin();
+	bool sat = render_scene();
+	gl_swap_buffers();
+	gl_end();
+	if (!sat) return 1;  // xxx
+	
+	gl_begin();
+	boost::tie( mouse.pick, mouse.pickpos, mouse.position) =
+		pick( last_mousepos_x, last_mousepos_y);
+	gl_end();
+	
+	// It's very important for the render thread not to starve Python.  Since
+	// it holds the gil_lock so much longer, it tends to monopolize it if it
+	// doesn't sleep between renders.  However, note that this code does a poor
+	// job of making the frame rate smooth if rendering takes varying time.  A
+	// better implementation will need to use the multimedia timers for better 
+	// precision.
+	int next_render_interval = 30;
+	SetTimer( widget_handle, 1, next_render_interval, &timer_callback);
+	
+	RECT dims;
+	// The following calls report the fact that the widget area has been
+	// repainted to the windowing system.
+	GetClientRect( widget_handle, &dims);
+	ValidateRect( widget_handle, &dims);
+	return 0;
+}
+
+LRESULT
+display::on_close( WPARAM, LPARAM)
+{
+	// Happens only when the user closes the window
+	VPYTHON_NOTE( "Closing a window from the GUI");
+	DestroyWindow(widget_handle);
+	if (exit)
+		PostQuitMessage(0);
+	return 0;
+}
+
+LRESULT
+display::on_destroy(WPARAM wParam,LPARAM lParam)
+{
+	// Happens after on_close, and also when a window is destroyed programmatically
+	// (e.g. scene.visible = 0)
+	report_closed();
+	UINT id = 1;
+	KillTimer( widget_handle, id);
+	// We can only free the OpenGL context if it isn't the one we are using for display list sharing
+	// xxx Display list sharing is the suck
+	if ( gl_context != root_glrc )
+		wglDeleteContext( gl_context );
+	ReleaseDC( widget_handle, dev_context);
+	widgets.erase( widget_handle );
+	return DefWindowProc( widget_handle, WM_DESTROY, wParam, lParam );
+}
+
+void
+display::gl_begin()
+{
+	saved_dc = wglGetCurrentDC();
+	saved_glrc = wglGetCurrentContext();
+	if (!wglMakeCurrent( dev_context, gl_context))
+		WIN32_CRITICAL_ERROR( "wglMakeCurrent failed");
+	current = this;
+}
+
+void
+display::gl_end()
+{
+	wglMakeCurrent( saved_dc, saved_glrc);
+	saved_dc = 0;
+	saved_glrc = 0;
+	current = 0;
+}
+
+void
+display::gl_swap_buffers()
+{
+	SwapBuffers( dev_context);
+}
+
+void
+display::create()
+{
+	python::gil_lock gil;  // protect statics like widgets, the shared display list context
+	
+	register_win32_class();
+
+	RECT screen;
+	SystemParametersInfo( SPI_GETWORKAREA, 0, &screen, 0);
+	int style = -1;
+	int real_x = static_cast<int>(x);
+	int real_y = static_cast<int>(y);
+	int real_width = static_cast<int>(window_width);
+	int real_height = static_cast<int>(window_height);
+
+	if (fullscreen) {
+		real_x = screen.left;
+		real_y = screen.top;
+		real_width = screen.right - real_x;
+		real_height = screen.bottom - real_y;
+		style = WS_OVERLAPPED | WS_POPUP | WS_MAXIMIZE | WS_VISIBLE;
+	}
+	else if (real_x < 0 && real_y < 0 || real_x > screen.right || real_y > screen.bottom) {
+		real_x = CW_USEDEFAULT;
+		real_y = CW_USEDEFAULT;
+	}
+	else if (real_x < screen.left) {
+		real_x = screen.left;
+	}
+	else if (real_y < screen.top) {
+		real_y = screen.top;
+	}
+
+	if (real_x + real_width > screen.right)
+		real_width = screen.right - real_x;
+	if (real_y + real_height > screen.bottom)
+		real_height = screen.bottom - real_y;
+
+	if (!fullscreen)
+		style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+
+	widget_handle = CreateWindow(
+		win32_class.lpszClassName,
+		title.c_str(),
+		style,
+		real_x, real_y,
+		real_width, real_height,
+		0,
+		0, // A unique index to identify this widget by the parent
+		GetModuleHandle(0),
+		0 // No data passed to the WM_CREATE function.
+	);
+	widgets[widget_handle] = this;
+
+	dev_context = GetDC(widget_handle);
+	if (!dev_context)
+		WIN32_CRITICAL_ERROR( "GetDC()");
+
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd
+		1,                               // version number
+		PFD_DRAW_TO_WINDOW |             // output to screen (not an image)
+		PFD_SUPPORT_OPENGL |             // support OpenGL
+		PFD_DOUBLEBUFFER,                // double buffered
+		PFD_TYPE_RGBA,                   // RGBA type
+		24,                              // 24-bit color depth
+		0, 0, 0, 0, 0, 0,                // color bits ignored
+		0,                               // no opacity buffer
+		0,                               // shift bit ignored
+		0,                               // no accumulation buffer
+		0, 0, 0, 0,                      // accum bits ignored
+		32,                              // 32-bit z-buffer
+		0,                               // no stencil buffer
+		0,                               // no auxiliary buffer
+		PFD_MAIN_PLANE,                  // main layer
+		0,                               // reserved
+		0, 0, 0                          // layer masks ignored
+	};
+
+	int pixelformat = ChoosePixelFormat( dev_context, &pfd);
+
+	DescribePixelFormat( dev_context, pixelformat, sizeof(pfd), &pfd);
+	SetPixelFormat( dev_context, pixelformat, &pfd);
+
+	gl_context = wglCreateContext( dev_context);
+	if (!gl_context)
+		WIN32_CRITICAL_ERROR("wglCreateContext()");
+
+	if (!root_glrc)
+		root_glrc = gl_context;
+	else
+		wglShareLists( root_glrc, gl_context);
+
+	ShowWindow( widget_handle, SW_SHOW);
+}
+
+void
+display::destroy()
+{
+	DestroyWindow( widget_handle);
+}
+
+display::~display()
+{
+}
+
+void
+display::activate(bool active) {
+	if (active) {
+		VPYTHON_NOTE( "Opening a window from Python.");
+		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
+	} else {
+		VPYTHON_NOTE( "Closing a window from Python.");
+		gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
+	}
+}
+
+display::EXTENSION_FUNCTION
+display::getProcAddress(const char* name) {
+	return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
 }
 
 LRESULT
@@ -202,81 +452,6 @@ display::on_mousemove( WPARAM wParam, LPARAM lParam)
 	if (!spin_is_allowed() && right_button.is_dragging())
 		mouse.push_event( drag_event( 3, mouse));
 
-	return 0;
-}
-
-LRESULT
-display::on_size( WPARAM, LPARAM)
-{
-	RECT dims;
-	// The following calls report the fact that the widget area has been
-	// repainted to the windowing system.
-	GetClientRect( widget_handle, &dims);
-	if (dims.right != window_width || dims.bottom != window_height) {
-		window_width = (float) dims.right;
-		window_height = (float) dims.bottom;
-		report_resize( window_width, window_height);
-	}
-	return 0;
-}
-
-LRESULT
-display::on_move( WPARAM, LPARAM lParam)
-{
-	x = LOWORD( lParam);
-	y = HIWORD( lParam);
-	return 0;
-}
-
-LRESULT
-display::on_getminmaxinfo( WPARAM, LPARAM lParam)
-{
-	MINMAXINFO* info = (MINMAXINFO*)lParam;
-	// Prevents making the window too small.
-	info->ptMinTrackSize.x = 70;
-	info->ptMinTrackSize.y = 70;
-	return 0;
-}
-
-LRESULT
-display::on_paint( WPARAM, LPARAM)
-{
-	if (window_width < 1 || window_height < 1)
-		return 0;
-
-	bool sat = render_scene();
-	if (!sat)
-		return 1;
-
-	boost::tie( mouse.pick, mouse.pickpos, mouse.position) =
-		pick( last_mousepos_x, last_mousepos_y);
-	// TODO: Add timer cycle time munging (or at least consider it)
-	RECT dims;
-	// The following calls report the fact that the widget area has been
-	// repainted to the windowing system.
-	GetClientRect( widget_handle, &dims);
-	ValidateRect( widget_handle, &dims);
-	return 0;
-}
-
-LRESULT
-display::on_close( WPARAM, LPARAM)
-{
-	VPYTHON_NOTE( "Closing a window from the GUI");
-	UINT id = 1;
-	KillTimer( widget_handle, id);
-	if (exit) {
-		//gl_free();
-	}
-	gui_main::report_window_delete(this);
-	wglDeleteContext( gl_context);
-	ReleaseDC( widget_handle, dev_context);
-	widgets.erase( widget_handle);
-	DestroyWindow(widget_handle);
-	if (exit) {
-		PostQuitMessage(0);
-	}
-	active = false;
 	return 0;
 }
 
@@ -520,9 +695,8 @@ display::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			// Allow the user to delete a fullscreen window this way
 			destroy();
-			gui_main::report_window_delete(this);
 			if (exit)
-				gui_main::quit();
+				PostQuitMessage(0);
 			return 0;
 		}
 		keys.push( std::string(kStr));
@@ -531,644 +705,73 @@ display::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-WNDCLASS display::win32_class;
-
-// Callbacks provided to the display_kernel object.
-void
-display::on_gl_begin()
-{
-	saved_dc = wglGetCurrentDC();
-	saved_glrc = wglGetCurrentContext();
-	if (!wglMakeCurrent( dev_context, gl_context))
-		WIN32_CRITICAL_ERROR( "wglMakeCurrent failed");
-	current = this;
-}
-
-void
-display::on_gl_end()
-{
-	wglMakeCurrent( saved_dc, saved_glrc);
-	saved_dc = 0;
-	saved_glrc = 0;
-	current = 0;
-}
-
-void
-display::on_gl_swap_buffers()
-{
-	SwapBuffers( dev_context);
-}
-
-display::display()
-	: x(-1), y(-1),
-	exit(true), visible(true), fullscreen(false), title( "VPython"),
-	Kshift(false), Kctrl(false), Kalt(false),
-	window_width(430), window_height(430),
-	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
-	saved_dc(0), saved_glrc(0),
-	last_mousepos_x(0), last_mousepos_y(0), mouselocked( false), active(false)
-{
-	// Connect callbacks from the display_kernel to this object.  These will not
-	// be called back from the core until report_realize is called.
-	gl_begin.connect(
-		boost::bind(&display::on_gl_begin, this));
-	gl_end.connect(
-		boost::bind(&display::on_gl_end, this));
-	gl_swap_buffers.connect(
-		boost::bind(&display::on_gl_swap_buffers, this));
-}
-
-void
-display::create()
-{
-	register_win32_class();
-
-	RECT screen;
-	SystemParametersInfo( SPI_GETWORKAREA, 0, &screen, 0);
-	int style = -1;
-	int real_x = static_cast<int>(x);
-	int real_y = static_cast<int>(y);
-	int real_width = static_cast<int>(window_width);
-	int real_height = static_cast<int>(window_height);
-
-	if (fullscreen) {
-		real_x = screen.left;
-		real_y = screen.top;
-		real_width = screen.right - real_x;
-		real_height = screen.bottom - real_y;
-		style = WS_OVERLAPPED | WS_POPUP | WS_MAXIMIZE | WS_VISIBLE;
-	}
-	else if (real_x < 0 && real_y < 0 || real_x > screen.right || real_y > screen.bottom) {
-		real_x = CW_USEDEFAULT;
-		real_y = CW_USEDEFAULT;
-	}
-	else if (real_x < screen.left) {
-		real_x = screen.left;
-	}
-	else if (real_y < screen.top) {
-		real_y = screen.top;
-	}
-
-	if (real_x + real_width > screen.right)
-		real_width = screen.right - real_x;
-	if (real_y + real_height > screen.bottom)
-		real_height = screen.bottom - real_y;
-
-	if (!fullscreen)
-		style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-
-	widget_handle = CreateWindow(
-		win32_class.lpszClassName,
-		title.c_str(),
-		style,
-		real_x, real_y,
-		real_width, real_height,
-		0,
-		0, // A unique index to identify this widget by the parent
-		GetModuleHandle(0),
-		0 // No data passed to the WM_CREATE function.
-	);
-	widgets[widget_handle] = this;
-
-	// The first OpenGL Rendering Context, used to share displaylists.
-	static HGLRC root_glrc = 0;
-
-	dev_context = GetDC(widget_handle);
-	if (!dev_context)
-		WIN32_CRITICAL_ERROR( "GetDC()");
-
-	PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd
-		1,                               // version number
-		PFD_DRAW_TO_WINDOW |             // output to screen (not an image)
-		PFD_SUPPORT_OPENGL |             // support OpenGL
-		PFD_DOUBLEBUFFER,                // double buffered
-		PFD_TYPE_RGBA,                   // RGBA type
-		24,                              // 24-bit color depth
-		0, 0, 0, 0, 0, 0,                // color bits ignored
-		0,                               // no opacity buffer
-		0,                               // shift bit ignored
-		0,                               // no accumulation buffer
-		0, 0, 0, 0,                      // accum bits ignored
-		32,                              // 32-bit z-buffer
-		0,                               // no stencil buffer
-		0,                               // no auxiliary buffer
-		PFD_MAIN_PLANE,                  // main layer
-		0,                               // reserved
-		0, 0, 0                          // layer masks ignored
-	};
-
-	int pixelformat = ChoosePixelFormat( dev_context, &pfd);
-
-	DescribePixelFormat( dev_context, pixelformat, sizeof(pfd), &pfd);
-	SetPixelFormat( dev_context, pixelformat, &pfd);
-
-	gl_context = wglCreateContext( dev_context);
-	if (!gl_context)
-		WIN32_CRITICAL_ERROR("wglCreateContext()");
-
-	if (!root_glrc)
-		root_glrc = gl_context;
-	else
-		wglShareLists( root_glrc, gl_context);
-	active = true;
-	visible = true;
-	ShowWindow( widget_handle, SW_SHOW);
-}
-
-void
-display::destroy()
-{
-	CloseWindow( widget_handle);
-	// widget_handle = 0;
-}
-
-display::~display()
-{
-}
-
-void
-display::set_x( float n_x)
-{
-	lock L(mtx);
-	if (active) {
-		throw std::runtime_error( "Cannot change parameters of an active window");
-	}
-	else
-		x = n_x;
-}
-float
-display::get_x()
-{
-	return x;
-}
-
-void
-display::set_y( float n_y)
-{
-	lock L(mtx);
-	if (active) {
-		throw std::runtime_error( "Cannot change parameters of an active window");
-	}
-	else
-		y = n_y;
-}
-float
-display::get_y()
-{
-	return y;
-}
-
-void
-display::set_width( float w)
-{
-	lock L(mtx);
-	if (active) {
-		throw std::runtime_error( "Cannot change parameters of an active window");
-	}
-	else
-		window_width = w;
-}
-float
-display::get_width()
-{
-	return window_width;
-}
-
-void
-display::set_height( float h)
-{
-	lock L(mtx);
-	if (active) {
-		throw std::runtime_error( "Cannot change parameters of an active window");
-	}
-	else
-		window_height = h;;
-}
-float
-display::get_height()
-{
-	return window_height;
-}
-
-void
-display::set_visible( bool vis)
-{
-	if (vis && !active) {
-		VPYTHON_NOTE( "Opening a window from Python.");
-		gui_main::add_display( this);
-	}
-	else if (!vis && active) {
-		VPYTHON_NOTE( "Closing a window from Python.");
-		gui_main::remove_display(this);
-	}
-	visible = vis;
-}
-bool
-display::get_visible()
-{
-	if (!active)
-		return false;
-	return visible;
-}
-
-void
-display::set_title( std::string n_title)
-{
-	lock L(mtx);
-	if (active) {
-		throw std::runtime_error( "Cannot change parameters of an active window");
-	}
-	else
-		title = n_title;
-}
-std::string
-display::get_title()
-{
-	return title;
-}
-
-bool
-display::is_fullscreen()
-{
-	return fullscreen;
-}
-void
-display::set_fullscreen( bool fs)
-{
-	lock L(mtx);
-	if (active) {
-		throw std::runtime_error( "Cannot change parameters of an active window");
-	}
-	else
-		fullscreen = fs;
-}
-
-int
-display::get_titlebar_height()
-{
-#if !(defined(_WIN32) || defined(_MSC_VER))
-	return 23;
-#else
-	return 25; // Ubuntu Linux; unknown what situation is on Mac
-#endif
-}
-
-int
-display::get_toolbar_height()
-{
-	return 37;
-}
-
-bool
-display::is_showing_toolbar()
-{
-	return show_toolbar;
-}
-
-void
-display::set_show_toolbar( bool fs)
-{
-	if (active)
-		throw std::runtime_error( 
-			"Cannot change the window's state after initialization.");
-	show_toolbar = fs;
-}
-
-void
-display::add_renderable( shared_ptr<renderable> obj)
-{
-	display_kernel::add_renderable( obj);
-	if (!active && visible) {
-		gui_main::add_display(this);
-	}
-}
-
-void
-display::add_renderable_screen( shared_ptr<renderable> obj)
-{
-	display_kernel::add_renderable( obj);
-	if (!active && visible)
-		gui_main::add_display(this);
-}
-
-mouse_t*
-display::get_mouse()
-{
-	if (!visible)
-		visible = true;
-	if (!active)
-		gui_main::add_display( this);
-
-	return &mouse;
-}
-
-atomic_queue<std::string>*
-display::get_kb()
-{
-	if (!visible)
-		visible = true;
-	if (!active)
-		gui_main::add_display( this);
-
-	return &keys;
-}
-
-void
-display::set_selected( shared_ptr<display> d)
-{
-	selected = d;
-}
-
-shared_ptr<display>
-display::get_selected()
-{
-	return selected;
-}
-
-display::EXTENSION_FUNCTION
-display::getProcAddress(const char* name) {
-	return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
-}
-
 /******************************* gui_main implementatin **********************/
 
-gui_main* gui_main::self = 0;
-mutex* volatile gui_main::init_lock = 0;
-condition* volatile gui_main::init_signal = 0;
+gui_main* gui_main::self = 0;  // Protected by python GIL
+
 boost::signal<void()> gui_main::on_shutdown;
 
+const int CALL_MESSAGE = WM_USER;
 
 gui_main::gui_main()
-	: idThread(GetCurrentThreadId()),
-	caller( 0), returned( false), waiting_allclosed(false),
-	thread_exited(false), shutting_down( false)
+ : gui_thread(-1)
 {
-	// Force the create of a message queue
-	MSG message;
-	PeekMessage( &message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
-}
-
-void
-gui_main::signal_add_display()
-{
-	PostThreadMessage( idThread, VPYTHON_ADD_DISPLAY, 0, 0);
-}
-
-void
-gui_main::signal_remove_display()
-{
-	PostThreadMessage( idThread, VPYTHON_REMOVE_DISPLAY, 0, 0);
-}
-
-void
-gui_main::signal_shutdown()
-{
-	PostThreadMessage( idThread, VPYTHON_SHUTDOWN, 0, 0);
 }
 
 void
 gui_main::run()
 {
-	// Enter the message loop
 	MSG message;
-	while (true) {
-		while (PeekMessage(&message, 0, 0, 0, PM_REMOVE)) {
-			if (message.message == WM_QUIT) {
-				VPYTHON_NOTE( "WM_QUIT recieved");
-				goto quit;
-			}
 
-			if (message.hwnd ==0) { // One of the threaded callbacks
-				switch (message.message) {
-					case VPYTHON_ADD_DISPLAY:
-						add_display_impl();
-						break;
-					case VPYTHON_REMOVE_DISPLAY:
-						remove_display_impl();
-						break;
-					case VPYTHON_SHUTDOWN:
-						shutdown_impl();
-						break;
-					default:
-						break; // nothing...
-				}
-				continue;
-			}
-			//if(!self->shutting_down)
-			//if(!(self->shutting_down && (message.message == WM_PAINT)))
-			{
-				// Destined for the primary window procedure above
-				TranslateMessage( &message);
-				DispatchMessage( &message);
-			}
+	// Create a message queue
+	PeekMessage(&message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+	
+	// Tell the initializing thread
+	{
+		lock L(init_lock);
+		gui_thread = GetCurrentThreadId();
+		initialized.notify_all();
+	}
+
+	// Enter the message loop
+	while (GetMessage(&message, 0, 0, 0) > 0) {
+		if (message.hwnd ==0 && message.message == CALL_MESSAGE ) {
+			boost::function<void()>* f = (boost::function<void()>*)message.wParam;
+			(*f)();
+			delete f;
+			continue;
 		}
-		if (!WaitMessage())
-			WIN32_CRITICAL_ERROR( "WaitMessage()");
+
+		// Destined for the primary window procedure above
+		TranslateMessage( &message);
+		DispatchMessage( &message);
 	}
 
-quit:
-	lock L(call_lock);
-	if (waiting_allclosed) {
-		returned = true;
-		call_complete.notify_all();
-	}
-	thread_exited = true;
-}
-
-void
-gui_main::thread_proc(void)
-{
-	assert( init_lock);
-	assert( init_signal);
-	assert( !self);
-	{
-		lock L(*init_lock);
-		self = new gui_main();
-		init_signal->notify_all();
-	}
-	
-	// Brandmeyer suggestion: (http://msdn2.microsoft.com/en-us/library/ms685100.aspx)
-	/*
-	if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST)) {
-		VPYTHON_WARNING("Could not raise the rendering thread priority");
-	}
-	else
-	{
-		VPYTHON_NOTE("Raised the rendering thread priority to THREAD_PRIORITY_HIGHEST");
-	}
-	*/
-	
-	// Try opposite priority:
-	/*
-	if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST)) {
-		VPYTHON_WARNING("Could not lower the rendering thread priority");
-	}
-	else
-	{
-		VPYTHON_NOTE("Lowered the rendering thread priority to THREAD_PRIORITY_LOWEST");
-	}
-	*/
-	
-	self->run();
-	VPYTHON_NOTE( "Terminating GUI thread.");
-	gui_main::on_shutdown();
+	// We normally exit the message queue because PostQuitMessage() has been called
+	VPYTHON_NOTE( "WM_QUIT (or message queue error) received");
+	on_shutdown(); // Tries to kill Python
 }
 
 void
 gui_main::init_thread(void)
 {
-	if (!init_lock) {
-		init_lock = new mutex;
-		init_signal = new condition;
-		VPYTHON_NOTE( "Starting GUI thread.");
-		lock L(*init_lock);
-		thread gui( &gui_main::thread_proc);
-		while (!self)
-			init_signal->wait(L);
-	}
-}
-
-// TODO: This may not be safe.  In fact, it might be easier to get notification
-// of shutdown via a truly joinable GUI thread.
-bool
-gui_main::allclosed()
-{
-	if (!self)
-		return true;
-	lock L(self->call_lock);
-	return self->displays.empty();
-}
-
-void
-gui_main::waitclosed()
-{
-	if (!self)
-		return;
-	lock L(self->call_lock);
-	if (self->thread_exited)
-		return;
-	self->waiting_allclosed = true;
-	self->returned = false;
-	while (!self->returned) {
-		self->call_complete.wait(L);
+	if (!self) {
+		// We are holding the Python GIL through this process, including the wait!
+		// We can't let go because a different Python thread could come along and mess us up (e.g.
+		//   think that we are initialized and go on to call PostThreadMessage without a valid idThread)
+		self = new gui_main;
+		thread gui( boost::bind( &gui_main::run, self ) );
+		lock L( self->init_lock );
+		while (self->gui_thread == -1)
+			self->initialized.wait( L );
 	}
 }
 
 void
-gui_main::add_display( display* d)
+gui_main::call_in_gui_thread( const boost::function< void() >& f )
 {
 	init_thread();
-	lock L(self->call_lock);
-	if (self->shutting_down) {
-		return;
-	}
-	VPYTHON_NOTE( std::string("Adding new display object at address ")
-		+ lexical_cast<std::string>(d));
-	self->caller = d;
-	self->returned = false;
-	self->signal_add_display();
-	while (!self->returned)
-		self->call_complete.py_wait(L);
-	self->caller = 0;
-}
-
-void
-gui_main::add_display_impl()
-{
-	lock L(call_lock);
-	caller->create();
-	displays.push_back(caller);
-	returned = true;
-	call_complete.notify_all();
-}
-
-void
-gui_main::remove_display( display* d)
-{
-	assert( self);
-	VPYTHON_NOTE( std::string("Removing existing display object at address ")
-		+ lexical_cast<std::string>(d));
-
-	lock L(self->call_lock);
-	self->caller = d;
-	self->returned = false;
-	self->signal_remove_display();
-	while (!self->returned)
-		self->call_complete.py_wait(L);
-	self->caller = 0;
-}
-
-void
-gui_main::remove_display_impl()
-{
-	lock L(call_lock);
-	caller->destroy();
-	displays.remove( caller);
-	returned = true;
-	call_complete.notify_all();
-}
-
-void
-gui_main::shutdown()
-{
-	if (!self)
-		return;
-	lock L(self->call_lock);
-	VPYTHON_NOTE( "Initiating shutdown from Python.");
-	if (self->thread_exited)
-		return;
-	self->returned = false;
-	self->shutting_down = true;
-	self->signal_shutdown();
-//	while (!self->returned)
-//		self->call_complete.py_wait(L);
-}
-
-void
-gui_main::shutdown_impl()
-{
-	lock L(call_lock);
-	shutting_down = true;
-	for (std::list<display*>::iterator i = displays.begin(); i != displays.end(); ++i) {
-		(*i)->destroy();
-	}
-	self->returned = true;
-	call_complete.notify_all();
-	PostQuitMessage( 0);
-}
-
-void
-gui_main::report_window_delete( display* window)
-{
-	assert( self != 0);
-	bool display_empty = false;
-	{
-		lock L(self->call_lock);
-		self->displays.remove( window);
-		display_empty = self->displays.empty();
-		//gui_main::shutdown();
-	}
-	if (display_empty){
-		if  (self->waiting_allclosed)
-			gui_main::quit();
-		else
-			gui_main::shutdown();
-	}//*/
-}
-
-void
-gui_main::quit()
-{
-	assert( self != 0);
-	lock L(self->call_lock);
-	self->shutting_down = true;
-	for (std::list<display*>::iterator i = self->displays.begin();
-			i != self->displays.end(); ++i) {
-		(*i)->destroy();
-	}
-	self->displays.clear();
-	PostQuitMessage( 0);
+	PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
 }
 
 } // !namespace cvisual;

@@ -151,7 +151,6 @@ renderable::refresh_cache(const view& geometry)
 void
 renderable::set_shininess( const float s)
 {
-	lock L(mtx);
 	model_damage();
 	shininess = clamp( 0.0f, s, 1.0f);
 }
@@ -165,7 +164,6 @@ renderable::get_shininess()
 void
 renderable::set_lit(bool l)
 {
-	lock L(mtx);
 	lit = l;
 }
 
@@ -178,7 +176,6 @@ renderable::is_lit()
 void
 renderable::set_texture( shared_ptr<texture> t)
 {
-	lock L(mtx);
 	tex = t;
 }
 
@@ -191,7 +188,6 @@ renderable::get_texture()
 void 
 renderable::set_material( shared_ptr<class material> m )
 {
-	lock L(mtx);
 	model_damage();
 	mat = m;
 }

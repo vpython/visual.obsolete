@@ -328,72 +328,7 @@ operator<<( basic_ostream<char_T, traits>& stream, const cvisual::vector& v)
 
 namespace cvisual {
 
-// This is a utility class to help provide wrapping around a shared vector object.
-// Locking is only provided for writes, not reads; the reading object must lock
-// it (ie, the rendering thread).
-// shared_vector provides simmillar functionallity to LockedVectorPtr under the
-// Py::CXX-based interface.
-class shared_vector : public vector
-{
- private:
-	mutex& owner; //< The owner of this mutex must be a Cache
-	// object.  Since return_internal_reference<>() binds the lifetime of this
-	// vector to its owner, we do not need any additional lifetime management for
-	// the pointer.  Just the same, all of the assignment checks verify that the
-	// mutex is not NULL.  In the event that owner is NULL, shared_vector
-	// behaves indistinguishably from vector.
-
- public:
-	shared_vector( mutex& _owner, const vector& v )
-		:  vector(v), owner(_owner){}
-
-	shared_vector( mutex& _owner, double x, double y, double z)
-		:  vector( x, y, z), owner( _owner){}
-
-
-	void
-	set_x( const double& x);
-
-	void
-	set_y( const double& y);
-
-	void
-	set_z( const double& z);
-
-	// Thread safely assign to this vector.
-	const shared_vector&
-	operator=( const vector& v);
-
-	const shared_vector&
-	operator+=( const vector& v);
-
-	const shared_vector&
-	operator-=( const vector& v);
-
-	const shared_vector&
-	operator*=( const double& s);
-
-	const shared_vector&
-	operator/=( const double& s);
-
-	const shared_vector&
-	operator*=( const int& s);
-
-	const shared_vector&
-	operator/=( const int& s);
-
-	void py_setitem(int i, double value);
-
-	void py_scale( double);
-	void py_scale2( double);
-
-    // Use this function to assign to this vector when the parent mutex is
-    // already locked.
-    inline void assign_locked( const vector& v)
-    {
-        vector::operator=(v);
-    }
-}; // !class shared_vector
+typedef vector shared_vector;
 
 } // !namespace cvisual
 

@@ -24,6 +24,31 @@
 
 namespace cvisual {
 
+shared_ptr<display_kernel> display_kernel::selected;
+
+////////////////////////////////////////////////////////////////
+// Implementation of display_kernel::waitWhileAnyDisplayVisible()
+
+static mutex displays_visible_lock;
+static boost::condition displays_visible_condition;
+static int displays_visible = 0;
+void set_display_visible( display_kernel*, bool visible ) {
+	lock L( displays_visible_lock );
+	if (visible) displays_visible++;
+	else displays_visible--;
+	displays_visible_condition.notify_all();
+}
+void 
+display_kernel::waitWhileAnyDisplayVisible() 
+{
+	python::gil_release gil;
+
+	lock L( displays_visible_lock );
+	while ( displays_visible )
+		displays_visible_condition.wait( L );
+}
+////////////////////////////////////////////////////////////////
+
 static const display_kernel::EXTENSION_FUNCTION notImplemented = (display_kernel::EXTENSION_FUNCTION)-1;
 
 void
@@ -82,7 +107,6 @@ display_kernel::disable_lights()
 void
 display_kernel::add_light( shared_ptr<light> n_light)
 {
-	lock L(mtx);
 	if (lights.size() >= 8)
 		throw std::invalid_argument( "There may be no more than 8 lights.");
 	lights.push_back( n_light);
@@ -91,7 +115,6 @@ display_kernel::add_light( shared_ptr<light> n_light)
 void
 display_kernel::remove_light( shared_ptr<light> old_light)
 {
-	lock L(mtx);
 	lights.remove( old_light);
 }
 
@@ -130,11 +153,18 @@ display_kernel::calc_camera()
 }
 
 display_kernel::display_kernel()
-	: window_width(430),
+	: 
+	x(-1), y(-1),
+	exit(true), 
+	visible(false), 
+	explicitly_invisible(false),
+	fullscreen(false), 
+	title( "VPython" ),
+	window_width(430), 
 	window_height(430),
-	center(mtx, 0, 0, 0),
-	forward(mtx, 0, 0, -1),
-	up(mtx, 0, 1, 0),
+	center(0, 0, 0),
+	forward(0, 0, -1),
+	up(0, 1, 0),
 	range(10, 10, 10),
 	forward_changed(true),
 	cycles_since_extent(4),
@@ -164,6 +194,19 @@ display_kernel::display_kernel()
 
 display_kernel::~display_kernel()
 {
+	if (visible)
+		set_display_visible( this, false );
+}
+
+void
+display_kernel::report_closed() {
+	set_display_visible( this, false );
+
+	lock L( realize_lock );
+	realized = false;
+	visible = false;
+	explicitly_invisible = true;
+	realize_condition.notify_all();
 }
 
 void
@@ -219,12 +262,10 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 					if (spin_allowed)
 						center += pan_rate * vfrac * forward.norm();
 					break;
-				case ZOOM_ROLL: case ZOOM_ROTATE: {
+				case ZOOM_ROLL: case ZOOM_ROTATE:
 					// Zoom in/out.
-						lock L(mtx);
-						if (zoom_allowed)
-							user_scale *= std::pow( 10.0f, vfrac);
-					}
+					if (zoom_allowed)
+						user_scale *= std::pow( 10.0f, vfrac);
 					break;
 			}
 			break;
@@ -272,18 +313,17 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 }
 
 void
-display_kernel::report_resize( float new_width, float new_height)
+display_kernel::report_resize( float new_x, float new_y, float new_width, float new_height)
 {
-	lock L(mtx);
+	x = new_x;
+	y = new_y;
 	window_height = new_height;
 	window_width = new_width;
 }
 
 void
-display_kernel::report_realize()
+display_kernel::realize()
 {
-	lock L(mtx);
-	gl_begin();
 	clear_gl_error();
 	if (!extensions) {
 		using namespace std;
@@ -299,8 +339,8 @@ display_kernel::report_realize()
 		
 		// The test is a hack so that subclasses not bothering to implement getProcAddress just
 		//   don't get any extensions.
-		if (static_cast<display*>(this)->getProcAddress("display_kernel::getProcAddress") != notImplemented)
-			glext.init( *static_cast<display*>( this ) );
+		if (getProcAddress("display_kernel::getProcAddress") != notImplemented)
+			glext.init( *this );
 	}
 
 	// Those features of OpenGL that are always used are set up here.
@@ -336,9 +376,6 @@ display_kernel::report_realize()
 	}
 
 	check_gl_error();
-	gl_end();
-	
-	realized = true;
 }
 
 // Set up matricies for transforms from world coordinates to view coordinates
@@ -533,8 +570,7 @@ display_kernel::recalc_extent(void)
 	cycles_since_extent = 0;
 	if (autocenter) {
 		// Move the camera to accomodate the new center of the scene
-        // assert( mtx.locked()); // TODO: Implement this feature.
-		center.assign_locked( world_extent.center());
+		center = world_extent.center();
 	}
 	if (autoscale) {
 		// Compute range such that the three axes, centered at center,
@@ -572,22 +608,26 @@ display_kernel::recalc_extent(void)
 	lastgcf = newgcf;
 }
 
+void display_kernel::implicit_activate() {
+	if (!visible && !explicitly_invisible)
+		set_visible( true );
+}
+
 void
 display_kernel::add_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
-	lock L(mtx);
 	if (obj->color.opacity == 1.0)
 		layer_world.push_back( obj);
 	else
 		layer_world_transparent.push_back( obj);
+	implicit_activate();
 }
 
 void
 display_kernel::remove_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
-	lock L(mtx);
 	if (obj->color.opacity == 1.0) {
 		std::remove( layer_world.begin(), layer_world.end(), obj);
 		layer_world.pop_back();
@@ -612,7 +652,6 @@ display_kernel::draw(
 	world_iterator i( layer_world.begin());
 	world_iterator i_end( layer_world.end());
 	while (i != i_end) {
-		lock L(i->mtx);
 		if (i->color.opacity != 1.0 || (i->get_texture() && i->get_texture()->has_opacity())) {
 			// The color of the object has become transparent when it was not
 			// initially.  Move it to the transparent layer.  The penalty for
@@ -638,7 +677,6 @@ display_kernel::draw(
 	world_trans_iterator j( layer_world_transparent.begin());
 	world_trans_iterator j_end( layer_world_transparent.end());
 	while (j != j_end) {
-		lock L(j->mtx);
 		j->outer_render( scene_geometry );
 		++j;
 	}
@@ -664,9 +702,14 @@ display_kernel::draw(
 bool
 display_kernel::render_scene(void)
 {
-	lock L(mtx);
-	if (!realized) 
-		return false;  // xxx This "fixes" problems with GL not being set up correctly on the first frame, but may be covering over a bug in win32 display - why can render_scene() get called before report_realize()?
+	// xxx Exception handling?
+	if (!realized) {
+		realize();
+		
+		lock L(realize_lock);
+		realized = true;
+		realize_condition.notify_all();
+	}
 	double start_time, cycle;
 	if (show_rendertime) {
 		start_time = render_timer.elapsed();
@@ -678,7 +721,6 @@ display_kernel::render_scene(void)
 		view scene_geometry( forward.norm(), center, window_width,
 			window_height, forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
-		gl_begin();
 		clear_gl_error();
 		
 		on_gl_free.frame();
@@ -808,7 +850,7 @@ display_kernel::render_scene(void)
 		if (show_rendertime) {
 			double render_time = render_timer.elapsed()-start_time, flush_time = -1;
 			
-			#if 1 // xxx Only for performance measurement; disable in shipping code
+			#if 0 // xxx Only for performance measurement; disable in shipping code
 			glFinish();
 			
 			flush_time = render_timer.elapsed() - start_time - render_time;
@@ -846,9 +888,7 @@ display_kernel::render_scene(void)
 
 
 		// Cleanup
-		gl_swap_buffers();
 		check_gl_error();
-		gl_end();
 		cycles_since_extent++;
 		gcf_changed = false;
 		forward_changed = false;
@@ -870,12 +910,10 @@ display_kernel::pick( float x, float y, float d_pixels)
 {
 	using boost::scoped_array;
 
-	lock L(mtx);
 	shared_ptr<renderable> best_pick;
     vector pickpos;
     vector mousepos;
 	try {
-		gl_begin();
 		clear_gl_error();
 		// Notes:
 		// culled polygons don't count.  glRasterPos() does count.
@@ -929,7 +967,6 @@ display_kernel::pick( float x, float y, float d_pixels)
 			glLoadName( name_table.size());
 			name_table.push_back( *i);
 			{
-				lock L((*i)->mtx);
 				(*i)->gl_pick_render( scene_geometry);
 			}
 			++i;
@@ -942,7 +979,6 @@ display_kernel::pick( float x, float y, float d_pixels)
 			glLoadName( name_table.size());
 			name_table.push_back( *j);
 			{
-				lock L((*j)->mtx);
 				(*j)->gl_pick_render( scene_geometry);
 			}
 			++j;
@@ -1010,7 +1046,6 @@ display_kernel::pick( float x, float y, float d_pixels)
         	projection.matrix_addr(),
         	viewport_bounds,
         	&mousepos.x, &mousepos.y, &mousepos.z);
-        gl_end();
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;
@@ -1025,7 +1060,6 @@ void
 display_kernel::gl_free()
 {
 	VPYTHON_NOTE( "Releasing GL resources");
-	gl_begin();
 	try {
 		clear_gl_error();
 		on_gl_free.shutdown();
@@ -1036,14 +1070,12 @@ display_kernel::gl_free()
 			+ std::string(error.what())
 			+ "; Continuing with the shutdown.");
 	}
-	gl_end();
 	VPYTHON_NOTE( "GL resource release complete");
 }
 
 void
 display_kernel::allow_spin(bool b)
 {
-	lock L(mtx);
 	spin_allowed = b;
 }
 
@@ -1056,7 +1088,6 @@ display_kernel::spin_is_allowed(void) const
 void
 display_kernel::allow_zoom(bool b)
 {
-	lock L(mtx);
 	zoom_allowed = b;
 }
 
@@ -1101,7 +1132,6 @@ display_kernel::set_scale( const vector& n_scale)
 			"The scale of each axis must be non-zero.");
 
 	vector n_range = vector( 1.0/n_scale.x, 1.0/n_scale.y, 1.0/n_scale.z);
-	lock L(mtx);
 	autoscale = false;
 	range = n_range;
 }
@@ -1109,7 +1139,6 @@ display_kernel::set_scale( const vector& n_scale)
 vector
 display_kernel::get_scale()
 {
-	lock L(mtx);
 	return vector( 1/range.x, 1/range.y, 1/range.z);
 }
 
@@ -1134,7 +1163,6 @@ display_kernel::set_fov( double n_fov)
 		throw std::invalid_argument(
 			"attribute visual.display.fov must be between 0.0 and math.pi "
 			"(exclusive)");
-	lock L(mtx);
 	fov = n_fov;
 }
 
@@ -1162,7 +1190,6 @@ display_kernel::get_lod()
 void
 display_kernel::set_uniform( bool n_uniform)
 {
-	lock L(mtx);
 	uniform = n_uniform;
 }
 
@@ -1176,7 +1203,6 @@ display_kernel::is_uniform()
 void
 display_kernel::set_background( const rgba& n_background)
 {
-	lock L(mtx);
 	background = n_background;
 }
 
@@ -1189,7 +1215,6 @@ display_kernel::get_background()
 void
 display_kernel::set_forground( const rgba& n_forground)
 {
-	lock L(mtx);
 	forground = n_forground;
 }
 
@@ -1202,7 +1227,6 @@ display_kernel::get_forground()
 void
 display_kernel::set_autoscale( bool n_autoscale)
 {
-	lock L(mtx);
 	if (!n_autoscale && autoscale)
 		recalc_extent();
 	autoscale = n_autoscale;
@@ -1223,14 +1247,12 @@ display_kernel::get_autocenter()
 void
 display_kernel::set_autocenter( bool n_autocenter)
 {
-	lock L(mtx);
 	autocenter = n_autocenter;
 }
 
 void
 display_kernel::set_show_rendertime( bool show)
 {
-	lock L(mtx);
 	show_rendertime = show;
 }
 
@@ -1246,7 +1268,6 @@ display_kernel::set_range_d( double r)
 	if (r == 0.0)
 		throw std::invalid_argument(
 			"attribute visual.display.range may not be zero.");
-	lock L(mtx);
 	autoscale = false;
 	range = vector( r, r, r);
 }
@@ -1257,7 +1278,6 @@ display_kernel::set_range( const vector& n_range)
 	if (n_range.x == 0.0 || n_range.y == 0.0 || n_range.z == 0.0)
 		throw std::invalid_argument(
 			"attribute visual.display.range may not be zero.");
-	lock L(mtx);
 	autoscale = false;
 	range = n_range;
 }
@@ -1265,14 +1285,12 @@ display_kernel::set_range( const vector& n_range)
 vector
 display_kernel::get_range()
 {
-	lock L(mtx);
 	return range;
 }
 
 void
 display_kernel::set_stereomode( std::string mode)
 {
-	lock L(mtx);
 	if (mode == "nostereo")
 		stereo_mode = NO_STEREO;
 	else if (mode == "active")
@@ -1323,7 +1341,6 @@ display_kernel::get_stereomode()
 std::list<shared_ptr<renderable> >
 display_kernel::get_objects() const
 {
-	lock L(mtx);
 	std::list<shared_ptr<renderable> > ret = layer_world;
 	ret.insert( ret.end(),
 		layer_world_transparent.begin(), layer_world_transparent.end());
@@ -1333,7 +1350,6 @@ display_kernel::get_objects() const
 std::string
 display_kernel::info()
 {
-	lock L(mtx);
 	if (!extensions)
 		return std::string( "Renderer inactive.\n");
 	else {
@@ -1355,7 +1371,6 @@ display_kernel::info()
 
 void 
 display_kernel::set_shader( std::string source ) {
-	lock L(mtx);
 	if (source.size())
 		global_shader.reset( new shader_program( source ) );
 	else
@@ -1364,11 +1379,160 @@ display_kernel::set_shader( std::string source ) {
 
 std::string 
 display_kernel::get_shader() {
-	lock L(mtx);
 	if ( global_shader ) 
 		return global_shader->get_source();
 	else 
 		return std::string();
+}
+
+void
+display_kernel::set_x( float n_x)
+{
+	if (visible)
+		throw std::runtime_error( "Cannot change parameters of an active window");
+	else
+		x = n_x;
+}
+float
+display_kernel::get_x()
+{
+	return x;
+}
+
+void
+display_kernel::set_y( float n_y)
+{
+	if (visible)
+		throw std::runtime_error( "Cannot change parameters of an active window");
+	else
+		y = n_y;
+}
+float
+display_kernel::get_y()
+{
+	return y;
+}
+
+void
+display_kernel::set_width( float w)
+{
+	if (visible)
+		throw std::runtime_error( "Cannot change parameters of an active window");
+	else
+		window_width = w;
+}
+float
+display_kernel::get_width()
+{
+	return window_width;
+}
+
+void
+display_kernel::set_height( float h)
+{
+	if (visible)
+		throw std::runtime_error( "Cannot change parameters of an active window");
+	else
+		window_height = h;;
+}
+float
+display_kernel::get_height()
+{
+	return window_height;
+}
+
+void
+display_kernel::set_visible( bool vis)
+{
+	if (vis != visible) {
+		visible = vis;
+		if (!vis) explicitly_invisible = true;
+		set_display_visible( this, visible );
+		activate( vis );
+
+		// Wait for (in)activation to complete
+		python::gil_release gil;
+		lock L( realize_lock );
+		while ( realized != vis )
+			realize_condition.wait( L );
+	}
+}
+
+bool
+display_kernel::get_visible()
+{
+	return visible;
+}
+
+void
+display_kernel::set_title( std::string n_title)
+{
+	if (visible)
+		throw std::runtime_error( "Cannot change parameters of an active window");
+	else
+		title = n_title;
+}
+std::string
+display_kernel::get_title()
+{
+	return title;
+}
+
+bool
+display_kernel::is_fullscreen()
+{
+	return fullscreen;
+}
+void
+display_kernel::set_fullscreen( bool fs)
+{
+	if (visible)
+		throw std::runtime_error( "Cannot change parameters of an active window");
+	else
+		fullscreen = fs;
+}
+
+bool display_kernel::get_exit() { return exit; }
+void display_kernel::set_exit(bool b) { exit = b; }
+
+bool
+display_kernel::is_showing_toolbar()
+{
+	return show_toolbar;
+}
+
+void
+display_kernel::set_show_toolbar( bool fs)
+{
+	if (visible)
+		throw std::runtime_error( "Cannot change parameters of an active window");
+	show_toolbar = fs;
+}
+
+mouse_t*
+display_kernel::get_mouse()
+{
+	implicit_activate();
+	return &mouse;
+}
+
+atomic_queue<std::string>*
+display_kernel::get_kb()
+{
+	implicit_activate();
+	return &keys;
+}
+
+void
+display_kernel::set_selected( shared_ptr<display_kernel> d )
+{
+	selected = d;
+}
+
+shared_ptr<display_kernel>
+display_kernel::get_selected()
+{
+	return selected;
 }
 
 bool

@@ -1,11 +1,10 @@
 #include "util/gl_extensions.hpp"
-#include "display.hpp"
-#include "GL/glext.h"
+#include "display_kernel.hpp"
 
 namespace cvisual {
 
 template <class PFN>
-void getPFN( PFN& func, display& d, const char* name ) {
+void getPFN( PFN& func, display_kernel& d, const char* name ) {
 	func = reinterpret_cast<PFN>( d.getProcAddress( name ) );
 	if (!func)
 		throw std::runtime_error( 
@@ -17,7 +16,7 @@ gl_extensions::gl_extensions() {
 	memset( this, 0, sizeof(this) );
 }
 
-void gl_extensions::init( display& d ) {
+void gl_extensions::init( display_kernel& d ) {
 	#define F( name ) getPFN( name, d, #name )
 
 	if ( ARB_shader_objects = d.hasExtension( "GL_ARB_shader_objects" ) ) {

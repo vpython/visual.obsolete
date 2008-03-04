@@ -160,7 +160,6 @@ convex::set_pos( array n_pos)
 	std::vector<npy_intp> dims = shape( n_pos);
 	if (dims.size() == 1 && count == 0) {
 		// perform a single append
-		lock L(mtx);
 		set_length( 1);
 		double* pos_data = index(pos, 0);
 		pos_data[0] = extract<double>(n_pos[0]);
@@ -172,12 +171,10 @@ convex::set_pos( array n_pos)
 		throw std::invalid_argument( "pos must be an Nx3 or Nx2 array");
 	}
 	if (dims[1] == 2) {
-		lock L(mtx);
 		set_length(dims[0]);
 		pos[make_tuple(slice(0, count), slice(_,1))] = n_pos;
 	}
 	else if (dims[1] == 3) {
-		lock L(mtx);
 		set_length(dims[0]);
 		pos[slice(0, count)] = n_pos;
 
@@ -195,7 +192,6 @@ convex::set_pos_l( const boost::python::list& pos)
 void
 convex::set_color( const rgba& n_color)
 {
-	lock L(mtx);
 	color = n_color;
 }
 
@@ -242,7 +238,6 @@ convex::set_length( size_t length)
 void
 convex::append( vector nv_pos)
 {
-	lock L(mtx);
 	set_length( count + 1);
 
 	double* pos_data = index(pos, count - 1);

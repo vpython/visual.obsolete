@@ -35,64 +35,11 @@ class display : public display_kernel,
 	Glib::RefPtr<Gnome::Glade::Xml> glade_file;
 	Gtk::Window* window;
 	sigc::connection timer;
-
-	mutex mtx;
-	bool active; ///< True when the display is actually visible
- 
-	// Properties of the main window.
-	float x;
-	float y;
-	float width;
-	float height;
-	bool exit; ///< True when Visual should shutdown on exit.
-	bool visible; ///< True when the user has requested this window to be visible.
-	bool fullscreen; ///< True when the display is in fullscreen mode.
-	bool show_toolbar; ///< True when toolbar is displayed (pan, etc).
-	std::string title;
- 
-	// The 'selected' display.
-	static shared_ptr<display> selected;
-		
-	// The interface for reading keyboard presses from this display in Python.
-	atomic_queue<std::string> keys;
 	
  public:
 	display();
 	virtual ~display();
 
-	void set_x( float x);
-	float get_x();
- 
-	void set_y( float y);
-	float get_y();
- 
-	void set_width( float w);
-	float get_width();
- 
-	void set_height( float h);
-	float get_height();
-	
-	void set_visible( bool v);
-	bool get_visible();
-
-	void set_title( std::string n_title);
-	std::string get_title();
- 
-	bool is_fullscreen();
-	void set_fullscreen( bool);
- 
-	bool is_showing_toolbar();
-	void set_show_toolbar( bool);
-
-	virtual void add_renderable( shared_ptr<renderable>);
-	virtual void add_renderable_screen( shared_ptr<renderable>);
-	
-	static void set_selected( shared_ptr<display> d);
-	static shared_ptr<display> get_selected();
-	
-	static int get_titlebar_height();
-	static int get_toolbar_height();
-	
 	static void set_dataroot( Glib::ustring dataroot);
 	
 	// Called by the gui_main class below when this window needs to create
@@ -100,12 +47,12 @@ class display : public display_kernel,
 	void create();
 	void destroy();
 	
-	atomic_queue<std::string>& get_kb();
-	mouse_t* get_mouse();
-
 	EXTENSION_FUNCTION getProcAddress( const char* name );
 	
  private:
+	static int get_titlebar_height();
+	static int get_toolbar_height();
+
 	// Signal handlers for the various widgets.
 	void on_fullscreen_clicked();
 	void on_pan_clicked();
@@ -158,11 +105,6 @@ class gui_main : public sigc::trackable
 	static void init_thread(void);
 
  public:
-	// (Nonblocking) Returns true if all of the active displays have been
-	// shut down
-	static bool allclosed();
-	// Waits until all displays have been closed by the user.
-	static void waitclosed();
 	// Force all displays to close and exit the Gtk event loop.
 	static void shutdown();
 	

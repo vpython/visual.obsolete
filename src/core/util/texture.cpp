@@ -36,7 +36,6 @@ texture::enable_type() const {
 void
 texture::gl_activate(const view& v)
 {
-	lock L(mtx);
 	damage_check();
 	if (damaged) {
 		gl_init(v);

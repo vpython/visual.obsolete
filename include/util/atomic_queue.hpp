@@ -23,7 +23,6 @@ class atomic_queue_impl
 	{}
 	
 	void push_notify();
-	void pop_wait( lock& L);
 	void py_pop_wait( lock& L);
 };
 
@@ -54,14 +53,8 @@ class atomic_queue : private atomic_queue_impl
 		data.push( item);
 		push_notify();
 	}
-	
-	T pop()
-	{
-		lock L(barrier);
-		pop_wait( L);
-		return pop_impl();
-	}
-	
+
+	// It's assumed that the caller of py_pop() holds the Python GIL
 	T py_pop()
 	{
 		lock L(barrier);
@@ -80,6 +73,7 @@ class atomic_queue : private atomic_queue_impl
 		lock L(barrier);
 		while (!data.empty())
 			data.pop();
+		empty = true;
 	}
 };
 

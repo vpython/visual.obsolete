@@ -191,7 +191,6 @@ protected:
 	friend class frame;
 	renderable();
 	renderable( const renderable& other);
-	mutex mtx;
 
 	shared_ptr<class material> mat;
 	

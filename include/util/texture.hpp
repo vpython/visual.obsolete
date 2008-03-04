@@ -36,7 +36,6 @@ class texture
 	bool damaged;
 
  public:
-	mutex mtx;
 	/** Release the handle to OpenGL.  Subclasses must not call 
  		glDeleteTextures() on this class's handle.
 	*/

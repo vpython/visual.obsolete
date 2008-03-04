@@ -10,20 +10,20 @@
 namespace cvisual {
 
 frame::frame()
-	: pos( mtx, 0, 0, 0),
-	axis( mtx, 1, 0, 0),
-	up( mtx, 0, 1, 0),
-	scale( mtx, 1.0, 1.0, 1.0)
+	: pos( 0, 0, 0),
+	axis( 1, 0, 0),
+	up( 0, 1, 0),
+	scale( 1.0, 1.0, 1.0)
 {
 	model_damage();
 }
 
 frame::frame( const frame& other)
 	: renderable( other),
-	pos( mtx, other.pos.x, other.pos.y, other.pos.z),
-	axis( mtx, other.axis.x, other.axis.y, other.axis.z),
-	up( mtx, other.up.x, other.up.y, other.up.z),
-	scale( mtx, other.scale.x, other.scale.y, other.scale.z)
+	pos(other.pos.x, other.pos.y, other.pos.z),
+	axis(other.axis.x, other.axis.y, other.axis.z),
+	up(other.up.x, other.up.y, other.up.z),
+	scale(other.scale.x, other.scale.y, other.scale.z)
 {
 	model_damage();
 }
@@ -127,10 +127,9 @@ frame::rotate( double angle, const vector& _axis, const vector& origin)
 			fake_up = vector( 0,1,0);
 	}
     {
-        lock L(mtx);
-        pos.assign_locked( R * pos);
-        axis.assign_locked( R.times_v( axis));
-        up.assign_locked( R.times_v( fake_up));
+        pos = R * pos;
+        axis = R.times_v( axis);
+        up = R.times_v( fake_up);
     }
 }
 
@@ -234,7 +233,6 @@ frame::remove_renderable( shared_ptr<renderable> obj)
 std::list<shared_ptr<renderable> >
 frame::get_objects()
 {
-	lock L(mtx);
 	std::list<shared_ptr<renderable> > ret = children;
 	ret.insert( ret.end(), trans_children.begin(), trans_children.end());
 	return ret;
@@ -314,8 +312,6 @@ frame::gl_render( const view& v)
 		gl_matrix_stackguard guard( fwt);
 
 		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
-			lock L(i->mtx);
-			
 			if (i->color.opacity != 1.0) {
 				// See display_kernel::draw().
 				trans_children.push_back( *i.base());
@@ -338,7 +334,6 @@ frame::gl_render( const view& v)
 			i != trans_child_iterator(trans_children.end());
 			++i) 
 		{
-			lock L(i->mtx);
 			i->outer_render(local);
 		}
 	}
@@ -365,7 +360,6 @@ frame::gl_pick_render( const view& scene)
 		// The unique integer to pass to OpenGL.
 		unsigned int name = 0;
 		while (i != i_end) {
-			lock L(i->mtx);
 			glLoadName(name);
 			i->gl_pick_render( scene);
 			++i;
@@ -375,7 +369,6 @@ frame::gl_pick_render( const view& scene)
 		trans_child_iterator j( trans_children.begin());
 		trans_child_iterator j_end( trans_children.end());
 		while (j != j_end) {
-			lock L(j->mtx);
 			glLoadName(name);
 			j->gl_pick_render(scene);
 			++j;

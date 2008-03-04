@@ -24,7 +24,6 @@ class material {
 	std::vector< boost::shared_ptr< texture > > textures;
 	boost::scoped_ptr< shader_program > shader;
 	double shininess;
-	mutex mtx;  // for now
 };
 
 class apply_material {

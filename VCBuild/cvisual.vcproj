@@ -466,10 +466,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\curve.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\include\cylinder.hpp"
 				>
 			</File>
@@ -542,10 +538,6 @@
 				</File>
 				<File
 					RelativePath="..\include\win32\GL\glext.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\win32\render_surface.hpp"
 					>
 				</File>
 				<File

@@ -99,13 +99,13 @@ primitive::get_center() const
 }
 
 primitive::primitive()
-	: axis(mtx, 1,0,0), up(mtx, 0,1,0), pos(mtx, 0,0,0)
+	: axis(1,0,0), up(0,1,0), pos(0,0,0)
 {
 }
 
 primitive::primitive( const primitive& other)
-	: renderable( other), axis(mtx, other.axis), up( mtx, other.up), 
-		pos(mtx, other.pos)
+	: renderable( other), axis(other.axis), up(other.up), 
+		pos(other.pos)
 {
 }
 
@@ -124,10 +124,9 @@ primitive::rotate( double angle, const vector& _axis, const vector& origin)
 			fake_up = vector( 0,1,0);
 	}
     {
-        lock L(mtx);
-    	pos.assign_locked( R * pos);
-    	axis.assign_locked( R.times_v( axis));
-    	up.assign_locked( R.times_v( fake_up));
+    	pos = R * pos;
+    	axis = R.times_v(axis);
+    	up = R.times_v(fake_up);
     }
 }
 
@@ -216,7 +215,6 @@ primitive::get_up()
 void 
 primitive::set_color( const rgba& n_color)
 {
-	lock L(mtx);
 	model_damage();
 	color = n_color;
 }
@@ -224,7 +222,6 @@ primitive::set_color( const rgba& n_color)
 void
 primitive::set_red( float r)
 {
-	lock L(mtx);
 	color.red = r;
 }
 
@@ -237,7 +234,6 @@ primitive::get_red()
 void
 primitive::set_green( float g)
 {
-	lock L(mtx);
 	color.green = g;
 }
 
@@ -250,7 +246,6 @@ primitive::get_green()
 void
 primitive::set_blue( float b)
 {
-	lock L(mtx);
 	color.blue = b;
 }
 
@@ -263,7 +258,6 @@ primitive::get_blue()
 void
 primitive::set_opacity( float a)
 {
-	lock L(mtx);
 	color.opacity = a;
 }
 

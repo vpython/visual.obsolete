@@ -288,7 +288,6 @@ numeric_texture::set_data( boost::python::numeric::array data)
 			"Texture data must be NxMxC, where C is between 1 and 4 (inclusive)");
 	}
 
-	lock L(mtx);
 	damage();
 	texdata = data;
 	data_height = dims[0];
@@ -336,7 +335,7 @@ numeric_texture::set_type( std::string requested_type)
 		req_type = 0;
 	else
 		throw std::invalid_argument( "Unknown texture type");
-	lock L(mtx);
+
 	data_textype = req_type;
 	if (req_type == GL_RGBA || req_type == GL_ALPHA || req_type == GL_LUMINANCE_ALPHA)
 		have_opacity = true;
@@ -365,7 +364,6 @@ numeric_texture::get_type() const
 void
 numeric_texture::set_mipmapped( bool m)
 {
-	lock L(mtx);
 	damage();
 	data_mipmapped = m;
 }
@@ -379,7 +377,6 @@ numeric_texture::is_mipmapped(void)
 void
 numeric_texture::set_antialias( bool aa)
 {
-	lock L(mtx);
 	damage();
 	data_antialias = aa;
 }

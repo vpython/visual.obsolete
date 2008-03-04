@@ -26,28 +26,14 @@ light::spotlight() const
 light::light( const vector& position, rgba color)
 	: diffuse( color), 
 	specular( color), 
-	position( mtx, position), 
+	position( position ), 
 	local(true),
-	spot_direction( mtx, vector()),
+	spot_direction(vector()),
 	spot_exponent(0), 
 	spot_cutoff(180.0), 
 	constant_attenuation(1.0),
 	linear_attenuation( 0.0), 
 	quadratic_attenuation(0.0)
-{
-}
-
-light::light( const light& other)
-	: diffuse( other.diffuse),
-	specular( other.specular),
-	position( mtx, other.position),
-	local( other.local),
-	spot_direction( mtx, other.spot_direction),
-	spot_exponent( other.spot_exponent),
-	spot_cutoff( other.spot_cutoff),
-	constant_attenuation( other.constant_attenuation),
-	linear_attenuation( other.linear_attenuation),
-	quadratic_attenuation( other.quadratic_attenuation)
 {
 }
 
@@ -66,7 +52,6 @@ light::get_pos()
 void 
 light::set_local( bool n_local)
 {
-	lock L(mtx);
 	local = n_local;
 }
 
@@ -94,7 +79,6 @@ light::set_spot_exponent( float e)
 	if (e < 0 || e > 128)
 		throw std::invalid_argument( 
 			"spot exponent must be within the range [0, 128].");
-	lock L(mtx);
 	spot_exponent = e;
 }
 
@@ -111,7 +95,6 @@ light::set_spot_cutoff( float e)
 		throw std::invalid_argument( 
 			"spot cutoff angle must be an angle between [0,90], or exactly 180 "
 			"degrees.");
-	lock L(mtx);
 	spot_cutoff = e;
 }
 
@@ -145,7 +128,6 @@ light::get_attentuation()
 void 
 light::set_diffuse_color( const rgba& color)
 {
-	lock L(mtx);
 	diffuse = color;
 }
 
@@ -158,7 +140,6 @@ light::get_diffuse_color()
 void 
 light::set_specular_color( const rgba& color)
 {
-	lock L(mtx);
 	specular = color;
 }
 
@@ -171,8 +152,6 @@ light::get_specular_color()
 void
 light::gl_begin( GLenum id, double gcf) const
 {
-	lock L(mtx);
-
 	glEnable( id);
 	if (attenuated()) {
 		glLightf( id, GL_CONSTANT_ATTENUATION, (GLfloat) (constant_attenuation*gcf));

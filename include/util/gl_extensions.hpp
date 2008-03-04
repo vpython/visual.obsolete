@@ -15,7 +15,7 @@ class gl_extensions {
 	gl_extensions();
 
 	// Must be initialized and used with the same OpenGL context current
-	void init( class display& d );
+	void init( class display_kernel& d );
 
 	// Extension: ARB_shader_objects
 	bool ARB_shader_objects;

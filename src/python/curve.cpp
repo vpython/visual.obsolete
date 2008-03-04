@@ -208,7 +208,6 @@ curve::set_length( size_t length)
 void
 curve::append_rgba( vector npos, float red, float green, float blue, float opacity)
 {
-	lock L(mtx);
 	if (retain > 0 && count >= retain) {
 		set_length( retain-1); //move pos and color lists down
 	}
@@ -231,7 +230,6 @@ curve::append_rgba( vector npos, float red, float green, float blue, float opaci
 void
 curve::append( vector npos, rgba ncolor)
 {
-	lock L(mtx);
 	if (retain > 0 && count >= retain) {
 		set_length( retain-1); //move pos and color lists down
 	}
@@ -250,7 +248,6 @@ curve::append( vector npos, rgba ncolor)
 void
 curve::append( vector npos)
 {
-	lock L(mtx);
 	if (retain > 0 && count >= retain) {
 		set_length( retain-1); //move pos and color lists down
 	}
@@ -271,12 +268,10 @@ curve::set_pos( array n_pos)
 	std::vector<npy_intp> dims = shape( n_pos);
 	if (dims.size() == 1) {
 		if (!dims[0]) {
-			lock L(mtx);
 			set_length(0);
 			return;
 		}
 		else {
-			lock L(mtx);
 			set_length( dims[0]);
 			pos[make_tuple(slice(1, count+1), slice())] = n_pos;
 			if (retain > 0 && count >= retain) set_length( retain);
@@ -287,7 +282,6 @@ curve::set_pos( array n_pos)
 		throw std::invalid_argument( "pos must be an Nx3 array");
 	}
 	if (dims[1] == 2) {
-		lock L(mtx);
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice(0,2))] = n_pos;
 		pos[make_tuple(slice(1, count+1), 2)] = 0.0;
@@ -295,7 +289,6 @@ curve::set_pos( array n_pos)
 		return;
 	}
 	else if (dims[1] == 3) {
-		lock L(mtx);
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice())] = n_pos;
 		if (retain > 0 && count >= retain) set_length( retain);
@@ -332,14 +325,12 @@ curve::set_color( array n_color)
     if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
-		lock L(mtx);
 		color[slice(1,npoints+1), slice(0, 3)] = n_color;
 		return;
 	}
 	if (dims.size() == 1 && dims[0] == 4) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
-		lock L(mtx);
 		color[slice( 1, npoints+1)] = n_color;
 		return;
 	}
@@ -348,7 +339,6 @@ curve::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		lock L(mtx);
 		// The following doesn't work; I don't know why. 
 		// Note that it works with a single color above.
 		//color[slice(1, count+1), slice(0, 3)] = n_color;
@@ -370,7 +360,6 @@ curve::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		lock L(mtx);
 		color[slice( 1, count+1)] = n_color;
 		return;
 	}
@@ -392,7 +381,6 @@ curve::set_color_t( const rgba& color)
 void
 curve::set_red( const array& red)
 {
-	lock L(mtx);
 	set_length( shape(red).at(0));
 	color[make_tuple(slice(1,count+1), 0)] = red;
 }
@@ -400,7 +388,6 @@ curve::set_red( const array& red)
 void
 curve::set_green( const array& green)
 {
-	lock L(mtx);
 	set_length( shape(green).at(0));
 	color[make_tuple(slice(1,count+1), 1)] = green;
 }
@@ -408,7 +395,6 @@ curve::set_green( const array& green)
 void
 curve::set_blue( const array& blue)
 {
-	lock L(mtx);
 	set_length( shape(blue).at(0));
 	color[make_tuple(slice(1,count+1), 2)] = blue;
 }
@@ -416,7 +402,6 @@ curve::set_blue( const array& blue)
 void
 curve::set_x( const array& x)
 {
-	lock L(mtx);
 	set_length( shape(x).at(0));
 	pos[make_tuple( slice(1, count+1), 0)] = x;
 }
@@ -424,7 +409,6 @@ curve::set_x( const array& x)
 void
 curve::set_y( const array& y)
 {
-	lock L(mtx);
 	set_length( shape(y).at(0));
 	pos[make_tuple( slice(1, count+1), 1)] = y;
 }
@@ -432,7 +416,6 @@ curve::set_y( const array& y)
 void
 curve::set_z( const array& z)
 {
-	lock L(mtx);
 	set_length( shape(z).at(0));
 	pos[make_tuple( slice(1, count+1), 2)] = z;
 }
@@ -476,7 +459,6 @@ curve::set_z_l( const list& z)
 void
 curve::set_x_d( const double x)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -486,7 +468,6 @@ curve::set_x_d( const double x)
 void
 curve::set_y_d( const double y)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -496,7 +477,6 @@ curve::set_y_d( const double y)
 void
 curve::set_z_d( const double z)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -506,7 +486,6 @@ curve::set_z_d( const double z)
 void
 curve::set_red_d( const double red)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -516,7 +495,6 @@ curve::set_red_d( const double red)
 void
 curve::set_green_d( const double green)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -526,7 +504,6 @@ curve::set_green_d( const double green)
 void
 curve::set_blue_d( const double blue)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -536,21 +513,18 @@ curve::set_blue_d( const double blue)
 void
 curve::set_radius( const double& radius)
 {
-	lock L(mtx);
 	this->radius = radius;
 }
 
 void
 curve::set_antialias( bool aa)
 {
-	lock L(mtx);
 	this->antialias = aa;
 }
 
 void
 curve::set_retain( int retain)
 {
-	lock L(mtx);
 	if (retain > 0 && count > retain) {
 		set_length( retain); //move pos and color lists down
 	}
@@ -839,16 +813,11 @@ curve::thickline( const view& scene, const float* spos, float* tcolor, size_t pc
 			ai = 0;
 		}
 
-		for (size_t i = 0; i < npoints; i += 127u) {
-			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*curve_around + ai].x);
-			if (!mono)
-				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*curve_around + ai)].red );
-			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*curve_around + ai].x);
-			if (npoints-i < 128)
-				glDrawElements(GL_TRIANGLE_STRIP, 2*(npoints-i), GL_UNSIGNED_INT, ind);
-			else
-				glDrawElements(GL_TRIANGLE_STRIP, 256u, GL_UNSIGNED_INT, ind);
-		}
+		glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[ai].x);
+		if (!mono)
+			glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[ai].red );
+		glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[ai].x);
+		glDrawElements(GL_TRIANGLE_STRIP, 2*npoints, GL_UNSIGNED_INT, ind);
 	}
 	if (!mono)
 		glDisableClientState( GL_COLOR_ARRAY);

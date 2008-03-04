@@ -36,7 +36,6 @@ ellipsoid::get_length()
 void 
 ellipsoid::set_height( double h)
 {
-	lock L(mtx);
 	height = h;
 }
 
@@ -49,7 +48,6 @@ ellipsoid::get_height()
 void 
 ellipsoid::set_width( double w)
 {
-	lock L(mtx);
 	width = w;
 }
 
@@ -69,7 +67,6 @@ void
 ellipsoid::set_size( const vector& s)
 {
 	axis = axis.norm() * s.x;
-	lock L(mtx);
 	height = s.y;
 	width = s.z;
 }

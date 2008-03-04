@@ -112,7 +112,6 @@ class mouse_t : public mousebase
  public:
 	mouse_t() : click_count(0) {}
 	virtual ~mouse_t();
-	mutex mtx;
 	
 	// The following member functions are synchronized - no additional locking
 	// is requred.

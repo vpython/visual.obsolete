@@ -132,7 +132,6 @@ points::set_length( size_t length)
 void
 points::append_rgba( vector npos, float red, float green, float blue, float opacity)
 {
-	lock L(mtx);
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
 	float* last_color = findex( color, count-1);
@@ -152,7 +151,6 @@ points::append_rgba( vector npos, float red, float green, float blue, float opac
 void
 points::append( vector npos, rgba ncolor)
 {
-	lock L(mtx);
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
 	float* last_color = findex( color, count-1);
@@ -168,7 +166,6 @@ points::append( vector npos, rgba ncolor)
 void
 points::append( vector npos)
 {
-	lock L(mtx);
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
 	last_pos[0] = npos.x;
@@ -191,7 +188,6 @@ points::get_color()
 void
 points::set_size( float size)
 {
-	lock L(mtx);
 	this->size = size;
 }
 
@@ -224,7 +220,6 @@ points::get_points_shape( void)
 void
 points::set_size_type( const std::string& n_type)
 {
-	lock L(mtx);
 	if (n_type == "screen") {
 		size_type = SCREEN;
 	}
@@ -259,7 +254,6 @@ points::set_pos( array n_pos)
 
 	std::vector<npy_intp> dims = shape( n_pos);
 	if (dims.size() == 1 && !dims[0]) {
-		lock L(mtx);
 		set_length(0);
 		return;
 	}
@@ -267,14 +261,12 @@ points::set_pos( array n_pos)
 		throw std::invalid_argument( "pos must be an Nx3 array");
 	}
 	if (dims[1] == 2) {
-		lock L(mtx);
 		set_length( dims[0]);
 		pos[make_tuple(slice(0, count), slice(0,2))] = n_pos;
 		pos[make_tuple(slice(0, count), 2)] = 0.0;
 		return;
 	}
 	else if (dims[1] == 3) {
-		lock L(mtx);
 		set_length( dims[0]);
 		pos[make_tuple(slice(0, count), slice())] = n_pos;
 		return;
@@ -311,14 +303,12 @@ points::set_color( array n_color)
 	if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
-		lock L(mtx);
 		color[slice( 0,npoints), slice(0, 3)] = n_color;
 		return;
 	}
 	if (dims.size() == 1 && dims[0] == 4) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
-		lock L(mtx);
 		color[slice( 0, npoints)] = n_color;
 		return;
 	}
@@ -327,7 +317,6 @@ points::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		lock L(mtx);
 		// The following doesn't work; I don't know why. 
 		// Note that it works with a single color above.
 		//color[slice(1, count+1), slice(0, 3)] = n_color;
@@ -349,7 +338,6 @@ points::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		lock L(mtx);
 		color[slice( 0, count)] = n_color;
 		return;
 	}
@@ -372,7 +360,6 @@ points::set_color_t( const rgba& color)
 void
 points::set_red( const array& red)
 {
-	lock L(mtx);
 	set_length( shape( red).at(0));
 	color[make_tuple( slice( 0, count), 0)] = red;
 }
@@ -380,7 +367,6 @@ points::set_red( const array& red)
 void
 points::set_green( const array& green)
 {
-	lock L(mtx);
 	set_length( shape( green).at(0));
 	color[make_tuple( slice( 0, count), 1)] = green;
 }
@@ -388,7 +374,6 @@ points::set_green( const array& green)
 void
 points::set_blue( const array& blue)
 {
-	lock L(mtx);
 	set_length( shape( blue).at(0));
 	color[make_tuple( slice( 0, count), 2)] = blue;
 }
@@ -396,7 +381,6 @@ points::set_blue( const array& blue)
 void
 points::set_opacity( const array& opacity)
 {
-	lock L(mtx);
 	set_length(shape( opacity).at(0));
 	color[make_tuple( slice( 0, count), 3)] = opacity;
 }
@@ -428,7 +412,6 @@ points::set_opacity_l( const list& opacity)
 void
 points::set_x( const array& x)
 {
-	lock L(mtx);
 	set_length( shape(x).at(0));
 	pos[make_tuple( slice(1, count+1), 0)] = x;
 }
@@ -436,7 +419,6 @@ points::set_x( const array& x)
 void
 points::set_y( const array& y)
 {
-	lock L(mtx);
 	set_length( shape(y).at(0));
 	pos[make_tuple( slice(1, count+1), 1)] = y;
 }
@@ -444,7 +426,6 @@ points::set_y( const array& y)
 void
 points::set_z( const array& z)
 {
-	lock L(mtx);
 	set_length( shape(z).at(0));
 	pos[make_tuple( slice(1, count+1), 2)] = z;
 }
@@ -471,7 +452,6 @@ points::set_z_l( const list& z)
 void
 points::set_x_d( const double x)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -481,7 +461,6 @@ points::set_x_d( const double x)
 void
 points::set_y_d( const double y)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -491,7 +470,6 @@ points::set_y_d( const double y)
 void
 points::set_z_d( const double z)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -502,7 +480,6 @@ points::set_z_d( const double z)
 void
 points::set_red_d( float red)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -512,7 +489,6 @@ points::set_red_d( float red)
 void
 points::set_green_d( float green)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -522,7 +498,6 @@ points::set_green_d( float green)
 void
 points::set_blue_d( float blue)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}
@@ -532,7 +507,6 @@ points::set_blue_d( float blue)
 void
 points::set_opacity_d( float opacity)
 {
-	lock L(mtx);
 	if (count == 0) {
 		set_length(1);
 	}

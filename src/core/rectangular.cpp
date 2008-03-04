@@ -31,7 +31,6 @@ rectangular::get_length()
 void 
 rectangular::set_height( double h)
 {
-	lock L(mtx);
 	height = h;
 }
 
@@ -44,7 +43,6 @@ rectangular::get_height()
 void 
 rectangular::set_width( double w)
 {
-	lock L(mtx);
 	width = w;
 }
 
@@ -64,7 +62,6 @@ void
 rectangular::set_size( const vector& s)
 {
 	axis = axis.norm() * s.x;
-	lock L(mtx);
 	height = s.y;
 	width = s.z;
 }

@@ -12,6 +12,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/python/class.hpp>
+#include <boost/python/call_method.hpp>
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/args.hpp>
@@ -22,37 +23,16 @@
 
 namespace cvisual {
 
-// The function that is passed to Python to break out of an infinate loop.
-static int
-py_quit( void*)
-{
-	VPYTHON_NOTE("Exiting");
-	std::exit(0);
-	return 0;
-}
-
-static void
-wrap_shutdown(void)
-{
-	gui_main::shutdown();
-}
-
-static void
-wrap_waitclosed(void)
-{
-	gui_main::waitclosed();
-}
-
 // The callback function that is invoked from the display class when
 // shutting-down. Prior to Jan. 23, 2008, force_py_exit locked and posted
-// a callback to py_quit, but this failed if the program was sitting
-// at scene.mouse.getclick(). Simply calling py_quit directly seems
+// a callback to exit, but this failed if the program was sitting
+// at scene.mouse.getclick(). Simply calling exit directly seems
 // to work fine.
 static void
 force_py_exit(void)
 {
-	wrap_shutdown(); // destroy graphics displays before trying to quit
-	py_quit(0);
+	VPYTHON_NOTE("Exiting");
+	std::exit(0);
 }
 
 namespace py = boost::python;
@@ -89,81 +69,23 @@ struct lights_to_py_list
 	}
 };
 
-// The purpose of this class is to expose the signal-handling methods to Python.
-class py_display_kernel : public display_kernel, public boost::signals::trackable
+// I must not know how to use Boost.Python yet, because I need this:
+class py_base_display_kernel : public display_kernel {};
+
+// A display implemented in python (e.g. to use PyOpenGL or PyObjC)
+class py_display_kernel : public py_base_display_kernel
 {
- private:
-	py::object gl_begin_cb;
-	py::object gl_end_cb;
-	py::object gl_swap_buffers_cb;
-
-	void on_gl_begin()
-	{
-		if (gl_begin_cb.ptr() == Py_None) {
-			PySys_WriteStderr( "***VPython CRITICAL ERROR***: "
-				"No callback function registered for call to gl_begin().");
-			return;
-		}
-		gl_begin_cb();
-	}
-
-	void on_gl_end()
-	{
-		if (gl_end_cb.ptr() == Py_None) {
-			PySys_WriteStderr( "***VPython CRITICAL ERROR***: "
-				"No callback function registered for call to gl_end().");
-			return;
-		}
-		gl_end_cb();
-	}
-	void on_gl_swap_buffers()
-	{
-		if (gl_swap_buffers_cb.ptr() == Py_None) {
-			PySys_WriteStderr( "***VPython CRITICAL ERROR***: "
-				"No callback function registered for call to gl_swap_buffers().");
-			return;
-		}
-		gl_swap_buffers_cb();
-	}
-
-	void verify_callable( py::object obj)
-	{
-		if (!PyCallable_Check( obj.ptr())) {
-			PyErr_SetString( PyExc_TypeError, "Did not pass a callable object.");
-			py::throw_error_already_set();
-		}
-	}
-
  public:
-	py_display_kernel()
-		: display_kernel()
-	{
-		gl_begin.connect(
-			boost::bind(&py_display_kernel::on_gl_begin, this));
-		gl_end.connect(
-			boost::bind(&py_display_kernel::on_gl_end, this));
-		gl_swap_buffers.connect(
-			boost::bind(&py_display_kernel::on_gl_swap_buffers, this));
-	}
-
-	void set_gl_begin_cb( py::object obj)
-	{
-		verify_callable( obj);
-		gl_begin_cb = obj;
-	}
-
-	void set_gl_end_cb( py::object obj)
-	{
-		verify_callable( obj);
-		gl_end_cb = obj;
-	}
-
-	void set_gl_swap_buffers_cb( py::object obj)
-	{
-		verify_callable( obj);
-		gl_swap_buffers_cb = obj;
-	}
-
+	PyObject* self;
+	
+	py_display_kernel( PyObject* self ) : self(self) {}
+ 
+	// Delegates key display_kernel virtual methods to Python
+	virtual void activate( bool active ) { boost::python::call_method<void>( self, "_activate", active ); }
+	virtual EXTENSION_FUNCTION getProcAddress( const char* name ) { return (EXTENSION_FUNCTION)boost::python::call_method<intptr_t>( self, "_getProcAddress", name ); }
+	intptr_t base_getProcAddress( const char* name ) { return (intptr_t)display_kernel::getProcAddress(name); }
+ 
+	// Utility methods for Python subclasses
 	void report_mouse_motion( float dx, float dy, std::string button)
 	{
 		if (button.empty())
@@ -173,10 +95,10 @@ class py_display_kernel : public display_kernel, public boost::signals::trackabl
 				display_kernel::report_mouse_motion( dx, dy, display_kernel::LEFT);
 				break;
 			case 'r':
-				display_kernel::report_mouse_motion( dx, dy, display_kernel::LEFT);
+				display_kernel::report_mouse_motion( dx, dy, display_kernel::RIGHT);
 				break;
 			case 'm':
-				display_kernel::report_mouse_motion( dx, dy, display_kernel::LEFT);
+				display_kernel::report_mouse_motion( dx, dy, display_kernel::MIDDLE);
 				break;
 		}
 	}
@@ -262,28 +184,44 @@ wrap_display_kernel(void)
 		.add_property( "show_rendertime",
 			&display_kernel::is_showing_rendertime,
 			&display_kernel::set_show_rendertime)
-		.add_property( "userspin", &display::spin_is_allowed,
-			&display::allow_spin)
-		.add_property( "userzoom", &display::zoom_is_allowed,
-			&display::allow_zoom)
+		.add_property( "userspin", &display_kernel::spin_is_allowed,
+			&display_kernel::allow_spin)
+		.add_property( "userzoom", &display_kernel::zoom_is_allowed,
+			&display_kernel::allow_zoom)
 		.def( "info", &display_kernel::info)
+		.add_property( "x", &display_kernel::get_x, &display_kernel::set_x)
+		.add_property( "y", &display_kernel::get_y, &display_kernel::set_y)
+		.add_property( "width", &display_kernel::get_width, &display_kernel::set_width)
+		.add_property( "height", &display_kernel::get_height, &display_kernel::set_height)
+		.add_property( "title", &display_kernel::get_title, &display_kernel::set_title)
+		.add_property( "fullscreen", &display_kernel::is_fullscreen,
+			&display_kernel::set_fullscreen)
+		.add_property( "toolbar", &display_kernel::is_showing_toolbar,
+			&display_kernel::set_show_toolbar)
+		.add_property( "visible", &display_kernel::get_visible, &display_kernel::set_visible)
+		.add_property( "exit", &display_kernel::get_exit, &display_kernel::set_exit)
+		.add_property( "kb", py::make_function(
+			&display_kernel::get_kb, py::return_internal_reference<>()))
+		.add_property( "mouse", py::make_function(
+			&display_kernel::get_mouse, py::return_internal_reference<>()))
+		.def( "set_selected", &display_kernel::set_selected)
+		.staticmethod( "set_selected")
+		.def( "get_selected", &display_kernel::get_selected)
+		.staticmethod( "get_selected")
+
 		.def( "_set_range", &display_kernel::set_range_d)
 		.def( "_set_range", &display_kernel::set_range)
 		.def( "_get_range", &display_kernel::get_range)
 		.add_property( "_shader", &display_kernel::get_shader, &display_kernel::set_shader)
 		;
 
-	class_<py_display_kernel, bases<display_kernel>, noncopyable>
+	class_<py_base_display_kernel, py_display_kernel, bases<display_kernel>, noncopyable>
 			( "display_kernel")
-		.def( "set_gl_begin_cb", &py_display_kernel::set_gl_begin_cb)
-		.def( "set_gl_end_cb", &py_display_kernel::set_gl_end_cb)
-		.def( "set_gl_swap_buffers_cb",
-			&py_display_kernel::set_gl_swap_buffers_cb)
+		// Default implementations of key override methods
+		.def( "_getProcAddress", &py_display_kernel::base_getProcAddress )
 		// Functions for extending this type in Python.
 		.def( "render_scene", &display_kernel::render_scene)
-		.def( "report_realise", &display_kernel::report_realize)
-		.def( "report_resize", &display_kernel::report_resize,
-			py::args( "width", "height"))
+		.def( "report_resize", &display_kernel::report_resize)
 		.def( "report_mouse_motion", &py_display_kernel::report_mouse_motion)
 		.def( "pick", &display_kernel::pick, pick_overloads(
 			py::args( "x", "y", "pixels")))
@@ -296,29 +234,6 @@ wrap_display_kernel(void)
 		;
 
 	py::class_<display, bases<display_kernel>, noncopyable>( "display")
-		.add_property( "x", &display::get_x, &display::set_x)
-		.add_property( "y", &display::get_y, &display::set_y)
-		.add_property( "width", &display::get_width, &display::set_width)
-		.add_property( "height", &display::get_height, &display::set_height)
-		.add_property( "title", &display::get_title, &display::set_title)
-		.add_property( "fullscreen", &display::is_fullscreen,
-			&display::set_fullscreen)
-		.add_property( "toolbar", &display::is_showing_toolbar,
-			&display::set_show_toolbar)
-		.def( "set_selected", &display::set_selected)
-		.staticmethod( "set_selected")
-		.def( "get_selected", &display::get_selected)
-		.staticmethod( "get_selected")
-		.def( "get_titlebar_height", &display::get_titlebar_height)
-		.staticmethod( "get_titlebar_height")
-		.def( "get_toolbar_height", &display::get_toolbar_height)
-		.staticmethod( "get_toolbar_height")
-		.add_property( "visible", &display::get_visible, &display::set_visible)
-		.add_property( "kb", py::make_function(
-			&display::get_kb, py::return_internal_reference<>()))
-		.add_property( "mouse", py::make_function(
-			&display::get_mouse, py::return_internal_reference<>()))
-		// TODO: add cursor attribute
 		;
 
 	py::def( "_set_dataroot", &display::set_dataroot);
@@ -333,11 +248,7 @@ wrap_display_kernel(void)
 
 	// Free functions for exiting the system.
 	// These are undocumented at the moment, and are only used internally.
-	def( "shutdown", wrap_shutdown,
-		"Close all Displays and shutdown visual.");
-	def( "allclosed", gui_main::allclosed,
-		"Returns true if all of the Displays are closed.");
-	def( "waitclose", wrap_waitclosed,
+	def( "waitclose", &display_kernel::waitWhileAnyDisplayVisible,
 		"Blocks until all of the Displays are closed by the user.");
 
 	gui_main::on_shutdown.connect( &force_py_exit );
