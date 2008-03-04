@@ -4,7 +4,6 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
-#include "display.hpp"
 #include "util/errors.hpp"
 #include "util/tmatrix.hpp"
 #include "util/gl_enable.hpp"
@@ -1444,9 +1443,9 @@ display_kernel::get_height()
 void
 display_kernel::set_visible( bool vis)
 {
+	if (!vis) explicitly_invisible = true;
 	if (vis != visible) {
 		visible = vis;
-		if (!vis) explicitly_invisible = true;
 		set_display_visible( this, visible );
 		activate( vis );
 
