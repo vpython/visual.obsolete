@@ -813,11 +813,16 @@ curve::thickline( const view& scene, const float* spos, float* tcolor, size_t pc
 			ai = 0;
 		}
 
-		glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[ai].x);
-		if (!mono)
-			glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[ai].red );
-		glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[ai].x);
-		glDrawElements(GL_TRIANGLE_STRIP, 2*npoints, GL_UNSIGNED_INT, ind);
+		for (size_t i = 0; i < npoints; i += 127u) {
+			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*curve_around + ai].x);
+			if (!mono)
+				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*curve_around + ai)].red );
+			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*curve_around + ai].x);
+			if (npoints-i < 128)
+				glDrawElements(GL_TRIANGLE_STRIP, 2*(npoints-i), GL_UNSIGNED_INT, ind);
+			else
+				glDrawElements(GL_TRIANGLE_STRIP, 256u, GL_UNSIGNED_INT, ind);
+		}
 	}
 	if (!mono)
 		glDisableClientState( GL_COLOR_ARRAY);
