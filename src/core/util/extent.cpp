@@ -169,7 +169,7 @@ vector
 extent::range( vector center) const
 {
     if (first)
-        return vector(10.0, 10.0, 10.0);
+        return vector(0,0,0);
  
 	return vector(
 		std::max( fabs( center.x - mins.x), fabs( center.x - maxs.x)),
@@ -181,7 +181,7 @@ double
 extent::uniform_range( vector center) const
 {
     if (first)
-        return 10.0;
+        return 0.0;
 	double ret = std::max( fabs(center.x - mins.x), fabs(center.x - maxs.x));
 	ret = std::max( fabs( center.y - mins.y), ret);
 	ret = std::max( fabs( center.y - maxs.y), ret);

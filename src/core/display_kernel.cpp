@@ -174,8 +174,7 @@ display_kernel::display_kernel()
 	user_scale(1.0),
 	gcf(1.0),
 	gcfvec(vector(1.0,1.0,1.0)),
-	mingcf(1e100),
-	lastgcf(1.0),
+	last_range_mag(0.0),
 	gcf_changed(false),
 	ambient( 0.2f, 0.2f, 0.2f),
 	show_rendertime( false),
@@ -434,8 +433,9 @@ display_kernel::world_to_view_transform(
 	// gcf chosen so gcf*world -> scene fits in a 2 by 2 by 2 cube.
 	// scene_camera  is theposition used in gluLookAt to observe this cube.
 
-	double nearest, farthest; // nearest and farthest points relative to <0,0,0> when projected onto forward
-	world_extent.near_and_far(forward, nearest, farthest);
+	double nearest, farthest; 
+	world_extent.near_and_far(forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
+	farthest = (farthest * gcf - scene_center.dot( forward ));  // relative to scene.center, in "cube space"
 
 	// Position camera and clip planes so that a (2*user_scale)^3 cube will 
 	// have all its faces showing, with some border.
@@ -444,7 +444,7 @@ display_kernel::world_to_view_transform(
 	double nearclip = 0.25 * cam_to_cube;  // partway from camera to front face of cube
 	double farclip = cam_to_cube + 2.1*user_scale;  // just beyond back face of cube
 	// ... but there might be objects far beyond the back of the cube, because we are zoomed in
-	farclip = std::max( farclip, cam_to_cube + user_scale + 1.05*farthest*gcf );
+	farclip = std::max( farclip, cam_to_cube + user_scale + 1.05*farthest );
 
 	// The true camera position, in world space.
 	camera = scene_camera/gcf;
@@ -572,37 +572,44 @@ display_kernel::recalc_extent(void)
 	if (autoscale) {
 		// Compute range such that the three axes, centered at center,
 		// will contain the entire scene.
-		range = world_extent.range( center);
-		if (!range.x)
-			range.x = 1.0;
-		if (!range.y)
-			range.y = 1.0;
-		if (!range.z)
-			range.z = 1.0;
-		if (range.mag() > 1e150)
+		vector new_range = world_extent.range( center);
+		bool new_range_valid = new_range.x || new_range.y || new_range.z;
+		if (!new_range.x) new_range.x = 1.0;
+		if (!new_range.y) range.y = 1.0;
+		if (!new_range.z) range.z = 1.0;
+		if (new_range.mag() > 1e150)
 			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
 				" an extent greater than about 1e154 units.");
+
+		double mag = std::max(std::max(range.x,range.y),range.z);
+		if (!uniform || !last_range_mag || mag > last_range_mag || mag < 0.5 * last_range_mag) {
+			range = new_range;
+			if (new_range_valid)
+				last_range_mag = mag;
+		}
+
         // We should NEVER deliberately set range to zero on any axis.
 		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
 	}
-	double newgcf = 1.0/(std::max(std::max(range.x,range.y),range.z));
-	gcf_changed = false;
-	if ( ((newgcf < lastgcf) && (newgcf < mingcf)) || (newgcf > 2.0*lastgcf) ) {
-		if (newgcf < mingcf)
-			mingcf = newgcf;
-		gcf = newgcf;
-		gcfvec = vector(gcf,gcf,gcf);
+	
+	double scale = 1.0/(std::max(std::max(range.x,range.y),range.z));
+	
+	// xxx Instead of changing gcf so much, we should change it only when it is 2x
+	// off, and keep a separate OpenGL scaling factor, to aid primitives whose caching
+	// may depend on gcf.
+	if (gcf != scale) {
+		gcf = scale;
 		gcf_changed = true;
 	}
 
+	gcfvec = vector(gcf,gcf,gcf);
+	
 	if (!uniform) {
 		gcf_changed = true;
 		double width = (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
 			? view_width*0.5 : view_width;
 		gcfvec = vector(1.0/range.x, (view_height/width)/range.y, 0.1/range.z);
 	}
-
-	lastgcf = newgcf;
 }
 
 void display_kernel::implicit_activate() {
