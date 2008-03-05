@@ -615,9 +615,9 @@ points::gl_render( const view& scene)
 		
 		vector p(proj * vertex(.5,0,1,1));  // eye coordinates .5,0,1 -> window coordinates
 		
-		// At an eye z of 1, a sphere of world-space diameter 1 is p.x * scene.window_width pixels wide,
+		// At an eye z of 1, a sphere of world-space diameter 1 is p.x * scene.view_width pixels wide,
 		// so a sphere of world-space diameter (size*scene.gcf) is
-		double point_radius_at_z_1 = size * scene.gcf * p.x * scene.window_width;
+		double point_radius_at_z_1 = size * scene.gcf * p.x * scene.view_width;
 
 		float attenuation_eqn[] =  { 0, 0, 1.0 / (point_radius_at_z_1*point_radius_at_z_1) };
 		scene.glext.glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);

@@ -123,7 +123,7 @@ display_kernel::tan_hfov( double* x, double* y)
 {
 	// tangent of half the field of view.
 	double tan_hfov = std::tan( fov*0.5);
-	double aspect_ratio = window_height / window_width;
+	double aspect_ratio = (double)view_height / view_width;
 	if (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
 		aspect_ratio *= 2.0;
 	if (aspect_ratio > 1.0) {
@@ -153,14 +153,13 @@ display_kernel::calc_camera()
 
 display_kernel::display_kernel()
 	: 
-	x(-1), y(-1),
 	exit(true), 
 	visible(false), 
 	explicitly_invisible(false),
 	fullscreen(false), 
 	title( "VPython" ),
-	window_width(430), 
-	window_height(430),
+	window_x(-1), window_y(-1), window_width(430), window_height(430),
+	view_x(-1), view_y(-1), view_width(-1), view_height(-1),
 	center(0, 0, 0),
 	forward(0, 0, -1),
 	up(0, 1, 0),
@@ -233,10 +232,10 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 	// The vertical and horizontal fractions of the window's height that the
 	// mouse has traveled for this event.
 	// TODO: Implement ZOOM_ROLL modes.
-	float vfrac = dy / window_height;
+	float vfrac = dy / view_height;
 	float hfrac = dx
 		/ ((stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO) ? 
-		     (window_width*0.5f) : window_width);
+		     (view_width*0.5f) : view_width);
 
 	// The amount by which the scene should be shifted in response to panning
 	// motion.
@@ -311,13 +310,12 @@ display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
 	}
 }
 
-void
-display_kernel::report_resize( float new_x, float new_y, float new_width, float new_height)
+void 
+display_kernel::report_resize(	int win_x, int win_y, int win_w, int win_h,
+								int v_x, int v_y, int v_w, int v_h )
 {
-	x = new_x;
-	y = new_y;
-	window_height = new_height;
-	window_width = new_width;
+	window_x = win_x; window_y = win_y; window_width = win_w; window_height = win_h;
+	view_x = v_x; view_y = v_y; view_width = v_w; view_height = v_h;
 }
 
 void
@@ -600,8 +598,8 @@ display_kernel::recalc_extent(void)
 	if (!uniform) {
 		gcf_changed = true;
 		double width = (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
-			? window_width*0.5 : window_width;
-		gcfvec = vector(1.0/range.x, (window_height/width)/range.y, 0.1/range.z);
+			? view_width*0.5 : view_width;
+		gcfvec = vector(1.0/range.x, (view_height/width)/range.y, 0.1/range.z);
 	}
 
 	lastgcf = newgcf;
@@ -717,8 +715,8 @@ display_kernel::render_scene(void)
 	}
 	try {
 		recalc_extent();
-		view scene_geometry( forward.norm(), center, window_width,
-			window_height, forward_changed, gcf, gcfvec, gcf_changed, glext);
+		view scene_geometry( forward.norm(), center, view_width,
+			view_height, forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
 		clear_gl_error();
 		
@@ -730,16 +728,14 @@ display_kernel::render_scene(void)
 			case NO_STEREO:
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
-				glViewport( 0, 0, static_cast<int>(window_width),
-					static_cast<int>(window_height));
+				glViewport( 0, 0, view_width, view_height);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				draw(scene_geometry, 0);
 				break;
 			case ACTIVE_STEREO:
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
-				glViewport( 0, 0, static_cast<int>(window_width),
-					static_cast<int>(window_height));
+				glViewport( 0, 0, view_width, view_height);
 				glDrawBuffer( GL_BACK_LEFT);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				draw( scene_geometry, -1);
@@ -752,8 +748,7 @@ display_kernel::render_scene(void)
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = false;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, static_cast<int>(window_width),
-					static_cast<int>(window_height));
+				glViewport( 0, 0, view_width, view_height);
 				glColorMask( GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, false);
 				// Blue channel
@@ -768,8 +763,7 @@ display_kernel::render_scene(void)
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, static_cast<int>(window_width),
-					static_cast<int>(window_height));
+				glViewport( 0, 0, view_width, view_height);
 				glColorMask( GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, true);
 				// Green and Blue channels
@@ -784,8 +778,7 @@ display_kernel::render_scene(void)
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, static_cast<int>(window_width),
-					static_cast<int>(window_height));
+				glViewport( 0, 0, view_width, view_height);
 				glColorMask( GL_TRUE, GL_TRUE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, true);
 				// Blue channel
@@ -800,8 +793,7 @@ display_kernel::render_scene(void)
 				scene_geometry.anaglyph = true;
 				scene_geometry.coloranaglyph = true;
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, static_cast<int>(window_width),
-					static_cast<int>(window_height));
+				glViewport( 0, 0, view_width, view_height);
 				glColorMask( GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
 				draw( scene_geometry, -1, true, true);
 				// Red and blue channels
@@ -813,35 +805,31 @@ display_kernel::render_scene(void)
 				break;
 			case PASSIVE_STEREO: {
 				// Also handle viewport modifications.
-				scene_geometry.window_width =  window_width * 0.5f;
+				scene_geometry.view_width =  view_width * 0.5f;
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
-				int stereo_width = int(scene_geometry.window_width);
+				int stereo_width = int(scene_geometry.view_width);
 				// Left eye
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, stereo_width,
-					static_cast<int>(window_height));
+				glViewport( 0, 0, stereo_width, view_height );
 				draw( scene_geometry, -1);
 				// Right eye
-				glViewport( stereo_width+1, 0, stereo_width,
-					static_cast<int>(window_height));
+				glViewport( stereo_width+1, 0, stereo_width, view_height);
 				draw( scene_geometry, 1);
 				break;
 			}
 			case CROSSEYED_STEREO: {
 				// Also handle viewport modifications.
-				scene_geometry.window_width =  window_width * 0.5f;
+				scene_geometry.view_width =  view_width * 0.5f;
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
-				int stereo_width = int(scene_geometry.window_width);
+				int stereo_width = int(scene_geometry.view_width);
 				// Left eye
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-				glViewport( 0, 0, stereo_width,
-					static_cast<int>(window_height));
+				glViewport( 0, 0, stereo_width, view_height);
 				draw( scene_geometry, 1);
 				// Right eye
-				glViewport( stereo_width+1, 0, stereo_width,
-					static_cast<int>(window_height));
+				glViewport( stereo_width+1, 0, stereo_width, view_height );
 				draw( scene_geometry, -1);
 				break;
 			}
@@ -867,7 +855,7 @@ display_kernel::render_scene(void)
 			glMatrixMode( GL_PROJECTION);
 			glPushMatrix();
 			glLoadIdentity();
-			gluOrtho2D( 0, window_width, 0, window_height);
+			gluOrtho2D( 0, view_width, 0, view_height);
 			glMatrixMode( GL_MODELVIEW);
 			glPushMatrix();
 			glLoadIdentity();
@@ -949,12 +937,12 @@ display_kernel::pick( float x, float y, float d_pixels)
 
 		// Initialize the picking matrix.
 		int viewport_bounds[4] = {
-			0, 0, static_cast<int>(window_width), static_cast<int>(window_height)
+			0, 0, view_width, view_height
 		};
 		glMatrixMode( GL_PROJECTION);
 		glLoadIdentity();
-		gluPickMatrix( x, window_height - y, d_pixels, d_pixels, viewport_bounds);
-		view scene_geometry( forward.norm(), center, window_width, window_height,
+		gluPickMatrix( x, view_height - y, d_pixels, d_pixels, viewport_bounds);
+		view scene_geometry( forward.norm(), center, view_width, view_height,
 			forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
 		world_to_view_transform( scene_geometry, 0, true);
@@ -1025,7 +1013,7 @@ display_kernel::pick( float x, float y, float d_pixels)
         tmatrix projection;
         projection.gl_projection_get();
         gluUnProject(
-            x, window_height - y, best_pick_depth,
+            x, view_height - y, best_pick_depth,
             modelview.matrix_addr(),
             projection.matrix_addr(),
             viewport_bounds,
@@ -1040,7 +1028,7 @@ display_kernel::pick( float x, float y, float d_pixels)
             &center.x, &center.y, &center.z);
 
         gluUnProject(
-        	x, window_height - y, center.z,
+        	x, view_height - y, center.z,
         	modelview.matrix_addr(),
         	projection.matrix_addr(),
         	viewport_bounds,
@@ -1390,12 +1378,12 @@ display_kernel::set_x( float n_x)
 	if (visible)
 		throw std::runtime_error( "Cannot change parameters of an active window");
 	else
-		x = n_x;
+		window_x = n_x;
 }
 float
 display_kernel::get_x()
 {
-	return x;
+	return window_x;
 }
 
 void
@@ -1404,12 +1392,12 @@ display_kernel::set_y( float n_y)
 	if (visible)
 		throw std::runtime_error( "Cannot change parameters of an active window");
 	else
-		y = n_y;
+		window_y = n_y;
 }
 float
 display_kernel::get_y()
 {
-	return y;
+	return window_y;
 }
 
 void
@@ -1432,7 +1420,7 @@ display_kernel::set_height( float h)
 	if (visible)
 		throw std::runtime_error( "Cannot change parameters of an active window");
 	else
-		window_height = h;;
+		window_height = h;
 }
 float
 display_kernel::get_height()

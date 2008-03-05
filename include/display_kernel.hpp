@@ -158,11 +158,20 @@ protected:
 	mouse_t mouse;
 	atomic_queue<std::string> keys;
 
-	// Properties of the main window.
-	float x;
-	float y;
-	float window_width; ///< The last reported width of the window.
-	float window_height; ///< The last reported height of the window.
+	// The bounding rectangle of the window on the screen (or equivalent super-window
+	// coordinate system), including all decorations.
+	// If the window is invisible, window_x and/or window_y may be -1, meaning
+	// that the window will be positioned automatically by the window system.
+	int window_x, window_y, window_width, window_height;
+	
+	// The rectangle on the screen into which we can actually draw.
+	// At present, these are undefined until the display is realized, and
+	// they are not used in constructing the display (they are outputs of
+	// that process)
+	// This includes both viewports in a side-by-side stereo mode, whereas
+	//   view.view_width does not.  (xxx?)
+	int view_x, view_y, view_width, view_height;
+	
 	bool exit; ///< True when Visual should shutdown on window close.
 	bool visible; ///< scene.visible
 	bool explicitly_invisible;  ///< true iff scene.visible has ever been set to 0 by the program, or by the user closing a window
@@ -233,12 +242,12 @@ public: // Public Data.
 
 	/** Report that the position and/or size of the widget has changed.
 		Some platforms might not know about position changes; they can pass (x,y,new_width,new_height)
- 		@param x: The new upper-left x position of the window.
- 		@param y: The new upper-left y position of the window.
- 		@param new_width: The new width of the window.
- 		@param new_height: The new height of the window.
+ 		
+ 		win_* give the window rectangle (see this->window_*)
+ 		v_* give the view rectangle (see this->view_*)
  		*/
-	void report_resize( float new_x, float new_y, float new_width, float new_height);
+	void report_resize( int win_x, int win_y, int win_w, int win_h,
+						int v_x, int v_y, int v_w, int v_h );
 
 	/** Determine which object (if any) was picked by the cursor.
  	    @param x the x-position of the mouse cursor, in pixels.

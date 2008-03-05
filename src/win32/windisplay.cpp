@@ -168,19 +168,29 @@ display::on_showwindow( WPARAM wParam, LPARAM lParam)
 LRESULT
 display::on_size( WPARAM, LPARAM)
 {
-	RECT dims;
-	// The following calls report the fact that the widget area has been
-	// repainted to the windowing system.
-	GetClientRect( widget_handle, &dims);
-	report_resize( x, y, (float) dims.right, (float) dims.bottom );
+	update_size();
 	return 0;
 }
 
 LRESULT
 display::on_move( WPARAM, LPARAM lParam)
 {
-	report_resize( LOWORD( lParam ), HIWORD( lParam ), window_width, window_height );
+	update_size();
 	return 0;
+}
+
+void
+display::update_size()
+{
+	if (!IsIconic( widget_handle )) {
+		RECT windowRect, clientSize;
+		GetWindowRect( widget_handle, &windowRect );
+		GetClientRect( widget_handle, &clientSize );
+		POINT clientPos; clientPos.x = clientPos.y = 0;
+		ClientToScreen( widget_handle, &clientPos);
+		report_resize(	windowRect.left, windowRect.top, windowRect.right-windowRect.left, windowRect.bottom-windowRect.top, 
+						clientPos.x, clientPos.y, clientSize.right, clientSize.bottom );
+	}
 }
 
 LRESULT
@@ -290,11 +300,12 @@ display::create()
 	RECT screen;
 	SystemParametersInfo( SPI_GETWORKAREA, 0, &screen, 0);
 	int style = -1;
-	int real_x = static_cast<int>(x);
-	int real_y = static_cast<int>(y);
+	
+	int real_x = static_cast<int>(window_x);
+	int real_y = static_cast<int>(window_y);
 	int real_width = static_cast<int>(window_width);
 	int real_height = static_cast<int>(window_height);
-
+	
 	if (fullscreen) {
 		real_x = screen.left;
 		real_y = screen.top;
@@ -374,6 +385,8 @@ display::create()
 		wglShareLists( root_glrc, gl_context);
 
 	ShowWindow( widget_handle, SW_SHOW);
+	
+	update_size();
 }
 
 void
@@ -421,14 +434,16 @@ display::on_mousemove( WPARAM wParam, LPARAM lParam)
 
 	float dx = mouse_x - last_mousepos_x;
 	float dy = mouse_y - last_mousepos_y;
-	// bool mouselocked = false;
+	bool mouselocked = false;
 	if (middle_down) {
 		report_mouse_motion( dx, dy, display_kernel::MIDDLE);
-		// mouselocked = true;
+		if (zoom_is_allowed())
+			mouselocked = true;
 	}
 	if (right_down) {
 		report_mouse_motion( dx, dy, display_kernel::RIGHT);
-		// mouselocked = true;
+		if (spin_is_allowed())
+			mouselocked = true;
 	}
 	if (!buttondown)
 		report_mouse_motion( dx, dy, display_kernel::NONE);
@@ -436,13 +451,15 @@ display::on_mousemove( WPARAM wParam, LPARAM lParam)
 	mouse.set_shift( wParam & MK_SHIFT);
 	mouse.set_ctrl( wParam & MK_CONTROL);
 	mouse.set_alt( GetKeyState( VK_MENU) < 0);
-	// if (mouselocked) {
-	//	SetCursorPos( static_cast<int>(last_mousepos_x), static_cast<int>(last_mousepos_y));
-	// }
-	// else {
-	last_mousepos_x = mouse_x;
-	last_mousepos_y = mouse_y;
-	// }
+	if (mouselocked) {
+		if (mouse_x != last_mousepos_x || mouse_y != last_mousepos_y)
+			SetCursorPos( view_x + static_cast<int>(last_mousepos_x), view_y + static_cast<int>(last_mousepos_y));
+	}
+	else {
+		last_mousepos_x = mouse_x;
+		last_mousepos_y = mouse_y;
+	}
+	
 	mouse.cam = calc_camera();
 
 	if (left_button.is_dragging())
@@ -466,14 +483,17 @@ display::on_buttondown( WPARAM wParam, LPARAM lParam)
 	float y = (float)GET_Y_LPARAM(lParam);
 
 	int button_id = 0;
-	if (wParam & MK_LBUTTON && left_button.press(x, y)) {
-		button_id = 1;
-	}
-	else if (wParam & MK_MBUTTON && middle_button.press( x, y)) {
+	if ((wParam & MK_LBUTTON) && (wParam & MK_RBUTTON) && middle_button.press( x, y)) {
 		button_id = 2;
+		if (zoom_is_allowed()) 
+			ShowCursor(FALSE);
+	} else if (wParam & MK_LBUTTON && left_button.press(x, y)) {
+		button_id = 1;
 	}
 	else if (wParam & MK_RBUTTON && right_button.press( x, y)) {
 		button_id = 3;
+		if (spin_is_allowed()) 
+			ShowCursor(FALSE);
 	}
 
 	if (button_id)
@@ -496,25 +516,33 @@ display::on_buttonup( WPARAM wParam, LPARAM lParam)
 	#define unique unique_drop.first
 	#define drop unique_drop.second
 
-	if (!(wParam & ~MK_LBUTTON)) {
+	if (!(wParam & MK_LBUTTON)) {
 		unique_drop = left_button.release();
 		if (unique) {
 			button_id = 1;
 			goto found;
 		}
 	}
-	if (!(wParam & ~MK_MBUTTON) && !zoom_is_allowed()) {
+	if (!(wParam & MK_LBUTTON) || !(wParam & MK_RBUTTON)) {
 		unique_drop = middle_button.release();
 		if (unique) {
-			button_id = 2;
-			goto found;
+			if (zoom_is_allowed()) {
+				ShowCursor(TRUE);
+			} else {
+				button_id = 2;
+				goto found;
+			}
 		}
 	}
-	if (!(wParam & ~MK_RBUTTON) && !spin_is_allowed()) {
+	if (!(wParam & MK_RBUTTON)) {
 		unique_drop = right_button.release();
 		if (unique) {
-			button_id = 3;
-			goto found;
+			if (spin_is_allowed()) {
+				ShowCursor(TRUE);
+			} else {
+				button_id = 3;
+				goto found;
+			}
 		}
 	}
 found:
@@ -718,12 +746,28 @@ gui_main::gui_main()
 {
 }
 
+LRESULT
+gui_main::threadMessage( int code, WPARAM wParam, LPARAM lParam ) {
+	if (wParam == PM_REMOVE) {
+		MSG& message = *(MSG*)lParam;
+		
+		if (message.hwnd ==0 && message.message == CALL_MESSAGE ) {
+			boost::function<void()>* f = (boost::function<void()>*)message.wParam;
+			(*f)();
+			delete f;
+		}
+	}
+	return CallNextHookEx( NULL, code, wParam, lParam );
+}
+
 void
 gui_main::run()
 {
 	MSG message;
-
-	// Create a message queue
+	
+	// Create a message queue and hook thread messages (we can't just check for them in the loop
+	// below, becomes Windows runs modal message loops e.g. when resizing a window)
+	SetWindowsHookEx(WH_GETMESSAGE, &gui_main::threadMessage, NULL, GetCurrentThreadId());
 	PeekMessage(&message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 	
 	// Tell the initializing thread
@@ -735,14 +779,6 @@ gui_main::run()
 
 	// Enter the message loop
 	while (GetMessage(&message, 0, 0, 0) > 0) {
-		if (message.hwnd ==0 && message.message == CALL_MESSAGE ) {
-			boost::function<void()>* f = (boost::function<void()>*)message.wParam;
-			(*f)();
-			delete f;
-			continue;
-		}
-
-		// Destined for the primary window procedure above
 		TranslateMessage( &message);
 		DispatchMessage( &message);
 	}

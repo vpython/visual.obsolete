@@ -158,10 +158,10 @@ display::create()
 {
 	area.reset( new render_surface(*this, stereo_mode == ACTIVE_STEREO));
 	
-	// width and height give the size of the window (including borders and such)
+	// window_width and window_height give the size of the window (including borders and such)
 	// determine the size of the render_surface
 	// xxx Some way to use less magic constants here?
-	int w = width, h = height;
+	int w = window_width, h = window_height;
 	w -= border_width; h -= border_height;
 	h -= get_titlebar_height();
 	if (show_toolbar) h -= get_toolbar_height();
@@ -205,18 +205,8 @@ display::create()
 	// position. But at least on Windows this causes problems, at least
 	// with multiple physical displays (extended desktop).
 	window->show_all();
-	int init_x, init_y;
-	window->get_position( init_x, init_y);
-	if (x >= 0 || y >= 0) { // if user specified x or y
-		if (x < 0)
-			x = init_x;
-		if (y < 0)
-			y = init_y;
-		window->move( (int)x, (int)y);
-	}
-	else {
-		x = init_x;
-		y = init_y;
+	if (window_x >= 0 && window_y >= 0) { // if user specified x or y
+		window->move( (int)window_x, (int)window_y);
 	}
 	if (fullscreen)
 		window->fullscreen();

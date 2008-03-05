@@ -45,6 +45,8 @@ class display : public display_kernel
 	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_move( WPARAM, LPARAM);
 	
+	void update_size();
+	
 	// State for keyboard and mouse handling
 	bool Kshift;
 	bool Kalt;
@@ -91,6 +93,8 @@ class gui_main
 	DWORD gui_thread;
 	mutex init_lock;
 	condition initialized;
+	
+	static LRESULT CALLBACK threadMessage( int, WPARAM, LPARAM );
 	
  public:
 	// Calls the given function in the GUI thread.

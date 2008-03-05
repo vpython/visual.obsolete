@@ -337,7 +337,7 @@ label::gl_render( const view& scene)
 		identity.gl_load();
 		
 		glTranslated( origin.x, origin.y, origin.z);
-		glScaled( 2.0/scene.window_width, 2.0/scene.window_height, 1.0);
+		glScaled( 2.0/scene.view_width, 2.0/scene.view_height, 1.0);
 		// At this point, all furthur translations are in direction of label
 		//  space.
 		if (space && (xoffset || yoffset)) {

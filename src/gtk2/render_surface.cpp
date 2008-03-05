@@ -172,10 +172,12 @@ bool
 render_surface::on_configure_event( GdkEventConfigure* event)
 {
 	python::gil_lock L;
+	int x,y,w,h;
+	get_parent_window()->get_position( x, y );
+	get_parent_window()->get_size(w,h);
 	core.report_resize( 
-		x, y, 
-		static_cast<float>(event->width), 
-		static_cast<float>(event->height));
+		x,y,w,h,
+		x+event->x, y+event->y, event->width, event->height );
 	return true;
 }
 

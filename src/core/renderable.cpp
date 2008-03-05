@@ -8,12 +8,12 @@
 
 namespace cvisual {
 
-view::view( const vector& n_forward, vector& n_center, float& n_width,
-	float& n_height, bool n_forward_changed,
-	double& n_gcf, vector& n_gcfvec,
+view::view( const vector n_forward, vector n_center, float n_width,
+	float n_height, bool n_forward_changed,
+	double n_gcf, vector n_gcfvec,
 	bool n_gcf_changed, gl_extensions& glext)
-	: forward( n_forward), center(n_center), window_width( n_width),
-	window_height( n_height), forward_changed( n_forward_changed),
+	: forward( n_forward), center(n_center), view_width( n_width),
+	view_height( n_height), forward_changed( n_forward_changed),
 	gcf( n_gcf), gcfvec( n_gcfvec), gcf_changed( n_gcf_changed), lod_adjust(0),
 	anaglyph(false), coloranaglyph(false), tan_hfov_x(0), tan_hfov_y(0),
 	screen_objects( z_comparator( forward)), glext(glext)
@@ -25,8 +25,8 @@ view::view( const view& other, const tmatrix& wft)
 	forward( wft.times_v(other.forward)),
 	center( wft * other.center),
 	up( wft.times_v(other.up)),
-	window_width( other.window_width),
-	window_height( other.window_height),
+	view_width( other.view_width),
+	view_height( other.view_height),
 	forward_changed( true),
 	gcf( other.gcf),
 	gcfvec( other.gcfvec),
@@ -57,7 +57,7 @@ view::pixel_coverage( const vector& pos, double radius) const
 	// The fraction of the apparent width covered by the coverage circle.
 	double coverage_fraction = radius / apparent_hwidth;
 	// Convert from fraction to pixels.
-	return coverage_fraction * window_width;
+	return coverage_fraction * view_width;
 
 }
 

@@ -77,16 +77,16 @@ struct view
 	/// The true up direction of the scene in world space.
 	vector up;
 	
-	/// The width of the window in pixels.
-	float window_width;
-	/// The height of the window in pixels.
-	float& window_height;
+	/// The width of the viewport in pixels.
+	float view_width;
+	/// The height of the viewport in pixels.
+	float view_height;
 	/// True if the forward vector changed since the last rending operation.
 	bool forward_changed;
 	/// The Global Scaling Factor
-	double& gcf;
+	double gcf;
 	/// The vector version of the Global Scaling Factor, for scene.uniform=0
-	vector& gcfvec;
+	vector gcfvec;
 	/// True if gcf changed since the last render cycle.
 	bool gcf_changed;
 	/// The user adjustment to the level-of-detail.
@@ -102,9 +102,9 @@ struct view
 	
 	tmatrix camera_world;
 	
-	view( const vector& n_forward, vector& n_center, float& n_width, 
-		float& n_height, bool n_forward_changed, 
-		double& n_gcf, vector& n_gcfvec,
+	view( vector n_forward, vector n_center, float n_width, 
+		float n_height, bool n_forward_changed, 
+		double n_gcf, vector n_gcfvec,
 		bool n_gcf_changed,
 		gl_extensions& glext);
 	
