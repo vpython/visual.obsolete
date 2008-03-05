@@ -244,6 +244,7 @@ cross_v_a( const vector& arg1, const array& arg2)
 
 namespace {
 using namespace boost::python;
+BOOST_PYTHON_FUNCTION_OVERLOADS( free_rotate, rotate, 2, 3 )
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( vector_rotate, vector::rotate, 1, 2)
 } // !namespace anonymous
 
@@ -324,11 +325,6 @@ vector_pos( const vector& v)
 void
 wrap_vector()
 {
-	vector (*rotate_vector)( vector, double, const vector) = rotate;
-
- //   AS commented out, constructor has not been defined	
-//	vector (*rotate)(vector, double) = rotate;
-
 	// Numeric versions for some of the above
 	// TODO: round out the set.
 	def( "mag", mag_a);
@@ -350,10 +346,8 @@ wrap_vector()
 	py::def( "comp", comp, "The scalar projection of arg1 to arg2.");
 	py::def( "proj", proj, "The vector projection of arg1 to arg2.");
 	py::def( "diff_angle", diff_angle, "The angle between two vectors, in radians.");
-	py::def( "rotate", rotate_vector, args("angle", "axis"));
-	py::def( "rotate", rotate, args("angle"), "Rotate a vector about an axis vector"
-		" through an angle.");
-
+	py::def( "rotate", rotate, free_rotate( args("vector", "angle", "axis"), 
+		"Rotate a vector about an axis vector through an angle.") );
 
 	//AS added throw()
 
