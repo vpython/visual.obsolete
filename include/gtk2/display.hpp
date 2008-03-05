@@ -42,6 +42,8 @@ class display : public display_kernel,
 
 	static void set_dataroot( Glib::ustring dataroot);
 	
+	virtual void activate(bool);
+	
 	// Called by the gui_main class below when this window needs to create
 	// or destroy itself.
 	void create();

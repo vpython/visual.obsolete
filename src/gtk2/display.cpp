@@ -36,54 +36,6 @@ using boost::thread;
 	const int border_height = 6;
 #endif
 
-	
-/* Startup:  When the first display is created, from Python, set_selected is
-	called with itself as the argument.
-	Various attributes of the display object itself are set by the user from
-	Python.
-	When the first renderable object is made visible, it calls 
-	add_renderable(self) for the display that owns it.  If the global main object
-	does not exist, it is created.  This initializes a Gtk::Main object and enters
-	the event loop.
-	Next, the display calls main->add_display(self), This places the pointer to
-	the display in static memory and invokes a asynchronous callback function through a 
-	Glib::Dispatcher.  The Python thread then blocks with a condition variable
-	on the state of the 'active' data member.
-	The Gtk thread recieves the callback function and forwards it to the display
-	object that requested it.  The display creates the required Gtk resources,
-	creates the display, makes it visible, adds a timer, sets 'active' to true, 
-	and signals	the condition.
-	The Python thread is awakened upon signaling of the condition, and returns
-	control to the user.
-	The Gtk thread returns to the event loop.
-*/
-
-/* Shutdown:  This may be invoked from three paths.
-	
-	First: The Python program's simulation loop is closed, and the program
-	reaches the end.  Python calls the atexit() handler cvisual.waitclosed(),
-	and blocks after calling Py_BEGIN_ALLOW_THREADS().
-	At this point, all of the active displays continue to accept user input
-	until closed by the user.  When the first window is closed whose exit_on_close
-	variable is true, all of the windows are called with hide_all and deleted.
-	kit.quit() is called which return control to the thread function which signals
-	waitclosed() before exiting the thread.
-	
-	Second.  The Python loop may explicitly exit VPython by calling shutdown().
-	In this case, the same shutdown procedure is invoked as before, but the thread
-	exits without signaling waitclosed().
-	
-	Third:  The Python program's simulation loop is infinate.  In this case the
-	program runs until a display is closed whose exit_on_close variable is true,
-	which initiates the shutdown as before.  In this case, Py_AddPendingCall is 
-	called with exit() as the required func.
-*/
-
-/* Visibility:  When a display is explicity made visible, than startup commences
- * as normal without any objects within it.  When an object is explicitly made
- * invisible, the owning window is hidden and destoyed.  It is recreated as needed.
- */
-
 namespace {
 Glib::ustring dataroot = "";
 }
@@ -210,7 +162,6 @@ display::create()
 	}
 	if (fullscreen)
 		window->fullscreen();
-	active = true;
 	area->grab_focus();
 	assert( area->can_focus());
 	while (Gtk::Main::events_pending())
@@ -222,7 +173,6 @@ display::destroy()
 {
 	timer.disconnect();
 	window->hide();
-	active = false;
 	window = 0;
 	area.reset();
 	glade_file.clear();
@@ -267,7 +217,6 @@ display::on_window_delete(GdkEventAny*)
 {
 	VPYTHON_NOTE( "Closing a window from the GUI.");
 	timer.disconnect();
-	active = false;
 	window = NULL;
 	area.reset();
 	glade_file.clear();
