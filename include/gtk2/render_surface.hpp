@@ -39,7 +39,7 @@ class render_surface : public Gtk::GL::DrawingArea
 	double last_time; // the last time render_surface was run
  	
  public:
-	render_surface( display_kernel& _core, bool activestereo = false);
+	render_surface( display_kernel& _core, mouse_t& mouse, bool activestereo = false);
 	display_kernel& core;
  
  protected:

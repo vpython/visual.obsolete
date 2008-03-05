@@ -48,13 +48,13 @@ namespace {
 	Glib::RefPtr<Gdk::GL::Context> share_list;
 }
 
-render_surface::render_surface( display_kernel& _core, bool activestereo)
+render_surface::render_surface( display_kernel& _core, mouse_t& _mouse, bool activestereo)
 	: last_mousepos_x(0),
 	last_mousepos_y(0),
 	cycle_time(TIMEOUT),
 	last_time(0),
 	core( _core),
-	mouse( _core.mouse )
+	mouse( _mouse )
 {
 	Glib::RefPtr<Gdk::GL::Config> config;
 

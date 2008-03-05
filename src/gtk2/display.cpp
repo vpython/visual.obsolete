@@ -108,7 +108,7 @@ get_widget( Glib::RefPtr<Gnome::Glade::Xml> tree, const Glib::ustring& name)
 void
 display::create()
 {
-	area.reset( new render_surface(*this, stereo_mode == ACTIVE_STEREO));
+	area.reset( new render_surface(*this, mouse, stereo_mode == ACTIVE_STEREO));
 	
 	// window_width and window_height give the size of the window (including borders and such)
 	// determine the size of the render_surface
