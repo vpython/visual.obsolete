@@ -581,11 +581,15 @@ display_kernel::recalc_extent(void)
 			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
 				" an extent greater than about 1e154 units.");
 
-		double mag = std::max(std::max(range.x,range.y),range.z);
-		if (!uniform || !last_range_mag || mag > last_range_mag || mag < 0.5 * last_range_mag) {
+		double mag = std::max(std::max(new_range.x,new_range.y),new_range.z);
+		if (!uniform || !last_range_mag || mag > last_range_mag) {
 			range = new_range;
 			if (new_range_valid)
 				last_range_mag = mag;
+		} else if ( mag * 3.0 < last_range_mag ) {
+			range = new_range * 3.0;
+			if (new_range_valid)
+				last_range_mag = mag * 3.0;
 		}
 
         // We should NEVER deliberately set range to zero on any axis.
