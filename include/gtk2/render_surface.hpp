@@ -23,12 +23,7 @@ namespace cvisual {
 class render_surface : public Gtk::GL::DrawingArea
 {
  private:
-	// Note that the upper-left corner of the window is the origin.
-	float last_mousepos_x;
-	float last_mousepos_y;
-
-	mousebutton left_button, right_button, middle_button;
-	mouse_t& mouse;
+	mouse_manager& mouse;
     
 	// The length of the Glib::signal_timout, in milliseconds.
 	long cycle_time;
@@ -39,7 +34,7 @@ class render_surface : public Gtk::GL::DrawingArea
 	double last_time; // the last time render_surface was run
  	
  public:
-	render_surface( display_kernel& _core, mouse_t& mouse, bool activestereo = false);
+	render_surface( display_kernel& _core, mouse_manager& mouse, bool activestereo = false);
 	display_kernel& core;
  
  protected:
@@ -59,6 +54,9 @@ class render_surface : public Gtk::GL::DrawingArea
  private:
 	// Timer function for rendering
 	bool forward_render_scene();
+	
+	template <class E>
+	void mouse_event( E* event );
 
 	// Manage the current OpenGL context
 	void gl_begin();

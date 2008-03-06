@@ -15,7 +15,7 @@
 #include "util/thread.hpp"
 #include "util/gl_extensions.hpp"
 #include "util/atomic_queue.hpp"
-#include "mouseobject.hpp"
+#include "mouse_manager.hpp"
 #include <list>
 #include <vector>
 #include <set>
@@ -151,7 +151,7 @@ class display_kernel
 
 protected:
 	// Mouse and keyboard objects
-	mouse_t mouse;
+	mouse_manager mouse;
 	atomic_queue<std::string> keys;
 
 	// The bounding rectangle of the window on the screen (or equivalent super-window
@@ -230,11 +230,12 @@ public: // Public Data.
 	*/
 	void report_closed();
 
-	/** Report that the mouse moved with one mouse button down.
+	/** Called by mouse_manager to report mouse movement that should affect the camera.
+		Report that the mouse moved with one mouse button down.
  		@param dx horizontal change in mouse position in pixels.
  		@param dy vertical change in mouse position in pixels.
 	*/
-	void report_mouse_motion( float dx, float dy, mouse_button button);
+	void report_camera_motion( float dx, float dy, mouse_button button);
 
 	/** Report that the position and/or size of the widget has changed.
 		Some platforms might not know about position changes; they can pass (x,y,new_width,new_height)

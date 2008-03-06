@@ -32,12 +32,10 @@ class display : public display_kernel
 
 	// Procedures used to process messages.
 	LRESULT on_showwindow( WPARAM, LPARAM);
-	LRESULT on_mousemove( WPARAM, LPARAM);
+	LRESULT on_mouse( WPARAM, LPARAM);
 	LRESULT on_paint( WPARAM, LPARAM );
 	LRESULT on_close( WPARAM, LPARAM );
 	LRESULT on_destroy( WPARAM, LPARAM );
-	LRESULT on_buttondown( WPARAM, LPARAM);
-	LRESULT on_buttonup( WPARAM, LPARAM);
 	LRESULT on_getminmaxinfo( WPARAM, LPARAM);
 	LRESULT on_keyUp( UINT, WPARAM, LPARAM);
 	LRESULT on_keyDown( UINT, WPARAM, LPARAM);
@@ -47,15 +45,6 @@ class display : public display_kernel
 	
 	void update_size();
 	
-	// State for keyboard and mouse handling
-	bool Kshift;
-	bool Kalt;
-	bool Kctrl;
-	mousebutton left_button, right_button, middle_button;
-	float last_mousepos_x;
- 	float last_mousepos_y;
- 	bool mouselocked;
- 	
 	// Functions to manipulate the OpenGL context
 	void gl_begin();
 	void gl_end();

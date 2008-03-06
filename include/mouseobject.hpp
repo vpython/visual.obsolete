@@ -138,6 +138,7 @@ shared_ptr<event> click_event( int which, const mouse_t& mouse);
 shared_ptr<event> drop_event( int which, const mouse_t& mouse);
 shared_ptr<event> press_event( int which, const mouse_t& mouse);
 shared_ptr<event> drag_event( int which, const mouse_t& mouse);
+shared_ptr<event> release_event( int which, const mouse_t& mouse);
 
 // Utility object for tracking mouse press, release, clicks, drags, and drops.
 struct mousebutton

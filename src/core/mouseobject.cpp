@@ -53,6 +53,15 @@ drop_event( int which, const mouse_t& mouse)
 	return ret;
 }
 
+shared_ptr<event> 
+release_event( int which, const mouse_t& mouse)
+{
+	shared_ptr<event> ret( new event());;
+	ret->set_release( true);
+	init_event( which, ret, mouse);
+	return ret;
+}
+
 shared_ptr<event>
 click_event( int which, const mouse_t& mouse)
 {

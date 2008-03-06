@@ -48,9 +48,8 @@ namespace {
 	Glib::RefPtr<Gdk::GL::Context> share_list;
 }
 
-render_surface::render_surface( display_kernel& _core, mouse_t& _mouse, bool activestereo)
-	: last_mousepos_x(0),
-	last_mousepos_y(0),
+render_surface::render_surface( display_kernel& _core, mouse_manager& _mouse, bool activestereo)
+	: 
 	cycle_time(TIMEOUT),
 	last_time(0),
 	core( _core),
@@ -114,48 +113,22 @@ render_surface::render_surface( display_kernel& _core, mouse_t& _mouse, bool act
 	set_flags( get_flags() | Gtk::CAN_FOCUS);
 }
 
+template <class E>
+void 
+render_surface::mouse_event( E* event ) {
+	bool buttons[] = { event->state & GDK_BUTTON1_MASK, event->state & GDK_BUTTON2_MASK };
+	bool shiftState[] = { event->state & GDK_SHIFT_MASK, event->state & GDK_CONTROL_MASK, event->state & GDK_MOD1_MASK };
+
+	mouse.report_mouse_state( 2, buttons, mouse_x, mouse_y, 3, shiftState, false );
+
+	// xxx Is mouse locking possible with GTK2?
+}
+
 bool 
 render_surface::on_motion_notify_event( GdkEventMotion* event)
 {
 	python::gil_lock L;
-
-#ifdef G_OS_WIN32
-	// Fake middle mouse events on Win32
-	if (event->state & GDK_BUTTON3_MASK && event->state & GDK_BUTTON1_MASK) {
-		event->state |= GDK_BUTTON2_MASK;
-		event->state &= ~(GDK_BUTTON3_MASK | GDK_BUTTON1_MASK);
-	}
-#endif
-	// The vertical and horizontal changes of the mouse position since the last
-	// call.
-	float dy = static_cast<float>( event->y) - last_mousepos_y;
-	float dx = static_cast<float>( event->x) - last_mousepos_x;
-	bool buttondown = false;
-	
-	if (event->state & GDK_BUTTON2_MASK) {
-		core.report_mouse_motion( dx, dy, display_kernel::MIDDLE);
-		buttondown = true;
-	}
-	if (event->state & GDK_BUTTON3_MASK) {
-		core.report_mouse_motion( dx, dy, display_kernel::RIGHT);
-		buttondown = true;
-	}	
-	if (!buttondown) {
-		core.report_mouse_motion( dx, dy, display_kernel::NONE);
-	}
-	mouse.set_shift( event->state & GDK_SHIFT_MASK);
-	mouse.set_ctrl( event->state & GDK_CONTROL_MASK);
-	mouse.set_alt( event->state & GDK_MOD1_MASK);
-	last_mousepos_x = static_cast<float>(event->x);
-	last_mousepos_y = static_cast<float>(event->y);
-	mouse.cam = core.calc_camera();
-	
-	if (left_button.is_dragging())
-		mouse.push_event( drag_event( 1, mouse));
-	if (!core.zoom_is_allowed() && middle_button.is_dragging())
-		mouse.push_event( drag_event( 2, mouse));
-	if (!core.spin_is_allowed() && right_button.is_dragging())
-		mouse.push_event( drag_event( 3, mouse));
+	mouse_event( event );
 	return true;
 }
 
@@ -163,8 +136,7 @@ bool
 render_surface::on_enter_notify_event( GdkEventCrossing* event)
 {
 	python::gil_lock L;
-	last_mousepos_x = event->x;
-	last_mousepos_y = event->y;
+	mouse_event( event );
 	return true;
 }
 
@@ -229,12 +201,7 @@ render_surface::forward_render_scene()
 
 	if (!sat)
 		return sat;
-	// TODO: Figure out an optimzation to avoid performing this extra pick
-	// rendering cycle when the user isn't looking at scene.mouse[.{pick,pickpos,pos}]
-	gl_begin();
-	boost::tie( mouse.pick, mouse.pickpos, mouse.position) = 
-		core.pick( last_mousepos_x, last_mousepos_y);
-	gl_end();
+
 	double pick_time = stopwatch.elapsed() - start_time - render_time;
 	long irender = int(1000*(render_time+pick_time));
 	long icycle = int(1000*cycle);
@@ -303,31 +270,7 @@ bool
 render_surface::on_button_press_event( GdkEventButton* event)
 {
 	python::gil_lock L;
-	if (event->type == GDK_BUTTON_RELEASE)
-		// Ignore erronious condition
-		return true;
-	if (event->button > 3)
-		// Ignore extra buttons (such as scroll wheel and forward/back)
-		return true;
-	mouse.set_shift( event->state & GDK_SHIFT_MASK);
-	mouse.set_ctrl( event->state & GDK_CONTROL_MASK);
-	mouse.set_alt( event->state & GDK_MOD1_MASK);
-	switch (event->button) {
-		case 1: // Left
-			left_button.press( event->x, event->y);
-			break;
-		case 2: // Middle
-			middle_button.press( event->x, event->y);
-			break;
-		case 3: // Right
-			right_button.press( event->x, event->y);
-			break;
-		default:
-			// Captured above
-			break;
-	}
-	// Generate a press event.
-	mouse.push_event( press_event( event->button, mouse));
+	mouse_event( event );
 	return true;
 }
 
@@ -335,41 +278,7 @@ bool
 render_surface::on_button_release_event( GdkEventButton* event)
 {
 	python::gil_lock L;
-	if (event->type != GDK_BUTTON_RELEASE)
-		// Ignore erronious condition
-		return true;
-	if (event->button > 3)
-		// Ignore extra buttons (such as scroll wheel and forward/back)
-		return true;
-	
-	mouse.set_shift( event->state & GDK_SHIFT_MASK);
-	mouse.set_ctrl( event->state & GDK_CONTROL_MASK);
-	mouse.set_alt( event->state & GDK_MOD1_MASK);
-	bool drop = false;
-	bool clickok = false;
-	switch (event->button) {
-		case 1:
-			clickok = true;
-			drop = left_button.release().second;
-			break;
-		case 2:
-			if (!core.zoom_is_allowed())
-				clickok = true;
-				drop = middle_button.release().second;
-			break;
-		case 3:
-			if (!core.spin_is_allowed())
-				clickok = true;
-				drop = right_button.release().second;
-			break;
-		default:
-			// Captured above
-			break;
-	}
-	if (drop)
-		mouse.push_event( drop_event( event->button, mouse));
-	else if (clickok)
-		mouse.push_event( click_event( event->button, mouse));
+	mouse_event( event );
 	return true;
 }
 

@@ -215,6 +215,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\src\core\mouse_manager.cpp"
+				>
+			</File>
 			<Filter
 				Name="win32"
 				>
@@ -487,6 +491,10 @@
 			</File>
 			<File
 				RelativePath="..\include\material.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\mouse_manager.hpp"
 				>
 			</File>
 			<File

@@ -56,10 +56,8 @@ std::map<HWND, display*> display::widgets;
 display* display::current = 0;
 
 display::display()
-  : Kshift(false), Kctrl(false), Kalt(false),
-	widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
-	saved_dc(0), saved_glrc(0),
-	last_mousepos_x(0), last_mousepos_y(0), mouselocked( false)
+  : widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
+	saved_dc(0), saved_glrc(0)
 {
 }
 
@@ -88,16 +86,12 @@ display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				return This->on_move( wParam, lParam);
 			case WM_PAINT:
 				return This->on_paint( wParam, lParam);
-			case WM_MOUSEMOVE:
-				// Handle mouse cursor movement.
-				return This->on_mousemove( wParam, lParam);
 			case WM_SHOWWINDOW:
 				return This->on_showwindow( wParam, lParam);
-			//case WM_LBUTTONDBLCLK:
 			case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN:
-				return This->on_buttondown( wParam, lParam);
 			case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
-				return This->on_buttonup( wParam, lParam);
+			case WM_MOUSEMOVE:
+				return This->on_mouse( wParam, lParam);
     		case WM_KEYUP:
 				return This->on_keyUp(uMsg, wParam, lParam);
     		case WM_KEYDOWN:
@@ -214,11 +208,6 @@ display::on_paint( WPARAM, LPARAM)
 	gl_swap_buffers();
 	gl_end();
 	if (!sat) return 1;  // xxx
-	
-	gl_begin();
-	boost::tie( mouse.pick, mouse.pickpos, mouse.position) =
-		pick( last_mousepos_x, last_mousepos_y);
-	gl_end();
 	
 	// It's very important for the render thread not to starve Python.  Since
 	// it holds the gil_lock so much longer, it tends to monopolize it if it
@@ -416,154 +405,30 @@ display::getProcAddress(const char* name) {
 }
 
 LRESULT
-display::on_mousemove( WPARAM wParam, LPARAM lParam)
+display::on_mouse( WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Modify this implementation to make the mouse disappear and lock
-	// it to a particular position during mouse right-clicks.
-	bool left_down = wParam & MK_LBUTTON;
-	bool middle_down = wParam & MK_MBUTTON;
-	bool right_down = wParam & MK_RBUTTON;
-	if (left_down && right_down) {
-		middle_down = true;
-		right_down = false;
-		left_down = false;
-	}
-	bool buttondown = left_down || middle_down || right_down;
-	float mouse_x = LOWORD(lParam);
-	float mouse_y = HIWORD(lParam);
-
-	float dx = mouse_x - last_mousepos_x;
-	float dy = mouse_y - last_mousepos_y;
-	bool mouselocked = false;
-	if (middle_down) {
-		report_mouse_motion( dx, dy, display_kernel::MIDDLE);
-		if (zoom_is_allowed())
-			mouselocked = true;
-	}
-	if (right_down) {
-		report_mouse_motion( dx, dy, display_kernel::RIGHT);
-		if (spin_is_allowed())
-			mouselocked = true;
-	}
-	if (!buttondown)
-		report_mouse_motion( dx, dy, display_kernel::NONE);
-
-	mouse.set_shift( wParam & MK_SHIFT);
-	mouse.set_ctrl( wParam & MK_CONTROL);
-	mouse.set_alt( GetKeyState( VK_MENU) < 0);
-	if (mouselocked) {
-		if (mouse_x != last_mousepos_x || mouse_y != last_mousepos_y)
-			SetCursorPos( view_x + static_cast<int>(last_mousepos_x), view_y + static_cast<int>(last_mousepos_y));
-	}
-	else {
-		last_mousepos_x = mouse_x;
-		last_mousepos_y = mouse_y;
-	}
+	bool buttons[] = { wParam & MK_LBUTTON, wParam & MK_RBUTTON };
+	bool shiftState[] = { wParam & MK_SHIFT, wParam & MK_CONTROL, GetKeyState( VK_MENU) < 0 };
 	
-	mouse.cam = calc_camera();
+	int mouse_x = GET_X_LPARAM(lParam);
+	int mouse_y = GET_Y_LPARAM(lParam);
+	bool was_locked = mouse.is_mouse_locked();
+	int old_x = mouse.get_x(), old_y = mouse.get_y();
+	
+	mouse.report_mouse_state( 2, buttons, mouse_x, mouse_y, 3, shiftState, true );
+	
+	if ( mouse.is_mouse_locked() != was_locked )
+		ShowCursor( !mouse.is_mouse_locked() );
 
-	if (left_button.is_dragging())
-		mouse.push_event( drag_event( 1, mouse));
-	if (!zoom_is_allowed() && middle_button.is_dragging())
-		mouse.push_event( drag_event( 2, mouse));
-	if (!spin_is_allowed() && right_button.is_dragging())
-		mouse.push_event( drag_event( 3, mouse));
+	if (mouse.is_mouse_locked() && (mouse_x != old_x || mouse_y != old_y))
+		SetCursorPos( view_x + old_x, view_y + old_y);
 
 	return 0;
-}
-
-LRESULT
-display::on_buttondown( WPARAM wParam, LPARAM lParam)
-{
-	mouse.set_shift( wParam & MK_SHIFT);
-	mouse.set_ctrl( wParam & MK_CONTROL);
-	mouse.set_alt( GetKeyState( VK_MENU) < 0);
-
-	float x = (float)GET_X_LPARAM(lParam);
-	float y = (float)GET_Y_LPARAM(lParam);
-
-	int button_id = 0;
-	if ((wParam & MK_LBUTTON) && (wParam & MK_RBUTTON) && middle_button.press( x, y)) {
-		button_id = 2;
-		if (zoom_is_allowed()) 
-			ShowCursor(FALSE);
-	} else if (wParam & MK_LBUTTON && left_button.press(x, y)) {
-		button_id = 1;
-	}
-	else if (wParam & MK_RBUTTON && right_button.press( x, y)) {
-		button_id = 3;
-		if (spin_is_allowed()) 
-			ShowCursor(FALSE);
-	}
-
-	if (button_id)
-		mouse.push_event( press_event( button_id, mouse));
-	return 0;
-}
-
-LRESULT
-display::on_buttonup( WPARAM wParam, LPARAM lParam)
-{
-	mouse.set_shift( wParam & MK_SHIFT);
-	mouse.set_ctrl( wParam & MK_CONTROL);
-	mouse.set_alt( GetKeyState( VK_MENU) < 0);
-
-	// float x = (float)GET_X_LPARAM(lParam);
-	// float y = (float)GET_Y_LPARAM(lParam);
-
-	int button_id = 0;
-	std::pair<bool, bool> unique_drop( false, false);
-	#define unique unique_drop.first
-	#define drop unique_drop.second
-
-	if (!(wParam & MK_LBUTTON)) {
-		unique_drop = left_button.release();
-		if (unique) {
-			button_id = 1;
-			goto found;
-		}
-	}
-	if (!(wParam & MK_LBUTTON) || !(wParam & MK_RBUTTON)) {
-		unique_drop = middle_button.release();
-		if (unique) {
-			if (zoom_is_allowed()) {
-				ShowCursor(TRUE);
-			} else {
-				button_id = 2;
-				goto found;
-			}
-		}
-	}
-	if (!(wParam & MK_RBUTTON)) {
-		unique_drop = right_button.release();
-		if (unique) {
-			if (spin_is_allowed()) {
-				ShowCursor(TRUE);
-			} else {
-				button_id = 3;
-				goto found;
-			}
-		}
-	}
-found:
-	if (button_id)
-		if (drop)
-			mouse.push_event( drop_event( button_id, mouse));
-		else {
-			mouse.push_event( click_event( button_id, mouse));
-		}
-	return 0;
-	#undef unique
-	#undef drop
 }
 
 LRESULT
 display::on_keyUp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	Kshift = (GetKeyState(VK_SHIFT) < 0) ||
-		(GetKeyState(VK_CAPITAL) & 1);
-	Kalt = GetKeyState(VK_MENU) < 0;
-	Kctrl = GetKeyState(VK_CONTROL) < 0;
 
 	return 0;
 }
@@ -576,10 +441,10 @@ display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	char *kNameP;
 	char kStr[60],fStr[4];
 	
-	Kshift = (GetKeyState(VK_SHIFT) < 0) ||
+	bool Kshift = (GetKeyState(VK_SHIFT) < 0) ||
 		(GetKeyState(VK_CAPITAL) & 1);
-	Kalt = GetKeyState(VK_MENU) < 0;
-	Kctrl = GetKeyState(VK_CONTROL) < 0;
+	bool Kalt = GetKeyState(VK_MENU) < 0;
+	bool Kctrl = GetKeyState(VK_CONTROL) < 0;
 	kStr[0] = 0;
 	kNameP = NULL;
 	

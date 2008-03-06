@@ -185,7 +185,8 @@ display_kernel::display_kernel()
 	mouse_mode( ZOOM_ROTATE),
 	stereo_mode( NO_STEREO),
 	lod_adjust(0),
-	realized(false)
+	realized(false),
+	mouse( *this )
 {
 }
 
@@ -207,7 +208,7 @@ display_kernel::report_closed() {
 }
 
 void
-display_kernel::report_mouse_motion( float dx, float dy, mouse_button button)
+display_kernel::report_camera_motion( float dx, float dy, mouse_button button )
 {
 	// This stuff handles automatic movement of the camera in responce to user
 	// input.  See also view_to_world_transform for how the affected variables
@@ -900,6 +901,12 @@ display_kernel::render_scene(void)
 	if (show_rendertime) {
 		render_time = render_timer.elapsed()-start_time;
 	}
+	
+	// xxx Can we delay picking until the Python program actually wants one of these attributes?
+	mouse.get_mouse().cam = camera;
+	boost::tie( mouse.get_mouse().pick, mouse.get_mouse().pickpos, mouse.get_mouse().position) =
+		pick( mouse.get_x(), mouse.get_y() );
+	
 	return true;
 }
 
@@ -1511,7 +1518,7 @@ mouse_t*
 display_kernel::get_mouse()
 {
 	implicit_activate();
-	return &mouse;
+	return &mouse.get_mouse();
 }
 
 atomic_queue<std::string>*

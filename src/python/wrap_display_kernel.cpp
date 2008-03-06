@@ -86,21 +86,27 @@ class py_display_kernel : public py_base_display_kernel
 	intptr_t base_getProcAddress( const char* name ) { return (intptr_t)display_kernel::getProcAddress(name); }
  
 	// Utility methods for Python subclasses
-	void report_mouse_motion( float dx, float dy, std::string button)
+	bool report_mouse_state(py::object is_button_down, 
+							int cursor_client_x, int cursor_client_y,
+							py::object shift_state,
+							bool can_lock_mouse ) 
 	{
-		if (button.empty())
-			return;
-		switch (button.at(0)) {
-			case 'l':
-				display_kernel::report_mouse_motion( dx, dy, display_kernel::LEFT);
-				break;
-			case 'r':
-				display_kernel::report_mouse_motion( dx, dy, display_kernel::RIGHT);
-				break;
-			case 'm':
-				display_kernel::report_mouse_motion( dx, dy, display_kernel::MIDDLE);
-				break;
-		}
+		int button_len = boost::python::len( is_button_down );
+		boost::scoped_array<bool> buttons( new bool[button_len] );
+		for(int b = 0; b<button_len; b++)
+			buttons[b] = boost::python::extract<bool>( is_button_down[b] );
+			
+		int shift_len = boost::python::len( shift_state );
+		boost::scoped_array<bool> shift( new bool[shift_len] );
+		for(int b=0; b<shift_len; b++)
+			shift[b] = boost::python::extract<bool>( shift_state[b] );
+			
+		mouse.report_mouse_state( button_len, &buttons[0], 
+								  cursor_client_x, cursor_client_y, 
+								  shift_len, &shift[0], 
+								  can_lock_mouse );
+
+		return mouse.is_mouse_locked();
 	}
 };
 
@@ -222,7 +228,7 @@ wrap_display_kernel(void)
 		// Functions for extending this type in Python.
 		.def( "render_scene", &display_kernel::render_scene)
 		.def( "report_resize", &display_kernel::report_resize)
-		.def( "report_mouse_motion", &py_display_kernel::report_mouse_motion)
+		.def( "report_mouse_state", &py_display_kernel::report_mouse_state )
 		.def( "pick", &display_kernel::pick, pick_overloads(
 			py::args( "x", "y", "pixels")))
 		;
