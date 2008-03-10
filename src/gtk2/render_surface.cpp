@@ -119,7 +119,7 @@ render_surface::mouse_event( E* event ) {
 	bool buttons[] = { event->state & GDK_BUTTON1_MASK, event->state & GDK_BUTTON2_MASK };
 	bool shiftState[] = { event->state & GDK_SHIFT_MASK, event->state & GDK_CONTROL_MASK, event->state & GDK_MOD1_MASK };
 
-	mouse.report_mouse_state( 2, buttons, mouse_x, mouse_y, 3, shiftState, false );
+	mouse.report_mouse_state( 2, buttons, event->x, event->y, 3, shiftState, false );
 
 	// xxx Is mouse locking possible with GTK2?
 }
