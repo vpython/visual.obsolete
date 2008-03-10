@@ -67,8 +67,8 @@ CVISUAL_OBJS = atomic_queue.lo clipping_plane.lo displaylist.lo errors.lo extent
 	quadric.lo rgba.lo shader_program.lo texture.lo tmatrix.lo vector.lo \
 	arrow.lo axial.lo box.lo cone.lo convex.lo cylinder.lo \
 	display_kernel.lo ellipsoid.lo frame.lo label.lo material.lo \
-	mouseobject.lo primitive.lo pyramid.lo rectangular.lo renderable.lo \
-	ring.lo sphere.lo \
+	mouseobject.lo mouse_manager.lo primitive.lo pyramid.lo rectangular.lo \
+	renderable.lo ring.lo sphere.lo \
 	display.lo random_device.lo render_surface.lo text.lo timer.lo\
 	convex.lo curve.lo cvisualmodule.lo faces.lo num_util.lo \
 	numeric_texture.lo points.lo scalar_array.lo slice.lo \
