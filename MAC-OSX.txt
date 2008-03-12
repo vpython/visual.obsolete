@@ -10,15 +10,23 @@ Install fink from fink.sourceforge.net. Probably best to install from source?
 I use Fink Commander as a GUI to fink, but you can use the command line.
 	
 Use fink to install the components listed for Linux in INSTALL.txt (details repeated here).
-	Currently (Jan. 2008) you will find 10 entries for Boost; you
-	need to expand the package name field wide enough to be able to see which
-	boostN.N.pyth packages go with your chosen version of Python (you also
-	need the non-Python libraries, boostN.N.nopy and boostN.N.syste).
-	I installed Python2.5, numpy, the boost libraries, then install these:
 	
-	gtkmm-2.4, which installs many other packages on which it depends, including
-	gtk+2, glib, glibmm, libsig++, atk, pango, automake, autoconf, libtool, pkgconfig 
+	If you're not using Fink Commander (and despite its graphic user interface there are
+	hints that maybe it is buggy), on a command line you say for example "fink install python25".
 	
+	Install numpy-25, which also installs python25.
+
+	Currently (Jan. 2008) you will find 10 entries for Boost libraries; if using Fink Commander
+	you need to expand the package name field wide enough to be able to see the full names,
+	as you want the Boost libraries for Python 2.5.
+	
+	Install boost1.34.python25, boost1.34.systempython, and boost1.34.nopython.
+	
+	Next install gtkmm2.4-dev, which installs many other packages on which it depends, including
+	gtk+2, glib, glibmm, libsig++, atk, pango, expat1, libpng3,
+	automake, autoconf, libtool, pkgconfig 
+	
+	Next, install these libraries:
 	libglademm2.4, libglademm2.4-shlibs
 	
 	cairomm1, cairomm1-shlibs (takes a LONG time)
