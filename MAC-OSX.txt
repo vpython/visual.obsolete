@@ -27,13 +27,13 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	automake, autoconf, libtool, pkgconfig 
 	
 	Next, install these libraries:
-	libglademm2.4, libglademm2.4-shlibs
+	libglademm2.4 (also installs libglademm2.4-shlibs)
 	
-	cairomm1, cairomm1-shlibs (takes a LONG time)
+	cairomm1 (also installs cairomm1-shlibs, freetype219, freetype219-shlibs etc; takes a LONG time)
 	
 	gtkglextmm, getkglextmm-shlibs
 	
-	Need freetype2, but install freetype219 and freetype219-shlibs instead.
+	Need freetype2, but freetype219 and freetype219-shlibs are installed instead (by cairomm1).
 	Because this does not put freetype2.pc into the usual place (/sw/lib/pkgconfig),
 	PKG_CONFIG_PATH is set in the configure script to find it.
 
