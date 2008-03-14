@@ -31,7 +31,7 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	
 	cairomm1 (also installs cairomm1-shlibs, freetype219, freetype219-shlibs etc; takes a LONG time)
 	
-	gtkglextmm, getkglextmm-shlibs
+	gtkglextmm (also installs gtkglextmm-shlibs, gtkglext1, gtkglext1-shlibs)
 	
 	Need freetype2, but freetype219 and freetype219-shlibs are installed instead (by cairomm1).
 	Because this does not put freetype2.pc into the usual place (/sw/lib/pkgconfig),
@@ -93,12 +93,7 @@ The rule is that if you make an object invisible, then reassign the only name fo
 object (obj = 35), Python is free to destroy the object and reuse the memory, 
 because there is no longer any way for your program to get at that object.
 
-2) rotate(v, angle=something, axis=something) crashes. This free function is in vector.hpp.
-The form v.rotate(angle=something, axis=something) works fine. This is in vector.cpp.
-Note that in wrap_vector.cpp there are 5 different references to rotate.
-One wonders whether this is a Boost problem? Works fine on Windows and Linux.
-
-3) Programs that append to a faces object crash (for example, faces_heightfield.py, graphs
+2) Programs that append to a faces object crash (for example, faces_heightfield.py, graphs
 that use gvbars or ghistogram). No problem on Windows and Linux. 
 faces_heightfield.py has append(pos, color, normal) -- append_all_vectors in wrap_arrayobjects.cpp
 graph.py has append(pos, normal) -- this is append_default_color in wrap_arrayobjects.cpp
@@ -108,8 +103,6 @@ Note: Shouldn't we also accept append(pos)?
 We didn't in Visual 3, but we should have. The documentation doesn't even mention any append option.
 Putting in print statements in faces.cpp we see that append never gets to faces.cpp.
 Suggestive of a Boost problem.
-
-4) A non-fatal bug is that orbits.py and stars.py have dim or strange lighting.
 
 Because it looks like the problem could be Boost, try building Boost libraries from scratch:
 
