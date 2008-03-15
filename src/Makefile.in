@@ -109,9 +109,17 @@ endef
 
 # Why the -v flag, you might wonder?  Because FSF GCC fails to properly parse
 # the -bundle and -bundle_loader options otherwise.
+# The strange line concerning libGL.dylib is due to changes that arrived with OSX 10.5.
+# In the words of Martin Costabel, "This should be a no-op (it tells the linker: 
+# "When you are asked to load /System/..../libGL.dylib, then really load this library 
+# and not another one with a similar name that you happen to fancy"), but it isn't.
+# On Leopard (10.5), it must be used whenever you link with /usr/X11/lib/libGL.dylib 
+# (even indirectly, for example by linking with libgtkgl-2.0.dylib)."
 _OSX_SORULE = $(CXX) -v -bundle -bundle_loader $(PYTHON) \
 	$(CVISUAL_LDFLAGS) $(LDFLAGS) -o $@ $^ $(CVISUAL_LIBS) $(LIBS) \
-	-Wl,-exported_symbols_list,$(srcdir)/osx-symbols.txt
+	-Wl,-exported_symbols_list,$(srcdir)/osx-symbols.txt \
+	-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+	
 define OSX_SORULE$
 	@echo Linking $@ ...
 	@echo $(_OSX_SORULE) >> $(LOGFILE)
