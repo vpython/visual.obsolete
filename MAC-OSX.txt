@@ -160,7 +160,7 @@ ranlib: file: libboost_thread-mt.a(tss_dll.o) has no symbols
 ranlib: file: libboost_thread-mt.a(tss_pe.o) has no symbols
 bruce-sherwoods-computer:/sw/lib brucesherwood$ 
 
-Still has same problems with faces.append and rotate(vector, angle, axis).
+Still has same problems with faces.append.
 
 -----------------
 Unsuccessful approach
