@@ -123,8 +123,6 @@ wrap_arrayobjects()
 
 	class_<faces, bases<renderable> >("faces")
 		.def( init<const faces&>())
-		.def( "append", append_default_color, args( "pos", "normal"))
-		.def( "append", append_all_vectors, args("pos", "normal", "color"))
 		.def( "get_pos", &faces::get_pos)
 		.def( "set_pos", &faces::set_pos)
 		.def( "set_pos", &faces::set_pos_l)
@@ -140,7 +138,9 @@ wrap_arrayobjects()
 			faces_smooth_shade( args("doublesided"),
 			"Average normal vectors at coincident vertexes."))
 		.def( "append", &faces::append_rgba,
-			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1, args("opacity")=-1))
+			(args("pos"), args("normal"), args("red")=-1, args("green")=-1, args("blue")=-1, args("opacity")=-1))
+		.def( "append", append_default_color, args( "pos", "normal"))
+		.def( "append", append_all_vectors, args("pos", "normal", "color"))
 		;
 	
 	using python::convex;
