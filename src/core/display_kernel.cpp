@@ -315,7 +315,7 @@ display_kernel::report_resize(	int win_x, int win_y, int win_w, int win_h,
 								int v_x, int v_y, int v_w, int v_h )
 {
 	window_x = win_x; window_y = win_y; window_width = win_w; window_height = win_h;
-	view_x = v_x; view_y = v_y; view_width = v_w; view_height = v_h;
+	view_x = v_x; view_y = v_y; view_width = std::max(v_w,1); view_height = std::max(v_h,1);
 }
 
 void
@@ -525,6 +525,14 @@ display_kernel::world_to_view_transform(
 	else if (whicheye == 0) {
 		frustum_stereo_offset = 0;
 	}
+	
+	if (nearclip<=0 || farclip<=nearclip || tan_hfov_x<=0 || tan_hfov_y<=0) {
+		std::ostringstream msg;
+		msg << "VPython degenerate projection: " << nearclip << " " << farclip << " " << tan_hfov_x << " " << tan_hfov_y;
+		VPYTHON_CRITICAL_ERROR( msg.str());
+		std::exit(1);
+	}
+	
 	glFrustum(
 		-nearclip * tan_hfov_x + frustum_stereo_offset,
 		nearclip * tan_hfov_x + frustum_stereo_offset,
