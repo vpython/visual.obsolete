@@ -56,7 +56,7 @@ class render_surface : public Gtk::GL::DrawingArea
 	bool forward_render_scene();
 	
 	template <class E>
-	void mouse_event( E* event );
+	void mouse_event( E* event, int buttons_toggled = 0 );
 
 	// Manage the current OpenGL context
 	void gl_begin();

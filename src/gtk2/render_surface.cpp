@@ -115,9 +115,12 @@ render_surface::render_surface( display_kernel& _core, mouse_manager& _mouse, bo
 
 template <class E>
 void 
-render_surface::mouse_event( E* event ) {
+render_surface::mouse_event( E* event, int buttons_toggled ) {
 	bool buttons[] = { event->state & GDK_BUTTON1_MASK, event->state & GDK_BUTTON2_MASK };
 	bool shiftState[] = { event->state & GDK_SHIFT_MASK, event->state & GDK_CONTROL_MASK, event->state & GDK_MOD1_MASK };
+	
+	for(int i=0; i<2; i++)
+		buttons[i] = ( buttons[i] != bool( buttons_toggled & (1<<i) ) );
 
 	mouse.report_mouse_state( 2, buttons, event->x, event->y, 3, shiftState, false );
 
@@ -270,7 +273,7 @@ bool
 render_surface::on_button_press_event( GdkEventButton* event)
 {
 	python::gil_lock L;
-	mouse_event( event );
+	mouse_event( event, 1 << (event->button-1) );
 	return true;
 }
 
@@ -278,7 +281,7 @@ bool
 render_surface::on_button_release_event( GdkEventButton* event)
 {
 	python::gil_lock L;
-	mouse_event( event );
+	mouse_event( event, 1 << (event->button-1) );
 	return true;
 }
 
