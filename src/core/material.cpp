@@ -49,7 +49,7 @@ apply_material::apply_material( const view& v, material* m, tmatrix& model_mater
 		
 		if (m->shader && v.glext.ARB_shader_objects) {
 			texa[3] = '0'+t;
-			v.glext.glUniform1i( m->shader->get_uniform_location( v, texa ), t );
+			v.glext.glUniform1iARB( m->shader->get_uniform_location( v, texa ), t );
 		}
 		if (!v.glext.ARB_multitexture) break;
 	}
@@ -63,14 +63,14 @@ apply_material::apply_material( const view& v, material* m, tmatrix& model_mater
 		float matrix[16];
 		for(int i=0; i<16; i++)
 			matrix[i] = v.camera_world.matrix_addr()[i];
-		v.glext.glUniformMatrix4fv( loc, 1, false, matrix );
+		v.glext.glUniformMatrix4fvARB( loc, 1, false, matrix );
 	}
 	
 	if ( (loc = m->shader->get_uniform_location( v, "model_material" )) >= 0 ) {
 		float matrix[16];
 		for(int i=0; i<16; i++)
 			matrix[i] = model_material.matrix_addr()[i];
-		v.glext.glUniformMatrix4fv( loc, 1, false, matrix );
+		v.glext.glUniformMatrix4fvARB( loc, 1, false, matrix );
 	}
 }
 

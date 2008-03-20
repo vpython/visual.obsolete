@@ -29,9 +29,11 @@ void gl_extensions::init( display_kernel& d ) {
 		F( glAttachObjectARB );
 		F( glDeleteObjectARB );
 		F( glGetHandleARB );
-		F( glUniform1i );
-		F( glUniformMatrix4fv );
-		F( glGetUniformLocation );
+		F( glUniform1iARB );
+		F( glUniformMatrix4fvARB );
+		F( glGetUniformLocationARB );
+		F( glGetObjectParameterivARB );
+		F( glGetInfoLogARB );
 	}
 	
 	if ( EXT_texture3D = d.hasExtension( "GL_EXT_texture3D" ) ) {
