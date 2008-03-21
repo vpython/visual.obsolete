@@ -36,13 +36,15 @@ void shader_program::realize( const view& v ) {
 	compile( v, GL_FRAGMENT_SHADER_ARB, getSection("fragment") );
 
 	v.glext.glLinkProgramARB( program );
-	check_gl_error();
 
 	// Check if linking succeeded
 	int link_ok = 0;
 	v.glext.glGetObjectParameterivARB( program, GL_OBJECT_LINK_STATUS_ARB, &link_ok );
 	
 	if ( !link_ok ) {
+		// Some drivers (incorrectly?) set the GL error in glLinkProgramARB() in this situation
+		clear_gl_error();
+
 		std::string infoLog;
 		
 		int length = 0;
@@ -60,6 +62,8 @@ void shader_program::realize( const view& v ) {
 		v.glext.glDeleteObjectARB( program );
 		program = 0;
 	} else {
+		check_gl_error();
+
 		// xxx It's probably not technically legal to call glext functions from on_gl_free callbacks,
 		// since they might run in a different context, even though the program _handle_ is shared.  Plus
 		// this is kind of ugly.
