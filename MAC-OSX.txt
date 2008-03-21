@@ -82,9 +82,9 @@ libraries. But then I got this error message in the link phase of the make:
 
 So I executed ranlib /sw/lib/libboost_python-mt.a, redid the make, executed make install, and it worked.
 
-However, there are significant bugs which show up when running the example programs:
+However, there is a significant bug in controls.text (menu option), which seems to boil down to this:
 
-1) The following sequence crashes if the object is a label, but not with other objects:
+The following sequence crashes if the object is a label, but not with other objects:
 obj = label(text='hello')
 obj.visible = 0
 obj = 35
@@ -93,18 +93,14 @@ The rule is that if you make an object invisible, then reassign the only name fo
 object (obj = 35), Python is free to destroy the object and reuse the memory, 
 because there is no longer any way for your program to get at that object.
 
-2) Programs that append to a faces object crash (for example, faces_heightfield.py, graphs
-that use gvbars or ghistogram). No problem on Windows and Linux. 
 faces_heightfield.py has append(pos, color, normal) -- append_all_vectors in wrap_arrayobjects.cpp
 graph.py has append(pos, normal) -- this is append_default_color in wrap_arrayobjects.cpp
 There is also append_rgba in wrap_arrayobjects.cpp, for pattern append(pos, red, green, blue, opacity),
   and this version also crashes.
 Note: Shouldn't we also accept append(pos)?
 We didn't in Visual 3, but we should have. The documentation doesn't even mention any append option.
-Putting in print statements in faces.cpp we see that append never gets to faces.cpp.
-Suggestive of a Boost problem.
 
-Because it looks like the problem could be Boost, try building Boost libraries from scratch:
+When there looked to be a Boost problem, tried building Boost libraries from scratch:
 
 ./configure --prefix=/sw --with-libraries=python,thread --with-python=/sw/bin/python2.5
    (This creates user-config.jam)
