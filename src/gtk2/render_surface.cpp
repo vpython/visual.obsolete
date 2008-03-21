@@ -116,11 +116,11 @@ render_surface::render_surface( display_kernel& _core, mouse_manager& _mouse, bo
 template <class E>
 void 
 render_surface::mouse_event( E* event, int buttons_toggled ) {
-	bool buttons[] = { event->state & GDK_BUTTON1_MASK, event->state & GDK_BUTTON2_MASK };
+	bool buttons[] = { event->state & GDK_BUTTON1_MASK, event->state & GDK_BUTTON3_MASK };
 	bool shiftState[] = { event->state & GDK_SHIFT_MASK, event->state & GDK_CONTROL_MASK, event->state & GDK_MOD1_MASK };
 	
-	for(int i=0; i<2; i++)
-		buttons[i] = ( buttons[i] != bool( buttons_toggled & (1<<i) ) );
+	buttons[0] = (buttons[0] != bool( buttons_toggled&1 ));
+	buttons[1] = (buttons[1] != bool( buttons_toggled&4 ));
 
 	mouse.report_mouse_state( 2, buttons, event->x, event->y, 3, shiftState, false );
 
