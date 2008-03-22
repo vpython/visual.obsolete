@@ -40,7 +40,7 @@ class display : public display_kernel,
 	display();
 	virtual ~display();
 
-	static void set_dataroot( Glib::ustring dataroot);
+	static void set_dataroot( const std::wstring& dataroot);
 	
 	virtual void activate(bool);
 	

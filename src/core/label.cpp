@@ -162,14 +162,14 @@ label::set_opacity( float o)
 }
 
 void
-label::set_text( string_t t)
+label::set_text( const std::wstring& t )
 {
 	text = t;
 	text_changed = true;
 }
 
 
-string_t
+std::wstring
 label::get_text()
 {
 	return text;
@@ -224,13 +224,13 @@ label::get_border()
 }
 
 void 
-label::set_font_family( string_t name)
+label::set_font_family( const std::wstring& name)
 {
 	font_description = name;
 	text_changed = true;
 }
 
-string_t
+std::wstring
 label::get_font_family()
 {
 	return font_description;
@@ -291,8 +291,8 @@ label::gl_render( const view& scene)
 	if (text_changed) {
 		boost::shared_ptr<font> texmap_font = 
 			font::find_font( font_description, int(font_size));
-		if (text == string_t())
-			text_layout = texmap_font->lay_out( " ");
+		if (text.empty())
+			text_layout = texmap_font->lay_out( L" " );
 		else
 			text_layout = texmap_font->lay_out( text);
 		text_changed = false;
@@ -395,7 +395,7 @@ label::gl_render( const view& scene)
 
 		// Render the text iteself.
 		color.gl_set();
-		text_layout->gl_render( text_pos);
+		text_layout->gl_render(scene, text_pos);
 	} glMatrixMode( GL_MODELVIEW); } // Pops the matricies back off the stack
 	list.gl_compile_end();
 	check_gl_error();

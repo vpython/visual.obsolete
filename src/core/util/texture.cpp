@@ -40,6 +40,7 @@ texture::gl_activate(const view& v)
 	if (damaged) {
 		gl_init(v);
 		damaged = false;
+		check_gl_error();
 	}
 	if (!handle) return;
 	
@@ -55,10 +56,18 @@ texture::has_opacity() const
 }
 
 void
+texture::set_handle( const view&, unsigned h ) {
+	if (handle) on_gl_free.free( boost::bind( &gl_free, handle ) );
+
+	handle = h;
+	on_gl_free.connect( boost::bind(&texture::gl_free, handle) );
+	VPYTHON_NOTE( "Allocated texture number " + lexical_cast<std::string>(handle));
+}
+
+void
 texture::gl_free(unsigned handle)
 {
-	VPYTHON_NOTE( "Deleting texture number " 
-		+ lexical_cast<std::string>(handle));
+	VPYTHON_NOTE( "Deleting texture number " + lexical_cast<std::string>(handle));
 	glDeleteTextures(1, &handle);
 }
 

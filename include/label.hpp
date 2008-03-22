@@ -47,8 +47,8 @@ class label : public renderable
 	void set_opacity( float);
 	double get_opacity();
 	
-	void set_text( string_t t);
-	string_t get_text();
+	void set_text( const std::wstring& t);
+	std::wstring get_text();
 
 	void set_space( double space);
 	double get_space();
@@ -62,8 +62,8 @@ class label : public renderable
 	void set_border( double border);
 	double get_border();
 
-	void set_font_family( string_t name);
-	string_t get_font_family();
+	void set_font_family( const std::wstring& name);
+	std::wstring get_font_family();
 
 	void set_font_size(double);
 	double get_font_size();
@@ -88,7 +88,7 @@ class label : public renderable
 	double border;    // space between text and box
 
 	/// A common name for the font.
-	string_t font_description;
+	std::wstring font_description;
 	/// The nominal size of the font, in pixels.
 	double font_size;
 
@@ -99,9 +99,7 @@ class label : public renderable
 	rgba linecolor; ///< The color of the lines in the label. (color is for text)
 	float opacity; ///< The opacity of the background for the text.
 
-	// Text strings in python may be specified by the """ ... """ syntax in python.
-	// This case is handled by the layout code
-	string_t text;
+	std::wstring text;
 
 	bool text_changed;
 	boost::shared_ptr<layout> text_layout;

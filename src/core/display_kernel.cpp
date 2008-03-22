@@ -863,7 +863,7 @@ display_kernel::render_scene(void)
 			flush_time = render_timer.elapsed() - start_time - render_time;
 			#endif
 			
-			std::ostringstream render_msg;
+			std::wostringstream render_msg;
 			render_msg.precision(3);
 			// render time does not include pick time, which may be negligible
 			render_msg << "cycle: " << int(1000*cycle) << 
@@ -884,7 +884,7 @@ display_kernel::render_scene(void)
 				gl_disable depth_test(GL_DEPTH_TEST);
 				boost::shared_ptr<font> default_font = font::find_font();
 				boost::shared_ptr<layout> lay_out = default_font->lay_out( render_msg.str());
-				lay_out->gl_render( vector(5, lay_out->extent().y + 3));
+				lay_out->gl_render( scene_geometry, vector(5, lay_out->extent().y + 3));
 			}
 
 			glPopMatrix();

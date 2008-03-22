@@ -215,13 +215,13 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath="..\src\core\mouse_manager.cpp"
-				>
-			</File>
 			<Filter
 				Name="win32"
 				>
+				<File
+					RelativePath="..\src\win32\font_renderer.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\src\win32\windisplay.cpp"
 					>
@@ -232,10 +232,6 @@
 				</File>
 				<File
 					RelativePath="..\src\win32\winrate.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\win32\wintext.cpp"
 					>
 				</File>
 				<File
@@ -287,6 +283,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\core\mouse_manager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\core\mouseobject.cpp"
 					>
 				</File>
@@ -312,6 +312,10 @@
 				</File>
 				<File
 					RelativePath="..\src\core\sphere.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\core\text.cpp"
 					>
 				</File>
 				<Filter
@@ -530,6 +534,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\text.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\include\vpython-config.h"
 				>
 			</File>
@@ -542,6 +550,10 @@
 				>
 				<File
 					RelativePath="..\include\win32\display.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\win32\font_renderer.hpp"
 					>
 				</File>
 				<File

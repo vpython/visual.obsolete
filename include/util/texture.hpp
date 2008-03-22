@@ -34,6 +34,7 @@ class texture
 {
  private:
 	bool damaged;
+	unsigned int handle;
 
  public:
 	/** Release the handle to OpenGL.  Subclasses must not call 
@@ -63,7 +64,6 @@ class texture
  
  protected:
 	// A unique identifier for the texture, to be obtained from glGenTextures().
-	unsigned int handle;
 	bool have_opacity;
  
 	// Perform zero initialization of POD members.
@@ -72,6 +72,10 @@ class texture
 	// Make this class noncopyable.
 	texture( const texture&);
 	const texture& operator=( const texture&);
+	
+	// Sets handle and registers it to be freed at shutdown
+	void set_handle( const view&, unsigned int handle );
+	unsigned get_handle() { return handle; }
  
 	// Called by gl_activate() on the first use and whenever damaged.
 	// Postcondition: handle refers to an initialized OpenGL texture object.

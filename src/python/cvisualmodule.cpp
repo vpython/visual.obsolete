@@ -29,9 +29,6 @@ void wrap_rgba();
 void wrap_light(); // Also defined in wrap_rgba.cpp
 void wrap_vector();
 void wrap_arrayobjects();
-#if !defined(_WIN32)
-	void wrap_glib_ustring();
-#endif
 
 namespace python {
 	void wrap_vector_array();
@@ -103,10 +100,6 @@ BOOST_PYTHON_MODULE( cvisual)
 	wrap_arrayobjects();
 	python::wrap_vector_array();
 	python::wrap_scalar_array();
-#if !defined(_WIN32)
-	wrap_glib_ustring();
-#endif
-
 }
 
 } // !namespace cvisual

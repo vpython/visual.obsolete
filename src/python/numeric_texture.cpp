@@ -99,10 +99,10 @@ numeric_texture::gl_init( const view& v )
 		return;
 
 	gl_enable tex( type );
+	unsigned handle = get_handle();
 	if (!handle) {
 		glGenTextures(1, &handle);
-		on_gl_free.connect( boost::bind(&texture::gl_free, handle) );
-		VPYTHON_NOTE( "Allocated texture number " + boost::lexical_cast<std::string>(handle));
+		set_handle( v, handle );
 	}
 	glBindTexture(type, handle);
 
@@ -183,15 +183,6 @@ numeric_texture::gl_init( const view& v )
 	}
 	tex_textype = internal_format;
 
-	int saved_alignment = -1;
-	glGetIntegerv( GL_UNPACK_ALIGNMENT, &saved_alignment);
-	int alignment = data_width % 4;
-	if (!alignment)
-		alignment = 4;
-	if (alignment == 3)
-		alignment = 1;
-	glPixelStorei( GL_UNPACK_ALIGNMENT, alignment);
-
 	if (data_mipmapped && !data_depth) {
 		tex_width = data_width;
 		tex_height = data_height;
@@ -233,7 +224,6 @@ numeric_texture::gl_init( const view& v )
 		}
 	}
 	
-	glPixelStorei( GL_UNPACK_ALIGNMENT, saved_alignment);
 	check_gl_error();
 }
 

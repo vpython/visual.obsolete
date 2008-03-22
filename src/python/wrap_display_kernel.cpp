@@ -31,6 +31,7 @@ namespace cvisual {
 static void
 force_py_exit(void)
 {
+	python::gil_lock gil;
 	VPYTHON_NOTE("Exiting");
 	std::exit(0);
 }

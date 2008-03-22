@@ -3,6 +3,7 @@
 #include "util/errors.hpp"
 #include "python/gil.hpp"
 #include "util/gl_free.hpp"
+#include "font_renderer.hpp"
 
 #include <boost/thread/thread.hpp>
 #include <boost/lexical_cast.hpp>
@@ -41,9 +42,9 @@ Glib::ustring dataroot = "";
 }
 
 void
-display::set_dataroot( Glib::ustring _dataroot)
+display::set_dataroot( const std::wstring& _dataroot)
 {
-	dataroot = _dataroot;
+	dataroot = w2u( _dataroot );
 }
 
 display::display()
