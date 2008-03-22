@@ -94,3 +94,4 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 	// And copy it into the texture
 	tx.set_image( extents.get_width(), extents.get_height(), GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE, 1, bitmap.buffer );
 }
+}
