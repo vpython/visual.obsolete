@@ -32,9 +32,15 @@ void mouse_manager::report_mouse_state( int physical_button_count, bool is_butto
 										int shift_state_count, bool shift_state[],
 										bool can_lock_mouse )
 {
-	// Right now we only support a 2-button mouse with shift,ctrl,alt
+	// A 2-button mouse with shift,ctrl,alt
 	bool new_buttons[2]; fill(2, new_buttons, physical_button_count, is_button_down );
 	bool new_shift[3]; fill(3, new_shift, shift_state_count, shift_state);
+	
+	// if we have a 3rd button, pressing it is like pressing both left and right buttons.
+	// This is necessary to make platforms that "emulate" a 3rd button behave sanely with
+	// a two-button mouse.
+	if (physical_button_count>=3 && is_button_down[2]) 
+		new_buttons[0] = new_buttons[1] = true;
 
 	// If there's been more than one button change, impose an arbitrary order, so that update()
 	// only sees one change at a time even if the display driver doesn't enforce that
