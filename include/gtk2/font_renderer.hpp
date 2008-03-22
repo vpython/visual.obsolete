@@ -6,6 +6,8 @@
 #include "text.hpp"
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
+#include <pangomm.h>
+#include <pango/pangoft2.h>
 
 namespace cvisual {
 
@@ -22,7 +24,7 @@ class font_renderer {
 	Glib::RefPtr<Pango::Context> ft2_context;
 };
 
-extern Glib::ustring w2u( const wstring& );
+extern Glib::ustring w2u( const std::wstring& );
 
 } // namespace cvisual
 
