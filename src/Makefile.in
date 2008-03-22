@@ -65,7 +65,7 @@ CPPFLAGS = @CPPFLAGS@
 CVISUAL_OBJS = atomic_queue.lo clipping_plane.lo displaylist.lo errors.lo extent.lo \
 	gl_extensions.lo gl_free.lo icososphere.lo lighting.lo \
 	quadric.lo rgba.lo shader_program.lo texture.lo tmatrix.lo vector.lo \
-	arrow.lo axial.lo box.lo cone.lo convex.lo cylinder.lo \
+	arrow.lo axial.lo box.lo cone.lo cylinder.lo \
 	display_kernel.lo ellipsoid.lo frame.lo label.lo material.lo \
 	mouseobject.lo mouse_manager.lo primitive.lo pyramid.lo rectangular.lo \
 	renderable.lo ring.lo sphere.lo \
