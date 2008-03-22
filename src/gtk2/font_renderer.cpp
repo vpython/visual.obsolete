@@ -1,5 +1,6 @@
 #include "font_renderer.hpp"
 #include "util/errors.hpp"
+#include <stdexcept>
 
 #include <gtkmm/style.h>
 #include <gtkmm/settings.h>
@@ -18,14 +19,14 @@ Glib::ustring w2u( const wstring& w ) {
 
 	gchar* utf8;
 	if ( sizeof(wchar_t) == 2 )
-		utf8 = g_utf16_to_utf8( reinterpret_cast<gunichar2*>(w.c_str()), -1, 0, 0, 0 );
+		utf8 = g_utf16_to_utf8( reinterpret_cast<const gunichar2*>(w.c_str()), -1, 0, 0, 0 );
 	else if ( sizeof(wchar_t) == 4 )
-		utf8 = g_ucs4_to_utf8( reinterpret_cast<guinchar*>(w.c_str()), -1, 0, 0, 0 );
+		utf8 = g_ucs4_to_utf8( reinterpret_cast<const gunichar*>(w.c_str()), -1, 0, 0, 0 );
 	else
-		throw std::exception("Unexpected wchar_t.");
+		throw std::logic_error("Unexpected wchar_t.");
 	
 	Glib::ustring us( utf8 );
-	gfree( utf8 );
+	g_free( utf8 );
 	
 	return us;
 }
@@ -56,7 +57,7 @@ font_renderer::font_renderer( const wstring& description, int height ) {
 	Pango::FontDescription font_desc = Glib::wrap(gtk_style_new())->get_font();
 	if (height > 0)
 		font_desc.set_size( height * Pango::SCALE);
-	if (desc.size())
+	if (description.size())
 		font_desc.set_family( w2u(description) );
 	font_desc.set_style( Pango::STYLE_NORMAL);
 	
@@ -79,7 +80,6 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 	FT_Bitmap bitmap;
 	bitmap.rows = PANGO_PIXELS(extents.get_height());
 	bitmap.width = PANGO_PIXELS(extents.get_width());
-	assert( bitmap.width == saved_width);
 	bitmap.pitch = bitmap.width;
 	boost::scoped_array<uint8_t> pix_buf( new uint8_t[bitmap.rows * bitmap.width]);
 	bitmap.buffer = pix_buf.get();
