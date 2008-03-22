@@ -50,7 +50,7 @@ class layout_texture : texture {
 	~layout_texture();
  
 	boost::shared_ptr<font> text_font;
-	const std::wstring& text;
+	std::wstring text;
 
 	virtual void gl_init( const view& );
 	
@@ -87,7 +87,7 @@ class layout {
 	void gl_render( const view& v, const vector& pos_ll );
 	
 	// Return the size of the text in pixels (x,y,0)
-	vector extent();
+	vector extent( const view& );
 
  private:
 	friend class font;

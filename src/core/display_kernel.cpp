@@ -884,7 +884,7 @@ display_kernel::render_scene(void)
 				gl_disable depth_test(GL_DEPTH_TEST);
 				boost::shared_ptr<font> default_font = font::find_font();
 				boost::shared_ptr<layout> lay_out = default_font->lay_out( render_msg.str());
-				lay_out->gl_render( scene_geometry, vector(5, lay_out->extent().y + 3));
+				lay_out->gl_render( scene_geometry, vector(5, lay_out->extent( scene_geometry ).y + 3));
 			}
 
 			glPopMatrix();

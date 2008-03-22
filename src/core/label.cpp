@@ -298,7 +298,7 @@ label::gl_render( const view& scene)
 		text_changed = false;
 	}
 	// Compute the width of the text box.
-	vector extents = text_layout->extent();
+	vector extents = text_layout->extent( scene );
 	double box_width = extents.x + 2.0*border;
 
 	// Compute the positions of the text in the text box, and the height of the

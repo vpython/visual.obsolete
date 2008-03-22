@@ -35,7 +35,8 @@ layout::layout( const boost::shared_ptr<font>& font, const wstring& text )
 {
 }
 
-vector layout::extent() {
+vector layout::extent( const view& v ) {
+	tx.gl_activate(v);  //< a little tacky
 	return vector( tx.width, tx.height );
 }
 
