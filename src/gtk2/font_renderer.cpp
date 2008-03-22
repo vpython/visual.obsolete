@@ -3,8 +3,6 @@
 
 #include <gtkmm/style.h>
 #include <gtkmm/settings.h>
-#include <pangomm.h>
-#include <pango/pangoft2.h>
 #include <gtk/gtkstyle.h>
 
 namespace cvisual {
