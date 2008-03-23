@@ -157,9 +157,14 @@ display::create()
 	// flashing of the window from an initial position to its final
 	// position. But at least on Windows this causes problems, at least
 	// with multiple physical displays (extended desktop).
+	
+	// Save and restore window_x/y because show_all drives a window routine that resets them:
+	int save_x=window_x, save_y=window_y;
 	window->show_all();
+	window_x = save_x;
+	window_y = save_y;
 	if (window_x >= 0 && window_y >= 0) { // if user specified x or y
-		window->move( (int)window_x, (int)window_y);
+		window->move( window_x, window_y);
 	}
 	if (fullscreen)
 		window->fullscreen();
