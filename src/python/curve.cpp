@@ -879,7 +879,7 @@ curve::gl_render( const view& scene)
 	const float* c_i = (float*)( data(this->color));
 	
 	// Choose which points to display
-	for (float fptr=0.0; iptr < count; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
+	for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
 		iptr3 = 3*(iptr+1); // first real point is the second in the data array
 		cptr = 4*(iptr+1); // color is rgb-opacity (4 floats)
 		spos[3*pcount] = p_i[iptr3];
