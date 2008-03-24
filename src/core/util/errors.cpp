@@ -8,7 +8,14 @@
 #include <iomanip>
 #include <sstream>
 
+#include <boost/python/import.hpp>
+
 namespace cvisual {
+
+void write_stderr( const std::string& message ) {
+	// TODO: Exception handling; in case of failure maybe print error to "real" stderr or a log file
+	boost::python::import( "sys" ).attr( "stderr" ).attr( "write" )( message );
+}
 
 void
 write_critical( 
@@ -17,8 +24,10 @@ write_critical(
 	std::string function, 
 	std::string message)
 {
-	std::cerr << "VPython ***CRITICAL ERROR***: " << file << ":" << line << ": " 
+	std::ostringstream o;
+	o << "VPython ***CRITICAL ERROR***: " << file << ":" << line << ": " 
 	<< function << ": " << message << "\n";
+	write_stderr( o.str() );
 	return;
 }
 
@@ -29,17 +38,23 @@ write_warning(
 	std::string function, 
 	std::string message)
 {
-	std::cerr << "VPython WARNING: " << file << ":" << line << ": " 
+	std::ostringstream o;
+	o << "VPython WARNING: " << file << ":" << line << ": " 
 	<< function << ": " << message << "\n";
+	write_stderr( o.str() );
 	return;
 }
 
 void
 write_note( std::string file, int line, std::string message)
 {
-	if (getenv( "VPYTHON_DEBUG"))
-		std::cerr << "VPython: " << file << ":" << line << ": " << message 
-			<< "\n";
+	static bool enable = (bool)getenv( "VPYTHON_DEBUG");
+	if (!enable) return;
+	
+	std::ostringstream o;
+	o << "VPython: " << file << ":" << line << ": " << message 
+		<< "\n";
+	write_stderr( o.str() );
 }
 
 void

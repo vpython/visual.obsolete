@@ -54,7 +54,7 @@ void shader_program::realize( const view& v ) {
 		infoLog.append( &temp[0], length );
 		
 		// xxx A way to report infoLog to the program?
-		fprintf(stderr, "VPython: errors in shader program:\n%s\n", infoLog.c_str());
+		write_stderr( "VPython WARNING: errors in shader program:\n" + infoLog + "\n");
 		
 		// Get rid of the program, since it can't be used without generating GL errors.  We set
 		//   program to 0 instead of -1 so that binding it will revert to the fixed function pipeline,

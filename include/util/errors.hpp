@@ -43,6 +43,9 @@ write_warning(
 void
 write_note( std::string file, int line, std::string message);
 
+void
+write_stderr( const std::string& message );
+
 /** Obtains the active OpenGL transformation matrix and dumps it to stderr. */
 void
 dump_glmatrix();
