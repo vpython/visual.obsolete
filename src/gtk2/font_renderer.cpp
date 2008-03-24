@@ -73,13 +73,11 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 	pango_layout->set_text( w2u(text) );
 
 	Pango::Rectangle extents = pango_layout->get_logical_extents();
-	if (!extents.get_width()) extents.set_width(1);
-	if (!extents.get_height()) extents.set_height(1);
 
 	// Allocate a greyscale buffer
 	FT_Bitmap bitmap;
-	bitmap.rows = PANGO_PIXELS(extents.get_height());
-	bitmap.width = PANGO_PIXELS(extents.get_width());
+	bitmap.rows = std::max(1, PANGO_PIXELS(extents.get_height()));
+	bitmap.width = std::max(1, PANGO_PIXELS(extents.get_width()));
 	bitmap.pitch = bitmap.width;
 	boost::scoped_array<uint8_t> pix_buf( new uint8_t[bitmap.rows * bitmap.width]);
 	bitmap.buffer = pix_buf.get();
@@ -92,6 +90,8 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 		-PANGO_PIXELS(extents.get_x()), -PANGO_PIXELS(extents.get_y()));
 
 	// And copy it into the texture
-	tx.set_image( extents.get_width(), extents.get_height(), GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE, 1, bitmap.buffer );
+	tx.set_image( bitmap.width, -bitmap.rows, 
+					GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE, 1, bitmap.buffer );
 }
-}
+
+} // namespace cvisual
