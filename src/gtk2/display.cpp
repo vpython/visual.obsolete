@@ -163,7 +163,7 @@ display::create()
 	window->show_all();
 	if (save_x >= 0 && save_y >= 0) { // if user specified x or y
 		window_x = save_x;
-		window_y = save_y
+		window_y = save_y;
 		window->move( window_x, window_y);
 	}
 	if (fullscreen)
