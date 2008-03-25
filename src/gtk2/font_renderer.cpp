@@ -90,7 +90,7 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 		-PANGO_PIXELS(extents.get_x()), -PANGO_PIXELS(extents.get_y()));
 
 	// And copy it into the texture
-	tx.set_image( bitmap.width, -bitmap.rows, 
+	tx.set_image( bitmap.width, bitmap.rows, 
 					GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE, 1, bitmap.buffer );
 }
 
