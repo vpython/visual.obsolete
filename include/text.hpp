@@ -34,6 +34,7 @@
 namespace cvisual {
 
 class font;
+class layout;
 
 class layout_texture : texture {
  public: // But only for use by font_renderer!
