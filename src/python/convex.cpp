@@ -60,8 +60,8 @@ convex::recalc()
 	
 	// Calculate extents
 	min_extent = max_extent = vector( pos_i );
-	for(int i=1; i<count; i++)
-		for(int j=0; j<3; j++) {
+	for(size_t i=1; i<count; i++)
+		for(size_t j=0; j<3; j++) {
 			if (*pos_i < min_extent[j]) min_extent[j] = *pos_i;
 			else if (*pos_i > max_extent[j]) max_extent[j] = *pos_i;
 			pos_i++;
