@@ -42,7 +42,7 @@ apply_material::apply_material( const view& v, material* m, tmatrix& model_mater
 {
 	if (!m || !sp.ok()) return;
 	char texa[] = "tex0";
-	for(int t=0; t<m->textures.size(); t++) {
+	for(size_t t=0; t<m->textures.size(); t++) {
 		if (t && v.glext.ARB_multitexture)
 			v.glext.glActiveTexture(GL_TEXTURE0 + t);
 		m->textures[t]->gl_activate(v);
@@ -62,14 +62,14 @@ apply_material::apply_material( const view& v, material* m, tmatrix& model_mater
 	if ( (loc = m->shader->get_uniform_location( v, "camera_world" )) >= 0 ) {
 		float matrix[16];
 		for(int i=0; i<16; i++)
-			matrix[i] = v.camera_world.matrix_addr()[i];
+			matrix[i] = (float)v.camera_world.matrix_addr()[i];
 		v.glext.glUniformMatrix4fvARB( loc, 1, false, matrix );
 	}
 	
 	if ( (loc = m->shader->get_uniform_location( v, "model_material" )) >= 0 ) {
 		float matrix[16];
 		for(int i=0; i<16; i++)
-			matrix[i] = model_material.matrix_addr()[i];
+			matrix[i] = (float)model_material.matrix_addr()[i];
 		v.glext.glUniformMatrix4fvARB( loc, 1, false, matrix );
 	}
 }
