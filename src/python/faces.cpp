@@ -151,7 +151,7 @@ faces::append_rgba( vector nv_pos, vector nv_normal, float red, float green, flo
 	norm_data[1] = nv_normal.get_y();
 	norm_data[2] = nv_normal.get_z();
 	if (red != -1)
-		last_color[0] = 0.01; //red;
+		last_color[0] = red;
 	if (green != -1)
 		last_color[1] = green;
 	if (blue != -1)
