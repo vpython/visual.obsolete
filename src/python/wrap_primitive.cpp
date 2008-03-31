@@ -75,7 +75,7 @@ struct textures_to_list
 		using namespace boost::python;
 		list result;
 		
-		for(unsigned int i=0; i < a.size(); i++)
+		for(size_t i=0; i < a.size(); i++)
 			result.append( a[i] );
 		
 		return incref(result.ptr()); 
@@ -113,7 +113,7 @@ struct textures_from_list
 
 		list l = extract< list >( obj_ptr );
 		result.resize( len(l) );
-		for(unsigned int i=0; i < result.size(); i++)
+		for(size_t i=0; i < result.size(); i++)
 			result[i] = extract< shared_ptr<texture> >( l[i] );
 	}
 };
