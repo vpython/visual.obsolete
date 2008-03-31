@@ -61,7 +61,7 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 	locked = (can_lock_mouse && display.zoom_is_allowed() && new_buttons[0] && new_buttons[1]) ||
 	         (can_lock_mouse && display.spin_is_allowed() && new_buttons[1]);
 	if (new_buttons[1])
-		display.report_camera_motion( new_px - px, new_py - py, 
+		display.report_camera_motion( (float)(new_px - px), (float)(new_py - py), 
 									  new_buttons[0] ? display_kernel::MIDDLE : display_kernel::RIGHT );
 
 	// left_semidrag means that we've moved the mouse and so can't get a left click, but we aren't
