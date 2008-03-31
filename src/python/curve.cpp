@@ -592,11 +592,11 @@ curve::closed_path() const
 }
 
 long
-curve::checksum( float* spos, float* tcolor, size_t pcount)
+curve::checksum( double* spos, float* tcolor, size_t pcount)
 {
 	boost::crc_32_type engine;
 	engine.process_bytes( &radius, sizeof(radius));
-	engine.process_bytes( spos, 3*sizeof(float)*pcount);
+	engine.process_bytes( spos, 3*sizeof(double)*pcount);
 	engine.process_bytes( tcolor, 3*sizeof(float)*pcount);
 	return engine.checksum();
 }
@@ -695,7 +695,7 @@ struct converter
 
 
 void
-curve::thickline( const view& scene, const float* spos, float* tcolor, size_t pcount, double scaled_radius)
+curve::thickline( const view& scene, const double* spos, float* tcolor, size_t pcount, double scaled_radius)
 {
 	size_t curve_around = sides;
 	std::vector<vector> projected;
@@ -708,7 +708,7 @@ curve::thickline( const view& scene, const float* spos, float* tcolor, size_t pc
 	vector lastx(1, 0, 0), lasty(0, 1, 0);
 
 	// pos and color iterators
-	const float* v_i = spos;
+	const double* v_i = spos;
 	const float* c_i = tcolor;
 	bool mono = adjust_colors( scene, tcolor, pcount);
 
@@ -869,10 +869,10 @@ curve::gl_render( const view& scene)
 	// The maximum number of points to display.
 	const int LINE_LENGTH = 10000;
 	// Data storage for the position and color data.
-	float spos[3*LINE_LENGTH];
+	double spos[3*LINE_LENGTH];
 	float tcolor[3*LINE_LENGTH]; // opacity not yet implemented for curves
-	float fstep = ( ((float) count)-1.0)/(LINE_LENGTH-1.0);
-	if (fstep < 1.0) fstep = 1.0;
+	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
+	if (fstep < 1.0F) fstep = 1.0F;
 	size_t iptr=0, iptr3, cptr, pcount=0;
 
 	const double* p_i = (double*)( data(this->pos));
@@ -949,7 +949,7 @@ curve::gl_render( const view& scene)
 	else {
 		if (could_cache) c->gl_cache.gl_compile_begin();
 		if (do_thinline) {
-			glVertexPointer( 3, GL_FLOAT, 0, spos);
+			glVertexPointer( 3, GL_DOUBLE, 0, spos);
 			bool mono = adjust_colors( scene, tcolor, pcount);
 			if (!mono) glColorPointer( 3, GL_FLOAT, 0, tcolor);
 			glDrawArrays( GL_LINE_STRIP, 0, pcount);

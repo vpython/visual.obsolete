@@ -31,7 +31,7 @@ class curve : public renderable
 	size_t retain; // how many recent points to retain
 	
 	size_t last_pcount; // value of pcount in previous render
-	float last_pos[3]; // the last position in the pos array in previous render
+	double last_pos[3]; // the last position in the pos array in previous render
 	
 	// the space allocated for storage so far
 	size_t preallocated_size;
@@ -75,7 +75,7 @@ class curve : public renderable
  	bool closed_path() const;
 	// Compute a checksum over the pcount elements of the temporary
 	// position and color arrays.
-	long checksum( float* spos, float* tcolor, size_t pcount);
+	long checksum( double* spos, float* tcolor, size_t pcount);
 
 	static const int MAX_SIDES = 20;
 	size_t sides;
@@ -131,7 +131,7 @@ class curve : public renderable
  private:
 	
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
-	void thickline( const view&, const float* spos, float* tcolor, size_t pcount, double scaled_radius);
+	void thickline( const view&, const double* spos, float* tcolor, size_t pcount, double scaled_radius);
 
 };
 
