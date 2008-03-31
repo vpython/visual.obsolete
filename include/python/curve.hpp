@@ -28,7 +28,7 @@ class curve : public renderable
 	array color;
 	bool antialias;
 	double radius;
-	int retain; // how many recent points to retain
+	size_t retain; // how many recent points to retain
 	
 	size_t last_pcount; // value of pcount in previous render
 	float last_pos[3]; // the last position in the pos array in previous render
