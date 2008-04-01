@@ -133,6 +133,15 @@ void layout_texture::set_image( int width, int height, int gl_internal_format, i
 	glPixelStorei( GL_UNPACK_ROW_LENGTH, width );
 	
 	check_gl_error();
+	
+	/*{
+	std::ostringstream os;
+	os << "glTexImage2D( " << type << ", 0, " << gl_internal_format << ", " 
+		<< tx_width << ", " << tx_height << ", 0, " << gl_format << ", "
+		<< gl_type << ", NULL );\n";
+	write_stderr( os.str() );
+	}*/
+	
 	glTexImage2D( type, 0, gl_internal_format, tx_width, tx_height, 0, gl_format, gl_type, NULL );
 	check_gl_error();
 	glTexSubImage2D(type, 0, 
@@ -145,7 +154,7 @@ void layout_texture::set_image( int width, int height, int gl_internal_format, i
 
 	this->width = width;
 	this->height = height;
-	this->internal_format = internal_format;
+	this->internal_format = gl_internal_format;
 
 	coord[0] = vector();
 	coord[1] = vector(0, -height);
