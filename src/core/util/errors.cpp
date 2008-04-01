@@ -9,12 +9,15 @@
 #include <sstream>
 
 #include <boost/python/import.hpp>
+#include "python/gil.hpp"
 
 namespace cvisual {
 
 void write_stderr( const std::string& message ) {
+	python::gil_lock L;  // though usually we already have it
 	// TODO: Exception handling; in case of failure maybe print error to "real" stderr or a log file
 	boost::python::import( "sys" ).attr( "stderr" ).attr( "write" )( message );
+	boost::python::import( "sys" ).attr( "stderr" ).attr( "flush" )();
 }
 
 void
