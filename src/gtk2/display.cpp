@@ -532,7 +532,7 @@ gui_main::report_window_delete( display* window)
 	assert( self != 0);
 
 	lock L(self->call_lock);
-	self->displays.erase( std::find(displays.begin(), displays.end(), window) );
+	self->displays.erase( std::find(self->displays.begin(), self->displays.end(), window) );
 }
 
 void
