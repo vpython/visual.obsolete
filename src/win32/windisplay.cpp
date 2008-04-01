@@ -3,23 +3,23 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
+#define _WIN32_WINNT 0x0500		// Requires Windows 2000, for CreateTimerQueueTimer()
+
 #include "win32/display.hpp"
+#include "util/render_manager.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"
 
-// For GET_X_LPARAM, GET_Y_LPARAM
-#include <windowsx.h>
-
-#include <cstdlib>
-#include <cstring>
-#include <cassert>
-#include <iostream>
+#include <windowsx.h>	// For GET_X_LPARAM, GET_Y_LPARAM
 
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 using boost::thread;
 #include <boost/lexical_cast.hpp>
 using boost::lexical_cast;
+
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
 
 namespace cvisual {
 
@@ -40,8 +40,11 @@ win32_write_critical(
 		512, // Allocate at least one byte in order to free something below.
 		0); // No additional arguments.
 
-	std::cerr << "VPython ***Win32 Critical Error*** " << file << ":" << line << ": "
-		<< func << ": " << msg << ": " << message;
+	std::ostringstream os;
+	os << "VPython ***Win32 Critical Error*** " << file << ":" << line << ": "
+		<< func << ": " << msg << ": [" << code << "] " << message;
+	write_stderr( os.str() );
+	
 	LocalFree(message);
 	std::exit(1);
 }
@@ -52,12 +55,12 @@ WNDCLASS display::win32_class;
 
 // A lookup-table for the default widget procedure to use to find the actual
 // widget that should handle a particular callback message.
-std::map<HWND, display*> display::widgets;
+static std::map<HWND, display*> widgets;
+
 display* display::current = 0;
 
 display::display()
-  : widget_handle(0), timer_handle(0), dev_context(0), gl_context(0),
-	saved_dc(0), saved_glrc(0)
+  : widget_handle(0), dev_context(0), gl_context(0), window_visible(false)
 {
 }
 
@@ -105,17 +108,6 @@ display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc( hwnd, uMsg, wParam, lParam);
 }
 
-VOID CALLBACK
-display::timer_callback( HWND hwnd, UINT, UINT_PTR, DWORD)
-{
-	python::gil_lock gil;
-	
-	display* This = widgets[hwnd];
-	if (0 == This)
-		return;
-	This->on_paint(0, 0);
-}
-
 void
 display::register_win32_class()
 {
@@ -141,17 +133,13 @@ LRESULT
 display::on_showwindow( WPARAM wParam, LPARAM lParam)
 {
 	switch (lParam) {
-		case 0:
-			// Opening for the first time.
-			SetTimer( widget_handle, 1, 30, &timer_callback);
+		case 0:	// Opening for the first time.
+		case SW_PARENTOPENING: // restart rendering when the window is restored.
+			window_visible = true;
 			break;
 		case SW_PARENTCLOSING:
 			// Stop rendering when the window is minimized.
-			KillTimer( widget_handle, 1);
-			break;
-		case SW_PARENTOPENING:
-			// restart rendering when the window is restored.
-			SetTimer( widget_handle, 1, 30, &timer_callback);
+			window_visible = false;
 			break;
 		default:
 			return DefWindowProc( widget_handle, WM_SHOWWINDOW, wParam, lParam);
@@ -200,30 +188,22 @@ display::on_getminmaxinfo( WPARAM, LPARAM lParam)
 LRESULT
 display::on_paint( WPARAM, LPARAM)
 {
-	if (window_width < 1 || window_height < 1)
-		return 0;
+	// paint(); gl_swap_buffers();  //< Doesn't seem qualitatively better, even at very low frame rates
+	ValidateRect( widget_handle, NULL );
+	return 0;
+}
+
+void display::paint() {
+	if (!window_visible) return;
 
 	gl_begin();
-	bool sat = render_scene();
-	gl_swap_buffers();
+
+	{
+		python::gil_lock gil;
+		render_scene();
+	}
+
 	gl_end();
-	if (!sat) return 1;  // xxx
-	
-	// It's very important for the render thread not to starve Python.  Since
-	// it holds the gil_lock so much longer, it tends to monopolize it if it
-	// doesn't sleep between renders.  However, note that this code does a poor
-	// job of making the frame rate smooth if rendering takes varying time.  A
-	// better implementation will need to use the multimedia timers for better 
-	// precision.
-	int next_render_interval = 30;
-	SetTimer( widget_handle, 1, next_render_interval, &timer_callback);
-	
-	RECT dims;
-	// The following calls report the fact that the widget area has been
-	// repainted to the windowing system.
-	GetClientRect( widget_handle, &dims);
-	ValidateRect( widget_handle, &dims);
-	return 0;
 }
 
 LRESULT
@@ -243,8 +223,6 @@ display::on_destroy(WPARAM wParam,LPARAM lParam)
 	// Happens after on_close, and also when a window is destroyed programmatically
 	// (e.g. scene.visible = 0)
 	report_closed();
-	UINT id = 1;
-	KillTimer( widget_handle, id);
 	// We can only free the OpenGL context if it isn't the one we are using for display list sharing
 	// xxx Display list sharing is the suck
 	if ( gl_context != root_glrc )
@@ -253,12 +231,10 @@ display::on_destroy(WPARAM wParam,LPARAM lParam)
 	widgets.erase( widget_handle );
 	return DefWindowProc( widget_handle, WM_DESTROY, wParam, lParam );
 }
-
+ 
 void
 display::gl_begin()
 {
-	saved_dc = wglGetCurrentDC();
-	saved_glrc = wglGetCurrentContext();
 	if (!wglMakeCurrent( dev_context, gl_context))
 		WIN32_CRITICAL_ERROR( "wglMakeCurrent failed");
 	current = this;
@@ -267,16 +243,20 @@ display::gl_begin()
 void
 display::gl_end()
 {
-	wglMakeCurrent( saved_dc, saved_glrc);
-	saved_dc = 0;
-	saved_glrc = 0;
+	wglMakeCurrent( NULL, NULL );
 	current = 0;
 }
+
 
 void
 display::gl_swap_buffers()
 {
+	if (!window_visible) return;
+
+	gl_begin();
 	SwapBuffers( dev_context);
+	glFinish();	// Ensure rendering completes here (without the GIL) rather than at the next paint (with the GIL)
+	gl_end();
 }
 
 void
@@ -392,6 +372,7 @@ void
 display::activate(bool active) {
 	if (active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
+		SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
 		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
 	} else {
 		VPYTHON_NOTE( "Closing a window from Python.");
@@ -417,12 +398,20 @@ display::on_mouse( WPARAM wParam, LPARAM lParam)
 	
 	mouse.report_mouse_state( 2, buttons, mouse_x, mouse_y, 3, shiftState, true );
 	
-	if ( mouse.is_mouse_locked() != was_locked )
+	// This mouse locking code is more complicated but much smoother and the cursor can't escape.
+	if ( mouse.is_mouse_locked() != was_locked ) {
+		if (mouse.is_mouse_locked()) SetCapture( widget_handle );
+		else ReleaseCapture();
 		ShowCursor( !mouse.is_mouse_locked() );
-
-	if (mouse.is_mouse_locked() && (mouse_x != old_x || mouse_y != old_y))
-		SetCursorPos( view_x + old_x, view_y + old_y);
-
+	}
+	if (mouse.is_mouse_locked() && ( mouse_x < 20 || mouse_x > view_width - 20 || mouse_y < 20 || mouse_y > view_height - 20 ) ) {
+		mouse.report_setcursor( view_width/2, view_height/2 );
+		SetCursorPos( view_x + view_width/2, view_y + view_height/2 );
+	}
+	if (was_locked && !mouse.is_mouse_locked()) {
+		mouse.report_setcursor( old_x, old_y );
+		SetCursorPos( view_x + old_x, view_y + old_y );
+	}
 	return 0;
 }
 
@@ -625,6 +614,9 @@ gui_main::threadMessage( int code, WPARAM wParam, LPARAM lParam ) {
 	return CallNextHookEx( NULL, code, wParam, lParam );
 }
 
+#define TIMER_RESOLUTION 5
+void __cdecl end_period() { timeEndPeriod(TIMER_RESOLUTION); }
+
 void
 gui_main::run()
 {
@@ -641,6 +633,11 @@ gui_main::run()
 		gui_thread = GetCurrentThreadId();
 		initialized.notify_all();
 	}
+	
+	timeBeginPeriod(TIMER_RESOLUTION);
+	atexit( end_period );
+	
+	poll();
 
 	// Enter the message loop
 	while (GetMessage(&message, 0, 0, 0) > 0) {
@@ -673,6 +670,26 @@ gui_main::call_in_gui_thread( const boost::function< void() >& f )
 {
 	init_thread();
 	PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
+}
+
+VOID CALLBACK gui_main::timer_callback( PVOID, BOOLEAN ) {
+	// Called in high-priority timer thread when it's time to render
+	self->call_in_gui_thread( boost::bind( &gui_main::poll, self ) );
+}
+
+void gui_main::poll() {
+	// Called in gui thread when it's time to render
+	// We don't need the lock here, because displays can't be created or destroyed from Python
+	// without a message being processed by the GUI thread.  paint_displays() will pick
+	// the lock up as necessary to synchronize access to the actual display contents.
+
+	std::vector<display*> displays;
+	for(std::map<HWND, display*>::iterator i = widgets.begin(); i != widgets.end(); ++i )
+		if (i->second)
+			displays.push_back( i->second );
+
+	int interval = int( 1000. * render_manager::paint_displays( displays ) );
+	CreateTimerQueueTimer( &timer_handle, NULL, &timer_callback, NULL, interval, 0, WT_EXECUTEINTIMERTHREAD );
 }
 
 } // !namespace cvisual;

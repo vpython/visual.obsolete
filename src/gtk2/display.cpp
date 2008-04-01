@@ -3,6 +3,7 @@
 #include "util/errors.hpp"
 #include "python/gil.hpp"
 #include "util/gl_free.hpp"
+#include "util/render_manager.hpp"
 #include "font_renderer.hpp"
 
 #include <boost/thread/thread.hpp>
@@ -177,7 +178,6 @@ display::create()
 void
 display::destroy()
 {
-	timer.disconnect();
 	window->hide();
 	window = 0;
 	area.reset();
@@ -222,7 +222,6 @@ bool
 display::on_window_delete(GdkEventAny*)
 {
 	VPYTHON_NOTE( "Closing a window from the GUI.");
-	timer.disconnect();
 	window = NULL;
 	area.reset();
 	glade_file.clear();
@@ -388,9 +387,22 @@ gui_main::gui_main()
 void
 gui_main::run()
 {
+	poll();
 	kit.run();
 	lock L(call_lock);
 	thread_exited = true;
+}
+
+bool
+gui_main::poll()
+{
+	// Called in gui thread when it's time to render
+	if (shutting_down) return false;
+	
+	int interval = 1000 * render_manager::paint_displays( displays );
+	
+	Glib::signal_timeout().connect( sigc::mem_fun( *this, &gui_main::poll), interval, Glib::PRIORITY_HIGH_IDLE)
+	return false; // We connect a new timeout every time, so we don't want this timeout to repeat
 }
 
 void 
@@ -415,6 +427,15 @@ gui_main::init_thread(void)
 	if (!init_lock) {
 		init_lock = new mutex;
 		init_signal = new condition;
+
+		// Make sure the python thread has low priority:
+		#if defined(_WIN32)
+			SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+		#else
+			int default_prio = getpriority(PRIO_PROCESS, getpid());
+			setpriority(PRIO_PROCESS, getpid(), std::min(default_prio+5, 19) );
+		#endif
+
 		VPYTHON_NOTE( "Starting GUI thread.");
 		lock L(*init_lock);
 		thread gtk( &gui_main::thread_proc);
@@ -472,7 +493,7 @@ gui_main::remove_display_impl()
 {
 	lock L(call_lock);
 	caller->destroy();
-	displays.remove( caller);
+	displays.erase( std::find(displays.begin(), displays.end(), caller) );
 	returned = true;
 	call_complete.notify_all();
 }
@@ -497,7 +518,7 @@ gui_main::shutdown_impl()
 {
 	lock L(call_lock);
 	shutting_down = true;
-	for (std::list<display*>::iterator i = displays.begin(); i != displays.end(); ++i) {
+	for (std::vector<display*>::iterator i = displays.begin(); i != displays.end(); ++i) {
 		(*i)->destroy();
 	}
 	self->returned = true;
@@ -509,12 +530,9 @@ void
 gui_main::report_window_delete( display* window)
 {
 	assert( self != 0);
-	bool display_empty = false;
-	{
-		lock L(self->call_lock);
-		self->displays.remove( window);
-		display_empty = self->displays.empty();
-	}
+
+	lock L(self->call_lock);
+	self->displays.erase( std::find(displays.begin(), displays.end(), window) );
 }
 
 void
@@ -523,7 +541,7 @@ gui_main::quit()
 	assert( self != 0);
 	lock L(self->call_lock);
 	self->shutting_down = true;
-	for (std::list<display*>::iterator i = self->displays.begin(); 
+	for (std::vector<display*>::iterator i = self->displays.begin(); 
 			i != self->displays.end(); ++i) {
 		(*i)->destroy();
 	}

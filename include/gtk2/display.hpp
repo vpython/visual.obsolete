@@ -30,12 +30,6 @@ using boost::scoped_ptr;
 class display : public display_kernel,
 	public sigc::trackable
 {
- private:
-	scoped_ptr<render_surface> area;
-	Glib::RefPtr<Gnome::Glade::Xml> glade_file;
-	Gtk::Window* window;
-	sigc::connection timer;
-	
  public:
 	display();
 	virtual ~display();
@@ -44,10 +38,11 @@ class display : public display_kernel,
 	
 	virtual void activate(bool);
 	
-	// Called by the gui_main class below when this window needs to create
-	// or destroy itself.
+	// Called by the gui_main class below (or render_manager as its agent)
 	void create();
 	void destroy();
+	void paint() { area->paint(); }
+	void swap() { area->swap(); }
 	
 	EXTENSION_FUNCTION getProcAddress( const char* name );
 	
@@ -63,6 +58,11 @@ class display : public display_kernel,
 	void on_quit_clicked();
 	void on_zoom_clicked();
 	bool on_key_pressed( GdkEventKey*);
+
+ private:
+	scoped_ptr<render_surface> area;
+	Glib::RefPtr<Gnome::Glade::Xml> glade_file;
+	Gtk::Window* window;
 };
 
 // A singleton.  This class provides all of the abstraction from the Gtk::Main
@@ -82,6 +82,8 @@ class gui_main : public sigc::trackable
 	Glib::Dispatcher signal_shutdown;
 	void shutdown_impl();
 	
+	bool poll(); //< Runs periodically to update displays
+	
 	// Storage used for communication, initialized by the caller, filled by the
 	// callee.  Some of them are marked volitile to inhibit optimizations that
 	// could prevent a read operation from observing the change in state.
@@ -93,13 +95,13 @@ class gui_main : public sigc::trackable
 	volatile bool thread_exited;
 	volatile bool shutting_down;
 	
-	std::list<display*> displays;
+	std::vector<display*> displays;
 	
 	// Componants of the startup sequence.
 	gui_main();
 	void run();
-	static gui_main* self; //< Always initialized by the thread after it starts
-	// up.
+	static gui_main* self; //< Always initialized by the thread after it starts up.
+
 	// init_{signal,lock} are always initialized by the Python thread.
 	static mutex* init_lock;
 	static condition* init_signal;
@@ -117,6 +119,7 @@ class gui_main : public sigc::trackable
 	// Called by a display from within the Gtk loop when closed by the user.
 	static void report_window_delete( display*);
 	static void quit();
+
 	// This signal is invoked when the gui thread exits on shutdown.
 	// wrap_display_kernel() connects a signal handler that forces Python to
 	// exit upon shutdown of the render loop.

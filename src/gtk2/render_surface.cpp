@@ -40,8 +40,6 @@
 	#include <windows.h>
 #endif
 
-const long TIMEOUT = 35; // delay before next rendering
-
 namespace cvisual {
 
 namespace {
@@ -50,8 +48,6 @@ namespace {
 
 render_surface::render_surface( display_kernel& _core, mouse_manager& _mouse, bool activestereo)
 	: 
-	cycle_time(TIMEOUT),
-	last_time(0),
 	core( _core),
 	mouse( _mouse )
 {
@@ -167,105 +163,26 @@ render_surface::on_realize()
 		share_list = get_gl_context();
 	}
 	assert( share_list);
-	
-	// Use PRIORITY_DEFAULT_IDLE to ensure that this signal does not get
-	// priority over user-initiated GUI events, like mouse clicks and such.
-	timer = Glib::signal_timeout().connect( 
-		sigc::mem_fun( *this, &render_surface::forward_render_scene),
-		cycle_time, Glib::PRIORITY_HIGH_IDLE);
-		//cycle_time, Glib::PRIORITY_DEFAULT_IDLE-10);
-		//cycle_time, Glib::PRIORITY_HIGH);
 }
 
-bool
-render_surface::forward_render_scene()
+void
+render_surface::paint()
 {
-	python::gil_lock L;
-
-	// TODO: Use the mouse motion signal hinting to poll its state at the end
-	// of a render cycle and pass a single mouse_motion event for it.
-
-// Make sure this rendering thread has high priority:
-#if defined(_WIN32) || defined(_MSC_VER)
-	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
-#else
-	int default_prio = getpriority(PRIO_PROCESS, getpid());
-	setpriority(PRIO_PROCESS, getpid(), std::max(default_prio -5, -20));
-#endif
-
-	double start_time = stopwatch.elapsed();
-	double cycle = start_time - last_time;
-	last_time = start_time;
 	gl_begin();
-	bool sat = core.render_scene(); // render the scene
-	gl_swap_buffers();
-	gl_end();
-	double render_time = stopwatch.elapsed() - start_time;
-
-	if (!sat)
-		return sat;
-
-	double pick_time = stopwatch.elapsed() - start_time - render_time;
-	long irender = int(1000*(render_time+pick_time));
-	long icycle = int(1000*cycle);
-
-#if 0
-	// cycle_time, one actual cycle, 
-	// render_time, pick_time, render+pick, estimate of computation during cycle
-	std::cout << cycle_time << " " << icycle << " " << 
-		int(1000*render_time) << " " << int(1000*pick_time) << " " <<
-		irender << " " << 
-		(icycle-irender) << std::endl;
-#endif
-
-	/* Scheduling logic for the rendering pulse. This code is intended to make
-	 * the rendering loop a good citizen with regard to sharing CPU time with
-	 * the Python computational thread. If the time for one render pulse is
-	 * large (small) compared to the most recent cycle_time specification, 
-	 * we increase (decrease) the timeout, not to go below TIMEOUT ms or 
-	 * above 500 ms. 
-	 * 
-	 * A refinement would be to run rendering full-time if computation has
-	 * stopped (e.g. at the end of a program, or when waiting for an event).
-	 */
-	 
-	long old_cycle_time = cycle_time;
-	if ((icycle-irender) < (TIMEOUT/2))
-		cycle_time += 16;
-	else if ((icycle-irender) > TIMEOUT) 
-		cycle_time = irender+16;
-	if (cycle_time < TIMEOUT) cycle_time = TIMEOUT;
-	if (cycle_time > 500) cycle_time = 500;
-	if (cycle_time != old_cycle_time) {	
-		// Adjust last_time because next cycle starts now:
-		last_time += render_time+pick_time;
-		timer.disconnect();
-		timer = Glib::signal_timeout().connect( 
-			sigc::mem_fun( *this, &render_surface::forward_render_scene),
-			cycle_time, Glib::PRIORITY_HIGH_IDLE);
-			//cycle_time, Glib::PRIORITY_DEFAULT_IDLE-10);
-			//cycle_time, Glib::PRIORITY_HIGH);
-		
-		VPYTHON_NOTE( 
-			std::string("Changed rendering cycle time to ") 
-			+ boost::lexical_cast<std::string>(cycle_time) + "ms.");
-			
-		return false;
+	{
+		python::gil_lock L;
+		core.render_scene(); // render the scene
 	}
+	gl_end();
 
-	return sat;
+	return;
 }
 
 bool
 render_surface::on_expose_event( GdkEventExpose*)
 {
-	python::gil_lock L;
-	
-	gl_begin();
-	core.render_scene(); // render the scene
-	gl_swap_buffers();
-	gl_end();
+	// TODO: should we render here, instead of waiting for the normal frame rate?
+	// paint(); swap();
 
 	return true;
 }
@@ -301,7 +218,10 @@ render_surface::gl_end()
 void
 render_surface::gl_swap_buffers()
 {
+	gl_begin();
 	get_gl_window()->swap_buffers();
+	glFinish(); 	// Ensure rendering completes here (without the GIL) rather than at the next paint (with the GIL)
+	gl_end();
 }
 
 } // !namespace cvisual

@@ -12,23 +12,18 @@ class display : public display_kernel
 {
  private:
 	friend class font;
-	static VOID CALLBACK
-		timer_callback( HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 	static LRESULT CALLBACK
 		dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static display* current;
 
  	HWND widget_handle;
- 	UINT_PTR timer_handle;
  	HDC dev_context;
  	HGLRC gl_context;
 
- 	HDC saved_dc;
- 	HGLRC saved_glrc;
+ 	bool window_visible;
 
 	static void register_win32_class();
 	static WNDCLASS win32_class;
-	static std::map<HWND, display*> widgets;
 
 	// Procedures used to process messages.
 	LRESULT on_showwindow( WPARAM, LPARAM);
@@ -54,14 +49,15 @@ class display : public display_kernel
 	display();
 	virtual ~display();
 
-	// Called by the gui_main class below when this window needs to create
-	// or destroy itself.
+	// Called by the gui_main class below (or render_manager as its agent)
 	void create();
 	void destroy();
+	void paint();
+	void swap() { gl_swap_buffers(); }
 
 	// Tells the application where it can find its data.  Win32 doesn't
 	// use this information;
-	static void set_dataroot( std::string) {};
+	static void set_dataroot( const std::wstring& ) {};
 
 	// Implements key display_kernel virtual methods
 	virtual void activate( bool active );
@@ -76,14 +72,19 @@ class gui_main
 
 	gui_main();	//< This is the only nonstatic member function that doesn't run in the gui thread!
 	void run();
+	void poll();
 
 	static gui_main* self;
 	
 	DWORD gui_thread;
 	mutex init_lock;
 	condition initialized;
+
+ 	HANDLE timer_handle;
 	
 	static LRESULT CALLBACK threadMessage( int, WPARAM, LPARAM );
+
+	static VOID CALLBACK timer_callback( PVOID, BOOLEAN );
 	
  public:
 	// Calls the given function in the GUI thread.

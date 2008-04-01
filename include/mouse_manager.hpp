@@ -30,6 +30,8 @@ class mouse_manager {
 	
 	mouse_t& get_mouse();
 	
+	void report_setcursor( int, int );
+	
  private:
 	void update( bool new_buttons[], int new_px, int new_py, bool new_shift[], bool can_lock );
  
@@ -39,6 +41,7 @@ class mouse_manager {
 	bool buttons[2];
 	int px, py;
 	bool locked;
+	int locked_px, locked_py;
 	bool left_down, left_dragging, left_semidrag;
 };
 

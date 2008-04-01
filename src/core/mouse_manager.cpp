@@ -16,8 +16,6 @@ mouse_manager::mouse_manager( class display_kernel& display )
 
 // trivial properties
 bool mouse_manager::is_mouse_locked() { return locked; }
-int mouse_manager::get_x() { return px; }
-int mouse_manager::get_y() { return py; }
 mouse_t& mouse_manager::get_mouse() { return mouse; }
 
 static void fill( int out_size, bool out[], int in_size, bool in[], bool def = false ) {
@@ -25,6 +23,20 @@ static void fill( int out_size, bool out[], int in_size, bool in[], bool def = f
 		out[i] = in[i];
 	for(int i=in_size; i<out_size; i++)
 		out[i] = def;
+}
+
+int mouse_manager::get_x() { 
+	if (locked) 
+		return locked_px;
+	else
+		return px; 
+}
+
+int mouse_manager::get_y() { 
+	if (locked)
+		return locked_py;
+	else
+		return py; 
 }
 
 void mouse_manager::report_mouse_state( int physical_button_count, bool is_button_down[], 
@@ -58,12 +70,15 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 	mouse.set_ctrl( new_shift[1] );
 	mouse.set_alt( new_shift[2] );
 
+	bool was_locked = locked;
 	locked = (can_lock_mouse && display.zoom_is_allowed() && new_buttons[0] && new_buttons[1]) ||
 	         (can_lock_mouse && display.spin_is_allowed() && new_buttons[1]);
+	if (locked && !was_locked) { locked_px = new_px; locked_py = new_py; }
+	
 	if (new_buttons[1])
-		display.report_camera_motion( (float)(new_px - px), (float)(new_py - py), 
+		display.report_camera_motion( float(new_px - px), float(new_py - py), 
 									  new_buttons[0] ? display_kernel::MIDDLE : display_kernel::RIGHT );
-
+	
 	// left_semidrag means that we've moved the mouse and so can't get a left click, but we aren't
 	// necessarily actually dragging, because the movement might have occurred with the right button down.
 	if (left_down && !left_dragging && (new_px != px || new_py != py))
@@ -99,11 +114,14 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 
 	// xxx Generate mouse events for right (and middle?) buttons.  Very carefully.
 		
-	if (!locked) {
-		px = new_px;
-		py = new_py;
-	}
+	px = new_px;
+	py = new_py;
 	for(int b=0; b<2; b++) buttons[b] = new_buttons[b];
+}
+
+void mouse_manager::report_setcursor( int new_px, int new_py ) {
+	px = new_px;
+	py = new_py;
 }
 
 } // namespace cvisual
