@@ -17,7 +17,7 @@ static void * createFont( const wstring& desc, int height, bool isClearType ) {
 	
 	if (isClearType) quality = 5;
 
-	return CreateFontW( height, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_TT_PRECIS,
+	return CreateFontW( -height, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_TT_PRECIS,
 						CLIP_DEFAULT_PRECIS, quality, DEFAULT_PITCH | FF_DONTCARE,
 						desc.size() ? desc.c_str() : NULL );
 }
@@ -40,7 +40,7 @@ font_renderer::font_renderer( const wstring& description, int height ) {
 			"falling back to system default");
 		font_handle = createFont( wstring(), height, isClearType );
 	}
-	
+		
 	// Work around KB306198
 	HDC sic = CreateIC( "DISPLAY", NULL, NULL, NULL );
 	SelectObject( sic, SelectObject( sic, font_handle ) );
@@ -87,7 +87,8 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 		bmp = CreateDIBSection( dc, (BITMAPINFO*)&hdr, DIB_RGB_COLORS, &bits, NULL, 0 );
 		if (!bmp) throw win32_exception("CreateDIBSection failed.");
 		
-		memset(bits, 0, (hdr.biWidth*3 + (-hdr.biWidth*3)&3) * hdr.biHeight);
+		int biPitch = (hdr.biWidth*3 + ((-hdr.biWidth*3)&3));
+		memset(bits, 0, biPitch * hdr.biHeight);
 		
 		SetTextColor(dc, 0xFFFFFF);
 		SetBkColor(dc, 0);
