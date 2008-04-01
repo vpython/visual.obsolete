@@ -401,7 +401,7 @@ gui_main::poll()
 	
 	int interval = 1000 * render_manager::paint_displays( displays );
 	
-	Glib::signal_timeout().connect( sigc::mem_fun( *this, &gui_main::poll), interval, Glib::PRIORITY_HIGH_IDLE)
+	Glib::signal_timeout().connect( sigc::mem_fun( *this, &gui_main::poll), interval, Glib::PRIORITY_HIGH_IDLE);
 	return false; // We connect a new timeout every time, so we don't want this timeout to repeat
 }
 
