@@ -12,9 +12,11 @@ Building vpython with from Visual Studio C++
 		Install VPython from the normal installer.  Technically it is only required to install
                 numpy(?) but this will tend to get you the latest dependencies.
 
-        d)Install Visual C++ 2005 Express Edition and platform SDK as per the instructions at
+    d)Install Visual C++ 2005 Express Edition and platform SDK as per the instructions at
         	http://msdn2.microsoft.com/en-us/vstudio/aa700736.aspx
         	At least on Vista, you must do this in Internet Explorer, not some other browser.
+        	(An attempt to use Visual C++ 2008 on Vista failed to produce a module that worked,
+        	and the Boost libraries complained about the compiler version not being acceptable.)
 			
 			Note that you need to go to the bottom of the SDK page to get the 2003 download.
 			
@@ -28,7 +30,7 @@ Building vpython with from Visual Studio C++
 			in C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
 			(\Bin, \Include, \Lib).
         
-        e)Unzip Boost
+    e)Unzip Boost
                 Extract the files in vpython-core2/dependencies/boost_1_34_1.zip so that there
                 is a folder vpython-core2/dependencies/boost_1_34_1.
         
