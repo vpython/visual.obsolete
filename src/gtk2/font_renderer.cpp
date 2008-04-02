@@ -57,11 +57,20 @@ font_renderer::font_renderer( const wstring& description, int height ) {
 	Pango::FontDescription font_desc = Glib::wrap(gtk_style_new())->get_font();
 	if (height > 0)
 		font_desc.set_size( height * Pango::SCALE);
-	if (description.size())
+	if (description == L"sans-serif")
+		font_desc.set_family( "sans" );
+	else if (description.size())
 		font_desc.set_family( w2u(description) );
 	font_desc.set_style( Pango::STYLE_NORMAL);
 	
-	ft2_context->set_font_description(font_desc);
+	if (!fontmap->load_font( ft2_context, font_desc ))
+		ft2_context = NULL;
+	else
+		ft2_context->set_font_description(font_desc);
+}
+
+bool font_renderer::ok() {
+	return ft2_context != NULL;
 }
 
 void font_renderer::gl_render_to_texture( const view&, const wstring& text, layout_texture& tx ) {

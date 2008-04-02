@@ -2,6 +2,7 @@
 #include "font_renderer.hpp"
 #include "util/gl_enable.hpp"
 #include "util/errors.hpp"
+#include "boost/algorithm/string.hpp"
 
 namespace cvisual {
 
@@ -15,12 +16,45 @@ font::font( font_renderer* fr ) : renderer(fr) {}
 
 boost::shared_ptr<font> 
 font::find_font( const wstring& desc, int height ) {
-	boost::shared_ptr<font>& f = font_cache[ std::make_pair( desc, height) ];
-	if (f) return f;
+	if (height <= 0) height = 13;
 
-	f.reset( new font( new font_renderer( desc, height ) ) );
-	f->self = f;
-	return f;
+	std::vector<wstring> fonts;
+	if (desc.size())
+		boost::split( fonts, desc, boost::is_any_of(L",") );
+		
+	// normalize font names
+	for(int i=0; i<fonts.size(); i++) {
+		boost::trim(fonts[i]);
+		boost::to_lower(fonts[i]);
+		if (fonts[i] == L"sans") fonts[i] = L"sans-serif";
+	}
+
+	fonts.push_back( L"sans-serif" );	//< default and last resort
+
+	{
+		// Attempt to use consistent fonts for generic font families across platforms
+		std::vector<wstring> real_fonts;
+		for(int i=0; i<fonts.size(); i++) {
+			if		(fonts[i] == L"sans-serif")	real_fonts.push_back( L"verdana" );
+			else if (fonts[i] == L"serif")		real_fonts.push_back( L"times new roman" );
+			else if (fonts[i] == L"monospace")	real_fonts.push_back( L"courier new" );
+			real_fonts.push_back( fonts[i] );
+		}
+		fonts.swap( real_fonts );
+	}
+		
+	for(int i=0; i<fonts.size(); i++) {
+		boost::shared_ptr<font>& f = font_cache[ std::make_pair( fonts[i], height) ];
+		if (!f) {
+			f.reset( new font( new font_renderer( fonts[i], height ) ) );
+			f->self = f;
+		}
+				
+		if ( f->renderer->ok() )
+			return f;
+	}
+	
+	throw std::logic_error( "Platform font_renderer doesn't recognize required generic font names." );
 }
 
 boost::shared_ptr<layout> 

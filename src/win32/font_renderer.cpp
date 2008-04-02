@@ -12,39 +12,56 @@ class win32_exception : std::exception {
 	}
 };
 
-static void * createFont( const wstring& desc, int height, bool isClearType ) {
-	int quality = DEFAULT_QUALITY;
-	
-	if (isClearType) quality = 5;
-
-	return CreateFontW( -height, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_TT_PRECIS,
-						CLIP_DEFAULT_PRECIS, quality, DEFAULT_PITCH | FF_DONTCARE,
-						desc.size() ? desc.c_str() : NULL );
-}
-
-font_renderer::font_renderer( const wstring& description, int height ) {
-	if (height<0) height = 0; // default
-	
-	// Respect the users' preferences as to whether ClearType should be enabled.
-	isClearType = false;
+bool isClearTypeEnabled() {
 	UINT smoothType = 0;
 	// On versions of Windows < XP, this call should fail
 	if (SystemParametersInfo( 0x200a, 0, &smoothType, 0 )) {  // SPI_GETFONTSMOOTHINGTYPE
 		if (smoothType == 2) // FE_FONTSMOOTHINGCLEARTYPE
-			isClearType = true;
+			return true;
 	}
+	return false;
+}
 
-	font_handle = createFont( description, height, isClearType );
-	if (!font_handle) {
-		VPYTHON_WARNING( "Could not allocate requested font, "
-			"falling back to system default");
-		font_handle = createFont( wstring(), height, isClearType );
-	}
-		
-	// Work around KB306198
+static int CALLBACK ef_callback(ENUMLOGFONTEXW *,NEWTEXTMETRICEXW *,DWORD,LPARAM lParam) {
+	*(bool*)lParam = true;
+	return 0;
+}
+
+font_renderer::font_renderer( const wstring& description, int height ) {
+	font_handle = NULL;
+	
+	// TODO: support generic "sans-serif", "serif", "monospace" families using lfPitchAndFamily.
+	// Doesn't matter much because Windows machines pretty much always have "verdana", 
+	// "times new roman", and "courier new".
+
+	// Respect the users' preferences as to whether ClearType should be enabled.
+	isClearType = isClearTypeEnabled();
+	int quality = DEFAULT_QUALITY;
+	if (isClearType) quality = 5;
+	
 	HDC sic = CreateIC( "DISPLAY", NULL, NULL, NULL );
-	SelectObject( sic, SelectObject( sic, font_handle ) );
+	
+	LOGFONTW lf;
+	memset(&lf, 0, sizeof(lf));
+	lf.lfHeight = -height;
+	lf.lfOutPrecision = OUT_TT_PRECIS;
+	lf.lfQuality = quality;
+	wcsncpy( lf.lfFaceName, description.c_str(), sizeof(lf.lfFaceName)/2-1 );
+	lf.lfFaceName[ sizeof(lf.lfFaceName)/2-1 ] = 0;
+	
+	bool fontFound = false;
+	EnumFontFamiliesExW( sic, &lf, (FONTENUMPROCW)ef_callback, (LPARAM)&fontFound, 0 );
+	if (fontFound)
+		font_handle = CreateFontIndirectW( &lf );
+
+	if (font_handle)  
+		SelectObject( sic, SelectObject( sic, font_handle ) ); //< Work around KB306198
+	
 	DeleteDC( sic );
+}
+
+bool font_renderer::ok() {
+	return font_handle != 0;
 }
 
 font_renderer::~font_renderer() {
