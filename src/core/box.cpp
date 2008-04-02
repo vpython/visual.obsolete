@@ -292,9 +292,9 @@ box::calc_simple_model(quad *faces, int level)
 	// Calculate the non-textured, sorted model.
 	// There are level*level squares on each of the 6 sides of the box.
 	double spacing = 1.0/level;
-	for(size_t i = 0; i < level; i++)
+	for(int i = 0; i < level; i++)
 	{
-		for(size_t j = 0; j < level; j++)
+		for(int j = 0; j < level; j++)
 		{
 			faces[0*level*level+(i*level+j)] = quad( // Right face
 				vector( 0.5, -0.5+(j+1)*spacing, -0.5+(i+1)*spacing),
@@ -335,10 +335,10 @@ box::calc_textured_model(tquad *faces, int level)
 {
 	// Calculate the textured, sorted model.
 	// There are level*level squares on each of the 6 sides of the box.
-	double spacing = 1.0/level;
-	for(size_t i = 0; i < level; i++)
+	GLfloat spacing = 1.0f/level;
+	for(int i = 0; i < level; i++)
 	{
-		for(size_t j = 0; j < level; j++)
+		for(int j = 0; j < level; j++)
 		{
 			faces[0*level*level+(i*level+j)] = tquad( // Right face
 				vector( 0.5, -0.5+(j+1)*spacing, -0.5+(i+1)*spacing), tcoord((j+1)*spacing, (i+1)*spacing),
