@@ -8,8 +8,8 @@
 
 namespace cvisual {
 
-view::view( const vector n_forward, vector n_center, float n_width,
-	float n_height, bool n_forward_changed,
+view::view( const vector n_forward, vector n_center, int n_width,
+	int n_height, bool n_forward_changed,
 	double n_gcf, vector n_gcfvec,
 	bool n_gcf_changed, gl_extensions& glext)
 	: forward( n_forward), center(n_center), view_width( n_width),

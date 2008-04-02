@@ -78,9 +78,9 @@ struct view
 	vector up;
 	
 	/// The width of the viewport in pixels.
-	float view_width;
+	int view_width;
 	/// The height of the viewport in pixels.
-	float view_height;
+	int view_height;
 	/// True if the forward vector changed since the last rending operation.
 	bool forward_changed;
 	/// The Global Scaling Factor
@@ -102,8 +102,8 @@ struct view
 	
 	tmatrix camera_world;
 	
-	view( vector n_forward, vector n_center, float n_width, 
-		float n_height, bool n_forward_changed, 
+	view( vector n_forward, vector n_center, int n_width, 
+		int n_height, bool n_forward_changed, 
 		double n_gcf, vector n_gcfvec,
 		bool n_gcf_changed,
 		gl_extensions& glext);
