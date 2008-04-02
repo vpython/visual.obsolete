@@ -619,7 +619,7 @@ points::gl_render( const view& scene)
 		// so a sphere of world-space diameter (size*scene.gcf) is
 		double point_radius_at_z_1 = size * scene.gcf * p.x * scene.view_width;
 
-		float attenuation_eqn[] =  { 0, 0, 1.0 / (point_radius_at_z_1*point_radius_at_z_1) };
+		float attenuation_eqn[] =  { 0.0f, 0.0f, 1.0f / (float)(point_radius_at_z_1*point_radius_at_z_1) };
 		scene.glext.glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);
 		glPointSize( 1 );
 	}
