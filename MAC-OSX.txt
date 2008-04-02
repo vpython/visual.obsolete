@@ -23,6 +23,7 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	as you want the Boost libraries for Python 2.5.
 	
 	Install boost1.34.python25, boost1.34.systempython, and boost1.34.nopython.
+	(You can say /sw/bin/fink install boost1.34.python25 boost1.34.systempython boost1.34.nopython)
 	
 	Next install gtkmm2.4-dev, which installs many other packages on which it depends, including
 	gtk+2, glib, glibmm, libsig++, atk, pango, expat1, libpng3,
