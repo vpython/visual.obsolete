@@ -208,7 +208,7 @@ display_kernel::report_closed() {
 }
 
 void
-display_kernel::report_camera_motion( float dx, float dy, mouse_button button )
+display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 {
 	// This stuff handles automatic movement of the camera in responce to user
 	// input.  See also view_to_world_transform for how the affected variables
@@ -232,7 +232,7 @@ display_kernel::report_camera_motion( float dx, float dy, mouse_button button )
 	// The vertical and horizontal fractions of the window's height that the
 	// mouse has traveled for this event.
 	// TODO: Implement ZOOM_ROLL modes.
-	float vfrac = dy / view_height;
+	float vfrac = (float)dy / view_height;
 	float hfrac = dx
 		/ ((stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO) ? 
 		     (view_width*0.5f) : view_width);
@@ -825,7 +825,7 @@ display_kernel::render_scene(void)
 				break;
 			case PASSIVE_STEREO: {
 				// Also handle viewport modifications.
-				scene_geometry.view_width =  view_width * 0.5f;
+				scene_geometry.view_width =  view_width/2;
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
 				int stereo_width = int(scene_geometry.view_width);
@@ -840,7 +840,7 @@ display_kernel::render_scene(void)
 			}
 			case CROSSEYED_STEREO: {
 				// Also handle viewport modifications.
-				scene_geometry.view_width =  view_width * 0.5f;
+				scene_geometry.view_width =  view_width/2;
 				scene_geometry.anaglyph = false;
 				scene_geometry.coloranaglyph = false;
 				int stereo_width = int(scene_geometry.view_width);
@@ -919,7 +919,7 @@ display_kernel::render_scene(void)
 }
 
 boost::tuple< shared_ptr<renderable>, vector, vector>
-display_kernel::pick( float x, float y, float d_pixels)
+display_kernel::pick( int x, int y, float d_pixels)
 {
 	using boost::scoped_array;
 
@@ -967,7 +967,7 @@ display_kernel::pick( float x, float y, float d_pixels)
 		};
 		glMatrixMode( GL_PROJECTION);
 		glLoadIdentity();
-		gluPickMatrix( x, view_height - y, d_pixels, d_pixels, viewport_bounds);
+		gluPickMatrix( (float)x, (float)(view_height - y), d_pixels, d_pixels, viewport_bounds);
 		view scene_geometry( forward.norm(), center, view_width, view_height,
 			forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
@@ -1404,12 +1404,12 @@ display_kernel::set_x( float n_x)
 	if (visible)
 		throw std::runtime_error( "Cannot change parameters of an active window");
 	else
-		window_x = n_x;
+		window_x = (int)n_x;
 }
 float
 display_kernel::get_x()
 {
-	return window_x;
+	return (float)window_x;
 }
 
 void
@@ -1418,12 +1418,12 @@ display_kernel::set_y( float n_y)
 	if (visible)
 		throw std::runtime_error( "Cannot change parameters of an active window");
 	else
-		window_y = n_y;
+		window_y = (int)n_y;
 }
 float
 display_kernel::get_y()
 {
-	return window_y;
+	return (float)window_y;
 }
 
 void
@@ -1432,12 +1432,12 @@ display_kernel::set_width( float w)
 	if (visible)
 		throw std::runtime_error( "Cannot change parameters of an active window");
 	else
-		window_width = w;
+		window_width = (int)w;
 }
 float
 display_kernel::get_width()
 {
-	return window_width;
+	return (float)window_width;
 }
 
 void
@@ -1446,12 +1446,12 @@ display_kernel::set_height( float h)
 	if (visible)
 		throw std::runtime_error( "Cannot change parameters of an active window");
 	else
-		window_height = h;
+		window_height = (int)h;
 }
 float
 display_kernel::get_height()
 {
-	return window_height;
+	return (float)window_height;
 }
 
 void

@@ -235,7 +235,7 @@ public: // Public Data.
  		@param dx horizontal change in mouse position in pixels.
  		@param dy vertical change in mouse position in pixels.
 	*/
-	void report_camera_motion( float dx, float dy, mouse_button button);
+	void report_camera_motion( int dx, int dy, mouse_button button);
 
 	/** Report that the position and/or size of the widget has changed.
 		Some platforms might not know about position changes; they can pass (x,y,new_width,new_height)
@@ -257,7 +257,7 @@ public: // Public Data.
            positions are undefined.
 	*/
 	boost::tuple<shared_ptr<renderable>, vector, vector>
-	pick( float x, float y, float d_pixels = 2.0);
+	pick( int x, int y, float d_pixels = 2.0);
 
 	/** Recenters the scene.  Call this function exactly once to move the visual
 	 * center of the scene to the true center of the scene.  This will work
