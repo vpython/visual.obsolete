@@ -8,12 +8,17 @@ X11 is automatically installed on 10.5.
 To do a clean install of fink (www.finkproject.org), I deleted /sw and started from scratch.
 Install fink from fink.sourceforge.net. Probably best to install from source?
 I use Fink Commander as a GUI to fink, but you can use the command line.
+
+Create a file in your home directory named ".profile" with these contents:
+test -r /sw/bin/init.sh && . /sw/bin/init.sh
+
+Start up a new terminal program, which will read the .profile file with the effect that
+/sw/bin will be on your application search path.
 	
 Use fink to install the components listed for Linux in INSTALL.txt (details repeated here).
 	
 	If you're not using Fink Commander (and despite its graphic user interface there are
 	hints that maybe it is buggy), on a command line you say for example "fink install python25".
-	Depending on your environment settings, you may have to say /sw/bin/fink install python25.
 	
 	Install numpy-py25, which also installs python25.
 	(2008/4/2 on OSX 10.5; accepted the choice "db44-aes-shlibs: Shared Libraries for db44-aes")
@@ -23,7 +28,7 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	as you want the Boost libraries for Python 2.5.
 	
 	Install boost1.34.python25, boost1.34.systempython, and boost1.34.nopython.
-	(You can say /sw/bin/fink install boost1.34.python25 boost1.34.systempython boost1.34.nopython)
+	(You can say fink install boost1.34.python25 boost1.34.systempython boost1.34.nopython)
 	
 	Next install gtkmm2.4-dev, which installs many other packages on which it depends, including
 	gtk+2, glib, glibmm, libsig++, atk, pango, expat1, libpng3,
@@ -41,9 +46,10 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	PKG_CONFIG_PATH is set in the configure script to find it.
 
 You can test the pkgconfig machinery by executing the following:
-	   pkg-config --libs pango
+	   pkg-config --libs pango (or /sw/bin/pkg-config --libs pango)
 The output should be -L/sw/lib -lpango-1.0 -lm -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lintl -liconv 
-	   
+
+Next cd into the vpython-core2 directory and execute chmod +x autogen.sh, then ./autogen.sh	   
 Here is what happens when I run autogen.sh: 
 /sw/share/aclocal/gtkglextmm-1.2.m4:225: warning: 
           underquoted definition of AC_GTKGLEXTMM_SUPPORTS_MULTIHEAD
