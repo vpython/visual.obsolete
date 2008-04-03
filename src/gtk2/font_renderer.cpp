@@ -63,14 +63,14 @@ font_renderer::font_renderer( const wstring& description, int height ) {
 		font_desc.set_family( w2u(description) );
 	font_desc.set_style( Pango::STYLE_NORMAL);
 	
-	if (!fontmap->load_font( ft2_context, font_desc ))
-		ft2_context = NULL;
+	if (!ft2_context->load_font( font_desc ))
+		ft2_context.reset();
 	else
 		ft2_context->set_font_description(font_desc);
 }
 
 bool font_renderer::ok() {
-	return ft2_context != NULL;
+	return (bool)ft2_context;
 }
 
 void font_renderer::gl_render_to_texture( const view&, const wstring& text, layout_texture& tx ) {
