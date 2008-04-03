@@ -64,7 +64,7 @@ font_renderer::font_renderer( const wstring& description, int height ) {
 	font_desc.set_style( Pango::STYLE_NORMAL);
 	
 	if (!ft2_context->load_font( font_desc ))
-		ft2_context.reset();
+		ft2_context.clear();
 	else
 		ft2_context->set_font_description(font_desc);
 }
