@@ -22,6 +22,11 @@ using boost::lexical_cast;
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/radiotoolbutton.h>
 
+#ifndef _WIN32
+#include <sys/time.h>
+#include <sys/resource.h>
+#endif
+
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
@@ -399,7 +404,7 @@ gui_main::poll()
 	// Called in gui thread when it's time to render
 	if (shutting_down) return false;
 	
-	int interval = 1000 * render_manager::paint_displays( displays );
+	int interval = (int)(1000 * render_manager::paint_displays( displays ));
 	
 	Glib::signal_timeout().connect( sigc::mem_fun( *this, &gui_main::poll), interval, Glib::PRIORITY_HIGH_IDLE);
 	return false; // We connect a new timeout every time, so we don't want this timeout to repeat
