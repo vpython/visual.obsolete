@@ -164,21 +164,9 @@ display::create()
 	
 	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
 	
-	//window->set_position(Gtk::WIN_POS_NONE); // seems not needed
+	window->move( window_x, window_y);
+	window->show_all(); // this will update the actual x,y
 	
-	// It would make more sense to show_all after move, to avoid possible
-	// flashing of the window from an initial position to its final
-	// position. But at least on Windows this causes problems, at least
-	// with multiple physical displays (extended desktop).
-	
-	// Save and restore window_x/y because show_all drives a window routine that resets them:
-	int save_x=window_x, save_y=window_y;
-	window->show_all();
-	if (save_x >= 0 && save_y >= 0) { // if user specified x or y
-		window_x = save_x;
-		window_y = save_y;
-		window->move( window_x, window_y);
-	}
 	if (fullscreen)
 		window->fullscreen();
 	area->grab_focus();
