@@ -4,6 +4,16 @@ namespace cvisual {
 
 gl_free_manager on_gl_free;
 
+void gl_free_manager::on_shutdown() {
+	static boost::signal< void() >* i = new boost::signal< void() >;
+	return *i;
+}
+
+void gl_free_manager::on_next_frame() {
+	static boost::signal< void() >* i = new boost::signal< void() >;
+	return *i;
+}
+
 void 
 gl_free_manager::frame() {
 	on_next_frame();
