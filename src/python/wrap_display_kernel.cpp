@@ -227,9 +227,10 @@ wrap_display_kernel(void)
 		// Default implementations of key override methods
 		.def( "_getProcAddress", &py_display_kernel::base_getProcAddress )
 		// Functions for extending this type in Python.
-		.def( "render_scene", &display_kernel::render_scene)
-		.def( "report_resize", &display_kernel::report_resize)
+		.def( "render_scene", &display_kernel::render_scene )
+		.def( "report_resize", &display_kernel::report_resize )
 		.def( "report_mouse_state", &py_display_kernel::report_mouse_state )
+		.def( "report_closed", &display_kernel::report_closed )
 		.def( "pick", &display_kernel::pick, pick_overloads(
 			py::args( "x", "y", "pixels")))
 		;
