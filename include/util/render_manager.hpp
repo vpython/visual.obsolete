@@ -11,7 +11,7 @@ namespace cvisual {
 		// Takes care of a lot of platform-independent policy and implementation, including
 		// the tradeoff between frame rate and Python program performance, vertical retrace
 		// synchronization, etc.
-		static double paint_displays( const std::vector< class display* >& );
+		static double paint_displays( const std::vector< class display* >&, bool swap_single_threaded = false );
 	};
 };
 

@@ -34,6 +34,13 @@ using boost::lexical_cast;
 namespace cvisual {
 using boost::thread;
 
+#ifdef __APPLE__
+// Apple OpenGL drivers break if buffers are swapped from a thread
+static const bool swap_single_threaded = true;
+#else
+static const bool swap_single_threaded = false;
+#endif
+
 #if (defined(_WIN32) || defined(_MSC_VER))
 	const int border_width = 8;
 	const int border_height = 3;
@@ -404,7 +411,8 @@ gui_main::poll()
 	// Called in gui thread when it's time to render
 	if (shutting_down) return false;
 	
-	int interval = (int)(1000 * render_manager::paint_displays( displays ));
+	
+	int interval = (int)(1000 * render_manager::paint_displays( displays, swap_single_threaded ));
 	
 	Glib::signal_timeout().connect( sigc::mem_fun( *this, &gui_main::poll), interval, Glib::PRIORITY_HIGH_IDLE);
 	return false; // We connect a new timeout every time, so we don't want this timeout to repeat

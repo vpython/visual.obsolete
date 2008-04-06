@@ -5,7 +5,7 @@
 
 namespace cvisual {
 
-double render_manager::paint_displays( const std::vector< display* >& displays ) {
+double render_manager::paint_displays( const std::vector< display* >& displays, bool swap_single_threaded ) {
 	// If there are no active displays, poll at a reasonable rate.  The platform driver
 	// may turn off polling in this situation, which is fine.
 	if (!displays.size()) return .030;
@@ -21,21 +21,26 @@ double render_manager::paint_displays( const std::vector< display* >& displays )
 		displays[d]->paint();
 	double paint = time.elapsed() - start;
 
-	// Use a thread pool to call SwapBuffers for each display in a separate thread, since
-	// at least with some drivers, it can block waiting for vertical retrace
-	if (displays.size() > 1) {
-		if (!swap_thread_pool)
-			swap_thread_pool = new boost::threadpool::pool( displays.size()-1 );
-		else if ( swap_thread_pool->size() < displays.size() )
-			swap_thread_pool->size_controller().resize( displays.size()-1 );
-		
-		for(size_t d=1; d<displays.size(); d++)
-			swap_thread_pool->schedule( boost::bind( &display::swap, displays[d] ) );
+	if (swap_single_threaded) {
+		for(int d=0; d<displays.size(); d++)
+			displays[d]->swap();
+	} else {
+		// Use a thread pool to call SwapBuffers for each display in a separate thread, since
+		// at least with some drivers, it can block waiting for vertical retrace
+		if (displays.size() > 1) {
+			if (!swap_thread_pool)
+				swap_thread_pool = new boost::threadpool::pool( displays.size()-1 );
+			else if ( swap_thread_pool->size() < displays.size() )
+				swap_thread_pool->size_controller().resize( displays.size()-1 );
+			
+			for(int d=1; d<displays.size(); d++)
+				swap_thread_pool->schedule( boost::bind( &display::swap, displays[d] ) );
+		}
+		displays[0]->swap();
+		if (displays.size() > 1)
+			swap_thread_pool->wait();
 	}
-	displays[0]->swap();
-	if (displays.size() > 1)
-		swap_thread_pool->wait();
-
+	
 	double swap = time.elapsed() - (start+paint);
 	
 	// We want to be holding the lock about half the time, so the next rendering cycle
