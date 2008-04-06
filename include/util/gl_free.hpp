@@ -10,12 +10,12 @@ class gl_free_manager {
  public:
 	// The callback will be called if the OpenGL context(s) are destroyed
 	template <class T>
-	void connect( T callback ) { on_shutdown.connect( callback ); }
+	void connect( T callback ) { on_shutdown().connect( callback ); }
 	
 	// The callback will be called the next time OpenGL objects may be freed, and
 	//   will no longer be called on shutdown().
 	template <class T>
-	void free( T callback ) { on_next_frame.connect( callback ); on_shutdown.disconnect( callback ); }
+	void free( T callback ) { on_next_frame().connect( callback ); on_shutdown().disconnect( callback ); }
 	
 	// Call with OpenGL context active
 	void frame();
@@ -24,8 +24,8 @@ class gl_free_manager {
 	void shutdown();
 
  private:
-	boost::signal< void() > on_shutdown;
-	boost::signal< void() > on_next_frame;
+	boost::signal< void() > &on_shutdown();
+	boost::signal< void() > &on_next_frame();
 };
 
 // At present, there is just one of these, because all OpenGL contexts share server
