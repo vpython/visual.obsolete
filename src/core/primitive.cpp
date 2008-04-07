@@ -9,7 +9,8 @@
 #include <typeinfo>
 #include <cmath>
 
-#ifndef _MSC_VER
+//#ifndef _MSC_VER // This was needed when we used GTK2 on Windows
+#ifndef _WIN32
 #include <cxxabi.h>
 #endif
 

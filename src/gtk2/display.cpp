@@ -34,7 +34,7 @@ using boost::lexical_cast;
 namespace cvisual {
 using boost::thread;
 
-#if (defined(_WIN32) || defined(_MSC_VER))
+#ifdef _WIN32
 	const int border_width = 8;
 	const int border_height = 3;
 #else
@@ -76,7 +76,7 @@ display::activate( bool active )
 int
 display::get_titlebar_height()
 {
-#if !(defined(_WIN32) || defined(_MSC_VER))
+#ifndef _WIN32
 	return 23;
 #else
 	return 25; // Ubuntu Linux; unknown what situation is on Mac

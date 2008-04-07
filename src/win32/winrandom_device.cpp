@@ -10,7 +10,7 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: winrandom_device.cpp,v 1.4 2008/02/21 01:16:19 dscherer Exp $
+ * $Id: winrandom_device.cpp,v 1.5 2008/04/07 19:22:00 bsherwood Exp $
  *
  */
 
@@ -34,7 +34,7 @@ const boost::random_device::result_type boost::random_device::max_value;
 #endif
 
 #define WIN32_LEAN_AND_MEAN 1
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
     #define NOMINMAX
 #endif
 

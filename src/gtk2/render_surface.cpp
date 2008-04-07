@@ -9,7 +9,7 @@
 #include "vpython-config.h"
 #include "python/gil.hpp"
 
-#if !(defined(_WIN32) || defined(_MSC_VER))
+#ifndef _WIN32
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
@@ -36,7 +36,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 
-#if defined(_WIN32) || defined(_MSC_VER)
+#ifdef _WIN32
 	#include <windows.h>
 #endif
 
