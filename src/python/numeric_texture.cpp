@@ -98,7 +98,6 @@ numeric_texture::gl_init( const view& v )
 	if (type == GL_TEXTURE_3D_EXT && !v.glext.EXT_texture3D)
 		return;
 
-	gl_enable tex( type );
 	unsigned handle = get_handle();
 	if (!handle) {
 		glGenTextures(1, &handle);
