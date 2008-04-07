@@ -1,0 +1,12 @@
+Started 2008 April 7 as a place to record the status of Visual 4 on various platforms
+
+Bruce MacBook OSX 10.5 Intel graphics
+4/6 constrolstest and gas: there is a small gap between windows (need to account for decoration);
+material_test.py gives a hard crash (can move mouse but do nothing; must reboot).
+
+Bruce home Dell desktop Vista GeForce 7600 GS
+4/6 OK
+
+Bruce VAIO dual-boot laptop Ubuntu
+4/6 OK except that only the 1st window of a multiwindow program has a toolbar
+
