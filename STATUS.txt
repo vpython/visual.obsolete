@@ -1,12 +1,67 @@
-Started 2008 April 7 as a place to record the status of Visual 4 on various platforms
+Started 2008/4/7 as a place to record the status of Visual 4 on various platforms
 
 Bruce MacBook OSX 10.5 Intel graphics
-4/6 constrolstest and gas: there is a small gap between windows (need to account for decoration);
-material_test.py gives a hard crash (can move mouse but do nothing; must reboot).
+4/6 material_test.py gives a hard crash (can move mouse but do nothing; must reboot).
 
 Bruce home Dell desktop Vista GeForce 7600 GS
 4/6 OK
 
-Bruce VAIO dual-boot laptop Ubuntu
+Bruce VAIO dual-boot laptop Ubuntu Intel graphics
 4/6 OK except that only the 1st window of a multiwindow program has a toolbar
 
+Ruth MacBook Pro OSX 10.5 GeForce 8600M GT (but questionable Apple driver?) 
+For most materials gives this error message (and the display dies):
+
+VPYTHON ***CRITICAL ERROR***: 
+../../vpython-core2/src/core/display_kernel.cpp:906: render_scene: 
+OpenGL error: ../../vpyton-core2/src/core/sphere.cpp:188 invalid operation, aborting.
+
+Here is the end of a trace using the Apple OpenGL Profiler, where we crash trying to 
+make a wood1-material sphere:
+
+    0.07 ¬µs glEnd();
+    1.65 ¬µs glGetError(); returns: GL_ZERO
+18347.44 ¬µs glCreateProgramObjectARB();
+    1.04 ¬µs glGetError(); returns: GL_ZERO
+    1.22 ¬µs glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+   12.43 ¬µs glShaderSourceARB(2, 1, 0xb00801ac, 0xb00801a8);
+
+I experimented with making a single sphere with a specific material and find that 
+most materials behave this way, but fast displays, rawturbulence displays a black sphere, 
+emissive1 and emissive 2 display white spheres.
+
+Scherer: Hmm.  What's particularly odd about this is that sphere does a 
+clear_gl_error(), so the error can't come from the material application per se.
+I'd try the apple "OpenGL Profiler" as a way of tracking down the error.  
+You could alternatively try scattering some check_gl_error() calls around 
+sphere::gl_render to try to track down where the error occurs. 
+(I'd place one before the clear_gl_error(), since there might be an earlier 
+error being masked which causes a later error.) Since the error is an opengl 
+error rather than a shader compile or link error, I think we really need to 
+know exactly where the error is, and preferably some details.
+
+PERFORMANCE
+4/4 Interesting cycle/render timing results for stonehenge:
+
+Dell Vista 15/2
+Ruth MacBook Pro 14/5
+VAIO XP 97-144/37-62
+VAIO Ubuntu 170-250/73-114
+
+The VAIO measurements surprised me. In the past I recall various measurements 
+indicating that most things were twice as fast in Linux as XP. I'll make some 
+other kinds of measurements about this.
+
+Scherer: Things certainly shouldn't be twice as fast in Linux as XP!  
+If that was ever true, it's probably been fixed.
+Linux and the Mac, as I've warned you before, are currently not defining the 
+NDEBUG macro and so are using a bunch of extremely slow OpenGL error checking, 
+which is not present on Windows in Release mode. That could account for some 
+of the speed difference.
+(I had forgotten about the NDEBUG issue.)
+
+BUGS
+All: Setting visible=True in the constructor gives the error 
+"Can't change parameters of an active window".
+
+Mac: there is a small gap between windows (need to account for decoration).
