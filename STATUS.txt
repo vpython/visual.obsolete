@@ -20,12 +20,72 @@ Here is the end of a trace using the Apple OpenGL Profiler, where we crash in a 
 program trying to make a single wood1-material sphere:
 
     .........
-    0.07 Уs glEnd();
-    1.65 Уs glGetError(); returns: GL_ZERO
-18347.44 Уs glCreateProgramObjectARB();
-    1.04 Уs glGetError(); returns: GL_ZERO
-    1.22 Уs glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-   12.43 Уs glShaderSourceARB(2, 1, 0xb00801ac, 0xb00801a8);
+    0.05 탎 glTexCoord2f(0.00714284, 0.0144928);
+    0.06 탎 glVertex3f(-0.00204199, 0.0454687, -0.998964);
+    0.10 탎 glNormal3f(-0, -8.74228e-08, -1);
+    0.05 탎 glTexCoord2f(0, 0);
+    0.06 탎 glVertex3f(0, 0, -1);
+    0.10 탎 glNormal3f(0, 0.0455145, -0.998964);
+    0.06 탎 glTexCoord2f(0, 0.0144928);
+    0.06 탎 glVertex3f(0, 0.0455145, -0.998964);
+    0.07 탎 glEnd();
+    1.63 탎 glGetError(); returns: GL_ZERO 
+22416.17 탎 glCreateProgramObjectARB();
+    1.00 탎 glGetError(); returns: GL_ZERO 
+    4.56 탎 glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+   19.49 탎 glShaderSourceARB(2, 1, 0xb00801ac, 0xb00801a8);
+ 1750.13 탎 glCompileShaderARB(2);
+    1.37 탎 glAttachObjectARB(1, 2);
+    0.42 탎 glDeleteObjectARB(2);
+    1.57 탎 glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+    3.54 탎 glShaderSourceARB(3, 1, 0xb00801ac, 0xb00801a8);
+ 3459.42 탎 glCompileShaderARB(3);
+    1.41 탎 glAttachObjectARB(1, 3);
+    0.34 탎 glDeleteObjectARB(3);
+ 1410.01 탎 glLinkProgramARB(1);
+    1.14 탎 glGetObjectParameterivARB(1, GL_OBJECT_LINK_STATUS_ARB, 0xb0080264);
+    1.53 탎 glGetError(); returns: GL_ZERO 
+   75.09 탎 glUseProgramObjectARB(1);
+    2.15 탎 glGetError(); returns: GL_ZERO 
+    1.85 탎 glEnable(GL_TEXTURE_2D);
+    2.35 탎 glGenTextures(1, 0xb0080270);
+    7.42 탎 glBindTexture(GL_TEXTURE_2D, 1);
+   18.45 탎 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    0.37 탎 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    0.72 탎 glGetError(); returns: GL_INVALID_OPERATION 
+   
+glGetError(); returns: GL_INVALID_OPERATION 
+	Context: 0x00934a00
+	kCGLCPGPUFragmentProcessing:  GL_FALSE
+	kCGLCPGPUVertexProcessing:  GL_FALSE
+	kCGLCPCurrentRendererID:  1024 (0x00000400)
+Function call stack: 
+	0: 0x14b2ece2 in gloGetCGLDispatch in <GLProfilerFBDisp> 
+	1: 0x933a5bbc in glGetError in <libGL.dylib> 
+	2: 0x01005b6d in cvisual::check_gl_error_real(char const*, int) at errors.cpp: 99 
+	3: 0x0107057a in cvisual::python::numeric_texture::gl_init(cvisual::view const&) at numeric_texture.cpp: 87 
+	4: 0x01010adc in cvisual::texture::gl_activate(cvisual::view const&) at texture.cpp: 43 
+	5: 0x0103d7c0 in cvisual::apply_material::apply_material(cvisual::view const&, cvisual::material*, cvisual::tmatrix&) at scoped_ptr.hpp: 125 
+	6: 0x01045bcf in cvisual::renderable::outer_render(cvisual::view const&) at renderable.cpp: 96 
+	7: 0x0102a50b in cvisual::display_kernel::draw(cvisual::view&, int, bool, bool) at stl_list.h: 140 
+	8: 0x010300d6 in cvisual::display_kernel::render_scene() at display_kernel.cpp: 753 
+	9: 0x01051395 in cvisual::render_surface::paint() at gil.hpp: 21 
+	10: 0x0110c9fa in cvisual::render_manager::paint_displays(std::vector<cvisual::display*, std::allocator<cvisual::display*> > const&, bool) at stl_vector.h: 343 
+	11: 0x0104991f in cvisual::gui_main::poll() at mem_fun.h: 89 
+	12: 0x0104e8eb in sigc::internal::slot_call0<sigc::bound_mem_functor0<bool, cvisual::gui_main>, bool>::call_it(sigc::internal::slot_rep*) at slot.h: 103 
+	13: 0x01b94ad6 in (anonymous namespace)::glibmm_source_callback(void*) in <libglibmm-2.4.1.dylib> 
+	14: 0x0246f7d0 in g_timeout_dispatch in <libglib-2.0.0.dylib> 
+	15: 0x0246c34d in g_main_dispatch in <libglib-2.0.0.dylib> 
+	16: 0x0246d8c2 in g_main_context_dispatch in <libglib-2.0.0.dylib> 
+	17: 0x0246de4d in g_main_context_iterate in <libglib-2.0.0.dylib> 
+	18: 0x0246e647 in g_main_loop_run in <libglib-2.0.0.dylib> 
+	19: 0x01d03621 in gtk_main in <libgtk-x11-2.0.0.dylib> 
+	20: 0x01776f9b in Gtk::Main::run() in <libgtkmm-2.4.1.dylib> 
+	21: 0x01049adf in cvisual::gui_main::run() at lock.hpp: 33 
+	22: 0x0104d347 in cvisual::gui_main::thread_proc() at display.cpp: 414 
+	23: 0x026ac991 in thread_proxy in <libboost_thread-mt-1_34_1.dylib> 
+	24: 0x90b9fc55 in pthread_start in <libSystem.B.dylib> 
+	25: 0x90b9fb12 in thread_start in <libSystem.B.dylib> 
 
 I experimented with making a single sphere with a specific material and find that 
 most materials behave this way, but fast displays, rawturbulence displays a black sphere, 
