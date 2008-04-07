@@ -1,24 +1,25 @@
 Started 2008/4/7 as a place to record the status of Visual 4 on various platforms
 
-Bruce MacBook OSX 10.5 Intel graphics
+***Bruce MacBook OSX 10.5 Intel graphics
 4/6 material_test.py gives a hard crash (can move mouse but do nothing; must reboot).
 
-Bruce home Dell desktop Vista GeForce 7600 GS
+***Bruce home Dell desktop Vista GeForce 7600 GS
 4/6 OK
 
-Bruce VAIO dual-boot laptop Ubuntu Intel graphics
+***Bruce VAIO dual-boot laptop Ubuntu Intel graphics
 4/6 OK except that only the 1st window of a multiwindow program has a toolbar
 
-Ruth MacBook Pro OSX 10.5 GeForce 8600M GT (but questionable Apple driver?) 
-For most materials gives this error message (and the display dies):
+***Ruth MacBook Pro OSX 10.5 GeForce 8600M GT (but questionable Apple driver?) 
+4/7 For most materials gives this error message (and the display dies):
 
 VPYTHON ***CRITICAL ERROR***: 
 ../../vpython-core2/src/core/display_kernel.cpp:906: render_scene: 
 OpenGL error: ../../vpyton-core2/src/core/sphere.cpp:188 invalid operation, aborting.
 
-Here is the end of a trace using the Apple OpenGL Profiler, where we crash trying to 
-make a wood1-material sphere:
+Here is the end of a trace using the Apple OpenGL Profiler, where we crash in a test
+program trying to make a single wood1-material sphere:
 
+    .........
     0.07 ¬µs glEnd();
     1.65 ¬µs glGetError(); returns: GL_ZERO
 18347.44 ¬µs glCreateProgramObjectARB();
