@@ -32,8 +32,8 @@ class label : public renderable
 	void set_z( double z);
 	double get_z();
 
-	void set_color( const rgba& n_color);
-	rgba get_color();
+	void set_color( const rgb& n_color);
+	rgb get_color();
 
 	void set_red( float x);
 	double get_red();
@@ -74,8 +74,8 @@ class label : public renderable
 	void render_line( bool);
 	bool has_line();
 
-	void set_linecolor( const rgba& color);
-	rgba get_linecolor();
+	void set_linecolor( const rgb& color);
+	rgb get_linecolor();
 
  protected:
 	// In world space:
@@ -96,7 +96,7 @@ class label : public renderable
 	bool line_enabled; ///< True to draw a line to the text.
 
 	// bitmap_font* font;
-	rgba linecolor; ///< The color of the lines in the label. (color is for text)
+	rgb linecolor; ///< The color of the lines in the label. (color is for text)
 	float opacity; ///< The opacity of the background for the text.
 
 	std::wstring text;

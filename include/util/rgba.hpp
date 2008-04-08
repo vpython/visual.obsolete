@@ -65,22 +65,21 @@ class rgb
 	float red;
 	float green;
 	float blue;
+	float opacity;
 	
 	inline rgb() : red(1.0f), green(1.0f), blue(1.0f) {}
-	
 	inline rgb( float r, float g, float b)
 		: red(r), green(g), blue(b)
 	{}
-	
 	inline rgb( float bw)
 		: red(bw), green(bw), blue(bw)
 	{}
-	
-	inline rgb( const rgba& other)
+	inline explicit rgb( const float* c)
+		: red(c[0]), green(c[1]), blue(c[2]) {}
+	inline rgb( const rgb& other)
 		: red( other.red), green( other.green), blue(other.blue)
 	{}
-	
-	inline operator rgba() const { return rgba( red, green, blue, 1.0f); }
+	inline operator rgb() const { return rgb( red, green, blue); }
 	
 	rgb desaturate() const;
 	rgb grayscale() const;

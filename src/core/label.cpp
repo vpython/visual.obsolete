@@ -102,12 +102,12 @@ label::get_z()
 }
 
 void 
-label::set_color( const rgba& n_color)
+label::set_color( const rgb& n_color)
 {
 	color = n_color;
 }
 
-rgba
+rgb
 label::get_color()
 {
 	return color;
@@ -274,12 +274,12 @@ label::has_line()
 }
 
 void
-label::set_linecolor( const rgba& n_color)
+label::set_linecolor( const rgb& n_color)
 {
 	linecolor = n_color;
 }
 
-rgba
+rgb
 label::get_linecolor()
 {
 	return linecolor;
@@ -317,7 +317,7 @@ label::gl_render( const view& scene)
 		lst = lst * translate;
 	}
 	vector origin = lst * vertex(vector(), 1.0);
-	rgba stereo_linecolor = linecolor;
+	rgb stereo_linecolor = linecolor;
 	if (scene.anaglyph)
 		if (scene.coloranaglyph)
 			stereo_linecolor = linecolor.desaturate();

@@ -214,7 +214,7 @@ primitive::get_up()
 }
 
 void 
-primitive::set_color( const rgba& n_color)
+primitive::set_color( const rgb& n_color)
 {
 	model_damage();
 	color = n_color;
@@ -268,7 +268,7 @@ primitive::get_opacity()
 	return color.opacity;
 }
 
-rgba
+rgb
 primitive::get_color()
 {
 	return color;

@@ -97,7 +97,7 @@ class display_kernel
 	std::list<shared_ptr<light> > lights;
 	typedef indirect_iterator<std::list<shared_ptr<light> >::iterator> light_iterator;
 
-	rgba ambient; ///< The ambient light color.
+	rgb ambient; ///< The ambient light color.
 	/** Called at the beginning of a render cycle to establish lighting. */
 	void enable_lights();
 	/** Called at the end of a render cycle to complete lighting. */
@@ -107,8 +107,8 @@ class display_kernel
 	 * Default: false.
 	 */
 	bool show_rendertime;
-	rgba background; ///< The background color of the scene.
-	rgba forground; ///< The default color for objects to be rendered into the scene.
+	rgb background; ///< The background color of the scene.
+	rgb foreground; ///< The default color for objects to be rendered into the scene.
 
 	// Whether or not the user is allowed to spin or zoom the display
 	bool spin_allowed;
@@ -193,8 +193,8 @@ public: // Public Data.
 	/** Add an additional light source. */
 	void add_light( shared_ptr<light> n_light);
 	/** Change the background ambient lighting. */
-	void set_ambient( const rgba& color) { ambient = color; }
-	rgba get_ambient() { return ambient; }
+	void set_ambient( const rgb& color) { ambient = color; }
+	rgb get_ambient() { return ambient; }
 	/** Remove an existing light source. */
 	void remove_light( shared_ptr<light> old_light);
 	/** Get the list of lights for this window. */
@@ -305,11 +305,11 @@ public: // Public Data.
 	void set_uniform( bool);
 	bool is_uniform();
 
-	void set_background( const rgba&);
-	rgba get_background();
+	void set_background( const rgb&);
+	rgb get_background();
 
-	void set_forground( const rgba&);
-	rgba get_forground();
+	void set_foreground( const rgb&);
+	rgb get_foreground();
 
 	void set_autoscale( bool);
 	bool get_autoscale();

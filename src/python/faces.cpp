@@ -35,11 +35,6 @@ double* index( const array& a, size_t i)
 
 float* findex( const array& a, size_t i)
 {
-	return ((float*)data(a)) + i * 4; // (red,green,blue,opacity)
-}
-
-float* findex3( const array& a, size_t i)
-{
 	return ((float*)data(a)) + i * 3; // (red,green,blue)
 }
 
@@ -59,7 +54,7 @@ faces::faces()
 	double* i = index( pos, 0);
 	i[0] = i[1] = i[2] = 0.0;
 	float* j = findex( color,0);
-	j[0] = j[1] = j[2] = j[3] = 1.0;
+	j[0] = j[1] = j[2] = 1.0;
 	double* k = index( normal,0);
 	k[0] = k[1] = k[2] = 0.0;
 }
@@ -91,11 +86,10 @@ faces::set_length( int length)
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
 		array n_normal = makeNum( dims);
-		dims[1] = 4;
 		array n_color = makeNum( dims, NPY_FLOAT);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * npoints);
 		std::memcpy( data( n_normal), data( normal), sizeof(double) * 3 * npoints);
-		std::memcpy( data( n_color), data( color), sizeof(float) * 4 * npoints);
+		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * npoints);
 		pos = n_pos;
 		color = n_color;
 		normal = n_normal;
@@ -130,15 +124,14 @@ faces::set_length( int length)
 			color_i[0] = last_color[0];
 			color_i[1] = last_color[1];
 			color_i[2] = last_color[2];
-			color_i[3] = last_color[3];
-			color_i += 4;
+			color_i += 3;
 		}
 	}
 	count = length;
 }
 
 void
-faces::append_rgba( vector nv_pos, vector nv_normal, float red, float green, float blue, float opacity)
+faces::append_rgb( vector nv_pos, vector nv_normal, float red, float green, float blue)
 {
 	set_length( count+1);
 	double* pos_data = index( pos, count-1);
@@ -156,12 +149,10 @@ faces::append_rgba( vector nv_pos, vector nv_normal, float red, float green, flo
 		last_color[1] = green;
 	if (blue != -1)
 		last_color[2] = blue;
-	if (opacity != -1)
-		last_color[3] = opacity;
 }
 
 void
-faces::append( vector nv_pos, vector nv_normal, rgba nv_color)
+faces::append( vector nv_pos, vector nv_normal, rgb nv_color)
 {
 	set_length( count+1);
 	double* pos_data = index( pos, count-1);
@@ -176,7 +167,6 @@ faces::append( vector nv_pos, vector nv_normal, rgba nv_color)
 	color_data[0] = nv_color.red;
 	color_data[1] = nv_color.green;
 	color_data[2] = nv_color.blue;
-	color_data[3] = nv_color.opacity; // this is 1.0 if nv_color is an rgb triple
 }
 
 void
@@ -332,12 +322,6 @@ faces::set_color( array n_color)
 	if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
-		color[slice( 0,npoints), slice(0, 3)] = n_color;
-		return;
-	}
-	if (dims.size() == 1 && dims[0] == 4) {
-		// A single color, broadcast across the entire (used) array.
-		int npoints = (count) ? count : 1;
 		color[slice( 0, npoints)] = n_color;
 		return;
 	}
@@ -352,22 +336,14 @@ faces::set_color( array n_color)
 		// So instead do it by brute force:
 		float* color_i = findex( color, 0);
 		float* color_end = findex( color, count);
-		float* n_color_i = findex3( n_color,0);
+		float* n_color_i = findex( n_color,0);
 		while (color_i < color_end) {
 			color_i[0] = n_color_i[0];
 			color_i[1] = n_color_i[1];
 			color_i[2] = n_color_i[2];
-			color_i += 4;
+			color_i += 3;
 			n_color_i += 3;
 		}
-		return;
-	}
-	if (dims.size() == 2 && dims[1] == 4) {
-		// An RGB-opacity chunk of color
-		if (dims[0] != (long)count) {
-			throw std::invalid_argument( "color must be the same length as pos.");
-		}
-		color[slice( 0, count)] = n_color;
 		return;
 	}
 	throw std::invalid_argument( "color must be an Nx4 array");
@@ -380,12 +356,12 @@ faces::set_color_l( boost::python::list color)
 }
 
 void
-faces::set_color_t( rgba c)
+faces::set_color_t( rgb c)
 {
 	using boost::python::make_tuple;
 	// Broadcast the new color across the array.
 	int npoints = count ? count : 1;
-	color[slice(0, npoints)] = make_tuple( c.red, c.green, c.blue, c.opacity);
+	color[slice(0, npoints)] = make_tuple( c.red, c.green, c.blue);
 }
 
 void
@@ -416,7 +392,7 @@ faces::gl_render( const view& scene)
 		return;
 
 	std::vector<vector> spos;
-	std::vector<rgba> tcolor;
+	std::vector<rgb> tcolor;
 	
 	gl_enable_client vertexes( GL_VERTEX_ARRAY);
 	gl_enable_client normals( GL_NORMAL_ARRAY);
@@ -438,20 +414,20 @@ faces::gl_render( const view& scene)
 		glVertexPointer( 3, GL_DOUBLE, 0, index( pos,0));
 
 	if (scene.anaglyph) {
-		std::vector<rgba> tmp( count);
+		std::vector<rgb> tmp( count);
 		tcolor.swap( tmp);
 		const float* color_i = findex( color, 0);
-		for (std::vector<rgba>::iterator i = tcolor.begin(); i != tcolor.end(); ++i) {
+		for (std::vector<rgb>::iterator i = tcolor.begin(); i != tcolor.end(); ++i) {
 			if (scene.coloranaglyph)
 				*i = rgb(color_i[0], color_i[1], color_i[2]).desaturate();
 			else
 				*i =  rgb(color_i[0], color_i[1], color_i[2]).grayscale();
-			color_i += 4;
+			color_i += 3;
 		}
-		glColorPointer( 4, GL_FLOAT, 0, &*tcolor.begin());
+		glColorPointer( 3, GL_FLOAT, 0, &*tcolor.begin());
 	}
 	else
-		glColorPointer( 4, GL_FLOAT, 0, findex( color, 0));
+		glColorPointer( 3, GL_FLOAT, 0, findex( color, 0));
 
 	gl_enable cull_face( GL_CULL_FACE);
 	for (int drawn = 0; drawn < count - count%3; drawn += 54) {

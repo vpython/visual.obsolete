@@ -82,7 +82,7 @@ renderable::outer_render( const view& v )
 {
 	refresh_cache( v );
 	
-	rgba actual_color = color;
+	rgb actual_color = color;
 	if (v.anaglyph) {
 		if (v.coloranaglyph)
 			color = actual_color.desaturate();

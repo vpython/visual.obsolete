@@ -87,8 +87,8 @@ class convex : public renderable
 	convex( const convex& other);
 	virtual ~convex();
 	void append( vector pos);
-	void set_color( const rgba&);
-	rgba get_color();
+	void set_color( const rgb&);
+	rgb get_color();
 	
 	boost::python::object get_pos();
 	void set_pos( array);

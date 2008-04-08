@@ -30,7 +30,7 @@ wrap_arrayobjects()
 	using namespace boost::python;
 	using python::curve;
 
-	void (curve::*append_v_r)( vector, rgba) = &curve::append;
+	void (curve::*append_v_r)( vector, rgb) = &curve::append;
 	void (curve::*append_v)( vector) = &curve::append;
 	
 	class_<curve, bases<renderable> >( "curve")
@@ -65,14 +65,14 @@ wrap_arrayobjects()
 		.def( "set_z", &curve::set_z_d)
 		.def( "set_z", &curve::set_z)
 		.def( "append", append_v_r, args( "pos", "color"))
-		.def( "append", &curve::append_rgba,
-			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1, args("opacity")=-1))
+		.def( "append", &curve::append_rgb,
+			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1))
 		.def( "append", append_v, args("pos"))
 		;
 
 	using python::points;
 
-	void (points::*pappend_v_r)( vector, rgba) = &points::append;
+	void (points::*pappend_v_r)( vector, rgb) = &points::append;
 	void (points::*pappend_v)( vector) = &points::append;
 	
 	class_<points, bases<renderable> >( "points")
@@ -111,14 +111,14 @@ wrap_arrayobjects()
 		.def( "set_z", &points::set_z_d)
 		.def( "set_z", &points::set_z)
 		.def( "append", pappend_v_r, args( "pos", "color"))
-		.def( "append", &points::append_rgba,
-			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1, args("opacity")=-1))
+		.def( "append", &points::append_rgb,
+			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1))
 		.def( "append", pappend_v, args("pos"))
 		;
 
 	using python::faces;
 
-	void (faces::* append_all_vectors)(vector, vector, rgba) = &faces::append;
+	void (faces::* append_all_vectors)(vector, vector, rgb) = &faces::append;
 	void (faces::* append_default_color)( vector, vector) = &faces::append;
 
 	class_<faces, bases<renderable> >("faces")
@@ -137,8 +137,8 @@ wrap_arrayobjects()
 		.def( "smooth_shade", &faces::smooth_shade, 
 			faces_smooth_shade( args("doublesided"),
 			"Average normal vectors at coincident vertexes."))
-		.def( "append", &faces::append_rgba,
-			(args("pos"), args("normal"), args("red")=-1, args("green")=-1, args("blue")=-1, args("opacity")=-1))
+		.def( "append", &faces::append_rgb,
+			(args("pos"), args("normal"), args("red")=-1, args("green")=-1, args("blue")=-1))
 		.def( "append", append_default_color, args( "pos", "normal"))
 		.def( "append", append_all_vectors, args("pos", "normal", "color"))
 		;

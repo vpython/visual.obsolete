@@ -42,8 +42,8 @@ class faces : public renderable
 	virtual ~faces();
 	
 	// Add another vertex, normal, and color to the faces.
-	void append_rgba(vector, vector, float red=-1, float green=-1, float blue=-1, float opacity=-1);
-	void append( vector, vector, rgba);
+	void append_rgb(vector, vector, float red=-1, float green=-1, float blue=-1);
+	void append( vector, vector, rgb);
 	void append( vector, vector);
 	// This routine was adapted from faces_heightfield.py.  It averages the normal
 	// vectors at coincident verticies to smooth out boundaries between facets.  
@@ -58,7 +58,7 @@ class faces : public renderable
 	void set_pos( const array& pos);
 	void set_pos_l( boost::python::list pos);
 	void set_color( array color);
-	void set_color_t( rgba color);
+	void set_color_t( rgb color);
 	void set_color_l( boost::python::list color);
 	void set_normal( const array& normal);
 	void set_normal_l( boost::python::list normals);

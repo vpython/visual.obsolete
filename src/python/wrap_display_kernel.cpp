@@ -180,8 +180,8 @@ wrap_display_kernel(void)
 		 	&display_kernel::set_uniform)
 		.add_property( "background", &display_kernel::get_background,
 			&display_kernel::set_background)
-		.add_property( "foreground", &display_kernel::get_forground,
-			&display_kernel::set_forground)
+		.add_property( "foreground", &display_kernel::get_foreground,
+			&display_kernel::set_foreground)
 		.add_property( "autoscale", &display_kernel::get_autoscale,
 			&display_kernel::set_autoscale)
 		.add_property( "autocenter", &display_kernel::get_autocenter,

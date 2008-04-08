@@ -87,8 +87,8 @@ class curve : public renderable
 	curve( const curve& other);
 	virtual ~curve();
 
-	void append_rgba( vector, float red=-1, float green=-1, float blue=-1, float opacity=-1);
-	void append( vector _pos, rgba _color); // Append a single position with new color.
+	void append_rgb( vector, float red=-1, float green=-1, float blue=-1);
+	void append( vector _pos, rgb _color); // Append a single position with new color.
 	void append( vector _pos); // Append a single position element, extend color.
 	
 	boost::python::object get_pos(void);
@@ -103,7 +103,7 @@ class curve : public renderable
 	void set_pos_v( const vector& pos); // Interpreted as an initial append().
 	void set_color( array color); // An Nx4 array of color floats
 	void set_color_l( const list& color); // A list of vectors
-	void set_color_t( const rgba& color); // A single tuple
+	void set_color_t( const rgb& color); // A single tuple
 	
 	void set_antialias( bool);
 	void set_radius( const double& r);

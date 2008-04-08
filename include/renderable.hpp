@@ -140,7 +140,7 @@ public:
 	/** The base color of this body.  Ignored by the variable-color composites
 	 * (curve, faces, frame).
 	 */
-	rgba color;
+	rgb color;
 	/** Default base constructor.  Creates a white, model_damaged object. */
 	virtual ~renderable();
 	

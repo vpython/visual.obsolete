@@ -18,13 +18,8 @@ using boost::python::make_tuple;
 using boost::python::object;
 
 namespace {
-float*
-findex( const array& a, size_t i)
-{
-	return ((float*)data(a)) + (i) * 4; // (red,green,blue,opacity)
-}
 
-float* findex3( const array& a, size_t i)
+float* findex( const array& a, size_t i)
 {
 	return ((float*)data(a)) + (i)*3; // (red,green,blue)
 }
@@ -47,7 +42,6 @@ points::points()
 	dims[0] = preallocated_size;
 	dims[1] = 3;
 	pos = makeNum(dims);
-	dims[1] = 4;
 	color = makeNum(dims, NPY_FLOAT);
 
 	double* pos_i = index( pos, 0);
@@ -59,7 +53,6 @@ points::points()
 	color_i[0] = 1;
 	color_i[1] = 1;
 	color_i[2] = 1;
-	color_i[3] = 1;
 }
 
 points::points( const points& other)
@@ -95,10 +88,9 @@ points::set_length( size_t length)
 		dims[0] = 2*length;
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
-		dims[1] = 4;
 		array n_color = makeNum( dims, NPY_FLOAT);
 		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints+1));
-		std::memcpy( data( n_color), data( color), sizeof(float) * 4 * (npoints+1));
+		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * (npoints+1));
 		pos = n_pos;
 		color = n_color;
 		preallocated_size = dims[0];
@@ -122,15 +114,14 @@ points::set_length( size_t length)
 			color_i[0] = last_color[0];
 			color_i[1] = last_color[1];
 			color_i[2] = last_color[2];
-			color_i[3] = last_color[3];
-			color_i += 4;
+			color_i += 3;
 		}
 	}
 	count = length;
 }
 
 void
-points::append_rgba( vector npos, float red, float green, float blue, float opacity)
+points::append_rgb( vector npos, float red, float green, float blue)
 {
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
@@ -144,12 +135,10 @@ points::append_rgba( vector npos, float red, float green, float blue, float opac
 		last_color[1] = green;
 	if (blue != -1)
 		last_color[2] = blue;
-	if (opacity != -1)
-		last_color[3] = opacity;
 }
 
 void
-points::append( vector npos, rgba ncolor)
+points::append( vector npos, rgb ncolor)
 {
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
@@ -160,7 +149,6 @@ points::append( vector npos, rgba ncolor)
 	last_color[0] = ncolor.red;
 	last_color[1] = ncolor.green;
 	last_color[2] = ncolor.blue;
-	last_color[3] = ncolor.opacity; // this is 1.0 if ncolor is an rgb triple
 }
 
 void
@@ -303,12 +291,6 @@ points::set_color( array n_color)
 	if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
 		int npoints = (count) ? count : 1;
-		color[slice( 0,npoints), slice(0, 3)] = n_color;
-		return;
-	}
-	if (dims.size() == 1 && dims[0] == 4) {
-		// A single color, broadcast across the entire (used) array.
-		int npoints = (count) ? count : 1;
 		color[slice( 0, npoints)] = n_color;
 		return;
 	}
@@ -323,22 +305,14 @@ points::set_color( array n_color)
 		// So instead do it by brute force:
 		float* color_i = findex( color, 0);
 		float* color_end = findex( color, count);
-		float* n_color_i = findex3( n_color,0);
+		float* n_color_i = findex( n_color,0);
 		while (color_i < color_end) {
 			color_i[0] = n_color_i[0];
 			color_i[1] = n_color_i[1];
 			color_i[2] = n_color_i[2];
-			color_i += 4;
+			color_i += 3;
 			n_color_i += 3;
 		}
-		return;
-	}
-	if (dims.size() == 2 && dims[1] == 4) {
-		// An RGB-opacity chunk of color
-		if (dims[0] != (long)count) {
-			throw std::invalid_argument( "color must be the same length as pos.");
-		}
-		color[slice( 0, count)] = n_color;
 		return;
 	}
 	throw std::invalid_argument( "color must be an Nx4 array");
@@ -351,9 +325,9 @@ points::set_color_l( const list& color)
 }
 
 void
-points::set_color_t( const rgba& color)
+points::set_color_t( const rgb& color)
 {
-	this->set_color( array( make_tuple( color.red, color.green, color.blue, color.opacity)));
+	this->set_color( array( make_tuple( color.red, color.green, color.blue)));
 }
 
 
@@ -382,7 +356,8 @@ void
 points::set_opacity( const array& opacity)
 {
 	set_length(shape( opacity).at(0));
-	color[make_tuple( slice( 0, count), 3)] = opacity;
+	// Needs work....
+	//color[make_tuple( slice( 0, count), 3)] = opacity;
 }
 
 void
@@ -510,7 +485,8 @@ points::set_opacity_d( float opacity)
 	if (count == 0) {
 		set_length(1);
 	}
-	color[make_tuple(slice(0,count), 3)] = opacity;
+	// Needs work.....
+	//color[make_tuple(slice(0,count), 3)] = opacity;
 }
 
 bool
@@ -522,8 +498,8 @@ points::degenerate() const
 struct point_coord
 {
 	vector center;
-	mutable rgba color;
-	inline point_coord( const vector& p, const rgba& c)
+	mutable rgb color;
+	inline point_coord( const vector& p, const rgb& c)
 		: center( p), color(c)
 	{}
 };
@@ -548,21 +524,22 @@ points::gl_render( const view& scene)
 
 	// First classify each point based on whether or not it is translucent
 	if (points_shape == ROUND) { // Every point must be depth sorted
-		for ( ; pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 4) {
-			translucent_points.push_back( point_coord( vector(pos_i), rgba(color_i)));
+		for ( ; pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 3) {
+			translucent_points.push_back( point_coord( vector(pos_i), rgb(color_i)));
 		}
 	}
 	else { // Only translucent points need to be depth-sorted
-		for ( ; pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 4) {
-			if (color_i[3] < 1.0)
-				translucent_points.push_back( point_coord( vector(pos_i), rgba(color_i)));
+		for ( ; pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 3) {
+			if (0) // opacity not done
+				translucent_points.push_back( point_coord( vector(pos_i), rgb(color_i)));
 			else
-				opaque_points.push_back( point_coord( vector(pos_i), rgba(color_i)));
+				opaque_points.push_back( point_coord( vector(pos_i), rgb(color_i)));
 		}
 	}
 	// Now conditionally apply transformations for gcf and anaglyph color
-	if (translucent_points.size())
-		renderable::color.opacity = 0.5;
+// Needs work
+//	if (translucent_points.size())
+//		renderable::color.opacity = 0.5;
 	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
 		for (opaque_iterator i = opaque_points.begin(); i != opaque_points.end(); ++i) {
 			i->center = (i->center).scale(scene.gcfvec);
@@ -648,7 +625,7 @@ points::gl_render( const view& scene)
 		opaque_iterator end = opaque_points.end();
 		while (begin < end) {
 			std::ptrdiff_t block = std::min( chunk, end - begin);
-			glColorPointer( 4, GL_FLOAT, sizeof(point_coord), &begin->color.red);
+			glColorPointer( 3, GL_FLOAT, sizeof(point_coord), &begin->color.red);
 			glVertexPointer( 3, GL_DOUBLE, sizeof(point_coord), &begin->center.x);
 			glDrawArrays( GL_POINTS, 0, block);
 			begin += block;
@@ -665,7 +642,7 @@ points::gl_render( const view& scene)
 		translucent_iterator end = translucent_points.end();
 		while (begin < end) {
 			std::ptrdiff_t block = std::min( chunk, end - begin);
-			glColorPointer( 4, GL_FLOAT, sizeof(point_coord), &begin->color.red);
+			glColorPointer( 3, GL_FLOAT, sizeof(point_coord), &begin->color.red);
 			glVertexPointer( 3, GL_DOUBLE, sizeof(point_coord), &begin->center.x);
 			glDrawArrays( GL_POINTS, 0, block);
 			begin += block;
@@ -688,8 +665,8 @@ points::get_center() const
 	const double* pos_end = index( pos, count);
 	const float* color_i = findex( color, 0);
 	const float* color_end = findex( color, count);
-	for ( ;pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 4) {
-		if (points_shape == ROUND || color_i[3] != 1.0)
+	for ( ;pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 3) {
+		if (points_shape == ROUND) // || opacity)
 			ret += vector(pos_i);
 	}
 	ret /= count;

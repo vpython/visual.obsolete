@@ -179,7 +179,7 @@ display_kernel::display_kernel()
 	ambient( 0.2f, 0.2f, 0.2f),
 	show_rendertime( false),
 	last_time(0),
-	background(0, 0, 0, 0), //< Transparent black.
+	background(0, 0, 0), //< Transparent black.
 	spin_allowed(true),
 	zoom_allowed(true),
 	mouse_mode( ZOOM_ROTATE),
@@ -1214,27 +1214,27 @@ display_kernel::is_uniform()
 
 
 void
-display_kernel::set_background( const rgba& n_background)
+display_kernel::set_background( const rgb& n_background)
 {
 	background = n_background;
 }
 
-rgba
+rgb
 display_kernel::get_background()
 {
 	return background;
 }
 
 void
-display_kernel::set_forground( const rgba& n_forground)
+display_kernel::set_foreground( const rgb& n_foreground)
 {
-	forground = n_forground;
+	foreground = n_foreground;
 }
 
-rgba
-display_kernel::get_forground()
+rgb
+display_kernel::get_foreground()
 {
-	return forground;
+	return foreground;
 }
 
 void

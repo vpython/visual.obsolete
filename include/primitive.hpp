@@ -71,8 +71,8 @@ class primitive : public renderable
 	void set_up( const vector& n_up);
 	shared_vector& get_up();
 	
-	void set_color( const rgba& n_color);
-	rgba get_color();
+	void set_color( const rgb& n_color);
+	rgb get_color();
 	
 	void set_red( float x);
 	double get_red();

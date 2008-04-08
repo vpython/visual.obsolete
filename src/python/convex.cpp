@@ -190,12 +190,12 @@ convex::set_pos_l( const boost::python::list& pos)
 }
 
 void
-convex::set_color( const rgba& n_color)
+convex::set_color( const rgb& n_color)
 {
 	color = n_color;
 }
 
-rgba
+rgb
 convex::get_color()
 {
 	return color;
