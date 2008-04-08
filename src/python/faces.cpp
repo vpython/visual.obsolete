@@ -49,7 +49,6 @@ faces::faces()
 	dims[1] = 3;
 	pos = makeNum(dims);
 	normal = makeNum(dims);
-	dims[1] = 4;
 	color = makeNum(dims, NPY_FLOAT);
 	double* i = index( pos, 0);
 	i[0] = i[1] = i[2] = 0.0;
