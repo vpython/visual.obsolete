@@ -23,7 +23,7 @@ font::find_font( const wstring& desc, int height ) {
 		boost::split( fonts, desc, boost::is_any_of(L",") );
 		
 	// normalize font names
-	for(int i=0; i<fonts.size(); i++) {
+	for(size_t i=0; i<fonts.size(); i++) {
 		boost::trim(fonts[i]);
 		boost::to_lower(fonts[i]);
 		if (fonts[i] == L"sans") fonts[i] = L"sans-serif";
@@ -34,7 +34,7 @@ font::find_font( const wstring& desc, int height ) {
 	{
 		// Attempt to use consistent fonts for generic font families across platforms
 		std::vector<wstring> real_fonts;
-		for(int i=0; i<fonts.size(); i++) {
+		for(size_t i=0; i<fonts.size(); i++) {
 			if		(fonts[i] == L"sans-serif")	real_fonts.push_back( L"verdana" );
 			else if (fonts[i] == L"serif")		real_fonts.push_back( L"times new roman" );
 			else if (fonts[i] == L"monospace")	real_fonts.push_back( L"courier new" );
@@ -43,7 +43,7 @@ font::find_font( const wstring& desc, int height ) {
 		fonts.swap( real_fonts );
 	}
 		
-	for(int i=0; i<fonts.size(); i++) {
+	for(size_t i=0; i<fonts.size(); i++) {
 		boost::shared_ptr<font>& f = font_cache[ std::make_pair( fonts[i], height) ];
 		if (!f) {
 			f.reset( new font( new font_renderer( fonts[i], height ) ) );

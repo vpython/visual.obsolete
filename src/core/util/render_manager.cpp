@@ -22,7 +22,7 @@ double render_manager::paint_displays( const std::vector< display* >& displays, 
 	double paint = time.elapsed() - start;
 
 	if (swap_single_threaded) {
-		for(int d=0; d<displays.size(); d++)
+		for(size_t d=0; d<displays.size(); d++)
 			displays[d]->swap();
 	} else {
 		// Use a thread pool to call SwapBuffers for each display in a separate thread, since
@@ -33,7 +33,7 @@ double render_manager::paint_displays( const std::vector< display* >& displays, 
 			else if ( swap_thread_pool->size() < displays.size() )
 				swap_thread_pool->size_controller().resize( displays.size()-1 );
 			
-			for(int d=1; d<displays.size(); d++)
+			for(size_t d=1; d<displays.size(); d++)
 				swap_thread_pool->schedule( boost::bind( &display::swap, displays[d] ) );
 		}
 		displays[0]->swap();
