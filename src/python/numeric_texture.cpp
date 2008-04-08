@@ -310,15 +310,9 @@ numeric_texture::set_type( std::string requested_type)
 		req_type = GL_ALPHA;
 	else if (requested_type == "luminance_opacity")
 		req_type = GL_LUMINANCE_ALPHA;
-	else if (requested_type == "alpha")
-		req_type = GL_ALPHA;
-	else if (requested_type == "luminance_alpha")
-		req_type = GL_LUMINANCE_ALPHA;
 	else if (requested_type == "rgb")
 		req_type = GL_RGB;
 	else if (requested_type == "rgbo")
-		req_type = GL_RGBA;
-	else if (requested_type == "rgba")
 		req_type = GL_RGBA;
 	else if (requested_type == "auto")
 		req_type = 0;
