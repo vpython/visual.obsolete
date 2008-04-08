@@ -17,8 +17,93 @@ VPYTHON ***CRITICAL ERROR***:
 OpenGL error: ../../vpyton-core2/src/core/sphere.cpp:188 invalid operation, aborting.
 
 Here is the end of a trace using the Apple OpenGL Profiler, where we crash in a test
-program trying to make a single wood1-material sphere:
+program trying to make a single wood1-material sphere. These data were made after
+placing check_gl_error() after every operation in numeric_texture::gl_init. An odd thing
+is that with those extra checks installed, and with a breakpoint on an error, continuing
+after the error led to a wood1 sphere being displayed for the first time. There would seem
+to be some kind of timing error.
 
+    0.49 탎 glGenTextures(1, 0xb0080270);
+    0.17 탎 glGetError(); returns: GL_ZERO 
+    4.12 탎 glBindTexture(GL_TEXTURE_2D, 1);
+    0.06 탎 glGetError(); returns: GL_ZERO 
+    9.71 탎 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    0.06 탎 glGetError(); returns: GL_ZERO 
+    0.33 탎 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    0.06 탎 glGetError(); returns: GL_ZERO 
+    2.04 탎 glGetString(GL_VERSION);
+   18.10 탎 glTexImage2D(GL_PROXY_TEXTURE_2D, 1, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, 0x00000000);
+100858.22 탎 glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, 0xb008017c);
+
+glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, 0xb008017c); returns: 0 
+	Error: GL_INVALID_OPERATION
+	Context: 0x00934a00
+	kCGLCPGPUFragmentProcessing:  GL_FALSE
+	kCGLCPGPUVertexProcessing:  GL_FALSE
+	kCGLCPCurrentRendererID:  1024 (0x00000400)
+Function call stack: 
+	0: 0x14cb365c in gloGetCGLDispatch in <GLProfilerFBDisp> 
+	1: 0x933a7e98 in glGetTexLevelParameteriv in <libGL.dylib> 
+	2: 0x01555a91 in closestFit in <libGLU.1.dylib> 
+	3: 0x015718c6 in gluBuild2DMipmaps in <libGLU.1.dylib> 
+	4: 0x01070d0d in cvisual::python::numeric_texture::gl_init(cvisual::view const&) at numeric_texture.cpp: 201 
+	5: 0x01010a8c in cvisual::texture::gl_activate(cvisual::view const&) at texture.cpp: 43 
+	6: 0x0103d770 in cvisual::apply_material::apply_material(cvisual::view const&, cvisual::material*, cvisual::tmatrix&) at scoped_ptr.hpp: 125 
+	7: 0x01045b7f in cvisual::renderable::outer_render(cvisual::view const&) at renderable.cpp: 96 
+	8: 0x0102a4bb in cvisual::display_kernel::draw(cvisual::view&, int, bool, bool) at stl_list.h: 140 
+	9: 0x01030086 in cvisual::display_kernel::render_scene() at display_kernel.cpp: 753 
+	10: 0x01051345 in cvisual::render_surface::paint() at gil.hpp: 21 
+	11: 0x0110c9fa in cvisual::render_manager::paint_displays(std::vector<cvisual::display*, std::allocator<cvisual::display*> > const&, bool) at stl_vector.h: 343 
+	12: 0x010498cf in cvisual::gui_main::poll() at mem_fun.h: 89 
+	13: 0x0104e89b in sigc::internal::slot_call0<sigc::bound_mem_functor0<bool, cvisual::gui_main>, bool>::call_it(sigc::internal::slot_rep*) at slot.h: 103 
+	14: 0x01b94ad6 in (anonymous namespace)::glibmm_source_callback(void*) in <libglibmm-2.4.1.dylib> 
+	15: 0x0246f7d0 in g_timeout_dispatch in <libglib-2.0.0.dylib> 
+	16: 0x0246c34d in g_main_dispatch in <libglib-2.0.0.dylib> 
+	17: 0x0246d8c2 in g_main_context_dispatch in <libglib-2.0.0.dylib> 
+	18: 0x0246de4d in g_main_context_iterate in <libglib-2.0.0.dylib> 
+	19: 0x0246e647 in g_main_loop_run in <libglib-2.0.0.dylib> 
+	20: 0x01d03621 in gtk_main in <libgtk-x11-2.0.0.dylib> 
+	21: 0x01776f9b in Gtk::Main::run() in <libgtkmm-2.4.1.dylib> 
+	22: 0x01049a8f in cvisual::gui_main::run() at lock.hpp: 33 
+	23: 0x0104d2f7 in cvisual::gui_main::thread_proc() at display.cpp: 414 
+	24: 0x026ac991 in thread_proxy in <libboost_thread-mt-1_34_1.dylib> 
+	25: 0x90b9fc55 in pthread_start in <libSystem.B.dylib> 
+	26: 0x90b9fb12 in thread_start in <libSystem.B.dylib> 
+	
+Note that with a breakpoint on error, the following occurs earlier in the run,
+a previously unnoticed error in the pick machinery. The display was empty at this time.
+
+glRenderMode(GL_SELECT); returns: 0 
+	Error: GL_INVALID_OPERATION
+	Context: 0x00934a00
+	kCGLCPGPUFragmentProcessing:  GL_TRUE
+	kCGLCPGPUVertexProcessing:  GL_TRUE
+	kCGLCPCurrentRendererID:  9732 (0x00002604)
+Function call stack: 
+	0: 0x14c8a08f in gloGetCGLDispatch in <GLProfilerFBDisp> 
+	1: 0x933a7c23 in glRenderMode in <libGL.dylib> 
+	2: 0x0102912a in cvisual::display_kernel::pick(int, int, float) at display_kernel.cpp: 958 
+	3: 0x0102fdde in cvisual::display_kernel::render_scene() at display_kernel.cpp: 916 
+	4: 0x01051355 in cvisual::render_surface::paint() at gil.hpp: 21 
+	5: 0x0110c9fa in cvisual::render_manager::paint_displays(std::vector<cvisual::display*, std::allocator<cvisual::display*> > const&, bool) at stl_vector.h: 343 
+	6: 0x010498df in cvisual::gui_main::poll() at mem_fun.h: 89 
+	7: 0x0104e8ab in sigc::internal::slot_call0<sigc::bound_mem_functor0<bool, cvisual::gui_main>, bool>::call_it(sigc::internal::slot_rep*) at slot.h: 103 
+	8: 0x01b94ad6 in (anonymous namespace)::glibmm_source_callback(void*) in <libglibmm-2.4.1.dylib> 
+	9: 0x0246f7d0 in g_timeout_dispatch in <libglib-2.0.0.dylib> 
+	10: 0x0246c34d in g_main_dispatch in <libglib-2.0.0.dylib> 
+	11: 0x0246d8c2 in g_main_context_dispatch in <libglib-2.0.0.dylib> 
+	12: 0x0246de4d in g_main_context_iterate in <libglib-2.0.0.dylib> 
+	13: 0x0246e647 in g_main_loop_run in <libglib-2.0.0.dylib> 
+	14: 0x01d03621 in gtk_main in <libgtk-x11-2.0.0.dylib> 
+	15: 0x01776f9b in Gtk::Main::run() in <libgtkmm-2.4.1.dylib> 
+	16: 0x01049a9f in cvisual::gui_main::run() at lock.hpp: 33 
+	17: 0x0104d307 in cvisual::gui_main::thread_proc() at display.cpp: 414 
+	18: 0x026ac991 in thread_proxy in <libboost_thread-mt-1_34_1.dylib> 
+	19: 0x90b9fc55 in pthread_start in <libSystem.B.dylib> 
+	20: 0x90b9fb12 in thread_start in <libSystem.B.dylib> 
+
+The following data were obtained before placing check_gl_error() statements after every
+operation in numeric_texture::gl_init.
     .........
     0.05 탎 glTexCoord2f(0.00714284, 0.0144928);
     0.06 탎 glVertex3f(-0.00204199, 0.0454687, -0.998964);
@@ -126,3 +211,4 @@ All: Setting visible=True in the constructor gives the error
 "Can't change parameters of an active window".
 
 Mac: there is a small gap between windows (need to account for decoration).
+
