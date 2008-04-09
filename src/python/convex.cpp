@@ -259,7 +259,7 @@ convex::gl_render( const view& scene)
 
 	glShadeModel(GL_FLAT);
 	gl_enable cull_face( GL_CULL_FACE);
-	color.gl_set();
+	color.gl_set(1.0);
 
 	glBegin(GL_TRIANGLES);
 	for (std::vector<face>::const_iterator f = hull.begin(); f != hull.end(); ++f) {

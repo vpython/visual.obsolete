@@ -631,12 +631,12 @@ curve::adjust_colors( const view& scene, float* tcolor, size_t pcount)
 		rendered_color = rgb( tcolor[0], tcolor[1], tcolor[2]);
 		if (scene.anaglyph) {
 			if (scene.coloranaglyph)
-				rendered_color.desaturate().gl_set();
+				rendered_color.desaturate().gl_set(opacity);
 			else
-				rendered_color.grayscale().gl_set();
+				rendered_color.grayscale().gl_set(opacity);
 		}
 		else
-			rendered_color.gl_set();
+			rendered_color.gl_set(opacity);
 	}
 	else {
 		glEnableClientState( GL_COLOR_ARRAY);

@@ -82,8 +82,8 @@ class rgb
 	rgb desaturate() const;
 	rgb grayscale() const;
 	
-	inline void gl_set() const
-	{ glColor3fv( &red); }
+	inline void gl_set(float opacity) const
+	{ glColor4f( red, green, blue, opacity); }
 };
 
 } // !namespace cvisual

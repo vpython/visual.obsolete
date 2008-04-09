@@ -327,7 +327,7 @@ label::gl_render( const view& scene)
 	displaylist list;
 	list.gl_compile_begin();
 	{
-		stereo_linecolor.gl_set();
+		stereo_linecolor.gl_set(opacity);
 		// Zero out the existing matrices, rendering will be in screen coords.
 		gl_matrix_stackguard guard;
 		tmatrix identity;
@@ -384,7 +384,7 @@ label::gl_render( const view& scene)
 		}
 		if (box_enabled) {
 			// Draw a box around the text.
-			stereo_linecolor.gl_set();
+			stereo_linecolor.gl_set(opacity);
 			glBegin( GL_LINE_LOOP);
 				vector().gl_render();
 				vector( box_width, 0).gl_render();
@@ -393,8 +393,8 @@ label::gl_render( const view& scene)
 			glEnd();
 		}
 
-		// Render the text iteself.
-		color.gl_set();
+		// Render the text itself.
+		color.gl_set(opacity);
 		text_layout->gl_render(scene, text_pos);
 	} glMatrixMode( GL_MODELVIEW); } // Pops the matricies back off the stack
 	list.gl_compile_end();

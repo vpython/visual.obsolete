@@ -164,7 +164,7 @@ box::gl_render( const view& scene)
 	clear_gl_error();
 	lighting_prepare();
 	shiny_prepare();
-	color.gl_set();
+	color.gl_set(opacity);
 	{
 		double gcf = scene.gcf;
 		gl_matrix_stackguard guard;

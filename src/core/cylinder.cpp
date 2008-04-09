@@ -142,7 +142,7 @@ cylinder::gl_render( const view& scene)
 		gl_enable blend( GL_BLEND);
 		gl_enable cull_face( GL_CULL_FACE);
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		color.gl_set();
+		color.gl_set(opacity);
 				
 		// Render the back half.
 		glCullFace( GL_FRONT);
@@ -153,7 +153,7 @@ cylinder::gl_render( const view& scene)
 		cylinder_simple_model[lod].gl_render();
 	}
 	else {
-		color.gl_set();
+		color.gl_set(opacity);
 		cylinder_simple_model[lod].gl_render();
 	}
 	

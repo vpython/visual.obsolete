@@ -141,7 +141,7 @@ pyramid::gl_render( const view& scene)
 		mwt.gl_mult();
 		glScaled( axis.mag() * scene.gcf, height * scene.gcf, width * scene.gcf);
 		
-		color.gl_set();
+		color.gl_set(opacity);
 		if (opacity != 1.0) {
 			vector forward = mwt.times_inv((pos - scene.camera)).norm();
 			sorted_model->sort( forward);

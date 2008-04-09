@@ -115,7 +115,7 @@ sphere::gl_render( const view& geometry)
 	// Set up material properties for shininess.
 	shiny_prepare();
 
-	color.gl_set();
+	color.gl_set(opacity);
 	// Mode specific rendering code follows
 	if (tex && (opacity != 1.0 || tex->has_opacity())) {
 		// textured, and opacity-blended sphere

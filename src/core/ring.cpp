@@ -159,7 +159,7 @@ ring::band_prepare( const view& scene, size_t rings, size_t bands, scoped_array<
 
 	glVertexPointer( 3, GL_DOUBLE, 0, vertexes.get());
 	glNormalPointer( GL_DOUBLE, 0, normals.get());
-	color.gl_set();
+	color.gl_set(opacity);
 	vector scaled_pos = pos * scene.gcf;
 	glTranslated( scaled_pos.x, scaled_pos.y, scaled_pos.z);
 	model_world_transform().gl_mult();

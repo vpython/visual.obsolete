@@ -223,7 +223,7 @@ arrow::gl_render( const view& scene)
 	if (degenerate())
 		return;
 
-	color.gl_set();
+	color.gl_set(opacity);
 	gl_matrix_stackguard guard;
 	vector view_pos = pos * scene.gcf;
 	glTranslated( view_pos.x, view_pos.y, view_pos.z);			
