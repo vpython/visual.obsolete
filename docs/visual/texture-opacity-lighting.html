@@ -15,8 +15,8 @@
 <p>There is a new example program texture_and_lighting.py that displays many of 
   the new features: a swinging spotlight illuminates a translucent beach ball 
   that rolls on a wood-texture table. Also see the
-  example program boxlighttest.py.</p>
-<h3>New toolbar with &quot;pan&quot; mode </h3>
+  example programs material_test.py and boxlighttest.py.</p>
+<h3>New toolbar with &quot;pan&quot; mode (currently only on Mac and Linux) </h3>
 <p>At the top of a graphics window is a toolbar with an icon to change right-button dragging
   to &quot;pan&quot; rather than rotate (and another icon to switch back). There are also
   icons to exit the program, switch
@@ -28,13 +28,6 @@
    transparent, 
   and 1 means totally opaque. Currently curve, convex, faces, and helix objects
    do not allow transparency. </p>
-<p>You can also specify opacity as a 4th component of a color: <br>
-  box(color=(1, 0, 0, 0.8))
-  is the same as box(color=color.red,
-  opacity=0.8).</p>
-<p>In preparation for wider use of transparency, curve, faces, and points objects
-  accept color arrays whose elements are either red-green-blue (rgb) such as
-  (1, 1, 0) or red-green-blue-opacity (rgbo) such as (1, 1, 0, 0.8). </p>
 <h3>Surface textures</h3>
 <p>You can create a texture object and then apply it to the surface of an object. 
   This capability is currently limited to boxes and spheres. A surface texture 
@@ -133,29 +126,26 @@
   displays whose x and y scale factors are different. The only objects supported
   are curve, faces, points, and label. Set the scale factors with scene.range.</p>
 <h3>Fonts in labels</h3>
-<p>You can now specify font='times' or 'system' or 'symbol' etc. in a label object. 
+<p>You can now specify font='times' or 'system' or 'symbol' etc. in a label object. Unicode text is supported.
 </p>
 <h3>Specifying a gray</h3>
 <p>For convenience you can now say color=0.7 to mean color=(0.7,0.7,0.7).</p>
 <h3>Titlebar and toolbar heights </h3>
 <p>The height in pixels of the titlebar is given by display.get_titlebar_height(), and the height of the (to be optional) toolbar is given by display.get_toolbar_height(). These values are true for all windows, and these functions are associated with the display class of objects, not with individual displays such as the standard scene. So scene.get_titlebar_height() won't work..</p>
 <h3>Render time  </h3>
-<p>If you say scene.show_rendertime = True, in the lower left os the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene. This can be a useful diagnostic of performance issues. .</p>
+<p>If you say scene.show_rendertime = True, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene). This can be a useful diagnostic of performance issues.</p>
 <h3><a name="bugs"></a>Known bugs in this beta version</h3>
 <p>Here are known bugs:</p>
 <blockquote>
-  <p>Can drag a window to be larger, but not smaller. </p>
+  <p>If there is a toolbar (Mac and Linux), one can drag a window to be larger, but not smaller. </p>
   <p>Autoscaling is pretty good but occasionally positions the camera farther 
     <br>
     from the scene than one would prefer.</p>
   <p>Rendering of curves isn't quite right. This can be seen in the example program 
     <br>
     tictac.py, where one of the grid lines doesn't show until you rotate the view.</p>
-  <p>Unicode text in labels works properly on Linux but not on Windows. <br>
-    As
-  a temporary measure, Windows handles only simple English text. </p>
   <p>Spotlights created in a frame don't change with changes in the frame orientation.</p>
-  <p>scene.cursor.visible is not implemented yet and gives an error.</p>
+  <p>scene.cursor.visible is not implemented and gives an error.</p>
 </blockquote>
 <p><a href="index.html">Back to contents</a><br>
 </p>
