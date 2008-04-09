@@ -141,6 +141,8 @@ public:
 	 * (curve, faces, frame).
 	 */
 	rgb color;
+	// Fully opaque is 1.0, fully transparent is 0.0:
+	float opacity;
 	/** Default base constructor.  Creates a white, model_damaged object. */
 	virtual ~renderable();
 	

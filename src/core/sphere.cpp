@@ -117,7 +117,7 @@ sphere::gl_render( const view& geometry)
 
 	color.gl_set();
 	// Mode specific rendering code follows
-	if (tex && (color.opacity != 1.0 || tex->has_opacity())) {
+	if (tex && (opacity != 1.0 || tex->has_opacity())) {
 		// textured, and opacity-blended sphere
 		// Setup for blending
 		gl_enable blend( GL_BLEND);
@@ -140,7 +140,7 @@ sphere::gl_render( const view& geometry)
 		glCullFace( GL_BACK);
 		lod_cache[tex_lod].gl_render();
 	}
-	else if (color.opacity != 1.0) { // Render a transparent constant color sphere
+	else if (opacity != 1.0) { // Render a transparent constant color sphere
 		// Since spheres have identical symmetry
 		// along the view axis regardless of thier orientation, this code is
 		// easy (albeit somewhat slow) thanks to GL_CULL_FACE.

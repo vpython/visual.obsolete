@@ -23,9 +23,8 @@ class rgba
 	float green;
 	/** Blue channel intensity, clamped to [0,1] */
 	float blue;
-	/** opacity channel intensity, clamped to [0,1] */
+	/** Opacity, clamped to [0,1] */
 	float opacity;
-
 
 	/** Defaults to opaque white. */
 	inline rgba() : red(1.0), green(1.0), blue(1.0), opacity(1.0) {}
@@ -65,7 +64,6 @@ class rgb
 	float red;
 	float green;
 	float blue;
-	float opacity;
 	
 	inline rgb() : red(1.0f), green(1.0f), blue(1.0f) {}
 	inline rgb( float r, float g, float b)

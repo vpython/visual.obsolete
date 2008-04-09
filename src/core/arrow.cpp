@@ -303,7 +303,7 @@ arrow::update_cache( const view& scene)
 	eff_halfwidth = 0.5*eff_shaftwidth;
 	eff_halfheadwidth = 0.5*eff_headwidth;
 	
-	if (color.opacity != 1.0) {
+	if (opacity != 1.0) {
 		if (!sorted_model) {
 			sorted_model.reset( new z_sorted_model<triangle, 22>());
 		}

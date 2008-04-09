@@ -634,7 +634,7 @@ void
 display_kernel::add_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
-	if (obj->color.opacity == 1.0)
+	if (obj->opacity == 1.0)
 		layer_world.push_back( obj);
 	else
 		layer_world_transparent.push_back( obj);
@@ -645,7 +645,7 @@ void
 display_kernel::remove_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
-	if (obj->color.opacity == 1.0) {
+	if (obj->opacity == 1.0) {
 		std::remove( layer_world.begin(), layer_world.end(), obj);
 		layer_world.pop_back();
 	}
@@ -669,7 +669,7 @@ display_kernel::draw(
 	world_iterator i( layer_world.begin());
 	world_iterator i_end( layer_world.end());
 	while (i != i_end) {
-		if (i->color.opacity != 1.0 || (i->get_texture() && i->get_texture()->has_opacity())) {
+		if (i->opacity != 1.0 || (i->get_texture() && i->get_texture()->has_opacity())) {
 			// The color of the object has become transparent when it was not
 			// initially.  Move it to the transparent layer.  The penalty for
 			// being rendered in the transparent layer when it is opaque is only

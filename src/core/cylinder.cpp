@@ -137,7 +137,7 @@ cylinder::gl_render( const view& scene)
 	const double axial_scale = axis.mag() * scene.gcf;
 	glScaled( axial_scale, radial_scale, radial_scale);
 	
-	if (color.opacity != 1.0) {
+	if (opacity != 1.0) {
 		// Setup for blending
 		gl_enable blend( GL_BLEND);
 		gl_enable cull_face( GL_CULL_FACE);

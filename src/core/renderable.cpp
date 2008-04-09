@@ -134,7 +134,7 @@ renderable::update_z_sort( const view&)
 void
 renderable::refresh_cache(const view& geometry)
 {
-	if (color.opacity != 1.0 && (z_damaged || geometry.forward_changed)) {
+	if (opacity != 1.0 && (z_damaged || geometry.forward_changed)) {
 		if (model_damaged || geometry.gcf_changed)
 			update_cache( geometry);
 		else

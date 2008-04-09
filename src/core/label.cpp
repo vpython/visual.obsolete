@@ -152,7 +152,7 @@ label::get_blue()
 double
 label::get_opacity()
 {
-	return color.opacity;
+	return opacity;
 }
 
 void
