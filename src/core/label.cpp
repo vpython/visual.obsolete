@@ -327,7 +327,7 @@ label::gl_render( const view& scene)
 	displaylist list;
 	list.gl_compile_begin();
 	{
-		stereo_linecolor.gl_set(opacity);
+		stereo_linecolor.gl_set(1.0f);
 		// Zero out the existing matrices, rendering will be in screen coords.
 		gl_matrix_stackguard guard;
 		tmatrix identity;
@@ -384,7 +384,7 @@ label::gl_render( const view& scene)
 		}
 		if (box_enabled) {
 			// Draw a box around the text.
-			stereo_linecolor.gl_set(opacity);
+			stereo_linecolor.gl_set(1.0f);
 			glBegin( GL_LINE_LOOP);
 				vector().gl_render();
 				vector( box_width, 0).gl_render();
