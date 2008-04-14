@@ -1,4 +1,5 @@
 HOW TO BUILD VISUAL USING GTK2 ON MICROSOFT WINDOWS
+Last updated March 2008
 
 1.  Read the below steps
 2.  Thank your lucky stars you don't have to follow them
