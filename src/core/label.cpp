@@ -394,7 +394,7 @@ label::gl_render( const view& scene)
 		}
 
 		// Render the text itself.
-		color.gl_set(opacity);
+		color.gl_set(1.0f);
 		text_layout->gl_render(scene, text_pos);
 	} glMatrixMode( GL_MODELVIEW); } // Pops the matricies back off the stack
 	list.gl_compile_end();
