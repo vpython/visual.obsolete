@@ -4,7 +4,7 @@ print """
 Click and drag a ball (with mouse button down) on an RGB or HSV slider.
 Click one of the colored objects to print RGB and HSV values.
 """
-scene.show_rendertime = 1
+
 # Bruce Sherwood; opacity slider added by Jonathan Brandmeyer
 
 scene.userspin = 0
