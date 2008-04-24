@@ -91,24 +91,6 @@ libraries. But then I got this error message in the link phase of the make:
 
 So I executed ranlib /sw/lib/libboost_python-mt.a, redid the make, executed make install, and it worked.
 
-However, there is a significant bug in controls.text (menu option), which seems to boil down to this:
-
-The following sequence crashes if the object is a label, but not with other objects:
-obj = label(text='hello')
-obj.visible = 0
-obj = 35
-The implication is that the label destructor fails on Mac (works okay on Windows and Linux).
-The rule is that if you make an object invisible, then reassign the only name for that 
-object (obj = 35), Python is free to destroy the object and reuse the memory, 
-because there is no longer any way for your program to get at that object.
-
-faces_heightfield.py has append(pos, color, normal) -- append_all_vectors in wrap_arrayobjects.cpp
-graph.py has append(pos, normal) -- this is append_default_color in wrap_arrayobjects.cpp
-There is also append_rgba in wrap_arrayobjects.cpp, for pattern append(pos, red, green, blue, opacity),
-  and this version also crashes.
-Note: Shouldn't we also accept append(pos)?
-We didn't in Visual 3, but we should have. The documentation doesn't even mention any append option.
-
 When there looked to be a Boost problem, tried building Boost libraries from scratch:
 
 ./configure --prefix=/sw --with-libraries=python,thread --with-python=/sw/bin/python2.5
@@ -164,8 +146,6 @@ ranlib: file: libboost_thread-mt.a(tss_hooks.o) has no symbols
 ranlib: file: libboost_thread-mt.a(tss_dll.o) has no symbols
 ranlib: file: libboost_thread-mt.a(tss_pe.o) has no symbols
 bruce-sherwoods-computer:/sw/lib brucesherwood$ 
-
-Still has same problems with faces.append.
 
 -----------------
 Unsuccessful approach
