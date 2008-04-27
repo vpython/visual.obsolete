@@ -1,3 +1,8 @@
+AS OF EARLY 2008, THIS INFORMATION IS OBSOLETE.
+SEE INSTALL.txt instead.
+
+The following notes were written by Jonathan Brandmeyer, June 2006.
+
 This directory is a kind of sandbox that I'm using to build 
 and test a new OpenGL rendering engine for VPython.
 Dependancies (in Debian):
