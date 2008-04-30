@@ -29,7 +29,7 @@ I.  Prerequisites:
 		2.3 or higher, and is recommended in any case due to getting much
 		better error messages. 1.32.0 or higher is required if you want to use
 		GNU G++ 3.4.0 or higher to build the suite.
-		You need libboost-python-dev, libboost-signals-dev, and libboost-threads-dev.
+		You need libboost-python-dev, libboost-signals-dev, and libboost-thread-dev.
 		*** It is an unfortunate fact of life that the Boost libraries that
 		*** deal with Python have names that do not reflect what version of
 		*** Python they were built for and with. You have to be careful to
@@ -63,7 +63,12 @@ I.  Prerequisites:
 	of these libraries, except for atkmm, gdkmm, pangomm, gtkglext, and gtkglextmm.
 	There is a gtkglext1-dev package, but no gtkglextmm.
 	
-	For Ubuntu, I was unable to install gtkglextmm from source. But at
+	For Ubuntu 8.04, installing libgtkglextmm-x11-dev brought in everthing
+	except for libglademm.
+	
+	Install libglademm-2.4-dev (there may be a package, or www.gtkmm.org).
+	
+	For Ubuntu 7.10, I was unable to install gtkglextmm from source. But at
 	packages.ubuntu.com/source/gtkglextmm, from the older "edgy" distribution get
 	libgtkglextmm1c2a (allow the default package manager to process the download), then
 	libgtkglextmm1-dev. 
@@ -75,8 +80,6 @@ I.  Prerequisites:
 	4) ./configure
 	5) make
 	6) sudo make install
-	
-	libglademm (there may be a package, or www.gtkmm.org).
 
 II.   Configuration 
 	On most systems, configuration should be automatic.  Just run './configure'.
