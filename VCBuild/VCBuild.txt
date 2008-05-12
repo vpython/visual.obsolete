@@ -27,18 +27,12 @@ Building vpython with from Visual Studio C++
 			
 		Here are instructions that need to be followed to use the SDK:
 			
-		Update the Visual C++ directories in the Projects and Solutions section in the Options dialog box. 
-		Add the paths to the appropriate subsection:
+		Update the Visual C++ directories in the Projects and Solutions section 
+		in the Tools > Options dialog box. Add these paths to the appropriate subsection:
 
 		Executable files: C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Bin
 		Include files: C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include
 		Library files: C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib
-		Note: Alternatively, you can update the Visual C++ Directories by modifying the 
-		VCProjectEngine.dll.express.config file located in the \vc\vcpackages subdirectory of the 
-		Visual C++ Express install location. Please make sure that you also delete the file 
-		"vccomponents.dat" located in the 
-		"%USERPROFILE%\Local Settings\Application Data\Microsoft\VCExpress\8.0" 
-		if it exists before restarting Visual C++ Express Edition. 
 		
 			It isn't entirely obvious how you are supposed to add these paths: 
 			double-click an entry that has "SDK" in its name, 
@@ -46,8 +40,14 @@ Building vpython with from Visual Studio C++
 			Browse to the appropriate location
 			in C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
 			(\Bin, \Include, \Lib).
+			
+		Note: Alternatively, you can update the Visual C++ Directories by modifying the 
+		VCProjectEngine.dll.express.config file located in the \vc\vcpackages subdirectory of the 
+		Visual C++ Express install location. Please make sure that you also delete the file 
+		"vccomponents.dat" located in the 
+		"%USERPROFILE%\Local Settings\Application Data\Microsoft\VCExpress\8.0" 
+		if it exists before restarting Visual C++ Express Edition. 
 
-		Update the corewin_express.vsprops file.
 		One more step is needed to make the Win32 template work in Visual C++ Express. 
 		You need to edit the corewin_express.vsprops file 
 		(found in C:\Program Files\Microsoft Visual Studio 8\VC\VCProjectDefaults) and
