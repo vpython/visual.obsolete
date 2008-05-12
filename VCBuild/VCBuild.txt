@@ -19,8 +19,12 @@ Building vpython with from Visual Studio C++
         pretty complicated. We really need to be using Visual C++ 2008, I think.
         (An attempt to use Visual C++ 2008 on Vista failed to produce a module that worked,
         and the Boost libraries complained about the compiler version not being acceptable.)
+        
+        Some of what follows about getting the 2003 SDK may be irrelevant. David Scherer
+        points out that it should work to get the latest Windows SDK; it should work with
+        the old 2005 compiler.
 			
-		As of 2008/5/11, it has gotten harder to get the SDK, as Microsoft has eliminated
+		As of 2008/5/11, it has gotten harder to get the 2003 SDK, as Microsoft has eliminated
 		the 2003 SDK downloads except for the one which downloads a .img file.
 		I then had to find a program to unpack such a file, then install.
 			
