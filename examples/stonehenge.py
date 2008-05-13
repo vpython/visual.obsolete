@@ -3,7 +3,7 @@ from visual import *
 from visual.text import *
 import time
 import pickle
-
+scene.show_rendertime = 1
 print """
 Press to enter roaming mode, release to exit roaming mode.
 In roaming mode, with the mouse button down, move the mouse
@@ -224,17 +224,17 @@ while 1:
     if log.x >= wide:
         v = -v0
         omega = -v/rlog
-        if rightstop.color == (1,0,0,1):
-            rightstop.color = (0,0,1)
+        if rightstop.color == color.red:
+            rightstop.color = color.blue
         else:
-            rightstop.color = (1,0,0)
+            rightstop.color = color.red
     if log.x <= -wide:
         v = +v0
         omega = -v/rlog
-        if leftstop.color == (1,0,0,1):
-            leftstop.color = (0,0,1)
+        if leftstop.color == color.red:
+            leftstop.color = color.blue
         else:
-            leftstop.color = (1,0,0)
+            leftstop.color = color.red
 
     # Move the cloud
     cloud.rotate(angle=omegacloud*dt, origin=(0,0,0), axis=(0,1,0))
