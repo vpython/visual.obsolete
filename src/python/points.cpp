@@ -353,14 +353,6 @@ points::set_blue( const array& blue)
 }
 
 void
-points::set_opacity( const array& opacity)
-{
-	set_length(shape( opacity).at(0));
-	// Needs work....
-	//color[make_tuple( slice( 0, count), 3)] = opacity;
-}
-
-void
 points::set_red_l( const list& red)
 {
 	this->set_red( array(red));
@@ -376,12 +368,6 @@ void
 points::set_blue_l( const list& blue)
 {
 	this->set_blue( array(blue));
-}
-
-void
-points::set_opacity_l( const list& opacity)
-{
-	this->set_opacity( array( opacity));
 }
 
 void
@@ -477,16 +463,6 @@ points::set_blue_d( float blue)
 		set_length(1);
 	}
 	color[make_tuple(slice(0,count), 2)] = blue;
-}
-
-void
-points::set_opacity_d( float opacity)
-{
-	if (count == 0) {
-		set_length(1);
-	}
-	// Needs work.....
-	//color[make_tuple(slice(0,count), 3)] = opacity;
 }
 
 bool
