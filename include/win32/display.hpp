@@ -10,6 +10,24 @@ namespace cvisual {
 
 class display : public display_kernel
 {
+ public:
+	display();
+	virtual ~display();
+
+	// Called by the gui_main class below (or render_manager as its agent)
+	void create();
+	void destroy();
+	void paint();
+	void swap() { gl_swap_buffers(); }
+
+	// Tells the application where it can find its data.
+	// Win32 doesn't use this information.
+	static void set_dataroot( const std::wstring& ) {};
+
+	// Implements key display_kernel virtual methods
+	virtual void activate( bool active );
+	virtual EXTENSION_FUNCTION getProcAddress( const char* name );
+	
  private:
 	friend class font;
 	static LRESULT CALLBACK
@@ -45,29 +63,12 @@ class display : public display_kernel
 	void gl_end();
 	void gl_swap_buffers();
 
- public:
-	display();
-	virtual ~display();
-
-	// Called by the gui_main class below (or render_manager as its agent)
-	void create();
-	void destroy();
-	void paint();
-	void swap() { gl_swap_buffers(); }
-
-	// Tells the application where it can find its data.  Win32 doesn't
-	// use this information;
-	static void set_dataroot( const std::wstring& ) {};
-
-	// Implements key display_kernel virtual methods
-	virtual void activate( bool active );
-	virtual EXTENSION_FUNCTION getProcAddress( const char* name );
 };
 
 class gui_main
 {
  private:	
-	// Componants of the startup sequence.
+	// Components of the startup sequence.
 	static void init_thread(void);
 
 	gui_main();	//< This is the only nonstatic member function that doesn't run in the gui thread!

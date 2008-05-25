@@ -25,25 +25,24 @@
 namespace cvisual {
 using boost::scoped_ptr;
 
-// TODO: Implement userzoom, userspin, show, hide, keyboard, uniform, and
-// mouse events.
 class display : public display_kernel,
 	public sigc::trackable
-{
- public:
+{	
+public:
 	display();
 	virtual ~display();
-
-	static void set_dataroot( const std::wstring& dataroot);
-	
-	virtual void activate(bool);
 	
 	// Called by the gui_main class below (or render_manager as its agent)
 	void create();
 	void destroy();
 	void paint() { area->paint(); }
 	void swap() { area->swap(); }
+
+	// Tells the application where it can find its data.
+	static void set_dataroot( const std::wstring& dataroot);
 	
+	// Implements key display_kernel virtual methods
+	virtual void activate(bool);
 	EXTENSION_FUNCTION getProcAddress( const char* name );
 	
  private:
