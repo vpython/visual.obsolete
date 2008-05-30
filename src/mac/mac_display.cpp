@@ -3,12 +3,10 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "win32/display.hpp"
+#include "mac/display.hpp"
 #include "util/render_manager.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"
-
-#include <windowsx.h>	// For GET_X_LPARAM, GET_Y_LPARAM
 
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
@@ -16,179 +14,25 @@ using boost::thread;
 #include <boost/lexical_cast.hpp>
 using boost::lexical_cast;
 
-#include <mmsystem.h>
-#pragma comment(lib, "winmm.lib")
-
 namespace cvisual {
 
-/**************************** Utilities ************************************/
-// Extracts and decodes a Win32 error message.
-void
-win32_write_critical(
-	std::string file, int line, std::string func, std::string msg)
+template<typename T>
+inline T
+clamp( T x, T a, T b)
 {
-	DWORD code = GetLastError();
-	char* message = 0;
-	FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
-		0, // Ignored parameter
-		code, // Error code to be decoded.
-		0, // Use the default language
-		(char*)&message, // The output buffer to fill the message
-		512, // Allocate at least one byte in order to free something below.
-		0); // No additional arguments.
-
-	std::ostringstream os;
-	os << "VPython ***Win32 Critical Error*** " << file << ":" << line << ": "
-		<< func << ": " << msg << ": [" << code << "] " << message;
-	write_stderr( os.str() );
-	
-	LocalFree(message);
-	std::exit(1);
+	if (b<a) return std::max( b, std::min( x, a));
+	else return std::max( a, std::min( x, b));
 }
 
-// The first OpenGL Rendering Context, used to share displaylists.
-static HGLRC root_glrc = 0;
-WNDCLASS display::win32_class;
+static bool modBit (int mask, int bit)
+{
+	return (mask & (1 << bit));
+}
 
-// A lookup-table for the default widget procedure to use to find the actual
-// widget that should handle a particular callback message.
-static std::map<HWND, display*> widgets;
-
-display* display::current = 0;
-
+/**************************** display methods ************************************/
 display::display()
   : widget_handle(0), dev_context(0), gl_context(0), window_visible(false)
 {
-}
-
-// TODO: Change mouse movement handling to lock the mouse in place and continue
-// to process events.
-// This function dispatches incoming messages to the particular message-handler.
-LRESULT CALLBACK
-display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	{
-		python::gil_lock gil;
-
-		display* This = widgets[hwnd];
-		if (This == 0)
-			return DefWindowProc( hwnd, uMsg, wParam, lParam);
-
-		switch (uMsg) {
-			// Handle the cases for the kinds of messages that we are listening for.
-			case WM_CLOSE:
-				return This->on_close( wParam, lParam);
-			case WM_DESTROY:
-				return This->on_destroy( wParam, lParam );
-			case WM_SIZE:
-				return This->on_size( wParam, lParam);
-			case WM_MOVE:
-				return This->on_move( wParam, lParam);
-			case WM_PAINT:
-				return This->on_paint( wParam, lParam);
-			case WM_SHOWWINDOW:
-				return This->on_showwindow( wParam, lParam);
-			case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN:
-			case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
-			case WM_MOUSEMOVE:
-				return This->on_mouse( wParam, lParam);
-    		case WM_KEYUP:
-				return This->on_keyUp(uMsg, wParam, lParam);
-    		case WM_KEYDOWN:
-    			return This->on_keyDown(uMsg, wParam, lParam);
-    		case WM_CHAR:
-    			return This->on_keyChar(uMsg, wParam, lParam);
-			case WM_GETMINMAXINFO:
-				return This->on_getminmaxinfo( wParam, lParam);
-		}
-	}
-	return DefWindowProc( hwnd, uMsg, wParam, lParam);
-}
-
-void
-display::register_win32_class()
-{
-	static bool done = false;
-	if (done)
-		return;
-	else {
-		std::memset( &win32_class, 0, sizeof(win32_class));
-
-		win32_class.lpszClassName = "vpython_win32_render_surface";
-		win32_class.lpfnWndProc = &dispatch_messages;
-		win32_class.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
-		win32_class.hInstance = GetModuleHandle(0);
-		win32_class.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-		win32_class.hCursor = LoadCursor( NULL, IDC_ARROW );
-		if (!RegisterClass( &win32_class))
-			WIN32_CRITICAL_ERROR("RegisterClass()");
-		done = true;
-	}
-}
-
-LRESULT
-display::on_showwindow( WPARAM wParam, LPARAM lParam)
-{
-	switch (lParam) {
-		case 0:	// Opening for the first time.
-		case SW_PARENTOPENING: // restart rendering when the window is restored.
-			window_visible = true;
-			break;
-		case SW_PARENTCLOSING:
-			// Stop rendering when the window is minimized.
-			window_visible = false;
-			break;
-		default:
-			return DefWindowProc( widget_handle, WM_SHOWWINDOW, wParam, lParam);
-	}
-	return 0;
-}
-
-LRESULT
-display::on_size( WPARAM, LPARAM)
-{
-	update_size();
-	return 0;
-}
-
-LRESULT
-display::on_move( WPARAM, LPARAM lParam)
-{
-	update_size();
-	return 0;
-}
-
-void
-display::update_size()
-{
-	if (!IsIconic( widget_handle )) {
-		RECT windowRect, clientSize;
-		GetWindowRect( widget_handle, &windowRect );
-		GetClientRect( widget_handle, &clientSize );
-		POINT clientPos; clientPos.x = clientPos.y = 0;
-		ClientToScreen( widget_handle, &clientPos);
-		report_resize(	windowRect.left, windowRect.top, windowRect.right-windowRect.left, windowRect.bottom-windowRect.top, 
-						clientPos.x, clientPos.y, clientSize.right, clientSize.bottom );
-	}
-}
-
-LRESULT
-display::on_getminmaxinfo( WPARAM, LPARAM lParam)
-{
-	MINMAXINFO* info = (MINMAXINFO*)lParam;
-	// Prevents making the window too small.
-	info->ptMinTrackSize.x = 70;
-	info->ptMinTrackSize.y = 70;
-	return 0;
-}
-
-LRESULT
-display::on_paint( WPARAM, LPARAM)
-{
-	// paint(); gl_swap_buffers();  //< Doesn't seem qualitatively better, even at very low frame rates
-	ValidateRect( widget_handle, NULL );
-	return 0;
 }
 
 void display::paint() {
@@ -202,32 +46,6 @@ void display::paint() {
 	}
 
 	gl_end();
-}
-
-LRESULT
-display::on_close( WPARAM, LPARAM)
-{
-	// Happens only when the user closes the window
-	VPYTHON_NOTE( "Closing a window from the GUI");
-	DestroyWindow(widget_handle);
-	if (exit)
-		PostQuitMessage(0);
-	return 0;
-}
-
-LRESULT
-display::on_destroy(WPARAM wParam,LPARAM lParam)
-{
-	// Happens after on_close, and also when a window is destroyed programmatically
-	// (e.g. scene.visible = 0)
-	report_closed();
-	// We can only free the OpenGL context if it isn't the one we are using for display list sharing
-	// xxx Display list sharing is the suck
-	if ( gl_context != root_glrc )
-		wglDeleteContext( gl_context );
-	ReleaseDC( widget_handle, dev_context);
-	widgets.erase( widget_handle );
-	return DefWindowProc( widget_handle, WM_DESTROY, wParam, lParam );
 }
  
 void
@@ -244,7 +62,6 @@ display::gl_end()
 	wglMakeCurrent( NULL, NULL );
 	current = 0;
 }
-
 
 void
 display::gl_swap_buffers()
@@ -383,209 +200,629 @@ display::getProcAddress(const char* name) {
 	return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
 }
 
-LRESULT
-display::on_mouse( WPARAM wParam, LPARAM lParam)
+/******************************* Mac-specific stuff ***************************/
+/**************** aglFont implementation *******************/
+
+
+aglFont::aglFont(struct aglContext& _cx, 
+		 const char *name, 
+		 double size) 
+	: cx(_cx), refcount(1)
 {
-	bool buttons[] = { wParam & MK_LBUTTON, wParam & MK_RBUTTON };
-	bool shiftState[] = { wParam & MK_SHIFT, wParam & MK_CONTROL, GetKeyState( VK_MENU) < 0 };
-	
-	int mouse_x = GET_X_LPARAM(lParam);
-	int mouse_y = GET_Y_LPARAM(lParam);
-	bool was_locked = mouse.is_mouse_locked();
-	int old_x = mouse.get_x(), old_y = mouse.get_y();
-	
-	mouse.report_mouse_state( 2, buttons, mouse_x, mouse_y, 3, shiftState, true );
-	
-	// This mouse locking code is more complicated but much smoother and the cursor can't escape.
-	if ( mouse.is_mouse_locked() != was_locked ) {
-		if (mouse.is_mouse_locked()) SetCapture( widget_handle );
-		else ReleaseCapture();
-		ShowCursor( !mouse.is_mouse_locked() );
-	}
-	if (mouse.is_mouse_locked() && ( mouse_x < 20 || mouse_x > view_width - 20 || mouse_y < 20 || mouse_y > view_height - 20 ) ) {
-		mouse.report_setcursor( view_width/2, view_height/2 );
-		SetCursorPos( view_x + view_width/2, view_y + view_height/2 );
-	}
-	if (was_locked && !mouse.is_mouse_locked()) {
-		mouse.report_setcursor( old_x, old_y );
-		SetCursorPos( view_x + old_x, view_y + old_y );
-	}
-	return 0;
+		unsigned char pName[256];
+		int ok;
+		
+		// Font names vary across platforms, so fall back if necessary
+		strcpy((char *)(&(pName[1])), name);
+		pName[0] = strlen(name);
+		fID = FMGetFontFamilyFromName((unsigned char *)pName);
+		if (fID <= 0)
+			fID = GetAppFont();
+		// No size means default
+		if (size <= 0)
+			size = GetDefFontSize();
+		
+		fSize = (int)size;
+		FetchFontInfo(fID, fSize, 0, &fInfo);
+		
+		cx.makeCurrent();
+		listBase = glGenLists(256);
+		ok = aglUseFont(cx.getContext(), fID, 0, fSize, 0, 256, listBase);
+		// if (! ok)	um, report something? Unlikely
+		cx.makeNotCurrent();
 }
 
-LRESULT
-display::on_keyUp(UINT uMsg, WPARAM wParam, LPARAM lParam)
+aglFont::~aglFont()
 {
-
-	return 0;
+	fID = -1;
 }
 
-LRESULT
-display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
+void
+aglFont::draw(const char *c)
 {
-	// Note that this algorithm will proably fail if the user is using anything 
-	// other than a US keyboard.
-	char *kNameP;
-	char kStr[60],fStr[4];
-	
-	bool Kshift = (GetKeyState(VK_SHIFT) < 0) ||
-		(GetKeyState(VK_CAPITAL) & 1);
-	bool Kalt = GetKeyState(VK_MENU) < 0;
-	bool Kctrl = GetKeyState(VK_CONTROL) < 0;
-	kStr[0] = 0;
-	kNameP = NULL;
-	
-	switch (wParam) {
-		
-	case VK_F1:
-	case VK_F2:
-	case VK_F3:
-	case VK_F4:
-	case VK_F5:
-	case VK_F6:
-	case VK_F7:
-	case VK_F8:
-	case VK_F9:
-	case VK_F10:
-	case VK_F11:
-	case VK_F12:
-		sprintf(fStr,"f%d",wParam-VK_F1+1);
-		kNameP = fStr;
-		break;
-		
-	case VK_PRIOR:
-		kNameP = "page up";
-		break;
-		
-	case VK_NEXT:
-		kNameP = "page down";
-		break;
-		
-	case VK_END:
-		kNameP = "end";
-		break;
-		
-	case VK_HOME:
-		kNameP = "home";
-		break;
-		
-	case VK_LEFT:
-		kNameP = "left";
-		break;
-		
-	case VK_UP:
-		kNameP = "up";
-		break;
-		
-	case VK_RIGHT:
-		kNameP = "right";
-		break;
-		
-	case VK_DOWN:
-		kNameP = "down";
-		break;
-		
-	case VK_SNAPSHOT:
-		kNameP = "print screen";
-		break;
-		
-	case VK_INSERT:
-		kNameP = "insert";
-		break;
-		
-	case VK_DELETE:
-		kNameP = "delete";
-		break;
-		
-	case VK_NUMLOCK:
-		kNameP = "numlock";
-		break;
-		
-	case VK_SCROLL:
-		kNameP = "scrlock";
-		break;
-		
-	} // wParam
-	
-	if (kNameP) {
-		if (Kctrl) strcat(kStr,"ctrl+");
-		if (Kalt) strcat(kStr,"alt+");
-		if (Kshift) strcat(kStr,"shift+");
-		strcat(kStr,kNameP);
-		keys.push( std::string(kStr));
+	if (fID >= 0) {
+		glListBase(listBase);
+		glCallLists(strlen(c), GL_UNSIGNED_BYTE, c);
 	}
-	
-	return 0;
 }
 
-LRESULT
-display::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
+double
+aglFont::getWidth(const char *c)
 {
-	// Note that this algorithm will proably fail if the user is using anything 
-	// other than a US keyboard.
-	int fShift,fAlt,fCtrl;
-	char *kNameP;
-	char kStr[60],wStr[2];
+	int		tw;
 	
-	if ((wParam >= 32) && (wParam <= 126))
-	{
-		char kk[2];
-	    kk[0] = wParam;
-	    kk[1] = 0;
-	    keys.push( std::string(kk)); 
-	    return 0;
+	if (fID == 0)
+		return 0;
+	
+	// Still using old QuickDraw text measurement because I can't
+	// figure out how to use ATSUI
+	cx.makeCurrent();
+	TextFont(fID);
+	TextFace(0);
+	TextSize(fSize);
+	
+	tw = TextWidth(c, 0, strlen(c));
+	
+	return (double)(tw  * 2) / cx.width();
+}
+
+double
+aglFont::ascent()
+{
+	return (double)fInfo.ascent * 2 / cx.height();
+}
+
+double
+aglFont::descent()
+{
+	return (double)fInfo.descent * 2 / cx.height();
+}
+
+void
+aglFont::release()
+{
+	refcount--;
+	if (refcount <= 0) {
+		cx.add_pending_glDeleteList( listBase, 256);
+		delete(this);
 	}
+}
+
+glFont*
+aglContext::getFont(const char* description, double size)
+{
+	return new aglFont(*this, description, size);
+}
+
+
+/*************** aglContext implementation *************/
+
+
+aglContext::aglContext() 
+ : window(0),
+   ctx(0),
+   wx(0), wy(0),
+   wwidth(0), wheight(0),
+   buttonState(0),
+   buttonsChanged(0),
+   keyModState(0),
+   mouseLocked(false)
+{
+}
+
+aglContext::~aglContext()
+{
+}
+
+void aglContext::cleanup()
+{
+	wx	= -1;
+	wy	= -1;
+	wwidth	= 0;
+	wheight	= 0;
+	if (ctx)
+		aglDestroyContext(ctx);
+	ctx = NULL;
+	if (window)
+		DisposeWindow(window);
+	window = NULL;
+}
+
+
+int
+aglContext::getShiftKey()
+{
+	return modBit(keyModState, shiftKeyBit);
+}
+
+int
+aglContext::getAltKey()
+{
+	return modBit(keyModState, optionKeyBit);
+}
+
+int
+aglContext::getCtrlKey()
+{
+	// For Mac, treat command key as control also
+	return modBit(keyModState, cmdKeyBit) || modBit(keyModState, controlKeyBit);
+}
+
+OSStatus
+aglContext::vpWindowHandler (EventRef event)
+{
+	UInt32	kind;
+	Rect	bounds;
 	
-	fShift = (GetKeyState(VK_SHIFT) < 0) ||
-		(GetKeyState(VK_CAPITAL) & 1);
-	fAlt = GetKeyState(VK_MENU) < 0;
-	fCtrl = GetKeyState(VK_CONTROL) < 0;
-	kStr[0] = 0;
-	kNameP = NULL;
+	kind = GetEventKind(event);
+	if (kind == kEventWindowBoundsChanged) {
+		GetWindowBounds(window, kWindowStructureRgn, &bounds);
+		wx = bounds.left;
+		wy = bounds.top;
+		wwidth  = bounds.right - bounds.left;
+		wheight = bounds.bottom - bounds.top;
+		// Tell OpenGL about it
+		aglUpdateContext(ctx);
+	} else if (kind == kEventWindowClosed) {
+		// Safest way to destroy a window is by generating ESC key event,
+		// which will be passed on and interpreted as close request
+		keys.push("escape");
+		return noErr;
+	}
+	return eventNotHandledErr;
+}
+
+OSStatus
+aglContext::vpKeyboardHandler (EventRef event)
+{
+	UInt32	kind;
+	char	key[2];
+	UInt32	code;
+	std::string keyStr;
 	
-	if (!fCtrl && wParam == VK_RETURN)
-		kNameP = "\n";
-	else if (!fCtrl && wParam == VK_ESCAPE)
-		kNameP = "escape";
-	else if (!fCtrl && wParam == VK_BACK)
-		kNameP = "backspace";
-	else if (!fCtrl && wParam == VK_TAB)
-		kNameP = "\t";
-	else if ((wParam > 0) && (wParam <= 26)) {
-		wStr[0] = wParam-1+'a';
-		wStr[1] = 0;
-		kNameP = wStr;
-	} else if (wParam == 27)
-		kNameP = "[";
-	else if (wParam == 28)
-		kNameP = "\\";
-	else if (wParam == 29)
-		kNameP = "]";
-	else if (wParam == 30)
-		kNameP = "^";
-	else if (wParam == 31)
-		kNameP = "_";
-	
-	if (kNameP) {
-		if (fCtrl) strcat(kStr,"ctrl+");
-		if (fAlt) strcat(kStr,"alt+");
-		if (fShift) strcat(kStr,"shift+");
-		strcat(kStr,kNameP);			
-		if (strcmp(kStr,"escape") == 0)
-		{
-			// Allow the user to delete a fullscreen window this way
-			destroy();
-			if (exit)
-				PostQuitMessage(0);
-			return 0;
+	kind = GetEventKind(event);
+	if (kind == kEventRawKeyDown || kind == kEventRawKeyRepeat) {
+		GetEventParameter(event, kEventParamKeyMacCharCodes,
+						  typeChar, NULL,
+						  sizeof(char), NULL,
+						  &(key[0]));
+		key[1] = 0;
+		if (isprint(key[0])) {
+			// Easy
+			keys.push(std::string(key));
+		} else {
+			keyStr = std::string("");
+			GetEventParameter(event, kEventParamKeyModifiers,
+							  typeUInt32, NULL,
+							  sizeof(keyModState), NULL,
+							  &keyModState);
+			GetEventParameter(event, kEventParamKeyCode,
+							  typeUInt32, NULL,
+							  sizeof(code), NULL,
+							  &code);
+			if (this->getShiftKey())
+				keyStr += "shift+";
+			if (this->getCtrlKey())
+				keyStr += "ctrl+";
+			if (this->getAltKey())
+				keyStr += "alt+";
+			// Carbon doco is still in 1984 with no special keys...sigh
+			switch (code) {
+				// Apple really do number the F keys like this
+				case 122:
+					keyStr += "F1";
+					break;
+				case 120:
+					keyStr += "F2";
+					break;
+				case 99:
+					keyStr += "F3";
+					break;
+				case 118:
+					keyStr += "F4";
+					break;
+				case 96:
+					keyStr += "F5";
+					break;
+				case 97:
+					keyStr += "F6";
+					break;
+				case 98:
+					keyStr += "F7";
+					break;
+				case 100:
+					keyStr += "F8";
+					break;
+				// F9-F12 are reserved by Apple for various purposes
+				case 116:
+					keyStr += "page up";
+					break;
+				case 121:
+					keyStr += "page down";
+					break;
+				case 119:
+					keyStr += "end";
+					break;
+				case 115:
+					keyStr += "home";
+					break;
+				case 123:
+					keyStr += "left";
+					break;
+				case 126:
+					keyStr += "up";
+					break;
+				case 124:
+					keyStr += "right";
+					break;
+				case 125:
+					keyStr += "down";
+					break;	
+				case 117:
+					keyStr += "delete";
+					break;
+				case 51:
+					keyStr += "backspace";
+					break;
+				case 48:
+					keyStr += "\t";
+					break;
+				case 36:
+					keyStr += "\n";
+					break;
+				case 53:
+					keyStr += "escape";
+					break;
+				default:
+					keyStr += "unknown";
+					break;
+			}
 		}
-		keys.push( std::string(kStr));
-	}
-	
-	return 0;
+		keys.push(std::string(keyStr));
+		return noErr;
+	} else if (kind == kEventRawKeyModifiersChanged) {
+		GetEventParameter(event, kEventParamKeyModifiers,
+						  typeUInt32, NULL,
+						  sizeof(keyModState), NULL,
+						  &keyModState);
+		return noErr;
+	} else
+		return eventNotHandledErr;
 }
 
-/******************************* gui_main implementatin **********************/
+OSStatus
+aglContext::vpMouseHandler (EventRef event)
+{
+	WindowPartCode	part;
+	WindowRef		win;
+	UInt32			kind;
+	Point			pt;
+	EventMouseButton btn;
+	int				mask;
+	
+	// First must check if mouse event occurred within our content area
+	GetEventParameter(event, kEventParamMouseLocation,
+					  typeQDPoint, NULL,
+					  sizeof(pt), NULL,
+					  &pt);
+	part = FindWindow(pt, &win);
+	if (win != window || part != inContent)
+		// Title bar, close box, ... pass to OS
+		return eventNotHandledErr;
+	
+	// Get window-relative position and any modifier keys
+	GetEventParameter(event, kEventParamWindowMouseLocation,
+					  typeQDPoint, NULL,
+					  sizeof(pt), NULL,
+					  &pt);
+	GetEventParameter(event, kEventParamKeyModifiers,
+					  typeUInt32, NULL,
+					  sizeof(keyModState), NULL,
+					  &keyModState);
+	mousePos.set_x(pt.h);
+	mousePos.set_y(pt.v);
+
+	// Mouse button change?
+	kind = GetEventKind(event);
+	if (kind == kEventMouseUp || kind == kEventMouseDown) {
+		GetEventParameter(event, kEventParamMouseButton,
+						  typeMouseButton, NULL,
+						  sizeof(btn), NULL,
+						  &btn);
+		// VPython uses the middle and right buttons to adjust the viewpoint but there are
+		// still a lot of Macs with one button mice, so translate option/command + button
+		// into middle/right button.
+		if (btn == kEventMouseButtonPrimary && modBit(keyModState, cmdKeyBit) != 0)
+			btn = kEventMouseButtonSecondary;
+		if (btn == kEventMouseButtonPrimary && modBit(keyModState, optionKeyBit) != 0)
+			btn = kEventMouseButtonTertiary;
+		// VPython numbering
+		if (btn == kEventMouseButtonPrimary)
+			mask = 1 << 0;
+		else if (btn == kEventMouseButtonSecondary)
+			mask = 1 << 1;
+		else if (btn == kEventMouseButtonTertiary)
+			mask = 1 << 2;
+		// And update ourself
+		if (kind == kEventMouseDown) {
+			buttonState |= mask;
+			buttonsChanged |= mask;
+		} else {
+			buttonState &= (~mask);
+			buttonsChanged |= mask;
+		}
+	}
+	
+	return noErr;
+}
+
+static OSStatus vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
+{
+	UInt32	evtClass;
+	aglContext * ctx;
+	
+	ctx = (aglContext *)data;
+	
+	evtClass = GetEventClass(event);
+	
+	switch (evtClass) {
+		case kEventClassApplication:
+			if (GetEventKind(event) == kEventAppQuit) {
+				QuitApplicationEventLoop();
+				return noErr;
+			}
+			break;
+		case kEventClassWindow:
+			return ctx->vpWindowHandler(event);
+			break;
+		case kEventClassKeyboard:
+			return ctx->vpKeyboardHandler(event);
+			break;
+		case kEventClassMouse:
+			return ctx->vpMouseHandler(event);
+			break;
+		default:
+			break;
+	}
+	// Default is let OS do it
+	return eventNotHandledErr;
+}
+
+bool
+aglContext::changeWindow(const char* title, int x, int y, int width, int height, int flags)
+{
+	if (title) {
+		SetWindowTitleWithCFString(window, CFStringCreateWithCString(NULL, title, kCFStringEncodingASCII));
+	}
+	
+	if (x >= 0 && y >= 0) {
+		wx = x;
+		wy = y;
+		MoveWindow(window, wx, wy, false);
+	}
+	if (width > 0 && height > 0) {
+		wwidth  = width;
+		wheight = height;
+		SizeWindow(window, wwidth, wheight, true);
+	}
+	return true;
+}
+
+bool
+aglContext::initWindow(const char* title, int x, int y, int width, int height, int flags)
+{
+	GDHandle	dev;
+	OSStatus	err;
+	Rect		bounds;
+	int			idx;
+	AGLPixelFormat	fmt;
+	GLint		attrList[] = {
+				AGL_RGBA, AGL_DOUBLEBUFFER,
+				AGL_DEPTH_SIZE, 32,
+				AGL_ALL_RENDERERS, AGL_ACCELERATED,
+				AGL_NO_RECOVERY, 
+				AGL_NONE,		// Expansion
+				AGL_NONE,		// Expansion
+				AGL_NONE
+				};
+	EventHandlerUPP	upp;
+	EventHandlerRef	discard;
+	EventTypeSpec	handled[] = {
+		{ kEventClassApplication, kEventAppQuit },
+		{ kEventClassWindow, kEventWindowClosed },
+		{ kEventClassWindow, kEventWindowBoundsChanged },
+		{ kEventClassKeyboard, kEventRawKeyDown },
+		{ kEventClassKeyboard, kEventRawKeyRepeat },
+		{ kEventClassKeyboard, kEventRawKeyModifiersChanged },
+		{ kEventClassMouse, kEventMouseDown },
+		{ kEventClassMouse, kEventMouseUp },
+		{ kEventClassMouse, kEventMouseMoved },
+		{ kEventClassMouse, kEventMouseDragged },
+		{ 0, 0 }
+	};
+		
+	// Window 
+	SetRect(&bounds, x, y, width, height);
+	err = CreateNewWindow(kDocumentWindowClass, kWindowStandardDocumentAttributes, &bounds, &window);
+	if (err != noErr)
+		return false;
+	this->changeWindow(title, x, y, width, height, flags);
+	
+	// GL context
+	dev = GetMainDevice();
+	idx = 0;
+	while (attrList[idx] != AGL_NONE) idx ++;
+	// Special
+	if (flags & glContext::FULLSCREEN) {
+		attrList[idx] =	AGL_FULLSCREEN;
+		idx ++;
+	}
+	fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
+	if (fmt == NULL || aglGetError() != AGL_NO_ERROR)
+		return false;
+	ctx = aglCreateContext(fmt, NULL);
+	if (ctx == NULL)
+		return false;
+	
+	// Fullscreen on Mac
+	if (flags & glContext::FULLSCREEN) {
+		aglEnable(ctx, AGL_FS_CAPTURE_SINGLE);
+		aglSetFullScreen(ctx, 0, 0, 0, 0);
+	} else {
+		aglSetDrawable(ctx, GetWindowPort(window));
+	}
+	aglDestroyPixelFormat(fmt);
+
+	// Set up event handling
+	InstallStandardEventHandler(GetWindowEventTarget(window));
+	upp = NewEventHandlerUPP(vpEventHandler);
+	idx = 0;
+	while (handled[idx].eventClass != 0 && handled[idx].eventKind != 0) idx ++;
+	// Events within window
+	InstallEventHandler(GetWindowEventTarget(window),
+						upp,
+						idx, handled,
+						this, &discard);
+	// This handles menu bar quit and all events in fullscreen mode
+	InstallEventHandler(GetApplicationEventTarget(),
+						upp,
+						idx, handled,
+						this, &discard);
+	// Make visible
+	if (! (flags & glContext::FULLSCREEN)) {
+		ActivateWindow(window, true);
+		ShowWindow(window);
+	}
+	
+	return true;
+}
+
+bool
+aglContext::isOpen()
+{
+	return window != NULL;
+}
+
+void
+aglContext::lockMouse()
+{
+}
+
+void
+aglContext::unlockMouse()
+{
+}
+
+void
+aglContext::showMouse()
+{
+	ShowCursor();
+}
+
+void
+aglContext::hideMouse()
+{
+	HideCursor();
+}
+
+vector
+aglContext::getMousePos()
+{
+	if (!window)
+		return vector(0,0,0);
+	
+	vector tmp = mousePos;
+	tmp.x /= wwidth;
+	tmp.y /= wheight;
+	
+	return tmp;
+}
+
+vector
+aglContext::getMouseDelta()
+{
+	// GL units (% of window)
+	vector tmp = mousePos - oldMousePos;
+	oldMousePos = mousePos;
+	
+	return tmp;
+}
+
+int
+aglContext::getMouseButtons()
+{
+	return buttonState;
+}
+
+int
+aglContext::getMouseButtonsChanged()
+{
+	int c = buttonsChanged;
+	buttonsChanged = 0;
+	return c; 
+}
+
+std::string
+aglContext::getKeys()
+{
+	if (!keys.empty()) {
+		std::string s = keys.front();
+		keys.pop();
+		return s;
+	} 
+	return std::string("");
+}
+
+void
+aglContext::makeCurrent()
+{
+	SetPortWindowPort(window);
+	aglSetCurrentContext(ctx);
+	delete_pending_lists();
+}
+
+void
+aglContext::makeNotCurrent()
+{
+	aglSetCurrentContext(NULL);
+}
+
+void
+aglContext::swapBuffers()
+{
+	aglSwapBuffers(ctx);
+}
+
+int
+aglContext::winX()
+{
+	return wx;
+}
+
+int
+aglContext::winY()
+{
+	return wy;
+}
+
+int
+aglContext::width()
+{
+	return wwidth;
+}
+
+int
+aglContext::height()
+{
+	return wheight;
+}
+
+void destroy_context (glContext * cx)
+{
+	(static_cast<aglContext *>(cx))->cleanup();
+}
+
+/******************************* gui_main implementation **********************/
 
 gui_main* gui_main::self = 0;  // Protected by python GIL
 
