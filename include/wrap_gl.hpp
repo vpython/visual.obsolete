@@ -14,8 +14,14 @@
 	#include <windows.h>
 #endif
 
-#include <GL/gl.h>
-#include <GL/glext.h>
-#include <GL/glu.h>
+#if defined(VP_PLATFORM_MAC)
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glext.h>
+	#include <OpenGL/glu.h>
+#else
+	#include <GL/gl.h>
+	#include <GL/glext.h>
+	#include <GL/glu.h>
+#endif
 
 #endif // !defined VPYTHON_WRAP_GL_HPP
