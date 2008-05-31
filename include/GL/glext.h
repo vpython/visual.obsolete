@@ -3393,8 +3393,10 @@ typedef char GLchar;			/* native character */
 
 #ifndef GL_VERSION_1_5
 /* GL types for handling large vertex buffer objects */
+#ifndef VP_PLATFORM_MAC
 typedef ptrdiff_t GLintptr;
 typedef ptrdiff_t GLsizeiptr;
+#endif
 #endif
 
 #ifndef GL_ARB_vertex_buffer_object
