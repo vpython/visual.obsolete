@@ -14,7 +14,7 @@
 	#include <windows.h>
 #endif
 
-#if defined(VP_PLATFORM_MAC)
+#if defined(__APPLE__)
 	#include <OpenGL/gl.h>
 	#include <OpenGL/glext.h>
 	#include <OpenGL/glu.h>
