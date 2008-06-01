@@ -2,13 +2,15 @@
 
 TOP = ../vpython-core2
 DEPENDS = $(TOP)/dependencies
-VPATH = $(TOP)/src/mac $(TOP)/src/core/util $(TOP)/src/core $(TOP)/python
+SRC = $(TOP)/src
+VPATH = $(SRC)/mac $(SRC)/core/util $(SRC)/core $(SRC)/python $(SRC)
 
 CXX = /usr/bin/g++
 CXXFLAGS = -fPIC -MMD \
 	-Wno-long-double -DPIC -O2 -g -finline-functions \
 	-I$(TOP)/include/mac -I$(TOP)/include \
 	-I/System/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5 \
+	-I/Library/Python/2.5/site-packages/numpy/core/include \
 	-I$(DEPENDS)/boost_1_35_0/boost -I$(DEPENDS)/threadpool/include \
 	-F/System/Library/Frameworks/AGL.framework \
 	-F/System/Library/Frameworks/Carbon.framework \
@@ -20,7 +22,7 @@ OBJS = arrow.o axial.o box.o cone.o cylinder.o display_kernel.o ellipsoid.o \
 	atomic_queue.o clipping_plane.o displaylist.o errors.o extent.o \
 	gl_extensions.o gl_free.o icososphere.o lighting.o quadric.o \
 	render_manager.o rgba.o shader_program.o texture.o tmatrix.o vector.o\
-	convex.o curve.o cvisualmodule.o faces.o num_util_impl_numeric.o \
+	convex.o curve.o cvisualmodule.o faces.o \
 	num_util.o numeric_texture.o points.o scalar_array.o slice.o \
 	vector_array.o wrap_arrayobjects.o wrap_display_kernel.o wrap_primitive.o \
 	wrap_rgba.o wrap_vector.o \
