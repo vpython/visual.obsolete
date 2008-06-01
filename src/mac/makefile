@@ -12,8 +12,7 @@ CXXFLAGS = -fPIC -MMD \
 	-I$(DEPENDS)/boost_1_35_0/boost -I$(DEPENDS)/threadpool/include \
 	-F/System/Library/Frameworks/AGL.framework \
 	-F/System/Library/Frameworks/Carbon.framework \
-	-F/System/Library/Frameworks/OpenGL.framework \
-	 -DVP_PLATFORM_MAC
+	-F/System/Library/Frameworks/OpenGL.framework
 
 OBJS = arrow.o axial.o box.o cone.o cylinder.o display_kernel.o ellipsoid.o \
 	frame.o label.o material.o mouse_manager.o primitive.o pyramid.o \
