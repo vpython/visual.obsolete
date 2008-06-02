@@ -32,8 +32,7 @@ cvisual.so : $(OBJS)
 	$(CXX) -bundle -bundle_loader /usr/bin/python2.5 -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
-	$(BOOST)/lib \
-	$(TOP)/dependencies/threadpool
+	$(BOOST)/lib 
 
 clean :
 	rm *.o
