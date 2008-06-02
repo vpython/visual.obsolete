@@ -51,8 +51,12 @@ void display::paint() {
 void
 display::gl_begin()
 {
-	if (!wglMakeCurrent( dev_context, gl_context))
-		WIN32_CRITICAL_ERROR( "wglMakeCurrent failed");
+	if (!wglMakeCurrent( dev_context, gl_context)) {
+		std::ostringstream msg;
+		msg << "Could not initiate OpenGL!\n";
+		VPYTHON_CRITICAL_ERROR( msg.str());
+		std::exit(1);
+	}
 	current = this;
 }
 
@@ -78,99 +82,13 @@ void
 display::create()
 {
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
-	
-	register_win32_class();
-
-	RECT screen;
-	SystemParametersInfo( SPI_GETWORKAREA, 0, &screen, 0);
-	int style = -1;
-	
-	int real_x = static_cast<int>(window_x);
-	int real_y = static_cast<int>(window_y);
-	int real_width = static_cast<int>(window_width);
-	int real_height = static_cast<int>(window_height);
-	
-	if (fullscreen) {
-		real_x = screen.left;
-		real_y = screen.top;
-		real_width = screen.right - real_x;
-		real_height = screen.bottom - real_y;
-		style = WS_OVERLAPPED | WS_POPUP | WS_MAXIMIZE | WS_VISIBLE;
-	}
-	else if (real_x < 0 && real_y < 0 || real_x > screen.right || real_y > screen.bottom) {
-		real_x = CW_USEDEFAULT;
-		real_y = CW_USEDEFAULT;
-	}
-	else if (real_x < screen.left) {
-		real_x = screen.left;
-	}
-	else if (real_y < screen.top) {
-		real_y = screen.top;
-	}
-
-	if (real_x + real_width > screen.right)
-		real_width = screen.right - real_x;
-	if (real_y + real_height > screen.bottom)
-		real_height = screen.bottom - real_y;
-
-	if (!fullscreen)
-		style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-
-	widget_handle = CreateWindow(
-		win32_class.lpszClassName,
-		title.c_str(),
-		style,
-		real_x, real_y,
-		real_width, real_height,
-		0,
-		0, // A unique index to identify this widget by the parent
-		GetModuleHandle(0),
-		0 // No data passed to the WM_CREATE function.
-	);
-	widgets[widget_handle] = this;
-
-	dev_context = GetDC(widget_handle);
-	if (!dev_context)
-		WIN32_CRITICAL_ERROR( "GetDC()");
-
-	PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd
-		1,                               // version number
-		PFD_DRAW_TO_WINDOW |             // output to screen (not an image)
-		PFD_SUPPORT_OPENGL |             // support OpenGL
-		PFD_DOUBLEBUFFER,                // double buffered
-		PFD_TYPE_RGBA,                   // RGBA type
-		24,                              // 24-bit color depth
-		0, 0, 0, 0, 0, 0,                // color bits ignored
-		0,                               // no opacity buffer
-		0,                               // shift bit ignored
-		0,                               // no accumulation buffer
-		0, 0, 0, 0,                      // accum bits ignored
-		32,                              // 32-bit z-buffer
-		0,                               // no stencil buffer
-		0,                               // no auxiliary buffer
-		PFD_MAIN_PLANE,                  // main layer
-		0,                               // reserved
-		0, 0, 0                          // layer masks ignored
-	};
-
-	int pixelformat = ChoosePixelFormat( dev_context, &pfd);
-
-	DescribePixelFormat( dev_context, pixelformat, sizeof(pfd), &pfd);
-	SetPixelFormat( dev_context, pixelformat, &pfd);
-
-	gl_context = wglCreateContext( dev_context);
-	if (!gl_context)
-		WIN32_CRITICAL_ERROR("wglCreateContext()");
-
-	if (!root_glrc)
-		root_glrc = gl_context;
-	else
-		wglShareLists( root_glrc, gl_context);
-
-	ShowWindow( widget_handle, SW_SHOW);
-	
-	update_size();
+	// Just to get going, set flags to 0:
+	if (!aglContext::initWindow(title, window_x, window_y, window_width, window_height, 0)) {
+		std::ostringstream msg;
+		msg << "Could not create the window!\n";
+		VPYTHON_CRITICAL_ERROR( msg.str());
+		std::exit(1);
+	}	
 }
 
 void
@@ -200,7 +118,18 @@ display::getProcAddress(const char* name) {
 	return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
 }
 
-/******************************* Mac-specific stuff ***************************/
+/**************** Mac-specific stuff ***********************/
+
+# Deprecated:
+# In aglFont::aglFont,
+#    FMGetFontFamilyFromName, GetAppFont, GetDefFontSize, FetchFontInfo, aglUseFont
+
+# In aglFont::getWidth,
+#    TextFont, TextFace, TextSize, TextWidth
+
+# In aglContext::initWindow,
+#    GetMainDevice, aglSetDrawable
+
 /**************** aglFont implementation *******************/
 
 
@@ -598,7 +527,7 @@ aglContext::changeWindow(const char* title, int x, int y, int width, int height,
 	if (x >= 0 && y >= 0) {
 		wx = x;
 		wy = y;
-		MoveWindow(window, wx, wy, false);
+		MoveWindowStructure(window, wx, wy);
 	}
 	if (width > 0 && height > 0) {
 		wwidth  = width;
@@ -614,7 +543,7 @@ aglContext::initWindow(const char* title, int x, int y, int width, int height, i
 	GDHandle	dev;
 	OSStatus	err;
 	Rect		bounds;
-	int			idx;
+	int			minY, idx;
 	AGLPixelFormat	fmt;
 	GLint		attrList[] = {
 				AGL_RGBA, AGL_DOUBLEBUFFER,
@@ -640,9 +569,15 @@ aglContext::initWindow(const char* title, int x, int y, int width, int height, i
 		{ kEventClassMouse, kEventMouseDragged },
 		{ 0, 0 }
 	};
-		
+	
+	// Don't let window hide itself under the menu bar. Margin should be more than
+	// the menu bar itself because sometimes the position gets set first and then
+	// the title bar extended above that point.
+	minY = GetMBarHeight() * 2;
+	if (y < minY && ! (flags & glContext::FULLSCREEN))
+		y = minY;
 	// Window 
-	SetRect(&bounds, x, y, width, height);
+	SetRect(&bounds, x, y, x + width, y + height);
 	err = CreateNewWindow(kDocumentWindowClass, kWindowStandardDocumentAttributes, &bounds, &window);
 	if (err != noErr)
 		return false;
@@ -657,7 +592,18 @@ aglContext::initWindow(const char* title, int x, int y, int width, int height, i
 		attrList[idx] =	AGL_FULLSCREEN;
 		idx ++;
 	}
+	if (flags & glContext::QB_STEREO) {
+		attrList[idx] = AGL_STEREO;
+		idx ++;
+	}
 	fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
+	if ((fmt == NULL || aglGetError() != AGL_NO_ERROR) && (flags & glContext::QB_STEREO)) {
+		// Try without stereo
+		idx --;
+		attrList[idx] = AGL_NONE;
+		fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
+	}
+
 	if (fmt == NULL || aglGetError() != AGL_NO_ERROR)
 		return false;
 	ctx = aglCreateContext(fmt, NULL);
@@ -677,7 +623,7 @@ aglContext::initWindow(const char* title, int x, int y, int width, int height, i
 	InstallStandardEventHandler(GetWindowEventTarget(window));
 	upp = NewEventHandlerUPP(vpEventHandler);
 	idx = 0;
-	while (handled[idx].eventClass != 0 && handled[idx].eventKind != 0) idx ++;
+	while (handled[idx].eventClass != 0 || handled[idx].eventKind != 0) idx ++;
 	// Events within window
 	InstallEventHandler(GetWindowEventTarget(window),
 						upp,
@@ -822,109 +768,5 @@ void destroy_context (glContext * cx)
 	(static_cast<aglContext *>(cx))->cleanup();
 }
 
-/******************************* gui_main implementation **********************/
-
-gui_main* gui_main::self = 0;  // Protected by python GIL
-
-boost::signal<void()> gui_main::on_shutdown;
-
-const int CALL_MESSAGE = WM_USER;
-
-gui_main::gui_main()
- : gui_thread(-1)
-{
-}
-
-LRESULT
-gui_main::threadMessage( int code, WPARAM wParam, LPARAM lParam ) {
-	if (wParam == PM_REMOVE) {
-		MSG& message = *(MSG*)lParam;
-		
-		if (message.hwnd ==0 && message.message == CALL_MESSAGE ) {
-			boost::function<void()>* f = (boost::function<void()>*)message.wParam;
-			(*f)();
-			delete f;
-		}
-	}
-	return CallNextHookEx( NULL, code, wParam, lParam );
-}
-
-#define TIMER_RESOLUTION 5
-void __cdecl end_period() { timeEndPeriod(TIMER_RESOLUTION); }
-
-void
-gui_main::run()
-{
-	MSG message;
-	
-	// Create a message queue and hook thread messages (we can't just check for them in the loop
-	// below, becomes Windows runs modal message loops e.g. when resizing a window)
-	SetWindowsHookEx(WH_GETMESSAGE, &gui_main::threadMessage, NULL, GetCurrentThreadId());
-	PeekMessage(&message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
-	
-	// Tell the initializing thread
-	{
-		lock L(init_lock);
-		gui_thread = GetCurrentThreadId();
-		initialized.notify_all();
-	}
-	
-	timeBeginPeriod(TIMER_RESOLUTION);
-	atexit( end_period );
-	
-	poll();
-
-	// Enter the message loop
-	while (GetMessage(&message, 0, 0, 0) > 0) {
-		TranslateMessage( &message);
-		DispatchMessage( &message);
-	}
-
-	// We normally exit the message queue because PostQuitMessage() has been called
-	VPYTHON_NOTE( "WM_QUIT (or message queue error) received");
-	on_shutdown(); // Tries to kill Python
-}
-
-void
-gui_main::init_thread(void)
-{
-	if (!self) {
-		// We are holding the Python GIL through this process, including the wait!
-		// We can't let go because a different Python thread could come along and mess us up (e.g.
-		//   think that we are initialized and go on to call PostThreadMessage without a valid idThread)
-		self = new gui_main;
-		thread gui( boost::bind( &gui_main::run, self ) );
-		lock L( self->init_lock );
-		while (self->gui_thread == -1)
-			self->initialized.wait( L );
-	}
-}
-
-void
-gui_main::call_in_gui_thread( const boost::function< void() >& f )
-{
-	init_thread();
-	PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
-}
-
-VOID CALLBACK gui_main::timer_callback( PVOID, BOOLEAN ) {
-	// Called in high-priority timer thread when it's time to render
-	self->call_in_gui_thread( boost::bind( &gui_main::poll, self ) );
-}
-
-void gui_main::poll() {
-	// Called in gui thread when it's time to render
-	// We don't need the lock here, because displays can't be created or destroyed from Python
-	// without a message being processed by the GUI thread.  paint_displays() will pick
-	// the lock up as necessary to synchronize access to the actual display contents.
-
-	std::vector<display*> displays;
-	for(std::map<HWND, display*>::iterator i = widgets.begin(); i != widgets.end(); ++i )
-		if (i->second)
-			displays.push_back( i->second );
-
-	int interval = int( 1000. * render_manager::paint_displays( displays ) );
-	CreateTimerQueueTimer( &timer_handle, NULL, &timer_callback, NULL, interval, 0, WT_EXECUTEINTIMERTHREAD );
-}
 
 } // !namespace cvisual;
