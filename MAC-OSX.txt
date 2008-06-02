@@ -1,4 +1,31 @@
-HOW TO BUILD VISUAL ON Apple OSX (Version 10.4.x)
+HOW TO BUILD VISUAL 4 USING CARBON
+The makefile in src/mac should be copied into a directory parallel to vpython-core2, and the
+make performed there.
+
+I found it necessary to overwrite /System/Library/Frameworks/OpenGL.framework/Headers/glext.h with
+our own include/GL/glext.h. This header file is referenced from ....Headers/gl.h, which means that
+a working glext.h must be in the same directory as that gl.h, not in our own include/GL.
+
+You need the Boost Python library. Download the boost libraries. Execute this:
+
+sudo bjam --toolset=darwin -sPYTHON_ROOT=/usr/bin/python2.5 --build-type=complete
+
+This took a long time; "complete" means "make various variants of the libraries".
+Look in bin.v2/libs to find these static library files:
+libboost_python-1_35.a
+libboost_signals-1_35.a
+libboost_thread-mt-1_35.a
+libboost_date_time-1_35.a
+
+The file /usr/local/include/boost/python/extract.hpp needs to have commented out
+all statements involving check() functions. This requires also commenting out 
+a reference to check() in vector_array.cpp (altered version included here).
+Not clear what this problem is about. Is it Boost 1.35? With Boost 1.34 this
+problem didn't show up with the GTK2 Mac build. Is it building Boost with --toolset=darwin
+instead of --toolset=g++? Need to study this problem.
+
+------------------------------------------------------
+HOW TO BUILD VISUAL 4 ON Apple OSX using GTK2 (Version 10.4.x)
 
 If you find gaps in this information, please tell Bruce_Sherwood@ncsu.edu.
 
