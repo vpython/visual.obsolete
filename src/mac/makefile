@@ -21,12 +21,12 @@ OBJS = arrow.o axial.o box.o cone.o cylinder.o display_kernel.o ellipsoid.o \
 	rectangular.o renderable.o ring.o sphere.o text.o \
 	atomic_queue.o clipping_plane.o displaylist.o errors.o extent.o \
 	gl_extensions.o gl_free.o icososphere.o lighting.o quadric.o \
+	mac_display.o mac_font_renderer.o mac_random_device.o mac_rate.o mac_timer.o \
 	render_manager.o rgba.o shader_program.o texture.o tmatrix.o vector.o\
 	convex.o curve.o cvisualmodule.o faces.o \
 	num_util.o numeric_texture.o points.o scalar_array.o slice.o \
 	vector_array.o wrap_arrayobjects.o wrap_display_kernel.o wrap_primitive.o \
-	wrap_rgba.o wrap_vector.o \
-	mac_display.o mac_font_renderer.o mac_random_device.o mac_rate.o mac_timer.o
+	wrap_rgba.o wrap_vector.o
 
 cvisual.so : $(OBJS)
 	$(CXX) -bundle -bundle_loader /usr/bin/python2.5 -o cvisual.so \

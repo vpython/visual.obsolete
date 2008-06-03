@@ -30,8 +30,10 @@ static bool modBit (int mask, int bit)
 }
 
 /**************************** display methods ************************************/
+display* display::current = 0;
+
 display::display()
-  : widget_handle(0), dev_context(0), gl_context(0), window_visible(false)
+  : window_visible(false)
 {
 }
 
@@ -51,19 +53,14 @@ void display::paint() {
 void
 display::gl_begin()
 {
-	if (!wglMakeCurrent( dev_context, gl_context)) {
-		std::ostringstream msg;
-		msg << "Could not initiate OpenGL!\n";
-		VPYTHON_CRITICAL_ERROR( msg.str());
-		std::exit(1);
-	}
+	agl_context.makeCurrent();
 	current = this;
 }
 
 void
 display::gl_end()
 {
-	wglMakeCurrent( NULL, NULL );
+	agl_context.makeNotCurrent();
 	current = 0;
 }
 
@@ -73,7 +70,7 @@ display::gl_swap_buffers()
 	if (!window_visible) return;
 
 	gl_begin();
-	SwapBuffers( dev_context);
+	agl_context.swapBuffers();
 	glFinish();	// Ensure rendering completes here (without the GIL) rather than at the next paint (with the GIL)
 	gl_end();
 }
@@ -83,18 +80,18 @@ display::create()
 {
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
 	// Just to get going, set flags to 0:
-	if (!aglContext::initWindow(title, window_x, window_y, window_width, window_height, 0)) {
+	if (!agl_context.initWindow(title, window_x, window_y, window_width, window_height, 0)) {
 		std::ostringstream msg;
 		msg << "Could not create the window!\n";
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
-	}	
+	}
 }
 
 void
 display::destroy()
 {
-	DestroyWindow( widget_handle);
+	agl_context.cleanup();
 }
 
 display::~display()
@@ -105,7 +102,7 @@ void
 display::activate(bool active) {
 	if (active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
-		SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
+		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
 		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
 	} else {
 		VPYTHON_NOTE( "Closing a window from Python.");
@@ -115,20 +112,22 @@ display::activate(bool active) {
 
 display::EXTENSION_FUNCTION
 display::getProcAddress(const char* name) {
-	return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
+	//return (EXTENSION_FUNCTION)::wglGetProcAddress( name ); // what instead of wglGetProcAddress?
 }
 
 /**************** Mac-specific stuff ***********************/
 
-# Deprecated:
-# In aglFont::aglFont,
-#    FMGetFontFamilyFromName, GetAppFont, GetDefFontSize, FetchFontInfo, aglUseFont
+/*
+Deprecated:
+In aglFont::aglFont,
+   FMGetFontFamilyFromName, GetAppFont, GetDefFontSize, FetchFontInfo, aglUseFont
 
-# In aglFont::getWidth,
-#    TextFont, TextFace, TextSize, TextWidth
+In aglFont::getWidth,
+   TextFont, TextFace, TextSize, TextWidth
 
-# In aglContext::initWindow,
-#    GetMainDevice, aglSetDrawable
+In aglContext::initWindow,
+   GetMainDevice, aglSetDrawable
+*/
 
 /**************** aglFont implementation *******************/
 
@@ -217,12 +216,13 @@ aglFont::release()
 	}
 }
 
-glFont*
+/*
+aglFont*
 aglContext::getFont(const char* description, double size)
 {
 	return new aglFont(*this, description, size);
 }
-
+*/
 
 /*************** aglContext implementation *************/
 
@@ -518,11 +518,13 @@ static OSStatus vpEventHandler (EventHandlerCallRef target, EventRef event, void
 }
 
 bool
-aglContext::changeWindow(const char* title, int x, int y, int width, int height, int flags)
+aglContext::changeWindow(std::string title, int x, int y, int width, int height, int flags)
 {
+	/*
 	if (title) {
 		SetWindowTitleWithCFString(window, CFStringCreateWithCString(NULL, title, kCFStringEncodingASCII));
 	}
+	*/
 	
 	if (x >= 0 && y >= 0) {
 		wx = x;
@@ -538,7 +540,7 @@ aglContext::changeWindow(const char* title, int x, int y, int width, int height,
 }
 
 bool
-aglContext::initWindow(const char* title, int x, int y, int width, int height, int flags)
+aglContext::initWindow(std::string title, int x, int y, int width, int height, int flags)
 {
 	GDHandle	dev;
 	OSStatus	err;
@@ -574,7 +576,7 @@ aglContext::initWindow(const char* title, int x, int y, int width, int height, i
 	// the menu bar itself because sometimes the position gets set first and then
 	// the title bar extended above that point.
 	minY = GetMBarHeight() * 2;
-	if (y < minY && ! (flags & glContext::FULLSCREEN))
+	if (y < minY && ! (flags & aglContext::FULLSCREEN))
 		y = minY;
 	// Window 
 	SetRect(&bounds, x, y, x + width, y + height);
@@ -588,16 +590,16 @@ aglContext::initWindow(const char* title, int x, int y, int width, int height, i
 	idx = 0;
 	while (attrList[idx] != AGL_NONE) idx ++;
 	// Special
-	if (flags & glContext::FULLSCREEN) {
+	if (flags & aglContext::FULLSCREEN) {
 		attrList[idx] =	AGL_FULLSCREEN;
 		idx ++;
 	}
-	if (flags & glContext::QB_STEREO) {
+	if (flags & aglContext::QB_STEREO) {
 		attrList[idx] = AGL_STEREO;
 		idx ++;
 	}
 	fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
-	if ((fmt == NULL || aglGetError() != AGL_NO_ERROR) && (flags & glContext::QB_STEREO)) {
+	if ((fmt == NULL || aglGetError() != AGL_NO_ERROR) && (flags & aglContext::QB_STEREO)) {
 		// Try without stereo
 		idx --;
 		attrList[idx] = AGL_NONE;
@@ -611,7 +613,7 @@ aglContext::initWindow(const char* title, int x, int y, int width, int height, i
 		return false;
 	
 	// Fullscreen on Mac
-	if (flags & glContext::FULLSCREEN) {
+	if (flags & aglContext::FULLSCREEN) {
 		aglEnable(ctx, AGL_FS_CAPTURE_SINGLE);
 		aglSetFullScreen(ctx, 0, 0, 0, 0);
 	} else {
@@ -635,7 +637,7 @@ aglContext::initWindow(const char* title, int x, int y, int width, int height, i
 						idx, handled,
 						this, &discard);
 	// Make visible
-	if (! (flags & glContext::FULLSCREEN)) {
+	if (! (flags & aglContext::FULLSCREEN)) {
 		ActivateWindow(window, true);
 		ShowWindow(window);
 	}
@@ -763,10 +765,12 @@ aglContext::height()
 	return wheight;
 }
 
+/*
 void destroy_context (glContext * cx)
 {
 	(static_cast<aglContext *>(cx))->cleanup();
 }
+*/
 
 
 } // !namespace cvisual;
