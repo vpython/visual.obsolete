@@ -18,7 +18,7 @@ CXXFLAGS = -fPIC -MMD \
 	-F/System/Library/Frameworks/OpenGL.framework
 
 OBJS = arrow.o axial.o box.o cone.o cylinder.o display_kernel.o ellipsoid.o \
-	frame.o label.o material.o mouse_manager.o primitive.o pyramid.o \
+	frame.o label.o material.o mouse_manager.o mouseobject.o primitive.o pyramid.o \
 	rectangular.o renderable.o ring.o sphere.o text.o \
 	atomic_queue.o clipping_plane.o displaylist.o errors.o extent.o \
 	gl_extensions.o gl_free.o icososphere.o lighting.o quadric.o \
@@ -33,7 +33,6 @@ cvisual.so : $(OBJS)
 	$(CXX) -bundle -bundle_loader /usr/bin/python2.5 -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
-	$(BOOST)/libboost_date_time-mt-s-1_35.a \
 	$(BOOST)/libboost_python-mt-s-1_35.a \
 	$(BOOST)/libboost_signals-mt-s-1_35.a \
 	$(BOOST)/libboost_thread-mt-s-1_35.a
