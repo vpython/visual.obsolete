@@ -10,20 +10,18 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: mac_random_device.cpp,v 1.1 2008/04/24 19:48:51 bsherwood Exp $
+ * $Id: mac_random_device.cpp,v 1.2 2008/06/04 20:58:12 bsherwood Exp $
  *
  */
-
+ 
 /* Changes:
- *    Replace impl with a version that uses the MS Crypto API to generate random
- *       numbers for use on MS Windows. -JDB
- *
+ *    modify check for the availability of /dev/urandom to include OSX. -JDB
+ * 
  */
 
 #include <boost/nondet_random.hpp>
 #include <string>
 #include <cassert>
-#include <stdexcept>
 
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
@@ -33,50 +31,80 @@ const boost::random_device::result_type boost::random_device::min_value;
 const boost::random_device::result_type boost::random_device::max_value;
 #endif
 
-#define WIN32_LEAN_AND_MEAN 1
-#ifdef _MSC_VER
-    #define NOMINMAX
+// Known to be supported for GNU/Linux and Apple OSX.  Probably others as well.
+//#if defined(__linux__) || (defined(__APPLE__) && defined(__MACH__))
+
+// the default is the unlimited capacity device, using some secure hash
+// try "/dev/random" for blocking when the entropy pool has drained
+const char * const boost::random_device::default_token = "/dev/urandom";
+
+/*
+ * This uses the POSIX interface for unbuffered reading.
+ * Using buffered std::istream would consume entropy which may
+ * not actually be used.  Entropy is a precious good we avoid
+ * wasting.
+ */
+
+#if defined(__GNUC__) && defined(_CXXRT_STD_NAME)
+// I have severe difficulty to get the POSIX includes to work with
+// -fhonor-std and Dietmar K?hl's standard C++ library.  Hack around that
+// problem for now.
+extern "C" {
+static const int O_RDONLY = 0;
+extern int open(const char *__file, int __oflag, ...);
+extern int read(int __fd, __ptr_t __buf, size_t __nbytes);
+extern int close(int __fd);
+}
+#else
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>    // open
+#include <unistd.h>   // read, close
 #endif
 
-#include <windows.h>
-#include <wincrypt.h>
+#include <errno.h>    // errno
+#include <string.h>   // strerror
+#include <stdexcept>  // std::invalid_argument
 
-const char* const boost::random_device::default_token = "";
 
 class boost::random_device::impl
 {
- public:
-	impl()
-		: handle(0)
-	{
-		if (!CryptAcquireContext( &handle, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
-			error();
-	}
+public:
+  impl(const std::string & token) : path(token) {
+    fd = open(token.c_str(), O_RDONLY);
+    if(fd < 0)
+      error("cannot open");
+  }
 
-	~impl()
-	{
-		CryptReleaseContext( handle, 0);
-	}
+  ~impl() { if(close(fd) < 0) error("could not close"); }
 
-	unsigned int next()
-	{
-		unsigned int ret = 0;
-		CryptGenRandom( handle, sizeof(unsigned int), (BYTE*)&ret);
-		assert(ret != 0);
-		return ret;
-	}
+  unsigned int next() {
+    unsigned int result;
+    long sz = read(fd, reinterpret_cast<char *>(&result), sizeof(result));
+    if(sz == -1)
+      error("error while reading");
+    else if(sz != sizeof(result)) {
+      errno = 0;
+      error("EOF while reading");
+    }
+    return result;
+  }
 
- private:
-	HCRYPTPROV handle;
-
-	void error()
-	{
-		throw std::runtime_error( "CryptAquireContext() failed");
-	}
+private:
+  void error(const std::string & msg) {
+    throw std::invalid_argument("boost::random_device: " + msg + 
+                                " random-number pseudo-device " + path + 
+                                ": " + strerror(errno));
+  }
+  const std::string path;
+  int fd;
 };
 
-boost::random_device::random_device(const std::string&)
-  : pimpl(new impl())
+//#endif // __linux__
+
+
+boost::random_device::random_device(const std::string& token)
+  : pimpl(new impl(token))
 {
   assert(std::numeric_limits<result_type>::max() == max_value);
 }

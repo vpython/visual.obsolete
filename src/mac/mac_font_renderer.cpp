@@ -1,33 +1,106 @@
 #include "font_renderer.hpp"
 #include "util/errors.hpp"
+#include "mac/display.hpp"
 
 namespace cvisual {
 
-using std::wstring;
+/**************** aglFont implementation *******************/
 
-class win32_exception : std::exception {
- public:
-	win32_exception( const char* desc ) : std::exception(desc) {
-		// todo: report GetLastError(), see win32_write_critical in windisplay.cpp
-	}
-};
 
-bool isClearTypeEnabled() {
-	UINT smoothType = 0;
-	// On versions of Windows < XP, this call should fail
-	if (SystemParametersInfo( 0x200a, 0, &smoothType, 0 )) {  // SPI_GETFONTSMOOTHINGTYPE
-		if (smoothType == 2) // FE_FONTSMOOTHINGCLEARTYPE
-			return true;
-	}
-	return false;
+aglFont::aglFont(struct aglContext& _cx, 
+		 const char *name, 
+		 double size) 
+	: cx(_cx), refcount(1)
+{
+		unsigned char pName[256];
+		int ok;
+		
+		// Font names vary across platforms, so fall back if necessary
+		strcpy((char *)(&(pName[1])), name);
+		pName[0] = strlen(name);
+		fID = FMGetFontFamilyFromName((unsigned char *)pName);
+		if (fID <= 0)
+			fID = GetAppFont();
+		// No size means default
+		if (size <= 0)
+			size = GetDefFontSize();
+		
+		fSize = (int)size;
+		FetchFontInfo(fID, fSize, 0, &fInfo);
+		
+		cx.makeCurrent();
+		listBase = glGenLists(256);
+		ok = aglUseFont(cx.getContext(), fID, 0, fSize, 0, 256, listBase);
+		// if (! ok)	um, report something? Unlikely
+		cx.makeNotCurrent();
 }
 
-static int CALLBACK ef_callback(ENUMLOGFONTEXW *,NEWTEXTMETRICEXW *,DWORD,LPARAM lParam) {
-	*(bool*)lParam = true;
-	return 0;
+aglFont::~aglFont()
+{
+	fID = -1;
 }
 
-font_renderer::font_renderer( const wstring& description, int height ) {
+void
+aglFont::draw(const std::wstring& c)
+{
+	if (fID >= 0) {
+		glListBase(listBase);
+		//glCallLists(strlen(c), GL_UNSIGNED_BYTE, c);
+	}
+}
+
+double
+aglFont::getWidth(const std::wstring& c)
+{
+	int		tw;
+	
+	if (fID == 0)
+		return 0;
+	
+	// Still using old QuickDraw text measurement because I can't
+	// figure out how to use ATSUI
+	cx.makeCurrent();
+	TextFont(fID);
+	TextFace(0);
+	TextSize(fSize);
+	
+	//tw = TextWidth(c, 0, strlen(c));
+	
+	return (double)(tw  * 2) / cx.width();
+}
+
+double
+aglFont::ascent()
+{
+	return (double)fInfo.ascent * 2 / cx.height();
+}
+
+double
+aglFont::descent()
+{
+	return (double)fInfo.descent * 2 / cx.height();
+}
+
+void
+aglFont::release()
+{
+	refcount--;
+	if (refcount <= 0) {
+		cx.add_pending_glDeleteList( listBase, 256);
+		delete(this);
+	}
+}
+
+/*
+aglFont*
+aglContext::getFont(const char* description, double size)
+{
+	return new aglFont(*this, description, size);
+}
+*/
+
+font_renderer::font_renderer( const std::wstring& description, int height ) {
+	/*
 	font_handle = NULL;
 	
 	// TODO: support generic "sans-serif", "serif", "monospace" families using lfPitchAndFamily.
@@ -58,6 +131,7 @@ font_renderer::font_renderer( const wstring& description, int height ) {
 		SelectObject( sic, SelectObject( sic, font_handle ) ); //< Work around KB306198
 	
 	DeleteDC( sic );
+	*/
 }
 
 bool font_renderer::ok() {
@@ -65,11 +139,14 @@ bool font_renderer::ok() {
 }
 
 font_renderer::~font_renderer() {
+	/*
 	if (font_handle)
 		DeleteObject( font_handle );
+	*/
 }
 
-void font_renderer::gl_render_to_texture( const view&, const wstring& text, layout_texture& tx ) {
+void font_renderer::gl_render_to_texture( const view&, const std::wstring& text, layout_texture& tx ) {
+	/*
 	HDC dc = NULL;
 	HBITMAP bmp = NULL;
 	HFONT prevFont = NULL;
@@ -125,7 +202,7 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 		if (dc) { SelectObject(dc, prevFont); DeleteDC( dc ); }
 		
 		throw;
+	*/
 	}
-}
 
 } // namespace cvisual

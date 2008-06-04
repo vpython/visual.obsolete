@@ -3,6 +3,7 @@
 TOP = ../vpython-core2
 DEPENDS = $(TOP)/dependencies
 SRC = $(TOP)/src
+BOOST = $(TOP)/dependencies/boost_1_35_0/mac_lib
 VPATH = $(SRC)/mac $(SRC)/core/util $(SRC)/core $(SRC)/python $(SRC)
 
 CXX = /usr/bin/g++
@@ -11,7 +12,7 @@ CXXFLAGS = -fPIC -MMD \
 	-I$(TOP)/include/mac -I$(TOP)/include \
 	-I/System/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5 \
 	-I/Library/Python/2.5/site-packages/numpy/core/include \
-	-I$(DEPENDS)/boost_1_35_0/boost -I$(DEPENDS)/threadpool/include \
+	-I/usr/local/include/boost-1_35 -I$(DEPENDS)/threadpool/include \
 	-F/System/Library/Frameworks/AGL.framework \
 	-F/System/Library/Frameworks/Carbon.framework \
 	-F/System/Library/Frameworks/OpenGL.framework
@@ -32,7 +33,10 @@ cvisual.so : $(OBJS)
 	$(CXX) -bundle -bundle_loader /usr/bin/python2.5 -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
-	$(BOOST)/lib 
+	$(BOOST)/libboost_date_time-mt-s-1_35.a \
+	$(BOOST)/libboost_python-mt-s-1_35.a \
+	$(BOOST)/libboost_signals-mt-s-1_35.a \
+	$(BOOST)/libboost_thread-mt-s-1_35.a
 
 clean :
 	rm *.o

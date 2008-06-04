@@ -4,31 +4,27 @@
 
 #include "util/timer.hpp"
 
-#include <windows.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include <cmath>
 #include <numeric>
-#include <stdexcept>
 
 namespace cvisual {
-
-timer::timer()
-	: start(0)
-{
-	LARGE_INTEGER freq;
-	if (!QueryPerformanceFrequency(&freq))
-		throw std::runtime_error( "No high resolution timer." );
-	inv_tick_count = 1.0 / static_cast<double>(freq.QuadPart);
 	
+timer::timer()
+	: start(0), inv_tick_count(0)
+{
 	start = elapsed();
 }
 
-double
-timer::elapsed()
-{
-	LARGE_INTEGER count;
-	QueryPerformanceCounter( &count );
-	return static_cast<double>(count.QuadPart)*inv_tick_count - start;
+double timer::elapsed() {
+	timeval t;
+	timerclear(&t);
+	gettimeofday( &t, NULL);
+	return static_cast<double>(t.tv_sec)
+		+ static_cast<double>(t.tv_usec)*1e-6 
+		- start;
 }
 
 } // !namespace cvisual

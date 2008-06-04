@@ -16,43 +16,6 @@
 namespace cvisual {
 using boost::scoped_ptr;
 
-class aglFont 
-{
-public:
-	double getWidth(const char* string);
-	// returns the horizontal extent of the given string in
-	//   viewport coordinates (0.0 to 1.0)
-
-	double ascent();
-	// returns the maximum distance from the baseline to the top
-	//   of a glyph (e.g. "M")
-
-	double descent();
-	// returns the maximum distance from the baseline to the bottom
-	//   of a glyph (e.g. "g")
-
-	void draw(const char* string);
-	// draws string with the current glRasterPos at its left baseline
-
-	void release();
-	// call once for each call to glContext::getFont()
-	  
-	//used by aglContext
-	aglFont(struct aglContext& cx, 
-		const char *name, 
-		double size);
-	~aglFont();
-	void addref() {refcount++;};
-  
- private:
-	struct aglContext& cx;
-	SInt16		fID;
-	int			fSize;
-	FontInfo	fInfo;
-	int			listBase;
-	int			refcount;
-};
-
 class aglContext 
 {
  private:
