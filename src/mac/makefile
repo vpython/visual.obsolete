@@ -7,7 +7,7 @@ BOOST = $(TOP)/dependencies/boost_1_35_0/mac_lib
 VPATH = $(SRC)/mac $(SRC)/core/util $(SRC)/core $(SRC)/python $(SRC)
 
 CXX = /usr/bin/g++
-CXXFLAGS = -fPIC -MMD \
+CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-Wno-long-double -DPIC -O2 -g -finline-functions \
 	-I$(TOP)/include/mac -I$(TOP)/include \
 	-I/System/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5 \
