@@ -144,7 +144,7 @@ public:
 	void create();
 	void destroy();
 	void paint(); // { area->paint(); }
-	void swap(); // { area->swap(); } or win: { gl_swap_buffers(); }
+	void swap() { gl_swap_buffers(); }
 
 	// Tells the application where it can find its data.
 	static void set_dataroot( const std::wstring& dataroot);
