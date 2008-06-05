@@ -39,7 +39,6 @@ vector_array::vector_array( const boost::python::list& sequence)
 		}
 #else
 		if (v_extractor.check()) {
-		}
 			*i = v_extractor();
 		}
 #endif
