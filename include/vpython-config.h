@@ -12,4 +12,7 @@
 # pragma warning(disable: 4005)
 # pragma warning(disable: 4715)
 #endif
+
+#define BOOST_DATE_TIME_NO_LIB
+
 #endif
