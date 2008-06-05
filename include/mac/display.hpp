@@ -16,6 +16,36 @@
 namespace cvisual {
 using boost::scoped_ptr;
 
+/* XXX Why yet another implementation of mutex?
+class mutex 
+{
+	int count;
+	pthread_mutex_t mtx;
+  
+ public:
+	typedef lock<mutex> lock;
+
+	mutex(int spincount=0, int count=1);
+	~mutex();
+  
+	inline void sync_lock() { pthread_mutex_lock( &mtx); }
+	inline void count_lock() { pthread_mutex_lock( &mtx); count++; }
+	inline void sync_unlock() { pthread_mutex_unlock( &mtx); }
+	inline int sync_count() { return count; }
+  
+	inline void clear() 
+	{ sync_lock(); count=0; sync_unlock(); }
+};
+*/
+
+void _event_callback( double seconds, bool (*callback)(void*), void *data);
+
+template <class T>
+inline void event_callback( double seconds, bool (*callback)(T*), T* data) 
+{
+	_event_callback( seconds, (bool(*)(void*))callback, (void*)data);
+}
+
 class aglContext 
 {
  private:
@@ -98,9 +128,6 @@ class aglContext
 	
 };
 
-// A singleton.  This class provides all of the abstraction from the Gtk::Main
-// object, in addition to providing asynchronous communication channels between
-// threads.
 class gui_main
 {
  private:	

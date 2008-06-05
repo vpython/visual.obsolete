@@ -117,6 +117,142 @@ display::getProcAddress(const char* name) {
 
 /**************** Mac-specific stuff ***********************/
 
+void init_platform()
+{
+	ProcessSerialNumber psn;
+	CFDictionaryRef		app;
+	const void *		backKey;
+	const void *		background;
+	int					err;
+	
+	//std::cout << "init_platform\n";
+	// If we were invoked from python rather than pythonw, change into a GUI app
+	GetCurrentProcess(&psn);
+	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
+	backKey = CFStringCreateWithCString(NULL, "LSBackgroundOnly", kCFStringEncodingASCII);
+	background = CFDictionaryGetValue(app, backKey);
+	if (background == kCFBooleanTrue) {
+		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+	}
+	SetFrontProcess(&psn);
+}
+
+void threaded_exit ( int status)
+{
+	exit(status);
+}
+
+void threaded_sleep( double seconds)
+{
+	  Py_BEGIN_ALLOW_THREADS
+	  usleep( (unsigned int)(seconds * 1.0e6));
+	  Py_END_ALLOW_THREADS
+}
+
+void nothread_sleep( double seconds)
+{
+	usleep( (unsigned int)(seconds * 1.0e6));
+}
+
+double sclock()
+{
+	struct timeval tv;
+	gettimeofday( &tv, NULL);
+
+	return (tv.tv_sec + tv.tv_usec / 1.0e6);
+}
+
+/******** mutex implementation ********/
+/* XXX Why yet another mutex?
+
+mutex::mutex( int spincount, int _count)
+	 : count(_count)
+{
+	pthread_mutex_init( &mtx, NULL);
+}
+
+mutex::~mutex()
+{
+	pthread_mutex_destroy( &mtx);
+}
+*/
+
+/*********** event handling not needed ********/
+
+bool handle_event( PyObject*)
+{
+	return false;
+}
+
+/*********** GUI  implementation *************/
+
+
+static void* event_loop (void * arg)
+{
+	RunApplicationEventLoop();
+	//std::cout << "end event_loop\n";
+	return 0;
+}
+
+typedef struct {
+	bool (*func)(void * data);
+	void * funcData;
+	double delay;
+	EventLoopTimerUPP upp;
+} VPCallback;
+
+static void doCallback (EventLoopTimerRef timer, void * data)
+{
+	VPCallback * callback;
+		
+	callback = (VPCallback *)data;
+	
+	if (callback->func(callback->funcData)) {
+		_event_callback(callback->delay, callback->func, callback->funcData);
+	}
+	// FIXME Got a memory leak here
+	//delete callback;
+}
+
+void _event_callback( double seconds, bool (*callback)(void*), void *data)
+{
+	EventLoopTimerRef	discard;
+	VPCallback *		cb;
+	
+	if (callback) {
+		cb = new VPCallback;
+		cb->func	 = callback;
+		cb->funcData = data;
+		cb->delay	 = seconds;
+		cb->upp		 = NewEventLoopTimerUPP(doCallback);
+		InstallEventLoopTimer(GetMainEventLoop(), seconds, 0, cb->upp, cb, &discard);
+		DisposeEventLoopTimerUPP(cb->upp);
+	}
+}
+
+void start_event_loop ()
+{
+	pthread_t thread;
+	
+	//std::cout << "start_event_loop\n";
+	pthread_create( &thread, NULL, event_loop, 0);
+}
+
+
+static bool doQuit (void * arg)
+{
+	QuitApplicationEventLoop();
+	return 0;
+}
+
+void stop_event_loop ()
+{
+	//std::cout << "stop_event_loop\n";
+	_event_callback(0.0, doQuit, NULL);
+}
+
+/*************** aglContext implementation *************/
+
 /*
 Deprecated:
 In aglFont::aglFont,
@@ -128,9 +264,6 @@ In aglFont::getWidth,
 In aglContext::initWindow,
    GetMainDevice, aglSetDrawable
 */
-
-/*************** aglContext implementation *************/
-
 
 aglContext::aglContext() 
  : window(0),
@@ -676,6 +809,111 @@ void destroy_context (glContext * cx)
 	(static_cast<aglContext *>(cx))->cleanup();
 }
 */
+/******************************* gui_main implementatin **********************/
 
+gui_main* gui_main::self = 0;  // Protected by python GIL
+
+boost::signal<void()> gui_main::on_shutdown;
+
+//const int CALL_MESSAGE = WM_USER;
+
+gui_main::gui_main()
+// : gui_thread(-1)
+{
+}
+
+/* XXX
+LRESULT
+gui_main::threadMessage( int code, WPARAM wParam, LPARAM lParam ) {
+	if (wParam == PM_REMOVE) {
+		MSG& message = *(MSG*)lParam;
+		
+		if (message.hwnd ==0 && message.message == CALL_MESSAGE ) {
+			boost::function<void()>* f = (boost::function<void()>*)message.wParam;
+			(*f)();
+			delete f;
+		}
+	}
+	return CallNextHookEx( NULL, code, wParam, lParam );
+}
+
+#define TIMER_RESOLUTION 5
+void __cdecl end_period() { timeEndPeriod(TIMER_RESOLUTION); }
+
+void
+gui_main::run()
+{
+	MSG message;
+	
+	// Create a message queue and hook thread messages (we can't just check for them in the loop
+	// below, becomes Windows runs modal message loops e.g. when resizing a window)
+	SetWindowsHookEx(WH_GETMESSAGE, &gui_main::threadMessage, NULL, GetCurrentThreadId());
+	PeekMessage(&message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+	
+	// Tell the initializing thread
+	{
+		lock L(init_lock);
+		gui_thread = GetCurrentThreadId();
+		initialized.notify_all();
+	}
+	
+	timeBeginPeriod(TIMER_RESOLUTION);
+	atexit( end_period );
+	
+	poll();
+
+	// Enter the message loop
+	while (GetMessage(&message, 0, 0, 0) > 0) {
+		TranslateMessage( &message);
+		DispatchMessage( &message);
+	}
+
+	// We normally exit the message queue because PostQuitMessage() has been called
+	VPYTHON_NOTE( "WM_QUIT (or message queue error) received");
+	on_shutdown(); // Tries to kill Python
+}
+*/
+
+void
+gui_main::init_thread(void)
+{
+	if (!self) {
+		// We are holding the Python GIL through this process, including the wait!
+		// We can't let go because a different Python thread could come along and mess us up (e.g.
+		//   think that we are initialized and go on to call PostThreadMessage without a valid idThread)
+		self = new gui_main;
+		thread gui( boost::bind( &gui_main::run, self ) );
+		lock L( self->init_lock );
+		while (self->gui_thread == -1)
+			self->initialized.wait( L );
+	}
+}
+
+void
+gui_main::call_in_gui_thread( const boost::function< void() >& f )
+{
+	init_thread();
+	PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
+}
+
+VOID CALLBACK gui_main::timer_callback( PVOID, BOOLEAN ) {
+	// Called in high-priority timer thread when it's time to render
+	self->call_in_gui_thread( boost::bind( &gui_main::poll, self ) );
+}
+
+void gui_main::poll() {
+	// Called in gui thread when it's time to render
+	// We don't need the lock here, because displays can't be created or destroyed from Python
+	// without a message being processed by the GUI thread.  paint_displays() will pick
+	// the lock up as necessary to synchronize access to the actual display contents.
+
+	std::vector<display*> displays;
+	for(std::map<HWND, display*>::iterator i = widgets.begin(); i != widgets.end(); ++i )
+		if (i->second)
+			displays.push_back( i->second );
+
+	int interval = int( 1000. * render_manager::paint_displays( displays ) );
+	CreateTimerQueueTimer( &timer_handle, NULL, &timer_callback, NULL, interval, 0, WT_EXECUTEINTIMERTHREAD );
+}
 
 } // !namespace cvisual;
