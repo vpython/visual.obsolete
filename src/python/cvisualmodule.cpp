@@ -65,7 +65,8 @@ BOOST_PYTHON_MODULE( cvisual)
 	VPYTHON_NOTE( "Importing cvisual from vpython-core2.");
 
 #ifdef __APPLE__
-	gui_main::init_platform();
+	extern void init_platform();
+	init_platform();
 #endif
 	
 	using namespace boost::python;

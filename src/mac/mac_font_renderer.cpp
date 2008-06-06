@@ -7,7 +7,7 @@ namespace cvisual {
 /**************** aglFont implementation *******************/
 
 
-aglFont::aglFont(struct aglContext& _cx, 
+aglFont::aglFont(struct display& _cx, 
 		 const char *name, 
 		 double size) 
 	: cx(_cx), refcount(1)
@@ -66,19 +66,19 @@ aglFont::getWidth(const std::wstring& c)
 	
 	//tw = TextWidth(c, 0, strlen(c));
 	
-	return (double)(tw  * 2) / cx.width();
+	return (double)(tw  * 2) / cx.window_width;
 }
 
 double
 aglFont::ascent()
 {
-	return (double)fInfo.ascent * 2 / cx.height();
+	return (double)fInfo.ascent * 2 / cx.window_height;
 }
 
 double
 aglFont::descent()
 {
-	return (double)fInfo.descent * 2 / cx.height();
+	return (double)fInfo.descent * 2 / cx.window_height;
 }
 
 void

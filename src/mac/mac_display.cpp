@@ -21,6 +21,7 @@ static bool modBit (int mask, int bit)
 	return (mask & (1 << bit));
 }
 
+
 /*
 Deprecated Carbon elements (which means doubly deprecated, since Carbon itself has little support):
 In aglFont::aglFont in mac_font_renderer.cpp,
@@ -132,6 +133,7 @@ display::destroy() // was aglContext::cleanup()
 
 void
 display::activate(bool active) {
+	/*
 	if (active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
 		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
@@ -140,12 +142,45 @@ display::activate(bool active) {
 		VPYTHON_NOTE( "Closing a window from Python.");
 		gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
 	}
+	*/
 }
 
 display::EXTENSION_FUNCTION
 display::getProcAddress(const char* name) {
 	// TODO: What instead of wglGetProcAddress?
 	//return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
+}
+
+void
+display::makeCurrent()
+{
+	SetPortWindowPort(window);
+	aglSetCurrentContext(gl_context);
+	delete_pending_lists();
+}
+
+void
+display::makeNotCurrent()
+{
+	aglSetCurrentContext(NULL);
+}
+
+void
+display::add_pending_glDeleteList(int base, int howmany)
+{
+	// TODO: Cache::write_lock L(list_lock);
+	pending_glDeleteLists.push_back( std::make_pair(base, howmany));	
+}
+
+void 
+display::delete_pending_lists()
+{
+	// TODO: Cache::write_lock L( list_lock);
+	for (std::vector<std::pair<int, int> >::iterator i = pending_glDeleteLists.begin();
+		i != pending_glDeleteLists.end(); ++i) {
+		glDeleteLists(i->first, i->second);	
+	}
+	pending_glDeleteLists.clear();
 }
 
 int
@@ -614,18 +649,8 @@ display::getKeys()
 
 /******************** gui_main implementation **********************/
 
-gui_main* gui_main::self = 0;  // Protected by python GIL
-
-boost::signal<void()> gui_main::on_shutdown;
-
-
-gui_main::gui_main()
-// : gui_thread(-1)
-{
-}
-
 void 
-gui_main::init_platform()
+init_platform() // called from cvisualmodule initialization
 {
 	ProcessSerialNumber psn;
 	CFDictionaryRef		app;
@@ -643,6 +668,16 @@ gui_main::init_platform()
 		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
 	}
 	SetFrontProcess(&psn);
+}
+
+gui_main* gui_main::self = 0;  // Protected by python GIL
+
+boost::signal<void()> gui_main::on_shutdown;
+
+
+gui_main::gui_main()
+// : gui_thread(-1)
+{
 }
 
 static void 
@@ -693,7 +728,7 @@ gui_main::start_event_loop ()
 	pthread_create( &thread, NULL, event_loop, 0);
 }
 
-static bool 
+bool 
 gui_main::doQuit (void * arg)
 {
 	QuitApplicationEventLoop();
@@ -707,7 +742,8 @@ gui_main::stop_event_loop ()
 	_event_callback(0.0, doQuit, NULL);
 }
 
-static void
+/*
+void
 gui_main::init_thread()
 {
 	if (!self) {
@@ -722,7 +758,7 @@ gui_main::init_thread()
 	}
 }
 
-static void
+void
 gui_main::call_in_gui_thread( const boost::function< void() >& f )
 {
 	init_thread();
@@ -749,5 +785,6 @@ void gui_main::poll() {
 	int interval = int( 1000. * render_manager::paint_displays( displays ) );
 	CreateTimerQueueTimer( &timer_handle, NULL, &timer_callback, NULL, interval, 0, WT_EXECUTEINTIMERTHREAD );
 }
+*/
 
 } // !namespace cvisual;

@@ -15,6 +15,21 @@
 
 namespace cvisual {
 
+typedef struct {
+	bool (*func)(void * data);
+	void * funcData;
+	double delay;
+	EventLoopTimerUPP upp;
+} VPCallback;
+
+void _event_callback( double seconds, bool (*callback)(void*), void *data);
+
+template <class T>
+inline void event_callback( double seconds, bool (*callback)(T*), T* data) 
+{
+	_event_callback( seconds, (bool(*)(void*))callback, (void*)data);
+}
+
 class display : public display_kernel
 {
  public:
@@ -58,7 +73,7 @@ class display : public display_kernel
 	virtual EXTENSION_FUNCTION getProcAddress( const char* name );
 	
  private:
-	friend class font;
+	friend class aglFont;
 	static display* current;
 	
 	bool initWindow( std::string title, int x, int y, int width, int height, int flags );
@@ -119,27 +134,9 @@ class gui_main
 
 	gui_main();	//< This is the only nonstatic member function that doesn't run in the gui thread!
 	void run();
-	void poll();
+	//void poll();
 
 	static gui_main* self;
-
-	/*
-	template <class T>
-	inline void event_callback( double seconds, bool (*callback)(T*), T* data) 
-	{
-		_event_callback( seconds, (bool(*)(void*))callback, (void*)data);
-	}
-	
-	template <class T>	
-	void _event_callback( double seconds, bool (*callback)(T*), T* data);
-	*/
-	
-	typedef struct {
-		bool (*func)(void * data);
-		void * funcData;
-		double delay;
-		EventLoopTimerUPP upp;
-	} VPCallback;
 
  public:
 	 void start_event_loop();
@@ -147,10 +144,8 @@ class gui_main
 	 void stop_event_loop();
 	 
 	 // Calls the given function in the GUI thread.
-	 static void call_in_gui_thread( const boost::function< void() >& f );
-	 void timer_callback();
-	
-	 void init_platform(); // make app into a GUI app if necessary
+	 //static void call_in_gui_thread( const boost::function< void() >& f );
+	 //void timer_callback();
 	
 	 // This signal is invoked when the user closes the program (closes a display
 	 // with display.exit = True).

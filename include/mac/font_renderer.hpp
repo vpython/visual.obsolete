@@ -32,14 +32,14 @@ public:
 	// call once for each call to glContext::getFont()
 	  
 	//used by aglContext
-	aglFont(struct aglContext& cx, 
+	aglFont(struct display& cx, 
 		const char *name, 
 		double size);
 	~aglFont();
 	void addref() {refcount++;};
   
  private:
-	struct aglContext& cx;
+	struct display& cx;
 	SInt16		fID;
 	int			fSize;
 	FontInfo	fInfo;
