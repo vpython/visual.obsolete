@@ -14,52 +14,19 @@
 #include <AGL/agl.h>
 
 namespace cvisual {
-using boost::scoped_ptr;
 
-/* XXX Why yet another implementation of mutex?
-class mutex 
+class display : public display_kernel
 {
-	int count;
-	pthread_mutex_t mtx;
-  
  public:
-	typedef lock<mutex> lock;
+	display();
+	virtual ~display();
 
-	mutex(int spincount=0, int count=1);
-	~mutex();
-  
-	inline void sync_lock() { pthread_mutex_lock( &mtx); }
-	inline void count_lock() { pthread_mutex_lock( &mtx); count++; }
-	inline void sync_unlock() { pthread_mutex_unlock( &mtx); }
-	inline int sync_count() { return count; }
-  
-	inline void clear() 
-	{ sync_lock(); count=0; sync_unlock(); }
-};
-*/
-
-void _event_callback( double seconds, bool (*callback)(void*), void *data);
-
-template <class T>
-inline void event_callback( double seconds, bool (*callback)(T*), T* data) 
-{
-	_event_callback( seconds, (bool(*)(void*))callback, (void*)data);
-}
-
-class aglContext 
-{
- private:
-    // This is a list of glDeleteLists calls that should be made the next time
-    // the context is made active.
-    mutex list_lock;
-	std::vector<std::pair<int, int> > pending_glDeleteLists;
-
- protected:
-	// Implementors of this class should call this function in their implementation
-	// of makeCurrent();
- 	void delete_pending_lists();
-
- public:
+	// Called by the gui_main class below (or render_manager as its agent)
+	void create();
+	void destroy();
+	void paint();
+	void swap() { gl_swap_buffers(); }
+	
 	void lockMouse();
 	void unlockMouse();
 	void showMouse();
@@ -73,18 +40,27 @@ class aglContext
 	int getAltKey();
 	int getCtrlKey();
 	
-	// Do not delete contexts directly, as there can be
-	// nasty interactions with the event loop thread.
-	// Use the destroy_context function instead.
-	aglContext();
-	~aglContext();
-	
-	void cleanup();
+	// Functions to manipulate the OpenGL context
+	void gl_begin();
+	void gl_end();
+	void gl_swap_buffers();
 
+	// Tells the application where it can find its data.
+	// Win32 doesn't use this information.
+	static void set_dataroot( const std::wstring& ) {};
+
+	// Implements key display_kernel virtual methods
+	virtual void activate( bool active );
+	virtual EXTENSION_FUNCTION getProcAddress( const char* name );
+	
+ private:
+	friend class font;
+	static display* current;
+	
 	bool initWindow( std::string title, int x, int y, int width, int height, int flags );
 	bool changeWindow( std::string title, int x, int y, int width, int height, int flags );
-	bool isOpen();
-		
+	bool isOpen();	
+	
 	enum {
 		DEFAULT    = 0,
 		FULLSCREEN = 0x1,
@@ -95,29 +71,29 @@ class aglContext
 	void makeNotCurrent();
 	void swapBuffers();
 
-	OSStatus aglContext::vpWindowHandler (EventRef event);
-	OSStatus aglContext::vpMouseHandler (EventRef event);
-	OSStatus aglContext::vpKeyboardHandler (EventRef event);
+	OSStatus vpWindowHandler (EventRef event);
+	OSStatus vpMouseHandler (EventRef event);
+	OSStatus vpKeyboardHandler (EventRef event);
+
+ 	bool window_visible;
 	
-	int winX();
-	int winY();
-	int width();
-	int height();
+	void update_size();
+
+    // This is a list of glDeleteLists calls that should be made the next time
+    // the context is made active.
+    mutex list_lock;
+	std::vector<std::pair<int, int> > pending_glDeleteLists;
 
 	inline std::string lastError() { return error_message; }
     
-	//glFont* getFont(const char* description, double size);
-
-	AGLContext getContext () { return ctx; }
+	AGLContext getContext () { return gl_context; }
 	
 	void destroy_context (aglContext * cx);
 	
 	void add_pending_glDeleteList(int base, int howmany);
 	
- private:
 	WindowRef	window;
-	AGLContext	ctx;
-	int wx, wy, wwidth, wheight;
+	AGLContext	gl_context;
 	std::string error_message;
 
 	int buttonState, buttonsChanged;
@@ -125,8 +101,15 @@ class aglContext
 	vector mousePos, oldMousePos;
 	bool mouseLocked;
 	std::queue<std::string> keys;
-	
+
+ protected:
+	// Implementors of this class should call this function in their implementation
+	// of makeCurrent();
+ 	void delete_pending_lists();
+
 };
+
+/***************** gui_main implementation ********************/
 
 class gui_main
 {
@@ -140,72 +123,42 @@ class gui_main
 
 	static gui_main* self;
 	
-	//DWORD gui_thread;
-	mutex init_lock;
-	condition initialized;
+	void _event_callback( double seconds, bool (*callback)(void*), void *data);
 
- 	//HANDLE timer_handle;
+	template <class T>
+	inline void event_callback( double seconds, bool (*callback)(T*), T* data) 
+	{
+		_event_callback( seconds, (bool(*)(void*))callback, (void*)data);
+	}
 	
-	//static LRESULT CALLBACK threadMessage( int, WPARAM, LPARAM );
+	typedef struct {
+		bool (*func)(void * data);
+		void * funcData;
+		double delay;
+		EventLoopTimerUPP upp;
+	} VPCallback;
 
-	//static VOID CALLBACK timer_callback( PVOID, BOOLEAN );
-	
  public:
-	// Calls the given function in the GUI thread.
-	static void call_in_gui_thread( const boost::function< void() >& f );
+	 static void* event_loop (void * arg);
+	 static void doCallback (EventLoopTimerRef timer, void * data);
+	 void _event_callback( double seconds, bool (*callback)(void*), void *data)
+	 void start_event_loop();
+	 static bool doQuit(void * arg);
+	 void stop_event_loop();
+	 void init_thread(void);
+	 
+	 // Calls the given function in the GUI thread.
+	 static void call_in_gui_thread( const boost::function< void() >& f );
+	 void timer_callback(void, bool);
+	 void poll();
 	
-	// This signal is invoked when the user closes the program (closes a display
-	// with display.exit = True).
-	// wrap_display_kernel() connects a signal handler that forces Python to
-	// exit.
-	static boost::signal<void()> on_shutdown;
-};
-
-class display : public display_kernel
-{	
-public:
-	display();
-	virtual ~display();
+	 void init_platform(); // make app into a GUI app if necessary
 	
-	// Called by the gui_main class below (or render_manager as its agent)
-	void create();
-	void destroy();
-	void paint(); // { area->paint(); }
-	void swap() { gl_swap_buffers(); }
-
-	// Tells the application where it can find its data.
-	static void set_dataroot( const std::wstring& dataroot);
-	
-	// Implements key display_kernel virtual methods
-	virtual void activate(bool);
-	EXTENSION_FUNCTION getProcAddress( const char* name );
-	
- private:
-	//static int get_titlebar_height();
-	//static int get_toolbar_height();
-
-/*
-	// Signal handlers for the various widgets.
-	void on_fullscreen_clicked();
-	void on_pan_clicked();
-	void on_rotate_clicked();
-	bool on_window_delete(      );
-	void on_quit_clicked();
-	void on_zoom_clicked();
-	bool on_key_pressed(        );
-*/
-	
-	// Functions to manipulate the OpenGL context
-	void gl_begin();
-	void gl_end();
-	void gl_swap_buffers();
-
- private:
-	//scoped_ptr<render_surface> area;
-	//Gtk::Window* window;
-	 bool window_visible;
-	 aglContext agl_context;
-	 static display* current;
+	 // This signal is invoked when the user closes the program (closes a display
+	 // with display.exit = True).
+	 // wrap_display_kernel() connects a signal handler that forces Python to
+	 // exit.
+	 static boost::signal<void()> on_shutdown;
 };
 
 } // !namespace cvisual

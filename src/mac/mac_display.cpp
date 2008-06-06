@@ -16,24 +16,40 @@ using boost::lexical_cast;
 
 namespace cvisual {
 
-template<typename T>
-inline T
-clamp( T x, T a, T b)
-{
-	if (b<a) return std::max( b, std::min( x, a));
-	else return std::max( a, std::min( x, b));
-}
-
 static bool modBit (int mask, int bit)
 {
 	return (mask & (1 << bit));
 }
 
+/*
+Deprecated Carbon elements (which means doubly deprecated, since Carbon itself has little support):
+In aglFont::aglFont in mac_font_renderer.cpp,
+   FMGetFontFamilyFromName, GetAppFont, GetDefFontSize, FetchFontInfo, aglUseFont
+
+In aglFont::getWidth in mac_font_renderer.cpp,
+   TextFont, TextFace, TextSize, TextWidth
+
+In display::initWindow,
+   GetMainDevice, aglSetDrawable
+*/
+
 /**************************** display methods ************************************/
 display* display::current = 0;
 
 display::display()
-  : window_visible(false)
+ : window_visible(false)
+   window(0),
+   gl_context(0),
+   wx(0), wy(0),
+   wwidth(0), wheight(0),
+   buttonState(0),
+   buttonsChanged(0),
+   keyModState(0),
+   mouseLocked(false)
+{
+}
+
+display::~display()
 {
 }
 
@@ -53,14 +69,16 @@ void display::paint() {
 void
 display::gl_begin()
 {
-	agl_context.makeCurrent();
+	SetPortWindowPort(window);
+	aglSetCurrentContext(gl_context);
+	delete_pending_lists();
 	current = this;
 }
 
 void
 display::gl_end()
 {
-	agl_context.makeNotCurrent();
+	aglSetCurrentContext(NULL);
 	current = 0;
 }
 
@@ -70,7 +88,7 @@ display::gl_swap_buffers()
 	if (!window_visible) return;
 
 	gl_begin();
-	agl_context.swapBuffers();
+	aglSwapBuffers(gl_context);
 	glFinish();	// Ensure rendering completes here (without the GIL) rather than at the next paint (with the GIL)
 	gl_end();
 }
@@ -80,7 +98,7 @@ display::create()
 {
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
 	// Just to get going, set flags to 0:
-	if (!agl_context.initWindow(title, window_x, window_y, window_width, window_height, 0)) {
+	if (!initWindow(title, window_x, window_y, window_width, window_height, 0)) {
 		std::ostringstream msg;
 		msg << "Could not create the window!\n";
 		VPYTHON_CRITICAL_ERROR( msg.str());
@@ -88,14 +106,30 @@ display::create()
 	}
 }
 
-void
-display::destroy()
+/*
+// Original comment:
+ 	// Do not delete contexts directly, as there can be
+	// nasty interactions with the event loop thread.
+	// Use the destroy_context function instead.
+void destroy_context (glContext * cx)
 {
-	agl_context.cleanup();
+	(static_cast<aglContext *>(cx))->cleanup();
 }
+*/
 
-display::~display()
+void
+display::destroy() // was aglContext::cleanup()
 {
+	wx	= -1;
+	wy	= -1;
+	wwidth	= 0;
+	wheight	= 0;
+	if (gl_context)
+		aglDestroyContext(gl_context);
+	gl_context = NULL;
+	if (window)
+		DisposeWindow(window);
+	window = NULL;
 }
 
 void
@@ -112,211 +146,31 @@ display::activate(bool active) {
 
 display::EXTENSION_FUNCTION
 display::getProcAddress(const char* name) {
-	//return (EXTENSION_FUNCTION)::wglGetProcAddress( name ); // what instead of wglGetProcAddress?
+	// TODO: What instead of wglGetProcAddress?
+	//return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
 }
-
-/**************** Mac-specific stuff ***********************/
-
-void init_platform()
-{
-	ProcessSerialNumber psn;
-	CFDictionaryRef		app;
-	const void *		backKey;
-	const void *		background;
-	int					err;
-	
-	//std::cout << "init_platform\n";
-	// If we were invoked from python rather than pythonw, change into a GUI app
-	GetCurrentProcess(&psn);
-	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
-	backKey = CFStringCreateWithCString(NULL, "LSBackgroundOnly", kCFStringEncodingASCII);
-	background = CFDictionaryGetValue(app, backKey);
-	if (background == kCFBooleanTrue) {
-		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-	}
-	SetFrontProcess(&psn);
-}
-
-void threaded_exit ( int status)
-{
-	exit(status);
-}
-
-void threaded_sleep( double seconds)
-{
-	  Py_BEGIN_ALLOW_THREADS
-	  usleep( (unsigned int)(seconds * 1.0e6));
-	  Py_END_ALLOW_THREADS
-}
-
-void nothread_sleep( double seconds)
-{
-	usleep( (unsigned int)(seconds * 1.0e6));
-}
-
-double sclock()
-{
-	struct timeval tv;
-	gettimeofday( &tv, NULL);
-
-	return (tv.tv_sec + tv.tv_usec / 1.0e6);
-}
-
-/******** mutex implementation ********/
-/* XXX Why yet another mutex?
-
-mutex::mutex( int spincount, int _count)
-	 : count(_count)
-{
-	pthread_mutex_init( &mtx, NULL);
-}
-
-mutex::~mutex()
-{
-	pthread_mutex_destroy( &mtx);
-}
-*/
-
-/*********** event handling not needed ********/
-
-bool handle_event( PyObject*)
-{
-	return false;
-}
-
-/*********** GUI  implementation *************/
-
-
-static void* event_loop (void * arg)
-{
-	RunApplicationEventLoop();
-	//std::cout << "end event_loop\n";
-	return 0;
-}
-
-typedef struct {
-	bool (*func)(void * data);
-	void * funcData;
-	double delay;
-	EventLoopTimerUPP upp;
-} VPCallback;
-
-static void doCallback (EventLoopTimerRef timer, void * data)
-{
-	VPCallback * callback;
-		
-	callback = (VPCallback *)data;
-	
-	if (callback->func(callback->funcData)) {
-		_event_callback(callback->delay, callback->func, callback->funcData);
-	}
-	// FIXME Got a memory leak here
-	//delete callback;
-}
-
-void _event_callback( double seconds, bool (*callback)(void*), void *data)
-{
-	EventLoopTimerRef	discard;
-	VPCallback *		cb;
-	
-	if (callback) {
-		cb = new VPCallback;
-		cb->func	 = callback;
-		cb->funcData = data;
-		cb->delay	 = seconds;
-		cb->upp		 = NewEventLoopTimerUPP(doCallback);
-		InstallEventLoopTimer(GetMainEventLoop(), seconds, 0, cb->upp, cb, &discard);
-		DisposeEventLoopTimerUPP(cb->upp);
-	}
-}
-
-void start_event_loop ()
-{
-	pthread_t thread;
-	
-	//std::cout << "start_event_loop\n";
-	pthread_create( &thread, NULL, event_loop, 0);
-}
-
-
-static bool doQuit (void * arg)
-{
-	QuitApplicationEventLoop();
-	return 0;
-}
-
-void stop_event_loop ()
-{
-	//std::cout << "stop_event_loop\n";
-	_event_callback(0.0, doQuit, NULL);
-}
-
-/*************** aglContext implementation *************/
-
-/*
-Deprecated:
-In aglFont::aglFont,
-   FMGetFontFamilyFromName, GetAppFont, GetDefFontSize, FetchFontInfo, aglUseFont
-
-In aglFont::getWidth,
-   TextFont, TextFace, TextSize, TextWidth
-
-In aglContext::initWindow,
-   GetMainDevice, aglSetDrawable
-*/
-
-aglContext::aglContext() 
- : window(0),
-   ctx(0),
-   wx(0), wy(0),
-   wwidth(0), wheight(0),
-   buttonState(0),
-   buttonsChanged(0),
-   keyModState(0),
-   mouseLocked(false)
-{
-}
-
-aglContext::~aglContext()
-{
-}
-
-void aglContext::cleanup()
-{
-	wx	= -1;
-	wy	= -1;
-	wwidth	= 0;
-	wheight	= 0;
-	if (ctx)
-		aglDestroyContext(ctx);
-	ctx = NULL;
-	if (window)
-		DisposeWindow(window);
-	window = NULL;
-}
-
 
 int
-aglContext::getShiftKey()
+display::getShiftKey()
 {
 	return modBit(keyModState, shiftKeyBit);
 }
 
 int
-aglContext::getAltKey()
+display::getAltKey()
 {
 	return modBit(keyModState, optionKeyBit);
 }
 
 int
-aglContext::getCtrlKey()
+display::getCtrlKey()
 {
 	// For Mac, treat command key as control also
 	return modBit(keyModState, cmdKeyBit) || modBit(keyModState, controlKeyBit);
 }
 
 OSStatus
-aglContext::vpWindowHandler (EventRef event)
+display::vpWindowHandler (EventRef event)
 {
 	UInt32	kind;
 	Rect	bounds;
@@ -329,7 +183,7 @@ aglContext::vpWindowHandler (EventRef event)
 		wwidth  = bounds.right - bounds.left;
 		wheight = bounds.bottom - bounds.top;
 		// Tell OpenGL about it
-		aglUpdateContext(ctx);
+		aglUpdateContext(gl_context);
 	} else if (kind == kEventWindowClosed) {
 		// Safest way to destroy a window is by generating ESC key event,
 		// which will be passed on and interpreted as close request
@@ -340,7 +194,7 @@ aglContext::vpWindowHandler (EventRef event)
 }
 
 OSStatus
-aglContext::vpKeyboardHandler (EventRef event)
+display::vpKeyboardHandler (EventRef event)
 {
 	UInt32	kind;
 	char	key[2];
@@ -458,7 +312,7 @@ aglContext::vpKeyboardHandler (EventRef event)
 }
 
 OSStatus
-aglContext::vpMouseHandler (EventRef event)
+display::vpMouseHandler (EventRef event)
 {
 	WindowPartCode	part;
 	WindowRef		win;
@@ -523,12 +377,13 @@ aglContext::vpMouseHandler (EventRef event)
 	return noErr;
 }
 
-static OSStatus vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
+static OSStatus 
+display::vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
 {
 	UInt32	evtClass;
-	aglContext * ctx;
+	aglContext * gl_context;
 	
-	ctx = (aglContext *)data;
+	gl_context = (aglContext *)data;
 	
 	evtClass = GetEventClass(event);
 	
@@ -540,13 +395,13 @@ static OSStatus vpEventHandler (EventHandlerCallRef target, EventRef event, void
 			}
 			break;
 		case kEventClassWindow:
-			return ctx->vpWindowHandler(event);
+			return gl_context->vpWindowHandler(event);
 			break;
 		case kEventClassKeyboard:
-			return ctx->vpKeyboardHandler(event);
+			return gl_context->vpKeyboardHandler(event);
 			break;
 		case kEventClassMouse:
-			return ctx->vpMouseHandler(event);
+			return gl_context->vpMouseHandler(event);
 			break;
 		default:
 			break;
@@ -556,7 +411,7 @@ static OSStatus vpEventHandler (EventHandlerCallRef target, EventRef event, void
 }
 
 bool
-aglContext::changeWindow(std::string title, int x, int y, int width, int height, int flags)
+display::changeWindow(std::string title, int x, int y, int width, int height, int flags)
 {
 	/*
 	if (title) {
@@ -578,7 +433,7 @@ aglContext::changeWindow(std::string title, int x, int y, int width, int height,
 }
 
 bool
-aglContext::initWindow(std::string title, int x, int y, int width, int height, int flags)
+display::initWindow(std::string title, int x, int y, int width, int height, int flags)
 {
 	GDHandle	dev;
 	OSStatus	err;
@@ -646,16 +501,16 @@ aglContext::initWindow(std::string title, int x, int y, int width, int height, i
 
 	if (fmt == NULL || aglGetError() != AGL_NO_ERROR)
 		return false;
-	ctx = aglCreateContext(fmt, NULL);
-	if (ctx == NULL)
+	gl_context = aglCreateContext(fmt, NULL);
+	if (gl_context == NULL)
 		return false;
 	
 	// Fullscreen on Mac
 	if (flags & aglContext::FULLSCREEN) {
-		aglEnable(ctx, AGL_FS_CAPTURE_SINGLE);
-		aglSetFullScreen(ctx, 0, 0, 0, 0);
+		aglEnable(gl_context, AGL_FS_CAPTURE_SINGLE);
+		aglSetFullScreen(gl_context, 0, 0, 0, 0);
 	} else {
-		aglSetDrawable(ctx, GetWindowPort(window));
+		aglSetDrawable(gl_context, GetWindowPort(window));
 	}
 	aglDestroyPixelFormat(fmt);
 
@@ -684,35 +539,35 @@ aglContext::initWindow(std::string title, int x, int y, int width, int height, i
 }
 
 bool
-aglContext::isOpen()
+display::isOpen()
 {
 	return window != NULL;
 }
 
 void
-aglContext::lockMouse()
+display::lockMouse()
 {
 }
 
 void
-aglContext::unlockMouse()
+display::unlockMouse()
 {
 }
 
 void
-aglContext::showMouse()
+display::showMouse()
 {
 	ShowCursor();
 }
 
 void
-aglContext::hideMouse()
+display::hideMouse()
 {
 	HideCursor();
 }
 
 vector
-aglContext::getMousePos()
+display::getMousePos()
 {
 	if (!window)
 		return vector(0,0,0);
@@ -725,7 +580,7 @@ aglContext::getMousePos()
 }
 
 vector
-aglContext::getMouseDelta()
+display::getMouseDelta()
 {
 	// GL units (% of window)
 	vector tmp = mousePos - oldMousePos;
@@ -735,13 +590,13 @@ aglContext::getMouseDelta()
 }
 
 int
-aglContext::getMouseButtons()
+display::getMouseButtons()
 {
 	return buttonState;
 }
 
 int
-aglContext::getMouseButtonsChanged()
+display::getMouseButtonsChanged()
 {
 	int c = buttonsChanged;
 	buttonsChanged = 0;
@@ -749,7 +604,7 @@ aglContext::getMouseButtonsChanged()
 }
 
 std::string
-aglContext::getKeys()
+display::getKeys()
 {
 	if (!keys.empty()) {
 		std::string s = keys.front();
@@ -759,120 +614,100 @@ aglContext::getKeys()
 	return std::string("");
 }
 
-void
-aglContext::makeCurrent()
-{
-	SetPortWindowPort(window);
-	aglSetCurrentContext(ctx);
-	delete_pending_lists();
-}
-
-void
-aglContext::makeNotCurrent()
-{
-	aglSetCurrentContext(NULL);
-}
-
-void
-aglContext::swapBuffers()
-{
-	aglSwapBuffers(ctx);
-}
-
-int
-aglContext::winX()
-{
-	return wx;
-}
-
-int
-aglContext::winY()
-{
-	return wy;
-}
-
-int
-aglContext::width()
-{
-	return wwidth;
-}
-
-int
-aglContext::height()
-{
-	return wheight;
-}
-
-/*
-void destroy_context (glContext * cx)
-{
-	(static_cast<aglContext *>(cx))->cleanup();
-}
-*/
-/******************************* gui_main implementatin **********************/
+/******************** gui_main implementation **********************/
 
 gui_main* gui_main::self = 0;  // Protected by python GIL
 
 boost::signal<void()> gui_main::on_shutdown;
 
-//const int CALL_MESSAGE = WM_USER;
 
 gui_main::gui_main()
 // : gui_thread(-1)
 {
 }
 
-/* XXX
-LRESULT
-gui_main::threadMessage( int code, WPARAM wParam, LPARAM lParam ) {
-	if (wParam == PM_REMOVE) {
-		MSG& message = *(MSG*)lParam;
-		
-		if (message.hwnd ==0 && message.message == CALL_MESSAGE ) {
-			boost::function<void()>* f = (boost::function<void()>*)message.wParam;
-			(*f)();
-			delete f;
-		}
-	}
-	return CallNextHookEx( NULL, code, wParam, lParam );
-}
-
-#define TIMER_RESOLUTION 5
-void __cdecl end_period() { timeEndPeriod(TIMER_RESOLUTION); }
-
-void
-gui_main::run()
+void 
+gui_main::init_platform()
 {
-	MSG message;
+	ProcessSerialNumber psn;
+	CFDictionaryRef		app;
+	const void *		backKey;
+	const void *		background;
+	int					err;
 	
-	// Create a message queue and hook thread messages (we can't just check for them in the loop
-	// below, becomes Windows runs modal message loops e.g. when resizing a window)
-	SetWindowsHookEx(WH_GETMESSAGE, &gui_main::threadMessage, NULL, GetCurrentThreadId());
-	PeekMessage(&message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
-	
-	// Tell the initializing thread
-	{
-		lock L(init_lock);
-		gui_thread = GetCurrentThreadId();
-		initialized.notify_all();
+	//std::cout << "init_platform\n";
+	// If we were invoked from python rather than pythonw, change into a GUI app
+	GetCurrentProcess(&psn);
+	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
+	backKey = CFStringCreateWithCString(NULL, "LSBackgroundOnly", kCFStringEncodingASCII);
+	background = CFDictionaryGetValue(app, backKey);
+	if (background == kCFBooleanTrue) {
+		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
 	}
-	
-	timeBeginPeriod(TIMER_RESOLUTION);
-	atexit( end_period );
-	
-	poll();
-
-	// Enter the message loop
-	while (GetMessage(&message, 0, 0, 0) > 0) {
-		TranslateMessage( &message);
-		DispatchMessage( &message);
-	}
-
-	// We normally exit the message queue because PostQuitMessage() has been called
-	VPYTHON_NOTE( "WM_QUIT (or message queue error) received");
-	on_shutdown(); // Tries to kill Python
+	SetFrontProcess(&psn);
 }
-*/
+
+static void* 
+gui_main::event_loop (void * arg)
+{
+	RunApplicationEventLoop();
+	//std::cout << "end event_loop\n";
+	return 0;
+}
+
+static void 
+gui_main::doCallback (EventLoopTimerRef timer, void * data)
+{
+	VPCallback * callback;
+		
+	callback = (VPCallback *)data;
+	
+	if (callback->func(callback->funcData)) {
+		_event_callback(callback->delay, callback->func, callback->funcData);
+	}
+	// FIXME Got a memory leak here
+	//delete callback;
+}
+
+void 
+gui_main::_event_callback( double seconds, bool (*callback)(void*), void *data)
+{
+	EventLoopTimerRef	discard;
+	VPCallback *		cb;
+	
+	if (callback) {
+		cb = new VPCallback;
+		cb->func	 = callback;
+		cb->funcData = data;
+		cb->delay	 = seconds;
+		cb->upp		 = NewEventLoopTimerUPP(doCallback);
+		InstallEventLoopTimer(GetMainEventLoop(), seconds, 0, cb->upp, cb, &discard);
+		DisposeEventLoopTimerUPP(cb->upp);
+	}
+}
+
+void 
+gui_main::start_event_loop ()
+{
+	pthread_t thread;
+	
+	//std::cout << "start_event_loop\n";
+	pthread_create( &thread, NULL, event_loop, 0);
+}
+
+static bool 
+gui_main::doQuit (void * arg)
+{
+	QuitApplicationEventLoop();
+	return 0;
+}
+
+void 
+gui_main::stop_event_loop ()
+{
+	//std::cout << "stop_event_loop\n";
+	_event_callback(0.0, doQuit, NULL);
+}
 
 void
 gui_main::init_thread(void)
@@ -889,14 +724,15 @@ gui_main::init_thread(void)
 	}
 }
 
-void
+static void
 gui_main::call_in_gui_thread( const boost::function< void() >& f )
 {
 	init_thread();
 	PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
 }
 
-VOID CALLBACK gui_main::timer_callback( PVOID, BOOLEAN ) {
+void
+gui_main::timer_callback( PVOID, BOOLEAN ) {
 	// Called in high-priority timer thread when it's time to render
 	self->call_in_gui_thread( boost::bind( &gui_main::poll, self ) );
 }
