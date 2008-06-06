@@ -37,11 +37,9 @@ In display::initWindow,
 display* display::current = 0;
 
 display::display()
- : window_visible(false)
+ : window_visible(false),
    window(0),
    gl_context(0),
-   wx(0), wy(0),
-   wwidth(0), wheight(0),
    buttonState(0),
    buttonsChanged(0),
    keyModState(0),
@@ -120,10 +118,10 @@ void destroy_context (glContext * cx)
 void
 display::destroy() // was aglContext::cleanup()
 {
-	wx	= -1;
-	wy	= -1;
-	wwidth	= 0;
-	wheight	= 0;
+	window_x	= -1;
+	window_y	= -1;
+	window_width	= 0;
+	window_height	= 0;
 	if (gl_context)
 		aglDestroyContext(gl_context);
 	gl_context = NULL;
@@ -178,10 +176,10 @@ display::vpWindowHandler (EventRef event)
 	kind = GetEventKind(event);
 	if (kind == kEventWindowBoundsChanged) {
 		GetWindowBounds(window, kWindowStructureRgn, &bounds);
-		wx = bounds.left;
-		wy = bounds.top;
-		wwidth  = bounds.right - bounds.left;
-		wheight = bounds.bottom - bounds.top;
+		window_x = bounds.left;
+		window_y = bounds.top;
+		window_width  = bounds.right - bounds.left;
+		window_height = bounds.bottom - bounds.top;
 		// Tell OpenGL about it
 		aglUpdateContext(gl_context);
 	} else if (kind == kEventWindowClosed) {
@@ -378,12 +376,12 @@ display::vpMouseHandler (EventRef event)
 }
 
 static OSStatus 
-display::vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
+vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
 {
 	UInt32	evtClass;
-	aglContext * gl_context;
+	display * gl_context;
 	
-	gl_context = (aglContext *)data;
+	gl_context = (display *)data;
 	
 	evtClass = GetEventClass(event);
 	
@@ -420,14 +418,14 @@ display::changeWindow(std::string title, int x, int y, int width, int height, in
 	*/
 	
 	if (x >= 0 && y >= 0) {
-		wx = x;
-		wy = y;
-		MoveWindowStructure(window, wx, wy);
+		window_x = x;
+		window_y = y;
+		MoveWindowStructure(window, window_x, window_y);
 	}
 	if (width > 0 && height > 0) {
-		wwidth  = width;
-		wheight = height;
-		SizeWindow(window, wwidth, wheight, true);
+		window_width  = width;
+		window_height = height;
+		SizeWindow(window, window_width, window_height, true);
 	}
 	return true;
 }
@@ -469,7 +467,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	// the menu bar itself because sometimes the position gets set first and then
 	// the title bar extended above that point.
 	minY = GetMBarHeight() * 2;
-	if (y < minY && ! (flags & aglContext::FULLSCREEN))
+	if (y < minY && ! (flags & display::FULLSCREEN))
 		y = minY;
 	// Window 
 	SetRect(&bounds, x, y, x + width, y + height);
@@ -483,16 +481,16 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	idx = 0;
 	while (attrList[idx] != AGL_NONE) idx ++;
 	// Special
-	if (flags & aglContext::FULLSCREEN) {
+	if (flags & display::FULLSCREEN) {
 		attrList[idx] =	AGL_FULLSCREEN;
 		idx ++;
 	}
-	if (flags & aglContext::QB_STEREO) {
+	if (flags & display::QB_STEREO) {
 		attrList[idx] = AGL_STEREO;
 		idx ++;
 	}
 	fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
-	if ((fmt == NULL || aglGetError() != AGL_NO_ERROR) && (flags & aglContext::QB_STEREO)) {
+	if ((fmt == NULL || aglGetError() != AGL_NO_ERROR) && (flags & display::QB_STEREO)) {
 		// Try without stereo
 		idx --;
 		attrList[idx] = AGL_NONE;
@@ -506,7 +504,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 		return false;
 	
 	// Fullscreen on Mac
-	if (flags & aglContext::FULLSCREEN) {
+	if (flags & display::FULLSCREEN) {
 		aglEnable(gl_context, AGL_FS_CAPTURE_SINGLE);
 		aglSetFullScreen(gl_context, 0, 0, 0, 0);
 	} else {
@@ -530,7 +528,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 						idx, handled,
 						this, &discard);
 	// Make visible
-	if (! (flags & aglContext::FULLSCREEN)) {
+	if (! (flags & display::FULLSCREEN)) {
 		ActivateWindow(window, true);
 		ShowWindow(window);
 	}
@@ -573,8 +571,8 @@ display::getMousePos()
 		return vector(0,0,0);
 	
 	vector tmp = mousePos;
-	tmp.x /= wwidth;
-	tmp.y /= wheight;
+	tmp.x /= window_width;
+	tmp.y /= window_height;
 	
 	return tmp;
 }
@@ -647,16 +645,8 @@ gui_main::init_platform()
 	SetFrontProcess(&psn);
 }
 
-static void* 
-gui_main::event_loop (void * arg)
-{
-	RunApplicationEventLoop();
-	//std::cout << "end event_loop\n";
-	return 0;
-}
-
 static void 
-gui_main::doCallback (EventLoopTimerRef timer, void * data)
+doCallback (EventLoopTimerRef timer, void * data)
 {
 	VPCallback * callback;
 		
@@ -670,7 +660,7 @@ gui_main::doCallback (EventLoopTimerRef timer, void * data)
 }
 
 void 
-gui_main::_event_callback( double seconds, bool (*callback)(void*), void *data)
+_event_callback( double seconds, bool (*callback)(void*), void *data)
 {
 	EventLoopTimerRef	discard;
 	VPCallback *		cb;
@@ -684,6 +674,14 @@ gui_main::_event_callback( double seconds, bool (*callback)(void*), void *data)
 		InstallEventLoopTimer(GetMainEventLoop(), seconds, 0, cb->upp, cb, &discard);
 		DisposeEventLoopTimerUPP(cb->upp);
 	}
+}
+
+static void *
+event_loop (void * arg)
+{
+	RunApplicationEventLoop();
+	//std::cout << "end event_loop\n";
+	//return 0; // How can we return 0 from void?
 }
 
 void 
@@ -709,8 +707,8 @@ gui_main::stop_event_loop ()
 	_event_callback(0.0, doQuit, NULL);
 }
 
-void
-gui_main::init_thread(void)
+static void
+gui_main::init_thread()
 {
 	if (!self) {
 		// We are holding the Python GIL through this process, including the wait!
@@ -732,7 +730,7 @@ gui_main::call_in_gui_thread( const boost::function< void() >& f )
 }
 
 void
-gui_main::timer_callback( PVOID, BOOLEAN ) {
+gui_main::timer_callback() {
 	// Called in high-priority timer thread when it's time to render
 	self->call_in_gui_thread( boost::bind( &gui_main::poll, self ) );
 }

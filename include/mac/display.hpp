@@ -45,6 +45,10 @@ class display : public display_kernel
 	void gl_end();
 	void gl_swap_buffers();
 
+	OSStatus display::vpWindowHandler (EventRef event);
+	OSStatus display::vpMouseHandler (EventRef event);
+	OSStatus display::vpKeyboardHandler (EventRef event);
+
 	// Tells the application where it can find its data.
 	// Win32 doesn't use this information.
 	static void set_dataroot( const std::wstring& ) {};
@@ -71,10 +75,6 @@ class display : public display_kernel
 	void makeNotCurrent();
 	void swapBuffers();
 
-	OSStatus vpWindowHandler (EventRef event);
-	OSStatus vpMouseHandler (EventRef event);
-	OSStatus vpKeyboardHandler (EventRef event);
-
  	bool window_visible;
 	
 	void update_size();
@@ -88,7 +88,7 @@ class display : public display_kernel
     
 	AGLContext getContext () { return gl_context; }
 	
-	void destroy_context (aglContext * cx);
+	//void destroy_context (aglContext * cx);
 	
 	void add_pending_glDeleteList(int base, int howmany);
 	
@@ -122,14 +122,17 @@ class gui_main
 	void poll();
 
 	static gui_main* self;
-	
-	void _event_callback( double seconds, bool (*callback)(void*), void *data);
 
+	/*
 	template <class T>
 	inline void event_callback( double seconds, bool (*callback)(T*), T* data) 
 	{
 		_event_callback( seconds, (bool(*)(void*))callback, (void*)data);
 	}
+	
+	template <class T>	
+	void _event_callback( double seconds, bool (*callback)(T*), T* data);
+	*/
 	
 	typedef struct {
 		bool (*func)(void * data);
@@ -139,18 +142,13 @@ class gui_main
 	} VPCallback;
 
  public:
-	 static void* event_loop (void * arg);
-	 static void doCallback (EventLoopTimerRef timer, void * data);
-	 void _event_callback( double seconds, bool (*callback)(void*), void *data)
 	 void start_event_loop();
 	 static bool doQuit(void * arg);
 	 void stop_event_loop();
-	 void init_thread(void);
 	 
 	 // Calls the given function in the GUI thread.
 	 static void call_in_gui_thread( const boost::function< void() >& f );
-	 void timer_callback(void, bool);
-	 void poll();
+	 void timer_callback();
 	
 	 void init_platform(); // make app into a GUI app if necessary
 	
