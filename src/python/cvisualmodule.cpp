@@ -63,6 +63,11 @@ py_rate( double freq)
 BOOST_PYTHON_MODULE( cvisual)
 {
 	VPYTHON_NOTE( "Importing cvisual from vpython-core2.");
+
+#ifdef __APPLE__
+	gui_main::init_platform();
+#endif
+	
 	using namespace boost::python;
 	numeric::array::set_module_and_type( "numpy", "ndarray");
 
