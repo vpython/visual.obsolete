@@ -37,6 +37,9 @@ cvisual.so : $(OBJS)
 	$(BOOST)/libboost_signals-mt-s-1_35.a \
 	$(BOOST)/libboost_thread-mt-s-1_35.a
 
+install :
+	sudo cp cvisual.so /Library/Python/2.5/site-packages
+
 clean :
 	rm *.o
 
