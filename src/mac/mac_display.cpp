@@ -46,6 +46,7 @@ display::display()
    keyModState(0),
    mouseLocked(false)
 {
+	VPYTHON_NOTE( "Initialize display.");
 }
 
 display::~display()
@@ -95,6 +96,7 @@ display::gl_swap_buffers()
 void
 display::create()
 {
+	VPYTHON_NOTE( "Start create.");
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
 	// Just to get going, set flags to 0:
 	if (!initWindow(title, window_x, window_y, window_width, window_height, 0)) {
@@ -103,6 +105,7 @@ display::create()
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
 	}
+	VPYTHON_NOTE( "End create.");
 }
 
 /*
@@ -133,16 +136,18 @@ display::destroy() // was aglContext::cleanup()
 
 void
 display::activate(bool active) {
-	/*
+	VPYTHON_NOTE( "Start activate.");
 	if (active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
 		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
-		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
+		//gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
+		create();
 	} else {
 		VPYTHON_NOTE( "Closing a window from Python.");
-		gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
+		//gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
+		destroy();
 	}
-	*/
+	VPYTHON_NOTE( "End activate.");
 }
 
 display::EXTENSION_FUNCTION
@@ -498,6 +503,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 		{ 0, 0 }
 	};
 	
+	VPYTHON_NOTE( "Start initWindow.");
 	// Don't let window hide itself under the menu bar. Margin should be more than
 	// the menu bar itself because sometimes the position gets set first and then
 	// the title bar extended above that point.
@@ -510,6 +516,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	if (err != noErr)
 		return false;
 	this->changeWindow(title, x, y, width, height, flags);
+	VPYTHON_NOTE( "After CreateNewWindow.");
 	
 	// GL context
 	dev = GetMainDevice();
@@ -546,7 +553,8 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 		aglSetDrawable(gl_context, GetWindowPort(window));
 	}
 	aglDestroyPixelFormat(fmt);
-
+	
+	VPYTHON_NOTE( "Next, set up event handling in initWindow.");
 	// Set up event handling
 	InstallStandardEventHandler(GetWindowEventTarget(window));
 	upp = NewEventHandlerUPP(vpEventHandler);
@@ -568,6 +576,9 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 		ShowWindow(window);
 	}
 	
+	start_event_loop();
+	
+	VPYTHON_NOTE( "End initWindow.");
 	return true;
 }
 
@@ -658,6 +669,7 @@ init_platform() // called from cvisualmodule initialization
 	const void *		background;
 	int					err;
 	
+	VPYTHON_NOTE( "Start of init_platform.");
 	//std::cout << "init_platform\n";
 	// If we were invoked from python rather than pythonw, change into a GUI app
 	GetCurrentProcess(&psn);
@@ -668,6 +680,7 @@ init_platform() // called from cvisualmodule initialization
 		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
 	}
 	SetFrontProcess(&psn);
+	VPYTHON_NOTE( "End of init_platform.");
 }
 
 gui_main* gui_main::self = 0;  // Protected by python GIL
@@ -720,7 +733,7 @@ event_loop (void * arg)
 }
 
 void 
-gui_main::start_event_loop ()
+start_event_loop ()
 {
 	pthread_t thread;
 	

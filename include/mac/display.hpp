@@ -22,6 +22,7 @@ typedef struct {
 	EventLoopTimerUPP upp;
 } VPCallback;
 
+void start_event_loop();
 void _event_callback( double seconds, bool (*callback)(void*), void *data);
 
 template <class T>
@@ -139,7 +140,6 @@ class gui_main
 	static gui_main* self;
 
  public:
-	 void start_event_loop();
 	 static bool doQuit(void * arg);
 	 void stop_event_loop();
 	 
