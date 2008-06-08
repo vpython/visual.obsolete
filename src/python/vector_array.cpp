@@ -33,16 +33,9 @@ namespace cvisual {namespace python {
 			iterator i = data.begin();
 			for (int s_i = 0; s_i < sequence.attr("__len__")(); ++s_i, ++i) {
 				boost::python::extract<vector> v_extractor( sequence[s_i]);
-#ifdef __APPLE__
-				// TODO: Figure out what the real problem with "check" is on the Mac
-				//otherwise error: struct boost::python::extract<cvisual::vector> has no member named check
-				if (false) {
-				}
-#else
 				if (v_extractor.check()) {
 					*i = v_extractor();
 				}
-#endif
 				else {
 					boost::python::object elem = sequence[s_i];
 					*i = vector();
