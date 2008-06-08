@@ -5,11 +5,10 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "display_kernel.hpp"
-#include "display.hpp"
+// Apparently check gets defined somewhere in including display.hpp
 #include "mouseobject.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"
-
 #include <boost/bind.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/call_method.hpp>
@@ -20,6 +19,10 @@
 #include <boost/python/make_function.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/manage_new_object.hpp>
+
+// Must include display.hpp late because on the Mac it includes Carbon.h
+// which defines "check" which causes trouble in boost/python/extract.hpp
+#include "display.hpp"
 
 namespace cvisual {
 

@@ -1,6 +1,8 @@
 #ifndef VPYTHON_CONFIG_H
 #define VPYTHON_CONFIG_H
 
+#define check check_fix
+
 #include <math.h>
 
 #ifndef M_PI

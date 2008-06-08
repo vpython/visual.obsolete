@@ -21,6 +21,7 @@ static bool modBit (int mask, int bit)
 	return (mask & (1 << bit));
 }
 
+bool firstdisplay = true;
 
 /*
 Deprecated Carbon elements (which means doubly deprecated, since Carbon itself has little support):
@@ -93,11 +94,38 @@ display::gl_swap_buffers()
 	gl_end();
 }
 
+void 
+init_platform() // called from cvisualmodule initialization
+{
+	ProcessSerialNumber psn;
+	CFDictionaryRef		app;
+	const void *		backKey;
+	const void *		background;
+	int					err;
+	
+	VPYTHON_NOTE( "Start of init_platform.");
+	//std::cout << "init_platform\n";
+	// If we were invoked from python rather than pythonw, change into a GUI app
+	GetCurrentProcess(&psn);
+	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
+	backKey = CFStringCreateWithCString(NULL, "LSBackgroundOnly", kCFStringEncodingASCII);
+	background = CFDictionaryGetValue(app, backKey);
+	if (background == kCFBooleanTrue) {
+		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+	}
+	SetFrontProcess(&psn);
+	VPYTHON_NOTE( "End of init_platform.");
+}
+
 void
 display::create()
 {
 	VPYTHON_NOTE( "Start create.");
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
+	if (firstdisplay) {
+		firstdisplay = false;
+		init_platform();
+	}
 	// Just to get going, set flags to 0:
 	if (!initWindow(title, window_x, window_y, window_width, window_height, 0)) {
 		std::ostringstream msg;
@@ -140,12 +168,10 @@ display::activate(bool active) {
 	if (active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
 		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
-		//gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
-		create();
+		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
 	} else {
 		VPYTHON_NOTE( "Closing a window from Python.");
-		//gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
-		destroy();
+		gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
 	}
 	VPYTHON_NOTE( "End activate.");
 }
@@ -576,8 +602,6 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 		ShowWindow(window);
 	}
 	
-	start_event_loop();
-	
 	VPYTHON_NOTE( "End initWindow.");
 	return true;
 }
@@ -660,41 +684,14 @@ display::getKeys()
 
 /******************** gui_main implementation **********************/
 
-void 
-init_platform() // called from cvisualmodule initialization
-{
-	ProcessSerialNumber psn;
-	CFDictionaryRef		app;
-	const void *		backKey;
-	const void *		background;
-	int					err;
-	
-	VPYTHON_NOTE( "Start of init_platform.");
-	//std::cout << "init_platform\n";
-	// If we were invoked from python rather than pythonw, change into a GUI app
-	GetCurrentProcess(&psn);
-	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
-	backKey = CFStringCreateWithCString(NULL, "LSBackgroundOnly", kCFStringEncodingASCII);
-	background = CFDictionaryGetValue(app, backKey);
-	if (background == kCFBooleanTrue) {
-		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-	}
-	SetFrontProcess(&psn);
-	VPYTHON_NOTE( "End of init_platform.");
-}
+typedef struct {
+	bool (*func)(void * data);
+	void * funcData;
+	double delay;
+	EventLoopTimerUPP upp;
+} VPCallback;
 
-gui_main* gui_main::self = 0;  // Protected by python GIL
-
-boost::signal<void()> gui_main::on_shutdown;
-
-
-gui_main::gui_main()
-// : gui_thread(-1)
-{
-}
-
-static void 
-doCallback (EventLoopTimerRef timer, void * data)
+static void doCallback (EventLoopTimerRef timer, void * data)
 {
 	VPCallback * callback;
 		
@@ -707,8 +704,7 @@ doCallback (EventLoopTimerRef timer, void * data)
 	//delete callback;
 }
 
-void 
-_event_callback( double seconds, bool (*callback)(void*), void *data)
+void _event_callback( double seconds, bool (*callback)(void*), void *data)
 {
 	EventLoopTimerRef	discard;
 	VPCallback *		cb;
@@ -724,21 +720,32 @@ _event_callback( double seconds, bool (*callback)(void*), void *data)
 	}
 }
 
-static void *
-event_loop (void * arg)
+gui_main* gui_main::self = 0;  // Protected by python GIL
+
+boost::signal<void()> gui_main::on_shutdown;
+
+gui_main::gui_main()
+// : gui_thread(-1)
 {
+}
+
+void *
+gui_main::event_loop (void * arg)
+{
+	VPYTHON_NOTE( "Start event_loop.");
 	RunApplicationEventLoop();
-	//std::cout << "end event_loop\n";
+	VPYTHON_NOTE( "End event_loop.");
 	//return 0; // How can we return 0 from void?
 }
 
 void 
-start_event_loop ()
+gui_main::start_event_loop ()
 {
 	pthread_t thread;
 	
-	//std::cout << "start_event_loop\n";
+	VPYTHON_NOTE( "Begin start_event_loop.");
 	pthread_create( &thread, NULL, event_loop, 0);
+	VPYTHON_NOTE( "End start_event_loop.");
 }
 
 bool 
@@ -755,7 +762,6 @@ gui_main::stop_event_loop ()
 	_event_callback(0.0, doQuit, NULL);
 }
 
-/*
 void
 gui_main::init_thread()
 {
@@ -764,20 +770,26 @@ gui_main::init_thread()
 		// We can't let go because a different Python thread could come along and mess us up (e.g.
 		//   think that we are initialized and go on to call PostThreadMessage without a valid idThread)
 		self = new gui_main;
-		thread gui( boost::bind( &gui_main::run, self ) );
+		self->start_event_loop();
+		/*
+		thread gui( boost::bind( &gui_main::event_loop, self ) );
 		lock L( self->init_lock );
 		while (self->gui_thread == -1)
 			self->initialized.wait( L );
+		*/
 	}
 }
 
 void
 gui_main::call_in_gui_thread( const boost::function< void() >& f )
 {
+	VPYTHON_NOTE( "call_in_gui_thread");
 	init_thread();
-	PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
+	VPYTHON_NOTE( "Returned from init_thread.");
+	//PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
 }
 
+/*
 void
 gui_main::timer_callback() {
 	// Called in high-priority timer thread when it's time to render

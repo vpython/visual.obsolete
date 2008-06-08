@@ -10,19 +10,12 @@
 
 #include <boost/scoped_ptr.hpp>
 
+// Apparently check is defined in Carbon.h
 #include <Carbon/Carbon.h>
 #include <AGL/agl.h>
 
 namespace cvisual {
 
-typedef struct {
-	bool (*func)(void * data);
-	void * funcData;
-	double delay;
-	EventLoopTimerUPP upp;
-} VPCallback;
-
-void start_event_loop();
 void _event_callback( double seconds, bool (*callback)(void*), void *data);
 
 template <class T>
@@ -134,13 +127,21 @@ class gui_main
 	static void init_thread(void);
 
 	gui_main();	//< This is the only nonstatic member function that doesn't run in the gui thread!
-	void run();
 	//void poll();
 
 	static gui_main* self;
+	
+	int gui_thread;
+	mutex init_lock;
+	condition initialized;
 
  public:
+	 // Calls the given function in the GUI thread.
+	 static void call_in_gui_thread( const boost::function< void() >& f );
+	 
 	 static bool doQuit(void * arg);
+	 static void* event_loop(void * arg);
+	 void start_event_loop();
 	 void stop_event_loop();
 	 
 	 // Calls the given function in the GUI thread.
