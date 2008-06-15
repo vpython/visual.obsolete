@@ -1,6 +1,6 @@
 Started 2008/4/7 as a place to record the status of Visual 4 on various platforms
 
-VAIO 2008 June 14
+VAIO 2008 June 14 (XP)
 
 Zoomed out too far:
 dipole, heightfield, gas, hanoi, lathe, planar, stars, stonehenge, toroid, toroid_drag
@@ -10,7 +10,35 @@ materials_test runs okay (but without material texture, of course).
 
 stonehenge won't let me move past the back of the scene.
 
-01_newton.py red arrow bright when to the left, dark when to the right !!
+01_newton.py red arrow bright when axis.x < 0, dark when axis.x > 0 !!
+This works fine on HP Vista machine.
+
+HP 2008 June 14 (Vista)
+02_newton_grid.py grid lines flicker
+
+helix doesn't take extra arguments in the constructor.
+
+absorb_emit missing the message about "Electron beam now turned off".
+Bohr_levels: U gcurve not seen because not using gdisplay.foreground=color.black;
+  also energy levels not seen (probably same reason?)
+  
+In twopucks, it's a real problem that the upper (horizontal) string doesn't show well.
+
+alpha_on_alpha crashes when more than 10000 appends made to curve. This is not a problem
+in other programs, such as the Earth-to-Moon program.
+
+In crossproduct I see that it must have been that the default text color in a label
+used to be scene.foreground but is now white. May need to change new label for compatibility.
+
+gas.py for old Numeric gives this error:
+VPython WARNING: ..\src\python\curve.cpp:747: cvisual::python::curve::thickline: Degenerate curve case! 
+please report the following information to visualpython-users@lists.sourceforge.net: 
+current:<0, 0, 0> next:<0, 1, 0> prev:<0, 0, 0> A:<0, 1, 0> B:<0, 0, 0> x:<0, 1, 0> y:<0, 1, 0> lastx:<1, 0, 0> lasty:<0, 1, 0> first:0
+
+For those programs (gas, stars) that are different between Numeric and numpy, should
+use "try" to set a flag and make the programs run either way.
+
+plane_sinusoidal_wave is very jerky.
 
 ---------------------------
 
