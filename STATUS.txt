@@ -1,7 +1,21 @@
 Started 2008/4/7 as a place to record the status of Visual 4 on various platforms
 
+VAIO 2008 June 14
+
+Zoomed out too far:
+dipole, heightfield, gas, hanoi, lathe, planar, stars, stonehenge, toroid, toroid_drag
+
+Kill windows, IDLE lingers without redisplaying (but new run deletes old window).
+materials_test runs okay (but without material texture, of course).
+
+stonehenge won't let me move past the back of the scene.
+
+01_newton.py red arrow bright when to the left, dark when to the right !!
+
+---------------------------
+
 ***Bruce MacBook OSX 10.5 Intel graphics
-4/6 material_test.py gives a hard crash (can move mouse but do nothing; must reboot).
+2008/4/6 material_test.py gives a hard crash (can move mouse but do nothing; must reboot).
 
 ***Bruce home Dell desktop Vista GeForce 7600 GS
 4/6 OK
