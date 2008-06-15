@@ -29,6 +29,8 @@ in other programs, such as the Earth-to-Moon program.
 
 In crossproduct I see that it must have been that the default text color in a label
 used to be scene.foreground but is now white. May need to change new label for compatibility.
+I find that Visual 3 ignored color in label but used current foreground color only, which was bad.
+But if no color is specified for the text, we should use scene.foreground. 
 
 gas.py for old Numeric gives this error:
 VPython WARNING: ..\src\python\curve.cpp:747: cvisual::python::curve::thickline: Degenerate curve case! 
