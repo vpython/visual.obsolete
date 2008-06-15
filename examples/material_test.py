@@ -1,7 +1,5 @@
 from visual import *
 
-scene.show_rendertime = 1
-
 axis = (1,0,0)
 ##obj = box
 ##obj = cylinder; axis = (0,1,0)
@@ -28,8 +26,8 @@ box( pos = (0,-1.5,0), size=(10,1,10), material = materials.wood2 )
 
 while 1:
     rate(100)
-##    for s in spheres:
-##        s.rotate( axis=scene.up, angle=.01 )
+    for s in spheres:
+        s.rotate( axis=scene.up, angle=.01 )
     if scene.mouse.clicked:
         p = scene.mouse.getclick().pick
         if p:

@@ -124,7 +124,7 @@ def crystal(N=3, delta=1.0, R=None, sradius=None):
 
 sradius = R/3.
 vrange = 0.2*L*sqrt(k/m)
-dt = 2.*pi*sqrt(m/k)/40.
+dt = 0.02*(2.*pi*sqrt(m/k))
 scene.visible = False
 atoms = crystal(N=N, delta=L, R=R, sradius=sradius)
 scene.visible = True
@@ -151,7 +151,7 @@ Nsteps = 0
 k_dt = k * dt
 dt_m = dt / m
 while 1:
-    rate(50)
+    rate(100)
     for a in atoms:
         r = vector_array(a.nearpos) - a.pos
         a.p += k_dt *(r.norm()*(r.mag()-L)).sum()

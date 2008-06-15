@@ -1,12 +1,13 @@
 from visual import *
 from random import uniform, randint
 
-scene.forward = (-0.25,-0.25,1)
+scene.forward = (-0.25,-0.25,-1)
 
 nboxes = 8
 nlinks = 16
+maxgrid = 10
 
-# Create some random boxes:
+# Create some random cylinders:
 nodes = []
 for t in arange(-pi,pi,2*pi/nboxes):
   b = cylinder( pos=(10*sin(t),0,10*cos(t)) )
@@ -28,10 +29,10 @@ for l in range(nlinks):
   links.append(c)
 
 # Draw a grid:
-for i in range(11):
-    curve(pos=[(2*i-10,0,-10),(2*i-10,0,10)], color=color.cyan)       
-    curve(pos=[(-10,0,2*i-10),(10,0,2*i-10)], color=color.cyan)
-box(pos=(0,-0.6,0),width=20,length=20,height=1,color=(0,0,0.1))
+for i in range(maxgrid+1):
+    curve(pos=[(2*i-maxgrid,0,-maxgrid),(2*i-maxgrid,0,maxgrid)], color=color.cyan)       
+    curve(pos=[(-maxgrid,0,2*i-maxgrid),(maxgrid,0,2*i-maxgrid)], color=color.cyan)
+box(pos=(0,-0.6,0),width=2*maxgrid,length=2*maxgrid,height=1,color=(0,0,0.1))
 
 # Drag and drop loop
 drag = None
@@ -40,15 +41,19 @@ while 1:
   if scene.mouse.events:
     c = scene.mouse.getevent()
     if drag and (c.drop or c.click):   # drop the selected object
-      dp = c.project(normal=scene.up)
-      if dp: drag.pos = dp
+      newpos = c.project(normal=scene.up, d=yoffset)+offset
+      if abs(newpos.x)<=maxgrid and abs(newpos.z)<=maxgrid:
+        drag.pos = newpos
       drag.color = drag.icolor
       drag = None
     elif c.pick and hasattr(c.pick,"icolor"):   # pick up the object
       drag = c.pick
       drag.color = color.white
+      yoffset = c.pickpos.y
+      offset = drag.pos-c.project(normal=scene.up, d=yoffset)
   if drag:
-    dp = scene.mouse.project(normal=scene.up)
-    if dp: drag.pos = dp
-
+    newpos = scene.mouse.project(normal=scene.up, d=yoffset)+offset
+    if abs(newpos.x)<=maxgrid and abs(newpos.z)<=maxgrid:
+      drag.pos = newpos
+  
   for lnk in links: lnk.pos = lnk.ends

@@ -3,7 +3,7 @@ from visual import *
 from visual.text import *
 import time
 import pickle
-scene.show_rendertime = 1
+
 print """
 Press to enter roaming mode, release to exit roaming mode.
 In roaming mode, with the mouse button down, move the mouse

@@ -15,7 +15,7 @@ I = 1.0
 Ncoils = 20
 Bscale = (2.*Rsmall)/(4*pi*1E-7*Ncoils*I/L)
 
-dphi = 2.*pi/Ncoils/15.
+dphi = 2.*pi/Ncoils/50.
 phi = arange(0,2*pi+dphi,dphi)
 toroid=curve(x = Rbig*cos(phi)+Rsmall*cos(Ncoils*phi)*cos(phi),
             y = Rbig*sin(phi)+Rsmall*cos(Ncoils*phi)*sin(phi),
