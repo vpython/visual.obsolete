@@ -23,6 +23,31 @@ static bool modBit (int mask, int bit)
 
 bool firstdisplay = true;
 
+static std::set<display*> widgets;
+
+void 
+init_platform() // called from cvisualmodule initialization
+{
+	ProcessSerialNumber psn;
+	CFDictionaryRef		app;
+	const void *		backKey;
+	const void *		background;
+	int					err;
+	
+	VPYTHON_NOTE( "Start of init_platform.");
+	//std::cout << "init_platform\n";
+	// If we were invoked from python rather than pythonw, change into a GUI app
+	GetCurrentProcess(&psn);
+	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
+	backKey = CFStringCreateWithCString(NULL, "LSBackgroundOnly", kCFStringEncodingASCII);
+	background = CFDictionaryGetValue(app, backKey);
+	if (background == kCFBooleanTrue) {
+		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+	}
+	SetFrontProcess(&psn);
+	VPYTHON_NOTE( "End of init_platform.");
+}
+
 /*
 Deprecated Carbon elements (which means doubly deprecated, since Carbon itself has little support):
 In aglFont::aglFont in mac_font_renderer.cpp,
@@ -48,6 +73,10 @@ display::display()
    mouseLocked(false)
 {
 	VPYTHON_NOTE( "Initialize display.");
+	if (firstdisplay) {
+		firstdisplay = false;
+		init_platform();
+	}
 }
 
 display::~display()
@@ -94,39 +123,13 @@ display::gl_swap_buffers()
 	gl_end();
 }
 
-void 
-init_platform() // called from cvisualmodule initialization
-{
-	ProcessSerialNumber psn;
-	CFDictionaryRef		app;
-	const void *		backKey;
-	const void *		background;
-	int					err;
-	
-	VPYTHON_NOTE( "Start of init_platform.");
-	//std::cout << "init_platform\n";
-	// If we were invoked from python rather than pythonw, change into a GUI app
-	GetCurrentProcess(&psn);
-	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
-	backKey = CFStringCreateWithCString(NULL, "LSBackgroundOnly", kCFStringEncodingASCII);
-	background = CFDictionaryGetValue(app, backKey);
-	if (background == kCFBooleanTrue) {
-		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-	}
-	SetFrontProcess(&psn);
-	VPYTHON_NOTE( "End of init_platform.");
-}
-
-void
+bool
 display::create()
 {
 	VPYTHON_NOTE( "Start create.");
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
-	if (firstdisplay) {
-		firstdisplay = false;
-		init_platform();
-	}
-	// Just to get going, set flags to 0:
+	widgets.insert(this);
+	// TODO: Just to get going, set flags to 0:
 	if (!initWindow(title, window_x, window_y, window_width, window_height, 0)) {
 		std::ostringstream msg;
 		msg << "Could not create the window!\n";
@@ -134,6 +137,7 @@ display::create()
 		std::exit(1);
 	}
 	VPYTHON_NOTE( "End create.");
+	return true;
 }
 
 /*
@@ -160,6 +164,8 @@ display::destroy() // was aglContext::cleanup()
 	if (window)
 		DisposeWindow(window);
 	window = NULL;
+	python::gil_lock gil;
+	widgets.erase(this);
 }
 
 void
@@ -601,6 +607,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 		ActivateWindow(window, true);
 		ShowWindow(window);
 	}
+	window_visible = true; // TODO: do we need to wait for some event?
 	
 	VPYTHON_NOTE( "End initWindow.");
 	return true;
@@ -684,42 +691,6 @@ display::getKeys()
 
 /******************** gui_main implementation **********************/
 
-typedef struct {
-	bool (*func)(void * data);
-	void * funcData;
-	double delay;
-	EventLoopTimerUPP upp;
-} VPCallback;
-
-static void doCallback (EventLoopTimerRef timer, void * data)
-{
-	VPCallback * callback;
-		
-	callback = (VPCallback *)data;
-	
-	if (callback->func(callback->funcData)) {
-		_event_callback(callback->delay, callback->func, callback->funcData);
-	}
-	// FIXME Got a memory leak here
-	//delete callback;
-}
-
-void _event_callback( double seconds, bool (*callback)(void*), void *data)
-{
-	EventLoopTimerRef	discard;
-	VPCallback *		cb;
-	
-	if (callback) {
-		cb = new VPCallback;
-		cb->func	 = callback;
-		cb->funcData = data;
-		cb->delay	 = seconds;
-		cb->upp		 = NewEventLoopTimerUPP(doCallback);
-		InstallEventLoopTimer(GetMainEventLoop(), seconds, 0, cb->upp, cb, &discard);
-		DisposeEventLoopTimerUPP(cb->upp);
-	}
-}
-
 gui_main* gui_main::self = 0;  // Protected by python GIL
 
 boost::signal<void()> gui_main::on_shutdown;
@@ -729,71 +700,50 @@ gui_main::gui_main()
 {
 }
 
-void *
-gui_main::event_loop (void * arg)
+void
+gui_main::event_loop ()
 {
 	VPYTHON_NOTE( "Start event_loop.");
+	poll();
 	RunApplicationEventLoop();
 	VPYTHON_NOTE( "End event_loop.");
-	//return 0; // How can we return 0 from void?
-}
-
-void 
-gui_main::start_event_loop ()
-{
-	pthread_t thread;
-	
-	VPYTHON_NOTE( "Begin start_event_loop.");
-	pthread_create( &thread, NULL, event_loop, 0);
-	VPYTHON_NOTE( "End start_event_loop.");
-}
-
-bool 
-gui_main::doQuit (void * arg)
-{
-	QuitApplicationEventLoop();
-	return 0;
-}
-
-void 
-gui_main::stop_event_loop ()
-{
-	//std::cout << "stop_event_loop\n";
-	_event_callback(0.0, doQuit, NULL);
 }
 
 void
 gui_main::init_thread()
 {
 	if (!self) {
+		VPYTHON_NOTE( "begin init_thread");
 		// We are holding the Python GIL through this process, including the wait!
 		// We can't let go because a different Python thread could come along and mess us up (e.g.
 		//   think that we are initialized and go on to call PostThreadMessage without a valid idThread)
-		self = new gui_main;
-		self->start_event_loop();
-		/*
+		self = new gui_main;		
 		thread gui( boost::bind( &gui_main::event_loop, self ) );
 		lock L( self->init_lock );
 		while (self->gui_thread == -1)
 			self->initialized.wait( L );
-		*/
+		VPYTHON_NOTE( "end init_thread");
 	}
+}
+
+static void call_boost_function( EventLoopTimerRef, void* f_as_pvoid ) {
+	boost::function<void()>* f = reinterpret_cast<boost::function<void()>*>(f_as_pvoid);
+	(*f)();
+	delete f;
+}
+
+static void call_in_gui_thread_delayed( double delay, const boost::function< void() >& f) {
+	EventLoopTimerRef discard;
+	EventLoopTimerUPP upp = NewEventLoopTimerUPP(call_boost_function);
+	InstallEventLoopTimer(GetMainEventLoop(), delay, 0, upp, new boost::function<void()>(f), &discard);
+	DisposeEventLoopTimerUPP(upp);
 }
 
 void
 gui_main::call_in_gui_thread( const boost::function< void() >& f )
 {
-	VPYTHON_NOTE( "call_in_gui_thread");
 	init_thread();
-	VPYTHON_NOTE( "Returned from init_thread.");
-	//PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
-}
-
-/*
-void
-gui_main::timer_callback() {
-	// Called in high-priority timer thread when it's time to render
-	self->call_in_gui_thread( boost::bind( &gui_main::poll, self ) );
+    call_in_gui_thread_delayed( 0.0, f );
 }
 
 void gui_main::poll() {
@@ -802,14 +752,12 @@ void gui_main::poll() {
 	// without a message being processed by the GUI thread.  paint_displays() will pick
 	// the lock up as necessary to synchronize access to the actual display contents.
 
-	std::vector<display*> displays;
-	for(std::map<HWND, display*>::iterator i = widgets.begin(); i != widgets.end(); ++i )
-		if (i->second)
-			displays.push_back( i->second );
+	std::vector<display*> displays( widgets.begin(), widgets.end() );
 
-	int interval = int( 1000. * render_manager::paint_displays( displays ) );
-	CreateTimerQueueTimer( &timer_handle, NULL, &timer_callback, NULL, interval, 0, WT_EXECUTEINTIMERTHREAD );
+	double interval = render_manager::paint_displays( displays );
+
+	std::cout << "poll " << widgets.size() << " " << interval << std::endl;
+	call_in_gui_thread_delayed( interval, boost::bind(&gui_main::poll, this) );
 }
-*/
 
-} // !namespace cvisual;
+} // !namespace cvisual

@@ -1465,9 +1465,16 @@ display_kernel::set_visible( bool vis)
 
 		// Wait for (in)activation to complete
 		python::gil_release gil;
+		VPYTHON_NOTE( "display_kernel::set_visible -- did gil_release gil");
 		lock L( realize_lock );
-		while ( realized != vis )
+		VPYTHON_NOTE( "display_kernel::set_visible -- executed lock");
+		VPYTHON_NOTE( "display_kernel::set_visible -- next, enter while loop");
+		while ( realized != vis ) {
+			VPYTHON_NOTE( "display_kernel::set_visible - waiting1");
 			realize_condition.wait( L );
+			VPYTHON_NOTE( "display_kernel::set_visible - waiting2");
+		}
+		VPYTHON_NOTE( "display_kernel::set_visible - finished");
 	}
 }
 

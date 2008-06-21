@@ -16,14 +16,6 @@
 
 namespace cvisual {
 
-void _event_callback( double seconds, bool (*callback)(void*), void *data);
-
-template <class T>
-inline void event_callback( double seconds, bool (*callback)(T*), T* data) 
-{
-	_event_callback( seconds, (bool(*)(void*))callback, (void*)data);
-}
-
 class display : public display_kernel
 {
  public:
@@ -31,7 +23,7 @@ class display : public display_kernel
 	virtual ~display();
 
 	// Called by the gui_main class below (or render_manager as its agent)
-	void create();
+	bool create();
 	void destroy();
 	void paint();
 	void swap() { gl_swap_buffers(); }
@@ -127,7 +119,7 @@ class gui_main
 	static void init_thread(void);
 
 	gui_main();	//< This is the only nonstatic member function that doesn't run in the gui thread!
-	//void poll();
+	void poll();
 
 	static gui_main* self;
 	
@@ -140,9 +132,7 @@ class gui_main
 	 static void call_in_gui_thread( const boost::function< void() >& f );
 	 
 	 static bool doQuit(void * arg);
-	 static void* event_loop(void * arg);
-	 void start_event_loop();
-	 void stop_event_loop();
+	 void event_loop();
 	 
 	 // Calls the given function in the GUI thread.
 	 //static void call_in_gui_thread( const boost::function< void() >& f );
