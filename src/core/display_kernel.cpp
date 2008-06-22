@@ -198,7 +198,8 @@ display_kernel::~display_kernel()
 
 void
 display_kernel::report_closed() {
-	set_display_visible( this, false );
+	if (visible)
+		set_display_visible( this, false );
 
 	lock L( realize_lock );
 	realized = false;
