@@ -21,12 +21,10 @@ static bool modBit (int mask, int bit)
 	return (mask & (1 << bit));
 }
 
-bool firstdisplay = true;
-
 static std::set<display*> widgets;
 
 void 
-init_platform() // called from cvisualmodule initialization
+init_platform() // called just once
 {
 	ProcessSerialNumber psn;
 	CFDictionaryRef		app;
@@ -73,10 +71,6 @@ display::display()
    mouseLocked(false)
 {
 	VPYTHON_NOTE( "Initialize display.");
-	if (firstdisplay) {
-		firstdisplay = false;
-		init_platform();
-	}
 }
 
 display::~display()
@@ -123,7 +117,7 @@ display::gl_swap_buffers()
 	gl_end();
 }
 
-bool
+void
 display::create()
 {
 	VPYTHON_NOTE( "Start create.");
@@ -137,7 +131,6 @@ display::create()
 		std::exit(1);
 	}
 	VPYTHON_NOTE( "End create.");
-	return true;
 }
 
 /*
@@ -154,6 +147,7 @@ void destroy_context (glContext * cx)
 void
 display::destroy() // was aglContext::cleanup()
 {
+	VPYTHON_NOTE( "Start destroy()");
 	window_x	= -1;
 	window_y	= -1;
 	window_width	= 0;
@@ -166,6 +160,7 @@ display::destroy() // was aglContext::cleanup()
 	window = NULL;
 	python::gil_lock gil;
 	widgets.erase(this);
+	VPYTHON_NOTE( "End destroy()");
 }
 
 void
@@ -240,7 +235,7 @@ display::getCtrlKey()
 }
 
 OSStatus
-display::vpWindowHandler (EventRef event)
+display::vpWindowHandler (EventHandlerCallRef target, EventRef event)
 {
 	UInt32	kind;
 	Rect	bounds;
@@ -255,16 +250,25 @@ display::vpWindowHandler (EventRef event)
 		// Tell OpenGL about it
 		aglUpdateContext(gl_context);
 	} else if (kind == kEventWindowClosed) {
+		VPYTHON_NOTE( "kEventWindowClosed");
+		QuitApplicationEventLoop();
+		return noErr;
 		// Safest way to destroy a window is by generating ESC key event,
 		// which will be passed on and interpreted as close request
-		keys.push("escape");
+		//keys.push("escape");
+		/*
+		destroy(); // kill the window
+		if (exit) {
+			QuitApplicationEventLoop(); // by default, kill the application
+		}
 		return noErr;
+		*/
 	}
 	return eventNotHandledErr;
 }
 
 OSStatus
-display::vpKeyboardHandler (EventRef event)
+display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 {
 	UInt32	kind;
 	char	key[2];
@@ -382,7 +386,7 @@ display::vpKeyboardHandler (EventRef event)
 }
 
 OSStatus
-display::vpMouseHandler (EventRef event)
+display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 {
 	WindowPartCode	part;
 	WindowRef		win;
@@ -397,9 +401,10 @@ display::vpMouseHandler (EventRef event)
 					  sizeof(pt), NULL,
 					  &pt);
 	part = FindWindow(pt, &win);
-	if (win != window || part != inContent)
+	if (win != window || part != inContent) {
 		// Title bar, close box, ... pass to OS
 		return eventNotHandledErr;
+	}
 	
 	// Get window-relative position and any modifier keys
 	GetEventParameter(event, kEventParamWindowMouseLocation,
@@ -451,27 +456,24 @@ static OSStatus
 vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
 {
 	UInt32	evtClass;
-	display * gl_context;
+	display * thiswindow;
 	
-	gl_context = (display *)data;
+	thiswindow = (display *)data;
 	
 	evtClass = GetEventClass(event);
 	
 	switch (evtClass) {
-		case kEventClassApplication:
-			if (GetEventKind(event) == kEventAppQuit) {
-				QuitApplicationEventLoop();
-				return noErr;
-			}
-			break;
 		case kEventClassWindow:
-			return gl_context->vpWindowHandler(event);
+			//VPYTHON_NOTE( "kEventClassWindow");
+			return thiswindow->vpWindowHandler(target, event);
 			break;
 		case kEventClassKeyboard:
-			return gl_context->vpKeyboardHandler(event);
+			//VPYTHON_NOTE( "kEventClassKeyboard");
+			return thiswindow->vpKeyboardHandler(target, event);
 			break;
 		case kEventClassMouse:
-			return gl_context->vpMouseHandler(event);
+			//VPYTHON_NOTE( "kEventClassMouse");
+			return thiswindow->vpMouseHandler(target, event);
 			break;
 		default:
 			break;
@@ -602,6 +604,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 						upp,
 						idx, handled,
 						this, &discard);
+	DisposeEventHandlerUPP(upp);
 	// Make visible
 	if (! (flags & display::FULLSCREEN)) {
 		ActivateWindow(window, true);
@@ -707,12 +710,14 @@ gui_main::event_loop ()
 	poll();
 	RunApplicationEventLoop();
 	VPYTHON_NOTE( "End event_loop.");
+	ExitToShell();
 }
 
 void
 gui_main::init_thread()
 {
 	if (!self) {
+		init_platform();
 		VPYTHON_NOTE( "begin init_thread");
 		// We are holding the Python GIL through this process, including the wait!
 		// We can't let go because a different Python thread could come along and mess us up (e.g.
@@ -756,7 +761,7 @@ void gui_main::poll() {
 
 	double interval = render_manager::paint_displays( displays );
 
-	std::cout << "poll " << widgets.size() << " " << interval << std::endl;
+	//std::cout << "poll " << widgets.size() << " " << interval << std::endl;
 	call_in_gui_thread_delayed( interval, boost::bind(&gui_main::poll, this) );
 }
 

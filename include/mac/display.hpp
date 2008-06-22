@@ -23,7 +23,7 @@ class display : public display_kernel
 	virtual ~display();
 
 	// Called by the gui_main class below (or render_manager as its agent)
-	bool create();
+	void create();
 	void destroy();
 	void paint();
 	void swap() { gl_swap_buffers(); }
@@ -46,9 +46,9 @@ class display : public display_kernel
 	void gl_end();
 	void gl_swap_buffers();
 
-	OSStatus display::vpWindowHandler (EventRef event);
-	OSStatus display::vpMouseHandler (EventRef event);
-	OSStatus display::vpKeyboardHandler (EventRef event);
+	OSStatus display::vpWindowHandler (EventHandlerCallRef target, EventRef event);
+	OSStatus display::vpMouseHandler (EventHandlerCallRef target, EventRef event);
+	OSStatus display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event);
 
 	// Tells the application where it can find its data.
 	// Win32 doesn't use this information.
