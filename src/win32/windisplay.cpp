@@ -21,6 +21,45 @@ using boost::lexical_cast;
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
 
+/*
+How to shut down on Windows (Dave Scherer, 2008/6/22)
+
+There's more than one possible sequence of events leading to shutdown, 
+and can be more than one window. Remember that the program can close windows, 
+and that the user closing a window does NOT always mean the program terminates.
+
+Here's a high level description of how it works on Windows:
+
+1. In display::destroy(), ask the OS to close the window. Don't do any cleanup.
+
+2. When an event is received indicating that the USER wants to close the window, 
+also ask the OS to close the window. Additionally, if this->exit (equivalent to scene.exit = 1), 
+ask the event loop to shut down.
+
+3. In the event handler for window destruction (which gets called after either of the above cases), 
+call report_closed() and then clean up the resources used by the window like OpenGL contexts.
+
+4. When the event loop terminates (i.e. returns), call gui_main::on_shutdown(), 
+which will terminate the program (the actual shutdown logic is in wrap_display_kernel.cpp).
+
+5. If the program closes all its windows programmatically and then terminates itself, 
+the event loop never terminates; it is killed by the OS when the main thread calls std::exit().
+
+I don't know if this exact design will work on the Mac; it depends somewhat on OS behavior.
+But its behavior needs to be followed closely. 
+The most obvious possible implementation differences required:
+
+ - There might be only a single event for 2 and 3.
+   In that case, you need to clean up resources, and request event loop shutdown 
+   only if this->exit AND this->visible. I believe that check will identify only 
+   the case where the user is closing the window, as opposed to setting scene.visible = 0.
+
+ - 5 might not work, so the program might hang on shutdown in that situation.
+ In fact, a quick test revealed that this was broken on Windows due to a bug in display_kernel, 
+ which I'll check in a fix to. If there's a problem with this on the Mac, 
+ talk to me about it since it's not worth my solving if it isn't a problem.
+*/
+
 namespace cvisual {
 
 /**************************** Utilities ************************************/
