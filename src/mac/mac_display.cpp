@@ -401,7 +401,7 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	EventMouseButton btn;
 	bool buttons[3]; // left, right, middle buttons
 	bool shiftState[4]; // shift, ctrl, option, command key down
-	
+			
 	// First must check if mouse event occurred within our content area
 	GetEventParameter(event, kEventParamMouseLocation,
 					  typeQDPoint, NULL,
@@ -413,6 +413,11 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 		return eventNotHandledErr;
 	}
 	
+	// Get window-relative position and any modifier keys
+	GetEventParameter(event, kEventParamWindowMouseLocation,
+					  typeQDPoint, NULL,
+					  sizeof(pt), NULL,
+					  &pt);	
 	GetEventParameter(event, kEventParamMouseButton,
 					  typeMouseButton, NULL,
 					  sizeof(btn), NULL,
@@ -427,12 +432,15 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	shiftState[2] = modBit(keyModState, optionKeyBit);
 	shiftState[3] = modBit(keyModState, cmdKeyBit);
 
-	buttons[0] = (btn == kEventMouseButtonPrimary);
-	buttons[1] = (btn == kEventMouseButtonSecondary); // right button on 3-button mouse
-	buttons[2] = (btn == kEventMouseButtonTertiary); // middle button on 3-button mouse
+	// mouse_manager expects a release event to be reported with no button as true,
+	// which is the case for Windows, but not for the Mac:
+	kind = GetEventKind(event);
+	buttons[0] = (btn == kEventMouseButtonPrimary && kind != kEventMouseUp);
+	buttons[1] = (btn == kEventMouseButtonSecondary && kind != kEventMouseUp); // right button on 3-button mouse
+	buttons[2] = (btn == kEventMouseButtonTertiary && kind != kEventMouseUp); // middle button on 3-button mouse
 	
 	//std::cout << "buttons=(" << buttons[0] << "," << buttons[1] << "," << buttons[2] << ")" << std::endl;
-	
+
 	if (buttons[1] || buttons[2]) 
 		mouse.report_mouse_state( 3, buttons, pt.h, pt.v, 4, shiftState, false ); // TODO: can we lock mouse?
 	else
