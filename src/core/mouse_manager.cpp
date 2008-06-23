@@ -55,7 +55,7 @@ void mouse_manager::report_mouse_state( int physical_button_count, bool is_butto
 	// Mac: 1- or 3-button mouse, with shift, ctrl, option, command
 	// Linux: typically 3-button mouse
 	bool new_buttons[3]; fill(3, new_buttons, is_button_down );
-	bool new_shift[shift_state_count]; fill(shift_state_count, new_shift, shift_state);
+	bool new_shift[4]; fill(shift_state_count, new_shift, shift_state);
 	
 	//std::cout << "(x,y)=(" << cursor_client_x << "," << cursor_client_y << ")" << std::endl;
 		
