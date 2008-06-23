@@ -64,6 +64,7 @@ class display : public display_kernel
 	
 	bool initWindow( std::string title, int x, int y, int width, int height, int flags );
 	bool changeWindow( std::string title, int x, int y, int width, int height, int flags );
+	void update_size();
 	bool isOpen();	
 	
 	enum {
@@ -77,8 +78,6 @@ class display : public display_kernel
 	void swapBuffers();
 
  	bool window_visible;
-	
-	void update_size();
 
     // This is a list of glDeleteLists calls that should be made the next time
     // the context is made active.

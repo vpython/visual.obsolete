@@ -1,5 +1,6 @@
 #include "mouse_manager.hpp"
 #include "display_kernel.hpp"
+#include "util/errors.hpp"
 
 namespace cvisual {
 
@@ -18,11 +19,9 @@ mouse_manager::mouse_manager( class display_kernel& display )
 bool mouse_manager::is_mouse_locked() { return locked; }
 mouse_t& mouse_manager::get_mouse() { return mouse; }
 
-static void fill( int out_size, bool out[], int in_size, bool in[], bool def = false ) {
-	for(int i=0; i<out_size && i<in_size; i++)
+static void fill( int out_size, bool out[], bool in[] ) {
+	for(int i=0; i<out_size; i++)
 		out[i] = in[i];
-	for(int i=in_size; i<out_size; i++)
-		out[i] = def;
 }
 
 int mouse_manager::get_x() { 
@@ -44,31 +43,62 @@ void mouse_manager::report_mouse_state( int physical_button_count, bool is_butto
 										int shift_state_count, bool shift_state[],
 										bool can_lock_mouse )
 {
-	// A 2-button mouse with shift,ctrl,alt
-	bool new_buttons[2]; fill(2, new_buttons, physical_button_count, is_button_down );
-	bool new_shift[3]; fill(3, new_shift, shift_state_count, shift_state);
+	// Call this routine with is_button_down a completely filled-in triple (left, right, middle)
+	
+	// physical_button_count = 2 for Windows; 1 or 3 for Mac
+	// is_button_down = [left down, right down, middle down] for a 3-button mouse
+	// shift_state_count = 3 for Windows; 4 for Mac
+	// shift_state = [shift, ctrl, alt] for Windows; [shift, ctrl, option, command] for Mac
+	// We'll treat Mac option key as though it were alt for purposes of internal processing.
+	
+	// Windows: 2-button mouse, with shift,ctrl,alt
+	// Mac: 1- or 3-button mouse, with shift, ctrl, option, command
+	// Linux: typically 3-button mouse
+	bool new_buttons[3]; fill(3, new_buttons, is_button_down );
+	bool new_shift[shift_state_count]; fill(shift_state_count, new_shift, shift_state);
+	
+	//std::cout << "(x,y)=(" << cursor_client_x << "," << cursor_client_y << ")" << std::endl;
+		
+	/*
+	std::cout << "initial new_buttons=(" << new_buttons[0] << "," << new_buttons[1] << "," << new_buttons[2] << ")" << std::endl;
+	std::cout << "new_shift=(" << new_shift[0] << "," << new_shift[1] << "," 
+		<< new_shift[2] << "," << new_shift[3] << ")" << std::endl;
+	*/
 	
 	// if we have a 3rd button, pressing it is like pressing both left and right buttons.
 	// This is necessary to make platforms that "emulate" a 3rd button behave sanely with
-	// a two-button mouse.
+	// a two-button mouse.s
 	if (physical_button_count>=3 && is_button_down[2]) 
 		new_buttons[0] = new_buttons[1] = true;
+	else if (physical_button_count == 1 && new_buttons[0]) {
+		new_buttons[0] = false;
+		if (shift_state[2]) // option means "middle" button
+			new_buttons[0] = new_buttons[1] = true;
+		else if (shift_state[3]) // command means "right" button
+			new_buttons[1] = true;
+		else if (is_button_down[0])
+			new_buttons[0] = true;
+	}
+	//std::cout << "new_buttons=(" << new_buttons[0] << "," << new_buttons[1] << ")" << std::endl;
 
 	// If there's been more than one button change, impose an arbitrary order, so that update()
 	// only sees one change at a time even if the display driver doesn't enforce that
 	if (new_buttons[0] != buttons[0] && new_buttons[1] != buttons[1]) {
 		new_buttons[1] = !new_buttons[1];
-		update( new_buttons, cursor_client_x, cursor_client_y, new_shift, can_lock_mouse );
+		update( new_buttons, cursor_client_x, cursor_client_y, new_shift, shift_state_count, can_lock_mouse );
 		new_buttons[1] = !new_buttons[1];
 	}
-	update( new_buttons, cursor_client_x, cursor_client_y, new_shift, can_lock_mouse );
+
+	update( new_buttons, cursor_client_x, cursor_client_y, new_shift, shift_state_count, can_lock_mouse );
 }
 
-void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new_shift[], bool can_lock_mouse ) {
+void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new_shift[], int shift_state_count, bool can_lock_mouse ) {
 	// Shift states are just passed directly to mouseobject
 	mouse.set_shift( new_shift[0] );
 	mouse.set_ctrl( new_shift[1] );
-	mouse.set_alt( new_shift[2] );
+	mouse.set_alt( new_shift[2] ); // this is "option" on Mac keyboard
+	if (shift_state_count == 4)
+		mouse.set_command( new_shift[3] ); // Mac keyboard
 
 	bool was_locked = locked;
 	locked = (can_lock_mouse && display.zoom_is_allowed() && new_buttons[0] && new_buttons[1]) ||

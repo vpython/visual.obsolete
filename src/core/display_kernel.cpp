@@ -237,7 +237,7 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 	float hfrac = dx
 		/ ((stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO) ? 
 		     (view_width*0.5f) : view_width);
-
+	
 	// The amount by which the scene should be shifted in response to panning
 	// motion.
 	// TODO: Keep this synchronized with the eye_dist calc in

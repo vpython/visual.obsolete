@@ -427,7 +427,7 @@ display::getProcAddress(const char* name) {
 LRESULT
 display::on_mouse( WPARAM wParam, LPARAM lParam)
 {
-	bool buttons[] = { wParam & MK_LBUTTON, wParam & MK_RBUTTON };
+	bool buttons[] = { wParam & MK_LBUTTON, wParam & MK_RBUTTON, false };
 	bool shiftState[] = { wParam & MK_SHIFT, wParam & MK_CONTROL, GetKeyState( VK_MENU) < 0 };
 	
 	int mouse_x = GET_X_LPARAM(lParam);

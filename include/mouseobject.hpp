@@ -21,7 +21,7 @@ class mousebase
 {
  protected:
  	std::string button_name();
- 	std::bitset<3> modifiers;
+ 	std::bitset<4> modifiers;
 	std::bitset<5> eventtype;
 	std::bitset<3> buttons;
 
@@ -39,7 +39,7 @@ class mousebase
 	
 	/* 'buttonstate' contains the following state flags as defined by 'button'.
 	 */
-	enum modifiers_t { ctrl, alt, shift };
+	enum modifiers_t { shift, ctrl, alt, command };
 	
 	/* 'eventtype' contains state flags as defined by 'event'.
 	 */
@@ -54,9 +54,10 @@ class mousebase
 	inline bool is_drag() const { return eventtype.test( drag); }
 	inline bool is_drop() const { return eventtype.test( drop); }
 	std::string* get_buttons() const;
-	inline bool is_alt() const { return modifiers.test( alt); }
 	inline bool is_shift() const { return modifiers.test( shift); }
 	inline bool is_ctrl() const { return modifiers.test( ctrl); }
+	inline bool is_alt() const { return modifiers.test( alt); } // option on Mac keyboard
+	inline bool is_command() const { return modifiers.test( command); }
 	inline vector get_pos() const { return position; }
 	inline vector get_camera() const { return cam; }
 	inline vector get_ray() const { return (position - cam).norm(); }
@@ -65,7 +66,8 @@ class mousebase
 	
 	inline void set_shift( bool _shift) { modifiers.set( shift, _shift); }
 	inline void set_ctrl( bool _ctrl) { modifiers.set( ctrl, _ctrl); }
-	inline void set_alt( bool _alt) { modifiers.set( alt,  _alt); }
+	inline void set_alt( bool _alt) { modifiers.set( alt,  _alt); } // option on Mac keyboard
+	inline void set_command( bool _command) { modifiers.set( command,  _command); }
 	
 	inline void set_press( bool _press) { eventtype.set( press, _press); }
 	inline void set_release( bool _release) { eventtype.set( release, _release); }

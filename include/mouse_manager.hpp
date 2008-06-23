@@ -33,7 +33,7 @@ class mouse_manager {
 	void report_setcursor( int, int );
 	
  private:
-	void update( bool new_buttons[], int new_px, int new_py, bool new_shift[], bool can_lock );
+	void update( bool new_buttons[], int new_px, int new_py, bool new_shift[], int shift_state_count, bool can_lock );
  
 	mouse_t mouse;
 	display_kernel& display;

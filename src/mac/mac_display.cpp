@@ -234,19 +234,25 @@ display::getCtrlKey()
 	return modBit(keyModState, cmdKeyBit) || modBit(keyModState, controlKeyBit);
 }
 
+void
+display::update_size()
+{
+	Rect	drawing, bounds; // region to draw in, bounds of window
+	
+	GetWindowBounds(window, kWindowContentRgn, &drawing);
+	GetWindowBounds(window, kWindowStructureRgn, &bounds);
+	report_resize(	drawing.left, drawing.top, drawing.right-drawing.left, drawing.bottom-drawing.top, 
+			bounds.left, bounds.top, bounds.right-bounds.left, bounds.bottom-bounds.top );
+}
+
 OSStatus
 display::vpWindowHandler (EventHandlerCallRef target, EventRef event)
 {
 	UInt32	kind;
-	Rect	bounds;
 	
 	kind = GetEventKind(event);
 	if (kind == kEventWindowBoundsChanged) {
-		GetWindowBounds(window, kWindowStructureRgn, &bounds);
-		window_x = bounds.left;
-		window_y = bounds.top;
-		window_width  = bounds.right - bounds.left;
-		window_height = bounds.bottom - bounds.top;
+		update_size();
 		// Tell OpenGL about it
 		aglUpdateContext(gl_context);
 	} else if (kind == kEventWindowClosed) {
@@ -393,7 +399,8 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	UInt32			kind;
 	Point			pt;
 	EventMouseButton btn;
-	int				mask;
+	bool buttons[3]; // left, right, middle buttons
+	bool shiftState[4]; // shift, ctrl, option, command key down
 	
 	// First must check if mouse event occurred within our content area
 	GetEventParameter(event, kEventParamMouseLocation,
@@ -406,48 +413,30 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 		return eventNotHandledErr;
 	}
 	
-	// Get window-relative position and any modifier keys
-	GetEventParameter(event, kEventParamWindowMouseLocation,
-					  typeQDPoint, NULL,
-					  sizeof(pt), NULL,
-					  &pt);
+	GetEventParameter(event, kEventParamMouseButton,
+					  typeMouseButton, NULL,
+					  sizeof(btn), NULL,
+					  &btn);
 	GetEventParameter(event, kEventParamKeyModifiers,
 					  typeUInt32, NULL,
 					  sizeof(keyModState), NULL,
 					  &keyModState);
-	mousePos.set_x(pt.h);
-	mousePos.set_y(pt.v);
+	
+	shiftState[0] = modBit(keyModState, shiftKeyBit);
+	shiftState[1] = modBit(keyModState, controlKeyBit);
+	shiftState[2] = modBit(keyModState, optionKeyBit);
+	shiftState[3] = modBit(keyModState, cmdKeyBit);
 
-	// Mouse button change?
-	kind = GetEventKind(event);
-	if (kind == kEventMouseUp || kind == kEventMouseDown) {
-		GetEventParameter(event, kEventParamMouseButton,
-						  typeMouseButton, NULL,
-						  sizeof(btn), NULL,
-						  &btn);
-		// VPython uses the middle and right buttons to adjust the viewpoint but there are
-		// still a lot of Macs with one button mice, so translate option/command + button
-		// into middle/right button.
-		if (btn == kEventMouseButtonPrimary && modBit(keyModState, cmdKeyBit) != 0)
-			btn = kEventMouseButtonSecondary;
-		if (btn == kEventMouseButtonPrimary && modBit(keyModState, optionKeyBit) != 0)
-			btn = kEventMouseButtonTertiary;
-		// VPython numbering
-		if (btn == kEventMouseButtonPrimary)
-			mask = 1 << 0;
-		else if (btn == kEventMouseButtonSecondary)
-			mask = 1 << 1;
-		else if (btn == kEventMouseButtonTertiary)
-			mask = 1 << 2;
-		// And update ourself
-		if (kind == kEventMouseDown) {
-			buttonState |= mask;
-			buttonsChanged |= mask;
-		} else {
-			buttonState &= (~mask);
-			buttonsChanged |= mask;
-		}
-	}
+	buttons[0] = (btn == kEventMouseButtonPrimary);
+	buttons[1] = (btn == kEventMouseButtonSecondary); // right button on 3-button mouse
+	buttons[2] = (btn == kEventMouseButtonTertiary); // middle button on 3-button mouse
+	
+	//std::cout << "buttons=(" << buttons[0] << "," << buttons[1] << "," << buttons[2] << ")" << std::endl;
+	
+	if (buttons[1] || buttons[2]) 
+		mouse.report_mouse_state( 3, buttons, pt.h, pt.v, 4, shiftState, false ); // TODO: can we lock mouse?
+	else
+		mouse.report_mouse_state( 1, buttons, pt.h, pt.v, 4, shiftState, false );
 	
 	return noErr;
 }
@@ -611,6 +600,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 		ShowWindow(window);
 	}
 	window_visible = true; // TODO: do we need to wait for some event?
+	update_size();
 	
 	VPYTHON_NOTE( "End initWindow.");
 	return true;

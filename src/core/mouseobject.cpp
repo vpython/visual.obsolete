@@ -18,6 +18,7 @@ static void init_event( int which, shared_ptr<event> ret, const mouse_t& mouse)
 	ret->set_shift( mouse.is_shift());
 	ret->set_ctrl( mouse.is_ctrl());
 	ret->set_alt( mouse.is_alt());
+	ret->set_command( mouse.is_command());
 	switch (which) {
 		case 1:
 			ret->set_leftdown( true);
