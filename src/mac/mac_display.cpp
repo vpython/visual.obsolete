@@ -23,6 +23,9 @@ static bool modBit (int mask, int bit)
 
 static std::set<display*> widgets;
 
+// The first OpenGL Rendering Context, used to share displaylists.
+static AGLContext root_glrc = NULL;
+
 void 
 init_platform() // called just once
 {
@@ -572,7 +575,13 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 
 	if (fmt == NULL || aglGetError() != AGL_NO_ERROR)
 		return false;
-	gl_context = aglCreateContext(fmt, NULL);
+
+	if (!root_glrc) {
+		root_glrc = aglCreateContext(fmt, NULL);
+		if (root_glrc == NULL)
+			return false;
+	}
+	gl_context = aglCreateContext(fmt, root_glrc);
 	if (gl_context == NULL)
 		return false;
 	
