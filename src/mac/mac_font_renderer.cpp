@@ -84,7 +84,7 @@ void font_renderer::gl_render_to_texture( const view&, const std::wstring& text,
 		throw std::runtime_error("ATSUCreateTextLayoutWithTextPtr failed.");
 
 	// TODO: support multiple lines with ATSUBatchBreakLines, ATSUGetSoftLineBreaks
-
+	
 	Rect text_rect;
 	if (ATSUMeasureTextImage( layout, 0, kATSUToTextEnd, 0, 0, &text_rect ))
 		throw std::runtime_error("ATSUMeasureTextImage failed.");
@@ -96,12 +96,15 @@ void font_renderer::gl_render_to_texture( const view&, const std::wstring& text,
 	memset( pix_buf.get(), 0x80, width*4*height );
 	CGContextRef cx = CGBitmapContextCreate(pix_buf.get(),width,height,8,width*4,colorspace,kCGImageAlphaPremultipliedLast);
 	float rect[4] = {0,0,width,height};
-	float transparent[] = {0,0,1,1}, text_color[] = {1,1,1,1};
+	float transparent[] = {0,0,0,1}, text_color[] = {1,1,1,1};
 	CGContextSetFillColorSpace( cx, colorspace );
 	CGContextSetFillColor( cx, transparent );
 	CGContextFillRect(cx, *(CGRect*)rect);
 	CGContextSetFillColor( cx, text_color );
-
+	CGContextSetShouldSmoothFonts( cx, true );
+	CGContextSetShouldAntialias( cx, true );
+	CGContextSetAllowsAntialiasing( cx, true );
+	
 	{
 		ATSUAttributeTag attr_tag[] = { kATSUCGContextTag };
 		ByteCount attr_size[] = { sizeof(CGContextRef) };
@@ -113,8 +116,9 @@ void font_renderer::gl_render_to_texture( const view&, const std::wstring& text,
 	
 	if (ATSUDrawText( layout, 0, kATSUToTextEnd, -text_rect.left*65536, text_rect.bottom*65536 ))
 		throw std::runtime_error("ATSUDrawText failed.");
-	//CGContextFlush( cx );
+
 	CGContextRelease( cx );
+	
 	tx.set_image( width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 4, pix_buf.get() );
 	
 	// Cleanup (TODO: needed in exception cases also!)
