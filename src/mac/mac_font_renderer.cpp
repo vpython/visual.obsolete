@@ -1,208 +1,127 @@
 #include "font_renderer.hpp"
 #include "util/errors.hpp"
-#include "mac/display.hpp"
+//#include "mac/display.hpp"
+#include <ApplicationServices/ApplicationServices.h>
 
 namespace cvisual {
 
-/**************** aglFont implementation *******************/
-
-
-aglFont::aglFont(struct display& _cx, 
-		 const char *name, 
-		 double size) 
-	: cx(_cx), refcount(1)
-{
-		unsigned char pName[256];
-		int ok;
-		
-		// Font names vary across platforms, so fall back if necessary
-		strcpy((char *)(&(pName[1])), name);
-		pName[0] = strlen(name);
-		fID = FMGetFontFamilyFromName((unsigned char *)pName);
-		if (fID <= 0)
-			fID = GetAppFont();
-		// No size means default
-		if (size <= 0)
-			size = GetDefFontSize();
-		
-		fSize = (int)size;
-		FetchFontInfo(fID, fSize, 0, &fInfo);
-		
-		cx.makeCurrent();
-		listBase = glGenLists(256);
-		ok = aglUseFont(cx.getContext(), fID, 0, fSize, 0, 256, listBase);
-		// if (! ok)	um, report something? Unlikely
-		cx.makeNotCurrent();
-}
-
-aglFont::~aglFont()
-{
-	fID = -1;
-}
-
-void
-aglFont::draw(const std::wstring& c)
-{
-	if (fID >= 0) {
-		glListBase(listBase);
-		//glCallLists(strlen(c), GL_UNSIGNED_BYTE, c);
+bool ucs4_to_utf16( const std::wstring& in, std::vector<unsigned short>& out ) {
+	out.clear();
+	for(int i=0; i<in.size(); i++) {
+		if (in[i] >= 0x110000) return false;
+		if (in[i] >= 0x10000) {
+			out.push_back( 0xD800 + ((in[i] - 0x10000) >> 10) );
+			out.push_back( 0xDC00 + ((in[i] - 0x10000) & 1023) );
+		} else
+			out.push_back( in[i] );
 	}
+	return true;
 }
 
-double
-aglFont::getWidth(const std::wstring& c)
-{
-	int		tw;
-	
-	if (fID == 0)
-		return 0;
-	
-	// Still using old QuickDraw text measurement because I can't
-	// figure out how to use ATSUI
-	cx.makeCurrent();
-	TextFont(fID);
-	TextFace(0);
-	TextSize(fSize);
-	
-	//tw = TextWidth(c, 0, strlen(c));
-	
-	return (double)(tw  * 2) / cx.window_width;
-}
-
-double
-aglFont::ascent()
-{
-	return (double)fInfo.ascent * 2 / cx.window_height;
-}
-
-double
-aglFont::descent()
-{
-	return (double)fInfo.descent * 2 / cx.window_height;
-}
-
-void
-aglFont::release()
-{
-	refcount--;
-	if (refcount <= 0) {
-		cx.add_pending_glDeleteList( listBase, 256);
-		delete(this);
+bool ucs4_to_ascii( const std::wstring& in, std::vector<unsigned char>& out ) {
+	out.clear();
+	for(int i=0; i<in.size(); i++) {
+		if (in[i] >= 0x80) return false;
+		out.push_back( in[i] );
 	}
+	return true;
 }
-
-/*
-aglFont*
-aglContext::getFont(const char* description, double size)
-{
-	return new aglFont(*this, description, size);
-}
-*/
 
 font_renderer::font_renderer( const std::wstring& description, int height ) {
-	/*
-	font_handle = NULL;
-	
-	// TODO: support generic "sans-serif", "serif", "monospace" families using lfPitchAndFamily.
-	// Doesn't matter much because Windows machines pretty much always have "verdana", 
-	// "times new roman", and "courier new".
+	fontID = kATSUInvalidFontID;
+	this->height = height;
 
-	// Respect the users' preferences as to whether ClearType should be enabled.
-	isClearType = isClearTypeEnabled();
-	int quality = DEFAULT_QUALITY;
-	if (isClearType) quality = 5;
-	
-	HDC sic = CreateIC( "DISPLAY", NULL, NULL, NULL );
-	
-	LOGFONTW lf;
-	memset(&lf, 0, sizeof(lf));
-	lf.lfHeight = -height;
-	lf.lfOutPrecision = OUT_TT_PRECIS;
-	lf.lfQuality = quality;
-	wcsncpy( lf.lfFaceName, description.c_str(), sizeof(lf.lfFaceName)/2-1 );
-	lf.lfFaceName[ sizeof(lf.lfFaceName)/2-1 ] = 0;
-	
-	bool fontFound = false;
-	EnumFontFamiliesExW( sic, &lf, (FONTENUMPROCW)ef_callback, (LPARAM)&fontFound, 0 );
-	if (fontFound)
-		font_handle = CreateFontIndirectW( &lf );
+	// TODO: support generic "sans-serif", "serif", "monospace" families.
+	// Doesn't matter much if Macs always have "verdana", "times new roman", and "courier new".
 
-	if (font_handle)  
-		SelectObject( sic, SelectObject( sic, font_handle ) ); //< Work around KB306198
-	
-	DeleteDC( sic );
-	*/
+	// TODO: research suggests kFontUnicodePlatform might not work for all fonts!  Try
+	// kFontMacintoshPlatform and ascii description as well?
+	std::vector<unsigned char> desc;
+	if (!ucs4_to_ascii( description, desc )) return;
+	ATSUFontID fid;
+	if (ATSUFindFontFromName( &desc[0], desc.size()*sizeof(desc[0]), 
+			kFontFamilyName,  //< ?
+			kFontMacintoshPlatform,//kFontUnicodePlatform,
+			kFontNoScriptCode,
+			kFontNoLanguageCode,
+			&fid))
+		return;
+
+	fontID = fid;
 }
 
 bool font_renderer::ok() {
-	return font_handle != 0;
+	return fontID != kATSUInvalidFontID;
 }
 
 font_renderer::~font_renderer() {
-	/*
-	if (font_handle)
-		DeleteObject( font_handle );
-	*/
 }
 
 void font_renderer::gl_render_to_texture( const view&, const std::wstring& text, layout_texture& tx ) {
-	/*
-	HDC dc = NULL;
-	HBITMAP bmp = NULL;
-	HFONT prevFont = NULL;
+	std::vector< unsigned short > text_16;
+	if (!ucs4_to_utf16( text, text_16 ))
+		throw std::runtime_error("Encoding conversion failed.");
 
-	try {
-		dc = CreateCompatibleDC( NULL );
+	// TODO: Compute correct point size.  height is in pixels, not "points", and I
+	// don't know what part of the character is measured by point_size.
+	Fixed point_size = height * 65536;
 
-		prevFont = (HFONT)SelectObject( dc, font_handle );
-		
-		RECT rect;
-		rect.left = 0;
-		rect.top = 0;
-		rect.right = 1024;
-		rect.bottom = 1024;
-		
-		if (!DrawTextW( dc, text.c_str(), text.size(), &rect, DT_CALCRECT ))
-			throw win32_exception("DrawText(DT_CALCRECT) failed.");
-			
-		if (!rect.right) rect.right = 1;
-		if (!rect.bottom) rect.bottom = 1;
+	ATSUStyle style;
+	if (ATSUCreateStyle(&style)) throw std::runtime_error("ATSUCreateStyle failed.");
 
-		BITMAPINFOHEADER hdr;
-		memset(&hdr, 0, sizeof(hdr));
-		hdr.biSize = sizeof(hdr);
-		hdr.biWidth = rect.right;
-		hdr.biHeight = rect.bottom;
-		hdr.biPlanes = 1;
-		hdr.biBitCount = 24;
-		hdr.biCompression = BI_RGB;
-		
-		void* bits;
-		bmp = CreateDIBSection( dc, (BITMAPINFO*)&hdr, DIB_RGB_COLORS, &bits, NULL, 0 );
-		if (!bmp) throw win32_exception("CreateDIBSection failed.");
-		
-		int biPitch = (hdr.biWidth*3 + ((-hdr.biWidth*3)&3));
-		memset(bits, 0, biPitch * hdr.biHeight);
-		
-		SetTextColor(dc, 0xFFFFFF);
-		SetBkColor(dc, 0);
-		
-		HBITMAP prevBmp = (HBITMAP)SelectObject( dc, bmp );
-		DrawTextW( dc, text.c_str(), text.size(), &rect, 0 );
-		SelectObject(dc, prevBmp);
-		
-		SelectObject(dc, prevFont);
-		DeleteDC( dc ); dc = NULL;
-		
-		tx.set_image( rect.right, -rect.bottom, isClearType ? GL_RGB : GL_LUMINANCE, GL_BGR_EXT, GL_UNSIGNED_BYTE, 4, bits );
-
-		DeleteObject( bmp ); bmp = NULL;
-	} catch( ... ) {
-		if (bmp) DeleteObject( bmp );
-		if (dc) { SelectObject(dc, prevFont); DeleteDC( dc ); }
-		
-		throw;
-	*/
+	ATSUAttributeTag attr_tag[] = { kATSUFontTag, kATSUSizeTag };
+	ByteCount attr_size[] = { sizeof(fontID), sizeof(point_size) };
+	ATSUAttributeValuePtr attr_ptr[] = { &fontID, &point_size };
+	int a;
+	if (a=ATSUSetAttributes(style, sizeof(attr_tag)/sizeof(attr_tag[0]), attr_tag, attr_size, attr_ptr)) {
+		throw std::runtime_error("ATSUSetAttributes failed.");
 	}
+	
+	UniCharCount toEnd = kATSUToTextEnd;
+	ATSUTextLayout layout;
+	if (ATSUCreateTextLayoutWithTextPtr( &text_16[0], 0, kATSUToTextEnd, text_16.size(), 
+										 1, &toEnd, &style, &layout ))
+		throw std::runtime_error("ATSUCreateTextLayoutWithTextPtr failed.");
+
+	// TODO: support multiple lines with ATSUBatchBreakLines, ATSUGetSoftLineBreaks
+
+	Rect text_rect;
+	if (ATSUMeasureTextImage( layout, 0, kATSUToTextEnd, 0, 0, &text_rect ))
+		throw std::runtime_error("ATSUMeasureTextImage failed.");
+	int width = text_rect.right - text_rect.left, 
+		height = text_rect.bottom - text_rect.top;
+
+	CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
+	boost::scoped_array<uint8_t> pix_buf( new uint8_t[width*4*height] );
+	memset( pix_buf.get(), 0x80, width*4*height );
+	CGContextRef cx = CGBitmapContextCreate(pix_buf.get(),width,height,8,width*4,colorspace,kCGImageAlphaPremultipliedLast);
+	float rect[4] = {0,0,width,height};
+	float transparent[] = {0,0,1,1}, text_color[] = {1,1,1,1};
+	CGContextSetFillColorSpace( cx, colorspace );
+	CGContextSetFillColor( cx, transparent );
+	CGContextFillRect(cx, *(CGRect*)rect);
+	CGContextSetFillColor( cx, text_color );
+
+	{
+		ATSUAttributeTag attr_tag[] = { kATSUCGContextTag };
+		ByteCount attr_size[] = { sizeof(CGContextRef) };
+		ATSUAttributeValuePtr attr_ptr[] = { &cx };
+		if (ATSUSetLayoutControls (layout, sizeof(attr_tag)/sizeof(attr_tag[0]), attr_tag, attr_size, attr_ptr)) {
+			throw std::runtime_error("ATSUSetLayoutControls failed.");
+		}
+	}
+	
+	if (ATSUDrawText( layout, 0, kATSUToTextEnd, -text_rect.left*65536, text_rect.bottom*65536 ))
+		throw std::runtime_error("ATSUDrawText failed.");
+	//CGContextFlush( cx );
+	CGContextRelease( cx );
+	tx.set_image( width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 4, pix_buf.get() );
+	
+	// Cleanup (TODO: needed in exception cases also!)
+	CGColorSpaceRelease( colorspace );
+	
+	ATSUDisposeTextLayout( layout );
+	ATSUDisposeStyle( style );
+}
 
 } // namespace cvisual
