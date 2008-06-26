@@ -59,12 +59,13 @@ font_renderer::~font_renderer() {
 
 void font_renderer::gl_render_to_texture( const view&, const std::wstring& text, layout_texture& tx ) {
 	std::vector< unsigned short > text_16;
+	static int pfactor = 65536;
 	if (!ucs4_to_utf16( text, text_16 ))
 		throw std::runtime_error("Encoding conversion failed.");
 
-	// TODO: Compute correct point size.  height is in pixels, not "points", and I
+	// Compute correct point size. height is in pixels, not "points", and I
 	// don't know what part of the character is measured by point_size.
-	Fixed point_size = height * 65536;
+	Fixed point_size = (height+1)* pfactor;
 
 	ATSUStyle style;
 	if (ATSUCreateStyle(&style)) throw std::runtime_error("ATSUCreateStyle failed.");
@@ -88,14 +89,14 @@ void font_renderer::gl_render_to_texture( const view&, const std::wstring& text,
 	Rect text_rect;
 	if (ATSUMeasureTextImage( layout, 0, kATSUToTextEnd, 0, 0, &text_rect ))
 		throw std::runtime_error("ATSUMeasureTextImage failed.");
-	int width = text_rect.right - text_rect.left, 
-		height = text_rect.bottom - text_rect.top;
+	int ww = text_rect.right - text_rect.left+2, 
+		hh = text_rect.bottom - text_rect.top;
 
 	CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
-	boost::scoped_array<uint8_t> pix_buf( new uint8_t[width*4*height] );
-	memset( pix_buf.get(), 0x80, width*4*height );
-	CGContextRef cx = CGBitmapContextCreate(pix_buf.get(),width,height,8,width*4,colorspace,kCGImageAlphaPremultipliedLast);
-	float rect[4] = {0,0,width,height};
+	boost::scoped_array<uint8_t> pix_buf( new uint8_t[ww*4*hh] );
+	memset( pix_buf.get(), 0x80, ww*4*hh );
+	CGContextRef cx = CGBitmapContextCreate(pix_buf.get(),ww,hh,8,ww*4,colorspace,kCGImageAlphaPremultipliedLast);
+	float rect[4] = {0,0,ww,hh};
 	float transparent[] = {0,0,0,1}, text_color[] = {1,1,1,1};
 	CGContextSetFillColorSpace( cx, colorspace );
 	CGContextSetFillColor( cx, transparent );
@@ -114,12 +115,12 @@ void font_renderer::gl_render_to_texture( const view&, const std::wstring& text,
 		}
 	}
 	
-	if (ATSUDrawText( layout, 0, kATSUToTextEnd, -text_rect.left*65536, text_rect.bottom*65536 ))
+	if (ATSUDrawText( layout, 0, kATSUToTextEnd, -(text_rect.left-1)*pfactor, text_rect.bottom*pfactor ))
 		throw std::runtime_error("ATSUDrawText failed.");
 
 	CGContextRelease( cx );
 	
-	tx.set_image( width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 4, pix_buf.get() );
+	tx.set_image( ww, hh, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 4, pix_buf.get() );
 	
 	// Cleanup (TODO: needed in exception cases also!)
 	CGColorSpaceRelease( colorspace );
