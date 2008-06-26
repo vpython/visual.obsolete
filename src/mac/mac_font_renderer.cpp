@@ -65,7 +65,7 @@ void font_renderer::gl_render_to_texture( const view&, const std::wstring& text,
 
 	// Compute correct point size. height is in pixels, not "points", and I
 	// don't know what part of the character is measured by point_size.
-	Fixed point_size = (height+1)* pfactor;
+	Fixed point_size = (height)*pfactor;
 
 	ATSUStyle style;
 	if (ATSUCreateStyle(&style)) throw std::runtime_error("ATSUCreateStyle failed.");
@@ -84,13 +84,36 @@ void font_renderer::gl_render_to_texture( const view&, const std::wstring& text,
 										 1, &toEnd, &style, &layout ))
 		throw std::runtime_error("ATSUCreateTextLayoutWithTextPtr failed.");
 
-	// TODO: support multiple lines with ATSUBatchBreakLines, ATSUGetSoftLineBreaks
-	
-	Rect text_rect;
-	if (ATSUMeasureTextImage( layout, 0, kATSUToTextEnd, 0, 0, &text_rect ))
-		throw std::runtime_error("ATSUMeasureTextImage failed.");
-	int ww = text_rect.right - text_rect.left+2, 
-		hh = text_rect.bottom - text_rect.top;
+	ItemCount nLines;
+	if (ATSUBatchBreakLines( layout, 0, text_16.size(), 1024*pfactor, &nLines))
+		throw std::runtime_error("ATSUBatchBreakLines failed.");
+	boost::scoped_array<UniCharArrayOffset> lineBreaks( new UniCharArrayOffset[nLines+1] );
+	boost::scoped_array<ATSUTextMeasurement> lineY( new ATSUTextMeasurement[nLines+1] );
+	if (ATSUGetSoftLineBreaks( layout, 0, kATSUToTextEnd, nLines, lineBreaks.get()+1, &nLines ))
+		throw std::runtime_error("ATSUGetSoftLineBreaks failed.");
+	nLines += 1; lineBreaks[0] = 0;
+
+	int ww = 0, left = 1024;
+	ATSUTextMeasurement yy = 0;
+	for(int line=0; line<nLines; line++) {
+		ATSUTextMeasurement ascent, descent;
+		ByteCount bytes;
+		
+		// Ignore return value - these return an error "not set" but the correct value (!)
+		ATSUGetLineControl(layout, lineBreaks[line], kATSULineAscentTag, sizeof(ATSUTextMeasurement), &ascent, &bytes);
+		ATSUGetLineControl(layout, lineBreaks[line], kATSULineDescentTag, sizeof(ATSUTextMeasurement), &descent, &bytes);
+
+		lineY[line] = yy + ascent;
+		yy += ascent + descent;
+
+		Rect text_rect;
+
+		if (ATSUMeasureTextImage( layout, lineBreaks[line], kATSUToTextEnd, 0, 0, &text_rect ))
+			throw std::runtime_error("ATSUMeasureTextImage failed.");
+		ww = std::max( ww, text_rect.right - text_rect.left + 2 );
+		left = std::min( left, (int)text_rect.left );
+	}
+	int hh = yy / pfactor + 2;
 
 	CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
 	boost::scoped_array<uint8_t> pix_buf( new uint8_t[ww*4*hh] );
@@ -115,9 +138,12 @@ void font_renderer::gl_render_to_texture( const view&, const std::wstring& text,
 		}
 	}
 	
-	if (ATSUDrawText( layout, 0, kATSUToTextEnd, -(text_rect.left-1)*pfactor, text_rect.bottom*pfactor ))
-		throw std::runtime_error("ATSUDrawText failed.");
-
+	for(int line=0; line<nLines; line++)
+		if (ATSUDrawText( layout, lineBreaks[line], kATSUToTextEnd, 
+		                  pfactor*(1-left), 
+		                  pfactor*(hh-1)-lineY[line] ))
+			throw std::runtime_error("ATSUDrawText failed.");
+	
 	CGContextRelease( cx );
 	
 	tx.set_image( ww, hh, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 4, pix_buf.get() );
