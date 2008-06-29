@@ -1,6 +1,6 @@
 #include "font_renderer.hpp"
 #include "util/errors.hpp"
-//#include "mac/display.hpp"
+#include "vpython-config.h"
 #include <ApplicationServices/ApplicationServices.h>
 
 namespace cvisual {

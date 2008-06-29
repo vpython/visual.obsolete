@@ -4,6 +4,7 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "mac/display.hpp"
+#include "vpython-config.h"
 #include "util/render_manager.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"
@@ -36,7 +37,6 @@ init_platform() // called just once
 	int					err;
 	
 	VPYTHON_NOTE( "Start of init_platform.");
-	//std::cout << "init_platform\n";
 	// If we were invoked from python rather than pythonw, change into a GUI app
 	GetCurrentProcess(&psn);
 	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
@@ -123,7 +123,6 @@ display::gl_swap_buffers()
 void
 display::create()
 {
-	VPYTHON_NOTE( "Start create.");
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
 	widgets.insert(this);
 	// TODO: Just to get going, set flags to 0:
@@ -133,7 +132,6 @@ display::create()
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
 	}
-	VPYTHON_NOTE( "End create.");
 }
 
 /*
@@ -148,22 +146,11 @@ void destroy_context (glContext * cx)
 */
 
 void
-display::destroy() // was aglContext::cleanup()
+display::destroy() // if display.visible set to false by program
 {
-	VPYTHON_NOTE( "Start destroy()");
-	window_x	= -1;
-	window_y	= -1;
-	window_width	= 0;
-	window_height	= 0;
-	if (gl_context)
-		aglDestroyContext(gl_context);
-	gl_context = NULL;
-	if (window)
-		DisposeWindow(window);
-	window = NULL;
-	python::gil_lock gil;
-	widgets.erase(this);
-	VPYTHON_NOTE( "End destroy()");
+	VPYTHON_NOTE( "Start destroy().");
+	DisposeWindow(window);
+	VPYTHON_NOTE( "End destroy().");
 }
 
 void
@@ -248,30 +235,47 @@ display::update_size()
 			bounds.left, bounds.top, bounds.right-bounds.left, bounds.bottom-bounds.top );
 }
 
+void
+display::on_destroy()
+{
+	VPYTHON_NOTE( "Start on_destroy()");
+	report_closed();
+	VPYTHON_NOTE( "After report_closed()");
+	if ((gl_context == root_glrc) || !gl_context) {
+		VPYTHON_NOTE("Must not delete gl_context.");
+		return;
+	}
+	aglDestroyContext(gl_context);
+	gl_context = NULL;
+	python::gil_lock gil;
+	widgets.erase(this);
+	VPYTHON_NOTE( "End on_destroy()");
+}
+
 OSStatus
 display::vpWindowHandler (EventHandlerCallRef target, EventRef event)
 {
 	UInt32	kind;
 	
-	kind = GetEventKind(event);
+	kind = GetEventKind(event); // TODO: Handle minimized window
 	if (kind == kEventWindowBoundsChanged) {
 		update_size();
 		// Tell OpenGL about it
 		aglUpdateContext(gl_context);
-	} else if (kind == kEventWindowClosed) {
+	} else if (kind == kEventWindowClose) {
+		VPYTHON_NOTE( "kEventWindowClose"); // user hit close box
+		if (exit) {
+			QuitApplicationEventLoop(); // by default, kill the application
+			return noErr;
+		}
+	} else if (kind == kEventWindowClosed) { 
+		// window has been closed by user or by setting display.visible = False
 		VPYTHON_NOTE( "kEventWindowClosed");
-		QuitApplicationEventLoop();
-		return noErr;
 		// Safest way to destroy a window is by generating ESC key event,
 		// which will be passed on and interpreted as close request
 		//keys.push("escape");
-		/*
-		destroy(); // kill the window
-		if (exit) {
-			QuitApplicationEventLoop(); // by default, kill the application
-		}
+		on_destroy(); // window has been killed; clean up
 		return noErr;
-		*/
 	}
 	return eventNotHandledErr;
 }
@@ -524,7 +528,8 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	EventHandlerUPP	upp;
 	EventHandlerRef	discard;
 	EventTypeSpec	handled[] = {
-		{ kEventClassApplication, kEventAppQuit },
+		//{ kEventClassApplication, kEventAppQuit },
+		{ kEventClassWindow, kEventWindowClose },
 		{ kEventClassWindow, kEventWindowClosed },
 		{ kEventClassWindow, kEventWindowBoundsChanged },
 		{ kEventClassKeyboard, kEventRawKeyDown },
