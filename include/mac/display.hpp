@@ -25,6 +25,8 @@ class display : public display_kernel
 	// Called by the gui_main class below (or render_manager as its agent)
 	void create();
 	void destroy();
+	void show();
+	void hide();
 	void paint();
 	void swap() { gl_swap_buffers(); }
 	
@@ -63,9 +65,10 @@ class display : public display_kernel
 	static display* current;
 	
 	bool initWindow( std::string title, int x, int y, int width, int height, int flags );
-	bool changeWindow( std::string title, int x, int y, int width, int height, int flags );
 	void update_size();
-	bool isOpen();	
+	bool isOpen();
+	void on_destroy();
+	bool user_close; // true if user closed the window
 	
 	enum {
 		DEFAULT    = 0,

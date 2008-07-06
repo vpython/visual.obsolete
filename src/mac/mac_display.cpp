@@ -96,7 +96,6 @@ void display::paint() {
 void
 display::gl_begin()
 {
-	SetPortWindowPort(window);
 	aglSetCurrentContext(gl_context);
 	delete_pending_lists();
 	current = this;
@@ -145,12 +144,11 @@ void destroy_context (glContext * cx)
 }
 */
 
-void
-display::destroy() // if display.visible set to false by program
+void 
+display::destroy()
 {
-	VPYTHON_NOTE( "Start destroy().");
 	DisposeWindow(window);
-	VPYTHON_NOTE( "End destroy().");
+	user_close = false;
 }
 
 void
@@ -158,11 +156,12 @@ display::activate(bool active) {
 	VPYTHON_NOTE( "Start activate.");
 	if (active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
-		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
 		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
+		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
 	} else {
 		VPYTHON_NOTE( "Closing a window from Python.");
 		gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
+		//hide();
 	}
 	VPYTHON_NOTE( "End activate.");
 }
@@ -225,30 +224,20 @@ display::getCtrlKey()
 }
 
 void
-display::update_size()
-{
-	Rect	drawing, bounds; // region to draw in, bounds of window
-	
-	GetWindowBounds(window, kWindowContentRgn, &drawing);
-	GetWindowBounds(window, kWindowStructureRgn, &bounds);
-	report_resize(	drawing.left, drawing.top, drawing.right-drawing.left, drawing.bottom-drawing.top, 
-			bounds.left, bounds.top, bounds.right-bounds.left, bounds.bottom-bounds.top );
-}
-
-void
 display::on_destroy()
 {
 	VPYTHON_NOTE( "Start on_destroy()");
-	report_closed();
-	VPYTHON_NOTE( "After report_closed()");
+	printf("gl_context=%p, this=%p, window=%p, CFGetRetainCount(window)=%p\n", 
+			gl_context, this, window, CFGetRetainCount(window));
 	if ((gl_context == root_glrc) || !gl_context) {
 		VPYTHON_NOTE("Must not delete gl_context.");
 		return;
 	}
 	aglDestroyContext(gl_context);
 	gl_context = NULL;
-	python::gil_lock gil;
 	widgets.erase(this);
+	report_closed();
+	VPYTHON_NOTE( "After report_closed()");
 	VPYTHON_NOTE( "End on_destroy()");
 }
 
@@ -259,22 +248,24 @@ display::vpWindowHandler (EventHandlerCallRef target, EventRef event)
 	
 	kind = GetEventKind(event); // TODO: Handle minimized window
 	if (kind == kEventWindowBoundsChanged) {
+		python::gil_lock gil;
 		update_size();
 		// Tell OpenGL about it
 		aglUpdateContext(gl_context);
-	} else if (kind == kEventWindowClose) {
-		VPYTHON_NOTE( "kEventWindowClose"); // user hit close box
-		if (exit) {
-			QuitApplicationEventLoop(); // by default, kill the application
-			return noErr;
-		}
-	} else if (kind == kEventWindowClosed) { 
+	} else if (kind == kEventWindowClose) { // user hit close box
+		python::gil_lock gil;
+		VPYTHON_NOTE( "kEventWindowClose");
+		user_close = true;
+	} else if (kind == kEventWindowClosed) {
+		python::gil_lock gil;
 		// window has been closed by user or by setting display.visible = False
 		VPYTHON_NOTE( "kEventWindowClosed");
-		// Safest way to destroy a window is by generating ESC key event,
+		// Fisher: Safest way to destroy a window is by generating ESC key event,
 		// which will be passed on and interpreted as close request
 		//keys.push("escape");
 		on_destroy(); // window has been killed; clean up
+		if (exit && user_close)
+			QuitApplicationEventLoop();
 		return noErr;
 	}
 	return eventNotHandledErr;
@@ -419,6 +410,7 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 		// Title bar, close box, ... pass to OS
 		return eventNotHandledErr;
 	}
+	python::gil_lock gil;
 	
 	// Get window-relative position and any modifier keys
 	GetEventParameter(event, kEventParamWindowMouseLocation,
@@ -486,35 +478,27 @@ vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
 	return eventNotHandledErr;
 }
 
-bool
-display::changeWindow(std::string title, int x, int y, int width, int height, int flags)
+void
+display::update_size()
 {
-	/*
-	if (title) {
-		SetWindowTitleWithCFString(window, CFStringCreateWithCString(NULL, title, kCFStringEncodingASCII));
-	}
-	*/
+	Rect	bounds, drawing; // outer bounds of window, actual drawing region
+	int	    dy = GetMBarHeight();
 	
-	if (x >= 0 && y >= 0) {
-		window_x = x;
-		window_y = y;
-		MoveWindowStructure(window, window_x, window_y);
-	}
-	if (width > 0 && height > 0) {
-		window_width  = width;
-		window_height = height;
-		SizeWindow(window, window_width, window_height, true);
-	}
-	return true;
+	GetWindowBounds(window, kWindowStructureRgn, &bounds);
+	GetWindowBounds(window, kWindowContentRgn, &drawing);
+	report_resize(	bounds.left, bounds.top-dy, bounds.right-bounds.left, bounds.bottom-bounds.top, 
+			drawing.left, drawing.top, drawing.right-drawing.left, drawing.bottom-drawing.top );
 }
 
 bool
 display::initWindow(std::string title, int x, int y, int width, int height, int flags)
+// x, y, width, height refer to the outer bounds of the window, including the title bar
 {
 	GDHandle	dev;
 	OSStatus	err;
-	Rect		bounds;
-	int			minY, idx;
+	Rect		drawing;
+	int			idx;
+	int         dy = GetMBarHeight();
 	AGLPixelFormat	fmt;
 	GLint		attrList[] = {
 				AGL_RGBA, AGL_DOUBLEBUFFER,
@@ -528,7 +512,6 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	EventHandlerUPP	upp;
 	EventHandlerRef	discard;
 	EventTypeSpec	handled[] = {
-		//{ kEventClassApplication, kEventAppQuit },
 		{ kEventClassWindow, kEventWindowClose },
 		{ kEventClassWindow, kEventWindowClosed },
 		{ kEventClassWindow, kEventWindowBoundsChanged },
@@ -543,19 +526,18 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	};
 	
 	VPYTHON_NOTE( "Start initWindow.");
-	// Don't let window hide itself under the menu bar. Margin should be more than
-	// the menu bar itself because sometimes the position gets set first and then
-	// the title bar extended above that point.
-	minY = GetMBarHeight() * 2;
-	if (y < minY && ! (flags & display::FULLSCREEN))
-		y = minY;
+	
 	// Window 
-	SetRect(&bounds, x, y, x + width, y + height);
-	err = CreateNewWindow(kDocumentWindowClass, kWindowStandardDocumentAttributes, &bounds, &window);
+	SetRect(&drawing, x, y+2*dy, x + width, y+dy + height);
+	// drawing refers only to the content region of the window
+	err = CreateNewWindow(kDocumentWindowClass, kWindowStandardDocumentAttributes, &drawing, &window);
 	if (err != noErr)
 		return false;
-	this->changeWindow(title, x, y, width, height, flags);
-	VPYTHON_NOTE( "After CreateNewWindow.");
+	//this->changeWindow(title, x, y, width, height, flags);
+	window_x = x;
+	window_y = y;
+	window_width = width;
+	window_height = height;
 	
 	// GL context
 	dev = GetMainDevice();
@@ -589,6 +571,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	gl_context = aglCreateContext(fmt, root_glrc);
 	if (gl_context == NULL)
 		return false;
+	printf("gl_context=%p\n", gl_context);
 	
 	// Fullscreen on Mac
 	if (flags & display::FULLSCREEN) {
@@ -610,11 +593,13 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 						upp,
 						idx, handled,
 						this, &discard);
+	/*
 	// This handles menu bar quit and all events in fullscreen mode
 	InstallEventHandler(GetApplicationEventTarget(),
 						upp,
 						idx, handled,
 						this, &discard);
+	*/
 	DisposeEventHandlerUPP(upp);
 	// Make visible
 	if (! (flags & display::FULLSCREEN)) {
@@ -722,7 +707,7 @@ gui_main::event_loop ()
 	poll();
 	RunApplicationEventLoop();
 	VPYTHON_NOTE( "End event_loop.");
-	ExitToShell();
+	on_shutdown();
 }
 
 void
