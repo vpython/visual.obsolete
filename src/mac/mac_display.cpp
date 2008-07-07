@@ -536,6 +536,8 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	window_y = y;
 	window_width = width;
 	window_height = height;
+
+	SetWindowTitleWithCFString(window, CFStringCreateWithCString(NULL, title.c_str(), kCFStringEncodingASCII));
 	
 	// GL context
 	dev = GetMainDevice();
