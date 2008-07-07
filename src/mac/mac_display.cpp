@@ -437,13 +437,11 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	buttons[0] = (btn == kEventMouseButtonPrimary && kind != kEventMouseUp);
 	buttons[1] = (btn == kEventMouseButtonSecondary && kind != kEventMouseUp); // right button on 3-button mouse
 	buttons[2] = (btn == kEventMouseButtonTertiary && kind != kEventMouseUp); // middle button on 3-button mouse
-	
-	//std::cout << "buttons=(" << buttons[0] << "," << buttons[1] << "," << buttons[2] << ")" << std::endl;
 
 	if (buttons[1] || buttons[2]) 
-		mouse.report_mouse_state( 3, buttons, pt.h, pt.v, 4, shiftState, false ); // TODO: can we lock mouse?
+		mouse.report_mouse_state( 3, buttons, pt.h, pt.v-yadjust, 4, shiftState, false ); // TODO: can we lock mouse?
 	else
-		mouse.report_mouse_state( 1, buttons, pt.h, pt.v, 4, shiftState, false );
+		mouse.report_mouse_state( 1, buttons, pt.h, pt.v-yadjust, 4, shiftState, false );
 	
 	return noErr;
 }
@@ -482,11 +480,10 @@ void
 display::update_size()
 {
 	Rect	bounds, drawing; // outer bounds of window, actual drawing region
-	int	    dy = GetMBarHeight();
 	
 	GetWindowBounds(window, kWindowStructureRgn, &bounds);
 	GetWindowBounds(window, kWindowContentRgn, &drawing);
-	report_resize(	bounds.left, bounds.top-dy, bounds.right-bounds.left, bounds.bottom-bounds.top, 
+	report_resize(	bounds.left, bounds.top-yadjust, bounds.right-bounds.left, bounds.bottom-bounds.top, 
 			drawing.left, drawing.top, drawing.right-drawing.left, drawing.bottom-drawing.top );
 }
 
@@ -498,7 +495,6 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	OSStatus	err;
 	Rect		drawing;
 	int			idx;
-	int         dy = GetMBarHeight();
 	AGLPixelFormat	fmt;
 	GLint		attrList[] = {
 				AGL_RGBA, AGL_DOUBLEBUFFER,
@@ -527,13 +523,15 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	
 	VPYTHON_NOTE( "Start initWindow.");
 	
-	// Window 
-	SetRect(&drawing, x, y+2*dy, x + width, y+dy + height);
-	// drawing refers only to the content region of the window
+	// Window
+	// drawing refers only to the content region of the window, so must adjust
+	// for the fact that the VPython API for window size and placement is in
+	// terms of the outer bounds of the window
+	yadjust = GetMBarHeight();
+	SetRect(&drawing, x, y+2*yadjust, x + width, y+yadjust + height);
 	err = CreateNewWindow(kDocumentWindowClass, kWindowStandardDocumentAttributes, &drawing, &window);
 	if (err != noErr)
 		return false;
-	//this->changeWindow(title, x, y, width, height, flags);
 	window_x = x;
 	window_y = y;
 	window_width = width;
@@ -600,6 +598,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 						idx, handled,
 						this, &discard);
 	*/
+	// TODO: window flags, escape to kill a program
 	DisposeEventHandlerUPP(upp);
 	// Make visible
 	if (! (flags & display::FULLSCREEN)) {

@@ -69,6 +69,7 @@ class display : public display_kernel
 	bool isOpen();
 	void on_destroy();
 	bool user_close; // true if user closed the window
+	int yadjust; // set to height of title bar when creating a window
 	
 	enum {
 		DEFAULT    = 0,
