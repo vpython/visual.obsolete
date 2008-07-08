@@ -421,8 +421,8 @@ display_kernel::world_to_view_transform(
     vector scene_forward = forward.norm();
 
 	// the horizontal and vertical tangents of half the field of view.
-	double tan_hfov_x = 0.0;
-	double tan_hfov_y = 0.0;
+	double tan_hfov_x;
+	double tan_hfov_y;
 	tan_hfov( &tan_hfov_x, &tan_hfov_y);
 
 	// The cotangent of half of the wider field of view.
@@ -433,20 +433,20 @@ display_kernel::world_to_view_transform(
 		cot_hfov = 1.0 / std::max(tan_hfov_x, tan_hfov_y);
 
 	// gcf chosen so gcf*world -> scene fits in a 2 by 2 by 2 cube.
-	// scene_camera  is theposition used in gluLookAt to observe this cube.
+	// scene_camera  is the position used in gluLookAt to observe this cube.
 
 	double nearest, farthest; 
 	world_extent.near_and_far(forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
 	farthest = (farthest * gcf - scene_center.dot( forward ));  // relative to scene.center, in "cube space"
 
 	// Position camera and clip planes so that a (2*user_scale)^3 cube will 
-	// have all its faces showing, with some border.
+	// have all its faces showing, with some border. (user_scale <= 1.0)
 	vector scene_camera = scene_center-1.05*(cot_hfov+1.0)*user_scale*scene_forward;
-	double cam_to_cube = (scene_center - scene_camera).mag() - user_scale;
-	double nearclip = 0.25 * cam_to_cube;  // partway from camera to front face of cube
-	double farclip = cam_to_cube + 2.1*user_scale;  // just beyond back face of cube
+	double camera_to_center = (scene_center - scene_camera).mag();
+	double nearclip = 0.05 * camera_to_center;  // partway from camera to center
+	double farclip = camera_to_center + 2.0/user_scale;  // behind back face of cube, even if rotated
 	// ... but there might be objects far beyond the back of the cube, because we are zoomed in
-	farclip = std::max( farclip, cam_to_cube + user_scale + 1.05*farthest );
+	//farclip = std::max( farclip, cam_to_cube + user_scale + 1.05*farthest );
 
 	// The true camera position, in world space.
 	camera = scene_camera/gcf;
@@ -479,8 +479,7 @@ display_kernel::world_to_view_transform(
 	glMatrixMode( GL_MODELVIEW);
 	glLoadIdentity();
 
-	#if 0
-	// Enable this to peek at the actual scene geometry.
+	#if 0	// Enable this to peek at the actual scene geometry.
 	int max_proj_stack_depth = -1;
 	int max_mv_stack_depth = -1;
 	int proj_stack_depth = -1;
@@ -490,17 +489,18 @@ display_kernel::world_to_view_transform(
 	glGetIntegerv( GL_PROJECTION_STACK_DEPTH, &proj_stack_depth);
 	glGetIntegerv( GL_MODELVIEW_STACK_DEPTH, &mv_stack_depth);
 	std::cerr << "scene_geometry: camera:" << scene_camera
-        << " true camera:" << camera
-		<< " center:" << scene_center << " true center:" << center
-		<< " forward:" << scene_forward << " true forward:" << forward
-		<< " up:" << scene_up << " range:" << range
-		<< " gcf:" << gcf << " nearclip:" << nearclip
-		<< " farclip:" << farclip << " farthest:" << farthest << " user_scale:" << user_scale
-        << " cot_hfov:" << cot_hfov << " tan_hfov_x:" << tan_hfov_x
-        << " tan_hfov_y: " << tan_hfov_y
-        << " window_width:" << window_width << " window_height:" << window_height
-        << " max_proj_depth:" << max_proj_stack_depth << " current_proj_depth:" << proj_stack_depth
-        << " max_mv_depth:" << max_mv_stack_depth << " current_mv_depth:" << mv_stack_depth;
+        << " true camera:" << camera << std::endl
+		<< " center:" << scene_center << " true center:" << center << std::endl
+		<< " forward:" << scene_forward << " true forward:" << forward << std::endl
+		<< " up:" << scene_up << " range:" << range << " gcf:" << gcf  << std::endl
+		<< " nearclip:" << nearclip << " nearest:" << nearest << std::endl
+		<< " farclip:" << farclip << " farthest:" << farthest << std::endl
+		<< " user_scale:" << user_scale << std::endl
+        << " cot_hfov:" << cot_hfov << " tan_hfov_x:" << tan_hfov_x << std::endl
+        << " tan_hfov_y: " << tan_hfov_y << std::endl
+        << " window_width:" << window_width << " window_height:" << window_height << std::endl
+        << " max_proj_depth:" << max_proj_stack_depth << " current_proj_depth:" << proj_stack_depth << std::endl
+        << " max_mv_depth:" << max_mv_stack_depth << " current_mv_depth:" << mv_stack_depth << std::endl;
 	world_extent.dump_extent();
 	std::cerr << std::endl;
 	#endif
@@ -546,14 +546,12 @@ display_kernel::world_to_view_transform(
 	check_gl_error();
 
 	// Finish initializing the view object.
-	if (1) {  // (uniform && range.x == range.y && range.x == range.z) {
-		geometry.camera = camera;
-		geometry.tan_hfov_x = tan_hfov_x;
-		geometry.tan_hfov_y = tan_hfov_y;
-		// The true viewing vertical direction is not the same as what is needed for
-		// gluLookAt().
-		geometry.up = forward.cross_b_cross_c(up, forward).norm();
-	}
+	geometry.camera = camera;
+	geometry.tan_hfov_x = tan_hfov_x;
+	geometry.tan_hfov_y = tan_hfov_y;
+	// The true viewing vertical direction is not the same as what is needed for
+	// gluLookAt().
+	geometry.up = forward.cross_b_cross_c(up, forward).norm();
 }
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
@@ -1047,19 +1045,20 @@ display_kernel::pick( int x, int y, float d_pixels)
             &pickpos.x, &pickpos.y, &pickpos.z);
         // TODO: Replace the calls to gluUnProject() with own tmatrix inverse
         // and such for optimization
-        vector center;
+        vector tcenter;
         gluProject( center.x, center.y, center.z,
            	modelview.matrix_addr(),
             projection.matrix_addr(),
             viewport_bounds,
-            &center.x, &center.y, &center.z);
+            &tcenter.x, &tcenter.y, &tcenter.z);
 
         gluUnProject(
-        	x, view_height - y, center.z,
+        	x, view_height - y, tcenter.z,
         	modelview.matrix_addr(),
         	projection.matrix_addr(),
         	viewport_bounds,
         	&mousepos.x, &mousepos.y, &mousepos.z);
+        printf("***%f %f %f %f\n", mousepos.x, mousepos.y, mousepos.z, tcenter.z);
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;
