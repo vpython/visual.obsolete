@@ -199,12 +199,14 @@ maxcosine = dhairs/sqrt(rhairs**2+dhairs**2) # if ray inside crosshairs, don't m
 haircolor = color.black
 roam = 0
 
-while 1:
+while True:
     # Toggle roam option
     if scene.mouse.events:
         m = scene.mouse.getevent()
-        if m.drag or m.drop:
-            roam = not roam
+        if m.press or m.drag:
+            roam = True
+        elif m.release or m.drop:
+            roam = False
 
     # If in roaming mode, change center and forward according to mouse position
     if roam:
