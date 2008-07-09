@@ -22,7 +22,7 @@ T = 300. # around room temperature
 dt = 1E-5
 
 scene = display(title="Gas", width=win, height=win, x=0, y=0,
-                range=L, center=(L/2.,L/2.,L/2.))
+                center=(L/2.,L/2.,L/2.))
 
 deltav = 100. # binning for v histogram
 vdist = gdisplay(x=0, y=win, ymax = Natoms*deltav/1000.,
