@@ -47,18 +47,19 @@ while True:
             Bvector.pos = obs
     if scene.mouse.events:
         m = scene.mouse.getevent()
-        if m.press:
-            obs = scene.mouse.pos
-            Bvector.axis = Bscale*BField(obs)
-            Bvector.pos = obs
-        elif m.drag:
-            drag = True
-            obs = None # force update of position
-##            scene.cursor.visible = 0 # not yet implemented
-        elif m.release or m.drop:
-            drag = False
-##            scene.cursor.visible = 1 # not yet implemented
-            arrow(pos=obs, axis=Bscale*BField(obs), shaftwidth=vwidth, color=(0,1,1))
+        if m.button == 'left':
+            if m.press:
+                obs = scene.mouse.pos
+                Bvector.axis = Bscale*BField(obs)
+                Bvector.pos = obs
+            elif m.drag:
+                drag = True
+                obs = None # force update of position
+    ##            scene.cursor.visible = 0 # not yet implemented
+            elif m.release or m.drop:
+                drag = False
+    ##            scene.cursor.visible = 1 # not yet implemented
+                arrow(pos=obs, axis=Bscale*BField(obs), shaftwidth=vwidth, color=(0,1,1))
                         
             
 
