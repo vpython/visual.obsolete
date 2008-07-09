@@ -1,5 +1,10 @@
 Started 2008/4/7 as a place to record the status of Visual 4 on various platforms
 
+HP 2008 July 8 (Vista)
+Need to correct docs/visual/mouse.html: there are FIVE mouse events, including "release".
+
+Worrisome that gas.py is a lot slower in Visual 4 than Visual 3 (but stars.py is same speed).
+
 VAIO 2008 June 14 (XP)
 
 Zoomed out too far:
@@ -7,8 +12,6 @@ dipole, heightfield, gas, hanoi, lathe, planar, stars, stonehenge, toroid, toroi
 
 Kill windows, IDLE lingers without redisplaying (but new run deletes old window).
 materials_test runs okay (but without material texture, of course).
-
-stonehenge won't let me move past the back of the scene.
 
 01_newton.py red arrow bright when axis.x < 0, dark when axis.x > 0 !!
 This works fine on HP Vista machine.
