@@ -37,8 +37,8 @@ def BField(obs):
 Bvector = arrow(axis=(0,0,0), shaftwidth=vwidth, color=(0,1,1))
 drag = 0
 
-while 1:
-##    rate(100)
+while True:
+    rate(100)
     if drag:
         newobs = scene.mouse.pos
         if newobs != obs:
@@ -47,16 +47,18 @@ while 1:
             Bvector.pos = obs
     if scene.mouse.events:
         m = scene.mouse.getevent()
-        if m.drag:
-            drag = 1
+        if m.press:
+            obs = scene.mouse.pos
+            Bvector.axis = Bscale*BField(obs)
+            Bvector.pos = obs
+        elif m.drag:
+            drag = True
             obs = None # force update of position
 ##            scene.cursor.visible = 0 # not yet implemented
-        if m.drop:
-            drag = 0
+        elif m.release or m.drop:
+            drag = False
 ##            scene.cursor.visible = 1 # not yet implemented
             arrow(pos=obs, axis=Bscale*BField(obs), shaftwidth=vwidth, color=(0,1,1))
-        elif m.click:
-            arrow(pos=m.pos, axis=Bscale*BField(m.pos), shaftwidth=vwidth, color=(0,1,1))
                         
             
 
