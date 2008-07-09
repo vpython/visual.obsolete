@@ -443,7 +443,7 @@ display_kernel::world_to_view_transform(
 	// have all its faces showing, with some border. (user_scale <= 1.0)
 	vector scene_camera = scene_center-1.05*(cot_hfov+1.0)*user_scale*scene_forward;
 	double camera_to_center = (scene_center - scene_camera).mag();
-	double nearclip = 0.05 * camera_to_center;  // partway from camera to center
+	double nearclip = 0.01 * camera_to_center;  // partway from camera to center
 	double farclip = camera_to_center + 2.0/user_scale;  // behind back face of cube, even if rotated
 	// ... but there might be objects far beyond the back of the cube, because we are zoomed in
 	//farclip = std::max( farclip, cam_to_cube + user_scale + 1.05*farthest );
@@ -1058,7 +1058,6 @@ display_kernel::pick( int x, int y, float d_pixels)
         	projection.matrix_addr(),
         	viewport_bounds,
         	&mousepos.x, &mousepos.y, &mousepos.z);
-        printf("***%f %f %f %f\n", mousepos.x, mousepos.y, mousepos.z, tcenter.z);
 	}
 	catch (gl_error e) {
 		std::ostringstream msg;
