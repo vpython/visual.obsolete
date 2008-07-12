@@ -45,21 +45,18 @@ void mouse_manager::report_mouse_state( int physical_button_count, bool is_butto
 										bool can_lock_mouse )
 {
 	// A 2-button mouse with shift,ctrl,alt/option,command
-	bool new_buttons[2]; fill(2, new_buttons, physical_button_count, is_button_down );
+	bool new_buttons[3]; fill(3, new_buttons, physical_button_count, is_button_down );
 	bool new_shift[4]; fill(4, new_shift, shift_state_count, shift_state);
 	
 	// if we have a 3rd button, pressing it is like pressing both left and right buttons.
 	// This is necessary to make platforms that "emulate" a 3rd button behave sanely with
 	// a two-button mouse.
-	if (physical_button_count>=3 && is_button_down[2]) 
-		new_buttons[0] = new_buttons[1] = true;
-
-	// Macs can have a one-button mouse, which emulates two buttons
-	if (physical_button_count==1 && shift_state_count>=4 && is_button_down[0]) {
-		if (shift_state[2]) // option -> "middle" -> left+right
+	if (physical_button_count==3) {
+		if (is_button_down[2] || (shift_state_count==4 && is_button_down[0] && shift_state[2])) {
 			new_buttons[0] = new_buttons[1] = true;
-		else if (shift_state[3]) {
-			// command -> right
+			update( new_buttons, cursor_client_x, cursor_client_y, new_shift, can_lock_mouse );
+			return;
+		} else if (shift_state_count==4 && is_button_down[0] && shift_state[3]) {
 			new_buttons[0] = false;
 			new_buttons[1] = true;
 		}
@@ -124,7 +121,7 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 		left_down = b;
 	}
 
-	// xxx Generate mouse events for right (and middle?) buttons.  Very carefully.
+	// TODO: Generate mouse events for right (and middle?) buttons.  Very carefully.
 		
 	px = new_px;
 	py = new_py;

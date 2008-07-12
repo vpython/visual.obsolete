@@ -51,14 +51,7 @@ init_platform() // called just once
 
 /*
 Deprecated Carbon elements (which means doubly deprecated, since Carbon itself has little support):
-In aglFont::aglFont in mac_font_renderer.cpp,
-   FMGetFontFamilyFromName, GetAppFont, GetDefFontSize, FetchFontInfo, aglUseFont
-
-In aglFont::getWidth in mac_font_renderer.cpp,
-   TextFont, TextFace, TextSize, TextWidth
-
-In display::initWindow,
-   GetMainDevice, aglSetDrawable
+In display::initWindow, the routines GetMainDevice and aglSetDrawable
 */
 
 /**************************** display methods ************************************/
@@ -391,7 +384,7 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 
 OSStatus
 display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
-{
+{ // TODO: clicking in content area should bring window forward (but currently does not)
 	WindowPartCode	part;
 	WindowRef		win;
 	UInt32			kind;
@@ -438,11 +431,16 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	buttons[1] = (btn == kEventMouseButtonSecondary && kind != kEventMouseUp); // right button on 3-button mouse
 	buttons[2] = (btn == kEventMouseButtonTertiary && kind != kEventMouseUp); // middle button on 3-button mouse
 
-	if (buttons[1] || buttons[2]) 
+	if (buttons[1] || buttons[2]) // must be a 2- or 3-button mouse
 		mouse.report_mouse_state( 3, buttons, pt.h, pt.v-yadjust, 4, shiftState, false ); // TODO: can we lock mouse?
-	else
-		mouse.report_mouse_state( 1, buttons, pt.h, pt.v-yadjust, 4, shiftState, false );
-	
+	else { // may be either a 1- or 2- or 3-button mouse; report as 3-button
+		if (shiftState[3]) {
+			buttons[1] = true;
+		} else if (shiftState[2]) {
+			buttons[2] = true;
+		}
+		mouse.report_mouse_state( 3, buttons, pt.h, pt.v-yadjust, 4, shiftState, false );
+	}
 	return noErr;
 }
 
