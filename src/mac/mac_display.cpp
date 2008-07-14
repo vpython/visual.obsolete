@@ -117,8 +117,7 @@ display::create()
 {
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
 	widgets.insert(this);
-	// TODO: Just to get going, set flags to 0:
-	if (!initWindow(title, window_x, window_y, window_width, window_height, 0)) {
+	if (!initWindow(title, window_x, window_y, window_width, window_height)) {
 		std::ostringstream msg;
 		msg << "Could not create the window!\n";
 		VPYTHON_CRITICAL_ERROR( msg.str());
@@ -253,8 +252,8 @@ display::vpWindowHandler (EventHandlerCallRef target, EventRef event)
 		python::gil_lock gil;
 		// window has been closed by user or by setting display.visible = False
 		VPYTHON_NOTE( "kEventWindowClosed");
-		// Fisher: Safest way to destroy a window is by generating ESC key event,
-		// which will be passed on and interpreted as close request
+		// Hugh Fisher said, "Safest way to destroy a window is by generating ESC key event,
+		// which will be passed on and interpreted as close request."
 		//keys.push("escape");
 		on_destroy(); // window has been killed; clean up
 		if (exit && user_close)
@@ -363,6 +362,11 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 					keyStr += "\n";
 					break;
 				case 53:
+					if (exit) {
+						python::gil_lock gil;
+						on_destroy();
+						QuitApplicationEventLoop();
+					}
 					keyStr += "escape";
 					break;
 				default:
@@ -483,8 +487,9 @@ display::update_size()
 }
 
 bool
-display::initWindow(std::string title, int x, int y, int width, int height, int flags)
+display::initWindow(std::string title, int x, int y, int width, int height)
 // x, y, width, height refer to the outer bounds of the window, including the title bar
+// but the Mac CreateNewWindow has parameters in terms of the content area only.
 {
 	GDHandle	dev;
 	OSStatus	err;
@@ -539,21 +544,25 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	idx = 0;
 	while (attrList[idx] != AGL_NONE) idx ++;
 	// Special
-	if (flags & display::FULLSCREEN) {
+	if (fullscreen) {
 		attrList[idx] =	AGL_FULLSCREEN;
 		idx ++;
 	}
+	/*
 	if (flags & display::QB_STEREO) {
 		attrList[idx] = AGL_STEREO;
 		idx ++;
 	}
+	*/
 	fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
+	/*
 	if ((fmt == NULL || aglGetError() != AGL_NO_ERROR) && (flags & display::QB_STEREO)) {
 		// Try without stereo
 		idx --;
 		attrList[idx] = AGL_NONE;
 		fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
 	}
+	*/
 
 	if (fmt == NULL || aglGetError() != AGL_NO_ERROR)
 		return false;
@@ -569,7 +578,7 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 	printf("gl_context=%p\n", gl_context);
 	
 	// Fullscreen on Mac
-	if (flags & display::FULLSCREEN) {
+	if (fullscreen) {
 		aglEnable(gl_context, AGL_FS_CAPTURE_SINGLE);
 		aglSetFullScreen(gl_context, 0, 0, 0, 0);
 	} else {
@@ -595,10 +604,10 @@ display::initWindow(std::string title, int x, int y, int width, int height, int 
 						idx, handled,
 						this, &discard);
 	*/
-	// TODO: window flags, escape to kill a program
+	// TODO: window flags
 	DisposeEventHandlerUPP(upp);
 	// Make visible
-	if (! (flags & display::FULLSCREEN)) {
+	if (!fullscreen) {
 		ActivateWindow(window, true);
 		ShowWindow(window);
 	}

@@ -60,19 +60,13 @@ class display : public display_kernel
 	friend class aglFont;
 	static display* current;
 	
-	bool initWindow( std::string title, int x, int y, int width, int height, int flags );
+	bool initWindow( std::string title, int x, int y, int width, int height );
 	void update_size();
 	bool isOpen();
 	void on_destroy();
 	bool user_close; // true if user closed the window
 	int yadjust; // set to height of title bar when creating a window
-	
-	enum {
-		DEFAULT    = 0,
-		FULLSCREEN = 0x1,
-		QB_STEREO  = 0x2
-	} WindowFlags;
-  
+	  
 	void makeCurrent();
 	void makeNotCurrent();
 	void swapBuffers();
