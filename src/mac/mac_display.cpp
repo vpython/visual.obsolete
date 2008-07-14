@@ -219,8 +219,6 @@ void
 display::on_destroy()
 {
 	VPYTHON_NOTE( "Start on_destroy()");
-	printf("gl_context=%p, this=%p, window=%p, CFGetRetainCount(window)=%p\n", 
-			gl_context, this, window, CFGetRetainCount(window));
 	if ((gl_context == root_glrc) || !gl_context) {
 		VPYTHON_NOTE("Must not delete gl_context.");
 		return;
@@ -548,7 +546,7 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 		attrList[idx] =	AGL_FULLSCREEN;
 		idx ++;
 	}
-	/*
+	/* TODO: handle stereo
 	if (flags & display::QB_STEREO) {
 		attrList[idx] = AGL_STEREO;
 		idx ++;
@@ -575,7 +573,6 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	gl_context = aglCreateContext(fmt, root_glrc);
 	if (gl_context == NULL)
 		return false;
-	printf("gl_context=%p\n", gl_context);
 	
 	// Fullscreen on Mac
 	if (fullscreen) {
@@ -597,14 +594,14 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 						upp,
 						idx, handled,
 						this, &discard);
-	/*
+
 	// This handles menu bar quit and all events in fullscreen mode
-	InstallEventHandler(GetApplicationEventTarget(),
+	if (fullscreen)
+		InstallEventHandler(GetApplicationEventTarget(),
 						upp,
 						idx, handled,
 						this, &discard);
-	*/
-	// TODO: window flags
+
 	DisposeEventHandlerUPP(upp);
 	// Make visible
 	if (!fullscreen) {
