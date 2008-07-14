@@ -456,15 +456,12 @@ vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
 	
 	switch (evtClass) {
 		case kEventClassWindow:
-			//VPYTHON_NOTE( "kEventClassWindow");
 			return thiswindow->vpWindowHandler(target, event);
 			break;
 		case kEventClassKeyboard:
-			//VPYTHON_NOTE( "kEventClassKeyboard");
 			return thiswindow->vpKeyboardHandler(target, event);
 			break;
 		case kEventClassMouse:
-			//VPYTHON_NOTE( "kEventClassMouse");
 			return thiswindow->vpMouseHandler(target, event);
 			break;
 		default:
@@ -638,54 +635,6 @@ void
 display::hideMouse()
 {
 	HideCursor();
-}
-
-vector
-display::getMousePos()
-{
-	if (!window)
-		return vector(0,0,0);
-	
-	vector tmp = mousePos;
-	tmp.x /= window_width;
-	tmp.y /= window_height;
-	
-	return tmp;
-}
-
-vector
-display::getMouseDelta()
-{
-	// GL units (% of window)
-	vector tmp = mousePos - oldMousePos;
-	oldMousePos = mousePos;
-	
-	return tmp;
-}
-
-int
-display::getMouseButtons()
-{
-	return buttonState;
-}
-
-int
-display::getMouseButtonsChanged()
-{
-	int c = buttonsChanged;
-	buttonsChanged = 0;
-	return c; 
-}
-
-std::string
-display::getKeys()
-{
-	if (!keys.empty()) {
-		std::string s = keys.front();
-		keys.pop();
-		return s;
-	} 
-	return std::string("");
 }
 
 /******************** gui_main implementation **********************/

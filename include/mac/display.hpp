@@ -34,11 +34,7 @@ class display : public display_kernel
 	void unlockMouse();
 	void showMouse();
 	void hideMouse();
-	int  getMouseButtons();
-	int  getMouseButtonsChanged();
-	vector  getMouseDelta();
-	vector  getMousePos();
-	std::string getKeys();
+
 	int getShiftKey();
 	int getAltKey();
 	int getCtrlKey();
