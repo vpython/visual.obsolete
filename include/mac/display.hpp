@@ -100,7 +100,6 @@ class display : public display_kernel
 	UInt32 keyModState;
 	vector mousePos, oldMousePos;
 	bool mouseLocked;
-	std::queue<std::string> keys;
 
  protected:
 	// Implementors of this class should call this function in their implementation
