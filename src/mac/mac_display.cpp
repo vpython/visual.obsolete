@@ -489,7 +489,7 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 // x, y, width, height refer to the outer bounds of the window, including the title bar
 // but the Mac CreateNewWindow has parameters in terms of the content area only.
 {
-	GDHandle	dev;
+	GDHandle    dev;
 	OSStatus	err;
 	Rect		drawing;
 	int			idx;
@@ -525,8 +525,16 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	// drawing refers only to the content region of the window, so must adjust
 	// for the fact that the VPython API for window size and placement is in
 	// terms of the outer bounds of the window
-	yadjust = GetMBarHeight();
-	SetRect(&drawing, x, y+2*yadjust, x + width, y+yadjust + height);
+	
+	dev = GetMainDevice();
+	if (fullscreen) {
+		width = (**dev).gdRect.right-(**dev).gdRect.left;
+		height = (**dev).gdRect.bottom-(**dev).gdRect.top;
+		SetRect(&drawing, 0, 0, width, height);
+	} else {
+		yadjust = GetMBarHeight();
+		SetRect(&drawing, x, y+2*yadjust, x + width, y+yadjust + height);
+	}
 	err = CreateNewWindow(kDocumentWindowClass, kWindowStandardDocumentAttributes, &drawing, &window);
 	if (err != noErr)
 		return false;
@@ -538,7 +546,6 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	SetWindowTitleWithCFString(window, CFStringCreateWithCString(NULL, title.c_str(), kCFStringEncodingASCII));
 	
 	// GL context
-	dev = GetMainDevice();
 	idx = 0;
 	while (attrList[idx] != AGL_NONE) idx ++;
 	// Special
@@ -601,7 +608,7 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 						upp,
 						idx, handled,
 						this, &discard);
-
+	
 	DisposeEventHandlerUPP(upp);
 	// Make visible
 	if (!fullscreen) {
