@@ -395,26 +395,26 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	bool buttons[3]; // left, right, middle buttons
 	bool shiftState[4]; // shift, ctrl, option, command key down
 			
-	// First, if not full screen, must check if mouse event occurred within our content area
-	if (!fullscreen) {
-		GetEventParameter(event, kEventParamMouseLocation,
-						  typeQDPoint, NULL,
-						  sizeof(pt), NULL,
-						  &pt);
+	python::gil_lock gil;
+	GetEventParameter(event, kEventParamMouseLocation,
+					  typeQDPoint, NULL,
+					  sizeof(pt), NULL,
+					  &pt);
+	
+	if (!fullscreen) { // If not full screen, check if mouse event occurred within our content area
 		part = FindWindow(pt, &win);
 		if (win != window || part != inContent) {
 			// Title bar, close box, ... pass to OS
 			return eventNotHandledErr;
 		}
+		// And now get mouse coordinates in the content area
+		GetEventParameter(event, kEventParamWindowMouseLocation,
+						  typeQDPoint, NULL,
+						  sizeof(pt), NULL,
+						  &pt);	
 	}
-	python::gil_lock gil;
 	
-	// Get window-relative position and any modifier keys
-	GetEventParameter(event, kEventParamWindowMouseLocation,
-					  typeQDPoint, NULL,
-					  sizeof(pt), NULL,
-					  &pt);	
-	printf("%d %d\n", pt.h, pt.v);
+	// Get any modifier keys
 	GetEventParameter(event, kEventParamMouseButton,
 					  typeMouseButton, NULL,
 					  sizeof(btn), NULL,
@@ -467,7 +467,6 @@ vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
 			return thiswindow->vpKeyboardHandler(target, event);
 			break;
 		case kEventClassMouse:
-			VPYTHON_NOTE("kEventClassMouse");
 			return thiswindow->vpMouseHandler(target, event);
 			break;
 		default:
