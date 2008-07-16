@@ -556,21 +556,8 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 		attrList[idx] =	AGL_FULLSCREEN;
 		idx ++;
 	}
-	/* TODO: handle stereo
-	if (flags & display::QB_STEREO) {
-		attrList[idx] = AGL_STEREO;
-		idx ++;
-	}
-	*/
+
 	fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
-	/*
-	if ((fmt == NULL || aglGetError() != AGL_NO_ERROR) && (flags & display::QB_STEREO)) {
-		// Try without stereo
-		idx --;
-		attrList[idx] = AGL_NONE;
-		fmt = aglChoosePixelFormat(&dev, 1, (const GLint *)attrList);
-	}
-	*/
 
 	if (fmt == NULL || aglGetError() != AGL_NO_ERROR)
 		return false;
