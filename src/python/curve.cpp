@@ -23,11 +23,6 @@ using boost::python::object;
 
 namespace cvisual { namespace python {
 
-// Visual Studio chokes on this line in the link phase, but MinGW and Linux need it.
-#ifndef _MSC_VER
-const size_t curve::c_cache::items;
-#endif
-
 namespace {
 
 // returns a pointer to the ith vector in the array.
@@ -51,7 +46,7 @@ float* findex( const array& a, size_t i)
 curve::curve()
 	: pos( 0), color( 0), antialias( true),
 	radius(0.0),
-	retain(0), last_pcount(0),
+	retain(0),
 	preallocated_size(257),
 	count(0), sides(4)
 {
@@ -91,7 +86,6 @@ curve::curve( const curve& other)
 	radius( other.radius), preallocated_size( other.preallocated_size),
 	count( other.count)
 {
-	last_pcount = 0;
 	int curve_around = sides;
 
 	for (int i=0; i<curve_around; i++) {
@@ -142,9 +136,9 @@ curve::set_length( size_t length)
 		float* color_i = findex( color, shift);
 		float* color_end = findex( color, npoints);
 		while (color_i < color_end) {
-			color_i[0-4*shift] = color_i[0];
-			color_i[1-4*shift] = color_i[1];
-			color_i[2-4*shift] = color_i[2];
+			color_i[0-3*shift] = color_i[0];
+			color_i[1-3*shift] = color_i[1];
+			color_i[2-3*shift] = color_i[2];
 			color_i += 3;
 		}
 	}
@@ -188,11 +182,6 @@ curve::set_length( size_t length)
 		}
 	}
 	count = length;
-	int cache_length = (count+c_cache::items)/(c_cache::items-1) - cache.size();
-	while (cache_length > 0) {
-		cache.push_back( c_cache());
-		cache_length--;
-	}
 }
 
 void
@@ -564,16 +553,6 @@ curve::closed_path() const
 		&& eq_frac(begin.z, end.z, 1e-5);
 }
 
-long
-curve::checksum( double* spos, float* tcolor, size_t pcount)
-{
-	boost::crc_32_type engine;
-	engine.process_bytes( &radius, sizeof(radius));
-	engine.process_bytes( spos, 3*sizeof(double)*pcount);
-	engine.process_bytes( tcolor, 3*sizeof(float)*pcount);
-	return engine.checksum();
-}
-
 vector
 curve::get_center() const
 {
@@ -666,6 +645,15 @@ struct converter
 };
 } // !namespace (anonymous)
 
+long
+curve::checksum( double* spos, float* tcolor, size_t pcount)
+{
+	boost::crc_32_type engine;
+	engine.process_bytes( &radius, sizeof(radius));
+	engine.process_bytes( spos, 3*sizeof(double)*pcount);
+	engine.process_bytes( tcolor, 3*sizeof(float)*pcount);
+	return engine.checksum();
+}
 
 void
 curve::thickline( const view& scene, const double* spos, float* tcolor, size_t pcount, double scaled_radius)
@@ -891,65 +879,27 @@ curve::gl_render( const view& scene)
 		lighting_prepare();
 		shiny_prepare();
 	}
-
-	size_t size = std::min(c_cache::items, true_size);
-	size_t begin = 0;
-	cache_iterator c = cache.begin();
-	cache_iterator c_end = cache.end();
-	assert( c != c_end);
 	
-	// TODO: Make a smarter caching algorithm. Should only make a cache
-	// if the checksum has been constant for some predetermined number of
-	// rendering cycles. Also note that there's no reason to compute a
-	// checksum if pcount or final position has changed since last render;
-	// this is likely to be the case of a trail of a moving object.
-	// (A sophisticated scheme would be to append the new part of a
-	// trail to the cached older part.)
-	bool could_cache = (pcount == last_pcount && !scene.gcf_changed && \
-		last_pos[0] == spos[3*pcount] && \
-		last_pos[1] == spos[3*pcount+1] && \
-		last_pos[2] == spos[3*pcount+2]);
-	// If could_cache, worth calculating a checksum, and caching if necessary
-	bool checksum_ok = false;
-	long check = 0;
-	if (could_cache) {
-		check = checksum( spos, tcolor, pcount);
-		checksum_ok = (check == c->checksum);
-	}
-	if (checksum_ok) {
-		c->gl_cache.gl_render();
+	if (do_thinline) {
+		glVertexPointer( 3, GL_DOUBLE, 0, spos);
+		bool mono = adjust_colors( scene, tcolor, pcount);
+		if (!mono) glColorPointer( 3, GL_FLOAT, 0, tcolor);
+		glDrawArrays( GL_LINE_STRIP, 0, pcount);
+		glDisableClientState( GL_VERTEX_ARRAY);
+		glDisableClientState( GL_COLOR_ARRAY);
+		glEnable( GL_LIGHTING);
+		if (antialias) {
+			glDisable( GL_BLEND);
+			glDisable( GL_LINE_SMOOTH);
+		}
 	}
 	else {
-		if (could_cache) c->gl_cache.gl_compile_begin();
-		if (do_thinline) {
-			glVertexPointer( 3, GL_DOUBLE, 0, spos);
-			bool mono = adjust_colors( scene, tcolor, pcount);
-			if (!mono) glColorPointer( 3, GL_FLOAT, 0, tcolor);
-			glDrawArrays( GL_LINE_STRIP, 0, pcount);
-			glDisableClientState( GL_VERTEX_ARRAY);
-			glDisableClientState( GL_COLOR_ARRAY);
-			glEnable( GL_LIGHTING);
-			if (antialias) {
-				glDisable( GL_BLEND);
-				glDisable( GL_LINE_SMOOTH);
-			}
-		}
-		else {
-			thickline( scene, spos, tcolor, pcount, scaled_radius);
-			shiny_complete();
-			lighting_complete();
-		}
-		if (could_cache) {
-			c->gl_cache.gl_compile_end();
-			c->checksum = check;
-			c->gl_cache.gl_render();
-		}
+		thickline( scene, spos, tcolor, pcount, scaled_radius);
+		shiny_complete();
+		lighting_complete();
 	}
+
 	check_gl_error();
-	last_pcount = pcount;
-	last_pos[0] = spos[3*pcount];
-	last_pos[1] = spos[3*pcount+1];
-	last_pos[2] = spos[3*pcount+2];
 
 }
 

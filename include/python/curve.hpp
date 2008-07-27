@@ -30,9 +30,6 @@ class curve : public renderable
 	double radius;
 	size_t retain; // how many recent points to retain
 	
-	size_t last_pcount; // value of pcount in previous render
-	double last_pos[3]; // the last position in the pos array in previous render
-	
 	// the space allocated for storage so far
 	size_t preallocated_size;
 	// the number of vectors currently occupying the allocated storage.
@@ -57,17 +54,6 @@ class curve : public renderable
 	void get_material_matrix( const view& v, tmatrix& out );
 	
  private:
-	// A type used to cache (in OpenGL memory) a displaylist for a chunk of the
-	// curve.
-	struct c_cache 
-	{
-		static const size_t items = 256;
-		displaylist gl_cache;
-		long checksum;
-		c_cache() : checksum(0) {}
-	};
-	std::vector<c_cache> cache;
-	typedef std::vector<c_cache>::iterator cache_iterator;
 
 	// Returns true if the object is degenarate and should not be rendered.
  	bool degenerate() const;
