@@ -45,7 +45,7 @@ class curve : public renderable
 	void set_length( size_t new_length);
 	
 	// Returns true if the object is single-colored.
-	bool monochrome();
+	bool monochrome(float* tcolor, size_t pcount);
 	
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;

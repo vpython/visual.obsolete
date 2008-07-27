@@ -56,6 +56,7 @@ curve::curve()
 	dims[1] = 3;
 	pos = makeNum( dims);
 	color = makeNum( dims, NPY_FLOAT);
+	opacity = 1.0; // transparency not yet implmented for curve
 	double* pos_i = index( pos, 0);
 	float* color_i = findex( color, 0);
 	pos_i[0] = 0;
@@ -87,6 +88,7 @@ curve::curve( const curve& other)
 	count( other.count)
 {
 	int curve_around = sides;
+	opacity = 1.0; // transparency not yet implmented for curve
 
 	for (int i=0; i<curve_around; i++) {
 		curve_sc[i]  = (float) std::cos(i * 2 * M_PI / curve_around);
@@ -501,22 +503,18 @@ curve::degenerate() const
 
 
 bool
-curve::monochrome()
+curve::monochrome(float* tcolor, size_t pcount)
 {
-	const double* color_i = index( color, 0);
-	const double* color_end = index( color, count);
+	rgb first_color( tcolor[0], tcolor[1], tcolor[2]);
+	size_t nn;
 
-	rgb first_color( (float) color_i[0], (float) color_i[1],(float) color_i[2]);
-	color_i += 3;
-
-	while (color_i < color_end) {
-		if (color_i[0] != first_color.red)
+	for(nn=0; nn++; nn<pcount)  {
+		if (tcolor[nn] != first_color.red)
 			return false;
-		if (color_i[1] != first_color.green)
+		if (tcolor[nn+1] != first_color.green)
 			return false;
-		if (color_i[2] != first_color.blue)
+		if (tcolor[nn+2] != first_color.blue)
 			return false;
-		color_i += 3;
 	}
 
 	return true;
@@ -604,7 +602,7 @@ bool
 curve::adjust_colors( const view& scene, float* tcolor, size_t pcount)
 {
 	rgb rendered_color;
-	bool mono = monochrome();
+	bool mono = monochrome(tcolor, pcount);
 	if (mono) {
 		// We can get away without using a color array.
 		rendered_color = rgb( tcolor[0], tcolor[1], tcolor[2]);
@@ -644,16 +642,6 @@ struct converter
 	T data[3];
 };
 } // !namespace (anonymous)
-
-long
-curve::checksum( double* spos, float* tcolor, size_t pcount)
-{
-	boost::crc_32_type engine;
-	engine.process_bytes( &radius, sizeof(radius));
-	engine.process_bytes( spos, 3*sizeof(double)*pcount);
-	engine.process_bytes( tcolor, 3*sizeof(float)*pcount);
-	return engine.checksum();
-}
 
 void
 curve::thickline( const view& scene, const double* spos, float* tcolor, size_t pcount, double scaled_radius)
@@ -884,6 +872,7 @@ curve::gl_render( const view& scene)
 		glVertexPointer( 3, GL_DOUBLE, 0, spos);
 		bool mono = adjust_colors( scene, tcolor, pcount);
 		if (!mono) glColorPointer( 3, GL_FLOAT, 0, tcolor);
+		//glColorPointer( 3, GL_FLOAT, 0, tcolor);
 		glDrawArrays( GL_LINE_STRIP, 0, pcount);
 		glDisableClientState( GL_VERTEX_ARRAY);
 		glDisableClientState( GL_COLOR_ARRAY);
