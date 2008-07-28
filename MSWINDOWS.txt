@@ -12,10 +12,6 @@ If you find gaps in this information, please tell Bruce_Sherwood@ncsu.edu.
 Note: In source code, _WIN32 is a flag set by the MinGW compiler,
 and _MSC_VER is a flag set by the Microsoft Visual Studio compiler.
 
-(In early 2007 there was experimentation with using Visual Studio
-to build Visual, but this is not being used at present. See the
-VCBuild directory.)
-
 *************************************************************
 INSTALL PYTHON AND NUMPY
 Download and install Python 2.5.x from www.python.org.
@@ -376,5 +372,3 @@ From a typescript, the following will print all VPYTHON_NOTEs:
 env VPYTHON_DEBUG=1 python test.py
 (This assumes you've executed cd /c/python25 and that test.py as
 well as python.exe is in that directory.)
-
-
