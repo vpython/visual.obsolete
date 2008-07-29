@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="cvisual"
 	ProjectGUID="{6B195417-DC9C-499D-A16E-31FB23D526DF}"
 	RootNamespace="cvisual"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -81,6 +82,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="libs/cvisual-debug.pdb"
 				SubSystem="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=""
 				TargetMachine="1"
 			/>
@@ -101,9 +104,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -136,7 +136,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\include\win32;..\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;..\dependencies\boost_1_35_0;\Python25\include;.;..\dependencies\threadpool\include\;$(NOINHERIT)"
+				AdditionalIncludeDirectories="..\include\win32;..\include;c:\Python25\Lib\site-packages\numpy\core\include;..\dependencies\boost_1_35_0;c:\Python25\include;.;..\dependencies\threadpool\include\;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_USRDLL;MSC;BOOST_PYTHON_STATIC_LIB;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -168,15 +168,17 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="python25.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
 				ShowProgress="0"
-				OutputFile="\Python25\lib\site-packages\visual\cvisual.pyd"
+				OutputFile="c:\Python25\lib\site-packages\visual\cvisual.pyd"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="libs;\Python25\libs;..\dependencies\boost_1_35_0\lib"
+				AdditionalLibraryDirectories="libs;c:\Python25\libs;..\dependencies\boost_1_35_0\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="libs/cvisual-release.pdb"
 				SubSystem="0"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				SupportUnloadOfDelayLoadedDLL="false"
 				ImportLibrary=""
 				TargetMachine="1"
@@ -198,9 +200,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
