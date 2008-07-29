@@ -36,7 +36,6 @@ init_platform() // called just once
 	const void *		background;
 	int					err;
 	
-	VPYTHON_NOTE( "Start of init_platform.");
 	// If we were invoked from python rather than pythonw, change into a GUI app
 	GetCurrentProcess(&psn);
 	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
@@ -46,7 +45,6 @@ init_platform() // called just once
 		TransformProcessType(&psn, kProcessTransformToForegroundApplication);
 	}
 	SetFrontProcess(&psn);
-	VPYTHON_NOTE( "End of init_platform.");
 }
 
 /*
@@ -66,7 +64,6 @@ display::display()
    keyModState(0),
    mouseLocked(false)
 {
-	VPYTHON_NOTE( "Initialize display.");
 }
 
 display::~display()
@@ -140,22 +137,18 @@ void
 display::destroy()
 {
 	DisposeWindow(window);
+	window = 0;
 	user_close = false;
 }
 
 void
 display::activate(bool active) {
-	VPYTHON_NOTE( "Start activate.");
 	if (active) {
-		VPYTHON_NOTE( "Opening a window from Python.");
 		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
 		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
 	} else {
-		VPYTHON_NOTE( "Closing a window from Python.");
 		gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
-		//hide();
 	}
-	VPYTHON_NOTE( "End activate.");
 }
 
 display::EXTENSION_FUNCTION
@@ -218,17 +211,13 @@ display::getCtrlKey()
 void
 display::on_destroy()
 {
-	VPYTHON_NOTE( "Start on_destroy()");
 	if ((gl_context == root_glrc) || !gl_context) {
-		VPYTHON_NOTE("Must not delete gl_context.");
 		return;
 	}
 	aglDestroyContext(gl_context);
 	gl_context = NULL;
 	widgets.erase(this);
 	report_closed();
-	VPYTHON_NOTE( "After report_closed()");
-	VPYTHON_NOTE( "End on_destroy()");
 }
 
 OSStatus
@@ -236,22 +225,20 @@ display::vpWindowHandler (EventHandlerCallRef target, EventRef event)
 {
 	UInt32	kind;
 	
-	kind = GetEventKind(event); // TODO: Handle minimized window
-	if (kind == kEventWindowBoundsChanged) {
+	kind = GetEventKind(event);
+	if (kind == kEventWindowBoundsChanged) { // changed size or position of window
 		python::gil_lock gil;
 		update_size();
 		// Tell OpenGL about it
 		aglUpdateContext(gl_context);
 	} else if (kind == kEventWindowClose) { // user hit close box
 		python::gil_lock gil;
-		VPYTHON_NOTE( "kEventWindowClose");
 		user_close = true;
 	} else if (kind == kEventWindowClosed) {
 		python::gil_lock gil;
 		// window has been closed by user or by setting display.visible = False
-		VPYTHON_NOTE( "kEventWindowClosed");
 		// Hugh Fisher said, "Safest way to destroy a window is by generating ESC key event,
-		// which will be passed on and interpreted as close request."
+		// which will be passed on and interpreted as close request." But we're not doing this.
 		//keys.push("escape");
 		on_destroy(); // window has been killed; clean up
 		if (exit && user_close)
@@ -386,7 +373,7 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 
 OSStatus
 display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
-{ // TODO: clicking in content area should bring window forward (but currently does not)
+{ 
 	WindowPartCode	part;
 	WindowRef		win;
 	UInt32			kind;
@@ -445,6 +432,11 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 			buttons[2] = true;
 		}
 		mouse.report_mouse_state( 3, buttons, pt.h, pt.v-yadjust, 4, shiftState, false );
+	}
+	// TODO: clicking in content area should bring this window forward.
+	// But currently it leaves the currently active window active, and forward.
+	if (kind == kEventMouseDown && !fullscreen && !IsWindowActive(window)) {
+		activate(true);
 	}
 	return noErr;
 }
@@ -522,7 +514,10 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 		{ 0, 0 }
 	};
 	
-	VPYTHON_NOTE( "Start initWindow.");
+	if (window) { // window already exists; make active an bring to the front
+		SelectWindow(window);
+		return true;
+	}
 	
 	// Window
 	// drawing refers only to the content region of the window, so must adjust
@@ -580,7 +575,6 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	}
 	aglDestroyPixelFormat(fmt);
 	
-	VPYTHON_NOTE( "Next, set up event handling in initWindow.");
 	// Set up event handling
 	InstallStandardEventHandler(GetWindowEventTarget(window));
 	upp = NewEventHandlerUPP(vpEventHandler);
@@ -601,14 +595,10 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	
 	DisposeEventHandlerUPP(upp);
 	// Make visible
-	if (!fullscreen) {
-		ActivateWindow(window, true);
-		ShowWindow(window);
-	}
-	window_visible = true; // TODO: do we need to wait for some event?
+	if (!fullscreen) ShowWindow(window);
+	window_visible = true;
 	update_size();
 	
-	VPYTHON_NOTE( "End initWindow.");
 	return true;
 }
 
@@ -654,10 +644,8 @@ gui_main::gui_main()
 void
 gui_main::event_loop ()
 {
-	VPYTHON_NOTE( "Start event_loop.");
 	poll();
 	RunApplicationEventLoop();
-	VPYTHON_NOTE( "End event_loop.");
 	on_shutdown();
 }
 
@@ -666,7 +654,6 @@ gui_main::init_thread()
 {
 	if (!self) {
 		init_platform();
-		VPYTHON_NOTE( "begin init_thread");
 		// We are holding the Python GIL through this process, including the wait!
 		// We can't let go because a different Python thread could come along and mess us up (e.g.
 		//   think that we are initialized and go on to call PostThreadMessage without a valid idThread)
@@ -675,7 +662,6 @@ gui_main::init_thread()
 		lock L( self->init_lock );
 		while (self->gui_thread == -1)
 			self->initialized.wait( L );
-		VPYTHON_NOTE( "end init_thread");
 	}
 }
 
