@@ -872,7 +872,6 @@ curve::gl_render( const view& scene)
 		glVertexPointer( 3, GL_DOUBLE, 0, spos);
 		bool mono = adjust_colors( scene, tcolor, pcount);
 		if (!mono) glColorPointer( 3, GL_FLOAT, 0, tcolor);
-		//glColorPointer( 3, GL_FLOAT, 0, tcolor);
 		glDrawArrays( GL_LINE_STRIP, 0, pcount);
 		glDisableClientState( GL_VERTEX_ARRAY);
 		glDisableClientState( GL_COLOR_ARRAY);
