@@ -508,7 +508,7 @@ curve::monochrome(float* tcolor, size_t pcount)
 	rgb first_color( tcolor[0], tcolor[1], tcolor[2]);
 	size_t nn;
 
-	for(nn=0; nn++; nn<pcount)  {
+	for(nn=0; nn<pcount; nn++)  {
 		if (tcolor[nn] != first_color.red)
 			return false;
 		if (tcolor[nn+1] != first_color.green)
