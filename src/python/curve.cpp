@@ -311,7 +311,7 @@ curve::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		// The following doesn't work; I don't know why. 
+		// The following doesn't work; I don't know why.
 		// Note that it works with a single color above.
 		//color[slice(1, count+1), slice(0, 3)] = n_color;
 		// So instead do it by brute force:
@@ -661,7 +661,6 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 	const float* c_i = tcolor;
 	bool mono = adjust_colors( scene, tcolor, pcount);
 
-	bool first = true;
 	for(size_t corner=0; corner < count; ++corner, v_i += 3, c_i += 3 ) {
 		// The vector to which v_i currently points towards.
 		vector current( v_i[0], v_i[1], v_i[2] );
@@ -693,24 +692,19 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 
 		vector next( v_i[3], v_i[4], v_i[5]); // The next vector in pos
 		vector prev( v_i[-3], v_i[-2], v_i[-1]); // The previous vector in pos
+		vector x, y; // orthogonal to curve
 		vector A = (next - current).norm();
 		vector B = (current - prev).norm();
-		vector x = (A - B).norm();
-		vector y = A.cross(B).norm();
-		if (first && !x) {
-			x = A.cross( vector(0, 0, 1));
-			if (!x)
-				x = A.cross(vector( 1, 0, 0));
-			y = A.cross(x);
+		if (!A) A = vector(1, 0, 0);
+		if (!B) B = A;
+
+		x = (A - B).norm();
+		y = A.cross(B).norm();
+		if (!y) {
+			y = A.cross( vector(0, 0, 1));
+			if (!y) y = A.cross( vector(0, 1, 0));
 		}
-		if (first && !y) {
-			y = A.cross(x);
-		}
-		first = false;
-		if (!x)
-			x = lastx;
-		if (!y)
-			y = lasty;
+		if (!x) x = A.cross(y).norm();
 
 		if (!x || !y || x == y) {
 			std::ostringstream msg;
@@ -814,7 +808,7 @@ curve::gl_render( const view& scene)
 		pos_end[1] = pos_last[1] + (pos_last[1] - pos_last[1-3]);
 		pos_end[2] = pos_last[2] + (pos_last[2] - pos_last[2-3]);
 	}
-	
+
 	// The maximum number of points to display.
 	const int LINE_LENGTH = 10000;
 	// Data storage for the position and color data.
@@ -826,7 +820,7 @@ curve::gl_render( const view& scene)
 
 	const double* p_i = (double*)( data(this->pos));
 	const float* c_i = (float*)( data(this->color));
-	
+
 	// Choose which points to display
 	for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
 		iptr3 = 3*(iptr+1); // first real point is the second in the data array
@@ -838,7 +832,7 @@ curve::gl_render( const view& scene)
 		tcolor[3*pcount+1] = c_i[cptr+1];
 		tcolor[3*pcount+2] = c_i[cptr+2];
 	}
-	
+
 	// Do scaling if necessary
 	double scaled_radius = radius;
 	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
@@ -849,9 +843,9 @@ curve::gl_render( const view& scene)
 			spos[3*i+2] *= scene.gcfvec[2];
 		}
 	}
-		
+
 	clear_gl_error();
-	
+
 	const bool do_thinline = (radius == 0.0);
 	if (do_thinline) {
 		glEnableClientState( GL_VERTEX_ARRAY);
@@ -867,7 +861,7 @@ curve::gl_render( const view& scene)
 		lighting_prepare();
 		shiny_prepare();
 	}
-	
+
 	if (do_thinline) {
 		glVertexPointer( 3, GL_DOUBLE, 0, spos);
 		bool mono = adjust_colors( scene, tcolor, pcount);
@@ -891,12 +885,12 @@ curve::gl_render( const view& scene)
 
 }
 
-void 
+void
 curve::get_material_matrix( const view& v, tmatrix& out ) {
 	if (degenerate()) return;
-	
+
 	// xxx note this code is identical to faces::get_material_matrix, except for considering radius
-	
+
 	// xxx Add some caching for extent with grow_extent etc; once locking changes so we can trust the primitive not to change during rendering
 	vector min_extent, max_extent;
 	double* pos_i = index( pos, 0);
@@ -908,10 +902,10 @@ curve::get_material_matrix( const view& v, tmatrix& out ) {
 			else if (*pos_i > max_extent[j]) max_extent[j] = *pos_i;
 			pos_i++;
 		}
-		
+
 	min_extent -= vector(radius,radius,radius);
 	max_extent += vector(radius,radius,radius);
-	
+
 	out.translate( vector(.5,.5,.5) );
 	out.scale( vector(1,1,1) * (.999 / (v.gcf * std::max(max_extent.x-min_extent.x, std::max(max_extent.y-min_extent.y, max_extent.z-min_extent.z)))) );
 	out.translate( -.5 * v.gcf * (min_extent + max_extent) );
