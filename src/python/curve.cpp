@@ -73,6 +73,10 @@ curve::curve()
 		curve_sc[i+curve_around] = (float) std::sin(i * 2 * M_PI / curve_around);
 	}
 
+	// curve_slice is a list of indices for picking out the correct vertices from
+	// a list of vertices representing one side of a thick-line curve. The lower
+	// indices (0-255) are used for all but one of the sides. The upper indices
+	// (256-511) are used for the final side.
 	for (int i=0; i<128; i++) {
 		curve_slice[i*2]       = i*curve_around;
 		curve_slice[i*2+1]     = i*curve_around + 1;
@@ -654,7 +658,7 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 	float *cost = curve_sc;
 	float *sint = cost + curve_around;
 
-	vector lastx(1, 0, 0), lasty(0, 1, 0);
+	vector lastA(1, 0, 0);
 
 	// pos and color iterators
 	const double* v_i = spos;
@@ -665,67 +669,49 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 		// The vector to which v_i currently points towards.
 		vector current( v_i[0], v_i[1], v_i[2] );
 
-		/* To construct the circle of vertices around a point on the curve,
-		 * I need an orthonormal basis of the plane of the circle.  A and B,
-		 * normalized vectors pointing toward the next and from the previous
-		 * points on the curve, are vectors in the plane of the *curve* at
-		 * this point.  The cross product and the difference of these vectors
-		 * are orthogonal and lie in the appropriate plane.
-       * Then parallel transport the last frame to this plane
-		 * a) vectors 'initial' and 'final' specify the normal to the plane at the beginning
-		 * and end of the curve in which the surrounding tube terminates
-		 * b) vector 'vecx' specifies the 'x'-direction of the frame in the beginning plane
-		 *    This is useful to change the orientation of the surrounding box when sides=4
-		 * c) int 'sides' specifies the number of sides for the tube 2 <= sides <= 20
-		 * d)	rscale specifies how to define radius in the planes at the end of each segment
+		/* a) To construct the circle of vertices around a point on the curve,
+		 * we need an orthonormal basis of the plane of the circle, now constructed
+		 * from the up vector if possible.
+		 *
+		 * b) int 'sides' specifies the number of sides for the tube 2 <= sides <= 20
+		 * Currently set to 4, and not accessible to user.
+		 *
+		 * TODO: Need to make nice join at a joint in a thick line.
+		 * For example, an L has the first line narrow down at the joint;
+		 * the joint cross section should be at 45 degrees.
+		 * Jonathan Brandmeyer's notes on this, assuming a curve attribute "rscale":
+		 * c)	rscale specifies how to define radius in the planes at the end of each segment
 		 *		rscale = 0.0 defaults to projection of radius into plane without length scaling
 		 *                 and without parallel transport
 		 *    rscale > 0.0 scales the radius so that the tube is of constant diameter
 		 *    rscale small may give sharp points at very acute corners
 		 *    rscale = 1.0 gives same as default tube except uses parallel transport for frame
-		 * e) array rvect = (x,y,z) defines radius in x and y frame directions, z coordinate is not used
-		 *    this allows radius to vary along curve and should be defined for each point in curve
-	Last change:  AWW  21 Aug 2004    1:12 pm
-
-		Added to VPython-core2 16 May 2006
 		 */
 
 		vector next( v_i[3], v_i[4], v_i[5]); // The next vector in pos
-		vector prev( v_i[-3], v_i[-2], v_i[-1]); // The previous vector in pos
-		vector x, y; // orthogonal to curve
 		vector A = (next - current).norm();
-		vector B = (current - prev).norm();
-		if (!A) A = vector(1, 0, 0);
-		if (!B) B = A;
-
-		x = (A - B).norm();
-		y = A.cross(B).norm();
-		if (!y) {
-			y = A.cross( vector(0, 0, 1));
-			if (!y) y = A.cross( vector(0, 1, 0));
+		if (!A || (corner == count-1)) {
+			if (!lastA) A = vector(1, 0, 0);
+			else A = lastA;
 		}
-		if (!x) x = A.cross(y).norm();
+		lastA = A;
+		vector y = vector(0,1,0);
+		vector x = A.cross(y).norm();
+		if (!x) {
+			x = A.cross( vector(0, 0, 1));
+			if (!x) x = A.cross( vector(0, 1, 0));
+		}
+		y = x.cross(A).norm();
 
 		if (!x || !y || x == y) {
 			std::ostringstream msg;
 			msg << "Degenerate curve case! please report the following "
 				"information to visualpython-users@lists.sourceforge.net: ";
-			msg << "current:" << current << " next:" << next << " prev:" << prev
-		 		<< " A:" << A << " B:" << B << " x:" << x << " y:" << y
-		 		<< " lastx:" << lastx << " lasty:" << lasty << " first:"
-		 		<< first << std::endl;
+			msg << "current:" << current << " next:" << next
+		 		<< " A:" << A << " x:" << x << " y:" << y
+		 		<< std::endl;
 		 	VPYTHON_WARNING( msg.str());
 		}
-
-		// remove twists
-		if (x.dot(lastx) < 0)
-			x = -x;
-		if (y.dot(lasty) < 0)
-			y = -y;
-
-		// save last set of vectors
-		lastx = x;
-		lasty = y;
 
 		// scale radii
 		x *= scaled_radius;
@@ -736,6 +722,7 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 			float s = sint[a];
 			normals.push_back( (x*c + y*s).norm());
 			projected.push_back( current + x*c + y*s);
+
 			if (!mono) {
 				light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
 			}
@@ -752,20 +739,18 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 	for (size_t a=0; a < curve_around; a++) {
 		size_t ai = a;
 		if (a == curve_around-1) {
-			ind += 256;
+			ind += 256; // upper portion of curve_slice indices, for the last side
 			ai = 0;
 		}
 
+		// List all the vertices for the ai-th side of the thick line:
 		for (size_t i = 0; i < npoints; i += 127u) {
 			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*curve_around + ai].x);
 			if (!mono)
 				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*curve_around + ai)].red );
 			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*curve_around + ai].x);
-			if (npoints-i < 128)
-				glDrawElements(GL_TRIANGLE_STRIP, 2*(npoints-i), GL_UNSIGNED_INT, ind);
-			else
-				glDrawElements(GL_TRIANGLE_STRIP, 256u, GL_UNSIGNED_INT, ind);
 		}
+		glDrawElements(GL_TRIANGLE_STRIP, 2*npoints, GL_UNSIGNED_INT, ind);
 	}
 	if (!mono)
 		glDisableClientState( GL_COLOR_ARRAY);
