@@ -29,7 +29,7 @@ class curve : public renderable
 	bool antialias;
 	double radius;
 	size_t retain; // how many recent points to retain
-	
+
 	// the space allocated for storage so far
 	size_t preallocated_size;
 	// the number of vectors currently occupying the allocated storage.
@@ -43,16 +43,16 @@ class curve : public renderable
 	// Verify that the pos and color arrays have room for the requested length
 	// if not, they are grown as required and the old data is copied over.
 	void set_length( size_t new_length);
-	
+
 	// Returns true if the object is single-colored.
 	bool monochrome(float* tcolor, size_t pcount);
-	
+
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;
 	virtual void gl_pick_render( const view&);
 	virtual void grow_extent( extent&);
 	void get_material_matrix( const view& v, tmatrix& out );
-	
+
  private:
 
 	// Returns true if the object is degenarate and should not be rendered.
@@ -76,10 +76,10 @@ class curve : public renderable
 	void append_rgb( vector, float red=-1, float green=-1, float blue=-1);
 	void append( vector _pos, rgb _color); // Append a single position with new color.
 	void append( vector _pos); // Append a single position element, extend color.
-	
+
 	boost::python::object get_pos(void);
 	boost::python::object get_color(void);
-	
+
 	inline bool get_antialias( void) { return antialias; }
 	inline double get_radius( void) { return radius; }
 	inline int get_retain( void) { return retain; }
@@ -90,11 +90,11 @@ class curve : public renderable
 	void set_color( array color); // An Nx4 array of color floats
 	void set_color_l( const list& color); // A list of vectors
 	void set_color_t( const rgb& color); // A single tuple
-	
+
 	void set_antialias( bool);
 	void set_radius( const double& r);
-	void set_retain( int);
-	
+	void set_retain( size_t);
+
 	void set_red( const array& red);
 	void set_red_l( const list& red);
 	void set_red_d( const double red);
@@ -113,9 +113,9 @@ class curve : public renderable
 	void set_z( const array& z);
 	void set_z_l( const list& z);
 	void set_z_d( const double z);
-	
+
  private:
-	
+
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
 	void thickline( const view&, const double* spos, float* tcolor, size_t pcount, double scaled_radius);
 

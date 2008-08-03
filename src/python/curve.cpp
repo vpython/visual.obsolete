@@ -48,7 +48,7 @@ curve::curve()
 	radius(0.0),
 	retain(0),
 	preallocated_size(257),
-	count(0), sides(4)
+	count(0), sides(8)
 {
 	// Perform initial allocation of storage space.
 	std::vector<npy_intp> dims(2);
@@ -491,7 +491,7 @@ curve::set_antialias( bool aa)
 }
 
 void
-curve::set_retain( int retain)
+curve::set_retain( size_t retain)
 {
 	if (retain > 0 && count > retain) {
 		set_length( retain); //move pos and color lists down
@@ -658,7 +658,9 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 	float *cost = curve_sc;
 	float *sint = cost + curve_around;
 
-	vector lastA(1, 0, 0);
+	vector pts[MAX_SIDES]; // points around the previous segment
+
+	vector lastA; // unit vector of previous segment
 
 	// pos and color iterators
 	const double* v_i = spos;
@@ -669,65 +671,91 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 		// The vector to which v_i currently points towards.
 		vector current( v_i[0], v_i[1], v_i[2] );
 
-		/* a) To construct the circle of vertices around a point on the curve,
-		 * we need an orthonormal basis of the plane of the circle, now constructed
-		 * from the up vector if possible.
+		/* For the first point in the curve, create orthogonal unit vectors x and y
+		 * and use these to generate vertices in the cross section of the first segment.
 		 *
-		 * b) int 'sides' specifies the number of sides for the tube 2 <= sides <= 20
-		 * Currently set to 4, and not accessible to user.
+		 * Also save the generated points in the pts array.
 		 *
-		 * TODO: Need to make nice join at a joint in a thick line.
-		 * For example, an L has the first line narrow down at the joint;
-		 * the joint cross section should be at 45 degrees.
-		 * Jonathan Brandmeyer's notes on this, assuming a curve attribute "rscale":
-		 * c)	rscale specifies how to define radius in the planes at the end of each segment
-		 *		rscale = 0.0 defaults to projection of radius into plane without length scaling
-		 *                 and without parallel transport
-		 *    rscale > 0.0 scales the radius so that the tube is of constant diameter
-		 *    rscale small may give sharp points at very acute corners
-		 *    rscale = 1.0 gives same as default tube except uses parallel transport for frame
+		 * At each succeeding point in the curve, use the pts array as the basis
+		 * for generating vertices for the end of the previous segment, on an
+		 * ellipse that is the intersection of the previous and next segments.
+		 * Update the pts array with points reflected through the ellipse, which
+		 * will be used to generate vertices at the end of the new segment.
+		 *
+		 * The result is mitered joints, with no twisting from one joint to the next.
 		 */
 
 		vector next( v_i[3], v_i[4], v_i[5]); // The next vector in pos
-		vector A = (next - current).norm();
+		vector A = (next - current).norm(); // unit vector from current point
+		if (corner == 0) {
+			lastA = A;
+		}
 		if (!A || (corner == count-1)) {
 			if (!lastA) A = vector(1, 0, 0);
 			else A = lastA;
 		}
-		lastA = A;
-		vector y = vector(0,1,0);
-		vector x = A.cross(y).norm();
-		if (!x) {
-			x = A.cross( vector(0, 0, 1));
-			if (!x) x = A.cross( vector(0, 1, 0));
-		}
-		y = x.cross(A).norm();
 
-		if (!x || !y || x == y) {
-			std::ostringstream msg;
-			msg << "Degenerate curve case! please report the following "
-				"information to visualpython-users@lists.sourceforge.net: ";
-			msg << "current:" << current << " next:" << next
-		 		<< " A:" << A << " x:" << x << " y:" << y
-		 		<< std::endl;
-		 	VPYTHON_WARNING( msg.str());
-		}
+		if (corner == 0) {
+			vector y = vector(0,1,0);
+			vector x = A.cross(y).norm();
+			if (!x) {
+				x = A.cross( vector(0, 0, 1));
+				if (!x) x = A.cross( vector(0, 1, 0));
+			}
+			y = x.cross(A).norm();
 
-		// scale radii
-		x *= scaled_radius;
-		y *= scaled_radius;
+			if (!x || !y || x == y) {
+				std::ostringstream msg;
+				msg << "Degenerate curve case! please report the following "
+					"information to visualpython-users@lists.sourceforge.net: ";
+				msg << "current:" << current << " next:" << next
+			 		<< " A:" << A << " x:" << x << " y:" << y
+			 		<< std::endl;
+			 	VPYTHON_WARNING( msg.str());
+			}
+
+			// scale radii
+			x *= scaled_radius;
+			y *= scaled_radius;
+
+			for (size_t a=0; a < curve_around; a++) {
+				float c = cost[a];
+				float s = sint[a];
+				vector rel = x*s + y*c; // first point is "up"
+				pts[a] = rel;
+				normals.push_back( rel.norm());
+				projected.push_back( current + rel );
+
+				if (!mono) {
+					light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
+				}
+			}
+			continue;
+		}
+		// Make a "mitered" joint; the cross section of the joint is an ellipse.
+		vector joint_axis = lastA.cross(A).norm(); // perpendicular to the plane of lastA and A
+		vector perp = (lastA+A).norm(); // perpendicular to joint cross section
+		double costheta = lastA.dot(perp); // cos of angle new cross section makes with previous segment (0 to pi/2)
+		double tantheta;
+		if (corner == count-1 || fabs(costheta) > .99999 || fabs(costheta) < .00001) {
+			tantheta = 0.; // 2nd segment in same or opposite direction to 1st segment, or this is the last point
+		} else {
+			tantheta = sqrt(1.-costheta*costheta)/costheta;
+		}
 
 		for (size_t a=0; a < curve_around; a++) {
-			float c = cost[a];
-			float s = sint[a];
-			normals.push_back( (x*c + y*s).norm());
-			projected.push_back( current + x*c + y*s);
+			vector rel = pts[a];
+			pts[a] = rel - 2*(rel.dot(perp))*perp;
+			normals.push_back( rel.norm());
+			projected.push_back( current + rel - rel.cross(joint_axis)*tantheta );
 
 			if (!mono) {
 				light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
 			}
 		}
+		lastA = A;
 	}
+
 	size_t npoints = normals.size() / curve_around;
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
@@ -749,8 +777,11 @@ curve::thickline( const view& scene, const double* spos, float* tcolor, size_t p
 			if (!mono)
 				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*curve_around + ai)].red );
 			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*curve_around + ai].x);
+			if (npoints-i < 128)
+				glDrawElements(GL_TRIANGLE_STRIP, 2*(npoints-i), GL_UNSIGNED_INT, ind);
+			else
+				glDrawElements(GL_TRIANGLE_STRIP, 256u, GL_UNSIGNED_INT, ind);
 		}
-		glDrawElements(GL_TRIANGLE_STRIP, 2*npoints, GL_UNSIGNED_INT, ind);
 	}
 	if (!mono)
 		glDisableClientState( GL_COLOR_ARRAY);
