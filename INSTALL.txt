@@ -41,7 +41,7 @@ I.  Prerequisites:
 	On Ubuntu 7.10, the only package for numpy was for Python 2.4, even though
 	it is Python 2.5 which is installed by default. So it was necessary to download
 	numpy (www.scipy.org/Download). And it was also necessary to install the
-	packages libboost-python-dev, libboost-signals-dv, and libboost-thread-dev
+	packages libboost-python-dev, libboost-signals-dev, and libboost-thread-dev
 	before executing in the numpy folder "python setup.py install".
 	
 	The autoconf, automake, libtool, and pkg-config packages.
@@ -55,19 +55,32 @@ I.  Prerequisites:
 		
 	Here is a list of all the libraries involved. In many cases a library is 
 	automatically installed by a package manager when a requested library depends on it:
+	
+	For Ubuntu 8.04, installing libgtkglextmm-x11-dev brought in everything
+	except for libglademm-2.4, which also must be installed.
+
+	On Ubuntu 8.04, the packages are named (not including the "dev" part of the name):
+	   libgtk-2.0, libatk-1.0, atkmm-1.6, libsigc++-2.0, 
+	   libgtkmm-2.4, gdkmm-2.4, libglib-2.0, libglibmm-2.4, 
+	   libpango-1.0, pangomm-1.4, libfreetype2,  
+	   libgtkglext1, libgtkglextmm-x11-1.2, libcairo2, libcairomm-1.0, 
+	   libglade2, libglademm-2.4
+	Ubuntu 8.04 package manager doesn't list freetype2, (lib)atkmm, 
+	(lib)gdkmm, (lib)pangomm. But there exist these directories; maybe these
+	components are now part of Ubuntu and so don't show up in the package manager.
+		/usr/include/atkmm-1.6, /usr/lib/gdkmm-2.4, /usr/include/gdkmm-2.4.
+		/usr/include/pangomm-1.4
+	
+	On Ubuntu 7.10, the packages were named like this (not including "dev"):
 	   gtk-2.0, atk-1.0, atkmm-1.6, sigc++-2.0, 
 	   gtkmm-2.4, gdkmm-2.4, glib-2.0, glibmm-2.4, 
 	   pango-1.0, pangomm-1.4, freetype2,  
-	   gtkglext-1.0, gtkglextmm-1.2, cairo, cairomm-1.0, libglade-2.0, libglademm-2.4
+	   gtkglext-1.0, gtkglextmm-1.2, cairo, cairomm-1.0, 
+	   libglade-2.0, libglademm-2.4
 	On Ubuntu 7.10, installing libgtkmm-2.4-dev and libglademm-2.4-dev installs most
 	of these libraries, except for atkmm, gdkmm, pangomm, gtkglext, and gtkglextmm.
 	There is a gtkglext1-dev package, but no gtkglextmm.
-	
-	For Ubuntu 8.04, installing libgtkglextmm-x11-dev brought in everthing
-	except for libglademm.
-	
-	Install libglademm-2.4-dev (there may be a package, or www.gtkmm.org).
-	
+		
 	For Ubuntu 7.10, I was unable to install gtkglextmm from source. But at
 	packages.ubuntu.com/source/gtkglextmm, from the older "edgy" distribution get
 	libgtkglextmm1c2a (allow the default package manager to process the download), then
