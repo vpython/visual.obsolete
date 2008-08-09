@@ -630,6 +630,20 @@ display::hideMouse()
 	HideCursor();
 }
 
+/*
+#include <dlfcn.h>
+display::EXTENSION_FUNCTION
+display::getProcAddress(const char* name) {
+	void *lib = dlopen( (const char *)0L, RTLD_LAZY | RTLD_GLOBAL );
+	void *sym = dlsym( lib, name );
+	dlclose( lib );
+	printf("%s: %p\n", name, sym);
+	return (EXTENSION_FUNCTION)sym;
+	//return (EXTENSION_FUNCTION)::wglGetProcAddress( name ); // Windows
+	//return (EXTENSION_FUNCTION)Gdk::GL::get_proc_address( name ); // GTK2
+}
+*/
+
 /******************** gui_main implementation **********************/
 
 gui_main* gui_main::self = 0;  // Protected by python GIL

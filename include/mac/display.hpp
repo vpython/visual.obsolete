@@ -54,7 +54,7 @@ class display : public display_kernel
 
 	// Implements key display_kernel virtual methods
 	virtual void activate( bool active );
-	virtual EXTENSION_FUNCTION getProcAddress( const char* name );
+	//EXTENSION_FUNCTION getProcAddress( const char* name );
 	
  private:
 	friend class aglFont;
