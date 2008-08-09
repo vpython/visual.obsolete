@@ -151,12 +151,6 @@ display::activate(bool active) {
 	}
 }
 
-display::EXTENSION_FUNCTION
-display::getProcAddress(const char* name) {
-	// TODO: What instead of wglGetProcAddress?
-	//return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
-}
-
 void
 display::makeCurrent()
 {
@@ -696,7 +690,9 @@ void
 gui_main::call_in_gui_thread( const boost::function< void() >& f )
 {
 	init_thread();
-    call_in_gui_thread_delayed( 0.0, f );
+	// TODO: The delay should be 0.0, but there appears to be some kind of OS bug that
+	// occasionally delivers timer events twice if the delay is zero.  This is a workaround.
+    call_in_gui_thread_delayed( 0.001, f );
 }
 
 void gui_main::poll() {
