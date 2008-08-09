@@ -12,7 +12,7 @@ CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-I$(TOP)/include/mac -I$(TOP)/include \
 	-I/System/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5 \
 	-I/Library/Python/2.5/site-packages/numpy/core/include \
-	-I/usr/local/include/boost-1_35 -I$(DEPENDS)/threadpool/include \
+	-I$(DEPENDS)/boost_1_35_0 -I$(DEPENDS)/threadpool/include \
 	-F/System/Library/Frameworks/AGL.framework \
 	-F/System/Library/Frameworks/Carbon.framework \
 	-F/System/Library/Frameworks/OpenGL.framework
