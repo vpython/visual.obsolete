@@ -538,23 +538,6 @@ eq_frac( double lhs, double rhs, double frac)
 }
 } // !namespace (unnamed)
 
-bool
-curve::closed_path() const
-{
-	// Determines if the curve follows a closed path or not.  The case where
-	// this fails is when the beginning and end are:
-	//   very close together.
-	//   and very close to the origin.
-	//   and the scope of the entire curve is large relative to the points'
-	//     proximity to the origin.
-	// In this case, it returns false when it should be true.
-	vector begin( index(pos, 0));
-	vector end( index(pos, count-1));
-	return eq_frac(begin.x, end.x, 1e-5)
-		&& eq_frac(begin.y, end.y, 1e-5)
-		&& eq_frac(begin.z, end.z, 1e-5);
-}
-
 vector
 curve::get_center() const
 {
@@ -654,7 +637,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	std::vector<vector> projected;
 	std::vector<vector> normals;
 	std::vector<rgb> light;
-
+	
 	float *cost = curve_sc;
 	float *sint = cost + curve_around;
 
@@ -667,34 +650,26 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	// to points 1 and 2. At start of vertex generation, don't add
 	// 0th point to the vertex list; it will be added (with a mitered
 	// joint) when processing the last point.
-	bool closed = closed_path();
-	if (closed && pcount > 2) {
-		// Make the last element exactly equal to the 0th element.
-		// Make the last+1 element == first element.
-		// Make the last+2 element == second element.
-		spos[3*(pcount-1)] = spos[0]; // point 0
-		spos[3*(pcount-1)+1] = spos[1];
-		spos[3*(pcount-1)+2] = spos[2];
-		spos[3*(pcount)] = spos[3]; // point 1
-		spos[3*(pcount)+1] = spos[4];
-		spos[3*(pcount)+2] = spos[5];
-		spos[3*(pcount)+3] = spos[6]; // point 2
-		spos[3*(pcount)+4] = spos[7];
-		spos[3*(pcount)+5] = spos[8];
-		tcolor[3*(pcount)] = tcolor[3]; // point 1 color
-		tcolor[3*(pcount)+1] = tcolor[4];
-		tcolor[3*(pcount)+2] = tcolor[5];
-		tcolor[3*(pcount)+3] = tcolor[6]; // point 2 color
-		tcolor[3*(pcount)+4] = tcolor[7];
-		tcolor[3*(pcount)+5] = tcolor[8];
-		pcount++;
-	} else { // not closed, duplicate final point
-		spos[3*(pcount)] = spos[3*(pcount-1)]; // final point
-		spos[3*(pcount)+1] = spos[3*(pcount-1)+1];
-		spos[3*(pcount)+2] = spos[3*(pcount-1)+2];
-		tcolor[3*(pcount)] = tcolor[3*(pcount-1)]; // final point color
-		tcolor[3*(pcount)+1] = tcolor[3*(pcount-1)+1];
-		tcolor[3*(pcount)+2] = tcolor[3*(pcount-1)+2];
+	bool closed = false;
+	if (pcount > 3) {
+		vector end_to_end = vector(spos[3*(pcount-1)]-spos[0], 
+							  spos[3*(pcount-1)+1]-spos[1],
+						      spos[3*(pcount-1)+2]-spos[2]);
+		if (end_to_end.mag() < 0.1*scaled_radius) {
+			closed = true;
+			// Make the last position exactly equal to the 0th position.
+			// Add an element with the 0th position and 0th color.
+			// Add an element with the 1st position and color.
+			// Add an element with the 2nd position and color.
+			spos[3*(pcount-1)] = spos[0]; // point 0
+			spos[3*(pcount-1)+1] = spos[1];
+			spos[3*(pcount-1)+2] = spos[2];
+			for (size_t i=0; i<9; i++) {
+				spos[3*pcount+i] = spos[i];
+				tcolor[3*pcount+i] = tcolor[i];
+			}
+			pcount += 2; // the last added point is there only for look-ahead mitering
+		}
 	}
 
 	// pos and color iterators
@@ -718,16 +693,35 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 		 * will be used to generate vertices at the end of the new segment.
 		 *
 		 * The result is mitered joints, with no twisting from one joint to the next.
+		 * 
+		 * In the case of a closed curve, we added copies of the first three points and
+		 * we don't initial add vertices for the first point (point 0) in the vertex array.
+		 * These get added at the end of the process, with a clean break in the color (if
+		 * the color of the first and last point are different).
 		 */
 
-		vector next( v_i[3], v_i[4], v_i[5]); // The next vector in spos
-		vector A = (next - current).norm();
+		vector next, A;
+		if ((corner == pcount-1) && !closed) {
+			next = lastA;
+			A = lastA;
+		} else {
+			next = vector( v_i[3], v_i[4], v_i[5]); // The next vector in spos
+			A = (next - current).norm();
+		}
 		if (corner == 0) {
 			lastA = A;
 		}
+		int savecorner = -1; // assume no duplication of neighboring points
 		if (!A) {
-			if (!lastA) A = vector(1, 0, 0);
-			else A = lastA;
+			savecorner = corner; 
+			for(corner += 1, v_i += 3, c_i += 3; corner < pcount; ++corner, v_i += 3, c_i += 3 ) {
+				next = vector( v_i[3], v_i[4], v_i[5]);
+				A = (next - current).norm();
+			 	if (!A) continue;
+			 	break;
+			}
+			if (!A) A = lastA;
+			if (!A) A = vector(1,0,0); // desperation
 		}
 
 		if (corner == 0) {
@@ -761,9 +755,9 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 				if (!closed) {
 					normals.push_back( rel.norm());
 					projected.push_back( current + rel );
-				}
-				if (!mono) {
-					light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
+					if (!mono) {
+						light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
+					}
 				}
 			}
 			continue;
@@ -780,25 +774,35 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			tantheta = sqrt(1.-costheta*costheta)/costheta;
 		}
 
+		if (savecorner >= 0) { // a duplicated point
+			for (size_t a=0; a < curve_around; a++) {
+				vector rel = pts[a];
+				vector rel_ellipse = rel - rel.cross(joint_axis)*tantheta;
+				normals.push_back( rel_ellipse.norm() );
+				projected.push_back( current + rel_ellipse );
+				if (!mono) {
+					light.push_back( 
+						rgb( tcolor[3*savecorner], 
+							 tcolor[3*savecorner+1],
+							 tcolor[3*savecorner+2]) );
+				}
+			}
+		}
+		
 		for (size_t a=0; a < curve_around; a++) {
 			vector rel = pts[a];
 			pts[a] = rel - 2*(rel.dot(perp))*perp;
-			
-			vector r = rel.norm();
-			vector b = current + rel - rel.cross(joint_axis)*tantheta;
-			/*
-			if (b.z > 0.2) 
-				printf("corner=%d a=%d < %.2f %.2f  %.2f >\n", corner, a, b.x, b.y, b.z);
-			*/
-			
-			normals.push_back( rel.norm() );
-			projected.push_back( current + rel - rel.cross(joint_axis)*tantheta );
+			vector rel_ellipse = rel - rel.cross(joint_axis)*tantheta;
+			normals.push_back( rel_ellipse.norm() );
+			projected.push_back( current + rel_ellipse );
 			if (!mono) {
 				light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
 			}
 		}
 		lastA = A;
 	}
+	
+	if (closed) pcount -= 1; // correct for extra point added in closed case
 
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
@@ -842,9 +846,9 @@ curve::gl_render( const view& scene)
 	// to be closed, it should be rendered that way on-screen.
 	// The maximum number of points to display.
 	const int LINE_LENGTH = 1000;
-	// Data storage for the position and color data (plus room for 2 extra points)
-	double spos[3*(LINE_LENGTH+2)];
-	float tcolor[3*(LINE_LENGTH+2)]; // opacity not yet implemented for curves
+	// Data storage for the position and color data (plus room for 3 extra points)
+	double spos[3*(LINE_LENGTH+3)];
+	float tcolor[3*(LINE_LENGTH+3)]; // opacity not yet implemented for curves
 	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
 	if (fstep < 1.0F) fstep = 1.0F;
 	size_t iptr=0, iptr3, cptr, pcount=0;
