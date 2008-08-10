@@ -57,8 +57,6 @@ class curve : public renderable
 
 	// Returns true if the object is degenarate and should not be rendered.
  	bool degenerate() const;
-	// Returns true if the cuve follows a closed path.
- 	bool closed_path() const;
 	// Compute a checksum over the pcount elements of the temporary
 	// position and color arrays.
 	long checksum( double* spos, float* tcolor, size_t pcount);
