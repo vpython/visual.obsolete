@@ -8,6 +8,10 @@
 
 namespace cvisual {
 
+// TODO: tan_hfov_x and tan_hfov_y must be revisited in the face of
+// nonuniform scaling.  It may be more appropriate to describe the viewing
+// frustum in a different way entirely.
+
 view::view( const vector n_forward, vector n_center, int n_width,
 	int n_height, bool n_forward_changed,
 	double n_gcf, vector n_gcfvec,
@@ -18,8 +22,12 @@ view::view( const vector n_forward, vector n_center, int n_width,
 	anaglyph(false), coloranaglyph(false), tan_hfov_x(0), tan_hfov_y(0),
 	screen_objects( z_comparator( forward)), glext(glext)
 {
+	for(int i=0; i<N_LIGHT_TYPES; i++)
+		light_count[i] = 0;
 }
 
+// TODO: This interface should be changed to copy construct and then mutate the view?  Or
+// even eliminated (do we need the transform information here?)
 view::view( const view& other, const tmatrix& wft)
 	: camera( other.camera),
 	forward( wft.times_v(other.forward)),
@@ -34,14 +42,13 @@ view::view( const view& other, const tmatrix& wft)
 	lod_adjust( other.lod_adjust),
 	anaglyph( other.anaglyph),
 	coloranaglyph( other.coloranaglyph),
-	// TODO: tan_hfov_x and tan_hfov_y must be revisited in the face of
-	// nonuniform scaling.  It may be more appropriate to describe the viewing
-	// frustum in a different way entirely.
 	tan_hfov_x( other.tan_hfov_x),
 	tan_hfov_y( other.tan_hfov_y),
 	screen_objects( z_comparator( forward)),
 	glext(other.glext)
 {
+	for(int i=0; i<N_LIGHT_TYPES; i++)
+		light_count[i] = other.light_count[i];
 }
 
 double

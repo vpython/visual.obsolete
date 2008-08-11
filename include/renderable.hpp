@@ -20,7 +20,9 @@ namespace cvisual {
 
 using boost::shared_ptr;
 class renderable;
-	
+
+const int N_LIGHT_TYPES = 1;
+
 /** A depth sorting criterion for STL-compatable sorting algorithms.  This 
    implementation only performs 4 adds, 6 multiplies, and one comparison.  It
    could be made faster if the virtual function get_center() was somehow made
@@ -101,6 +103,8 @@ struct view
 	gl_extensions& glext;
 	
 	tmatrix camera_world;
+
+	int light_count[N_LIGHT_TYPES];
 	
 	view( vector n_forward, vector n_center, int n_width, 
 		int n_height, bool n_forward_changed, 

@@ -72,6 +72,9 @@ apply_material::apply_material( const view& v, material* m, tmatrix& model_mater
 			matrix[i] = (float)model_material.matrix_addr()[i];
 		v.glext.glUniformMatrix4fvARB( loc, 1, false, matrix );
 	}
+
+	if ( (loc = m->shader->get_uniform_location( v, "light_count" )) >= 0 )
+		v.glext.glUniform1iARB( loc, v.light_count[0] );
 }
 
 apply_material::~apply_material() {

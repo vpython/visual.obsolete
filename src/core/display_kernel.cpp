@@ -51,30 +51,20 @@ display_kernel::waitWhileAnyDisplayVisible()
 static const display_kernel::EXTENSION_FUNCTION notImplemented = (display_kernel::EXTENSION_FUNCTION)-1;
 
 void
-display_kernel::enable_lights()
+display_kernel::enable_lights(view& scene)
 {
 	glEnable( GL_LIGHTING);
 	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, &ambient.red);
-	// Note that this cascades.
-	GLenum light_ids[] = {
-		GL_LIGHT0,
-		GL_LIGHT1,
-		GL_LIGHT2,
-		GL_LIGHT3,
-		GL_LIGHT4,
-		GL_LIGHT5,
-		GL_LIGHT6,
-		GL_LIGHT7
-	};
-	GLenum* light_id = light_ids;
-	GLenum* light_end = light_id + 8;
+	GLenum light_id = GL_LIGHT0;
 	light_iterator i = lights.begin();
-	while (i != light_iterator(lights.end()) && light_id != light_end) {
-		i->gl_begin( *light_id, gcf);
+	while (i != light_iterator(lights.end()) && light_id <= GL_LIGHT7) {
+		i->gl_begin( light_id, gcf);
 		++i;
 		++light_id;
 	}
 	check_gl_error();
+
+	scene.light_count[0] = lights.size();
 }
 
 void
@@ -664,7 +654,7 @@ display_kernel::draw(
 	world_to_view_transform( scene_geometry, whicheye);
 
 	// Render all opaque objects in the world space layer
-	enable_lights();
+	enable_lights(scene_geometry);
 	world_iterator i( layer_world.begin());
 	world_iterator i_end( layer_world.end());
 	while (i != i_end) {

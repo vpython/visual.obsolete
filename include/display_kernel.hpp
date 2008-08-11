@@ -99,7 +99,7 @@ class display_kernel
 
 	rgb ambient; ///< The ambient light color.
 	/** Called at the beginning of a render cycle to establish lighting. */
-	void enable_lights();
+	void enable_lights(view& scene);
 	/** Called at the end of a render cycle to complete lighting. */
 	void disable_lights();
 
