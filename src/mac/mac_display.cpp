@@ -575,6 +575,7 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUFragmentProcessing, &gpuFragmentProcessing);
 	printf("vertex %d, fragment %d\n", gpuVertexProcessing, gpuFragmentProcessing);
 	// MacBook (no graphics): vertex -1341520386, fragment 0 (0 means okay)
+	// MacBook Pro (GeForce): vertex -1341520386, fragment 0; alas, same as MacBook 
 	
 	CGLRendererInfoObj rend;
 	GLint nrend, value;
@@ -591,9 +592,13 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	// MacBook (no graphics): 2 renderers 
 	// renderer #0 (ID=x24000, kCGLRendererIntel900ID) accelerated
 	// renderer #1 (ID=x20400, kCGLRendererGenericFloatID) not accelerated
+	// MacBook Pro (GeForce): 2 renderers 
+	// renderer #0 (ID=x22604, some kind of GeForce - all GeForce cards start with 22) accelerated
+	// renderer #1 (ID=x20400, kCGLRendererGenericFloatID) not accelerated
+	*/
 	
 	printf("destroy=%d\n", CGLDestroyRendererInfo(rend));
-	*/
+	
 
 	// Set up event handling
 	InstallStandardEventHandler(GetWindowEventTarget(window));
@@ -650,19 +655,17 @@ display::hideMouse()
 	HideCursor();
 }
 
-/*
 #include <dlfcn.h>
 display::EXTENSION_FUNCTION
 display::getProcAddress(const char* name) {
 	void *lib = dlopen( (const char *)0L, RTLD_LAZY | RTLD_GLOBAL );
 	void *sym = dlsym( lib, name );
 	dlclose( lib );
-	printf("%s: %p\n", name, sym);
+	//printf("%s: %p\n", name, sym);
 	return (EXTENSION_FUNCTION)sym;
 	//return (EXTENSION_FUNCTION)::wglGetProcAddress( name ); // Windows
 	//return (EXTENSION_FUNCTION)Gdk::GL::get_proc_address( name ); // GTK2
 }
-*/
 
 /******************** gui_main implementation **********************/
 
