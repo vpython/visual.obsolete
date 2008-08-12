@@ -26,7 +26,7 @@ class clipping_plane
 	~clipping_plane();
  
 	// TODO: perform testing to see how expensive this is.  Answer: better
-	// performace when texturing is required, slightly worse when not.  (for
+	// performance when texturing is required, slightly worse when not.  (for
 	// spheres anyway).
 	void gl_enable();
 	void gl_disable();
