@@ -38,12 +38,10 @@ sphere::gl_pick_render( const view& geometry)
 	init_model();
 
 	clear_gl_error();
+
 	gl_matrix_stackguard guard;
-	const vector view_pos = pos * geometry.gcf;
-	glTranslated( view_pos.x, view_pos.y, view_pos.z);
-	model_world_transform().gl_mult();
-	const vector scale = get_scale() * geometry.gcf;
-	glScaled( scale.x, scale.y, scale.z);
+	model_world_transform( geometry.gcf, get_scale() ).gl_mult();
+
 	lod_cache[0].gl_render();
 	check_gl_error();
 }
@@ -81,14 +79,8 @@ sphere::gl_render( const view& geometry)
 	else if (lod < 0)
 		lod = 0;
 
-	// Apply transforms.
 	gl_matrix_stackguard guard;
-	// Position of the body in view space.
-	const vector view_pos = pos * geometry.gcf;
-	glTranslated( view_pos.x, view_pos.y, view_pos.z);
-	model_world_transform().gl_mult();
-	const vector scale = get_scale() * geometry.gcf;
-	glScaled( scale.x, scale.y, scale.z);
+	model_world_transform( geometry.gcf, get_scale() ).gl_mult();
 
 	color.gl_set(opacity);
 

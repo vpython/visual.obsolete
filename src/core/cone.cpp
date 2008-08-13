@@ -122,13 +122,11 @@ cone::gl_pick_render( const view& scene)
 
 	size_t lod = 2;
 	clear_gl_error();
+	
 	gl_matrix_stackguard guard;
-	vector view_pos = pos * scene.gcf;
-	glTranslated( view_pos.x, view_pos.y, view_pos.z);
-	model_world_transform().gl_mult();
-	const double radial_scale = radius * scene.gcf;
-	const double axial_scale = axis.mag() * scene.gcf;
-	glScaled( axial_scale, radial_scale, radial_scale);
+	const double length = axis.mag();
+	model_world_transform( scene.gcf, vector( length, radius, radius ) ).gl_mult();
+
 	cone_simple_model[lod].gl_render();
 	check_gl_error();
 }
@@ -167,17 +165,13 @@ cone::gl_render( const view& scene)
 		lod = 5;
 	
 	gl_matrix_stackguard guard;
-	vector view_pos = pos * scene.gcf;
-	glTranslated( view_pos.x, view_pos.y, view_pos.z);
-	model_world_transform().gl_mult();
-	const double radial_scale = radius * scene.gcf;
-	const double axial_scale = axis.mag() * scene.gcf;
-	glScaled( axial_scale, radial_scale, radial_scale);
-	
+	const double length = axis.mag();
+	model_world_transform( scene.gcf, vector( length, radius, radius ) ).gl_mult();
+
+	color.gl_set(opacity);
+
 	if (opacity != 1.0) {
-		// Setup for blending
 		gl_enable cull_face( GL_CULL_FACE);
-		color.gl_set(opacity);
 				
 		// Render the back half.
 		glCullFace( GL_FRONT);
@@ -188,7 +182,6 @@ cone::gl_render( const view& scene)
 		cone_simple_model[lod].gl_render();
 	}
 	else {
-		color.gl_set(opacity);
 		cone_simple_model[lod].gl_render();
 	}
 	

@@ -69,16 +69,14 @@ rectangular::set_size( const vector& s)
 void
 rectangular::apply_transform( const view& scene )
 {
-	double gcf = scene.gcf;
-	vector view_pos = pos * scene.gcf;
-	glTranslated( view_pos.x, view_pos.y, view_pos.z);
-	model_world_transform().gl_mult();
 	// OpenGL needs to invert the modelview matrix to generate the normal matrix,
 	//   so try not to make it singular:
 	double min_scale = std::max( axis.mag(), std::max(height,width) ) * 1e-6;
-	glScaled( gcf * std::max(min_scale,axis.mag()), 
-			  gcf * std::max(min_scale,height), 
-			  gcf * std::max(min_scale,width) );
+	vector size( std::max(min_scale,axis.mag()), 
+				 std::max(min_scale,height), 
+			     std::max(min_scale,width) );
+
+	model_world_transform( scene.gcf, size ).gl_mult();
 }
 
 } // !namespace cvisual

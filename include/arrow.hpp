@@ -8,7 +8,6 @@
 
 #include "primitive.hpp"
 #include "util/displaylist.hpp"
-#include "util/sorted_model.hpp"
 
 #include <boost/scoped_ptr.hpp>
 

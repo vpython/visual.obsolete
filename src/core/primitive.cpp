@@ -19,13 +19,13 @@
 namespace cvisual {
 
 tmatrix 
-primitive::model_world_transform() const
+primitive::model_world_transform(double world_scale, const vector& object_scale) const
 {
-	// Performs a scale, reorientation, and translation transform in that order.
-	// ret = translation o reorientation o scale
-	// xxx Actually that is a lie.  This is only doing the rotation!  In light of its name, and the
-	//   fact that it isn't an inverse of world_model_transform(), I'm slightly disturbed.  --ds
-	
+	// Performs scale, rotation, translation, and world scale (gcf) transforms in that order.
+	// ret = world_scale o translation o rotation o scale
+	// Note that with the default parameters, only the rotation transformation is returned!  Typical
+	//   usage should be model_world_transform( scene.gcf, my_size );
+
 	tmatrix ret;
 	// A unit vector along the z_axis.
 	vector z_axis = vector(0,0,1);
@@ -43,52 +43,14 @@ primitive::model_world_transform() const
 	
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
-	ret.x_column( x_axis);
-	ret.y_column( y_axis);
-	ret.z_column( z_axis);
-	ret.w_column( /*pos*/);
+	ret.x_column( x_axis );
+	ret.y_column( y_axis );
+	ret.z_column( z_axis );
+	ret.w_column( pos * world_scale );
 	ret.w_row();
-	return ret;
-}
 
-// TODO: reevaluate this function in the context of object selection code.
-tmatrix
-primitive::world_model_transform() const
-{
-	// this performs the inverse of the model_world_transform - 
-	// translate backwards, reorinetation, and inverse scale.
-	// xxx Except for the inverse scale part?
-	// ret = reorient^T o translate_backwards.
-	
-	tmatrix ret;
-	vector z_axis( 0, 0, 1);
-	if (std::fabs(axis.norm().dot( up.norm())) > 0.98) {
-		if (std::fabs(axis.norm().dot( vector(-1,0,0))) > 0.98)
-			z_axis = axis.cross( vector(0,0,1)).norm();
-		else
-			z_axis = axis.cross( vector(-1,0,0)).norm();
-	}
-	else {
-		z_axis = axis.cross( up).norm();
-	}
-	vector y_axis = z_axis.cross(axis).norm();
-	vector x_axis = axis.norm();
-	// Since the reorientation matrix is orthogonal, its inverse is simply the
-	// transpose.  Multiplying each of the rows above by the scaling factor
-	// performs the left-multipy by the scaling matrix.
-	ret.x_column( x_axis.x, y_axis.x, z_axis.x);
-	ret.y_column( x_axis.y, y_axis.y, z_axis.y);
-	ret.z_column( x_axis.z, y_axis.z, z_axis.z);
-	ret.w_column();
-	ret.w_row();
-	
-	// Perform an inverse translation - simply right-multipy ret by a translate
-	// matrix that is the negative of the original.
-	ret.w_column( 
-		-x_axis.dot( pos),
-		-y_axis.dot( pos),
-		-z_axis.dot( pos));
-	
+	ret.scale( object_scale * world_scale );
+
 	return ret;
 }
 

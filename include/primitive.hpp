@@ -31,10 +31,7 @@ class primitive : public renderable
 
 	// Returns a tmatrix that performs reorientation of the object from model
 	// orientation to world (and view) orientation.
-	tmatrix model_world_transform() const;
-	// Returns a tmatrix that transforms coordinates from world space to
-	// model space, for ray intersection calculations.
-	tmatrix world_model_transform() const;
+	tmatrix model_world_transform( double world_scale = 0.0, const vector& object_scale = vector(1,1,1) ) const;
  
 	// Generate a displayobject at the origin, with up pointing along +y and
 	// an axis = vector(1, 0, 0).

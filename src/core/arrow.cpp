@@ -115,16 +115,14 @@ arrow::gl_render( const view& scene)
 	color.gl_set(opacity);
 
 	double hl,hw,len,sw;
-	effective_geometry( hw, sw, len, hl, scene.gcf );
+	effective_geometry( hw, sw, len, hl, 1.0 );
 
 	// Render the shaft and the head in back to front order (the shaft is in front
 	// of the head if axis points away from the camera)
 	int shaft = axis.dot( scene.camera - (pos + axis * (1-hl/len)) ) < 0;
 	for(int part=0; part<2; part++) {
 		gl_matrix_stackguard guard;
-		vector view_pos = pos * scene.gcf;
-		glTranslated( view_pos.x, view_pos.y, view_pos.z);
-		model_world_transform().gl_mult();
+		model_world_transform( scene.gcf ).gl_mult();
 		if (part == shaft) {
 			glScaled( len - hl, sw, sw );
 			glTranslated( 0.5, 0, 0 );

@@ -181,6 +181,8 @@ class face_z_comparator
 	the worst-case sort frequently.  See also test/model_zsort_bench.cpp.
 	Face is any class with a center data member.  nfaces is the number of faces
 	in the body.
+
+	TODO: As of 8/13/2008 this class is not used anywhere... remove it?
 */
 template <typename Face, size_t nfaces>
 struct z_sorted_model

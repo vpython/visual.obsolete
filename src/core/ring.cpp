@@ -115,10 +115,10 @@ ring::band_prepare( const view& scene, size_t rings, size_t bands, scoped_array<
 	// sequential calls to glRotate() using the same vertex array, thereby 
 	// taking advantage of OpenGL's hardware for the bulk of the transform labor.
 		
-	double scaled_radius = radius * scene.gcf;
+	double scaled_radius = radius;
 	double scaled_thickness = scaled_radius * 0.1;
 	if (thickness != 0.0)
-		scaled_thickness = thickness * scene.gcf;
+		scaled_thickness = thickness;
 
 	// The first band is a triangle strip at the point where the default ring
 	// passes through the yz plane through the +z axis.  The extra pair of vertexes
@@ -153,9 +153,8 @@ ring::band_prepare( const view& scene, size_t rings, size_t bands, scoped_array<
 	glVertexPointer( 3, GL_DOUBLE, 0, vertexes.get());
 	glNormalPointer( GL_DOUBLE, 0, normals.get());
 	color.gl_set(opacity);
-	vector scaled_pos = pos * scene.gcf;
-	glTranslated( scaled_pos.x, scaled_pos.y, scaled_pos.z);
-	model_world_transform().gl_mult();
+
+	model_world_transform( scene.gcf ).gl_mult();
 }
 
 void
