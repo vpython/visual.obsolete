@@ -20,6 +20,8 @@ class material {
 	void set_translucent( bool );
 	bool get_translucent();
 	
+	shader_program* get_shader_program() { return shader.get(); }
+
  private:
 	friend class apply_material;
 	

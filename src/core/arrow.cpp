@@ -8,6 +8,7 @@
 #include "util/gl_enable.hpp"
 #include "box.hpp"
 #include "pyramid.hpp"
+#include "material.hpp"
 
 namespace cvisual {
 	
@@ -117,6 +118,8 @@ arrow::gl_render( const view& scene)
 	double hl,hw,len,sw;
 	effective_geometry( hw, sw, len, hl, 1.0 );
 
+	int model_material_loc = mat && mat->get_shader_program() ? mat->get_shader_program()->get_uniform_location( scene, "model_material" ) : -1;
+
 	// Render the shaft and the head in back to front order (the shaft is in front
 	// of the head if axis points away from the camera)
 	int shaft = axis.dot( scene.camera - (pos + axis * (1-hl/len)) ) < 0;
@@ -126,10 +129,28 @@ arrow::gl_render( const view& scene)
 		if (part == shaft) {
 			glScaled( len - hl, sw, sw );
 			glTranslated( 0.5, 0, 0 );
+
+			if (model_material_loc >= 0) {  // TODO simplify
+				tmatrix model_mat;
+				double s = 1.0 / std::max( len, hw );
+				model_mat.translate( vector((len-hl)*s*0.5,0.5,0.5) );
+				model_mat.scale( vector((len-hl), sw, sw)*s );
+				mat->get_shader_program()->set_uniform_matrix( scene, model_material_loc, model_mat );
+			}
+
 			shaft_model.gl_render();
 		} else {
 			glTranslated( len - hl, 0, 0 );
 			glScaled( hl, hw, hw );
+
+			if (model_material_loc >= 0) {  // TODO simplify
+				tmatrix model_mat;
+				double s = 1.0 / std::max( len, hw );
+				model_mat.translate( vector((len-hl)*s,0.5,0.5) );
+				model_mat.scale( vector(hl, hw, hw)*s );
+				mat->get_shader_program()->set_uniform_matrix( scene, model_material_loc, model_mat );
+			}
+
 			pyramid::model.gl_render();
 		}
 	}
@@ -162,11 +183,7 @@ arrow::grow_extent( extent& world)
 void
 arrow::get_material_matrix(const view& v, tmatrix& out)
 {
-	double hl, hw, len, sw;
-	effective_geometry( hw, sw, len, hl, v.gcf);
-
-	out.translate( vector(0,.5,.5) );
-	out.scale( vector(1,1,1) * (1 / std::max( axis.mag()*v.gcf, hw )) );
+	// This work is done in gl_render, for shaft and head separately
 }
 
 void arrow::init_model()

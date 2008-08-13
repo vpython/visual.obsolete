@@ -13,6 +13,7 @@ class shader_program {
 	
 	const std::string& get_source() const { return source; }
 	int get_uniform_location( const view& v, const char* name );
+	void set_uniform_matrix( const view& v, int loc, const tmatrix& in );
 
  private:
 	friend class use_shader_program;

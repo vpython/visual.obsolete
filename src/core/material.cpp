@@ -63,17 +63,11 @@ apply_material::apply_material( const view& v, material* m, tmatrix& model_mater
 
 	int loc;
 	if ( (loc = m->shader->get_uniform_location( v, "camera_world" )) >= 0 ) {
-		float matrix[16];
-		for(int i=0; i<16; i++)
-			matrix[i] = (float)v.camera_world.matrix_addr()[i];
-		v.glext.glUniformMatrix4fvARB( loc, 1, false, matrix );
+		m->shader->set_uniform_matrix( v, loc, v.camera_world );
 	}
-	
+
 	if ( (loc = m->shader->get_uniform_location( v, "model_material" )) >= 0 ) {
-		float matrix[16];
-		for(int i=0; i<16; i++)
-			matrix[i] = (float)model_material.matrix_addr()[i];
-		v.glext.glUniformMatrix4fvARB( loc, 1, false, matrix );
+		m->shader->set_uniform_matrix( v, loc, model_material );
 	}
 
 	if ( (loc = m->shader->get_uniform_location( v, "light_count" )) >= 0 )

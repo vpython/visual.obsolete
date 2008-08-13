@@ -23,6 +23,14 @@ int shader_program::get_uniform_location( const view& v, const char* name ) {
 	return cache - 2;
 }
 
+void shader_program::set_uniform_matrix( const view& v, int loc, const tmatrix& in ) {
+	float matrix[16];
+	const double* in_p = in.matrix_addr();
+	for(int i=0; i<16; i++)
+		matrix[i] = (float)in_p[i];
+	v.glext.glUniformMatrix4fvARB( loc, 1, false, matrix );
+}
+
 void shader_program::realize( const view& v ) {
 	if (program != -1) return;
 	
