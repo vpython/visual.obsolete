@@ -93,12 +93,12 @@ sphere::gl_render( const view& geometry)
 		gl_enable cull_face( GL_CULL_FACE);
 
 		// Render the back half (inside)
-		glCullFace( GL_FRONT);
-		models[lod].gl_render();
+		glCullFace( GL_FRONT );
+		lod_cache[lod].gl_render();
 
 		// Render the front half (outside)
-		glCullFace( GL_BACK);
-		models[lod].gl_render();
+		glCullFace( GL_BACK );
+		lod_cache[lod].gl_render();
 	}
 	else {
 		// Render a simple sphere.
