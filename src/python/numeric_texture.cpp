@@ -182,6 +182,8 @@ numeric_texture::gl_init( const view& v )
 	}
 	tex_textype = internal_format;
 
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
 	if (data_mipmapped && !data_depth) {
 		tex_width = data_width;
 		tex_height = data_height;
@@ -279,8 +281,8 @@ numeric_texture::set_data( boost::python::numeric::array data)
 
 	damage();
 	texdata = data;
-	data_height = dims[0];
-	data_width = dims[1];
+	data_width = dims[0];
+	data_height = dims[1];
 	if (dims.size() == 4) data_depth = dims[2]; else data_depth = 0;
 	data_channels = channels;
 	have_opacity = (
