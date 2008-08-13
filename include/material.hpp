@@ -9,6 +9,8 @@ namespace cvisual {
 
 class material {
  public:
+	bool has_opacity();
+
 	void set_textures( std::vector< boost::shared_ptr< texture > > );
 	std::vector< boost::shared_ptr< texture > > get_textures();
 	

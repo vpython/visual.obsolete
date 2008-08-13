@@ -54,8 +54,6 @@ class quadric
 	void set_normal_style( normal_style);
 	/** Set the direction of teh normal vectors used for rendered objects. */
 	void set_orientation( orientation);
-	/** Set to true to cause later objects to be rendered with texture coordinates. */
-	void do_textures( bool);
 	
 	/** Draw a sphere centered at the origin, with the N pole pointing along the
 		y axis.

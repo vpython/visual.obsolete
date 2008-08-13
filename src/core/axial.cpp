@@ -19,7 +19,6 @@ axial::~axial()
 void
 axial::set_radius( double r)
 {
-	model_damage();
 	radius = r;
 }
 

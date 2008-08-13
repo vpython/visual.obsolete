@@ -122,9 +122,6 @@ void
 wrap_primitive()
 {
 	class_<renderable, boost::noncopyable>( "renderable", no_init)
-		.add_property( "shininess", &renderable::get_shininess, &renderable::set_shininess)
-		.add_property( "lit", &renderable::is_lit, &renderable::set_lit)
-		.add_property( "texture", &renderable::get_texture, &renderable::set_texture)
 		.add_property( "material", &renderable::get_material, &renderable::set_material)
 		;
 

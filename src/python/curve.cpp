@@ -881,23 +881,14 @@ curve::gl_render( const view& scene)
 
 	clear_gl_error();
 
-	const bool do_thinline = (radius == 0.0);
-	if (do_thinline) {
+	if (radius == 0.0) {
 		glEnableClientState( GL_VERTEX_ARRAY);
 		glDisable( GL_LIGHTING);
 		// Assume monochrome.
 		if (antialias) {
-			glEnable( GL_BLEND);
 			glEnable( GL_LINE_SMOOTH);
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
-	}
-	else {
-		lighting_prepare();
-		shiny_prepare();
-	}
 
-	if (do_thinline) {
 		glVertexPointer( 3, GL_DOUBLE, 0, spos);
 		bool mono = adjust_colors( scene, tcolor, pcount);
 		if (!mono) glColorPointer( 3, GL_FLOAT, 0, tcolor);
@@ -906,14 +897,11 @@ curve::gl_render( const view& scene)
 		glDisableClientState( GL_COLOR_ARRAY);
 		glEnable( GL_LIGHTING);
 		if (antialias) {
-			glDisable( GL_BLEND);
 			glDisable( GL_LINE_SMOOTH);
 		}
 	}
 	else {
 		thickline( scene, spos, tcolor, pcount, scaled_radius);
-		shiny_complete();
-		lighting_complete();
 	}
 
 	check_gl_error();

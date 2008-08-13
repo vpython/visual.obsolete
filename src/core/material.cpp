@@ -2,6 +2,10 @@
 
 namespace cvisual {
 
+bool material::has_opacity() {
+	return false; // TODO
+}
+
 void 
 material::set_textures( std::vector< boost::shared_ptr< texture > > tex ) {
 	textures = tex;

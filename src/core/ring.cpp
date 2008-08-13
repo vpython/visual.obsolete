@@ -82,14 +82,9 @@ ring::gl_render( const view& scene)
 	if (rings < 0)
 		rings = 80;
 	rings = clamp( 7, rings, 80);
-	if (shiny()) {
-		rings *= 2; bands *= 2;
-	}
 	
 	clear_gl_error(); 
 	{
-		lighting_prepare();
-		shiny_prepare();
 		gl_enable_client vertex_array( GL_VERTEX_ARRAY);
 		gl_enable_client normal_array( GL_NORMAL_ARRAY);
 		gl_matrix_stackguard guard;
@@ -97,8 +92,6 @@ ring::gl_render( const view& scene)
 			do_render_opaque( scene, rings, bands);
 		else
 			do_render_translucent( scene, rings, bands);
-		shiny_complete();
-		lighting_complete();
 	}
 	check_gl_error();
 	return;
@@ -172,6 +165,7 @@ ring::gl_draw( const view& scene, size_t rings, size_t bands)
 	for (size_t i = 0; i < rings; ++i) {
 		// Successively render the same triangle strip for each band, 
 		// rotated about the model's x axis into the next position.
+		// TODO: I believe this is very slow!
 		glRotated( 360.0 / rings, 1, 0, 0);
 		glDrawArrays( GL_TRIANGLE_STRIP, 0, bands * 2 + 2);
 	}
@@ -189,13 +183,13 @@ ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
 void
 ring::do_render_translucent( const view& scene, size_t rings, size_t bands)
 {
+	// TODO: I believe this is quite wrong
+
 	scoped_array<vector> vertexes, normals;
 	band_prepare( scene, rings, bands, vertexes, normals );
 	
 	gl_enable clip0( GL_CLIP_PLANE0);
 	gl_enable cull_face( GL_CULL_FACE);
-	gl_enable blend( GL_BLEND);
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	tmatrix modelview; modelview.gl_modelview_get();
 	vertex eye_center = modelview.project( vector()); // same as w_column?

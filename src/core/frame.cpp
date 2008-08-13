@@ -15,7 +15,6 @@ frame::frame()
 	up( 0, 1, 0),
 	scale( 1.0, 1.0, 1.0)
 {
-	model_damage();
 }
 
 frame::frame( const frame& other)
@@ -25,7 +24,6 @@ frame::frame( const frame& other)
 	up(other.up.x, other.up.y, other.up.z),
 	scale(other.scale.x, other.scale.y, other.scale.z)
 {
-	model_damage();
 }
 
 frame::~frame()
@@ -292,22 +290,10 @@ frame::get_center() const
 }
 
 void
-frame::update_cache( const view&)
-{
-}
-
-void
-frame::update_z_sort( const view&)
-{
-}
-
-void
 frame::gl_render( const view& v)
 {
 	view local( v, world_frame_transform()); // this seems irrelevant....??
-//	view local = v;
     tmatrix fwt = frame_world_transform(v.gcf);
-    model_damage();
 	{
 		gl_matrix_stackguard guard( fwt);
 

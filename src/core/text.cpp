@@ -80,8 +80,6 @@ void layout::gl_render( const view& v, const vector& pos_ll ) {
 
 	glTranslated( pos_ll.x, pos_ll.y, pos_ll.z );
 
-	gl_enable blend( GL_BLEND );
-	
 	if (tx.internal_format == GL_ALPHA) {
 		// Simple antialiasing
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -102,6 +100,7 @@ void layout::gl_render( const view& v, const vector& pos_ll ) {
 		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		draw_quad();
 	}
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	
 	check_gl_error();
 }

@@ -347,6 +347,9 @@ display_kernel::realize()
 	glEnable( GL_NORMALIZE);
 	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable( GL_COLOR_MATERIAL);
+	glEnable( GL_BLEND );
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Ensures that fully transparent pixels don't write into the depth buffer,
 	// ever.
 	glEnable( GL_ALPHA_TEST);
@@ -658,12 +661,14 @@ display_kernel::draw(
 	world_iterator i( layer_world.begin());
 	world_iterator i_end( layer_world.end());
 	while (i != i_end) {
-		if (i->opacity != 1.0 || (i->get_texture() && i->get_texture()->has_opacity())) {
+		if (i->opacity != 1.0 || (i->get_material() && i->get_material()->has_opacity())) {
 			// The color of the object has become transparent when it was not
 			// initially.  Move it to the transparent layer.  The penalty for
 			// being rendered in the transparent layer when it is opaque is only
 			// a small speed hit when it has to be sorted.  Therefore, that case
-			// is not tested at all.
+			// is not tested at all.  (TODO Untrue-- rendering opaque objects in transparent
+			// layer makes it possible to have opacity artifacts with a single convex
+			// opaque objects, provided other objects in the scene were ONCE transparent)
 			layer_world_transparent.push_back( *i.base());
 			i = layer_world.erase(i.base());
 			continue;

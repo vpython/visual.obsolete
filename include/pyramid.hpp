@@ -8,7 +8,6 @@
 
 #include "rectangular.hpp"
 #include "util/displaylist.hpp"
-#include "util/sorted_model.hpp"
 
 #include <boost/scoped_ptr.hpp>
 
@@ -19,23 +18,18 @@ using boost::scoped_ptr;
 class pyramid : public rectangular
 {
  private:
-	static displaylist simple_model;
-	static scoped_ptr< z_sorted_model<triangle, 6> > sorted_model;
-	PRIMITIVE_TYPEINFO_DECL;
-	bool degenerate();
-	
- public:
-	pyramid();
-	pyramid( const pyramid& other);
-	virtual ~pyramid();
+	static displaylist model;
+	static void init_model();
+	friend class arrow;
 	
  protected:
 	virtual void gl_pick_render( const view&);
-	virtual void update_cache( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
 	virtual vector get_center() const;
 	virtual void get_material_matrix( const view&, tmatrix& out );
+
+	PRIMITIVE_TYPEINFO_DECL;
 };
 
 } // !namespace cvisual

@@ -610,9 +610,6 @@ points::gl_render( const view& scene)
 
 	// Render translucent points (if any)
 	if (!translucent_points.empty()) {
-		gl_enable blend( GL_BLEND);
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		const std::ptrdiff_t chunk = 256;
 		translucent_iterator begin = translucent_points.begin();
 		translucent_iterator end = translucent_points.end();

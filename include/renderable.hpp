@@ -130,16 +130,6 @@ struct view
  */
 class renderable
 {
-private:
-	/** True if the model geometry needs to be recalculated.  This will lead to
-	 * refresh_cache being called.
-	 */
-	bool model_damaged;	
-	/** True if the model needs to be resorted.  update_z_sort() will be called
-	 * if this is true and color.opacity != 1.0 in the render cycle. 
-	 */
-	bool z_damaged;
-
 public:
 	/** The base color of this body.  Ignored by the variable-color composites
 	 * (curve, faces, frame).
@@ -147,7 +137,7 @@ public:
 	rgb color;
 	// Fully opaque is 1.0, fully transparent is 0.0:
 	float opacity;
-	/** Default base constructor.  Creates a white, model_damaged object. */
+
 	virtual ~renderable();
 	
 	/** Applies materials and other general features and calls gl_render(). 
@@ -170,19 +160,6 @@ public:
 	 * sorting of the transparent models.  */
 	virtual vector get_center() const = 0;
 	
-	/** Called by the render loop to determine if an object needs to be updated.
-	 * It is called unconditionally by the owning render_surface and determines
-	 * whether or not to call update_cache() and/or update_z_sort() based on the
-	 * damage states.
-	 */
-	void refresh_cache( const view&);
-	
-	void set_lit(bool);
-	bool is_lit();
-	
-	void set_shininess( float);
-	float get_shininess();
-	
 	// xxx get rid of this:
 	void set_texture( shared_ptr<texture> t);
 	shared_ptr<texture> get_texture();
@@ -196,55 +173,16 @@ protected:
 	friend class display_kernel;
 	friend class frame;
 	renderable();
-	renderable( const renderable& other);
 
 	shared_ptr<class material> mat;
 	
-	// Some objects may be textured.
-	shared_ptr<texture> tex;  // xxx get rid of this
+	/** True if the object should be rendered on the screen. */
+	bool visible;
 
 	/** Called by outer_render when drawing to the screen.  The default
 	 * is to do nothing.
 	 */
 	virtual void gl_render(const view&);
-	
-	/** If a subclass changes a property that affects its cached state, it must
-		call this function to ensure that its cache is updated on the next render
-		pass.
-	*/
-	inline void model_damage() { model_damaged = true; }
-	/** If a subclass changes its state such that it is no longer sorted, but 
-	 * does not need to recalculate its entire geometry, it must call this
-	 * funciton. */
-	inline void z_damage() { z_damaged = true; }
-	
-	/** True if the object should be rendered on the screen. */
-	bool visible;
-	/** True if the object should be rendered with lighting enabled */
-	bool lit;
-	/** non-zero (and non-unit) if the object should be rendered with GL shininess */
-	float shininess;
-	
-	// Utility functions that subclasses may use to easily prepare and complete
-	// lighting and shininess properties.
-	void lighting_prepare( void);
-	void lighting_complete( void);
-	
-	// True if the body will get specular highlights
-	bool shiny( void);
-
- protected:
-	void shiny_prepare( void);
-	void shiny_complete( void);
-	
-	friend class z_comparator;
-	/** A function that must be overridden if a subclass wants to cache its state
-		for rendering optimization.
-	*/
-	virtual void update_cache( const view& v);
-	// This function is called if the only thing that was damaged was the z-order
-	// that the primitives are rendered in.
-	virtual void update_z_sort( const view& forward);
 };
 
 inline bool 

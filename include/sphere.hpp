@@ -23,10 +23,7 @@ class sphere : public axial
 	*/
  	static displaylist lod_cache[6];
 	/// True until the first sphere is rendered, then false.
-	static bool first;
-
-	/** Creates the static cached on the first render pass */
-	static void create_cache();
+	static void init_model();
  
  public:
 	/** Construct a unit sphere at the origin. */
@@ -43,11 +40,6 @@ class sphere : public axial
 	virtual void gl_render( const view&);
 	/** Extent reported using extent::add_sphere(). */
 	virtual void grow_extent( extent&);
-
-	/** On the first render pass, computes the sphere model geometry and stores
-	 * it in the lod_cache.  Otherwise it does nothing. */
-	virtual void update_cache( const view&);
-
 	
 	/** Exposed for the benefit of the ellipsoid object, which overrides it. 
 	 * The default is to use <radius, radius, radius> for the scale. 

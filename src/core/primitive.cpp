@@ -134,7 +134,6 @@ primitive::rotate( double angle, const vector& _axis, const vector& origin)
 void 
 primitive::set_pos( const vector& n_pos)
 {
-	model_damage();
 	pos = n_pos;
 }
 
@@ -183,11 +182,6 @@ primitive::get_z()
 void 
 primitive::set_axis( const vector& n_axis)
 {
-	model_damage();
-	if (opacity != 1.0)
-		if (n_axis.norm() != axis.norm()) {
-			z_damage();
-		}
 	axis = n_axis;
 }
 
@@ -200,10 +194,6 @@ primitive::get_axis()
 void 
 primitive::set_up( const vector& n_up)
 {
-	model_damage();
-	if (opacity != 1.0) {
-		z_damage();
-	}
 	up = n_up;
 }
 
@@ -216,7 +206,6 @@ primitive::get_up()
 void 
 primitive::set_color( const rgb& n_color)
 {
-	model_damage();
 	color = n_color;
 }
 

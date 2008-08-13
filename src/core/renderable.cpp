@@ -69,14 +69,7 @@ view::pixel_coverage( const vector& pos, double radius) const
 }
 
 renderable::renderable()
-	: model_damaged(true), z_damaged(true), visible(true), lit(true),
-		shininess(0.0)
-{
-}
-
-renderable::renderable( const renderable& other)
-	: model_damaged(true), z_damaged(true), tex(other.tex),
-		visible(other.visible), lit(other.lit), shininess(other.shininess)
+	: visible(true), opacity( 1.0 )
 {
 }
 
@@ -87,8 +80,6 @@ renderable::~renderable()
 void 
 renderable::outer_render( const view& v ) 
 {
-	refresh_cache( v );
-	
 	rgb actual_color = color;
 	if (v.anaglyph) {
 		if (v.coloranaglyph)
@@ -123,133 +114,15 @@ renderable::grow_extent( extent&)
 	return;
 }
 
-// A function that must be overridden if an object wants to cache its state
-// for rendering optimization.
-void
-renderable::update_cache(const view&)
-{
-	return;
-}
-
-// By default, z-sorting is ignored.
-void
-renderable::update_z_sort( const view&)
-{
-	return;
-}
-
-void
-renderable::refresh_cache(const view& geometry)
-{
-	if (opacity != 1.0 && (z_damaged || geometry.forward_changed)) {
-		if (model_damaged || geometry.gcf_changed)
-			update_cache( geometry);
-		else
-			update_z_sort( geometry);
-		model_damaged = false;
-		z_damaged = false;
-	}
-	else if (model_damaged || geometry.gcf_changed) {
-		update_cache( geometry);
-		model_damaged = false;
-	}
-}
-
-void
-renderable::set_shininess( const float s)
-{
-	model_damage();
-	shininess = clamp( 0.0f, s, 1.0f);
-}
-
-float
-renderable::get_shininess()
-{
-	return shininess;
-}
-
-void
-renderable::set_lit(bool l)
-{
-	lit = l;
-}
-
-bool
-renderable::is_lit()
-{
-	return lit;
-}
-
-void
-renderable::set_texture( shared_ptr<texture> t)
-{
-	tex = t;
-}
-
-shared_ptr<texture>
-renderable::get_texture()
-{
-	return tex;
-}
-
 void 
 renderable::set_material( shared_ptr<class material> m )
 {
-	model_damage();
 	mat = m;
 }
 
 shared_ptr<class material> 
 renderable::get_material() {
 	return mat;
-}
-
-bool
-renderable::shiny( void)
-{
-	return !mat && shininess != 0.0;
-}
-
-void
-renderable::lighting_prepare( void)
-{
-	if (!lit)
-		glDisable( GL_LIGHTING);
-}
-
-void
-renderable::shiny_prepare( void)
-{
-
-	if (shiny()) {
-
-		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
-		glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
-		int gl_shininess = std::min( 127, static_cast<int>(shininess * 128));
-		//AS changes to &color.red from &rgba(.8,.8,.8).red
-
-		glMaterialfv( GL_FRONT, GL_SPECULAR, &color.red);
-		glMateriali( GL_FRONT, GL_SHININESS, gl_shininess);
-	}
-}
-
-void
-renderable::shiny_complete( void)
-{
-	if (shiny()) {
-		glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
-		glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
-		//AS changes to &color.red from &rgba(.8,.8,.8).red
-
-		glMaterialfv( GL_FRONT, GL_SPECULAR, &color.red);
-	}
-}
-
-void
-renderable::lighting_complete( void)
-{
-	if (!lit)
-		glEnable( GL_LIGHTING);
 }
 
 } // !namespace cvisual

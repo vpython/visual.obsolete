@@ -13,8 +13,7 @@ namespace cvisual {
 class cylinder : public axial
 {
  private:
-	// The radius of the base of the cone.
-	static bool first;
+	static void init_model();
 	bool degenerate();
 	
  public:
@@ -28,7 +27,6 @@ class cylinder : public axial
  protected:
 	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
-	virtual void update_cache( const view&);
 	virtual void grow_extent( extent&);
 	virtual vector get_center() const;
 	PRIMITIVE_TYPEINFO_DECL;

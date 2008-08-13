@@ -13,7 +13,7 @@
 
 namespace cvisual {
 
-// All implementing base classes should use this pair of macros to help with standard
+// All primitive subclasses should use this pair of macros to help with standard
 // error messages.  This allows functions to use the exact name of a virtual class.
 #define PRIMITIVE_TYPEINFO_DECL virtual const std::type_info& get_typeid() const
 #define PRIMITIVE_TYPEINFO_IMPL(base) \

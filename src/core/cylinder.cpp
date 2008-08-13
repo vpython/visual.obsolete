@@ -24,15 +24,13 @@ render_cylinder_model( size_t n_sides, size_t n_stacks = 1)
 {
 	quadric q;
 	q.render_cylinder( 1.0, 1.0, n_sides, n_stacks);
-	q.render_disk( 1.0, n_sides, n_stacks, -1); // left end of cylinder
+	q.render_disk( 1.0, n_sides, 1, -1); // left end of cylinder
 	gl_matrix_stackguard guard;
 	glTranslatef( 1.0f, 0.0f, 0.0f);
-	q.render_disk( 1.0, n_sides, n_stacks, 1); // right end of cylinder
+	q.render_disk( 1.0, n_sides, 1, 1); // right end of cylinder
 }
 
 static displaylist cylinder_simple_model[6];
-
-bool cylinder::first = true;
 
 cylinder::cylinder()
 {
@@ -48,10 +46,9 @@ cylinder::~cylinder()
 }
 
 void
-cylinder::update_cache( const view&)
+cylinder::init_model()
 {
-	if (first) {
-		first = false;
+	if (!cylinder_simple_model[0]) {
 		clear_gl_error();
 		// The number of faces corrisponding to each level of detail.
 		size_t n_faces[] = { 8, 16, 32, 64, 96, 188 };
@@ -82,8 +79,8 @@ cylinder::gl_pick_render( const view& scene)
 {
 	if (degenerate())
 		return;
-	if (first)
-		update_cache(scene);
+	init_model();
+
 	size_t lod = 2;
 	clear_gl_error();
 	gl_matrix_stackguard guard;
@@ -102,9 +99,9 @@ cylinder::gl_render( const view& scene)
 {
 	if (degenerate())
 		return;
+	init_model();
+
 	clear_gl_error();
-	lighting_prepare();
-	shiny_prepare();
 
 	// See sphere::gl_render() for a description of the level of detail calc.
 	double coverage = scene.pixel_coverage( pos, radius);
@@ -138,10 +135,7 @@ cylinder::gl_render( const view& scene)
 	glScaled( axial_scale, radial_scale, radial_scale);
 	
 	if (opacity != 1.0) {
-		// Setup for blending
-		gl_enable blend( GL_BLEND);
 		gl_enable cull_face( GL_CULL_FACE);
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		color.gl_set(opacity);
 				
 		// Render the back half.
@@ -158,8 +152,6 @@ cylinder::gl_render( const view& scene)
 	}
 	
 	// Cleanup.
-	shiny_complete();
-	lighting_complete();
 	check_gl_error();
 }
 

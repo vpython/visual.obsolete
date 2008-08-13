@@ -13,6 +13,8 @@ class rectangular : public primitive
 	rectangular();
 	rectangular( const rectangular& other);
 
+	void apply_transform( const view& );
+
  public:
 	virtual ~rectangular();
 	

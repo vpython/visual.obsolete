@@ -16,33 +16,10 @@ namespace cvisual {
 
 using boost::scoped_ptr;
 
-/** A 3D 4-sided arrow, with adjustable head and shaft.  TODO: revisit the cache
- * strategy for this object now that I have some more experience with the box
- * and pyramid models.
- */
+/** A 3D 4-sided arrow, with adjustable head and shaft. **/
 class arrow : public primitive
 {
  private:
-	/** OpenGL storage for the model, per-object basis.  Since the arrow's 
-	 * geometry must be recalculated every time any of the determining factors
-	 * change (like fixedwidth, headwidth, and so on), the model is recomputed
-	 * by refresh_cache() and stored here.
-	 * */
-	displaylist model;
-	
-	/** A sortable geometry for rendering transparent objects.  Some of the
-	 * flat sides have been recentered at the center of the rectangle they form
-	 * rather than the centroid of the triangle's themselves.
-	 */
-	scoped_ptr<z_sorted_model<triangle, 22> > sorted_model;
-	/** Helper function to recalculate the sorted_model.  The model will need
-	 * to be initially sorted after this function call.
-	 */
-	void recalc_sorted_model( const double& gcf);
-	
-	/** Renders the sorted_model into the model displaylist. */
-	void cache_transparent_model( const view&);
-	
 	/** True if the width of the point and shaft should not vary with the length
 		of the arrow. 
 	 */
@@ -55,8 +32,19 @@ class arrow : public primitive
 	double headwidth;
 	double headlength;
 	double shaftwidth;
-	
+
+	displaylist shaft_model;
+	void init_model();
 	bool degenerate();
+
+	/** Initializes these four variables with the effective geometry for the
+		arrow.  The resulting geometry is scaled to view space, but oriented
+		and positioned in model space.  The only requred transforms are
+		reorientation and translation.
+	*/
+	void effective_geometry( 
+		double& headwidth, double& shaftwidth, double& length, 
+		double& headlength, double gcf);
  
  public:
 	/** Default arrow.  Pointing along +x, unit length, 
@@ -81,36 +69,14 @@ class arrow : public primitive
 	double get_length();
 	
  protected:
-	/** Renderes the last cached state without checking its validity. */
 	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
-	/** The extent of this body is modeled as a pair of points: one at the tip,
-	 * another at the base. 
-	 */
+
 	virtual void grow_extent( extent&);
-	/** If needed, recomputes the entire bodies geometry.
-	 */
-	virtual void update_cache( const view&);
-	/** Resorts the sorted_model without recomputing it.  This is presently the
-	 * only object that takes advantage of this funciton.
-	 */
-	virtual void update_z_sort( const view&);
-	/** The center of this body is considered to be halfway between the tip and 
-	 * base. 
-	 */
 	virtual vector get_center() const;
 	virtual void get_material_matrix(const view&, tmatrix& out);
 	
 	PRIMITIVE_TYPEINFO_DECL;
-
-	/** Initializes these four variables with the effective geometry for the
-		arrow.  The resulting geometry is scaled to view space, but oriented
-		and positioned in model space.  The only requred transforms are
-		reorientation and translation.
-	*/
-	void effective_geometry( 
-		double& headwidth, double& shaftwidth, double& length, 
-		double& headlength, double gcf);
 };
 
 } // !namespace cvisual

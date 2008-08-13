@@ -12,15 +12,6 @@ ellipsoid::ellipsoid()
 {
 }
 
-ellipsoid::ellipsoid( const ellipsoid& other)
-	: sphere( other), height(other.height), width( other.width)
-{
-}
-
-ellipsoid::~ellipsoid()
-{
-}
-
 void 
 ellipsoid::set_length( double l)
 {

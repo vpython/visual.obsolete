@@ -13,13 +13,11 @@ namespace cvisual {
 class cone : public axial
 {
  private:
-	static bool first;
+	static void init_model();
 	bool degenerate();
 	
  public:
 	cone();
-	cone( const cone& other);
-	virtual ~cone();
 	
 	void set_length( double l);
 	double get_length();
@@ -27,7 +25,6 @@ class cone : public axial
  protected:
 	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
-	virtual void update_cache( const view&);
 	virtual void grow_extent( extent&);
 	virtual vector get_center() const;
 	PRIMITIVE_TYPEINFO_DECL;

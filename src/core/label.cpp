@@ -372,8 +372,6 @@ label::gl_render( const view& scene)
 		}
 		if (opacity) {
 			// Occlude objects behind the label.
-			gl_enable blend( GL_BLEND);
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			rgba( 0, 0, 0, opacity).gl_set();
 			glBegin( GL_QUADS);
 				vector().gl_render();

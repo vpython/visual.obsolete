@@ -80,18 +80,7 @@ render_cone_model( size_t n_sides, size_t n_stacks = 1)
 
 static displaylist cone_simple_model[6];
 
-bool cone::first = true;
-
 cone::cone()
-{
-}
-
-cone::cone( const cone& other)
-	: axial(other)
-{
-}
-
-cone::~cone()
 {
 }
 
@@ -108,10 +97,9 @@ cone::get_length()
 }
 
 void
-cone::update_cache( const view&)
+cone::init_model()
 {
-	if (first) {
-		first = false;
+	if (!cone_simple_model[0]) {
 		clear_gl_error();
 		// The number of faces corrisponding to each level of detail.
 		size_t n_faces[] = { 8, 16, 32, 46, 68, 90 };
@@ -130,8 +118,8 @@ cone::gl_pick_render( const view& scene)
 {
 	if (degenerate())
 		return;
-	if (first)
-		update_cache( scene);
+	init_model();
+
 	size_t lod = 2;
 	clear_gl_error();
 	gl_matrix_stackguard guard;
@@ -150,9 +138,10 @@ cone::gl_render( const view& scene)
 {
 	if (degenerate())
 		return;
+
+	init_model();
+
 	clear_gl_error();
-	lighting_prepare();
-	shiny_prepare();
 
 	// See sphere::gl_render() for a description of the level of detail calc.
 	double coverage = scene.pixel_coverage( pos, radius);
@@ -187,9 +176,7 @@ cone::gl_render( const view& scene)
 	
 	if (opacity != 1.0) {
 		// Setup for blending
-		gl_enable blend( GL_BLEND);
 		gl_enable cull_face( GL_CULL_FACE);
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		color.gl_set(opacity);
 				
 		// Render the back half.
@@ -205,8 +192,6 @@ cone::gl_render( const view& scene)
 		cone_simple_model[lod].gl_render();
 	}
 	
-	shiny_complete();
-	lighting_complete();
 	check_gl_error();
 }
 
@@ -219,7 +204,7 @@ cone::grow_extent( extent& e)
 	e.add_point( pos + axis);
 	e.add_body();
 }
-	
+
 vector 
 cone::get_center() const
 {

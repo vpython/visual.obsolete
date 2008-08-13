@@ -20,11 +20,9 @@ using boost::indirect_iterator;
 /*
 Operations on frame objects include:
 get_center() : Use the average of all its children.
-update_cache() : Calls refresh_cache() on all its children
 update_z_sort() : Never called.  Always re-sort this body's translucent children
 	in gl_render().
-gl_render() : Calls gl_render() on all its children.  Calls model_damage() to 
-	ensure that update_cache() is called later.
+gl_render() : Calls gl_render() on all its children.
 grow_extent() : Calls grow_extent() for each of its children, then transforms
 	the vertexes of the bounding box and uses those as its bounds.
 gl_pick_render() : PushName() on to the Name Stack, and renders its children.
@@ -103,8 +101,6 @@ class frame : public renderable
  
  protected:	
 	virtual vector get_center() const;
-	virtual void update_cache( const view& v);
-	virtual void update_z_sort( const view& forward);
 	virtual void gl_render( const view&);
 	virtual void gl_pick_render( const view&);
 	virtual void grow_extent( extent&);
