@@ -125,4 +125,8 @@ renderable::get_material() {
 	return mat;
 }
 
+bool renderable::translucent() {
+	return opacity != 1.0 || (mat && mat->get_translucent());
+}
+
 } // !namespace cvisual

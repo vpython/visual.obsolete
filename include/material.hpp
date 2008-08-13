@@ -9,7 +9,7 @@ namespace cvisual {
 
 class material {
  public:
-	bool has_opacity();
+	material();
 
 	void set_textures( std::vector< boost::shared_ptr< texture > > );
 	std::vector< boost::shared_ptr< texture > > get_textures();
@@ -17,15 +17,15 @@ class material {
 	void set_shader( const std::string& );
 	std::string get_shader();
 	
-	void set_shininess( double );
-	double get_shininess();
+	void set_translucent( bool );
+	bool get_translucent();
 	
  private:
 	friend class apply_material;
 	
 	std::vector< boost::shared_ptr< texture > > textures;
 	boost::scoped_ptr< shader_program > shader;
-	double shininess;
+	bool translucent;
 };
 
 class apply_material {

@@ -135,8 +135,6 @@ public:
 	 * (curve, faces, frame).
 	 */
 	rgb color;
-	// Fully opaque is 1.0, fully transparent is 0.0:
-	float opacity;
 
 	virtual ~renderable();
 	
@@ -169,10 +167,13 @@ public:
 	
 	virtual void get_material_matrix( const view&, tmatrix& out ) {};  // object coordinates -> material coordinates
 
+	virtual bool translucent();
+
 protected:
-	friend class display_kernel;
-	friend class frame;
 	renderable();
+
+	// Fully opaque is 1.0, fully transparent is 0.0:
+	float opacity;
 
 	shared_ptr<class material> mat;
 	

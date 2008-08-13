@@ -261,7 +261,7 @@ wrap_primitive()
 		.add_property( "data", &numeric_texture::get_data, &numeric_texture::set_data)
 		.add_property( "type", &numeric_texture::get_type, &numeric_texture::set_type)
 		.add_property( "mipmap", &numeric_texture::is_mipmapped, &numeric_texture::set_mipmapped)
-		.add_property( "antialias", &numeric_texture::is_antialiased, &numeric_texture::set_antialias);
+		.add_property( "interpolate", &numeric_texture::is_antialiased, &numeric_texture::set_antialias);
 		;
 
 	boost::python::to_python_converter< std::vector< shared_ptr<texture> >, textures_to_list>();
@@ -269,7 +269,7 @@ wrap_primitive()
 	class_<material, shared_ptr<material>, noncopyable>( "material" )
 		.add_property( "textures", &material::get_textures, &material::set_textures )
 		.add_property( "shader", &material::get_shader, &material::set_shader )
-		.add_property( "shininess", &material::get_shininess, &material::set_shininess )
+		.add_property( "translucent", &material::get_translucent, &material::set_translucent )
 		;
 }	
 	

@@ -208,7 +208,7 @@ void
 frame::add_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
-	if (obj->opacity == 1.0)
+	if (!obj->translucent())
 		children.push_back( obj);
 	else
 		trans_children.push_back( obj);
@@ -218,7 +218,7 @@ void
 frame::remove_renderable( shared_ptr<renderable> obj)
 {
 	// Driven from visual/primitives.py set_visible
-	if (obj->opacity == 1.0) {
+	if (!obj->translucent()) {
 		std::remove( children.begin(), children.end(), obj);
 		children.pop_back();
 	}
@@ -298,7 +298,7 @@ frame::gl_render( const view& v)
 		gl_matrix_stackguard guard( fwt);
 
 		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
-			if (i->opacity != 1.0) {
+			if (i->translucent()) {
 				// See display_kernel::draw().
 				trans_children.push_back( *i.base());
 				i = children.erase(i.base());
@@ -310,7 +310,7 @@ frame::gl_render( const view& v)
 
 		// Perform a depth sort of the transparent children from forward to backward.
 		if (!trans_children.empty()) {
-			opacity = 0.5;
+			opacity = 0.5;  //< TODO: BAD HACK
 		}
 		if (trans_children.size() > 1)
 			std::stable_sort( trans_children.begin(), trans_children.end(),

@@ -2,9 +2,7 @@
 
 namespace cvisual {
 
-bool material::has_opacity() {
-	return false; // TODO
-}
+material::material() : translucent(false) {}
 
 void 
 material::set_textures( std::vector< boost::shared_ptr< texture > > tex ) {
@@ -32,13 +30,14 @@ material::get_shader() {
 		return std::string();
 }
 
-void 
-material::set_shininess( double s ) {
-	shininess = clamp( 0.0, s, 1.0);
+bool
+material::get_translucent() {
+	return translucent;
 }
 
-double material::get_shininess() {
-	return shininess;
+void
+material::set_translucent( bool t ) {
+	translucent = t;
 }
 
 apply_material::apply_material( const view& v, material* m, tmatrix& model_material ) 

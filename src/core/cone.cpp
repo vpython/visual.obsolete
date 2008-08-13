@@ -170,7 +170,7 @@ cone::gl_render( const view& scene)
 
 	color.gl_set(opacity);
 
-	if (opacity != 1.0) {
+	if (translucent()) {
 		gl_enable cull_face( GL_CULL_FACE);
 				
 		// Render the back half.

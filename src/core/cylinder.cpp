@@ -128,7 +128,7 @@ cylinder::gl_render( const view& scene)
 	const double length = axis.mag();
 	model_world_transform( scene.gcf, vector( length, radius, radius ) ).gl_mult();
 	
-	if (opacity != 1.0) {
+	if (translucent()) {
 		gl_enable cull_face( GL_CULL_FACE);
 		color.gl_set(opacity);
 				

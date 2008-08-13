@@ -88,7 +88,7 @@ sphere::gl_render( const view& geometry)
 	// TODO: why are we rendering transparent spheres with one type of model and
 	// opaque ones with another??
 
-	if (opacity != 1.0) { // Render a transparent constant color sphere
+	if (translucent()) { // Render a transparent constant color sphere
 		// Spheres are convex, so we don't need to sort
 		gl_enable cull_face( GL_CULL_FACE);
 
