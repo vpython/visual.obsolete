@@ -2,7 +2,6 @@ from __future__ import division
 from visual import *
 from visual.text import *
 import time
-import pickle
 
 print """
 Press to enter roaming mode, release to exit roaming mode.
@@ -61,7 +60,7 @@ h = 5
 photocenter = 0.15*w
 
 # The floor, central post, and ball atop the post
-box(pos=(0,-0.1,0),length=24,height=0.2,width=24, color=(0,1,0))
+floor = box(pos=(0,-0.1,0),size=(24,24,.2), up=(0,0,1), color=color.orange, material=materials.wood)
 pole= cylinder(pos=(0,0,0),axis=(0,h,0), radius=0.2, color=(1,0,0))
 sphere(pos=(0,h,0), radius=0.5, color=(1,0,0))
 
@@ -84,25 +83,23 @@ for i in range(Nslabs):
         slab = box(pos=(R*c, h/2., R*s), axis=(c,0,s),
                    size=(d,h,w), color=grey)
         if i == 0:
-            photodata = pickle.load(open("flower128.vpt", 'rU'))
-            photo = texture(data=photodata)
+            photo = materials.texture(data = materials.loadBTX("flower128.btx",(128,128,3)),
+                       channels = ["red","green","blue"],
+                       mapping = "rectangular")
         if i != 6:
             for x in range(2):
                 for y in range(2):
                     box(pos=slab.pos+vector(-s*photocenter*(2*x-1),photocenter*(2*y-1),c*photocenter*(2*x-1)),
-                        axis=slab.axis,
-                        size=(1.1*d,0.9*2*photocenter,0.9*2*photocenter),
-                        color=grey, texture=photo)
+                        size=(0.9*2*photocenter,0.9*2*photocenter,1.1*d), axis=(s,0,-c),
+                        color=grey, material=photo)
 
 # Decorate the front entrance slab
 text(pos=(0, 0.77*h, R+d/2), string="NO EXIT", color=color.yellow,
            depth=0.2, height=0.7, justify="center")
 
 # Decorate back slab with a gold box and a clock
-wooddata = pickle.load(open("wood256lum.vpt", 'rU'))
-wood = texture(data=wooddata)
-box(pos=(0,h/2,-R+d/2+0.1), length=w/2,height=w/2,width=0.2,
-    color=(1,0.8,0), texture=wood, shininess=1)
+box(pos=(0,h/2,-R+d/2+0.1), size=(0.2,w/2,w/2), axis=(0,0,1),
+    color=(1,0.8,0), material=materials.wood, shininess=1)
 clock = analog_clock(pos=(0,h/2.,-R+d/2+0.2+0.2*h/10),
                      radius=0.2*w, axis=(0,0,1))
                      
