@@ -11,9 +11,12 @@ a1 = a2 = a3 = 0.0
 
 arrow(pos=(0, 4, 0), axis=(0, 1, 0), color=color.red)
 boxy = box(size=(3,3,3), color=(0.5, 0.5, 0.5), material=materials.rough)
-b1 = sphere(radius=0.3, pos=(r, 0, 0), color=color.magenta)
-b2 = sphere(radius=0.3, pos=(0, 0, r), color=color.yellow)
-b3 = sphere(radius=0.3, pos=(0, 0, r), color=color.green)
+b1 = sphere(radius=0.3, pos=(r, 0, 0),
+            color=color.magenta, material=materials.unlit)
+b2 = sphere(radius=0.3, pos=(0, 0, r),
+            color=color.yellow, material=materials.unlit)
+b3 = sphere(radius=0.3, pos=(0, 0, r),
+            color=color.green, material=materials.unlit)
 l1 = light(pos=b1.pos, color=b1.color)
 l2 = light(pos=b2.pos, color=b2.color)
 l3 = light(pos=b3.pos, color=b3.color)
