@@ -1,5 +1,4 @@
 from visual import *
-import pickle
 ## ruth chabay, carnegie mellon university, 2000-06
 ## rings may be dragged through stuff - a little surreal
 
@@ -15,10 +14,8 @@ leftpole.color=(.5,.5,.5)
 midpole=cylinder(pos=(0,-3,0), radius=0.3, axis=(0,6,0))
 midpole.color=(.5,.5,.5)
 rightpole=cylinder(pos=(2*spacing,-3,0), radius=0.3, axis=(0,6,0))
-wooddata = pickle.load(open("wood256lum.vpt", 'rU'))
-wood = texture(data=wooddata)
 floor=box(pos=(0,-3.5,0), axis=(0,.99,0), height=23, width=5,
-          color=(1.0,0.5,0), texture=wood)
+          color=(1.0,0.5,0), material=materials.wood)
 
 poles=[leftpole,midpole,rightpole]
 rings=[]

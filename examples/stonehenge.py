@@ -119,7 +119,7 @@ text( pos=(5.0,-0.6*sin(pi/18),-1.4), string='C', height=2.0, depth=0.3,
      color=(1.0,0,1.0), axis=(1,0,0.6), up=(0,cos(pi/18),sin(pi/18)) )
 
 # Display a pyramid
-pyramid(pos=(-4,0,-5), size=(2,2,2), axis=(0,3,0), color=color.orange)
+pyramid(pos=(-4,0,-5), size=(2,2,2), axis=(0,3,0), color=(0,0.6,0), material=materials.marble)
 
 # Display smoke rings rising out of a black tube
 smoke = []

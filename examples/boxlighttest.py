@@ -1,51 +1,29 @@
 from visual import *
-import pickle
 
 # Mikhail Temkine, University of Toronto, April 2007
 
 print """
 Box lighting test
-Correct surfaces should appear shiny and polished; incorrect are dull ones
-Click to switch between a textured and non-textured box
 """
 
 r = 3
-a1 = 0.0
-a2 = 0.0
-a3 = 0.0
+a1 = a2 = a3 = 0.0
 
 arrow(pos=(0, 4, 0), axis=(0, 1, 0), color=color.red)
-wood = texture(data=array(pickle.load(open('wood256lum.vpt', 'rU'))))
-boxy = box(size=(3,3,3), color=(0.5, 0.5, 0.5), texture=wood)
+boxy = box(size=(3,3,3), color=(0.5, 0.5, 0.5), material=materials.rough)
 b1 = sphere(radius=0.3, pos=(r, 0, 0), color=color.magenta)
 b2 = sphere(radius=0.3, pos=(0, 0, r), color=color.yellow)
 b3 = sphere(radius=0.3, pos=(0, 0, r), color=color.green)
-l1 = light(pos=(r, 0, 0), color=color.magenta)#, spot_direction=(-1,0,0), spot_cutoff=20)
-l2 = light(pos=(0, 0, r), color=color.yellow)#, spot_direction=(0,0,-1), spot_cutoff=10)
-l3 = light(pos=(0, 0, r), color=color.green)#, spot_direction=(0,0,-1), spot_cutoff=10)
-
+l1 = light(pos=b1.pos, color=b1.color)
+l2 = light(pos=b2.pos, color=b2.color)
+l3 = light(pos=b3.pos, color=b3.color)
 
 while 1:
-    if scene.mouse.clicked:
-        scene.mouse.getclick()
-        if boxy.texture == None:
-            boxy.texture=wood
-        else:
-            boxy.texture=None
     rate(100)
-    b1.pos.x = r*cos(a1)
-    b1.pos.y = r*sin(a1)
-    l1.pos.x = r*cos(a1)
-    l1.pos.y = r*sin(a1)
+    l1.pos = b1.pos = r*vector(cos(a1), sin(a1), b1.z)
     a1 += 0.02
-    b2.pos.z = (r+0.4)*cos(a2)
-    b2.pos.y = (r+0.4)*sin(a2)
-    l2.pos.z = (r+0.4)*cos(a2)
-    l2.pos.y = (r+0.4)*sin(a2)
+    l2.pos = b2.pos = (r+0.4)*vector(b2.x, sin(a2), cos(a2))
     a2 += 0.055
-    b3.pos.z = (r+1)*cos(a3)
-    b3.pos.x = (r+1)*sin(a3)
-    l3.pos.z = (r+1)*cos(a3)
-    l3.pos.x = (r+1)*sin(a3)
+    l3.pos = b3.pos = (r+1)*vector(sin(a3), b3.y, cos(a3))
     a3 += 0.033
     

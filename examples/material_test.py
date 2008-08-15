@@ -1,6 +1,5 @@
 from visual import *
 
-scene.show_rendertime = 1
 scene.foreground = (1,1,1)
 
 axis = (1,0,0)
