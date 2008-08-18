@@ -6,7 +6,11 @@ I found it necessary to overwrite /System/Library/Frameworks/OpenGL.framework/He
 our own include/GL/glext.h. This header file is referenced from ....Headers/gl.h, which means that
 a working glext.h must be in the same directory as that gl.h, not in our own include/GL.
 
-You need the Boost Python library. Download the boost libraries. Execute this:
+You need Boost libraries for the Mac. In the dependencies section of CVS, unzip the
+zip file boost_1_35_0.zip. You should end up with a folder in dependencies named boost_1_35_0,
+containing boost (the include files), lib (for Windows), and mac_lib (for Mac).
+
+The Boost libraries were built by downloading them and executing this:
 
 sudo bjam --toolset=darwin -sPYTHON_ROOT=/usr/bin/python2.5 --build-type=complete
 
@@ -25,7 +29,7 @@ problem didn't show up with the GTK2 Mac build. Is it building Boost with --tool
 instead of --toolset=g++? Need to study this problem.
 
 ------------------------------------------------------
-HOW TO BUILD VISUAL 4 ON Apple OSX using GTK2 (Version 10.4.x)
+Obsolete, of historical interest only: HOW TO BUILD VISUAL 4 ON Apple OSX using GTK2 (Version 10.4.x)
 
 If you find gaps in this information, please tell Bruce_Sherwood@ncsu.edu.
 
