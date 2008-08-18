@@ -1,5 +1,7 @@
 # Place this make file in a directory parallel to vpython-core2
+# Be sure to specify what version of Python is in /usr/bin (typically /usr/bin/python2.5)
 
+PYTHON_VERSION = 2.5
 TOP = ../vpython-core2
 DEPENDS = $(TOP)/dependencies
 SRC = $(TOP)/src
@@ -10,8 +12,8 @@ CXX = /usr/bin/g++
 CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-Wno-long-double -DPIC -O2 -g -finline-functions \
 	-I$(TOP)/include/mac -I$(TOP)/include \
-	-I/System/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5 \
-	-I/Library/Python/2.5/site-packages/numpy/core/include \
+	-I/System/Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/include/python$(PYTHON_VERSION) \
+	-I/Library/Python/$(PYTHON_VERSION)/site-packages/numpy/core/include \
 	-I$(DEPENDS)/boost_1_35_0 -I$(DEPENDS)/threadpool/include \
 	-F/System/Library/Frameworks/AGL.framework \
 	-F/System/Library/Frameworks/Carbon.framework \
@@ -30,7 +32,7 @@ OBJS = arrow.o axial.o box.o cone.o cylinder.o display_kernel.o ellipsoid.o \
 	wrap_rgba.o wrap_vector.o
 
 cvisual.so : $(OBJS)
-	$(CXX) -bundle -bundle_loader /usr/bin/python2.5 -o cvisual.so \
+	$(CXX) -bundle -bundle_loader /usr/bin/python$(PYTHON_VERSION) -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
 	$(BOOST)/libboost_python-mt-s-1_35.a \
@@ -38,7 +40,7 @@ cvisual.so : $(OBJS)
 	$(BOOST)/libboost_thread-mt-s-1_35.a
 
 install : cvisual.so
-	sudo cp cvisual.so /Library/Python/2.5/site-packages
+	sudo cp cvisual.so /Library/Python/$(PYTHON_VERSION)/site-packages
 
 clean :
 	rm *.o
