@@ -21,13 +21,6 @@ libboost_signals-mt-1_35.a
 libboost_thread-mt-1_35.a
 libboost_date_time-mt-1_35.a
 
-The file /usr/local/include/boost/python/extract.hpp needs to have commented out
-all statements involving check() functions. This requires also commenting out 
-a reference to check() in vector_array.cpp (altered version included here).
-Not clear what this problem is about. Is it Boost 1.35? With Boost 1.34 this
-problem didn't show up with the GTK2 Mac build. Is it building Boost with --toolset=darwin
-instead of --toolset=g++? Need to study this problem.
-
 ------------------------------------------------------
 Obsolete, of historical interest only: HOW TO BUILD VISUAL 4 ON Apple OSX using GTK2 (Version 10.4.x)
 
