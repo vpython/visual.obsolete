@@ -595,9 +595,10 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	// MacBook Pro (GeForce): 2 renderers 
 	// renderer #0 (ID=x22604, some kind of GeForce - all GeForce cards start with 22) accelerated
 	// renderer #1 (ID=x20400, kCGLRendererGenericFloatID) not accelerated
+	 
+	printf("destroy=%d\n", CGLDestroyRendererInfo(rend));
 	*/
 	
-	printf("destroy=%d\n", CGLDestroyRendererInfo(rend));
 	
 
 	// Set up event handling
