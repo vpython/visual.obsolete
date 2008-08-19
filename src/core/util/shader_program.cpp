@@ -116,6 +116,15 @@ void shader_program::realize( const view& v ) {
 
 		Assertion failed: (!pthread_mutex_destroy(&internal_mutex)), function ~condition_variable_any, file ../vpython-core2/dependencies/boost_1_35_0/boost/thread/pthread/condition_variable.hpp, line 86.
 		Abort trap
+		
+		MacBook Pro (GeForce)
+		vertex 1, fragment 1
+		nrend = 2
+		0 accelerated = 1
+		0 RendererID = 22604
+		1 accelerated = 0
+		1 RendererID = 20400
+		destroy=0
 		*/
 #endif
 	}
