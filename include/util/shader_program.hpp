@@ -4,6 +4,13 @@
 
 #include "display_kernel.hpp"
 
+#ifdef __APPLE__
+// The following are needed in order to be able to query the rendering properties
+#include <OpenGL/CGLCurrent.h>
+#include <OpenGL/CGLTypes.h>
+#include <OpenGL/OpenGL.h>
+#endif
+
 namespace cvisual {
 
 class shader_program {
