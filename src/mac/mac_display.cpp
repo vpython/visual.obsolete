@@ -568,38 +568,6 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 		aglSetDrawable(gl_context, GetWindowPort(window));
 	}
 	aglDestroyPixelFormat(fmt);
-	
-	/*
-	GLint gpuVertexProcessing, gpuFragmentProcessing;
-	CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUVertexProcessing, &gpuVertexProcessing);
-	CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUFragmentProcessing, &gpuFragmentProcessing);
-	printf("vertex %d, fragment %d\n", gpuVertexProcessing, gpuFragmentProcessing);
-	// MacBook (no graphics): vertex -1341520386, fragment 0 (0 means okay)
-	// MacBook Pro (GeForce): vertex -1341520386, fragment 0; alas, same as MacBook 
-	
-	CGLRendererInfoObj rend;
-	GLint nrend, value;
-	CGLQueryRendererInfo ( 255, &rend, &nrend);
-	printf("nrend = %d\n", nrend);
-	
-	for (int n = 0; n < nrend; n++) {
-		CGLDescribeRenderer(rend, n, kCGLRPAccelerated, &value);
-		printf("%d accelerated = %d\n", n, value);
-		CGLDescribeRenderer(rend, n, kCGLRPRendererID, &value);
-		printf("%d RendererID = %x\n", n, value);
-	}
-	
-	// MacBook (no graphics): 2 renderers 
-	// renderer #0 (ID=x24000, kCGLRendererIntel900ID) accelerated
-	// renderer #1 (ID=x20400, kCGLRendererGenericFloatID) not accelerated
-	// MacBook Pro (GeForce): 2 renderers 
-	// renderer #0 (ID=x22604, some kind of GeForce - all GeForce cards start with 22) accelerated
-	// renderer #1 (ID=x20400, kCGLRendererGenericFloatID) not accelerated
-	 
-	printf("destroy=%d\n", CGLDestroyRendererInfo(rend));
-	*/
-	
-	
 
 	// Set up event handling
 	InstallStandardEventHandler(GetWindowEventTarget(window));

@@ -14,11 +14,6 @@
 #include <Carbon/Carbon.h>
 #include <AGL/agl.h>
 
-// The following are needed in order to be able to query the rendering properties
-#include <OpenGL/CGLCurrent.h>
-#include <OpenGL/CGLTypes.h>
-#include <OpenGL/OpenGL.h>
-
 namespace cvisual {
 
 class display : public display_kernel
