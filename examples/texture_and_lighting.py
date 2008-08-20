@@ -58,6 +58,7 @@ scene.range = 0.45*H
 balltex = materials.rough
 ball = sphere(pos=(width/4,R,0), radius=R, up=(0,1,1),
               color=color.cyan, material=balltex, opacity=0.5)
+xlimit = 0.5*width-R*sin(acos(1-(height-thick)/R))
 v = vector(-0.5,0,0)
 dt = 0.03
 t = 0
@@ -66,7 +67,7 @@ while 1:
     rate(100)
     ball.pos += v*dt
     ball.rotate(axis=(0,0,1), angle=-v.x*dt/R)
-    if not (-width/2+xhit < ball.x < width/2-xhit):
+    if abs(ball.x) >= xlimit:
         v = -v
     angle = 0.02*cos(t)
     pendulum.rotate(axis=(1,0,0), angle=angle)
