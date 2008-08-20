@@ -1,6 +1,7 @@
 from visual import *
 
 scene.foreground = (1,1,1)
+scene.range = 6
 
 axis = (1,0,0)
 ##obj = box
