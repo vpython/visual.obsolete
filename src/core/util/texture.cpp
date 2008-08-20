@@ -65,7 +65,7 @@ texture::set_handle( const view&, unsigned h ) {
 }
 
 void
-texture::gl_free(unsigned handle)
+texture::gl_free(GLuint handle)
 {
 	VPYTHON_NOTE( "Deleting texture number " + lexical_cast<std::string>(handle));
 	glDeleteTextures(1, &handle);

@@ -130,7 +130,7 @@ void layout_texture::gl_init( const view& v ) {
 
 	gl_enable tex( type );
 
-	unsigned handle;
+	GLuint handle;
 	glGenTextures(1, &handle);
 	set_handle( v, handle );
 	glBindTexture(type, handle);

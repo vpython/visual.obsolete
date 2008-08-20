@@ -46,16 +46,17 @@ void shader_program::realize( const view& v ) {
 	v.glext.glLinkProgramARB( program );
 
 	// Check if linking succeeded
-	int link_ok = 0;
+	GLint link_ok = 0;
 	v.glext.glGetObjectParameterivARB( program, GL_OBJECT_LINK_STATUS_ARB, &link_ok );
 	
 	if ( !link_ok ) {
 		// Some drivers (incorrectly?) set the GL error in glLinkProgramARB() in this situation
+		printf("!linkok\n");
 		clear_gl_error();
 
 		std::string infoLog;
 		
-		int length = 0;
+		GLint length = 0;
 		v.glext.glGetObjectParameterivARB( program, GL_OBJECT_INFO_LOG_LENGTH_ARB, &length );
 		boost::scoped_array<char> temp( new char[length+2] );
 		v.glext.glGetInfoLogARB( program, length+1, &length, &temp[0] );
@@ -81,7 +82,8 @@ void shader_program::realize( const view& v ) {
 
 #ifdef __APPLE__
 		v.glext.glUseProgramObjectARB( program );
-		GLint gpuVertexProcessing, gpuFragmentProcessing;
+		//GLint gpuVertexProcessing, gpuFragmentProcessing;
+		GLint gpuVertexProcessing, gpuFragmentProcessing; // OS X 10.4 wants a long
 		CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUVertexProcessing, &gpuVertexProcessing);
 		// gpuVertexProcessing=1 on MacBook Pro (GeForce); gpuVertexProcessing=0 on MacBook (no graphics)
 		if (!gpuVertexProcessing) program = 0;
@@ -91,7 +93,8 @@ void shader_program::realize( const view& v ) {
 		printf("vertex %d, fragment %d\n", gpuVertexProcessing, gpuFragmentProcessing);
 		
 		CGLRendererInfoObj rend;
-		GLint nrend, value;
+		//GLint nrend, value;
+		long nrend, value;
 		CGLQueryRendererInfo ( 255, &rend, &nrend);
 		printf("nrend = %d\n", nrend);
 		
@@ -139,7 +142,7 @@ void shader_program::realize( const view& v ) {
 void shader_program::compile( const view& v, int type, const std::string& source ) {
 	int shader = v.glext.glCreateShaderObjectARB( type );
 	const char* str = source.c_str(); 
-	int len = source.size();
+	GLint len = source.size();
 	v.glext.glShaderSourceARB( shader, 1, &str, &len );
 	v.glext.glCompileShaderARB( shader );
 	v.glext.glAttachObjectARB( program, shader );

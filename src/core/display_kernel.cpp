@@ -358,7 +358,7 @@ display_kernel::realize()
 	// FSAA.  Doesn't seem to have much of an effect on my TNT2 card.  Grrr.
 	if ( hasExtension( "GL_ARB_multisample" ) ) {
 		glEnable( GL_MULTISAMPLE_ARB);
-		int n_samples, n_buffers;
+		GLint n_samples, n_buffers;
 		glGetIntegerv( GL_SAMPLES_ARB, &n_samples);
 		glGetIntegerv( GL_SAMPLE_BUFFERS_ARB, &n_buffers);
 		VPYTHON_NOTE( "Using GL_ARB_multisample extension: samples:"
@@ -946,7 +946,7 @@ display_kernel::pick( int x, int y, float d_pixels)
 		// as they are rendered.
 		std::vector<shared_ptr<renderable> > name_table;
 		// Pass the name stack to OpenGL with glSelectBuffer.
-		glSelectBuffer( hit_buffer_size, hit_buffer.get());
+		glSelectBuffer( hit_buffer_size, (GLuint*)hit_buffer.get());
 		// Enter selection mode with glRenderMode
 		glRenderMode( GL_SELECT);
 		glClear( GL_DEPTH_BUFFER_BIT);
@@ -956,7 +956,7 @@ display_kernel::pick( int x, int y, float d_pixels)
 		glPushName(0);
 
 		// Initialize the picking matrix.
-		int viewport_bounds[4] = {
+		GLint viewport_bounds[4] = {
 			0, 0, view_width, view_height
 		};
 		glMatrixMode( GL_PROJECTION);

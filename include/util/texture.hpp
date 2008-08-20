@@ -10,6 +10,12 @@
 #include "util/gl_free.hpp"
 #include "util/thread.hpp"
 
+#if defined(__APPLE__)
+	#include <OpenGL/gl.h>
+#else
+	#include <GL/gl.h>
+#endif
+
 namespace cvisual {
 
 using boost::shared_ptr;
@@ -97,7 +103,7 @@ class texture
 
  public: 
  	// Should be protected; makeing this public works around a GCC 3.4.2 bug
-	static void gl_free( unsigned handle );
+	static void gl_free( GLuint handle );
 };
 
 
