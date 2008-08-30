@@ -1,4 +1,6 @@
 HOW TO BUILD VISUAL 4 USING CARBON
+Install XcodeTools in the optional materials on the Mac installation DVD.
+
 The makefile in src/mac should be copied into a directory parallel to vpython-core2, and the
 make performed there.
 
