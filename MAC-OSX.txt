@@ -6,10 +6,6 @@ I found it necessary to overwrite /System/Library/Frameworks/OpenGL.framework/He
 our own include/GL/glext.h. This header file is referenced from ....Headers/gl.h, which means that
 a working glext.h must be in the same directory as that gl.h, not in our own include/GL.
 
-On OS X 10.4, in /System/Library/Frameworks/OpenGL.framework/Headers/gl.h it was necessary
-to change the definitions of GLint from long to int and GLuint from unsigned long to unsigned int,
-to match the definitions on OS X 10.5 and other platforms. 
-
 You need Boost libraries for the Mac. In the dependencies section of CVS, unzip the
 zip file boost_1_35_0.zip. You should end up with a folder in dependencies named boost_1_35_0,
 containing boost (the include files), lib (for Windows), and mac_lib (for Mac).
