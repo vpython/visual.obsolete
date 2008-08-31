@@ -1,16 +1,24 @@
 HOW TO BUILD VISUAL 4 USING CARBON
-Install XcodeTools in the optional materials on the Mac installation DVD.
+Install XcodeTools from the optional materials on the Mac installation DVD.
+Installing XcodeTools automatically installs the large number of individual
+components also listed on the DVD.
 
-The makefile in src/mac should be copied into a directory parallel to vpython-core2, and the
-make performed there.
+Download the source for numpy and unpack it (http://www.scipy.org/Download).
+In the numpy directory, execute "sudo /usr/bin/python setup.py install".
+This installs the numpy module which includes needed header files.
 
-I found it necessary to overwrite /System/Library/Frameworks/OpenGL.framework/Headers/glext.h with
+It is necessary to overwrite /System/Library/Frameworks/OpenGL.framework/Headers/glext.h with
 our own include/GL/glext.h. This header file is referenced from ....Headers/gl.h, which means that
 a working glext.h must be in the same directory as that gl.h, not in our own include/GL.
 
 You need Boost libraries for the Mac. In the dependencies section of CVS, unzip the
 zip file boost_1_35_0.zip. You should end up with a folder in dependencies named boost_1_35_0,
 containing boost (the include files), lib (for Windows), and mac_lib (for Mac).
+
+The makefile in src/mac should be copied into a directory parallel to vpython-core2, and the
+make performed there. At the moment this makefile copies only the file cvisual.so to 
+/Library/Python/2.5/site-packages; other visual components need to be copied here from
+the site-packages, examples, and docs directories from CVS.
 
 The Boost libraries were built by downloading them and executing this:
 
@@ -22,6 +30,17 @@ libboost_python-mt-1_35.a
 libboost_signals-mt-1_35.a
 libboost_thread-mt-1_35.a
 libboost_date_time-mt-1_35.a
+
+I built Boost libraries on a PowerPC running OS X 10.4 and tried using them
+on a PowerPC running OS X 10.5. Example programs ran okay, but in each case
+there was the following warning (so I'm going to build Boost libraries on
+OS X 10.5 to see whether the warning goes away):
+
+Warning (from warnings module):
+  File "/Library/Python/2.5/site-packages/visual/__init__.py", line 149
+    import cvisual
+RuntimeWarning: Python C API version mismatch for module cvisual: 
+This Python has API version 1013, module cvisual has version 1012.
 
 ------------------------------------------------------
 Obsolete, of historical interest only: HOW TO BUILD VISUAL 4 ON Apple OSX using GTK2 (Version 10.4.x)
