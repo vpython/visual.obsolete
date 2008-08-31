@@ -33,14 +33,16 @@ libboost_date_time-mt-1_35.a
 
 I built Boost libraries on a PowerPC running OS X 10.4 and tried using them
 on a PowerPC running OS X 10.5. Example programs ran okay, but in each case
-there was the following warning (so I'm going to build Boost libraries on
-OS X 10.5 to see whether the warning goes away):
+there was the following warning:
 
 Warning (from warnings module):
   File "/Library/Python/2.5/site-packages/visual/__init__.py", line 149
     import cvisual
 RuntimeWarning: Python C API version mismatch for module cvisual: 
 This Python has API version 1013, module cvisual has version 1012.
+
+After rebuilding the Boost libraries on a PowerPC running OS X 10.5 this
+warning went away.
 
 ------------------------------------------------------
 Obsolete, of historical interest only: HOW TO BUILD VISUAL 4 ON Apple OSX using GTK2 (Version 10.4.x)
