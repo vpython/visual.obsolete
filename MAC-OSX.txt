@@ -67,6 +67,8 @@ Use fink to install the components listed for Linux in INSTALL.txt (details repe
 	If you're not using Fink Commander (and despite its graphic user interface there are
 	hints that maybe it is buggy), on a command line you say for example "fink install python25".
 	
+	Execute fink selfupdate to get the latest packages. (You may need to invoke /sw/bin/fink.)
+	
 	Install numpy-py25, which also installs python25.
 	(2008/4/2 on OSX 10.5; accepted the choice "db44-aes-shlibs: Shared Libraries for db44-aes")
 
