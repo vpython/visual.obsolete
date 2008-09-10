@@ -13,7 +13,7 @@
 using boost::scoped_array;
 
 namespace cvisual {
-	
+
 bool
 ring::degenerate()
 {
@@ -21,13 +21,8 @@ ring::degenerate()
 }
 
 ring::ring()
-	: thickness( 0.0)
+	: thickness(0.0), model_rings(-1)
 {
-}
-
-ring::ring( const ring& other)
-	: axial( other), thickness( other.thickness)
-{	
 }
 
 ring::~ring()
@@ -49,9 +44,7 @@ ring::get_thickness()
 void
 ring::gl_pick_render( const view& scene)
 {
-	gl_matrix_stackguard guard;
-	do_render_opaque( scene, 7, 10);
-	return;
+	gl_render(scene);
 }
 
 void
@@ -64,35 +57,35 @@ ring::gl_render( const view& scene)
 	// The number of subdivisions around the hoop's radial direction.
 	double band_coverage = (thickness ? scene.pixel_coverage( pos, thickness) 
 			: scene.pixel_coverage(pos, radius*0.1));
-	int bands = static_cast<int>(band_coverage * 0.3);
-	if (bands < 10)
-		bands *= 4;
-	else if (bands < 30)
-		bands *= 2;
-	if (bands < 0)
-		bands = 60;
-	bands = clamp( 7, bands, 80);
+	if (band_coverage<0) band_coverage = 1000;
+	int bands = static_cast<int>( sqrt(band_coverage * 1.0) );
+	bands = clamp( 4, bands, 40);
 	// The number of subdivions around the hoop's tangential direction.
 	double ring_coverage = scene.pixel_coverage( pos, radius);
-	int rings = static_cast<int>(ring_coverage * 0.3);
-	if (rings < 10)
-		rings *= 4;
-	else if (rings < 30)
-		rings *= 2;
-	if (rings < 0)
-		rings = 80;
-	rings = clamp( 7, rings, 80);
-	
+	if (ring_coverage<0) ring_coverage = 1000;
+	int rings = static_cast<int>( sqrt(ring_coverage * 3.0) );
+	rings = clamp( 4, rings, 80);
+
+	if (model_rings != rings || model_bands != bands || model_radius != radius || model_thickness != thickness) {
+		model_rings = rings; model_bands = bands; model_radius = radius; model_thickness = thickness;
+		create_model( rings, bands, model );
+	}
+
 	clear_gl_error(); 
 	{
 		gl_enable_client vertex_array( GL_VERTEX_ARRAY);
 		gl_enable_client normal_array( GL_NORMAL_ARRAY);
+
 		gl_matrix_stackguard guard;
-		if (!translucent())
-			do_render_opaque( scene, rings, bands);
-		else
-			do_render_translucent( scene, rings, bands);
+		model_world_transform( scene.gcf, vector(radius,radius,radius) ).gl_mult();
+
+		color.gl_set(opacity);
+
+		glVertexPointer( 3, GL_FLOAT, 0, &model.vertex_pos[0] );
+		glNormalPointer( GL_FLOAT, 0, &model.vertex_normal[0] );
+		glDrawElements( GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_SHORT, &model.indices[0] );
 	}
+
 	check_gl_error();
 	return;
 }
@@ -107,115 +100,61 @@ ring::grow_extent( extent& world)
 }
 
 void 
-ring::band_prepare( const view& scene, size_t rings, size_t bands, scoped_array<vector> & vertexes, scoped_array<vector>& normals)
+ring::create_model( int rings, int bands, class model& m )
 {
-	// Implementation.  In software, I create a pair of arrays for vertex and
-	// normal data, filling them with the coordinates for one band of 
-	// the ring as a triangle strip.  Each successive band is created with 
-	// sequential calls to glRotate() using the same vertex array, thereby 
-	// taking advantage of OpenGL's hardware for the bulk of the transform labor.
-		
-	double scaled_radius = radius;
-	double scaled_thickness = scaled_radius * 0.1;
-	if (thickness != 0.0)
-		scaled_thickness = thickness;
+	double scaled_radius = 1.0;
+	double scaled_thickness = 0.1;
+	if (thickness != 0.0) scaled_thickness = thickness / radius;
 
-	// The first band is a triangle strip at the point where the default ring
-	// passes through the yz plane through the +z axis.  The extra pair of vertexes
-	// and normals is to form a closed loop.  The format is of a pair of
-	// interleaved rings, the first (in the xz plane) is stored at the even indexes;
-	// the second (rotated slightly above the first) is stored at the odd indexes.
-	const size_t n_verts = bands*2+2;
-	vertexes.reset( new vector[n_verts] );
-	normals.reset( new vector[n_verts] );
-	vertexes[0] = vertexes[ bands * 2] = 
-		vector( 0, 0, scaled_radius + scaled_thickness);
-	normals[0] = normals[bands * 2] = vertexes[0].norm();
-	tmatrix rotator = rotation(
-		2.0 * M_PI / bands, 
-		vector(0, 1, 0), 
-		vector( 0, 0, scaled_radius));
-	tmatrix normal_rotator = rotation(2.0 *  M_PI / bands, vector( 0, 1, 0));
-	for (size_t i = 2; i < bands * 2; i += 2) {
-		vertexes[i] = rotator * vertexes[i-2];
-		normals[i] = normal_rotator * normals[i-2];
+	// First generate a circle of radius thickness in the xy plane
+	if (bands > 80) throw std::logic_error("ring::create_model: More bands than expected.");
+	vector circle[80];
+	circle[0] = vector(0,scaled_thickness*0.5,0);
+	tmatrix rotator = rotation( 2.0 * M_PI / bands, vector( 0,0,1 ), vector( 0,0,0 ) );
+	for (int i = 1; i < bands; i ++)
+		circle[i] = rotator * circle[i-1];
+
+	m.vertex_pos.resize( rings * bands );
+	m.vertex_normal.resize( rings * bands );
+	fvertex* vertexes = &m.vertex_pos[0];
+	fvertex* normals = &m.vertex_normal[0];
+
+	// ... and then sweep it in a circle around the x axis
+	vector radial = vector(0,1,0);
+	int i=0;
+	rotator = rotation( 2.0 * M_PI / rings, vector( 1,0,0 ), vector( 0,0,0 ) );
+	for(int r=0; r<rings; r++) {
+		for(int b=0; b<bands; b++, i++) {
+			normals[i].x = circle[b].x;
+			normals[i].y = radial.y * circle[b].y;
+			normals[i].z = radial.z * circle[b].y;
+			vertexes[i].x = normals[i].x;
+			vertexes[i].y = normals[i].y + radial.y;
+			vertexes[i].z = normals[i].z + radial.z;
+		}
+		radial = rotator * radial;
 	}
-	// Rotate the single circle about the +x axis to produce the second 
-	// interleaved circle.
-	rotator = rotation( M_PI * 2.0 / rings, vector(1,0,0));
-	for (size_t i = 1; i < bands * 2; i += 2) {
-		vertexes[i] = rotator * vertexes[i-1];
-		normals[i] = rotator * normals[i-1];
+
+	// Now generate triangle indices... could do this with triangle strips but I'm looking
+	// ahead to next renderer design, where it would be nice to always use indexed tris
+	m.indices.resize( rings*bands*6 );
+	unsigned short *ind = &m.indices[0];
+	i = 0;
+	for(int r=0; r<rings; r++) {
+		for(int b=0; b<bands; b++,i++,ind+=6) {
+			ind[0] = i; ind[1] = i+bands; ind[2] = i+1;
+			ind[3] = i+bands; ind[4] = i+bands+1; ind[5] = i+1;
+		}
+		ind[2-6] -= bands;
+		ind[4-6] -= bands;
+		ind[5-6] -= bands;
 	}
-	vertexes[bands*2+1] = vertexes[1];
-	normals[bands*2+1] = normals[1];
-
-	glVertexPointer( 3, GL_DOUBLE, 0, vertexes.get());
-	glNormalPointer( GL_DOUBLE, 0, normals.get());
-	color.gl_set(opacity);
-
-	model_world_transform( scene.gcf ).gl_mult();
-}
-
-void
-ring::gl_draw( const view& scene, size_t rings, size_t bands)
-{
-	// Draw the first strip.
-	for (size_t i = 0; i < rings; ++i) {
-		// Successively render the same triangle strip for each band, 
-		// rotated about the model's x axis into the next position.
-		// TODO: I believe this is very slow!
-		glRotated( 360.0 / rings, 1, 0, 0);
-		glDrawArrays( GL_TRIANGLE_STRIP, 0, bands * 2 + 2);
+	ind -= 6*bands;
+	for(int b=0; b<bands; b++,ind+=6) {
+		ind[1] -= rings*bands;
+		ind[3] -= rings*bands;
+		ind[4] -= rings*bands;
 	}
-}
-
-void 
-ring::do_render_opaque( const view& scene, size_t rings, size_t bands)
-{
-	scoped_array<vector> vertexes, normals;
-	band_prepare( scene, rings, bands, vertexes, normals );
-	gl_draw( scene, rings, bands);
-	return;
-}
-
-void
-ring::do_render_translucent( const view& scene, size_t rings, size_t bands)
-{
-	// TODO: I believe this is quite wrong
-
-	scoped_array<vector> vertexes, normals;
-	band_prepare( scene, rings, bands, vertexes, normals );
-	
-	gl_enable clip0( GL_CLIP_PLANE0);
-	gl_enable cull_face( GL_CULL_FACE);
-	
-	tmatrix modelview; modelview.gl_modelview_get();
-	vertex eye_center = modelview.project( vector()); // same as w_column?
-	// Correct for perspective division
-	double eye_radius = (vector(eye_center) - modelview * vector(radius*scene.gcf, 0)).mag();
-	eye_center.z -= eye_radius * std::cos( M_PI*0.5 - std::atan( scene.tan_hfov_x));
-	// The plane equations
-	double show_back[] = { 0, 0, -1, eye_center.z / eye_center.w };
-	double show_front[] = { 0, 0, 1, -eye_center.z / eye_center.w };
-	
-	{ 	gl_matrix_stackguard g;
-		glLoadIdentity();
-		glClipPlane( GL_CLIP_PLANE0, show_back);
-	}
-	glCullFace( GL_FRONT);
-	gl_draw( scene, rings, bands);
-	glCullFace( GL_BACK);
-	gl_draw( scene, rings, bands);
-	
-	{	gl_matrix_stackguard g;
-		glLoadIdentity();
-		glClipPlane( GL_CLIP_PLANE0, show_front);
-	}
-	glCullFace( GL_FRONT);
-	gl_draw( scene, rings, bands);
-	glCullFace( GL_BACK);
-	gl_draw( scene, rings, bands);
 }
 
 PRIMITIVE_TYPEINFO_IMPL(ring)

@@ -16,6 +16,25 @@
 
 namespace cvisual {
 
+// This model representation is intended to be "sort of like" what a next generation
+// two phase renderer would use.  Eventually, therefore, it should be replaced with
+// the real thing.
+struct fvertex {
+	union {
+		float v[3];
+		struct { float x, y, z; };
+	};
+	fvertex() {}  // uninitialized!
+	fvertex( const vector& v ) : x(v.x), y(v.y), z(v.z) {}
+};
+
+class model {
+public:
+	std::vector< unsigned short > indices;
+	std::vector< fvertex > vertex_pos;
+	std::vector< fvertex > vertex_normal;
+};
+
 class ring : public axial
 {
  private:
@@ -25,9 +44,12 @@ class ring : public axial
 	PRIMITIVE_TYPEINFO_DECL;
 	bool degenerate();
 
+	model model;
+	int model_rings, model_bands;
+	double model_radius, model_thickness;
+
  public:
 	ring();
-	ring( const ring& other);
 	virtual ~ring();
 	void set_thickness( double t);
 	double get_thickness();
@@ -37,11 +59,7 @@ class ring : public axial
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
 	
-	void do_render_opaque( const view&, size_t rings, size_t bands);
-	void do_render_translucent( const view&, size_t rings, size_t bands);
-	
-	void band_prepare( const view&, size_t, size_t, boost::scoped_array<vector>& vertexes, boost::scoped_array<vector>& normals );
-	void gl_draw( const view&, size_t, size_t);
+	void create_model( int rings, int bands, class model& m );
 };
 
 } // !namespace cvisual
