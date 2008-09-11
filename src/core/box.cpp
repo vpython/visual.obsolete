@@ -71,17 +71,12 @@ box::gl_render( const view& scene)
 void 
 box::grow_extent( extent& e)
 {
-	// xxx This is slow but at least correct
-	tmatrix tm = model_world_transform();
-	vector vx = tm * vector(axis.mag()*.5, 0, 0);
-	vector vy = tm * vector(0, height*.5, 0);
-	vector vz = tm * vector(0, 0, width*.5);
+	tmatrix tm = model_world_transform( 1.0, vector( axis.mag(), height, width ) * 0.5 );
 
-	vector pos0 = pos - vx - vy - vz;
-	for (int i=0; i<2; i++)
-		for (int j=0; j<2; j++)
-			for (int k=0; k<2; k++)
-				e.add_point(pos0 + i*vx + j*vy + k*vz);
+	for (int i=-1; i<=1; i+=2)
+		for (int j=-1; j<=1; j+=2)
+			for (int k=-1; k<=1; k+=2)
+				e.add_point( tm * vector(i,j,k) );
 
 	e.add_body();
 }
