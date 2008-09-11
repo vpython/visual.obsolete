@@ -2,6 +2,11 @@ Started 2008/4/7 as a place to record the status of Visual 4 on various platform
 
 Need to correct docs/visual/mouse.html: there are FIVE mouse events, including "release".
 
+helix doesn't take extra arguments in the constructor.
+
+For those programs (gas, stars) that are different between Numeric and numpy, should
+use "try" to set a flag and make the programs run either way.
+
 Bruce office Dell 2008/9/11 (XP)
 
 Serious bug with back clipping plane in gas.py and when you
@@ -32,11 +37,6 @@ longer in 09_alpha_on_gold_PRIVATE.
 
 23_Radiation3D.py: Briefly see sphere that fills the window before autoscaling of
 other stuff kicks in. Could we do anything to suppress these transients?
-
-helix doesn't take extra arguments in the constructor.
-
-For those programs (gas, stars) that are different between Numeric and numpy, should
-use "try" to set a flag and make the programs run either way.
 
 VAIO 2008 June 14 (XP)
 
