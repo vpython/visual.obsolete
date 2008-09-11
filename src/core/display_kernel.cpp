@@ -380,34 +380,13 @@ void
 display_kernel::world_to_view_transform(
 	view& geometry, int whicheye, bool forpick)
 {
-	// Scaling the view.  Problem: objects in VPython are specified using
-	// double-precision floats, while OpenGL automatically truncates those
-	// down to single precision.  So, objects larger than about 1e16 generate
-	// NaN or infinity when rendered.  Solution:  When we calculate the extent
-	// of the universe in world space we calculate two scaling factors.
-	// The first (render_surface::world_scale) is equal to the size of the
-	// universe across its 3-axis diagonal.  The second (render_surface::gcf;
-	// is sized such that fabs(most_extreme_coordinate * gcf) < 1e10f.
-	// All world space coordinates are multiplied by the gcf
-	// prior to rendering.  All objects' rendering algorithms are specified such
-	// that their total size in model space is about 1 unit, and their size is
-	// blown up to world space by overriding get_scale().  Finally, the camera's
-	// position from the center (which determines the overall appearance of the
-	// size of the universe) is determined by four scaling factors.  The first
-	// is determined by the total extent of the scene (render_surface::world_scale).
-	// The second applies the scaling factor applied to the object coordinates
-	// by multiplying the camera distance by gcf.  The third is the interactive
-	// scaling factor (render_surface::user_scale), initialized to 1.0, and
-	// changed by dragging the mouse middle button across the viewing area up/down.
-	// Finally, the product of those scaling factors approximates the maximum
-	// apparent width of the scene in the display, it is divided by tan(fov/2)
-	// to correctly determine the distance from the center that encompasses the
-	// calculated width.  This algorithm is stable for objects up to about
-	// 1e+/-150, whereas vpython's original algorithm was stable to a range of
-	// about 1e-38 - 1e45, which was deemed acceptable before.
-
 	// See http://www.stereographics.com/support/developers/pcsdk.htm for a
 	// discussion regarding the design basis for the frustum offset code.
+
+	// gcf scales the region encompassed by scene.range into a 2x2x2 cube.
+	// Note that this is NOT necessarily the entire world, since scene.range
+	//   can be changed.
+	// This coordinate system is used for most of the calculations below.
 
 	vector scene_center = center.scale(gcfvec);
 	vector scene_up = up.norm();
@@ -421,47 +400,54 @@ display_kernel::world_to_view_transform(
 	// The cotangent of half of the wider field of view.
 	double cot_hfov;
 	if (!uniform) // We force width to be 2.0 (range.x 1.0)
-		cot_hfov = 1.0 /tan_hfov_x;
+		cot_hfov = 1.0 / tan_hfov_x;
 	else
 		cot_hfov = 1.0 / std::max(tan_hfov_x, tan_hfov_y);
 
-	// gcf chosen so gcf*world -> scene fits in a 2 by 2 by 2 cube.
-	// scene_camera  is the position used in gluLookAt to observe this cube.
+	// Position camera so that a (2*user_scale)^3 cube will have all its 
+	//   faces showing, with some border.
+	double cam_to_center_without_zoom = 1.05*(cot_hfov+1.0);
+	vector scene_camera = scene_center - cam_to_center_without_zoom*user_scale*scene_forward;
 
 	double nearest, farthest; 
 	world_extent.near_and_far(forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
-	farthest = (farthest * gcf - scene_center.dot( forward ));  // relative to scene.center, in "cube space"
+	nearest *= gcf; farthest *= gcf;
 
-	// Position camera and clip planes so that a (2*user_scale)^3 cube will 
-	// have all its faces showing, with some border. (user_scale <= 1.0)
-	vector scene_camera = scene_center-1.05*(cot_hfov+1.0)*user_scale*scene_forward;
-	double camera_to_center = (scene_center - scene_camera).mag();
-	double nearclip = 0.01 * camera_to_center;  // partway from camera to center
-	double farclip = camera_to_center + 2.0/user_scale;  // behind back face of cube, even if rotated
-	// ... but there might be objects far beyond the back of the cube, because we are zoomed in
-	//farclip = std::max( farclip, cam_to_cube + user_scale + 1.05*farthest );
-
-	// The true camera position, in world space.
-	camera = scene_camera/gcf;
-
-	// The true distance between the camera and the visual center of the scene,
-	// in scaled world space.
-	double eye_length = (center-camera).mag() * gcf;
+	double cam_to_center = (scene_center - scene_camera).mag();
+	// Z buffer resolution is highly sensitive to nearclip - a "small" camera will have terrible z buffer
+	//   precision for distant objects.  PLEASE don't fiddle with this unless you know what kind of 
+	//   test cases you need to see the results, including at nonstandard fields of view and 24 bit 
+	//   z buffers!
+	// The equation for nearclip below is designed to give similar z buffer resolution at all fields of
+	//   view.  It's a little weird, but seems to give acceptable results in all the cases I've been able
+	//   to test.
+	// The other big design question here is the effect of "zoom" (user_scale) on the near clipping plane.
+	//   Most users will have the mental model that this moves the camera closer to the scene, rather than
+	//   scaling the scene up.  There is actually a difference since the camera has a finite "size".
+	//   Unfortunately, following this model leads to a problem with zooming in a lot!  The problem is
+	//   especially pronounced at tiny fields of view, which typically have an enormous camera very far away;
+	//   when you try to zoom in the big camera "crashes" into the tiny scene!  So instead we use the 
+	//   slightly odd model of scaling the scene, or equivalently making the camera smaller as you zoom in.
+	double fwz = cam_to_center_without_zoom + 1.0;
+	double nearclip = fwz * fwz / (100 + fwz) * user_scale;
+	// TODO: nearclip = std::max( nearclip, (cam_to_center + nearest) * 0.95 );  //< ?? boost z buffer resolution if there's nothing close to camera?
+	double farclip = (farthest + cam_to_center) * 1.05;  //< actual maximum z in scene plus a little
+	farclip = std::max( farclip, nearclip * 1.001 ); //< just in case everything is behind the camera!
 
 	// Translate camera left/right 2% of the viewable width of the scene at
 	// the distance of its center.
-	double camera_stereo_offset = tan_hfov_x * eye_length * 0.02;
+	double camera_stereo_offset = tan_hfov_x * cam_to_center * 0.02;
 	// TODO: This should be doable with a simple glTranslated() call, but I haven't
 	// found the magic formula for it.
 	vector camera_stereo_delta = camera_stereo_offset
 		* up.cross( scene_camera).norm() * whicheye;
 	scene_camera += camera_stereo_delta;
 	scene_center += camera_stereo_delta;
-	// A multiple of the number of eye_length's away from the camera to place
+	// A multiple of the number of cam_to_center's away from the camera to place
 	// the zero-parallax plane.
 	double stereodepth = 1.0; // TODO: make this value configurable.
 	// The distance from the camera to the zero-parallax plane.
-	double focallength = eye_length * stereodepth;
+	double focallength = cam_to_center * stereodepth;
 	// The amount to translate the frustum to the left and right.
 	double frustum_stereo_offset = camera_stereo_offset * nearclip
 		/ focallength * whicheye;
@@ -537,6 +523,9 @@ display_kernel::world_to_view_transform(
 
 	glMatrixMode( GL_MODELVIEW);
 	check_gl_error();
+
+	// The true camera position, in world space.
+	camera = scene_camera/gcf;
 
 	// Finish initializing the view object.
 	geometry.camera = camera;
