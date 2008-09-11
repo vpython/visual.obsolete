@@ -1,249 +1,48 @@
 Started 2008/4/7 as a place to record the status of Visual 4 on various platforms
 
-HP 2008 July 8 (Vista)
 Need to correct docs/visual/mouse.html: there are FIVE mouse events, including "release".
 
-Worrisome that gas.py is a lot slower in Visual 4 than Visual 3 (but stars.py is same speed).
+Bruce office Dell 2008/9/11 (XP)
 
-VAIO 2008 June 14 (XP)
+Serious bug with back clipping plane in gas.py and when you
+rotate and zoom in texture_and_lighting.py.
+
+Should make improvements to texturetest.py.
+
+DS working on rings: rings look much thinner in hanoi.py than they do in Visual 3.
+Same in 18_Erings2.
 
 Zoomed out too far:
-dipole, heightfield, gas, hanoi, lathe, planar, stars, stonehenge, toroid, toroid_drag
+boxlighttest, faces_heightfield, colorsliders, hanoi, lathe, toroid, toroid_drag,
+04_speed_of_sound, 07_quantum_oscillator, 07_spectrum, 09_Rutherford_dist_PRIVATE,
+10_drop_clay, 10_wheel_L, 12_carnot (BIG effect), 13_E_dipole_step_PRIVATE,
+21_Gauss_2win (BIG effect when you choose an option)
 
-Kill windows, IDLE lingers without redisplaying (but new run deletes old window).
-materials_test runs okay (but without material texture, of course).
+03_Moon_Voyage_PRIVATE.py 4.7 s (0.01 years) in Visual 3, 5.4 s in Visual 4.
 
-01_newton.py red arrow bright when axis.x < 0, dark when axis.x > 0 !!
-This works fine on HP Vista machine.
+threebody.py "Show Energy" too wide for the controls button it's on.
+Similar problem in fields.py.
 
-HP 2008 June 14 (Vista)
-02_newton_grid.py grid lines flicker
+Would help in graph.py to show a small point where the plotting currently is.
+
+Serious bug with thick line in 09_alpha_on_alpha; during early part of motion
+the target trail is an infinitely long blue line going through the two particles.
+Change to thin line, no problem. Similar in 09_alpha_on_electron. Problem lasts
+longer in 09_alpha_on_gold_PRIVATE.
+
+23_Radiation3D.py: Briefly see sphere that fills the window before autoscaling of
+other stuff kicks in. Could we do anything to suppress these transients?
 
 helix doesn't take extra arguments in the constructor.
-
-absorb_emit missing the message about "Electron beam now turned off".
-Bohr_levels: U gcurve not seen because not using gdisplay.foreground=color.black;
-  also energy levels not seen (probably same reason?)
-  
-In twopucks, it's a real problem that the upper (horizontal) string doesn't show well.
-
-alpha_on_alpha crashes when more than 10000 appends made to curve. This is not a problem
-in other programs, such as the Earth-to-Moon program.
-
-In crossproduct I see that it must have been that the default text color in a label
-used to be scene.foreground but is now white. May need to change new label for compatibility.
-I find that Visual 3 ignored color in label but used current foreground color only, which was bad.
-But if no color is specified for the text, we should use scene.foreground. 
-
-gas.py for old Numeric gives this error:
-VPython WARNING: ..\src\python\curve.cpp:747: cvisual::python::curve::thickline: Degenerate curve case! 
-please report the following information to visualpython-users@lists.sourceforge.net: 
-current:<0, 0, 0> next:<0, 1, 0> prev:<0, 0, 0> A:<0, 1, 0> B:<0, 0, 0> x:<0, 1, 0> y:<0, 1, 0> lastx:<1, 0, 0> lasty:<0, 1, 0> first:0
 
 For those programs (gas, stars) that are different between Numeric and numpy, should
 use "try" to set a flag and make the programs run either way.
 
-plane_sinusoidal_wave is very jerky.
+VAIO 2008 June 14 (XP)
+
+Kill windows, IDLE lingers without redisplaying (but new run deletes old window).
 
 ---------------------------
-
-***Bruce MacBook OSX 10.5 Intel graphics
-2008/4/6 material_test.py gives a hard crash (can move mouse but do nothing; must reboot).
-
-***Bruce home Dell desktop Vista GeForce 7600 GS
-4/6 OK
-
-***Bruce VAIO dual-boot laptop Ubuntu Intel graphics
-4/6 OK except that only the 1st window of a multiwindow program has a toolbar
-
-***Ruth MacBook Pro OSX 10.5 GeForce 8600M GT (but questionable Apple driver?) 
-4/7 For most materials gives this error message (and the display dies):
-
-VPYTHON ***CRITICAL ERROR***: 
-../../vpython-core2/src/core/display_kernel.cpp:906: render_scene: 
-OpenGL error: ../../vpyton-core2/src/core/sphere.cpp:188 invalid operation, aborting.
-
-Here is the end of a trace using the Apple OpenGL Profiler, where we crash in a test
-program trying to make a single wood1-material sphere. These data were made after
-placing check_gl_error() after every operation in numeric_texture::gl_init. An odd thing
-is that with those extra checks installed, and with a breakpoint on an error, continuing
-after the error led to a wood1 sphere being displayed for the first time. There would seem
-to be some kind of timing error.
-
-    0.49 탎 glGenTextures(1, 0xb0080270);
-    0.17 탎 glGetError(); returns: GL_ZERO 
-    4.12 탎 glBindTexture(GL_TEXTURE_2D, 1);
-    0.06 탎 glGetError(); returns: GL_ZERO 
-    9.71 탎 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    0.06 탎 glGetError(); returns: GL_ZERO 
-    0.33 탎 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    0.06 탎 glGetError(); returns: GL_ZERO 
-    2.04 탎 glGetString(GL_VERSION);
-   18.10 탎 glTexImage2D(GL_PROXY_TEXTURE_2D, 1, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, 0x00000000);
-100858.22 탎 glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, 0xb008017c);
-
-glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, 0xb008017c); returns: 0 
-	Error: GL_INVALID_OPERATION
-	Context: 0x00934a00
-	kCGLCPGPUFragmentProcessing:  GL_FALSE
-	kCGLCPGPUVertexProcessing:  GL_FALSE
-	kCGLCPCurrentRendererID:  1024 (0x00000400)
-Function call stack: 
-	0: 0x14cb365c in gloGetCGLDispatch in <GLProfilerFBDisp> 
-	1: 0x933a7e98 in glGetTexLevelParameteriv in <libGL.dylib> 
-	2: 0x01555a91 in closestFit in <libGLU.1.dylib> 
-	3: 0x015718c6 in gluBuild2DMipmaps in <libGLU.1.dylib> 
-	4: 0x01070d0d in cvisual::python::numeric_texture::gl_init(cvisual::view const&) at numeric_texture.cpp: 201 
-	5: 0x01010a8c in cvisual::texture::gl_activate(cvisual::view const&) at texture.cpp: 43 
-	6: 0x0103d770 in cvisual::apply_material::apply_material(cvisual::view const&, cvisual::material*, cvisual::tmatrix&) at scoped_ptr.hpp: 125 
-	7: 0x01045b7f in cvisual::renderable::outer_render(cvisual::view const&) at renderable.cpp: 96 
-	8: 0x0102a4bb in cvisual::display_kernel::draw(cvisual::view&, int, bool, bool) at stl_list.h: 140 
-	9: 0x01030086 in cvisual::display_kernel::render_scene() at display_kernel.cpp: 753 
-	10: 0x01051345 in cvisual::render_surface::paint() at gil.hpp: 21 
-	11: 0x0110c9fa in cvisual::render_manager::paint_displays(std::vector<cvisual::display*, std::allocator<cvisual::display*> > const&, bool) at stl_vector.h: 343 
-	12: 0x010498cf in cvisual::gui_main::poll() at mem_fun.h: 89 
-	13: 0x0104e89b in sigc::internal::slot_call0<sigc::bound_mem_functor0<bool, cvisual::gui_main>, bool>::call_it(sigc::internal::slot_rep*) at slot.h: 103 
-	14: 0x01b94ad6 in (anonymous namespace)::glibmm_source_callback(void*) in <libglibmm-2.4.1.dylib> 
-	15: 0x0246f7d0 in g_timeout_dispatch in <libglib-2.0.0.dylib> 
-	16: 0x0246c34d in g_main_dispatch in <libglib-2.0.0.dylib> 
-	17: 0x0246d8c2 in g_main_context_dispatch in <libglib-2.0.0.dylib> 
-	18: 0x0246de4d in g_main_context_iterate in <libglib-2.0.0.dylib> 
-	19: 0x0246e647 in g_main_loop_run in <libglib-2.0.0.dylib> 
-	20: 0x01d03621 in gtk_main in <libgtk-x11-2.0.0.dylib> 
-	21: 0x01776f9b in Gtk::Main::run() in <libgtkmm-2.4.1.dylib> 
-	22: 0x01049a8f in cvisual::gui_main::run() at lock.hpp: 33 
-	23: 0x0104d2f7 in cvisual::gui_main::thread_proc() at display.cpp: 414 
-	24: 0x026ac991 in thread_proxy in <libboost_thread-mt-1_34_1.dylib> 
-	25: 0x90b9fc55 in pthread_start in <libSystem.B.dylib> 
-	26: 0x90b9fb12 in thread_start in <libSystem.B.dylib> 
-	
-Note that with a breakpoint on error, the following occurs earlier in the run,
-a previously unnoticed error in the pick machinery. The display was empty at this time.
-
-glRenderMode(GL_SELECT); returns: 0 
-	Error: GL_INVALID_OPERATION
-	Context: 0x00934a00
-	kCGLCPGPUFragmentProcessing:  GL_TRUE
-	kCGLCPGPUVertexProcessing:  GL_TRUE
-	kCGLCPCurrentRendererID:  9732 (0x00002604)
-Function call stack: 
-	0: 0x14c8a08f in gloGetCGLDispatch in <GLProfilerFBDisp> 
-	1: 0x933a7c23 in glRenderMode in <libGL.dylib> 
-	2: 0x0102912a in cvisual::display_kernel::pick(int, int, float) at display_kernel.cpp: 958 
-	3: 0x0102fdde in cvisual::display_kernel::render_scene() at display_kernel.cpp: 916 
-	4: 0x01051355 in cvisual::render_surface::paint() at gil.hpp: 21 
-	5: 0x0110c9fa in cvisual::render_manager::paint_displays(std::vector<cvisual::display*, std::allocator<cvisual::display*> > const&, bool) at stl_vector.h: 343 
-	6: 0x010498df in cvisual::gui_main::poll() at mem_fun.h: 89 
-	7: 0x0104e8ab in sigc::internal::slot_call0<sigc::bound_mem_functor0<bool, cvisual::gui_main>, bool>::call_it(sigc::internal::slot_rep*) at slot.h: 103 
-	8: 0x01b94ad6 in (anonymous namespace)::glibmm_source_callback(void*) in <libglibmm-2.4.1.dylib> 
-	9: 0x0246f7d0 in g_timeout_dispatch in <libglib-2.0.0.dylib> 
-	10: 0x0246c34d in g_main_dispatch in <libglib-2.0.0.dylib> 
-	11: 0x0246d8c2 in g_main_context_dispatch in <libglib-2.0.0.dylib> 
-	12: 0x0246de4d in g_main_context_iterate in <libglib-2.0.0.dylib> 
-	13: 0x0246e647 in g_main_loop_run in <libglib-2.0.0.dylib> 
-	14: 0x01d03621 in gtk_main in <libgtk-x11-2.0.0.dylib> 
-	15: 0x01776f9b in Gtk::Main::run() in <libgtkmm-2.4.1.dylib> 
-	16: 0x01049a9f in cvisual::gui_main::run() at lock.hpp: 33 
-	17: 0x0104d307 in cvisual::gui_main::thread_proc() at display.cpp: 414 
-	18: 0x026ac991 in thread_proxy in <libboost_thread-mt-1_34_1.dylib> 
-	19: 0x90b9fc55 in pthread_start in <libSystem.B.dylib> 
-	20: 0x90b9fb12 in thread_start in <libSystem.B.dylib> 
-
-The following data were obtained before placing check_gl_error() statements after every
-operation in numeric_texture::gl_init.
-    .........
-    0.05 탎 glTexCoord2f(0.00714284, 0.0144928);
-    0.06 탎 glVertex3f(-0.00204199, 0.0454687, -0.998964);
-    0.10 탎 glNormal3f(-0, -8.74228e-08, -1);
-    0.05 탎 glTexCoord2f(0, 0);
-    0.06 탎 glVertex3f(0, 0, -1);
-    0.10 탎 glNormal3f(0, 0.0455145, -0.998964);
-    0.06 탎 glTexCoord2f(0, 0.0144928);
-    0.06 탎 glVertex3f(0, 0.0455145, -0.998964);
-    0.07 탎 glEnd();
-    1.63 탎 glGetError(); returns: GL_ZERO 
-22416.17 탎 glCreateProgramObjectARB();
-    1.00 탎 glGetError(); returns: GL_ZERO 
-    4.56 탎 glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-   19.49 탎 glShaderSourceARB(2, 1, 0xb00801ac, 0xb00801a8);
- 1750.13 탎 glCompileShaderARB(2);
-    1.37 탎 glAttachObjectARB(1, 2);
-    0.42 탎 glDeleteObjectARB(2);
-    1.57 탎 glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-    3.54 탎 glShaderSourceARB(3, 1, 0xb00801ac, 0xb00801a8);
- 3459.42 탎 glCompileShaderARB(3);
-    1.41 탎 glAttachObjectARB(1, 3);
-    0.34 탎 glDeleteObjectARB(3);
- 1410.01 탎 glLinkProgramARB(1);
-    1.14 탎 glGetObjectParameterivARB(1, GL_OBJECT_LINK_STATUS_ARB, 0xb0080264);
-    1.53 탎 glGetError(); returns: GL_ZERO 
-   75.09 탎 glUseProgramObjectARB(1);
-    2.15 탎 glGetError(); returns: GL_ZERO 
-    1.85 탎 glEnable(GL_TEXTURE_2D);
-    2.35 탎 glGenTextures(1, 0xb0080270);
-    7.42 탎 glBindTexture(GL_TEXTURE_2D, 1);
-   18.45 탎 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    0.37 탎 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    0.72 탎 glGetError(); returns: GL_INVALID_OPERATION 
-   
-glGetError(); returns: GL_INVALID_OPERATION 
-	Context: 0x00934a00
-	kCGLCPGPUFragmentProcessing:  GL_FALSE
-	kCGLCPGPUVertexProcessing:  GL_FALSE
-	kCGLCPCurrentRendererID:  1024 (0x00000400)
-Function call stack: 
-	0: 0x14b2ece2 in gloGetCGLDispatch in <GLProfilerFBDisp> 
-	1: 0x933a5bbc in glGetError in <libGL.dylib> 
-	2: 0x01005b6d in cvisual::check_gl_error_real(char const*, int) at errors.cpp: 99 
-	3: 0x0107057a in cvisual::python::numeric_texture::gl_init(cvisual::view const&) at numeric_texture.cpp: 87 
-	4: 0x01010adc in cvisual::texture::gl_activate(cvisual::view const&) at texture.cpp: 43 
-	5: 0x0103d7c0 in cvisual::apply_material::apply_material(cvisual::view const&, cvisual::material*, cvisual::tmatrix&) at scoped_ptr.hpp: 125 
-	6: 0x01045bcf in cvisual::renderable::outer_render(cvisual::view const&) at renderable.cpp: 96 
-	7: 0x0102a50b in cvisual::display_kernel::draw(cvisual::view&, int, bool, bool) at stl_list.h: 140 
-	8: 0x010300d6 in cvisual::display_kernel::render_scene() at display_kernel.cpp: 753 
-	9: 0x01051395 in cvisual::render_surface::paint() at gil.hpp: 21 
-	10: 0x0110c9fa in cvisual::render_manager::paint_displays(std::vector<cvisual::display*, std::allocator<cvisual::display*> > const&, bool) at stl_vector.h: 343 
-	11: 0x0104991f in cvisual::gui_main::poll() at mem_fun.h: 89 
-	12: 0x0104e8eb in sigc::internal::slot_call0<sigc::bound_mem_functor0<bool, cvisual::gui_main>, bool>::call_it(sigc::internal::slot_rep*) at slot.h: 103 
-	13: 0x01b94ad6 in (anonymous namespace)::glibmm_source_callback(void*) in <libglibmm-2.4.1.dylib> 
-	14: 0x0246f7d0 in g_timeout_dispatch in <libglib-2.0.0.dylib> 
-	15: 0x0246c34d in g_main_dispatch in <libglib-2.0.0.dylib> 
-	16: 0x0246d8c2 in g_main_context_dispatch in <libglib-2.0.0.dylib> 
-	17: 0x0246de4d in g_main_context_iterate in <libglib-2.0.0.dylib> 
-	18: 0x0246e647 in g_main_loop_run in <libglib-2.0.0.dylib> 
-	19: 0x01d03621 in gtk_main in <libgtk-x11-2.0.0.dylib> 
-	20: 0x01776f9b in Gtk::Main::run() in <libgtkmm-2.4.1.dylib> 
-	21: 0x01049adf in cvisual::gui_main::run() at lock.hpp: 33 
-	22: 0x0104d347 in cvisual::gui_main::thread_proc() at display.cpp: 414 
-	23: 0x026ac991 in thread_proxy in <libboost_thread-mt-1_34_1.dylib> 
-	24: 0x90b9fc55 in pthread_start in <libSystem.B.dylib> 
-	25: 0x90b9fb12 in thread_start in <libSystem.B.dylib> 
-
-I experimented with making a single sphere with a specific material and find that 
-most materials behave this way, but fast displays, rawturbulence displays a black sphere, 
-emissive1 and emissive 2 display white spheres.
-
-Scherer: Hmm.  What's particularly odd about this is that sphere does a 
-clear_gl_error(), so the error can't come from the material application per se.
-I'd try the apple "OpenGL Profiler" as a way of tracking down the error.  
-You could alternatively try scattering some check_gl_error() calls around 
-sphere::gl_render to try to track down where the error occurs. 
-(I'd place one before the clear_gl_error(), since there might be an earlier 
-error being masked which causes a later error.) Since the error is an opengl 
-error rather than a shader compile or link error, I think we really need to 
-know exactly where the error is, and preferably some details.
-
-PERFORMANCE
-4/4 Interesting cycle/render timing results for stonehenge:
-
-Dell Vista 15/2
-Ruth MacBook Pro 14/5
-VAIO XP 97-144/37-62
-VAIO Ubuntu 170-250/73-114
-
-The VAIO measurements surprised me. In the past I recall various measurements 
-indicating that most things were twice as fast in Linux as XP. I'll make some 
-other kinds of measurements about this.
 
 Scherer: Things certainly shouldn't be twice as fast in Linux as XP!  
 If that was ever true, it's probably been fixed.
@@ -252,10 +51,4 @@ NDEBUG macro and so are using a bunch of extremely slow OpenGL error checking,
 which is not present on Windows in Release mode. That could account for some 
 of the speed difference.
 (I had forgotten about the NDEBUG issue.)
-
-BUGS
-All: Setting visible=True in the constructor gives the error 
-"Can't change parameters of an active window".
-
-Mac: there is a small gap between windows (need to account for decoration).
 
