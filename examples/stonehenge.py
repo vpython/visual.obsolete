@@ -60,7 +60,7 @@ h = 5
 photocenter = 0.15*w
 
 # The floor, central post, and ball atop the post
-floor = box(pos=(0,-0.1,0),size=(24,24,.2), up=(0,0,1), color=color.orange, material=materials.wood)
+floor = box(pos=(0,-0.1,0),size=(.2,24,24), axis=(0,1,0), color=color.orange, material=materials.wood)
 pole= cylinder(pos=(0,0,0),axis=(0,h,0), radius=0.2, color=(1,0,0))
 sphere(pos=(0,h,0), radius=0.5, color=(1,0,0))
 
@@ -90,15 +90,15 @@ for i in range(Nslabs):
             for x in range(2):
                 for y in range(2):
                     box(pos=slab.pos+vector(-s*photocenter*(2*x-1),photocenter*(2*y-1),c*photocenter*(2*x-1)),
-                        size=(0.9*2*photocenter,0.9*2*photocenter,1.1*d), axis=(s,0,-c),
-                        color=grey, material=photo)
+                        size=(1.1*d,0.9*2*photocenter,0.9*2*photocenter), axis=(c,0,s),
+                        material=photo)
 
 # Decorate the front entrance slab
 text(pos=(0, 0.77*h, R+d/2), string="NO EXIT", color=color.yellow,
            depth=0.2, height=0.7, justify="center")
 
 # Decorate back slab with a gold box and a clock
-box(pos=(0,h/2,-R+d/2+0.1), size=(0.2,w/2,w/2), axis=(0,0,1),
+box(pos=(0,h/2,-R+d/2+0.1), size=(w/2,w/2,0.2), 
     color=(1,0.8,0), material=materials.wood, shininess=1)
 clock = analog_clock(pos=(0,h/2.,-R+d/2+0.2+0.2*h/10),
                      radius=0.2*w, axis=(0,0,1))
@@ -188,7 +188,7 @@ vbaseball0 = 3*v0
 Rcloud = 0.8*R
 omegacloud = v0/Rcloud
 cloud = ellipsoid(pos=(0,0.7*h,-Rcloud), size=(5,2,2),
-                  color=(1,0.5,0.5), opacity=0.7)
+                  color=(1,0.5,0.5), opacity=0.3)
 
 rhairs = 0.025 # half-length of crosshairs
 dhairs = 2 # how far away the crosshairs are
