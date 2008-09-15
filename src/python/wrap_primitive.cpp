@@ -247,12 +247,14 @@ wrap_primitive()
 		.add_property( "up", 
 			make_function(&frame::get_up, return_internal_reference<>()),
 			&frame::set_up)
-         .add_property( "scale",
-            make_function(&frame::get_scale, return_internal_reference<>()),
-            &frame::set_scale)
         .def( "rotate", raw_function( &py_rotate<frame>))
 		.def( "add_renderable", &frame::add_renderable)
 		.def( "remove_renderable", &frame::remove_renderable)
+		/* frame.scale disabled for Visual 4.0
+         .add_property( "scale",
+            make_function(&frame::get_scale, return_internal_reference<>()),
+            &frame::set_scale)
+        */
 		;
 	
 	using python::numeric_texture;

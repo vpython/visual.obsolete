@@ -12,8 +12,9 @@ namespace cvisual {
 frame::frame()
 	: pos( 0, 0, 0),
 	axis( 1, 0, 0),
-	up( 0, 1, 0),
-	scale( 1.0, 1.0, 1.0)
+	up( 0, 1, 0)
+	// Disable frame.scale in Visual 4.0
+	//scale( 1.0, 1.0, 1.0)
 {
 }
 
@@ -21,8 +22,8 @@ frame::frame( const frame& other)
 	: renderable( other),
 	pos(other.pos.x, other.pos.y, other.pos.z),
 	axis(other.axis.x, other.axis.y, other.axis.z),
-	up(other.up.x, other.up.y, other.up.z),
-	scale(other.scale.x, other.scale.y, other.scale.z)
+	up(other.up.x, other.up.y, other.up.z)
+	// scale(other.scale.x, other.scale.y, other.scale.z)
 {
 }
 
@@ -102,6 +103,7 @@ frame::get_up()
 	return up;
 }
 
+/*
 void
 frame::set_scale( const vector& n_scale)
 {
@@ -113,6 +115,7 @@ frame::get_scale()
 {
 	return scale;
 }
+*/
 
 void
 frame::rotate( double angle, const vector& _axis, const vector& origin)
@@ -135,7 +138,7 @@ tmatrix
 frame::frame_world_transform( const double gcf) const
 {
 	// Performs a reorientation transform.
-	// ret = translation o reorientation o scale
+	// ret = translation o reorientation
 	tmatrix ret;
 	// A unit vector along the z_axis.
 	vector z_axis = vector(0,0,1);
@@ -152,10 +155,16 @@ frame::frame_world_transform( const double gcf) const
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
 
+	/*
 	// I don't understand why removing gcf from the following 3 statements makes frames work (bas):
 	ret.x_column( x_axis * scale.x);
 	ret.y_column( y_axis * scale.y);
 	ret.z_column( z_axis * scale.z);
+	*/
+	
+	ret.x_column( x_axis);
+	ret.y_column( y_axis);
+	ret.z_column( z_axis);
 
 	ret.w_column( pos * gcf);
 	ret.w_row();
@@ -166,8 +175,8 @@ tmatrix
 frame::world_frame_transform() const
 {
 	// Performs a reorientation transform.
-	// ret = translation o reorientation o scale
-	// ret = iscale o ireorientation o itranslation.
+	// ret = translation o reorientation
+	// ret = ireorientation o itranslation.
 	tmatrix ret;
 
 	// A unit vector along the z_axis.
@@ -184,9 +193,11 @@ frame::world_frame_transform() const
 
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
+	/*
 	x_axis /= scale.x;
 	y_axis /= scale.y;
 	z_axis /= scale.z;
+	*/
 
 	ret(0,0) = x_axis.x;
 	ret(0,1) = x_axis.y;

@@ -44,7 +44,7 @@ class frame : public renderable
 	shared_vector pos;
 	shared_vector axis;
 	shared_vector up;
-	shared_vector scale;
+	//shared_vector scale; // Disable frame.scale in Visual 4.0
 	/** Establishes the coordinate system into which this object's children
  		are rendered.
  		@param gcf: the global correction factor, propogated from gl_render(). 
@@ -92,8 +92,8 @@ class frame : public renderable
 	void set_up( const vector& n_up);
 	shared_vector& get_up();
 	
-	void set_scale( const vector& n_scale);
-	shared_vector& get_scale();
+	// void set_scale( const vector& n_scale);
+	// shared_vector& get_scale();
 	
 	// Lookup the target that belongs to this name.
 	shared_ptr<renderable> lookup_name( 
