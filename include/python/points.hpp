@@ -38,7 +38,7 @@ class points : public renderable
 	
 	// Specifies whether or not the size of the points should scale with the
 	// world or with the screen.
-	enum { WORLD, SCREEN } size_type;
+	enum { WORLD, PIXELS } size_units;
 	
 	// Specifies the shape of the point. Future candidates are triangles,
 	// diamonds, etc. 
@@ -73,8 +73,8 @@ class points : public renderable
 	void set_size( float r);
 	inline float get_size( void) { return size; }
 	
-	void set_size_type( const std::string& n_type);
-	std::string get_size_type( void);
+	void set_size_units( const std::string& n_type);
+	std::string get_size_units( void);
 	
 	void set_pos( array pos); // An Nx3 array
 	void set_pos_l( const list& pos); // A list of vector

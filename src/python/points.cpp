@@ -34,7 +34,7 @@ index( const array& a, size_t i)
 
 points::points()
 	: pos(0), color(0), preallocated_size(256), count(0),
-	size_type(SCREEN),
+	size_units(PIXELS),
 	points_shape(ROUND),
 	size( 1.5)
 {
@@ -61,7 +61,7 @@ points::points( const points& other)
 	color( other.color),
 	preallocated_size( other.preallocated_size),
 	count( other.count),
-	size_type( other.size_type),
+	size_units( other.size_units),
 	points_shape( other.points_shape),
 	size( other.size)
 {
@@ -206,24 +206,24 @@ points::get_points_shape( void)
 }
 
 void
-points::set_size_type( const std::string& n_type)
+points::set_size_units( const std::string& n_type)
 {
-	if (n_type == "screen") {
-		size_type = SCREEN;
+	if (n_type == "pixels") {
+		size_units = PIXELS;
 	}
 	else if (n_type == "world") {
-		size_type = WORLD;
+		size_units = WORLD;
 	}
 	else
 		throw std::invalid_argument( "Unrecognized coordinate type");
 }
 
 std::string
-points::get_size_type( void)
+points::get_size_units( void)
 {
-	switch (size_type) {
-		case SCREEN:
-			return "screen";
+	switch (size_units) {
+		case PIXELS:
+			return "pixels";
 		case WORLD:
 			return "world";
 		default:
@@ -553,7 +553,7 @@ points::gl_render( const view& scene)
 	if (points_shape == ROUND)
 		glEnable( GL_POINT_SMOOTH);
 
-	if (size_type == WORLD && scene.glext.ARB_point_parameters) {
+	if (size_units == WORLD && scene.glext.ARB_point_parameters) {
 		// This is simpler and more robust than what was here before, but it's still
 		// a little tacky and probably not perfectly general.  I'm not sure that it 
 		// should work with stereo frustums, but I can't find a case where it's 
@@ -576,7 +576,7 @@ points::gl_render( const view& scene)
 		scene.glext.glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation_eqn);
 		glPointSize( 1 );
 	}
-	else if (size_type == SCREEN) {
+	else if (size_units == PIXELS) {
 		// Restore to default (aka, disable attenuation)
 		if (scene.glext.ARB_point_parameters) {
 			float attenuation_eqn[] = {1.0f, 0.0f, 0.0f};
@@ -659,7 +659,7 @@ points::grow_extent( extent& world)
 		return;
 	const double* pos_i = index(pos, 0);
 	const double* pos_end = index( pos, count);
-	if (size_type == SCREEN)
+	if (size_units == PIXELS)
 		for ( ; pos_i < pos_end; pos_i += 3)
 			world.add_point( vector(pos_i));
 	else
