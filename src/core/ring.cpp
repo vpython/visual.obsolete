@@ -102,9 +102,14 @@ ring::grow_extent( extent& world)
 void 
 ring::create_model( int rings, int bands, class model& m )
 {
+	// In Visual 3, rendered thickness was (incorrectly) double what was documented.
+	// The documentation said that thickness was the diameter of a cross section of
+	// a solid part of the ring, but in fact ring.thickness was the radius of the
+	// cross section. Presumably we have to maintain the incorrect Visual 3 behavior
+	// and change the documentation.
 	double scaled_radius = 1.0;
-	double scaled_thickness = 0.1;
-	if (thickness != 0.0) scaled_thickness = thickness / radius;
+	double scaled_thickness = 0.2;
+	if (thickness != 0.0) scaled_thickness = 2*thickness / radius;
 
 	// First generate a circle of radius thickness in the xy plane
 	if (bands > 80) throw std::logic_error("ring::create_model: More bands than expected.");
