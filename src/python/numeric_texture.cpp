@@ -94,7 +94,7 @@ numeric_texture::gl_init( const view& v )
 		return;
 
 	int type = data_depth ? GL_TEXTURE_3D_EXT : GL_TEXTURE_2D;
-	
+
 	if (type == GL_TEXTURE_3D_EXT && !v.glext.EXT_texture3D)
 		return;
 
@@ -205,6 +205,13 @@ numeric_texture::gl_init( const view& v )
 			tex_type = data_type;
 			tex_mipmapped = false;
 
+			#ifdef __APPLE__
+				// Work around a bug in macbook pro nvidia drivers' glTexSubImage3D
+				//  GL_TEXTURE_STORAGE_HINT_APPLE = GL_STORAGE_CACHED_APPLE
+				//  See http://www.mailinglistarchive.com/mac-opengl@lists.apple.com/msg03035.html
+				glTexParameteri(GL_TEXTURE_3D, 0x85BC, 0x85BE);
+			#endif
+
 			if (type == GL_TEXTURE_3D_EXT) {
 				v.glext.glTexImage3D( type, 0, internal_format, tex_width, tex_height, tex_depth,
 					0, internal_format, gl_type_name(tex_type), NULL );
@@ -213,9 +220,9 @@ numeric_texture::gl_init( const view& v )
 					0, internal_format, gl_type_name( tex_type), NULL );
 			}
 		}
-		
+
 		if (type == GL_TEXTURE_3D_EXT) {
-			v.glext.glTexSubImage3D( type, 0, 
+			v.glext.glTexSubImage3D( type, 0,
 				0, 0, 0, data_width, data_height, data_depth,
 				internal_format, gl_type_name(tex_type), data(texdata));
 		} else {
@@ -224,7 +231,7 @@ numeric_texture::gl_init( const view& v )
 				internal_format, gl_type_name(tex_type), data(texdata));
 		}
 	}
-	
+
 	check_gl_error();
 }
 
@@ -255,7 +262,7 @@ numeric_texture::set_data( boost::python::numeric::array data)
 	NPY_TYPES t = type(data);
 	if (t == NPY_CFLOAT || t == NPY_CDOUBLE || t == NPY_OBJECT || t == NPY_NOTYPE)
 		throw std::invalid_argument( "Invalid texture data type");
-		
+
 	std::vector<npy_intp> dims = shape( data);
 	if (dims.size() < 2 || dims.size() > 4) {
 		throw std::invalid_argument( "Texture data must be NxMxC or NxM (or NxMxZxC for volume texture)");
@@ -272,7 +279,7 @@ numeric_texture::set_data( boost::python::numeric::array data)
 		// to check for changes; we make the user assign to texture.data again)
 		data = py::extract<py::numeric::array>( data.copy() );
 	}
-	
+
 	int channels = dims.size() >= 3 ? dims.back() : 1;
 	if (channels < 1 || channels > 4) {
 		throw std::invalid_argument(

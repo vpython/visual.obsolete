@@ -37,8 +37,8 @@ void set_display_visible( display_kernel*, bool visible ) {
 	else displays_visible--;
 	displays_visible_condition.notify_all();
 }
-void 
-display_kernel::waitWhileAnyDisplayVisible() 
+void
+display_kernel::waitWhileAnyDisplayVisible()
 {
 	python::gil_release gil;
 
@@ -53,12 +53,29 @@ static const display_kernel::EXTENSION_FUNCTION notImplemented = (display_kernel
 void
 display_kernel::enable_lights(view& scene)
 {
+	scene.light_pos.clear();
+	scene.light_color.clear();
+
+	tmatrix world_camera; world_camera.gl_modelview_get();
+
 	glEnable( GL_LIGHTING);
 	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, &ambient.red);
 	GLenum light_id = GL_LIGHT0;
 	light_iterator i = lights.begin();
 	while (i != light_iterator(lights.end()) && light_id <= GL_LIGHT7) {
 		i->gl_begin( light_id, gcf);
+
+		vertex p = world_camera * vertex( i->get_pos(), i->is_local()?1.0:0.0 );
+		scene.light_pos.push_back( p.x );
+		scene.light_pos.push_back( p.y );
+		scene.light_pos.push_back( p.z );
+		scene.light_pos.push_back( p.w );
+
+		scene.light_color.push_back( i->get_diffuse_color().red );
+		scene.light_color.push_back( i->get_diffuse_color().green );
+		scene.light_color.push_back( i->get_diffuse_color().blue );
+		scene.light_color.push_back( 1.0f );
+
 		++i;
 		++light_id;
 	}
@@ -142,11 +159,11 @@ display_kernel::calc_camera()
 }
 
 display_kernel::display_kernel()
-	: 
-	exit(true), 
-	visible(false), 
+	:
+	exit(true),
+	visible(false),
 	explicitly_invisible(false),
-	fullscreen(false), 
+	fullscreen(false),
 	title( "VPython" ),
 	window_x(-1), window_y(-1), window_width(430), window_height(430),
 	view_x(-1), view_y(-1), view_width(-1), view_height(-1),
@@ -225,9 +242,9 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 	// TODO: Implement ZOOM_ROLL modes.
 	float vfrac = (float)dy / view_height;
 	float hfrac = dx
-		/ ((stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO) ? 
+		/ ((stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO) ?
 		     (view_width*0.5f) : view_width);
-	
+
 	// The amount by which the scene should be shifted in response to panning
 	// motion.
 	// TODO: Keep this synchronized with the eye_dist calc in
@@ -301,7 +318,7 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 	}
 }
 
-void 
+void
 display_kernel::report_resize(	int win_x, int win_y, int win_w, int win_h,
 								int v_x, int v_y, int v_w, int v_h )
 {
@@ -324,7 +341,7 @@ display_kernel::realize()
 		vendor = std::string((const char*)glGetString(GL_VENDOR));
 		version = std::string((const char*)glGetString(GL_VERSION));
 		renderer = std::string((const char*)glGetString(GL_RENDERER));
-		
+
 		// The test is a hack so that subclasses not bothering to implement getProcAddress just
 		//   don't get any extensions.
 		if (getProcAddress("display_kernel::getProcAddress") != notImplemented)
@@ -404,19 +421,19 @@ display_kernel::world_to_view_transform(
 	else
 		cot_hfov = 1.0 / std::max(tan_hfov_x, tan_hfov_y);
 
-	// Position camera so that a (2*user_scale)^3 cube will have all its 
+	// Position camera so that a (2*user_scale)^3 cube will have all its
 	//   faces showing, with some border.
 	double cam_to_center_without_zoom = 1.05*(cot_hfov+1.0);
 	vector scene_camera = scene_center - cam_to_center_without_zoom*user_scale*scene_forward;
 
-	double nearest, farthest; 
+	double nearest, farthest;
 	world_extent.near_and_far(forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
 	nearest *= gcf; farthest *= gcf;
 
 	double cam_to_center = (scene_center - scene_camera).mag();
 	// Z buffer resolution is highly sensitive to nearclip - a "small" camera will have terrible z buffer
-	//   precision for distant objects.  PLEASE don't fiddle with this unless you know what kind of 
-	//   test cases you need to see the results, including at nonstandard fields of view and 24 bit 
+	//   precision for distant objects.  PLEASE don't fiddle with this unless you know what kind of
+	//   test cases you need to see the results, including at nonstandard fields of view and 24 bit
 	//   z buffers!
 	// The equation for nearclip below is designed to give similar z buffer resolution at all fields of
 	//   view.  It's a little weird, but seems to give acceptable results in all the cases I've been able
@@ -426,7 +443,7 @@ display_kernel::world_to_view_transform(
 	//   scaling the scene up.  There is actually a difference since the camera has a finite "size".
 	//   Unfortunately, following this model leads to a problem with zooming in a lot!  The problem is
 	//   especially pronounced at tiny fields of view, which typically have an enormous camera very far away;
-	//   when you try to zoom in the big camera "crashes" into the tiny scene!  So instead we use the 
+	//   when you try to zoom in the big camera "crashes" into the tiny scene!  So instead we use the
 	//   slightly odd model of scaling the scene, or equivalently making the camera smaller as you zoom in.
 	double fwz = cam_to_center_without_zoom + 1.0;
 	double nearclip = fwz * fwz / (100 + fwz) * user_scale;
@@ -488,10 +505,10 @@ display_kernel::world_to_view_transform(
 		scene_camera.x, scene_camera.y, scene_camera.z,
 		scene_center.x, scene_center.y, scene_center.z,
 		scene_up.x, scene_up.y, scene_up.z);
-		
+
 	tmatrix world_camera; world_camera.gl_modelview_get();
 	inverse( geometry.camera_world, world_camera );
-	
+
 	//vector scene_range = range * gcf;
 	//glScaled( 1.0/scene_range.x, 1.0/scene_range.y, 1.0/scene_range.z);
 
@@ -505,14 +522,14 @@ display_kernel::world_to_view_transform(
 	else if (whicheye == 0) {
 		frustum_stereo_offset = 0;
 	}
-	
+
 	if (nearclip<=0 || farclip<=nearclip || tan_hfov_x<=0 || tan_hfov_y<=0) {
 		std::ostringstream msg;
 		msg << "VPython degenerate projection: " << nearclip << " " << farclip << " " << tan_hfov_x << " " << tan_hfov_y;
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
 	}
-	
+
 	glFrustum(
 		-nearclip * tan_hfov_x + frustum_stereo_offset,
 		nearclip * tan_hfov_x + frustum_stereo_offset,
@@ -585,9 +602,9 @@ display_kernel::recalc_extent(void)
         // We should NEVER deliberately set range to zero on any axis.
 		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
 	}
-	
+
 	double scale = 1.0/(std::max(std::max(range.x,range.y),range.z));
-	
+
 	// xxx Instead of changing gcf so much, we should change it only when it is 2x
 	// off, and keep a separate OpenGL scaling factor, to aid primitives whose caching
 	// may depend on gcf.
@@ -597,7 +614,7 @@ display_kernel::recalc_extent(void)
 	}
 
 	gcfvec = vector(gcf,gcf,gcf);
-	
+
 	if (!uniform) {
 		gcf_changed = true;
 		double width = (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
@@ -662,7 +679,7 @@ display_kernel::draw(
 			i = layer_world.erase(i.base());
 			continue;
 		}
-		
+
 		i->outer_render( scene_geometry);
 		++i;
 	}
@@ -680,7 +697,7 @@ display_kernel::draw(
 		j->outer_render( scene_geometry );
 		++j;
 	}
-	
+
 	// Render all objects in screen space.
 	disable_lights();
 	gl_disable depth_test( GL_DEPTH_TEST);
@@ -705,7 +722,7 @@ display_kernel::render_scene(void)
 	// xxx Exception handling?
 	if (!realized) {
 		realize();
-		
+
 		lock L(realize_lock);
 		realized = true;
 		realize_condition.notify_all();
@@ -722,7 +739,7 @@ display_kernel::render_scene(void)
 			view_height, forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
 		clear_gl_error();
-		
+
 		on_gl_free.frame();
 
 		glClearColor( background.red, background.green, background.blue, 0);
@@ -839,17 +856,17 @@ display_kernel::render_scene(void)
 		}
 		if (show_rendertime) {
 			double render_time = render_timer.elapsed()-start_time, flush_time = -1;
-			
+
 			#if 0 // xxx Only for performance measurement; disable in shipping code
 			glFinish();
-			
+
 			flush_time = render_timer.elapsed() - start_time - render_time;
 			#endif
-			
+
 			std::wostringstream render_msg;
 			render_msg.precision(3);
 			// render time does not include pick time, which may be negligible
-			render_msg << "cycle: " << int(1000*cycle) << 
+			render_msg << "cycle: " << int(1000*cycle) <<
 			   " render: " << int(1000*(render_time));
 			if (flush_time>=0) render_msg << " flush: " << int(1000*flush_time);
 			glColor3f(
@@ -892,12 +909,12 @@ display_kernel::render_scene(void)
 	if (show_rendertime) {
 		render_time = render_timer.elapsed()-start_time;
 	}
-	
+
 	// xxx Can we delay picking until the Python program actually wants one of these attributes?
 	mouse.get_mouse().cam = camera;
 	boost::tie( mouse.get_mouse().pick, mouse.get_mouse().pickpos, mouse.get_mouse().position) =
 		pick( mouse.get_x(), mouse.get_y() );
-	
+
 	return true;
 }
 
@@ -1365,7 +1382,7 @@ display_kernel::info()
 	}
 }
 
-void 
+void
 display_kernel::set_shader( std::string source ) {
 	if (source.size())
 		global_shader.reset( new shader_program( source ) );
@@ -1373,11 +1390,11 @@ display_kernel::set_shader( std::string source ) {
 		global_shader.reset( NULL );
 }
 
-std::string 
+std::string
 display_kernel::get_shader() {
-	if ( global_shader ) 
+	if ( global_shader )
 		return global_shader->get_source();
-	else 
+	else
 		return std::string();
 }
 

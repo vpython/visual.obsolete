@@ -30,19 +30,20 @@ class gl_extensions {
 	PFNGLGETHANDLEARBPROC			glGetHandleARB;
 	PFNGLUNIFORM1IARBPROC			glUniform1iARB;
 	PFNGLUNIFORMMATRIX4FVARBPROC	glUniformMatrix4fvARB;
+	PFNGLUNIFORM4FVARBPROC			glUniform4fvARB;
 	PFNGLGETUNIFORMLOCATIONARBPROC	glGetUniformLocationARB;
 	PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB;
 	PFNGLGETINFOLOGARBPROC			glGetInfoLogARB;
-	
+
 	// Extension: EXT_texture3D
 	bool EXT_texture3D;
 	PFNGLTEXIMAGE3DEXTPROC			glTexImage3D;
 	PFNGLTEXSUBIMAGE3DEXTPROC		glTexSubImage3D;
-	
+
 	// Extension: ARB_multitexture
 	bool ARB_multitexture;
 	PFNGLACTIVETEXTUREARBPROC		glActiveTexture;
-	
+
 	// Extension: ARB_point_parameters
 	bool ARB_point_parameters;
 	PFNGLPOINTPARAMETERFVARBPROC	glPointParameterfvARB;
