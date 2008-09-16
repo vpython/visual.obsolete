@@ -55,15 +55,15 @@ ring::gl_render( const view& scene)
 	// Level of detail estimation.  See sphere::gl_render().
 
 	// The number of subdivisions around the hoop's radial direction.
-	double band_coverage = (thickness ? scene.pixel_coverage( pos, thickness) 
+	double band_coverage = (thickness ? scene.pixel_coverage( pos, thickness)
 			: scene.pixel_coverage(pos, radius*0.1));
 	if (band_coverage<0) band_coverage = 1000;
-	int bands = static_cast<int>( sqrt(band_coverage * 1.0) );
+	int bands = static_cast<int>( sqrt(band_coverage * 4.0) );
 	bands = clamp( 4, bands, 40);
 	// The number of subdivions around the hoop's tangential direction.
 	double ring_coverage = scene.pixel_coverage( pos, radius);
 	if (ring_coverage<0) ring_coverage = 1000;
-	int rings = static_cast<int>( sqrt(ring_coverage * 3.0) );
+	int rings = static_cast<int>( sqrt(ring_coverage * 4.0) );
 	rings = clamp( 4, rings, 80);
 
 	if (model_rings != rings || model_bands != bands || model_radius != radius || model_thickness != thickness) {
@@ -71,7 +71,7 @@ ring::gl_render( const view& scene)
 		create_model( rings, bands, model );
 	}
 
-	clear_gl_error(); 
+	clear_gl_error();
 	{
 		gl_enable_client vertex_array( GL_VERTEX_ARRAY);
 		gl_enable_client normal_array( GL_NORMAL_ARRAY);
@@ -99,7 +99,7 @@ ring::grow_extent( extent& world)
 	world.add_body();
 }
 
-void 
+void
 ring::create_model( int rings, int bands, class model& m )
 {
 	// In Visual 3, rendered thickness was (incorrectly) double what was documented.
