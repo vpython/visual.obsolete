@@ -79,7 +79,7 @@ wrap_arrayobjects()
 		.def( init<const points&>())
 		.add_property( "size", &points::get_size, &points::set_size)  // AKA thickness.
 		.add_property( "shape", &points::get_points_shape, &points::set_points_shape)
-		.add_property( "type", &points::get_size_type, &points::set_size_type)
+		.add_property( "size_units", &points::get_size_units, &points::set_size_units)
 		.def( "get_color", &points::get_color)
 		// The order of set_color specifications matters.
 		.def( "set_color", &points::set_color_t)
