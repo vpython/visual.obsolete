@@ -15,9 +15,10 @@
 #endif
 
 #if defined(__APPLE__)
+	#define GL_GLEXT_LEGACY
 	#include <OpenGL/gl.h>
-	#include <OpenGL/glext.h>
 	#include <OpenGL/glu.h>
+	#include "GL/glext.h"
 #else
 	#include <GL/gl.h>
 	#include <GL/glext.h>
