@@ -44,7 +44,7 @@ class ring : public axial
 	PRIMITIVE_TYPEINFO_DECL;
 	bool degenerate();
 
-	model model;
+	cvisual::model model;
 	int model_rings, model_bands;
 	double model_radius, model_thickness;
 
@@ -53,12 +53,12 @@ class ring : public axial
 	virtual ~ring();
 	void set_thickness( double t);
 	double get_thickness();
-	
+
  protected:
 	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
-	
+
 	void create_model( int rings, int bands, class model& m );
 };
 
