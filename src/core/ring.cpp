@@ -162,6 +162,12 @@ ring::create_model( int rings, int bands, class model& m )
 	}
 }
 
+void
+ring::get_material_matrix(const view&, tmatrix& out) {
+	out.translate( vector(.5,.5,.5) );
+	out.scale( vector(radius,radius,radius) * (.5 / (radius+thickness)) );
+}
+
 PRIMITIVE_TYPEINFO_IMPL(ring)
 
 } // !namespace cvisual

@@ -58,6 +58,7 @@ class ring : public axial
 	virtual void gl_pick_render( const view&);
 	virtual void gl_render( const view&);
 	virtual void grow_extent( extent&);
+	void get_material_matrix(const view&, tmatrix& out);
 
 	void create_model( int rings, int bands, class model& m );
 };
