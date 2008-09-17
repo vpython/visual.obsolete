@@ -28,7 +28,6 @@ class curve : public renderable
 	array color;
 	bool antialias;
 	double radius;
-	size_t retain; // how many recent points to retain
 
 	// the space allocated for storage so far
 	size_t preallocated_size;
@@ -71,8 +70,10 @@ class curve : public renderable
 	curve( const curve& other);
 	virtual ~curve();
 
-	void append_rgb( vector, float red=-1, float green=-1, float blue=-1);
+	void append_rgb( vector _pos, float red=-1, float green=-1, float blue=-1, int retain=-1);
+	void append( vector _pos, rgb _color, int retain); // Append a single position with new color.
 	void append( vector _pos, rgb _color); // Append a single position with new color.
+	void append( vector _pos, int retain); // Append a single position element, extend color.
 	void append( vector _pos); // Append a single position element, extend color.
 
 	boost::python::object get_pos(void);
@@ -80,7 +81,6 @@ class curve : public renderable
 
 	inline bool get_antialias( void) { return antialias; }
 	inline double get_radius( void) { return radius; }
-	inline int get_retain( void) { return retain; }
 
 	void set_pos( array pos); // An Nx3 array of doubles
 	void set_pos_l( const list& pos); // A list of vector
@@ -91,7 +91,6 @@ class curve : public renderable
 
 	void set_antialias( bool);
 	void set_radius( const double& r);
-	void set_retain( size_t);
 
 	void set_red( const array& red);
 	void set_red_l( const list& red);

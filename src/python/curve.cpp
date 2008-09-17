@@ -46,7 +46,6 @@ float* findex( const array& a, size_t i)
 curve::curve()
 	: pos( 0), color( 0), antialias( true),
 	radius(0.0),
-	retain(0),
 	preallocated_size(257),
 	count(0), sides(4)
 {
@@ -87,7 +86,7 @@ curve::curve()
 
 curve::curve( const curve& other)
 	: renderable( other), pos( other.pos), color( other.color),
-	antialias( other.antialias), retain( other.retain),
+	antialias( other.antialias),
 	radius( other.radius), preallocated_size( other.preallocated_size),
 	count( other.count)
 {
@@ -191,10 +190,10 @@ curve::set_length( size_t length)
 }
 
 void
-curve::append_rgb( vector npos, float red, float green, float blue)
+curve::append_rgb( vector npos, float red, float green, float blue, int retain)
 {
-	if (retain > 0 && count >= retain) {
-		set_length( retain-1); //move pos and color lists down
+	if (retain >= 0 && (int)count >= retain) {
+		set_length( retain); //move pos and color lists down
 	}
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
@@ -211,10 +210,10 @@ curve::append_rgb( vector npos, float red, float green, float blue)
 }
 
 void
-curve::append( vector npos, rgb ncolor)
+curve::append( vector npos, rgb ncolor, int retain)
 {
-	if (retain > 0 && count >= retain) {
-		set_length( retain-1); //move pos and color lists down
+	if (retain >= 0 && (int)count >= retain) {
+		set_length( retain); //move pos and color lists down
 	}
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
@@ -228,11 +227,35 @@ curve::append( vector npos, rgb ncolor)
 }
 
 void
+curve::append( vector npos, rgb ncolor)
+{
+	set_length( count+1);
+	double* last_pos = index( pos, count-1);
+	float* last_color = findex( color, count-1);
+	last_pos[0] = npos.x;
+	last_pos[1] = npos.y;
+	last_pos[2] = npos.z;
+	last_color[0] = ncolor.red;
+	last_color[1] = ncolor.green;
+	last_color[2] = ncolor.blue;
+}
+
+void
+curve::append( vector npos, int retain)
+{
+	if (retain >= 0 && (int)count >= retain) {
+		set_length( retain); //move pos and color lists down
+	}
+	set_length( count+1);
+	double* last_pos = index( pos, count-1);
+	last_pos[0] = npos.x;
+	last_pos[1] = npos.y;
+	last_pos[2] = npos.z;
+}
+
+void
 curve::append( vector npos)
 {
-	if (retain > 0 && count >= retain) {
-		set_length( retain-1); //move pos and color lists down
-	}
 	set_length( count+1);
 	double* last_pos = index( pos, count-1);
 	last_pos[0] = npos.x;
@@ -256,7 +279,6 @@ curve::set_pos( array n_pos)
 		else {
 			set_length( dims[0]);
 			pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-			if (retain > 0 && count >= retain) set_length( retain);
 			return;
 		}
 	}
@@ -267,13 +289,11 @@ curve::set_pos( array n_pos)
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice(0,2))] = n_pos;
 		pos[make_tuple(slice(1, count+1), 2)] = 0.0;
-		if (retain > 0 && count >= retain) set_length( retain);
 		return;
 	}
 	else if (dims[1] == 3) {
 		set_length( dims[0]);
 		pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-		if (retain > 0 && count >= retain) set_length( retain);
 		return;
 	}
 	else {
@@ -490,14 +510,6 @@ curve::set_antialias( bool aa)
 	this->antialias = aa;
 }
 
-void
-curve::set_retain( size_t retain)
-{
-	if (retain > 0 && count > retain) {
-		set_length( retain); //move pos and color lists down
-	}
-	this->retain = retain;
-}
 
 bool
 curve::degenerate() const

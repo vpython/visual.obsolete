@@ -30,13 +30,14 @@ wrap_arrayobjects()
 	using namespace boost::python;
 	using python::curve;
 
-	void (curve::*append_v_r)( vector, rgb) = &curve::append;
+	void (curve::*append_v_rgb_retain)( vector, rgb, int) = &curve::append;
+	void (curve::*append_v_rgb)( vector, rgb) = &curve::append;
+	void (curve::*append_v_retain)( vector, int) = &curve::append;
 	void (curve::*append_v)( vector) = &curve::append;
 	
 	class_<curve, bases<renderable> >( "curve")
 		.def( init<const curve&>())
 		.add_property( "radius", &curve::get_radius, &curve::set_radius)  // AKA thickness.
-		.add_property( "retain", &curve::get_retain, &curve::set_retain)
 		.def( "get_color", &curve::get_color)
 		// The order of set_color specifications matters.
 		.def( "set_color", &curve::set_color_t)
@@ -64,9 +65,11 @@ wrap_arrayobjects()
 		.def( "set_z", &curve::set_z_l)
 		.def( "set_z", &curve::set_z_d)
 		.def( "set_z", &curve::set_z)
-		.def( "append", append_v_r, args( "pos", "color"))
+		.def( "append", append_v_rgb_retain, args( "pos", "color", "retain"))
+		.def( "append", append_v_rgb, args( "pos", "color"))
+		.def( "append", append_v_retain, args( "pos", "retain"))
 		.def( "append", &curve::append_rgb,
-			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1))
+			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1, args("retain")=-1))
 		.def( "append", append_v, args("pos"))
 		;
 
