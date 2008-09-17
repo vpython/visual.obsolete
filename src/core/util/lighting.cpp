@@ -4,6 +4,7 @@
 
 #include "util/lighting.hpp"
 #include "util/errors.hpp"
+#include "renderable.hpp"
 #include <cassert>
 
 namespace cvisual {
@@ -11,94 +12,94 @@ namespace cvisual {
 bool
 light::attenuated() const
 {
-	return constant_attenuation != 1.0 
-		|| linear_attenuation != 0.0 
+	return constant_attenuation != 1.0
+		|| linear_attenuation != 0.0
 		|| quadratic_attenuation != 0.0;
 }
 
 bool
 light::spotlight() const
 {
-	return spot_cutoff != 0 || 
+	return spot_cutoff != 0 ||
 		(spot_cutoff != 180 && spot_direction != vector());
 }
 
 light::light( const vector& position, rgba color)
-	: diffuse( color), 
-	specular( color), 
-	position( position ), 
+	: diffuse( color),
+	specular( color),
+	position( position ),
 	local(true),
 	spot_direction(vector()),
-	spot_exponent(0), 
-	spot_cutoff(180.0), 
+	spot_exponent(0),
+	spot_cutoff(180.0),
 	constant_attenuation(1.0),
-	linear_attenuation( 0.0), 
+	linear_attenuation( 0.0),
 	quadratic_attenuation(0.0)
 {
 }
 
-void 
+void
 light::set_pos( const vector& n_pos)
 {
 	position = n_pos;
 }
 
-shared_vector& 
+shared_vector&
 light::get_pos()
 {
 	return position;
 }
 
-void 
+void
 light::set_local( bool n_local)
 {
 	local = n_local;
 }
 
-bool 
+bool
 light::is_local()
 {
 	return local;
 }
 
-void 
+void
 light::set_spot_direction( const vector& n_dir)
 {
 	spot_direction = n_dir;
 }
 
-shared_vector& 
+shared_vector&
 light::get_spot_direction()
 {
 	return spot_direction;
 }
 
-void 
+void
 light::set_spot_exponent( float e)
 {
 	if (e < 0 || e > 128)
-		throw std::invalid_argument( 
+		throw std::invalid_argument(
 			"spot exponent must be within the range [0, 128].");
 	spot_exponent = e;
 }
 
-float 
+float
 light::get_spot_exponent()
 {
 	return spot_exponent;
 }
- 
-void 
+
+void
 light::set_spot_cutoff( float e)
 {
 	if (e != 180 && (e < 0 || e > 90))
-		throw std::invalid_argument( 
+		throw std::invalid_argument(
 			"spot cutoff angle must be an angle between [0,90], or exactly 180 "
 			"degrees.");
 	spot_cutoff = e;
 }
 
-float 
+float
 light::get_spot_cutoff()
 {
 	return spot_cutoff;
@@ -111,7 +112,7 @@ light::set_attenuation( double constant, double linear, double quadratic)
 	if (!local)
 		throw std::invalid_argument( "Only local lights may be attenuated.");
 	if (constant < 0 || linear < 0 || quadratic < 0)
-		throw std::invalid_argument( 
+		throw std::invalid_argument(
 			"Light attenuation factors must be non-negative.");
 	constant_attenuation = constant;
 	linear_attenuation = linear;
@@ -121,32 +122,42 @@ light::set_attenuation( double constant, double linear, double quadratic)
 vector
 light::get_attentuation()
 {
-	return vector( 
+	return vector(
 		constant_attenuation, linear_attenuation, quadratic_attenuation);
 }
 
-void 
+void
 light::set_diffuse_color( const rgba& color)
 {
 	diffuse = color;
 }
 
-rgba 
+rgba
 light::get_diffuse_color()
 {
 	return diffuse;
 }
 
-void 
+void
 light::set_specular_color( const rgba& color)
 {
 	specular = color;
 }
 
-rgba 
+rgba
 light::get_specular_color()
 {
 	return specular;
+}
+
+vertex light::get_world_pos( const view& scene ) {
+	vertex p;
+	if (is_local())
+		p = vertex( position * scene.gcf, 1.0 );
+	else
+		p = vertex( position, 0.0 );
+
+	return p;
 }
 
 void
@@ -158,10 +169,10 @@ light::gl_begin( GLenum id, double gcf) const
 		glLightf( id, GL_LINEAR_ATTENUATION, (float)(linear_attenuation*gcf));
 		glLightf( id, GL_QUADRATIC_ATTENUATION, (float)(quadratic_attenuation*gcf*gcf));
 	}
-	
+
 	glLightfv( id, GL_DIFFUSE, &diffuse.red);
 	glLightfv( id, GL_SPECULAR, &specular.red);
-	
+
 	vector _pos = position;
 	if (!local) {
 		_pos = _pos.norm();
@@ -169,7 +180,7 @@ light::gl_begin( GLenum id, double gcf) const
 		_pos *= gcf;
 	float pos[] = { (float)_pos.x, (float)_pos.y, (float)_pos.z, local ? 1.0f : 0.0f };
 	glLightfv( id, GL_POSITION, pos);
-	
+
 	if (spotlight()) {
 		glLightf( id, GL_SPOT_CUTOFF, spot_cutoff);
 		glLightf( id, GL_SPOT_EXPONENT, spot_exponent);

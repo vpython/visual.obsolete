@@ -65,7 +65,7 @@ display_kernel::enable_lights(view& scene)
 	while (i != light_iterator(lights.end()) && light_id <= GL_LIGHT7) {
 		i->gl_begin( light_id, gcf);
 
-		vertex p = world_camera * vertex( i->get_pos(), i->is_local()?1.0:0.0 );
+		vertex p = world_camera * i->get_world_pos( scene );vertex( i->get_pos(), i->is_local()?1.0:0.0 );
 		scene.light_pos.push_back( p.x );
 		scene.light_pos.push_back( p.y );
 		scene.light_pos.push_back( p.z );

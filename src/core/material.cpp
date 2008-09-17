@@ -62,14 +62,9 @@ apply_material::apply_material( const view& v, material* m, tmatrix& model_mater
 		v.glext.glActiveTexture(GL_TEXTURE0);
 
 	int loc;
-	if ( (loc = m->shader->get_uniform_location( v, "camera_world" )) >= 0 ) {
-		m->shader->set_uniform_matrix( v, loc, v.camera_world );
-	}
-
 	if ( (loc = m->shader->get_uniform_location( v, "model_material" )) >= 0 ) {
 		m->shader->set_uniform_matrix( v, loc, model_material );
 	}
-
 	if ( (loc = m->shader->get_uniform_location( v, "light_count" )) >= 0 )
 		v.glext.glUniform1iARB( loc, v.light_count[0] );
 
