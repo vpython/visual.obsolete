@@ -428,7 +428,8 @@ display_kernel::world_to_view_transform(
 
 	double nearest, farthest;
 	world_extent.near_and_far(forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
-	nearest *= gcf; farthest *= gcf;
+	nearest = nearest*gcf-scene_center.dot(forward);
+	farthest = farthest*gcf-scene_center.dot(forward);
 
 	double cam_to_center = (scene_center - scene_camera).mag();
 	// Z buffer resolution is highly sensitive to nearclip - a "small" camera will have terrible z buffer
