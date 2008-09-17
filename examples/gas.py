@@ -85,16 +85,23 @@ pos = pos+(p/m)*(dt/2.) # initial half-step
 time = clock()
 
 while 1:
-    rate(200)
+    rate(100)
     observation.plot(data=mag(p/m))
 
     # Update all positions
     pos = pos+(p/m)*dt
 
-    r = pos-pos[:,newaxis] # all pairs of atom-to-atom vectors
-    rmag = sqrt(add.reduce(r*r,-1)) # atom-to-atom scalar distances
-    hit = less_equal(rmag,radius+radius[:,None])-identity(Natoms)
-    hitlist = sort(nonzero(hit.flat)[0]).tolist() # i,j encoded as i*Natoms+j
+    try:  # numpy
+        r = pos-pos[:,newaxis] # all pairs of atom-to-atom vectors
+        rmag = sqrt(add.reduce(r*r,-1)) # atom-to-atom scalar distances
+        hit = less_equal(rmag,radius+radius[:,None])-identity(Natoms)
+        hitlist = sort(nonzero(hit.flat)[0]).tolist() # i,j encoded as i*Natoms+j
+    except: # old Numeric
+        r = pos-pos[:,NewAxis] # all pairs of atom-to-atom vectors
+        rmag = sqrt(add.reduce(r*r,-1)) # atom-to-atom scalar distances
+        hit = less_equal(rmag,radius+radius[:,NewAxis])-identity(Natoms)
+        hitlist = sort(nonzero(hit.flat)).tolist() # i,j encoded as i*Natoms+j
+
     # If any collisions took place:
     for ij in hitlist:
         i, j = divmod(ij,Natoms) # decode atom pair
@@ -138,9 +145,4 @@ while 1:
     for i in range(Natoms):
         Atoms[i].pos = pos[i]
 
-    Nsteps = Nsteps+1
     t = t+dt
-
-    if Nsteps == 50:
-        print '%3.1f seconds for %d steps with %d Atoms' % (clock()-time, Nsteps, Natoms)
-##    rate(30)

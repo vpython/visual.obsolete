@@ -32,7 +32,10 @@ def BField(obs):
     r = obs-center
     rmag = mag(r)
     rmag.shape = (-1,1)
-    return (k*I*cross(delta, r)/rmag**3).sum(axis=0)
+    try:  # numpy
+        return (k*I*cross(delta, r)/rmag**3).sum(axis=0)
+    except:  # old Numeric
+        return sum(k*I*cross(delta, r)/rmag**3)
 
 Bvector = arrow(axis=(0,0,0), shaftwidth=vwidth, color=(0,1,1))
 drag = 0

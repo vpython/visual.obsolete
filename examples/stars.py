@@ -71,15 +71,26 @@ time = clock()
 Nhits = 0
 
 while 1:
-    # Compute all forces on all stars
-    r = pos-pos[:,newaxis] # all pairs of star-to-star vectors
-    for n in range(Nstars):
-        r[n,n] = 1e6  # otherwise the self-forces are infinite
-    rmag = sqrt(add.reduce(r*r,-1)) # star-to-star scalar distances
-    hit = less_equal(rmag,radius+radius[:,newaxis])-identity(Nstars)
-    hitlist = sort(nonzero(hit.flat)[0]).tolist() # 1,2 encoded as 1*Nstars+2
+    rate(100)
     
-    F = G*m*m[:,newaxis]*r/rmag[:,:,newaxis]**3 # all force pairs
+    # Compute all forces on all stars
+    try:  # numpy
+        r = pos-pos[:,newaxis] # all pairs of star-to-star vectors
+        for n in range(Nstars):
+            r[n,n] = 1e6  # otherwise the self-forces are infinite
+        rmag = sqrt(add.reduce(r*r,-1)) # star-to-star scalar distances
+        hit = less_equal(rmag,radius+radius[:,newaxis])-identity(Nstars)
+        hitlist = sort(nonzero(hit.flat)[0]).tolist() # 1,2 encoded as 1*Nstars+2
+        F = G*m*m[:,newaxis]*r/rmag[:,:,newaxis]**3 # all force pairs
+    except: # old Numeric
+        r = pos-pos[:,NewAxis] # all pairs of star-to-star vectors
+        for n in range(Nstars):
+            r[n,n] = 1e6  # otherwise the self-forces are infinite
+        rmag = sqrt(add.reduce(r*r,-1)) # star-to-star scalar distances
+        hit = less_equal(rmag,radius+radius[:,NewAxis])-identity(Nstars)
+        hitlist = sort(nonzero(hit.flat)) # 1,2 encoded as 1*Nstars+2
+        F = G*m*m[:,NewAxis]*r/rmag[:,:,NewAxis]**3 # all force pairs
+        
     for n in range(Nstars):
         F[n,n] = 0  # no self-forces
     p = p+sum(F,1)*dt
@@ -118,8 +129,4 @@ while 1:
         Nhits = Nhits+1
         pos[jset] = (10.*L*Nhits, 0, 0) # put it far away
 
-    if Nsteps == 100:
-        print '%3.1f seconds for %d steps with %d stars' % (clock()-time, Nsteps, Nstars)
-    Nsteps = Nsteps+1
     t = t+dt
-    rate(100)
