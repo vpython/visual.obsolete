@@ -2,6 +2,8 @@
 # Be sure to specify what version of Python is in /usr/bin (typically /usr/bin/python2.5)
 
 PYTHON_VERSION = 2.5
+PYTHON_FRAMEWORK = /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/
+SITE_PACKAGES = $(PYTHON_FRAMEWORK)lib/python$(PYTHON_VERSION)/site-packages/
 TOP = ../vpython-core2
 DEPENDS = $(TOP)/dependencies
 SRC = $(TOP)/src
@@ -12,8 +14,8 @@ CXX = /usr/bin/g++
 CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-Wno-long-double -DPIC -O2 -g -finline-functions \
 	-I$(TOP)/include/mac -I$(TOP)/include \
-	-I/System/Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/include/python$(PYTHON_VERSION) \
-	-I/Library/Python/$(PYTHON_VERSION)/site-packages/numpy/core/include \
+	-I$(PYTHON_FRAMEWORK)/include/python$(PYTHON_VERSION) \
+	-I$(SITE_PACKAGES)/numpy/core/include \
 	-I$(DEPENDS)/boost_1_35_0 -I$(DEPENDS)/threadpool/include \
 	-F/System/Library/Frameworks/AGL.framework \
 	-F/System/Library/Frameworks/Carbon.framework \
@@ -40,9 +42,17 @@ cvisual.so : $(OBJS)
 	$(BOOST)/libboost_thread-mt-s-1_35.a
 
 install : cvisual.so
-	sudo cp cvisual.so /Library/Python/$(PYTHON_VERSION)/site-packages
+	cp cvisual.so ../vpython-core2/site-packages/visual
+#	sudo cp cvisual.so /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/lib/python$(PYTHON_VERSION)/site-packages/
+#	sudo cp cvisual.so /Library/Python/$(PYTHON_VERSION)/site-packages
 
 clean :
 	rm *.o
+
+# This command to be run from the vpython-core2/src/mac
+setup : 
+	mkdir -p ../../../vpython-core2/../mbuild
+	ln -sfh $(abspath makefile) ../../../mbuild/makefile
+	ln -sfh $(abspath ../../site-packages/visual) $(SITE_PACKAGES)visual
 
 -include *.d
