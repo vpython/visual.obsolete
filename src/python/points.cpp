@@ -296,9 +296,8 @@ points::set_color( array n_color)
 	}
 	if (dims.size() == 2 && dims[1] == 3) {
 		// An RGB chunk of color
-		if (dims[0] != (long)count) {
-			throw std::invalid_argument( "color must be the same length as pos.");
-		}
+		set_length(dims[0]);
+
 		// The following doesn't work; I don't know why.
 		// Note that it works with a single color above.
 		//color[slice(1, count+1), slice(0, 3)] = n_color;

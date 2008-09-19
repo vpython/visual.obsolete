@@ -311,7 +311,7 @@ faces::set_color( array n_color)
 {
 	using namespace boost::python;
 	using cvisual::python::slice;
-	
+
 	NPY_TYPES t = type(n_color);
 	if (t != NPY_FLOAT) {
 		n_color = astype(n_color, NPY_FLOAT);
@@ -326,10 +326,9 @@ faces::set_color( array n_color)
 	}
 	if (dims.size() == 2 && dims[1] == 3) {
 		// An RGB chunk of color
-		if (dims[0] != (long)count) {
-			throw std::invalid_argument( "color must be the same length as pos.");
-		}
-		// The following doesn't work; I don't know why. 
+		set_length( dims[0] );
+
+		// The following doesn't work; I don't know why.
 		// Note that it works with a single color above.
 		//color[slice(1, count+1), slice(0, 3)] = n_color;
 		// So instead do it by brute force:
@@ -360,12 +359,16 @@ faces::set_color_t( rgb c)
 	using boost::python::make_tuple;
 	// Broadcast the new color across the array.
 	int npoints = count ? count : 1;
-	color[slice(0, npoints)] = make_tuple( c.red, c.green, c.blue);
+	color[slice(0, npoints)] = make_tuple(c.red, c.green, c.blue);
 }
 
 void
 faces::set_normal( const array& n_normal)
 {
+	std::vector<npy_intp> dims = shape(n_normal);
+	if (dims.size() == 2 && dims[1] == 3)
+		set_length( dims[0] );
+
 	normal[slice(0, count)] = n_normal;
 }
 
@@ -392,7 +395,7 @@ faces::gl_render( const view& scene)
 
 	std::vector<vector> spos;
 	std::vector<rgb> tcolor;
-	
+
 	gl_enable_client vertexes( GL_VERTEX_ARRAY);
 	gl_enable_client normals( GL_NORMAL_ARRAY);
 	gl_enable_client colors( GL_COLOR_ARRAY);
@@ -468,10 +471,10 @@ faces::grow_extent( extent& world)
 	world.add_body();
 }
 
-void 
+void
 faces::get_material_matrix( const view& v, tmatrix& out ) {
 	if (degenerate()) return;
-	
+
 	// xxx Add some caching for extent with grow_extent etc; once locking changes so we can trust the primitive not to change during rendering
 	vector min_extent, max_extent;
 	double* pos_i = index( pos, 0);
@@ -483,7 +486,7 @@ faces::get_material_matrix( const view& v, tmatrix& out ) {
 			else if (*pos_i > max_extent[j]) max_extent[j] = *pos_i;
 			pos_i++;
 		}
-	
+
 	out.translate( vector(.5,.5,.5) );
 	out.scale( vector(1,1,1) * (.999 / (v.gcf * std::max(max_extent.x-min_extent.x, std::max(max_extent.y-min_extent.y, max_extent.z-min_extent.z)))) );
 	out.translate( -.5 * v.gcf * (min_extent + max_extent) );
