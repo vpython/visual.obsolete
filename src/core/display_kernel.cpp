@@ -53,75 +53,54 @@ static const display_kernel::EXTENSION_FUNCTION notImplemented = (display_kernel
 void
 display_kernel::enable_lights(view& scene)
 {
+	scene.light_count[0] = 0;
 	scene.light_pos.clear();
 	scene.light_color.clear();
+	std::list<shared_ptr<renderable> >::iterator i = layer_world.begin();
+	std::list<shared_ptr<renderable> >::iterator i_end = layer_world.end();
+	for(; i != i_end; ++i)
+		(*i)->render_lights( scene );
+	std::vector<shared_ptr<renderable> >::iterator j = layer_world_transparent.begin();
+	std::vector<shared_ptr<renderable> >::iterator j_end = layer_world_transparent.end();
+	for(; j != j_end; ++j)
+		(*j)->render_lights( scene );
 
 	tmatrix world_camera; world_camera.gl_modelview_get();
+	vertex p;
 
-	glEnable( GL_LIGHTING);
-	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, &ambient.red);
-	GLenum light_id = GL_LIGHT0;
-	light_iterator i = lights.begin();
-	while (i != light_iterator(lights.end()) && light_id <= GL_LIGHT7) {
-		i->gl_begin( light_id, gcf);
+	// Clear modelview matrix since we are multiplying the light positions ourselves
+	gl_matrix_stackguard guard;
+	glLoadIdentity();
 
-		vertex p = world_camera * i->get_world_pos( scene );vertex( i->get_pos(), i->is_local()?1.0:0.0 );
-		scene.light_pos.push_back( p.x );
-		scene.light_pos.push_back( p.y );
-		scene.light_pos.push_back( p.z );
-		scene.light_pos.push_back( p.w );
+	for(int i=0; i<scene.light_count[0] && i<8; i++) {
+		int li = i*4;
 
-		scene.light_color.push_back( i->get_diffuse_color().red );
-		scene.light_color.push_back( i->get_diffuse_color().green );
-		scene.light_color.push_back( i->get_diffuse_color().blue );
-		scene.light_color.push_back( 1.0f );
+		// Transform the light into eye space
+		for(int d=0; d<4; d++) p[d] = scene.light_pos[li+d];
+		p = world_camera * p;
+		for(int d=0; d<4; d++) scene.light_pos[li+d] = p[d];
 
-		++i;
-		++light_id;
+		// Enable the light for fixed function lighting.  This is unnecessary if everything in the scene
+		// uses materials and the card supports our shaders, but for now...
+		int id = GL_LIGHT0 + i;
+		glLightfv( id, GL_DIFFUSE, &scene.light_color[li]);
+		glLightfv( id, GL_SPECULAR, &scene.light_color[li]);
+		glLightfv( id, GL_POSITION, &scene.light_pos[li]);
+		glEnable(id);
 	}
-	check_gl_error();
+	for(int i=scene.light_count[0]; i<8; i++)
+		glDisable( GL_LIGHT0 + i );
 
-	scene.light_count[0] = lights.size();
+	glEnable(GL_LIGHTING);
+	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, &ambient.red);
+
+	check_gl_error();
 }
 
 void
 display_kernel::disable_lights()
 {
-	GLenum light_ids[] = {
-		GL_LIGHT0,
-		GL_LIGHT1,
-		GL_LIGHT2,
-		GL_LIGHT3,
-		GL_LIGHT4,
-		GL_LIGHT5,
-		GL_LIGHT6,
-		GL_LIGHT7
-	};
-	GLenum* light_id = light_ids;
-	GLenum* light_end = light_id + 8;
-	light_iterator i = lights.begin();
-	while (i != light_iterator(lights.end()) && light_id != light_end) {
-		i->gl_end( *light_id);
-		++i;
-		++light_id;
-	}
-	glDisable( GL_LIGHTING);
-	check_gl_error();
-}
-
-
-void
-display_kernel::add_light( shared_ptr<light> n_light)
-{
-	if (lights.size() >= 8)
-		throw std::invalid_argument( "There may be no more than 8 lights.");
-	lights.push_back( n_light);
-}
-
-void
-display_kernel::remove_light( shared_ptr<light> old_light)
-{
-	lights.remove( old_light);
+	glDisable(GL_LIGHTING);
 }
 
 // Compute the horizontal and vertial tangents of half the field-of-view.
@@ -636,8 +615,9 @@ display_kernel::add_renderable( shared_ptr<renderable> obj)
 	if (!obj->translucent())
 		layer_world.push_back( obj);
 	else
-		layer_world_transparent.push_back( obj);
-	implicit_activate();
+		layer_world_transparent.push_back(obj);
+	if (!obj->is_light())
+		implicit_activate();
 }
 
 void

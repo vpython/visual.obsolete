@@ -25,7 +25,7 @@ OBJS = arrow.o axial.o box.o cone.o cylinder.o display_kernel.o ellipsoid.o \
 	frame.o label.o material.o mouse_manager.o mouseobject.o primitive.o pyramid.o \
 	rectangular.o renderable.o ring.o sphere.o text.o \
 	atomic_queue.o clipping_plane.o displaylist.o errors.o extent.o \
-	gl_extensions.o gl_free.o icososphere.o lighting.o quadric.o \
+	gl_extensions.o gl_free.o icososphere.o light.o quadric.o \
 	mac_display.o mac_font_renderer.o mac_random_device.o mac_rate.o mac_timer.o \
 	render_manager.o rgba.o shader_program.o texture.o tmatrix.o vector.o\
 	convex.o curve.o cvisualmodule.o faces.o \
@@ -48,6 +48,7 @@ install : cvisual.so
 
 clean :
 	rm *.o
+	rm *.d
 
 # This command to be run from the vpython-core2/src/mac
 setup : 

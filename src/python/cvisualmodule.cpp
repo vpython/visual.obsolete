@@ -26,7 +26,6 @@ namespace cvisual {
 void wrap_display_kernel();
 void wrap_primitive();
 void wrap_rgba();
-void wrap_light(); // Also defined in wrap_rgba.cpp
 void wrap_vector();
 void wrap_arrayobjects();
 
@@ -63,7 +62,7 @@ py_rate( double freq)
 BOOST_PYTHON_MODULE( cvisual)
 {
 	VPYTHON_NOTE( "Importing cvisual from vpython-core2.");
-	
+
 	using namespace boost::python;
 	numeric::array::set_module_and_type( "numpy", "ndarray");
 
@@ -95,7 +94,6 @@ BOOST_PYTHON_MODULE( cvisual)
 
 	wrap_vector();
 	wrap_rgba();
-	wrap_light();
 	wrap_display_kernel();
 	wrap_primitive();
 	wrap_arrayobjects();

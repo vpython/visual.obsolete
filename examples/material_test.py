@@ -9,8 +9,7 @@ axis = (1,0,0)
 obj = sphere
 
 ##scene.lights = []
-lite = light( pos = (0,0,0), color = (0,1,0),
-              specular_color = (0,1,0), local = True )
+lite = local_light( pos = (0,0,0), color = (0,1,0) )
 lite.m = points( color=(0,1,0), pos=[(0,0,0)], type = "world", size = 0.05 )
 
 spheres = []

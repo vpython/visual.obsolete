@@ -10,7 +10,7 @@
 
 namespace cvisual {
 
-void 
+void
 frustum( tmatrix& T, tmatrix& I, double l, double r, double b, double t, double n, double f ) throw()
 {
 	T.x_column(2*n/(r-l),0,0);
@@ -27,7 +27,7 @@ frustum( tmatrix& T, tmatrix& I, double l, double r, double b, double t, double 
 }
 
 // A fully unrolled 4x4 matrix inverse.  This algorithm was generated with GiNaC
-// It is 30-60% faster than a loop based implementation (specifically, the one 
+// It is 30-60% faster than a loop based implementation (specifically, the one
 // in SGI's libGLU), but only when run with full optimization.
 // (GCC 3.3, 800 MHz Crusoe processor)
 // Unoptimized: 14479 bytes, 25 usec
@@ -49,7 +49,7 @@ void inverse( tmatrix& dest, const tmatrix& src)
         *src(1,1)*src(3,2)+src(1,2)*src(0,1)*src(3,3)*src(2,0)+src(3,0)*src(1,3)
         *src(0,1)*src(2,2)-src(0,1)*src(2,2)*src(1,0)*src(3,3)+src(1,3)*src(0,0)
         *src(3,2)*src(2,1));
-        
+
     dest(0,0) = common*(-src(1,2)*(src(3,3)*src(2,1)-src(3,1)*src(2,3))-src(2,3)
         *src(1,1)*src(3,2)+src(1,3)*src(3,2)*src(2,1)-src(2,2)*(src(3,1)
         *src(1,3)-src(1,1)*src(3,3)));
@@ -101,14 +101,14 @@ void inverse( tmatrix& dest, const tmatrix& src)
     return;
 }
 
-const tmatrix& 
+const tmatrix&
 tmatrix::identity() throw()
-{ 
+{
 	static const tmatrix t = tmatrix().ident();
 	return t;
 }
 
-tmatrix 
+tmatrix
 rotation( double angle, const vector& axis)
 {
 	double c = std::cos(angle);
@@ -143,8 +143,8 @@ const tmatrix&
 tmatrix::operator*=( const tmatrix& other)
 {
 	for (size_t row = 0; row < 4; ++row) {
-		M[0][row] = 
-		
+		M[0][row] =
+
 	}
 	return *this;
 }
@@ -155,27 +155,27 @@ tmatrix::operator*( const tmatrix& o) const
 {
 	tmatrix ret;
 	for (size_t col = 0; col < 4; ++col) {
-		ret.M[col][0] = M[0][0]*o.M[col][0] + M[1][0]*o.M[col][1] 
+		ret.M[col][0] = M[0][0]*o.M[col][0] + M[1][0]*o.M[col][1]
 			          + M[2][0]*o.M[col][2] + M[3][0]*o.M[col][3];
-		ret.M[col][1] = M[0][1]*o.M[col][0] + M[1][1]*o.M[col][1] 
+		ret.M[col][1] = M[0][1]*o.M[col][0] + M[1][1]*o.M[col][1]
 			          + M[2][1]*o.M[col][2] + M[3][1]*o.M[col][3];
-		ret.M[col][2] = M[0][2]*o.M[col][0] + M[1][2]*o.M[col][1] 
+		ret.M[col][2] = M[0][2]*o.M[col][0] + M[1][2]*o.M[col][1]
 			          + M[2][2]*o.M[col][2] + M[3][2]*o.M[col][3];
-		ret.M[col][3] = M[0][3]*o.M[col][0] + M[1][3]*o.M[col][1] 
+		ret.M[col][3] = M[0][3]*o.M[col][0] + M[1][3]*o.M[col][1]
 			          + M[2][3]*o.M[col][2] + M[3][3]*o.M[col][3];
 	}
-	return ret;	
+	return ret;
 }
 
 #if 0
 // TODO: Reverse address me
-void 
+void
 tmatrix::invert_ortho(const tmatrix& A) throw()
 {
 	// Precondition: w = Mv = Rv + t  (R orthogonal)
-	// Therefore: (M^-1)w = v = (R^T)Rv 
-	//                        = (R^T)(Rv+t - t) 
-	//                        = (R^T)(w-t) 
+	// Therefore: (M^-1)w = v = (R^T)Rv
+	//                        = (R^T)(Rv+t - t)
+	//                        = (R^T)(w-t)
 	//                        = (R^T)w - (R^T)t
 
 	x_column(A(0, 0), A(0, 1), A(0,2));  // row 0
@@ -189,7 +189,7 @@ tmatrix::invert_ortho(const tmatrix& A) throw()
 }
 #endif
 
-vector 
+vector
 tmatrix::times_inv( const vector& v, double w) const throw()
 {
 	double x = v.x - M[3][0]*w;
@@ -202,7 +202,7 @@ tmatrix::times_inv( const vector& v, double w) const throw()
 		);
 }
 
-vector 
+vector
 tmatrix::times_v( const vector& v) const throw()
 {
 	return vector(
@@ -212,7 +212,7 @@ tmatrix::times_v( const vector& v) const throw()
 		);
 }
 
-vector 
+vector
 tmatrix::operator*( const vector& v) const throw()
 {
 	return vector(
@@ -222,8 +222,12 @@ tmatrix::operator*( const vector& v) const throw()
 		);
 }
 
+vector tmatrix::origin() const throw() {
+	return vector( M[3][0], M[3][1], M[3][2]);
+}
+
 /** multiplication by an arbirary vertex [x y z w] */
-vertex 
+vertex
 tmatrix::operator*( const vertex& v) const throw()
 {
 	return vertex(
@@ -252,17 +256,17 @@ tmatrix::scale( const vector& v, const double w)
 	M[0][1] *= v.x;
 	M[0][2] *= v.x;
 	M[0][3] *= v.x;
-	
+
 	M[1][0] *= v.y;
 	M[1][1] *= v.y;
 	M[1][2] *= v.y;
 	M[1][3] *= v.y;
-	
+
 	M[2][0] *= v.z;
 	M[2][1] *= v.z;
 	M[2][2] *= v.z;
 	M[2][3] *= v.z;
-	
+
 	M[3][0] *= w;
 	M[3][1] *= w;
 	M[3][2] *= w;

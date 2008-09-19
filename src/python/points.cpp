@@ -299,7 +299,7 @@ points::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		// The following doesn't work; I don't know why. 
+		// The following doesn't work; I don't know why.
 		// Note that it works with a single color above.
 		//color[slice(1, count+1), slice(0, 3)] = n_color;
 		// So instead do it by brute force:
@@ -555,19 +555,19 @@ points::gl_render( const view& scene)
 
 	if (size_units == WORLD && scene.glext.ARB_point_parameters) {
 		// This is simpler and more robust than what was here before, but it's still
-		// a little tacky and probably not perfectly general.  I'm not sure that it 
-		// should work with stereo frustums, but I can't find a case where it's 
+		// a little tacky and probably not perfectly general.  I'm not sure that it
+		// should work with stereo frustums, but I can't find a case where it's
 		// obviously wrong.
 		// However, note that point attenuation (regardless of parameters) isn't a
 		// correct perspective calculation, because it divides by distance, not by Z.
 		// Points not at the center of the screen will be too small, particularly
 		// at high fields of view.  This is in addition to the implementation limits
 		// on point size, which will be a problem when points get too big or close.
-		
+
 		tmatrix proj; proj.gl_projection_get();  // Projection matrix
-		
-		vector p(proj * vertex(.5,0,1,1));  // eye coordinates .5,0,1 -> window coordinates
-		
+
+		vector p = (proj * vertex(.5,0,1,1)).project();  // eye coordinates .5,0,1 -> window coordinates
+
 		// At an eye z of 1, a sphere of world-space diameter 1 is p.x * scene.view_width pixels wide,
 		// so a sphere of world-space diameter (size*scene.gcf) is
 		double point_radius_at_z_1 = size * scene.gcf * p.x * scene.view_width;

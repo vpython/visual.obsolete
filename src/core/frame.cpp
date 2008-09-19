@@ -161,7 +161,7 @@ frame::frame_world_transform( const double gcf) const
 	ret.y_column( y_axis * scale.y);
 	ret.z_column( z_axis * scale.z);
 	*/
-	
+
 	ret.x_column( x_axis);
 	ret.y_column( y_axis);
 	ret.z_column( z_axis);
@@ -280,30 +280,16 @@ frame::lookup_name(
 		return ret;
 }
 
-// TODO: Run some bench tests here.  The simplest solution may be to just use
-// pos as the 'center' of the frame, and warn that intersecting frames may not
-// be rendered in the right z-order.
 vector
 frame::get_center() const
 {
-	if (trans_children.empty())
-		return pos;
-	tmatrix fwt = frame_world_transform( 1.0);
-	vector ret;
-	const_trans_child_iterator j = trans_children.begin();
-	const_trans_child_iterator j_end = trans_children.end();
-	while (j != j_end) {
-		ret += fwt * j->get_center();
-		++j;
-	}
-	ret /= trans_children.size();
-	return ret;
+	return pos;
 }
 
 void
 frame::gl_render( const view& v)
 {
-	view local( v, world_frame_transform()); // this seems irrelevant....??
+	view local( v, world_frame_transform());
     tmatrix fwt = frame_world_transform(v.gcf);
 	{
 		gl_matrix_stackguard guard( fwt);
@@ -315,7 +301,7 @@ frame::gl_render( const view& v)
 				i = children.erase(i.base());
 				continue;
 			}
-			
+
 			i->outer_render(local);
 		}
 
@@ -329,7 +315,7 @@ frame::gl_render( const view& v)
 
 		for (trans_child_iterator i = trans_children.begin();
 			i != trans_child_iterator(trans_children.end());
-			++i) 
+			++i)
 		{
 			i->outer_render(local);
 		}
@@ -337,16 +323,17 @@ frame::gl_render( const view& v)
 	typedef std::multimap<vector, displaylist, z_comparator>::iterator screen_iterator;
 	screen_iterator i( local.screen_objects.begin());
 	screen_iterator i_end( local.screen_objects.end());
-  //  v.screen_objects.clear(); 
+  //  v.screen_objects.clear();
 	while (i != i_end) {
 		v.screen_objects.insert( std::make_pair( fwt*i->first, i->second));
 		++i;
-	} 
+	}
 }
 
 void
 frame::gl_pick_render( const view& scene)
 {
+	// TODO: This needs to construct a valid local view!
 	// Push name
 	glPushName(0);
 	{
@@ -395,6 +382,36 @@ frame::grow_extent( extent& world)
 	}
 	world.merge_local( frame_world_transform( 1.0), local);
 	world.pop_frame();
+}
+
+void frame::render_lights( view& world ) {
+	// TODO: this is expensive, especially if there are no lights at all in the frame!
+	view local( world, world_frame_transform());
+
+ 	child_iterator i( children.begin());
+	child_iterator i_end( children.end());
+	for (; i != i_end; ++i)
+		i->render_lights( local );
+	trans_child_iterator j( trans_children.begin());
+	trans_child_iterator j_end( trans_children.end());
+	for ( ; j != j_end; ++j)
+		j->render_lights( local );
+
+	// Transform lights back into scene
+	if ( world.light_count[0] != local.light_count[0] ) {
+		tmatrix fwt = frame_world_transform(world.gcf);
+		world.light_pos.resize( local.light_pos.size() );
+		world.light_color.resize( local.light_color.size() );
+		for(int l = world.light_count[0]; l < local.light_count[0]; l++) {
+			int li = l*4;
+			vertex v( local.light_pos[li], local.light_pos[li+1], local.light_pos[li+2], local.light_pos[li+3] );
+			v = fwt * v;
+			for(int d=0; d<4; d++) {
+				world.light_pos[li+d] = v[d];
+				world.light_color[li+d] = local.light_color[li+d];
+			}
+		}
+	}
 }
 
 } // !namespace cvisual

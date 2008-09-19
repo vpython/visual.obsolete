@@ -50,11 +50,9 @@ sphere(pos=(0.15*width,R/4,-0.3*depth), radius=R/4, color=color.green, material=
 sphere(pos=(0.1*width,R/4,-0.45*depth), radius=R/4, color=color.cyan, material=materials.marble)
 scene.lights = []
 scene.ambient = 0.25
-l1 = light(pos=(6,2,4), color=0.3)
-l2 = light(pos=(-10,2,4), color=0.2)
-# Local lights currently don't move with a frame they're in.
-# So we have to keep repositioning the lamplight.
-lamplight = light(pos=(0,H-L,0), local=True, color=0.5)
+l1 = distant_light(direction=(6,2,4), color=0.3)
+l2 = distant_light(direction=(-10,2,4), color=0.2)
+lamplight = local_light(frame=pendulum, pos=(L,0,0), color=0.5)
 scene.center = (0,0.4*H,0)
 scene.range = 0.45*H
 
@@ -72,7 +70,4 @@ while 1:
         v = -v
     angle = 0.02*cos(t)
     pendulum.rotate(axis=(1,0,0), angle=angle)
-    r = lamplight.pos-pendulum.pos
-    r = r.rotate(axis=(1,0,0), angle=angle)
-    lamplight.pos = pendulum.pos+r
     t += dt

@@ -159,16 +159,16 @@ public:
 	 * sorting of the transparent models.  */
 	virtual vector get_center() const = 0;
 
-	// xxx get rid of this:
-	void set_texture( shared_ptr<texture> t);
-	shared_ptr<texture> get_texture();
-
-	void set_material( shared_ptr<class material> m );
-	shared_ptr<class material> get_material();
+	virtual void set_material( shared_ptr<class material> m );
+	virtual shared_ptr<class material> get_material();
 
 	virtual void get_material_matrix( const view&, tmatrix& out ) {};  // object coordinates -> material coordinates
 
 	virtual bool translucent();
+
+	virtual void render_lights( view& ) {}
+
+	virtual bool is_light() { return false; }
 
 protected:
 	renderable();

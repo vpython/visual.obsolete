@@ -10,7 +10,6 @@
 #include "util/vector.hpp"
 #include "util/rgba.hpp"
 #include "util/extent.hpp"
-#include "util/lighting.hpp"
 #include "util/timer.hpp"
 #include "util/thread.hpp"
 #include "util/gl_extensions.hpp"
@@ -43,11 +42,11 @@ class display_kernel
  	double last_time;
  	double render_time;
  	bool realized;
- 	
+
  	boost::scoped_ptr< class shader_program > global_shader;
- 	
+
  	static shared_ptr<display_kernel> selected;
- 	
+
  	mutex realize_lock;
  	boost::condition realize_condition;
 
@@ -77,7 +76,7 @@ class display_kernel
 	bool uniform;
 	/** A scaling factor determined by middle mouse button scrolling. */
 	double user_scale;
-	
+
 	/** The global scaling factor. It is used to ensure that objects with
 	 large dimensions are rendered properly. See the .cpp file for details.
 	*/
@@ -92,10 +91,6 @@ class display_kernel
 	 * after every rendering cycle.
 	 */
 	bool gcf_changed;
-
-	/** The set of active lights. */
-	std::list<shared_ptr<light> > lights;
-	typedef indirect_iterator<std::list<shared_ptr<light> >::iterator> light_iterator;
 
 	rgb ambient; ///< The ambient light color.
 	/** Called at the beginning of a render cycle to establish lighting. */
@@ -145,7 +140,7 @@ class display_kernel
 	// Compute the tangents of half the vertical and half the horizontal
 	// true fields-of-view.
 	void tan_hfov( double* x, double* y);
-	
+
 	void realize();
 	void implicit_activate();
 
@@ -159,7 +154,7 @@ protected:
 	// If the window is invisible, window_x and/or window_y may be -1, meaning
 	// that the window will be positioned automatically by the window system.
 	int window_x, window_y, window_width, window_height;
-	
+
 	// The rectangle on the screen into which we can actually draw.
 	// At present, these are undefined until the display is realized, and
 	// they are not used in constructing the display (they are outputs of
@@ -167,7 +162,7 @@ protected:
 	// This includes both viewports in a side-by-side stereo mode, whereas
 	//   view.view_width does not.  (xxx?)
 	int view_x, view_y, view_width, view_height;
-	
+
 	bool exit; ///< True when Visual should shutdown on window close.
 	bool visible; ///< scene.visible
 	bool explicitly_invisible;  ///< true iff scene.visible has ever been set to 0 by the program, or by the user closing a window
@@ -189,19 +184,11 @@ public: // Public Data.
 		when it is less than 0.
 	*/
 	int lod_adjust;
-	
-	/** Add an additional light source. */
-	void add_light( shared_ptr<light> n_light);
+
 	/** Change the background ambient lighting. */
 	void set_ambient( const rgb& color) { ambient = color; }
 	rgb get_ambient() { return ambient; }
-	/** Remove an existing light source. */
-	void remove_light( shared_ptr<light> old_light);
-	/** Get the list of lights for this window. */
-	std::list< shared_ptr<light> >
-	get_lights() const
-	{ return lights; }
-	
+
 	/** Add a normal renderable object to the list of objects to be rendered into
 	 *  world space.
 	 */
@@ -239,7 +226,7 @@ public: // Public Data.
 
 	/** Report that the position and/or size of the widget has changed.
 		Some platforms might not know about position changes; they can pass (x,y,new_width,new_height)
- 		
+
  		win_* give the window rectangle (see this->window_*)
  		v_* give the view rectangle (see this->view_*)
  		*/
@@ -335,7 +322,7 @@ public: // Public Data.
 	// properties setter will not change the mode if the new one is invalid.
 	void set_stereomode( std::string mode);
 	std::string get_stereomode();
-	
+
 	// A list of all objects rendered into this display_kernel.  Modifying it
 	// does not propogate to the owning display_kernel.
 	std::list<shared_ptr<renderable> > get_objects() const;
@@ -365,21 +352,21 @@ public: // Public Data.
 
 	bool is_fullscreen();
 	void set_fullscreen( bool);
-	
+
 	bool get_exit();
 	void set_exit(bool);
- 
+
 	bool is_showing_toolbar();
 	void set_show_toolbar( bool);
 
 	mouse_t* get_mouse();
 	atomic_queue<std::string>* get_kb();
-	
+
 	static void set_selected( shared_ptr<display_kernel> );
 	static shared_ptr<display_kernel> get_selected();
-	
+
 	static void waitWhileAnyDisplayVisible();
-	
+
 	bool hasExtension( const std::string& ext );
 
 	typedef void (APIENTRYP EXTENSION_FUNCTION)();

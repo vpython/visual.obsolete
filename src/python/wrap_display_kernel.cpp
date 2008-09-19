@@ -57,22 +57,6 @@ struct renderable_objects_to_py_list
 	}
 };
 
-// This function automatically converts the std::list of light objects to a
-// Python list.
-struct lights_to_py_list
-{
-	static PyObject* convert( const std::list<shared_ptr<light> >& lights)
-	{
-		py::list ret;
-		for (std::list<shared_ptr<light> >::const_iterator i = lights.begin();
-				i != lights.end(); ++i) {
-			ret.append( py::object( *i));
-		}
-		Py_INCREF( ret.ptr());
-		return ret.ptr();
-	}
-};
-
 // I must not know how to use Boost.Python yet, because I need this:
 class py_base_display_kernel : public display_kernel {};
 
@@ -81,33 +65,33 @@ class py_display_kernel : public py_base_display_kernel
 {
  public:
 	PyObject* self;
-	
+
 	py_display_kernel( PyObject* self ) : self(self) {}
- 
+
 	// Delegates key display_kernel virtual methods to Python
 	virtual void activate( bool active ) { boost::python::call_method<void>( self, "_activate", active ); }
 	virtual EXTENSION_FUNCTION getProcAddress( const char* name ) { return (EXTENSION_FUNCTION)boost::python::call_method<intptr_t>( self, "_getProcAddress", name ); }
 	intptr_t base_getProcAddress( const char* name ) { return (intptr_t)display_kernel::getProcAddress(name); }
- 
+
 	// Utility methods for Python subclasses
-	bool report_mouse_state(py::object is_button_down, 
+	bool report_mouse_state(py::object is_button_down,
 							int cursor_client_x, int cursor_client_y,
 							py::object shift_state,
-							bool can_lock_mouse ) 
+							bool can_lock_mouse )
 	{
 		int button_len = boost::python::len( is_button_down );
 		boost::scoped_array<bool> buttons( new bool[button_len] );
 		for(int b = 0; b<button_len; b++)
 			buttons[b] = boost::python::extract<bool>( is_button_down[b] );
-			
+
 		int shift_len = boost::python::len( shift_state );
 		boost::scoped_array<bool> shift( new bool[shift_len] );
 		for(int b=0; b<shift_len; b++)
 			shift[b] = boost::python::extract<bool>( shift_state[b] );
-			
-		mouse.report_mouse_state( button_len, &buttons[0], 
-								  cursor_client_x, cursor_client_y, 
-								  shift_len, &shift[0], 
+
+		mouse.report_mouse_state( button_len, &buttons[0],
+								  cursor_client_x, cursor_client_y,
+								  shift_len, &shift[0],
 								  can_lock_mouse );
 
 		return mouse.is_mouse_locked();
@@ -158,9 +142,6 @@ wrap_display_kernel(void)
 		.def( "add_renderable", &display_kernel::add_renderable)
 		.def( "remove_renderable", &display_kernel::remove_renderable)
 		.add_property( "objects", &display_kernel::get_objects)
-		.def( "add_light", &display_kernel::add_light)
-		.def( "remove_light", &display_kernel::remove_light)
-		.def( "_get_lights", &display_kernel::get_lights)
 		.add_property( "ambient", &display_kernel::get_ambient,
 			&display_kernel::set_ambient)
 		.add_property( "up",
@@ -252,10 +233,6 @@ wrap_display_kernel(void)
 	py::to_python_converter<
 		std::list<shared_ptr<renderable> >,
 		renderable_objects_to_py_list>();
-
-	py::to_python_converter<
-		std::list<shared_ptr<light> >,
-		lights_to_py_list>();
 
 	// Free functions for exiting the system.
 	// These are undocumented at the moment, and are only used internally.

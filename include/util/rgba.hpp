@@ -35,8 +35,8 @@ class rgba
 		: red(bw), green(bw), blue(bw), opacity(1) {}
 	inline explicit rgba( const float* c)
 		: red(c[0]), green(c[1]), blue(c[2]), opacity( c[3]) {}
-			
-	/** Convert to HSVA, lower saturation by 50%, convert back to RGBA. 
+
+	/** Convert to HSVA, lower saturation by 50%, convert back to RGBA.
 		@return The desaturated color.
 	*/
 	rgba desaturate() const;
@@ -45,11 +45,11 @@ class rgba
 		@return The scaled color.
 	*/
 	rgba grayscale() const;
-	
+
 	/** Make this the active OpenGL color using glColor(). */
 	inline void gl_set() const
 	{ glColor4fv( &red); }
-	
+
 	/** Make this the active OpenGL material property for front and back ambient
 		and diffuse color.
 	*/
@@ -64,7 +64,7 @@ class rgb
 	float red;
 	float green;
 	float blue;
-	
+
 	inline rgb() : red(1.0f), green(1.0f), blue(1.0f) {}
 	inline rgb( float r, float g, float b)
 		: red(r), green(g), blue(b)
@@ -78,10 +78,12 @@ class rgb
 		: red( other.red), green( other.green), blue(other.blue)
 	{}
 	inline operator rgb() const { return rgb( red, green, blue); }
-	
+
 	rgb desaturate() const;
 	rgb grayscale() const;
-	
+
+	float operator[](int i) const { return (&red)[i]; }
+
 	inline void gl_set(float opacity) const
 	{ glColor4f( red, green, blue, opacity); }
 };

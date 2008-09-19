@@ -15,11 +15,11 @@ b1 = sphere(radius=0.3, pos=(r, 0, 0),
             color=color.magenta, material=materials.unlit)
 b2 = sphere(radius=0.3, pos=(0, 0, r),
             color=color.yellow, material=materials.unlit)
-b3 = sphere(radius=0.3, pos=(0, 0, r),
+b3 = arrow(radius=0.3, pos=(0, 0, r),
             color=color.green, material=materials.unlit)
-l1 = light(pos=b1.pos, color=b1.color)
-l2 = light(pos=b2.pos, color=b2.color)
-l3 = light(pos=b3.pos, color=b3.color)
+l1 = local_light(pos=b1.pos, color=b1.color)
+l2 = local_light(pos=b2.pos, color=b2.color)
+l3 = distant_light(direction=b3.pos, color=b3.color)
 
 while 1:
     rate(100)
@@ -27,6 +27,7 @@ while 1:
     a1 += 0.02
     l2.pos = b2.pos = (r+0.4)*vector(b2.x, sin(a2), cos(a2))
     a2 += 0.055
-    l3.pos = b3.pos = (r+1)*vector(sin(a3), b3.y, cos(a3))
+    l3.direction = b3.pos = (r+3)*vector(sin(a3), b3.y, cos(a3))
+    b3.axis = b3.pos * -0.3
     a3 += 0.033
     

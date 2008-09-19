@@ -14,7 +14,7 @@
 #include <list>
 
 namespace cvisual {
-	
+
 using boost::indirect_iterator;
 
 /*
@@ -27,13 +27,13 @@ grow_extent() : Calls grow_extent() for each of its children, then transforms
 	the vertexes of the bounding box and uses those as its bounds.
 gl_pick_render() : PushName() on to the Name Stack, and renders its children.
 	When looking up names later, the render_core calls lookup_name() with a
-	vector<uint>, which the frame uses to recursively look through frames to 
+	vector<uint>, which the frame uses to recursively look through frames to
 	find the right object.
 
 oolie case: When the frame is scaled up to a superhuge universe and the
 	child is very small, the frame_world_transform may overflow OpenGL.  The
 	problem lies in the scale variable.
-	
+
 another oolie: A transparent object that intersects a frame containing other
 	transparent object's will not be rendered in the right order.
 */
@@ -47,21 +47,21 @@ class frame : public renderable
 	//shared_vector scale; // Disable frame.scale in Visual 4.0
 	/** Establishes the coordinate system into which this object's children
  		are rendered.
- 		@param gcf: the global correction factor, propogated from gl_render(). 
+ 		@param gcf: the global correction factor, propogated from gl_render().
  	*/
 	tmatrix frame_world_transform( const double gcf) const;
 	tmatrix world_frame_transform() const;
-	
+
 	std::list<shared_ptr<renderable> > children;
-	typedef indirect_iterator<std::list<shared_ptr<renderable> >::iterator> 
+	typedef indirect_iterator<std::list<shared_ptr<renderable> >::iterator>
 		child_iterator;
-	typedef indirect_iterator<std::list<shared_ptr<renderable> >::const_iterator> 
+	typedef indirect_iterator<std::list<shared_ptr<renderable> >::const_iterator>
 		const_child_iterator;
-	
+
 	std::vector<shared_ptr<renderable> > trans_children;
-	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::iterator> 
+	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::iterator>
 		trans_child_iterator;
-	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::const_iterator> 
+	typedef indirect_iterator<std::vector<shared_ptr<renderable> >::const_iterator>
 		const_trans_child_iterator;
 
  public:
@@ -73,37 +73,38 @@ class frame : public renderable
 	void add_renderable( shared_ptr<renderable> child);
 	void remove_renderable( shared_ptr<renderable> child);
 	std::list<shared_ptr<renderable> > get_objects();
- 
+
 	void set_pos( const vector& n_pos);
 	shared_vector& get_pos();
-	
+
 	void set_x( double x);
 	double get_x();
-	
+
 	void set_y( double y);
 	double get_y();
-	
+
 	void set_z( double z);
 	double get_z();
-	
+
 	void set_axis( const vector& n_axis);
 	shared_vector& get_axis();
-	
+
 	void set_up( const vector& n_up);
 	shared_vector& get_up();
-	
+
 	// void set_scale( const vector& n_scale);
 	// shared_vector& get_scale();
-	
+
 	// Lookup the target that belongs to this name.
-	shared_ptr<renderable> lookup_name( 
+	shared_ptr<renderable> lookup_name(
 		const unsigned int* name_top, const unsigned int* name_end);
- 
- protected:	
+
+ protected:
 	virtual vector get_center() const;
 	virtual void gl_render( const view&);
 	virtual void gl_pick_render( const view&);
 	virtual void grow_extent( extent&);
+	virtual void render_lights( view& );
 };
 
 } // !namespace cvisual

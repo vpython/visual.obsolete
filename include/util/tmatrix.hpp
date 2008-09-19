@@ -11,35 +11,40 @@
 
 namespace cvisual {
 
-struct vertex 
+struct vertex
 {
 	double x;
 	double y;
 	double z;
 	double w;
+
 	inline vertex( double _x=0, double _y=0, double _z=0, double _w=1.0)
 		: x(_x), y(_y), z(_z), w(_w) {}
-			
+
 	explicit inline vertex( const vector& v, double _w = 1.0)
 		: x( v.x), y(v.y), z(v.z), w(_w) {}
-	inline operator vector() const
+
+	vector project() const
 	{ double w_i = 1.0/w; return vector( x*w_i, y*w_i, z*w_i); }
-	
+
 	inline void
 	gl_render() const
 	{ glVertex4d( x, y, z, w); }
+
+	double& operator[] (int i) { return (&x)[i]; }
+	double operator[] (int i) const { return (&x)[i]; }
 };
-	
+
 /** A double-precision 3D affine transformation matrix. */
-class tmatrix 
+class tmatrix
 {
 private:
 	/** This is a double-precision matrix in _COLUMN MAJOR ORDER_.  User's beware.
-	  It is in this order since that is what OpenGL uses internally - thus 
+	  It is in this order since that is what OpenGL uses internally - thus
 	  eliminating a reformatting penalty.
 	*/
 	double M[4][4];
-		
+
     friend void inverse( tmatrix& ret, const tmatrix& arg);
 public:
 	/** Returns the address of the first element in the matrix.  Ideally, this
@@ -49,11 +54,11 @@ public:
 
 	/** Create a new tmatrix, initialized to the identity matrix. */
 	inline tmatrix() throw() { ident(); }
-    
+
 	/** Make a deep copy of t. */
 	inline tmatrix( const tmatrix& t ) throw()
 	{ std::memcpy(M, t.M, sizeof(M)); }
-    
+
 	/** Initialize this matrix to A * B */
 	inline tmatrix( const tmatrix& A, const tmatrix& B ) throw()
 	{ *this = A * B; }
@@ -63,7 +68,7 @@ public:
 
 	/** Sets this matrix to the identity and returns an rvalue reference to self. */
 	inline const tmatrix&
-	ident( void) throw() 
+	ident( void) throw()
 	{
 		x_column();
 		y_column();
@@ -72,7 +77,7 @@ public:
 		w_row();
 		return *this;
 	}
-	
+
 	/** Address an individual element of the tmatrix.  The internal format of
 	  the matrix may be anything, so use this function to reliably get the
 	  individual elements.
@@ -84,7 +89,7 @@ public:
 	/** Address an individual element of the tmatrix.  The internal format of
 	  the matrix may be anything, so use this function to reliably get the
 	  individual elements.
-	*/	
+	*/
 	inline double&
 	operator()( size_t row, size_t column)
 	{ return M[column][row]; }
@@ -96,7 +101,7 @@ public:
 		M[0][1] = v.y;
 		M[0][2] = v.z;
 	}
-    
+
 	/** Sets the second column to v */
 	inline void y_column( const vector& v) throw()
 	{
@@ -104,7 +109,7 @@ public:
 		M[1][1] = v.y;
 		M[1][2] = v.z;
 	}
-    
+
 	/** Sets the third column to v */
 	inline void z_column( const vector& v) throw()
 	{
@@ -112,7 +117,7 @@ public:
 		M[2][1] = v.y;
 		M[2][2] = v.z;
 	}
-    
+
 	/** Sets the fourth column to v */
 	inline void w_column( const vector& v) throw()
 	{
@@ -128,7 +133,7 @@ public:
 		M[0][1] = y;
 		M[0][2] = z;
 	}
-    
+
 	/** Sets the second column to x, y, z */
 	inline void y_column( double x=0, double y=1, double z=0) throw()
 	{
@@ -136,7 +141,7 @@ public:
 		M[1][1] = y;
 		M[1][2] = z;
 	}
-    
+
 	/** Sets the third column to x, y, z */
 	inline void z_column( double x=0, double y=0, double z=1) throw()
 	{
@@ -144,7 +149,7 @@ public:
 		M[2][1] = y;
 		M[2][2] = z;
     }
-    
+
 	/** Sets the fourth column to x, y, z */
 	inline void w_column(double x=0, double y=0, double z=0) throw()
 	{
@@ -152,7 +157,7 @@ public:
 		M[3][1] = y;
 		M[3][2] = z;
 	}
-    
+
 	/** Sets the bottom row to x, y, z, w */
 	inline void w_row(double x=0, double y=0, double z=0, double w=1) throw()
 	{
@@ -167,17 +172,17 @@ public:
 
 	/** An alias for operator*= */
 	void concat(const tmatrix& A, const tmatrix& B) throw();
-	
+
 	// Right-multiply this matrix by a scaling matrix.
 	void scale( const vector& v, const double w = 1);
-	
+
 	// Right multiply the matrix by a translation matrix
 	void translate( const vector& v );
-	
+
 	/** Postcondition: *this == *this * other */
 	const tmatrix&
 	operator*=( const tmatrix& other);
-	
+
 	/** Multiply this matrix by another one. */
 	tmatrix
 	operator*( const tmatrix& other) const;
@@ -192,21 +197,24 @@ public:
 
 	/** multiplication by a point [x y z 1] */
 	vector operator*( const vector& v) const throw();
-	
+
 	/** multiplication by an arbirary vertex [x y z w] */
 	vertex operator*( const vertex& v) const throw();
-	
+
+	/** multiplication by [0 0 0 1] **/
+	vector origin() const throw();
+
 	/** Overwrites the currently active matrix in OpenGL with this one. */
 	inline void
 	gl_load(void) const
 	{ glLoadMatrixd( M[0]); }
-	
+
 	/** Multiplies the active OpenGL matrix by this one. */
 	inline void
 	gl_mult(void) const
 	{ glMultMatrixd( M[0]); }
-	
-	/** Initialize this tmatrix with the contents of the OpenGL modelview, 
+
+	/** Initialize this tmatrix with the contents of the OpenGL modelview,
 	  * texture, color, or projection matricies.
 	  * @return *this.
 	  */
@@ -230,7 +238,7 @@ tmatrix rotation( double angle, const vector& axis);
 // origin in the direction axis as specified by the Right Hand Rule.
 tmatrix rotation( double angle, const vector& axis, const vector& origin);
 
-// Pushes its constructor argument onto the active OpenGL matrix stack, and 
+// Pushes its constructor argument onto the active OpenGL matrix stack, and
 // multiplies the active matrix by the new one when constructed, and pops it off
 // when destructed.
 class gl_matrix_stackguard
@@ -240,7 +248,7 @@ class gl_matrix_stackguard
 	gl_matrix_stackguard( const gl_matrix_stackguard&);
 	const gl_matrix_stackguard&
 	operator=( const gl_matrix_stackguard&);
- 
+
  public:
 	// A stackguard that only performs a push onto the matrix stack.
 	// Postcondition: the stack is one matrix taller, but identical to before.

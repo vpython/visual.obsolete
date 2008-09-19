@@ -101,7 +101,7 @@ label::get_z()
 	return pos.z;
 }
 
-void 
+void
 label::set_color( const rgb& n_color)
 {
 	color = n_color;
@@ -175,7 +175,7 @@ label::get_text()
 	return text;
 }
 
-void 
+void
 label::set_space( double n_space)
 {
 	space = n_space;
@@ -187,7 +187,7 @@ label::get_space()
 	return space;
 }
 
-void 
+void
 label::set_xoffset( double n_xoffset)
 {
 	xoffset = n_xoffset;
@@ -199,7 +199,7 @@ label::get_xoffset()
 	return xoffset;
 }
 
-void 
+void
 label::set_yoffset( double n_yoffset)
 {
 	yoffset = n_yoffset;
@@ -211,7 +211,7 @@ label::get_yoffset()
 	return yoffset;
 }
 
-void 
+void
 label::set_border( double n_border)
 {
 	border = n_border;
@@ -223,7 +223,7 @@ label::get_border()
 	return border;
 }
 
-void 
+void
 label::set_font_family( const std::wstring& name)
 {
 	font_description = name;
@@ -249,7 +249,7 @@ label::get_font_size()
 	return font_size;
 }
 
-void 
+void
 label::render_box( bool enable)
 {
 	box_enabled = enable;
@@ -261,7 +261,7 @@ label::has_box()
 	return box_enabled;
 }
 
-void 
+void
 label::render_line( bool enable)
 {
 	line_enabled = enable;
@@ -289,7 +289,7 @@ void
 label::gl_render( const view& scene)
 {
 	if (text_changed) {
-		boost::shared_ptr<font> texmap_font = 
+		boost::shared_ptr<font> texmap_font =
 			font::find_font( font_description, int(font_size));
 		if (text.empty())
 			text_layout = texmap_font->lay_out( L" " );
@@ -302,10 +302,10 @@ label::gl_render( const view& scene)
 	double box_width = extents.x + 2.0*border;
 
 	// Compute the positions of the text in the text box, and the height of the
-	// text box.  The text positions are relative to the lower left corner of 
+	// text box.  The text positions are relative to the lower left corner of
 	// the text box.
 	double box_height = border*2.0 + extents.y;
-	
+
 	vector text_pos( border, box_height - border);
 
 	clear_gl_error();
@@ -316,7 +316,7 @@ label::gl_render( const view& scene)
 		translate.w_column( label_pos);
 		lst = lst * translate;
 	}
-	vector origin = lst * vertex(vector(), 1.0);
+	vector origin = (lst * vertex(vector(), 1.0)).project();
 	rgb stereo_linecolor = linecolor;
 	if (scene.anaglyph)
 		if (scene.coloranaglyph)
@@ -335,7 +335,7 @@ label::gl_render( const view& scene)
 		glMatrixMode( GL_PROJECTION); { //< Zero out the projection matrix, too
 		gl_matrix_stackguard guard2;
 		identity.gl_load();
-		
+
 		glTranslated( origin.x, origin.y, origin.z);
 		glScaled( 2.0/scene.view_width, 2.0/scene.view_height, 1.0);
 		// At this point, all furthur translations are in direction of label
@@ -346,7 +346,7 @@ label::gl_render( const view& scene)
 			glTranslated( space_offset.x, space_offset.y, space_offset.z);
 		}
 		// Optionally draw the line, and move the origin to the bottom left
-		// corner of the text box.		
+		// corner of the text box.
 		if (xoffset || yoffset) {
 			if (line_enabled) {
 				glBegin( GL_LINES);
@@ -355,13 +355,13 @@ label::gl_render( const view& scene)
 				glEnd();
 			}
 			if (std::fabs(xoffset) > std::fabs(yoffset)) {
-				glTranslated( 
-					xoffset + ((xoffset > 0) ? 0 : -box_width), 
+				glTranslated(
+					xoffset + ((xoffset > 0) ? 0 : -box_width),
 					yoffset - box_height*0.5,
 					0);
 			}
 			else {
-				glTranslated( 
+				glTranslated(
 					xoffset - box_width*0.5,
 					yoffset + ((yoffset > 0) ? 0 : -box_height),
 					0);
