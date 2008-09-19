@@ -278,6 +278,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\core\light.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\core\material.cpp"
 					>
 				</File>
@@ -350,10 +354,6 @@
 					</File>
 					<File
 						RelativePath="..\src\core\util\icososphere.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\core\util\lighting.cpp"
 						>
 					</File>
 					<File
@@ -494,6 +494,10 @@
 			</File>
 			<File
 				RelativePath="..\include\label.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\light.hpp"
 				>
 			</File>
 			<File
@@ -657,10 +661,6 @@
 				</File>
 				<File
 					RelativePath="..\include\util\icososphere.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\include\util\lighting.hpp"
 					>
 				</File>
 				<File
