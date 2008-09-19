@@ -49,8 +49,10 @@ class analog_clock:
 scene.title = "Surreal Stonehenge"
 scene.height = 600
 scene.width = 600
-scene.range = (18,18,18)
-scene.center = (0,2,0)
+scene.range = (1,1,1)
+scene.center = (0,2,20)
+scene.userspin = 0
+scene.userzoom = 0
 grey = (0.8, 0.8, 0.8)
 Nslabs = 8
 R = 10
@@ -158,7 +160,7 @@ cylinder(frame=log,
          pos=(0,0,0), axis=(zface-zpos,0,0),
          color=(0.8,0.5,0), opacity=0.5)
 box(frame=log,
-    pos=(zface-zpos+tlogend/2.,0,0), axis=(0,0,1),
+    pos=(zface-zpos+tlogend/2.+.01,0,0), axis=(0,0,1),
     length=rlog, height=rlog, width=tlogend,
     color=color.yellow, opacity=0.5)
 
