@@ -1,8 +1,25 @@
 from __future__ import division
 from visual import *
 # Bruce Sherwood, August 2006
-# Demonstration of transparency (opacity), materials, and local lights
-# in the new version 4 of VPython created by Jonathan Brandmeyer, reworked by David Scherer
+# Demonstration of transparency (opacity), materials, and local lights in the new
+# Visual 4 created by Jonathan Brandmeyer, reworked by David Scherer
+
+# Create a texture to apply to a sphere to make a beach ball
+bands = zeros([16,64,4], float)
+for i in range(len(bands)):
+    for j in range(len(bands[0])):
+        op = 1
+        if i % 2 == 0: # every other band is partially transparent
+            op = 0.3
+            col = color.cyan
+        else:
+            # choose a color for an opaque band of the beach ball:
+            col = [color.blue, color.green, color.red,
+                   color.yellow, color.cyan][i//2 % 5]
+        bands[i][j] = (col[0], col[1], col[2], op)
+stripes = materials.texture(data = bands,
+                       channels = ["red","green","blue","opacity"],
+                       mapping = "spherical")
 
 scene.width = scene.height = 800
 scene.forward = (-0.2,-0.2,-1)
@@ -41,23 +58,7 @@ lamplight = light(pos=(0,H-L,0), local=True, color=0.5)
 scene.center = (0,0.4*H,0)
 scene.range = 0.45*H
 
-### Create a material for the ball
-##M = N = 32
-##t = zeros([M,N,3], float)
-##colors = [color.blue, color.cyan, color.green, color.yellow]
-##for i in range(0,M,3):
-##     for j in range(0,N):
-##         for ii in range(3):
-##             print i, j, ii
-##             c = colors[ii%3]
-##             t[i+ii][j] = (c[0],c[1],c[2])
-##balltex = materials.texture(data = t,
-##                       channels = ["red","green","blue"],
-##                       mapping = "rectangular")
-##box(material=balltex)
-balltex = materials.rough
-ball = sphere(pos=(width/4,R,0), radius=R, up=(0,1,1),
-              color=color.cyan, material=balltex, opacity=0.5)
+ball = sphere(pos=(width/4,R,0), radius=R, up=(0,1,1), material=stripes)
 xlimit = 0.5*width-R*sin(acos(1-(height-thick)/R))
 v = vector(-0.5,0,0)
 dt = 0.03
