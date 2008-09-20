@@ -26,29 +26,13 @@ view::view( const vector n_forward, vector n_center, int n_width,
 		light_count[i] = 0;
 }
 
-// TODO: This interface should be changed to copy construct and then mutate the view?  Or
-// even eliminated (do we need the transform information here?)
-view::view( const view& other, const tmatrix& wft)
-	: camera( other.camera),
-	forward( wft.times_v(other.forward)),
-	center( wft * other.center),
-	up( wft.times_v(other.up)),
-	view_width( other.view_width),
-	view_height( other.view_height),
-	forward_changed( true),
-	gcf( other.gcf),
-	gcfvec( other.gcfvec),
-	gcf_changed( other.gcf_changed),
-	lod_adjust( other.lod_adjust),
-	anaglyph( other.anaglyph),
-	coloranaglyph( other.coloranaglyph),
-	tan_hfov_x( other.tan_hfov_x),
-	tan_hfov_y( other.tan_hfov_y),
-	screen_objects( z_comparator( forward)),
-	glext(other.glext)
-{
-	for(int i=0; i<N_LIGHT_TYPES; i++)
-		light_count[i] = other.light_count[i];
+void view::apply_frame_transform( const tmatrix& wft ) {
+	camera = wft * camera;
+	forward = wft.times_v( forward );
+	center = wft * center;
+	up = wft.times_v(up);
+	screen_objects_t tso( (z_comparator(forward)) );
+	screen_objects.swap( tso );
 }
 
 double
@@ -57,7 +41,7 @@ view::pixel_coverage( const vector& pos, double radius) const
 	// The distance from the camera to this position, in the direction of the
 	// camera.  This is the distance to the viewing plane that the coverage
 	// circle lies in.
-	
+
 	double dist = (pos - camera).dot(forward);
 	// Half of the width of the viewing plane at this distance.
 	double apparent_hwidth = tan_hfov_x * dist;
@@ -77,8 +61,8 @@ renderable::~renderable()
 {
 }
 
-void 
-renderable::outer_render( const view& v ) 
+void
+renderable::outer_render( const view& v )
 {
 	rgb actual_color = color;
 	if (v.anaglyph) {
@@ -114,13 +98,13 @@ renderable::grow_extent( extent&)
 	return;
 }
 
-void 
+void
 renderable::set_material( shared_ptr<class material> m )
 {
 	mat = m;
 }
 
-shared_ptr<class material> 
+shared_ptr<class material>
 renderable::get_material() {
 	return mat;
 }

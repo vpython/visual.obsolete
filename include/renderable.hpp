@@ -113,18 +113,19 @@ struct view
 		bool n_gcf_changed,
 		gl_extensions& glext);
 
-    /** Create a new view object in the coordinate system of a (sub-)frame.
-     * @param other  The view of the parent coordinate system.
-     * @param wft  The transform from world space to frame space.
+    /** Called on a copy of a parent view to make this a view in a child
+     *  frame.  pft is a transform from the parent to the frame coordinate
+     *  space.
      */
-	view( const view& other, const tmatrix& wft);
+	void apply_frame_transform( const tmatrix& pft);
 
 	// Compute the apparent diameter, in pixels, of a circle that is parallel
 	// to the screen, with a center at pos, and some radius.  If pos is behind
 	// the camera, it will return negative.
 	double pixel_coverage( const vector& pos, double radius) const;
 
-	mutable std::multimap<vector, displaylist, z_comparator> screen_objects;
+	typedef std::multimap<vector, displaylist, z_comparator> screen_objects_t;
+	mutable screen_objects_t screen_objects;
 };
 
 /** Virtual base class for all renderable objects and composites.

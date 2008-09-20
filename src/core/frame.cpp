@@ -289,7 +289,7 @@ frame::get_center() const
 void
 frame::gl_render( const view& v)
 {
-	view local( v, world_frame_transform());
+	view local(v); local.apply_frame_transform(world_frame_transform());
     tmatrix fwt = frame_world_transform(v.gcf);
 	{
 		gl_matrix_stackguard guard( fwt);
@@ -386,7 +386,7 @@ frame::grow_extent( extent& world)
 
 void frame::render_lights( view& world ) {
 	// TODO: this is expensive, especially if there are no lights at all in the frame!
-	view local( world, world_frame_transform());
+	view local( world ); local.apply_frame_transform(world_frame_transform());
 
  	child_iterator i( children.begin());
 	child_iterator i_end( children.end());
@@ -411,6 +411,7 @@ void frame::render_lights( view& world ) {
 				world.light_color[li+d] = local.light_color[li+d];
 			}
 		}
+		world.light_count[0] = local.light_count[0];
 	}
 }
 
