@@ -72,7 +72,7 @@ class frame : public renderable
 
 	void add_renderable( shared_ptr<renderable> child);
 	void remove_renderable( shared_ptr<renderable> child);
-	std::list<shared_ptr<renderable> > get_objects();
+	std::vector<shared_ptr<renderable> > get_objects();
 
 	void set_pos( const vector& n_pos);
 	shared_vector& get_pos();
@@ -98,6 +98,8 @@ class frame : public renderable
 	// Lookup the target that belongs to this name.
 	shared_ptr<renderable> lookup_name(
 		const unsigned int* name_top, const unsigned int* name_end);
+
+	virtual void get_children( std::vector< boost::shared_ptr<renderable> >& all );
 
  protected:
 	virtual vector get_center() const;

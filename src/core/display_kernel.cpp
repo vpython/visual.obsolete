@@ -1332,12 +1332,18 @@ display_kernel::get_stereomode()
 	}
 }
 
-std::list<shared_ptr<renderable> >
+std::vector<shared_ptr<renderable> >
 display_kernel::get_objects() const
 {
-	std::list<shared_ptr<renderable> > ret = layer_world;
-	ret.insert( ret.end(),
-		layer_world_transparent.begin(), layer_world_transparent.end());
+	std::vector<shared_ptr<renderable> > ret;
+	ret.insert( ret.end(), layer_world.begin(), layer_world.end() );
+	ret.insert( ret.end(), layer_world_transparent.begin(), layer_world_transparent.end() );
+
+	// ret[i]->get_children appends the immediate children of ret[i] to ret.  Since
+	//   ret.size() keeps increasing, we keep going until we have all the objects in the tree.
+	for(int i=0; i<ret.size(); i++)
+		ret[i]->get_children(ret);
+
 	return ret;
 }
 

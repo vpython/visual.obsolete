@@ -41,19 +41,19 @@ force_py_exit(void)
 
 namespace py = boost::python;
 
-// This function automatically converts the list of renderable objects to a
-// Python list.
-struct renderable_objects_to_py_list
+template < class Seq >
+struct container_to_tuple
 {
-	static PyObject* convert( const std::list<shared_ptr<renderable> >& items)
+	static PyObject* convert( const Seq& items)
 	{
-		py::list ret;
-		for (std::list<shared_ptr<renderable> >::const_iterator i = items.begin();
-				i != items.end(); ++i) {
-			ret.append( py::object( *i));
+		PyObject* p = PyTuple_New( items.size() );
+		int index = 0;
+		for( typename Seq::const_iterator item = items.begin(); item != items.end(); ++item, ++index ) {
+			py::object o( *item );
+			Py_INCREF(o.ptr());
+			PyTuple_SET_ITEM(p, index, o.ptr());
 		}
-		Py_INCREF(ret.ptr());
-		return ret.ptr();
+		return p;
 	}
 };
 
@@ -231,8 +231,8 @@ wrap_display_kernel(void)
 	py::def( "_set_dataroot", &display::set_dataroot);
 
 	py::to_python_converter<
-		std::list<shared_ptr<renderable> >,
-		renderable_objects_to_py_list>();
+		std::vector<shared_ptr<renderable> >,
+		container_to_tuple< std::vector<shared_ptr<renderable> > > >();
 
 	// Free functions for exiting the system.
 	// These are undocumented at the moment, and are only used internally.

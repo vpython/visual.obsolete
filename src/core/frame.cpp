@@ -239,11 +239,11 @@ frame::remove_renderable( shared_ptr<renderable> obj)
 	}
 }
 
-std::list<shared_ptr<renderable> >
+std::vector<shared_ptr<renderable> >
 frame::get_objects()
 {
-	std::list<shared_ptr<renderable> > ret = children;
-	ret.insert( ret.end(), trans_children.begin(), trans_children.end());
+	std::vector<shared_ptr<renderable> > ret;
+	get_children(ret);
 	return ret;
 }
 
@@ -413,6 +413,12 @@ void frame::render_lights( view& world ) {
 		}
 		world.light_count[0] = local.light_count[0];
 	}
+}
+
+void frame::get_children( std::vector< boost::shared_ptr<renderable> >& all )
+{
+	all.insert( all.end(), children.begin(), children.end() );
+	all.insert( all.end(), trans_children.begin(), trans_children.end() );
 }
 
 } // !namespace cvisual

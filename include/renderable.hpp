@@ -171,6 +171,8 @@ public:
 
 	virtual bool is_light() { return false; }
 
+	virtual void get_children( std::vector< boost::shared_ptr<renderable> >& all ) {}
+
 protected:
 	renderable();
 

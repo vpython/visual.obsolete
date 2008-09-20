@@ -325,7 +325,7 @@ public: // Public Data.
 
 	// A list of all objects rendered into this display_kernel.  Modifying it
 	// does not propogate to the owning display_kernel.
-	std::list<shared_ptr<renderable> > get_objects() const;
+	std::vector<shared_ptr<renderable> > get_objects() const;
 
 	void set_shader( std::string shader );
 	std::string get_shader();
