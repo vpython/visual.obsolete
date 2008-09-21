@@ -27,7 +27,7 @@ static std::set<display*> widgets;
 // The first OpenGL Rendering Context, used to share displaylists.
 static AGLContext root_glrc = NULL;
 
-void 
+void
 init_platform() // called just once
 {
 	ProcessSerialNumber psn;
@@ -35,7 +35,7 @@ init_platform() // called just once
 	const void *		backKey;
 	const void *		background;
 	int					err;
-	
+
 	// If we were invoked from python rather than pythonw, change into a GUI app
 	GetCurrentProcess(&psn);
 	app = ProcessInformationCopyDictionary(&psn, kProcessDictionaryIncludeAllInformationMask);
@@ -82,7 +82,7 @@ void display::paint() {
 
 	gl_end();
 }
- 
+
 void
 display::gl_begin()
 {
@@ -133,7 +133,7 @@ void destroy_context (glContext * cx)
 }
 */
 
-void 
+void
 display::destroy()
 {
 	DisposeWindow(window);
@@ -169,16 +169,16 @@ void
 display::add_pending_glDeleteList(int base, int howmany)
 {
 	// TODO: Cache::write_lock L(list_lock);
-	pending_glDeleteLists.push_back( std::make_pair(base, howmany));	
+	pending_glDeleteLists.push_back( std::make_pair(base, howmany));
 }
 
-void 
+void
 display::delete_pending_lists()
 {
 	// TODO: Cache::write_lock L( list_lock);
 	for (std::vector<std::pair<int, int> >::iterator i = pending_glDeleteLists.begin();
 		i != pending_glDeleteLists.end(); ++i) {
-		glDeleteLists(i->first, i->second);	
+		glDeleteLists(i->first, i->second);
 	}
 	pending_glDeleteLists.clear();
 }
@@ -218,7 +218,7 @@ OSStatus
 display::vpWindowHandler (EventHandlerCallRef target, EventRef event)
 {
 	UInt32	kind;
-	
+
 	kind = GetEventKind(event);
 	if (kind == kEventWindowBoundsChanged) { // changed size or position of window
 		python::gil_lock gil;
@@ -249,7 +249,7 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 	char	key[2];
 	UInt32	code;
 	std::string keyStr;
-	
+
 	kind = GetEventKind(event);
 	if (kind == kEventRawKeyDown || kind == kEventRawKeyRepeat) {
 		GetEventParameter(event, kEventParamKeyMacCharCodes,
@@ -327,7 +327,7 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 					break;
 				case 125:
 					keyStr += "down";
-					break;	
+					break;
 				case 117:
 					keyStr += "delete";
 					break;
@@ -367,21 +367,19 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 
 OSStatus
 display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
-{ 
+{
 	WindowPartCode	part;
 	WindowRef		win;
-	UInt32			kind;
 	Point			pt;
-	EventMouseButton btn;
 	bool buttons[3]; // left, right, middle buttons
 	bool shiftState[4]; // shift, ctrl, option, command key down
-			
+
 	python::gil_lock gil;
+
 	GetEventParameter(event, kEventParamMouseLocation,
 					  typeQDPoint, NULL,
 					  sizeof(pt), NULL,
 					  &pt);
-	
 	if (!fullscreen) { // If not full screen, check if mouse event occurred within our content area
 		part = FindWindow(pt, &win);
 		if (win != window || part != inContent) {
@@ -392,59 +390,47 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 		GetEventParameter(event, kEventParamWindowMouseLocation,
 						  typeQDPoint, NULL,
 						  sizeof(pt), NULL,
-						  &pt);	
+						  &pt);
 	}
-	
+
 	// Get any modifier keys
-	GetEventParameter(event, kEventParamMouseButton,
-					  typeMouseButton, NULL,
-					  sizeof(btn), NULL,
-					  &btn);
 	GetEventParameter(event, kEventParamKeyModifiers,
 					  typeUInt32, NULL,
 					  sizeof(keyModState), NULL,
 					  &keyModState);
-	
+
 	shiftState[0] = modBit(keyModState, shiftKeyBit);
 	shiftState[1] = modBit(keyModState, controlKeyBit);
 	shiftState[2] = modBit(keyModState, optionKeyBit);
 	shiftState[3] = modBit(keyModState, cmdKeyBit);
 
-	// mouse_manager expects a release event to be reported with no button as true,
-	// which is the case for Windows, but not for the Mac:
-	kind = GetEventKind(event);
-	buttons[0] = (btn == kEventMouseButtonPrimary && kind != kEventMouseUp);
-	buttons[1] = (btn == kEventMouseButtonSecondary && kind != kEventMouseUp); // right button on 3-button mouse
-	buttons[2] = (btn == kEventMouseButtonTertiary && kind != kEventMouseUp); // middle button on 3-button mouse
+	unsigned btnMask = GetCurrentEventButtonState();
+	for(int b=0; b<3; b++) buttons[b] = btnMask & (1<<b);
 
-	if (buttons[1] || buttons[2]) // must be a 2- or 3-button mouse
-		mouse.report_mouse_state( 3, buttons, pt.h, pt.v-yadjust, 4, shiftState, false ); // TODO: can we lock mouse?
-	else { // may be either a 1- or 2- or 3-button mouse; report as 3-button
-		if (shiftState[3]) {
-			buttons[1] = true;
-		} else if (shiftState[2]) {
-			buttons[2] = true;
-		}
-		mouse.report_mouse_state( 3, buttons, pt.h, pt.v-yadjust, 4, shiftState, false );
-	}
-	// TODO: clicking in content area should bring this window forward.
-	// But currently it leaves the currently active window active, and forward.
+	// Consider option and command as middle and right buttons
+	if (shiftState[3]) { buttons[1] = true; buttons[0] = false; }
+	if (shiftState[2]) buttons[2] = true;
+
+	mouse.report_mouse_state( 3, buttons, pt.h, pt.v-yadjust, 4, shiftState, false );
+
+	// clicking in content area should bring this window forward.
+	UInt32 kind = GetEventKind(event);
 	if (kind == kEventMouseDown && !fullscreen && !IsWindowActive(window)) {
 		activate(true);
 	}
 	return noErr;
 }
 
-static OSStatus 
+static OSStatus
 vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
 {
 	UInt32	evtClass;
 	display * thiswindow;
-	
+
 	thiswindow = (display *)data;
-	
+
 	evtClass = GetEventClass(event);
-	
+
 	switch (evtClass) {
 		case kEventClassWindow:
 			return thiswindow->vpWindowHandler(target, event);
@@ -466,10 +452,10 @@ void
 display::update_size()
 {
 	Rect	bounds, drawing; // outer bounds of window, actual drawing region
-	
+
 	GetWindowBounds(window, kWindowStructureRgn, &bounds);
 	GetWindowBounds(window, kWindowContentRgn, &drawing);
-	report_resize(	bounds.left, bounds.top-yadjust, bounds.right-bounds.left, bounds.bottom-bounds.top, 
+	report_resize(	bounds.left, bounds.top-yadjust, bounds.right-bounds.left, bounds.bottom-bounds.top,
 			drawing.left, drawing.top, drawing.right-drawing.left, drawing.bottom-drawing.top );
 }
 
@@ -487,7 +473,7 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 				AGL_RGBA, AGL_DOUBLEBUFFER,
 				AGL_DEPTH_SIZE, 32,
 				AGL_ALL_RENDERERS, AGL_ACCELERATED,
-				AGL_NO_RECOVERY, 
+				AGL_NO_RECOVERY,
 				AGL_NONE,		// Expansion
 				AGL_NONE,		// Expansion
 				AGL_NONE
@@ -507,17 +493,17 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 		{ kEventClassMouse, kEventMouseDragged },
 		{ 0, 0 }
 	};
-	
+
 	if (window) { // window already exists; make active an bring to the front
 		SelectWindow(window);
 		return true;
 	}
-	
+
 	// Window
 	// drawing refers only to the content region of the window, so must adjust
 	// for the fact that the VPython API for window size and placement is in
 	// terms of the outer bounds of the window
-	
+
 	dev = GetMainDevice();
 	if (fullscreen) {
 		width = (**dev).gdRect.right-(**dev).gdRect.left;
@@ -536,7 +522,7 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	window_height = height;
 
 	SetWindowTitleWithCFString(window, CFStringCreateWithCString(NULL, title.c_str(), kCFStringEncodingASCII));
-	
+
 	// GL context
 	idx = 0;
 	while (attrList[idx] != AGL_NONE) idx ++;
@@ -559,7 +545,7 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	gl_context = aglCreateContext(fmt, root_glrc);
 	if (gl_context == NULL)
 		return false;
-	
+
 	// Fullscreen on Mac
 	if (fullscreen) {
 		aglEnable(gl_context, AGL_FS_CAPTURE_SINGLE);
@@ -586,13 +572,13 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 						upp,
 						idx, handled,
 						this, &discard);
-	
+
 	DisposeEventHandlerUPP(upp);
 	// Make visible
 	if (!fullscreen) ShowWindow(window);
 	window_visible = true;
 	update_size();
-	
+
 	return true;
 }
 
@@ -663,7 +649,7 @@ gui_main::init_thread()
 		// We are holding the Python GIL through this process, including the wait!
 		// We can't let go because a different Python thread could come along and mess us up (e.g.
 		//   think that we are initialized and go on to call PostThreadMessage without a valid idThread)
-		self = new gui_main;		
+		self = new gui_main;
 		thread gui( boost::bind( &gui_main::event_loop, self ) );
 		lock L( self->init_lock );
 		while (self->gui_thread == -1)
