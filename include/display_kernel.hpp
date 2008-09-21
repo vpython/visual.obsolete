@@ -43,8 +43,6 @@ class display_kernel
  	double render_time;
  	bool realized;
 
- 	boost::scoped_ptr< class shader_program > global_shader;
-
  	static shared_ptr<display_kernel> selected;
 
  	mutex realize_lock;
@@ -327,9 +325,6 @@ public: // Public Data.
 	// does not propogate to the owning display_kernel.
 	std::vector<shared_ptr<renderable> > get_objects() const;
 
-	void set_shader( std::string shader );
-	std::string get_shader();
-
 	std::string info( void);
 
 	void set_x( float x);
@@ -358,6 +353,8 @@ public: // Public Data.
 
 	bool is_showing_toolbar();
 	void set_show_toolbar( bool);
+
+	static bool enable_shaders;
 
 	mouse_t* get_mouse();
 	atomic_queue<std::string>* get_kb();

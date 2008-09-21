@@ -20,7 +20,8 @@ view::view( const vector n_forward, vector n_center, int n_width,
 	view_height( n_height), forward_changed( n_forward_changed),
 	gcf( n_gcf), gcfvec( n_gcfvec), gcf_changed( n_gcf_changed), lod_adjust(0),
 	anaglyph(false), coloranaglyph(false), tan_hfov_x(0), tan_hfov_y(0),
-	screen_objects( z_comparator( forward)), glext(glext)
+	screen_objects( z_comparator( forward)), glext(glext),
+	enable_shaders(true)
 {
 	for(int i=0; i<N_LIGHT_TYPES; i++)
 		light_count[i] = 0;

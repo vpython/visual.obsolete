@@ -107,6 +107,11 @@ struct view
 	int light_count[N_LIGHT_TYPES];
 	std::vector<float> light_pos, light_color; // in eye coordinates!
 
+	typedef std::multimap<vector, displaylist, z_comparator> screen_objects_t;
+	mutable screen_objects_t screen_objects;
+
+	bool enable_shaders;
+
 	view( vector n_forward, vector n_center, int n_width,
 		int n_height, bool n_forward_changed,
 		double n_gcf, vector n_gcfvec,
@@ -123,9 +128,6 @@ struct view
 	// to the screen, with a center at pos, and some radius.  If pos is behind
 	// the camera, it will return negative.
 	double pixel_coverage( const vector& pos, double radius) const;
-
-	typedef std::multimap<vector, displaylist, z_comparator> screen_objects_t;
-	mutable screen_objects_t screen_objects;
 };
 
 /** Virtual base class for all renderable objects and composites.

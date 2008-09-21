@@ -25,6 +25,8 @@ namespace cvisual {
 
 shared_ptr<display_kernel> display_kernel::selected;
 
+bool display_kernel::enable_shaders = true;
+
 ////////////////////////////////////////////////////////////////
 // Implementation of display_kernel::waitWhileAnyDisplayVisible()
 
@@ -172,8 +174,7 @@ display_kernel::display_kernel()
 	stereo_mode( NO_STEREO),
 	lod_adjust(0),
 	realized(false),
-	mouse( *this )
-{
+	mouse( *this ){
 }
 
 display_kernel::~display_kernel()
@@ -638,8 +639,6 @@ bool
 display_kernel::draw(
 	view& scene_geometry, int whicheye, bool anaglyph, bool coloranaglyph)
 {
-	use_shader_program using_global_shader( scene_geometry, global_shader.get() );
-
 	// Set up the base modelview and projection matricies
 	world_to_view_transform( scene_geometry, whicheye);
 
@@ -719,6 +718,7 @@ display_kernel::render_scene(void)
 		view scene_geometry( forward.norm(), center, view_width,
 			view_height, forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
+		scene_geometry.enable_shaders = enable_shaders;
 		clear_gl_error();
 
 		on_gl_free.frame();
@@ -1367,22 +1367,6 @@ display_kernel::info()
 		s += buffer.str();
 		return s;
 	}
-}
-
-void
-display_kernel::set_shader( std::string source ) {
-	if (source.size())
-		global_shader.reset( new shader_program( source ) );
-	else
-		global_shader.reset( NULL );
-}
-
-std::string
-display_kernel::get_shader() {
-	if ( global_shader )
-		return global_shader->get_source();
-	else
-		return std::string();
 }
 
 void

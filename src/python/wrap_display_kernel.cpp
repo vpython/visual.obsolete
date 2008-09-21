@@ -203,7 +203,8 @@ wrap_display_kernel(void)
 		.def( "_set_range", &display_kernel::set_range_d)
 		.def( "_set_range", &display_kernel::set_range)
 		.def( "_get_range", &display_kernel::get_range)
-		.add_property( "_shader", &display_kernel::get_shader, &display_kernel::set_shader)
+
+		.def_readwrite( "enable_shaders", &display_kernel::enable_shaders)
 		;
 
 	class_<py_base_display_kernel, py_display_kernel, bases<display_kernel>, noncopyable>

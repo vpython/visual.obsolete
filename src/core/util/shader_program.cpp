@@ -33,13 +33,15 @@ void shader_program::set_uniform_matrix( const view& v, int loc, const tmatrix& 
 
 void shader_program::realize( const view& v ) {
 	if (program != -1) return;
-	
+
+	if ( !v.enable_shaders ) return;
+
 	if ( !v.glext.ARB_shader_objects )
 		return;
-	
+
 	program = v.glext.glCreateProgramObjectARB();
 	check_gl_error();
-	
+
 	compile( v, GL_VERTEX_SHADER_ARB, getSection("vertex") );
 	compile( v, GL_FRAGMENT_SHADER_ARB, getSection("fragment") );
 
@@ -48,30 +50,30 @@ void shader_program::realize( const view& v ) {
 	// Check if linking succeeded
 	GLint link_ok = 0;
 	v.glext.glGetObjectParameterivARB( program, GL_OBJECT_LINK_STATUS_ARB, &link_ok );
-	
+
 	if ( !link_ok ) {
 		// Some drivers (incorrectly?) set the GL error in glLinkProgramARB() in this situation
 		printf("!linkok\n");
 		clear_gl_error();
 
 		std::string infoLog;
-		
+
 		GLint length = 0;
 		v.glext.glGetObjectParameterivARB( program, GL_OBJECT_INFO_LOG_LENGTH_ARB, &length );
 		boost::scoped_array<char> temp( new char[length+2] );
 		v.glext.glGetInfoLogARB( program, length+1, &length, &temp[0] );
 		infoLog.append( &temp[0], length );
-		
+
 		// xxx A way to report infoLog to the program?
 		write_stderr( "VPython WARNING: errors in shader program:\n" + infoLog + "\n");
-		
+
 		// Get rid of the program, since it can't be used without generating GL errors.  We set
 		//   program to 0 instead of -1 so that binding it will revert to the fixed function pipeline,
 		//   and realize() won't be called again.
 		v.glext.glDeleteObjectARB( program );
 		program = 0;
 	} else {
-		
+
 		check_gl_error();
 
 		// xxx It's probably not technically legal to call glext functions from on_gl_free callbacks,
@@ -87,17 +89,17 @@ void shader_program::realize( const view& v ) {
 		CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUVertexProcessing, &gpuVertexProcessing);
 		// gpuVertexProcessing=1 on MacBook Pro (GeForce); gpuVertexProcessing=0 on MacBook (no graphics)
 		if (!gpuVertexProcessing) program = 0;
-		
+
 		/*
 		CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUFragmentProcessing, &gpuFragmentProcessing);
 		printf("vertex %d, fragment %d\n", gpuVertexProcessing, gpuFragmentProcessing);
-		
+
 		CGLRendererInfoObj rend;
 		//GLint nrend, value;
 		long nrend, value;
 		CGLQueryRendererInfo ( 255, &rend, &nrend);
 		printf("nrend = %d\n", nrend);
-		
+
 		for (int n = 0; n < nrend; n++) {
 			CGLDescribeRenderer(rend, n, kCGLRPAccelerated, &value);
 			printf("%d accelerated = %d\n", n, value);
@@ -106,8 +108,8 @@ void shader_program::realize( const view& v ) {
 		}
 
 		printf("destroy=%d\n", CGLDestroyRendererInfo(rend));
-		
-		/* 
+
+		/*
 		MacBook (no graphics)
 		(ID=x24000, kCGLRendererIntel900ID)
 		(ID=x22604, some kind of GeForce - all GeForce cards start with 22)
@@ -123,7 +125,7 @@ void shader_program::realize( const view& v ) {
 
 		Assertion failed: (!pthread_mutex_destroy(&internal_mutex)), function ~condition_variable_any, file ../vpython-core2/dependencies/boost_1_35_0/boost/thread/pthread/condition_variable.hpp, line 86.
 		Abort trap
-		
+
 		MacBook Pro (GeForce)
 		vertex 1, fragment 1
 		nrend = 2
@@ -133,7 +135,7 @@ void shader_program::realize( const view& v ) {
 		1 RendererID = 20400
 		destroy=0
 		*/
-		
+
 		v.glext.glUseProgramObjectARB( 0 );
 #endif
 	}
@@ -141,7 +143,7 @@ void shader_program::realize( const view& v ) {
 
 void shader_program::compile( const view& v, int type, const std::string& source ) {
 	int shader = v.glext.glCreateShaderObjectARB( type );
-	const char* str = source.c_str(); 
+	const char* str = source.c_str();
 	GLint len = source.size();
 	v.glext.glShaderSourceARB( shader, 1, &str, &len );
 	v.glext.glCompileShaderARB( shader );
@@ -161,17 +163,17 @@ std::string shader_program::getSection( const std::string& name ) {
 	std::string section;
 	std::string header = "\n[" + name + "]\n";
 	std::string source = "\n" + this->source;
-	
+
 	int p = 0;
 	while ( (p = source.find( header, p )) != source.npos ) {
 		p += header.size();
 		int end = source.find( "\n[", p );
 		if (end == source.npos) end = source.size();
-		
+
 		section += source.substr( p, end-p );
 		p = end;
 	}
-	
+
 	return section;
 }
 
@@ -195,13 +197,11 @@ use_shader_program::use_shader_program( const view& v, shader_program* program )
 
 void use_shader_program::init(shader_program* program) {
 	m_ok = false;
-	if (!program) {
+	if (!program || !v.glext.ARB_shader_objects || !v.enable_shaders) {
 		oldProgram = -1;
 		return;
 	}
-	
-	if (!v.glext.ARB_shader_objects) return;
-	
+
 	program->realize(v);
 
 	// xxx For now, nested shader invocations aren't supported.
@@ -210,7 +210,7 @@ void use_shader_program::init(shader_program* program) {
 
 	v.glext.glUseProgramObjectARB( program->program );
 	check_gl_error();
-	
+
 	m_ok = (program->program != 0);
 }
 
