@@ -49,12 +49,6 @@ class rgba
 	/** Make this the active OpenGL color using glColor(). */
 	inline void gl_set() const
 	{ glColor4fv( &red); }
-
-	/** Make this the active OpenGL material property for front and back ambient
-		and diffuse color.
-	*/
-	inline void gl_material() const
-	{ glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &red); }
 };
 
 
