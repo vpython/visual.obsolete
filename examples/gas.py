@@ -10,7 +10,7 @@ from random import random
 
 win=500
 
-Natoms = 50  # change this to have more or fewer atoms
+Natoms = 100  # change this to have more or fewer atoms
 
 # Typical values
 L = 1. # container is a cube L on a side

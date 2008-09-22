@@ -44,11 +44,11 @@ base = box(pos=top-vector(0,hpedestal+tbase/2.,0),
                  color=pedestal.color)
 
 gyro=frame(axis=(sin(theta)*sin(phi),cos(theta),sin(theta)*cos(phi)))
-shaft = cylinder(axis=(Lshaft,0,0),
-                 radius=Rshaft, color=(0,1,0), frame=gyro)
+shaft = cylinder(axis=(Lshaft,0,0), radius=Rshaft, color=(0,1,0),
+                 material=materials.rough, frame=gyro)
 rotor = cylinder(pos=(Lshaft/2 - Drotor/2, 0, 0),
-                 axis=(Drotor, 0, 0),
-                 radius=Rrotor, color=(1,0,0), frame=gyro)
+                 axis=(Drotor, 0, 0), radius=Rrotor, color=(1,0,0),
+                 material=materials.rough, frame=gyro)
 
 trail = curve(radius=Rshaft/8., color=(1,1,0))
 

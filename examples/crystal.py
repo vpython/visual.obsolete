@@ -1,7 +1,5 @@
 from visual import *
 from random import random
-from time import clock
-import sys
 
 # Bruce Sherwood; revised by Jonathan Brandmeyer
 
@@ -145,8 +143,6 @@ for a in atoms:
 springs = tuple(springs)
 atoms = tuple(atoms)
 
-tt = clock()
-Nsteps = 0
 # Evaluate a couple of constants outside the loop
 k_dt = k * dt
 dt_m = dt / m
@@ -165,9 +161,4 @@ while 1:
         dir = r12.norm()
         s.pos = p1+Rs*dir
         s.axis = (r12.mag-2*Rs)*dir
-    
-    if Nsteps == 100:
-        tt = clock()-tt
-        print '%0.2f' % tt, 'sec for', Nsteps, 'steps with', N, 'on a side'
-        # sys.exit(0)
-    Nsteps += 1
+
