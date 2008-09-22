@@ -88,7 +88,11 @@ void shader_program::realize( const view& v ) {
 		GLint gpuVertexProcessing, gpuFragmentProcessing; // OS X 10.4 wants a long
 		CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUVertexProcessing, &gpuVertexProcessing);
 		// gpuVertexProcessing=1 on MacBook Pro (GeForce); gpuVertexProcessing=0 on MacBook (no graphics)
-		if (!gpuVertexProcessing) program = 0;
+		if (!gpuVertexProcessing) {
+			printf("Material would be emulated in software; disabling.\n");
+			v.glext.glDeleteObjectARB( program );
+			program = 0;
+		}
 
 		/*
 		CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUFragmentProcessing, &gpuFragmentProcessing);
@@ -108,33 +112,6 @@ void shader_program::realize( const view& v ) {
 		}
 
 		printf("destroy=%d\n", CGLDestroyRendererInfo(rend));
-
-		/*
-		MacBook (no graphics)
-		(ID=x24000, kCGLRendererIntel900ID)
-		(ID=x22604, some kind of GeForce - all GeForce cards start with 22)
-		(ID=x20400, kCGLRendererGenericFloatID)
-		vertex 0, fragment 1
-		nrend = 2
-		0 accelerated = 1
-		0 RendererID = 24000
-		1 accelerated = 0
-		1 RendererID = 20400
-		destroy=0
-		VPython ***CRITICAL ERROR***: ../vpython-core2/src/core/display_kernel.cpp:900: render_scene: OpenGL error: ../vpython-core2/src/core/box.cpp:68 invalid operation, aborting.
-
-		Assertion failed: (!pthread_mutex_destroy(&internal_mutex)), function ~condition_variable_any, file ../vpython-core2/dependencies/boost_1_35_0/boost/thread/pthread/condition_variable.hpp, line 86.
-		Abort trap
-
-		MacBook Pro (GeForce)
-		vertex 1, fragment 1
-		nrend = 2
-		0 accelerated = 1
-		0 RendererID = 22604
-		1 accelerated = 0
-		1 RendererID = 20400
-		destroy=0
-		*/
 
 		v.glext.glUseProgramObjectARB( 0 );
 #endif
