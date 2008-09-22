@@ -5,7 +5,7 @@ from visual import *
 # Visual 4 created by Jonathan Brandmeyer, reworked by David Scherer
 
 # Create a texture to apply to a sphere to make a beach ball
-bands = zeros([16,64,4], float)
+bands = zeros([16,16,4], float)
 for i in range(len(bands)):
     for j in range(len(bands[0])):
         op = 1
@@ -19,7 +19,8 @@ for i in range(len(bands)):
         bands[i][j] = (col[0], col[1], col[2], op)
 stripes = materials.texture(data = bands,
                        channels = ["red","green","blue","opacity"],
-                       mapping = "spherical")
+                       mapping = "spherical",
+                       interpolate = False)
 
 scene.width = scene.height = 800
 scene.forward = (-0.2,-0.2,-1)
