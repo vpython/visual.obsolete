@@ -94,25 +94,6 @@ void shader_program::realize( const view& v ) {
 			program = 0;
 		}
 
-		/*
-		CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUFragmentProcessing, &gpuFragmentProcessing);
-		printf("vertex %d, fragment %d\n", gpuVertexProcessing, gpuFragmentProcessing);
-
-		CGLRendererInfoObj rend;
-		//GLint nrend, value;
-		long nrend, value;
-		CGLQueryRendererInfo ( 255, &rend, &nrend);
-		printf("nrend = %d\n", nrend);
-
-		for (int n = 0; n < nrend; n++) {
-			CGLDescribeRenderer(rend, n, kCGLRPAccelerated, &value);
-			printf("%d accelerated = %d\n", n, value);
-			CGLDescribeRenderer(rend, n, kCGLRPRendererID, &value);
-			printf("%d RendererID = %x\n", n, value);
-		}
-
-		printf("destroy=%d\n", CGLDestroyRendererInfo(rend));
-
 		v.glext.glUseProgramObjectARB( 0 );
 #endif
 	}
