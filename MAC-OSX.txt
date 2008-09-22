@@ -3,22 +3,25 @@ Install XcodeTools from the optional materials on the Mac installation DVD.
 Installing XcodeTools automatically installs the large number of individual
 components also listed on the DVD.
 
-Download the source for numpy and unpack it (http://www.scipy.org/Download).
-In the numpy directory, execute "sudo /usr/bin/python setup.py install".
-This installs the numpy module which includes needed header files.
+Install Python for the Mac ("MacPython") from python.org.
+There is already a /usr/bin/python that at the moment (OSX 10.5) up to date, but
+because this isn't always the case, and because the Python community seems to
+strongly prefer it, we will base Visual on MacPython, which is /usr/local/bin/python.
 
-It is necessary to overwrite /System/Library/Frameworks/OpenGL.framework/Headers/glext.h with
-our own include/GL/glext.h. This header file is referenced from ....Headers/gl.h, which means that
-a working glext.h must be in the same directory as that gl.h, not in our own include/GL.
+Download the source for numpy and unpack it (http://www.scipy.org/Download).
+In the numpy directory, execute "sudo /usr/local/bin/python setup.py install".
+This installs the numpy module which includes needed header files.
 
 You need Boost libraries for the Mac. In the dependencies section of CVS, unzip the
 zip file boost_1_35_0.zip. You should end up with a folder in dependencies named boost_1_35_0,
 containing boost (the include files), lib (for Windows), and mac_lib (for Mac).
 
-The makefile in src/mac should be copied into a directory parallel to vpython-core2, and the
-make performed there. At the moment this makefile copies only the file cvisual.so to 
-/Library/Python/2.5/site-packages; other visual components need to be copied here from
-the site-packages, examples, and docs directories from CVS.
+In src/mac, execute make setup.
+This creates a build directory mbuild parallel to the CVS files, and creates links
+from /Library/Frameworks/Python.framework/Versions/2.5/lib/python2.5/site-packages to
+the visual directory in the CVS files.
+
+In the mbuild directory, execute make install to build and install Visual.
 
 The Boost libraries were built by downloading them and executing this:
 
