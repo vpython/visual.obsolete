@@ -20,6 +20,7 @@ N = int(sqrt(len(materials.materials)+1.5))
 xi = -L/2 + 1.5*R
 dx = (L - 3*R)/(N-1)
 for i,mat in enumerate(materials.materials + [None]):
+    #scene.visible = 0
     if mat: print mat.name
     spheres.append( obj( pos = (xi + (i%N)*dx, R, (xi + (i//N)*dx)),
                          radius = R,
