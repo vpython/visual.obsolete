@@ -24,59 +24,58 @@
   and 1 means totally opaque. Currently curve, convex, faces, points, and helix objects
    do not allow transparency. </p>
 <h3>Materials</h3>
-<p>You can give a material property such as wood to an object: box(color=color.orange, material=materials.wood). Materials currently available include wood, plastic, marble, earth (continents and oceans), rough, diffuse, unlit, and show_mat_pos?? The example program material_test.py shows examples of all of these materials.</p>
-<p>Some materials such as wood are oriented to the specified axis. For example, a wood box with default axis = (1,0,0) shows tree rings on its yz surfaces and stripes on the other faces..</p>
+<p>You can give a material property such as wood to an object: box(color=color.orange,
+  material=materials.wood). Materials currently available include wood, plastic,
+  marble, earth (continents and oceans), rough, diffuse, and unlit (that is,
+  display the specified color unaffected by existing lights). The example program
+  material_test.py shows examples of all of these materials.</p>
+<p>Some materials such as wood are oriented to the specified axis. For example,
+  a wood box with default axis = (1,0,0) shows tree rings on its yz surfaces
+  and stripes on the other faces. Changing the axis changes which face you see
+  the tree rings on. </p>
 <p>Specifying a material has an effect only on computers with modern graphics capabilities such as NVIDIA or Radeon graphics cards. On  computers without such graphics capabilities, objects are displayed without material properties.</p>
-<p>------------------------??<br>
-</p>
 <p>You can create a texture object and then apply it to the surface of an object. 
   A surface texture 
   is an M by N array of 1, 2, 3, or 4 numerical values (a list or tuple). M and 
   N must be powers of 2 (1, 2, 4, 8, 16, 32, etc.). The numerical values can represent red, green, blue, luminance (brightness), or opacity.</p>
-<p>&nbsp;</p>
 <p>Here are the possible values 
   for each slot in the array:</p>
-<p>1 value: texture type must be &quot;luminance&quot; (how bright) or &quot;opacity&quot;</p>
-<p>2 values (opacity,luminance): texture type must be &quot;opacity_luminance&quot;</p>
-<p>3 values (red,green,blue): texture type must be &quot;rgb&quot;</p>
-<p>4 values (red,green,blue,opacity): texture type must be &quot;rgbo&quot;</p>
-<p>A VPython texture is basically a mask. For example, if you apply a texture 
-  to a box that is red, any cyan region of the texture will display as black, 
-  because the cyan (0,1,1) doesn't overlap at all with the red (1,0,0).</p>
+<p>1 value: channels must be [ &quot;luminance&quot;] (how bright) or
+  [&quot;opacity&quot;]</p>
+<p>2 values (luminance and opacity): channels must be [&quot;luminance&quot;,&quot;opacity&quot;]</p>
+<p>3 values (red,green,blue): channels must be [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;] </p>
+<p>4 values (red,green,blue,opacity): channels must be [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;,&quot;opacity&quot;] </p>
 <p>You can create a numeric array of zeros in various formats, then assign values:</p>
 <p>zeros([...], ubyte) means an 8-bit unsigned integer 0-255<br>
-  zeros([...], short) means a 16-bit iinteger plus or minus 0-32767<br>
+  zeros([...], short) means a 16-bit integer plus or minus 0-32767<br>
   zeros([...], int) means a 32-bit integer plus or minus 0-2147483648<br>
   zeros([...], float) means a floating-point (fractional) number</p>
-<p>Here is an example program in which a checkerboard texture is created and applied 
-  to a box:</p>
-<p>from visual import *<br>
-  M=4 # must be a power of 2 (1, 2, 4, 8, 16, 32, etc.)<br>
-  N=4 # must be a power of 2 (1, 2, 4, 8, 16, 32, etc.)<br>
-  checks = zeros([M,N], float) # create a numeric array of floating-point zeros
-   (0.0) <br>
-  for i in range(M):<br>
-  &nbsp;&nbsp;&nbsp;&nbsp; for j in range(N):<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ((i&amp;1) ^ (j&amp;1)): 
-  # true for every alternate square of the checkerboard<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;checks[i][j] 
-  = 1.0<br>
-  print checks<br>
-  lum = texture(data=checks, type=&quot;luminance&quot;)<br>
-  box(color=color.cyan, texture=lum)</p>
-<p>If you wanted to create a texture containing &quot;rgb&quot; values, you would
+<p>Here is an example program in which a checkerboard texture is created and
+  applied  to a box. (An &quot;array&quot; is a numerical array supported by the numpy
+  module which is imported when you import &quot;visual&quot;.) </p>
+<pre>from visual import *
+checkerboard = array([[0,1,0,1], <br>		      [1,0,1,0],<br>		      [0,1,0,1],<br>		      [1,0,1,0]], float)<br>lum = materials.texture( data=checkerboard,<br>                         channels=[&quot;luminance&quot;],<br>                         mapping=&quot;rectangular&quot;,<br>                         interpolate=False)<br>box(axis=(0,0,1), color=color.cyan, material=lum)
+</pre>
+<p>If you wanted to create a texture containing &quot;rgb&quot; values, you could
    start with zeros([M,N,3], float), and entries into this array would be the
   usual 
   (red,green,blue) triples, with values for each color in the range 0-1 inclusive.</p>
-<p>See the <a href="http://vpython.org/contributed.html" target="_blank">contributed</a> 
-  section of vpython.org for an example of a program to create, save, and use
-     a wood-grain texture. Such a texture is included in the examples and used
-    by the program texture_and_lighting.py.</p>
+<p>The example above uses a &quot;rectangular&quot; mapping, which places the texture on
+  two opposing faces of a box. By default, one of the faces is in the (1,0,0)
+  direction, but this can be changed by specifying a different axis for the box.
+  Other texture mappings are &quot;spherical&quot; and &quot;sign&quot;, the latter being similar
+  to &quot;rectangular&quot; but is unaffected by the color of the object and appearing
+  on only one face of a box (determined by the axis of the box).</p>
+<p>By default &quot;interpolate&quot; is True, but to get a sharply defined checkerboard
+  in the example above, &quot;interpolate&quot; was set to False.  </p>
+<p>In the example program texture_and_lighting.py you will find a creation of
+  a beach ball using spherical mapping. In the example program stonehenge.py
+  you will see an example of a display of a color photograph on a box. </p>
 <h3>Lighting</h3>
-<p>??In previous versions of Visual, lights were 
-  restricted to being very distant from the scene (&quot;at infinity&quot;). Now you 
-  can create lights that are local, near other objects. The following statement creates a  yellow light positioned 
-at (x,y,z):</p>
+<p>In previous versions of Visual, lights were 
+  restricted to being very distant from the scene (&quot;at infinity&quot;).
+  Now you  can create lights that are local, near other objects. The following
+  statement creates a yellow light positioned  at (x,y,z):</p>
 <blockquote>
   <p>lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
 </blockquote>
@@ -87,9 +86,8 @@ at (x,y,z):</p>
 <blockquote>
   <p>distant_light(direction=(x,y,z), color=color.red)</p>
 </blockquote>
-<p>?? Do lights have a visible attribute?</p>
 <h3>New frame option: visible</h3>
-<p>??You can now make a frame visible or invisible, and all objects in the frame
+<p>You can now make a frame visible or invisible, and all objects in the frame
   will be affected. </p>
 <h3>Points object</h3>
 <p>A new points object is similar to a curve, but with disconnected points. As with curve, the pos attribute is an array
