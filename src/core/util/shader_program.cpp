@@ -72,31 +72,29 @@ void shader_program::realize( const view& v ) {
 		//   and realize() won't be called again.
 		v.glext.glDeleteObjectARB( program );
 		program = 0;
-	} else {
-
-		check_gl_error();
-
-		// xxx It's probably not technically legal to call glext functions from on_gl_free callbacks,
-		// since they might run in a different context, even though the program _handle_ is shared.  Plus
-		// this is kind of ugly.
-		glDeleteObjectARB = v.glext.glDeleteObjectARB;
-		on_gl_free.connect( boost::bind( &shader_program::gl_free, v.glext.glDeleteObjectARB, program ) );
+		return;
+	}
+	check_gl_error();
 
 #ifdef __APPLE__
-		v.glext.glUseProgramObjectARB( program );
-		//GLint gpuVertexProcessing, gpuFragmentProcessing;
-		GLint gpuVertexProcessing, gpuFragmentProcessing; // OS X 10.4 wants a long
-		CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUVertexProcessing, &gpuVertexProcessing);
-		// gpuVertexProcessing=1 on MacBook Pro (GeForce); gpuVertexProcessing=0 on MacBook (no graphics)
-		if (!gpuVertexProcessing) {
-			printf("Material would be emulated in software; disabling.\n");
-			v.glext.glDeleteObjectARB( program );
-			program = 0;
-		}
-
-		v.glext.glUseProgramObjectARB( 0 );
-#endif
+	v.glext.glUseProgramObjectARB( program );
+	GLint gpuVertexProcessing=0; // OS X 10.4 wants a long
+	CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUVertexProcessing, &gpuVertexProcessing);
+	v.glext.glUseProgramObjectARB( 0 );
+	// gpuVertexProcessing=1 on MacBook Pro (GeForce); gpuVertexProcessing=0 on MacBook (no graphics)
+	if (!gpuVertexProcessing) {
+		write_stderr("Shader would be emulated in software; disabling.\n");
+		v.glext.glDeleteObjectARB( program );
+		program = 0;
+		return;
 	}
+#endif
+
+	// xxx It's probably not technically legal to call glext functions from on_gl_free callbacks,
+	// since they might run in a different context, even though the program _handle_ is shared.  Plus
+	// this is kind of ugly.
+	glDeleteObjectARB = v.glext.glDeleteObjectARB;
+	on_gl_free.connect( boost::bind( &shader_program::gl_free, v.glext.glDeleteObjectARB, program ) );
 }
 
 void shader_program::compile( const view& v, int type, const std::string& source ) {
