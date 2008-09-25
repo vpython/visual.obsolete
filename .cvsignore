@@ -10,3 +10,4 @@ Makefile.in
 missing
 mkinstalldirs
 py-compile
+scripts
