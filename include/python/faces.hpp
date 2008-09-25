@@ -55,13 +55,10 @@ class faces : public renderable
 	boost::python::object get_color();
 	boost::python::object get_normal();
 	
-	void set_pos( const array& pos);
-	void set_pos_l( boost::python::list pos);
-	void set_color( array color);
+	void set_pos( const double_array& pos);
+	void set_color( const double_array& color);
 	void set_color_t( rgb color);
-	void set_color_l( boost::python::list color);
-	void set_normal( const array& normal);
-	void set_normal_l( boost::python::list normals);
+	void set_normal( const double_array& normal);
 	void set_normal_v( const vector);
 };
 

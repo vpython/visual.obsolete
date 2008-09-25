@@ -1,6 +1,11 @@
 #ifndef VPYTHON_PYTHON_NUM_UTIL_HPP
 #define VPYTHON_PYTHON_NUM_UTIL_HPP
 
+#define PY_ARRAY_UNIQUE_SYMBOL visual_PyArrayHandle
+#ifndef IMPORT_ARRAY
+#define NO_IMPORT_ARRAY
+#endif
+
 // num_util.h and num_util.cpp were obtained from:
 // http://www.eos.ubc.ca/research/clouds/num_util.html on 2003-12-17 under the
 // terms and conditions of the Boost Software License, version 1.0.  num_util
@@ -76,6 +81,12 @@ DEALINGS IN THE SOFTWARE.
 namespace cvisual { namespace python {
 
   using boost::python::numeric::array;
+
+  class double_array : public array {
+  public:
+  	double_array( const boost::python::handle<>& h ) : array(h) {}
+  	double_array( const array& a ) : array(a) {}  //< TODO: callers are doing unnecessary copying; somewhat type unsafe
+  };
 
   //!
 

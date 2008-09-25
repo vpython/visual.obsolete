@@ -3,12 +3,10 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#define IMPORT_ARRAY
 #include "python/num_util.hpp"
 #include <boost/python/extract.hpp>
 #include <cassert>
-
-#define PY_ARRAY_UNIQUE_SYMBOL visual_PyArrayHandle
-//#define NO_IMPORT_ARRAY
 
 /* num_util.h and num_util.cpp were obtained from:
  * http://www.eos.ubc.ca/research/clouds/num_util.html on 2003-12-17 under the
@@ -48,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 namespace {
-	const char* rcsid = "$Id: num_util.cpp,v 1.7 2007/06/22 17:21:59 bsherwood Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.8 2008/09/25 19:26:43 dscherer Exp $";
 }
 
   // Local function prototypes

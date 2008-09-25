@@ -232,14 +232,8 @@ points::get_size_units( void)
 }
 
 void
-points::set_pos( array n_pos)
+points::set_pos( const double_array& n_pos)
 {
-
-    NPY_TYPES t = type( n_pos);
-    if (t != NPY_DOUBLE) {
-   		n_pos = astype(n_pos, NPY_DOUBLE);
-    }
-
 	std::vector<npy_intp> dims = shape( n_pos);
 	if (dims.size() == 1 && !dims[0]) {
 		set_length(0);
@@ -264,12 +258,6 @@ points::set_pos( array n_pos)
 	}
 }
 
-void
-points::set_pos_l( const list& pos)
-{
-	this->set_pos( array(pos));
-}
-
 // Interpreted as an initial append operation, with no color specified.
 void
 points::set_pos_v( const vector& npos)
@@ -280,13 +268,8 @@ points::set_pos_v( const vector& npos)
 }
 
 void
-points::set_color( array n_color)
+points::set_color( const double_array& n_color)
 {
-	NPY_TYPES t = type(n_color);
-	if (t != NPY_FLOAT) {
-		n_color = astype(n_color, NPY_FLOAT);
-	}
-
 	std::vector<npy_intp> dims = shape( n_color);
 	if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
@@ -297,30 +280,10 @@ points::set_color( array n_color)
 	if (dims.size() == 2 && dims[1] == 3) {
 		// An RGB chunk of color
 		set_length(dims[0]);
-
-		// The following doesn't work; I don't know why.
-		// Note that it works with a single color above.
-		//color[slice(1, count+1), slice(0, 3)] = n_color;
-		// So instead do it by brute force:
-		float* color_i = findex( color, 0);
-		float* color_end = findex( color, count);
-		float* n_color_i = findex( n_color,0);
-		while (color_i < color_end) {
-			color_i[0] = n_color_i[0];
-			color_i[1] = n_color_i[1];
-			color_i[2] = n_color_i[2];
-			color_i += 3;
-			n_color_i += 3;
-		}
+		color[slice(1, count+1)] = n_color;
 		return;
 	}
 	throw std::invalid_argument( "color must be an Nx4 array");
-}
-
-void
-points::set_color_l( const list& color)
-{
-	this->set_color( array( color));
 }
 
 void
@@ -331,83 +294,52 @@ points::set_color_t( const rgb& color)
 
 
 void
-points::set_red( const array& red)
+points::set_red( const double_array& arg )
 {
-	set_length( shape( red).at(0));
-	color[make_tuple( slice( 0, count), 0)] = red;
+	if (shape(arg).size() != 1) throw std::invalid_argument("red must be a 1D array.");
+	set_length( shape(arg)[0] );
+	color[make_tuple( slice( 0, count), 0)] = arg;
 }
 
 void
-points::set_green( const array& green)
+points::set_green( const double_array& arg )
 {
-	set_length( shape( green).at(0));
-	color[make_tuple( slice( 0, count), 1)] = green;
+	if (shape(arg).size() != 1) throw std::invalid_argument("green must be a 1D array.");
+	set_length( shape(arg)[0] );
+	color[make_tuple( slice( 0, count), 1)] = arg;
 }
 
 void
-points::set_blue( const array& blue)
+points::set_blue( const double_array& arg )
 {
-	set_length( shape( blue).at(0));
-	color[make_tuple( slice( 0, count), 2)] = blue;
+	if (shape(arg).size() != 1) throw std::invalid_argument("blue must be a 1D array.");
+	set_length( shape(arg)[0] );
+	color[make_tuple( slice( 0, count), 2)] = arg;
 }
 
 void
-points::set_red_l( const list& red)
+points::set_x( const double_array& arg )
 {
-	this->set_red( array(red));
+	if (shape(arg).size() != 1) throw std::invalid_argument("x must be a 1D array.");
+	set_length( shape(arg)[0] );
+	pos[make_tuple( slice(1, count+1), 0)] = arg;
 }
 
 void
-points::set_green_l( const list& green)
+points::set_y( const double_array& arg )
 {
-	this->set_green( array(green));
+	if (shape(arg).size() != 1) throw std::invalid_argument("x must be a 1D array.");
+	set_length( shape(arg)[0] );
+	pos[make_tuple( slice(1, count+1), 1)] = arg;
 }
 
 void
-points::set_blue_l( const list& blue)
+points::set_z( const double_array& arg )
 {
-	this->set_blue( array(blue));
+	if (shape(arg).size() != 1) throw std::invalid_argument("x must be a 1D array.");
+	set_length( shape(arg)[0] );
+	pos[make_tuple( slice(1, count+1), 2)] = arg;
 }
-
-void
-points::set_x( const array& x)
-{
-	set_length( shape(x).at(0));
-	pos[make_tuple( slice(1, count+1), 0)] = x;
-}
-
-void
-points::set_y( const array& y)
-{
-	set_length( shape(y).at(0));
-	pos[make_tuple( slice(1, count+1), 1)] = y;
-}
-
-void
-points::set_z( const array& z)
-{
-	set_length( shape(z).at(0));
-	pos[make_tuple( slice(1, count+1), 2)] = z;
-}
-
-void
-points::set_x_l( const list& x)
-{
-	set_x( array(x));
-}
-
-void
-points::set_y_l( const list& y)
-{
-	set_y( array(y));
-}
-
-void
-points::set_z_l( const list& z)
-{
-	set_z( array(z));
-}
-
 
 void
 points::set_x_d( const double x)
@@ -435,7 +367,6 @@ points::set_z_d( const double z)
 	}
 	pos[make_tuple(slice(0,count), 2)] = z;
 }
-
 
 void
 points::set_red_d( float red)

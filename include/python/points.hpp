@@ -76,35 +76,26 @@ class points : public renderable
 	void set_size_units( const std::string& n_type);
 	std::string get_size_units( void);
 	
-	void set_pos( array pos); // An Nx3 array
-	void set_pos_l( const list& pos); // A list of vector
+	void set_pos( const double_array& pos); // An Nx3 array
 	void set_pos_v( const vector& pos); // Interpreted as an initial append().
 	
-	void set_color( array color); // An Nx3 array of color
-	void set_color_l( const list& color); // A list of vectors
+	void set_color( const double_array& color); // An Nx3 array of color
 	void set_color_t( const rgb& color); // A single tuple
 	
-	void set_red( const array& red);
-	void set_red_l( const list& red);
+	void set_red( const double_array& red);
 	void set_red_d( const float red);
-	void set_blue( const array& blue);
-	void set_blue_l( const list& blue);
+	void set_blue( const double_array& blue);
 	void set_blue_d( const float blue);
-	void set_green( const array& green);
-	void set_green_l( const list& green);
+	void set_green( const double_array& green);
 	void set_green_d( const float green);
-	void set_opacity( const array& opacity);
-	void set_opacity_l( const list& opacity);
+	void set_opacity( const double_array& opacity);
 	void set_opacity_d( const float opacity);
-	void set_x( const array& x);
-	void set_x_l( const list& x);
-	void set_x_d( const double x);
-	void set_y( const array& y);
-	void set_y_l( const list& y);
-	void set_y_d( const double y);
-	void set_z( const array& z);
-	void set_z_l( const list& z);
-	void set_z_d( const double z);
+	void set_x( const double_array& x );
+	void set_x_d( const double x );
+	void set_y( const double_array& y );
+	void set_y_d( const double y );
+	void set_z( const double_array& z );
+	void set_z_d( const double z );
 	
 };
 

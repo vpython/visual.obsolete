@@ -264,23 +264,13 @@ curve::append( vector npos)
 }
 
 void
-curve::set_pos( array n_pos)
+curve::set_pos( const double_array& n_pos)
 {
-	NPY_TYPES t = type( n_pos);
-	if (t != NPY_DOUBLE) {
-		n_pos = astype(n_pos, NPY_DOUBLE);
-	}
-	std::vector<npy_intp> dims = shape( n_pos);
-	if (dims.size() == 1) {
-		if (!dims[0]) {
-			set_length(0);
-			return;
-		}
-		else {
-			set_length( dims[0]);
-			pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-			return;
-		}
+	std::vector<npy_intp> dims = shape( n_pos );
+	if (dims.size() == 1 && !dims[0]) {
+		// e.g. pos = ()
+		set_length(0);
+		return;
 	}
 	if (dims.size() != 2) {
 		throw std::invalid_argument( "pos must be an Nx3 array");
@@ -301,28 +291,18 @@ curve::set_pos( array n_pos)
 	}
 }
 
-void
-curve::set_pos_l( const list& pos)
-{
-	this->set_pos( array(pos));
-}
-
 // Interpreted as an initial append operation, with no color specified.
 void
 curve::set_pos_v( const vector& npos)
 {
 	using namespace boost::python;
 	tuple t_pos = make_tuple( npos.x, npos.y, npos.z);
-	set_pos( array(t_pos));
+	set_pos( double_array( array(t_pos) ) );
 }
 
 void
-curve::set_color( array n_color)
+curve::set_color( const double_array& n_color)
 {
-	NPY_TYPES t = type(n_color);
-	if (t != NPY_FLOAT) {
-		n_color = astype(n_color, NPY_FLOAT);
-	}
     std::vector<npy_intp> dims = shape( n_color);
 	if (dims.size() == 1 && dims[0] == 3) {
 		// A single color, broadcast across the entire (used) array.
@@ -335,113 +315,58 @@ curve::set_color( array n_color)
 		if (dims[0] != (long)count) {
 			throw std::invalid_argument( "color must be the same length as pos.");
 		}
-		// The following doesn't work; I don't know why.
-		// Note that it works with a single color above.
-		//color[slice(1, count+1), slice(0, 3)] = n_color;
-		// So instead do it by brute force:
-		float* color_i = findex( color, 1);
-		float* color_end = findex( color, count+1);
-		float* n_color_i = findex( n_color,0);
-		while (color_i < color_end) {
-			color_i[0] = n_color_i[0];
-			color_i[1] = n_color_i[1];
-			color_i[2] = n_color_i[2];
-			color_i += 3;
-			n_color_i += 3;
-		}
+		color[slice(1, count+1)] = n_color;
 		return;
 	}
 	throw std::invalid_argument( "color must be an Nx3 or Nx4 array");
 }
 
 void
-curve::set_color_l( const list& color)
-{
-	this->set_color( array(color));
-}
-
-void
 curve::set_color_t( const rgb& color)
 {
-	this->set_color( array( make_tuple(color.red, color.green, color.blue)));
+	this->set_color( double_array( array( make_tuple(color.red, color.green, color.blue))));
 }
 
 void
-curve::set_red( const array& red)
+curve::set_red( const double_array& red)
 {
 	set_length( shape(red).at(0));
 	color[make_tuple(slice(1,count+1), 0)] = red;
 }
 
 void
-curve::set_green( const array& green)
+curve::set_green( const double_array& green)
 {
 	set_length( shape(green).at(0));
 	color[make_tuple(slice(1,count+1), 1)] = green;
 }
 
 void
-curve::set_blue( const array& blue)
+curve::set_blue( const double_array& blue)
 {
 	set_length( shape(blue).at(0));
 	color[make_tuple(slice(1,count+1), 2)] = blue;
 }
 
 void
-curve::set_x( const array& x)
+curve::set_x( const double_array& x)
 {
 	set_length( shape(x).at(0));
 	pos[make_tuple( slice(1, count+1), 0)] = x;
 }
 
 void
-curve::set_y( const array& y)
+curve::set_y( const double_array& y)
 {
 	set_length( shape(y).at(0));
 	pos[make_tuple( slice(1, count+1), 1)] = y;
 }
 
 void
-curve::set_z( const array& z)
+curve::set_z( const double_array& z)
 {
 	set_length( shape(z).at(0));
 	pos[make_tuple( slice(1, count+1), 2)] = z;
-}
-
-void
-curve::set_red_l( const list& red)
-{
-	this->set_red( array(red));
-}
-
-void
-curve::set_green_l( const list& green)
-{
-	this->set_green( array(green));
-}
-
-void
-curve::set_blue_l( const list& blue)
-{
-	this->set_blue( array(blue));
-}
-
-void
-curve::set_x_l( const list& x)
-{
-	set_x( array(x));
-}
-
-void
-curve::set_y_l( const list& y)
-{
-	set_y( array(y));
-}
-
-void
-curve::set_z_l( const list& z)
-{
-	set_z( array(z));
 }
 
 void

@@ -255,7 +255,7 @@ faces::smooth_shade(bool doublesided)
 }
 
 void
-faces::set_pos( const array& n_pos)
+faces::set_pos( const double_array& n_pos)
 {
 	using namespace python;
 
@@ -282,12 +282,6 @@ faces::set_pos( const array& n_pos)
 		throw std::invalid_argument( "Numeric.array members must be Nx3 arrays.");
 }
 
-void
-faces::set_pos_l( boost::python::list l)
-{
-	set_pos( array( l));
-}
-
 boost::python::object
 faces::get_pos()
 {
@@ -307,15 +301,10 @@ faces::get_normal()
 }
 
 void
-faces::set_color( array n_color)
+faces::set_color( const double_array& n_color)
 {
 	using namespace boost::python;
 	using cvisual::python::slice;
-
-	NPY_TYPES t = type(n_color);
-	if (t != NPY_FLOAT) {
-		n_color = astype(n_color, NPY_FLOAT);
-	}
 
 	std::vector<npy_intp> dims = shape( n_color);
 	if (dims.size() == 1 && dims[0] == 3) {
@@ -327,30 +316,10 @@ faces::set_color( array n_color)
 	if (dims.size() == 2 && dims[1] == 3) {
 		// An RGB chunk of color
 		set_length( dims[0] );
-
-		// The following doesn't work; I don't know why.
-		// Note that it works with a single color above.
-		//color[slice(1, count+1), slice(0, 3)] = n_color;
-		// So instead do it by brute force:
-		float* color_i = findex( color, 0);
-		float* color_end = findex( color, count);
-		float* n_color_i = findex( n_color,0);
-		while (color_i < color_end) {
-			color_i[0] = n_color_i[0];
-			color_i[1] = n_color_i[1];
-			color_i[2] = n_color_i[2];
-			color_i += 3;
-			n_color_i += 3;
-		}
+		color[slice(1, count+1)] = n_color;
 		return;
 	}
-	throw std::invalid_argument( "color must be an Nx4 array");
-}
-
-void
-faces::set_color_l( boost::python::list color)
-{
-	set_color( array(color));
+	throw std::invalid_argument( "color must be an Nx3 array");
 }
 
 void
@@ -363,19 +332,13 @@ faces::set_color_t( rgb c)
 }
 
 void
-faces::set_normal( const array& n_normal)
+faces::set_normal( const double_array& n_normal)
 {
 	std::vector<npy_intp> dims = shape(n_normal);
 	if (dims.size() == 2 && dims[1] == 3)
 		set_length( dims[0] );
 
 	normal[slice(0, count)] = n_normal;
-}
-
-void
-faces::set_normal_l( boost::python::list normals)
-{
-	set_normal( array(normals));
 }
 
 void

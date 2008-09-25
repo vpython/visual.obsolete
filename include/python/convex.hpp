@@ -91,10 +91,7 @@ class convex : public renderable
 	rgb get_color();
 	
 	boost::python::object get_pos();
-	void set_pos( array);
-	// Provide an overload for code that expects implicit conversion from 
-	//   list->array.
-	void set_pos_l( const boost::python::list& );
+	void set_pos( const double_array& );
 	
  protected:
 	virtual void gl_render( const view&);

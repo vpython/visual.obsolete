@@ -148,23 +148,20 @@ convex::get_pos()
 }
 
 void
-convex::set_pos( array n_pos)
+convex::set_pos( const double_array& n_pos )
 {
 	using namespace boost::python;
 	using python::slice;
 
-	NPY_TYPES t = type( n_pos);
-	if (t != NPY_DOUBLE) {
-		n_pos = astype(n_pos, NPY_DOUBLE);
-	}
-	std::vector<npy_intp> dims = shape( n_pos);
-	if (dims.size() == 1 && count == 0) {
+	std::vector<npy_intp> dims = shape( n_pos );
+	if (dims.size() == 1 && dims[0]>=2 && dims[0]<=3 && count == 0) {
 		// perform a single append
 		set_length( 1);
 		double* pos_data = index(pos, 0);
 		pos_data[0] = extract<double>(n_pos[0]);
 		pos_data[1] = extract<double>(n_pos[1]);
-		pos_data[2] = extract<double>(n_pos[2]);
+		if (dims[0] == 3)
+			pos_data[2] = extract<double>(n_pos[2]);
 		return;
 	}
 	if (dims.size() != 2) {
@@ -177,16 +174,9 @@ convex::set_pos( array n_pos)
 	else if (dims[1] == 3) {
 		set_length(dims[0]);
 		pos[slice(0, count)] = n_pos;
-
 	}
 	else
 		throw std::invalid_argument( "pos must be an Nx3 or Nx2 array");
-}
-
-void
-convex::set_pos_l( const boost::python::list& pos)
-{
-	this->set_pos( array(pos));
 }
 
 void

@@ -82,34 +82,26 @@ class curve : public renderable
 	inline bool get_antialias( void) { return antialias; }
 	inline double get_radius( void) { return radius; }
 
-	void set_pos( array pos); // An Nx3 array of doubles
-	void set_pos_l( const list& pos); // A list of vector
+	void set_pos( const double_array& pos); // An Nx3 array of doubles
 	void set_pos_v( const vector& pos); // Interpreted as an initial append().
-	void set_color( array color); // An Nx4 array of color floats
-	void set_color_l( const list& color); // A list of vectors
+	void set_color( const double_array& color); // An Nx3 array of color floats
 	void set_color_t( const rgb& color); // A single tuple
 
 	void set_antialias( bool);
 	void set_radius( const double& r);
 
-	void set_red( const array& red);
-	void set_red_l( const list& red);
-	void set_red_d( const double red);
-	void set_blue( const array& blue);
-	void set_blue_l( const list& blue);
-	void set_blue_d( const double blue);
-	void set_green( const array& green);
-	void set_green_l( const list& green);
-	void set_green_d( const double green);
-	void set_x( const array& x);
-	void set_x_l( const list& x);
-	void set_x_d( const double x);
-	void set_y( const array& y);
-	void set_y_l( const list& y);
-	void set_y_d( const double y);
-	void set_z( const array& z);
-	void set_z_l( const list& z);
-	void set_z_d( const double z);
+	void set_red( const double_array& red);
+	void set_red_d( const double red );
+	void set_blue( const double_array& blue);
+	void set_blue_d( const double blue );
+	void set_green( const double_array& green);
+	void set_green_d( const double green );
+	void set_x( const double_array& x);
+	void set_x_d( const double x );
+	void set_y( const double_array& y);
+	void set_y_d( const double y );
+	void set_z( const double_array& z);
+	void set_z_d( const double z );
 
  private:
 
