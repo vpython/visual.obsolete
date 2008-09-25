@@ -85,12 +85,12 @@ points::set_length( size_t length)
 	if (length > preallocated_size) {
 		VPYTHON_NOTE( "Reallocating buffers for a points object.");
 		std::vector<npy_intp> dims(2);
-		dims[0] = 2*length;
+		dims[0] = 2*(length-2);  //< This keeps preallocated_size to powers of 2 when growing by 1
 		dims[1] = 3;
 		array n_pos = makeNum( dims);
 		array n_color = makeNum( dims, NPY_FLOAT);
-		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints+1));
-		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * (npoints+1));
+		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * npoints);
+		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * npoints);
 		pos = n_pos;
 		color = n_color;
 		preallocated_size = dims[0];
