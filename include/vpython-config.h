@@ -11,6 +11,7 @@
 # pragma warning(disable: 4996)
 # pragma warning(disable: 4005)
 # pragma warning(disable: 4715)
+# pragma warning(disable: 4244)
 #endif
 
 #define BOOST_DATE_TIME_NO_LIB
