@@ -76,7 +76,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="python25.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
-				OutputFile="\Python25\lib\site-packages\visual\cvisual.pyd"
+				OutputFile="$(ProjectDir)\..\site-packages\visual\cvisual.pyd"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="libs;\Python25\libs;..\dependencies\boost_1_35_0\lib"
 				GenerateDebugInformation="true"
@@ -84,7 +84,7 @@
 				SubSystem="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary=""
+				ImportLibrary="$(IntDir)\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -168,7 +168,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="python25.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
 				ShowProgress="0"
-				OutputFile="c:\Python25\lib\site-packages\visual\cvisual.pyd"
+				OutputFile="$(ProjectDir)\..\site-packages\visual\cvisual.pyd"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="libs;c:\Python25\libs;..\dependencies\boost_1_35_0\lib"
@@ -180,7 +180,7 @@
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				SupportUnloadOfDelayLoadedDLL="false"
-				ImportLibrary=""
+				ImportLibrary="$(IntDir)\$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
