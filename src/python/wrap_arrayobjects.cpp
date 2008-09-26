@@ -83,17 +83,19 @@ wrap_arrayobjects()
 
 	double_array_from_python();
 
-	void (curve::*append_v_rgb_retain)( vector, rgb, int) = &curve::append;
-	void (curve::*append_v_rgb)( vector, rgb) = &curve::append;
-	void (curve::*append_v_retain)( vector, int) = &curve::append;
-	void (curve::*append_v)( vector) = &curve::append;
+	// TODO: the arrprim inheritance hierarchy could be exposed here; for now I've left the duplication here
+	// to make it easy to control exactly what goes in the API for each array primitive, but arguably they
+	// should be as similar as possible!
+
+	void (curve::*append_v_rgb_retain)( const vector&, const rgb&, int ) = &curve::append;
+	void (curve::*append_v_retain)( const vector&, int ) = &curve::append;
 
 	class_<curve, bases<renderable> >( "curve")
 		.def( init<const curve&>())
 		.add_property( "radius", &curve::get_radius, &curve::set_radius)  // AKA thickness.
 		.def( "get_color", &curve::get_color)
 		// The order of set_color specifications matters.
-		.def( "set_color", &curve::set_color_t)
+		//.def( "set_color", &curve::set_color_t)
 		.def( "set_color", &curve::set_color)
 		.def( "set_red", &curve::set_red_d)
 		.def( "set_red", &curve::set_red)
@@ -110,18 +112,15 @@ wrap_arrayobjects()
 		.def( "set_y", &curve::set_y)
 		.def( "set_z", &curve::set_z_d)
 		.def( "set_z", &curve::set_z)
-		.def( "append", append_v_rgb_retain, args( "pos", "color", "retain"))
-		.def( "append", append_v_rgb, args( "pos", "color"))
-		.def( "append", append_v_retain, args( "pos", "retain"))
-		.def( "append", &curve::append_rgb,
-			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1, args("retain")=-1))
-		.def( "append", append_v, args("pos"))
+		.def( "append", append_v_rgb_retain, ( arg("pos"), arg("color"), arg("retain")=-1 ) )
+		.def( "append", append_v_retain, ( arg("pos"), arg("retain")=-1 ) )
+		.def( "append", &curve::append_rgb, ( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
 		;
 
 	using python::points;
 
-	void (points::*pappend_v_r)( vector, rgb) = &points::append;
-	void (points::*pappend_v)( vector) = &points::append;
+	void (points::*pappend_v_r)( const vector&, const rgb&, int ) = &points::append;
+	void (points::*pappend_v)( const vector&, int ) = &points::append;
 
 	class_<points, bases<renderable> >( "points")
 		.def( init<const points&>())
@@ -130,7 +129,7 @@ wrap_arrayobjects()
 		.add_property( "size_units", &points::get_size_units, &points::set_size_units)
 		.def( "get_color", &points::get_color)
 		// The order of set_color specifications matters.
-		.def( "set_color", &points::set_color_t)
+		//.def( "set_color", &points::set_color_t)
 		.def( "set_color", &points::set_color)
 		.def( "set_red", &points::set_red_d)
 		.def( "set_red", &points::set_red)
@@ -138,8 +137,8 @@ wrap_arrayobjects()
 		.def( "set_green", &points::set_green)
 		.def( "set_blue", &points::set_blue_d)
 		.def( "set_blue", &points::set_blue)
-		.def( "set_pos", &points::set_pos_v)
 		.def( "get_pos", &points::get_pos)
+		.def( "set_pos", &points::set_pos_v)
 		.def( "set_pos", &points::set_pos)
 		.def( "set_x", &points::set_x_d)
 		.def( "set_x", &points::set_x)
@@ -147,16 +146,16 @@ wrap_arrayobjects()
 		.def( "set_y", &points::set_y)
 		.def( "set_z", &points::set_z_d)
 		.def( "set_z", &points::set_z)
-		.def( "append", pappend_v_r, args( "pos", "color"))
+		.def( "append", pappend_v_r, (arg("pos"), arg("color"), arg("retain")=-1))
 		.def( "append", &points::append_rgb,
-			(args("pos"), args("red")=-1, args("green")=-1, args("blue")=-1))
+			(arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1))
 		.def( "append", pappend_v, args("pos"))
 		;
 
 	using python::faces;
 
-	void (faces::* append_all_vectors)(vector, vector, rgb) = &faces::append;
-	void (faces::* append_default_color)( vector, vector) = &faces::append;
+	void (faces::* append_all_vectors)(const vector&, const vector&, const rgb&) = &faces::append;
+	void (faces::* append_default_color)(const vector&, const vector&) = &faces::append;
 
 	class_<faces, bases<renderable> >("faces")
 		.def( init<const faces&>())
@@ -167,20 +166,21 @@ wrap_arrayobjects()
 		.def( "set_normal", &faces::set_normal)
 		.def( "get_color", &faces::get_color)
 		.def( "set_color", &faces::set_color)
-		.def( "set_color", &faces::set_color_t)
+		//.def( "set_color", &faces::set_color_t)
 		.def( "smooth_shade", &faces::smooth_shade,
 			faces_smooth_shade( args("doublesided"),
 			"Average normal vectors at coincident vertexes."))
 		.def( "append", &faces::append_rgb,
-			(args("pos"), args("normal"), args("red")=-1, args("green")=-1, args("blue")=-1))
-		.def( "append", append_default_color, args( "pos", "normal"))
-		.def( "append", append_all_vectors, args("pos", "normal", "color"))
+			(arg("pos"), arg("normal"), arg("red")=-1, arg("green")=-1, arg("blue")=-1))
+		.def( "append", append_default_color, ( arg("pos"), arg("normal") ))
+		.def( "append", append_all_vectors, (arg("pos"), arg("normal"), arg("color")))
 		;
 
 	using python::convex;
+	void (convex::* append_convex)(const vector&) = &convex::append;
 	class_<convex, bases<renderable> >( "convex")
 		.def( init<const convex&>())
-		.def( "append", &convex::append, args("pos"),
+		.def( "append", append_convex, (arg("pos")),
 		 	"Append a point to the surface in O(n) time.")
 		.add_property( "color", &convex::get_color, &convex::set_color)
 		.def( "set_pos", &convex::set_pos)

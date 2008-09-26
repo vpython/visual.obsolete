@@ -108,8 +108,7 @@ namespace cvisual { namespace python {
    *@param t elements' numpy type. Default is double.
    *@return a numeric array of shape dimens with elements initialized to zero.
    */
-  array makeNum(std::vector<npy_intp> dimens,
-					NPY_TYPES t =NPY_DOUBLE);
+  array makeNum(const std::vector<npy_intp>& dimens, NPY_TYPES t =NPY_DOUBLE);
 
   /**
    *Function template returns PyArray_Type for C++ type
@@ -236,6 +235,19 @@ namespace cvisual { namespace python {
 //  void use_numpy_impl();
   size_t typesize( NPY_TYPES t);
 
+  template <class T>
+  struct type_npy_traits {
+  };
+
+  template <>
+  struct type_npy_traits<float> {
+	  static const int npy_type = NPY_FLOAT;
+  };
+
+  template <>
+  struct type_npy_traits<double> {
+	  static const int npy_type = NPY_DOUBLE;
+  };
 
 } } //  visual
 

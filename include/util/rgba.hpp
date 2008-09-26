@@ -31,7 +31,7 @@ class rgba
 	/** Allocate a new color. */
 	inline rgba( float r, float g, float b, float a = 1.0)
 		: red(r), green(g), blue(b), opacity(a) {}
-	inline rgba( float bw)
+	inline explicit rgba( float bw)
 		: red(bw), green(bw), blue(bw), opacity(1) {}
 	inline explicit rgba( const float* c)
 		: red(c[0]), green(c[1]), blue(c[2]), opacity( c[3]) {}
@@ -63,7 +63,7 @@ class rgb
 	inline rgb( float r, float g, float b)
 		: red(r), green(g), blue(b)
 	{}
-	inline rgb( float bw)
+	inline explicit rgb( float bw)
 		: red(bw), green(bw), blue(bw)
 	{}
 	inline explicit rgb( const float* c)

@@ -21,165 +21,45 @@ faces::degenerate() const
 	return count < 3;
 }
 
-
-namespace {
-// returns a pointer to the ith vector in the array.
-double* index( const array& a, size_t i)
-{
-	// This is technically an unsafe cast since the alignment requirement
-	// goes up for the cast.  It is made safe by padding actions within the Numeric
-	// library itself, but the compiler doesn't know that, so I am just using a
-	// raw cast vice a static_cast<>.
-	return ((double*)data(a)) + i * 3;
-}
-
-float* findex( const array& a, size_t i)
-{
-	return ((float*)data(a)) + i * 3; // (red,green,blue)
-}
-
-} // !namespace (unnamed)
-
 faces::faces()
-	: pos(0), color(0), normal(0), preallocated_size(256),
-	count(0)
 {
-	std::vector<npy_intp> dims(2);
-	dims[0] = 256;
-	dims[1] = 3;
-	pos = makeNum(dims);
-	normal = makeNum(dims);
-	color = makeNum(dims, NPY_FLOAT);
-	double* i = index( pos, 0);
-	i[0] = i[1] = i[2] = 0.0;
-	float* j = findex( color,0);
-	j[0] = j[1] = j[2] = 1.0;
-	double* k = index( normal,0);
+	double* k = normal.data();
 	k[0] = k[1] = k[2] = 0.0;
 }
 
-faces::faces( const faces& other)
-	: renderable( other), pos( other.pos), color( other.color),
-	normal( other.normal),
-	preallocated_size( other.preallocated_size),
-	count( other.count)
-{
-}
-
-faces::~faces()
-{
+void faces::set_length(size_t new_len) {
+	arrayprim_color::set_length(new_len);
+	normal.set_length(new_len);
 }
 
 void
-faces::set_length( int length)
+faces::append_rgb( const vector& nv_pos, const vector& nv_normal, float red, float green, float blue)
 {
-	int npoints = count;
-	if (npoints > length) // A shrink operation - never done by VPython.
-		npoints = length;
-	if (npoints == 0) // The first allocation.
-		npoints = 1;
-
-	if (length > preallocated_size) {
-		std::vector<npy_intp> dims(2);
-		dims[0] = 2 * length;
-		dims[1] = 3;
-		array n_pos = makeNum( dims);
-		array n_normal = makeNum( dims);
-		array n_color = makeNum( dims, NPY_FLOAT);
-		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * npoints);
-		std::memcpy( data( n_normal), data( normal), sizeof(double) * 3 * npoints);
-		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * npoints);
-		pos = n_pos;
-		color = n_color;
-		normal = n_normal;
-		preallocated_size = dims[0];
-	}
-	if (length > npoints) {
-		// Copy the last good element to the new positions.
-		const double* last_element = index( pos, npoints-1);
-		double* element_i = index( pos, npoints);
-		double* element_end = index( pos, length);
-		while (element_i < element_end) {
-			element_i[0] = last_element[0];
-			element_i[1] = last_element[1];
-			element_i[2] = last_element[2];
-			element_i += 3;
-		}
-
-		const double* last_normal = index( normal, npoints-1);
-		double* normal_i = index( normal, npoints);
-		double* normal_end = index( normal, length);
-		while (normal_i < normal_end) {
-			normal_i[0] = last_normal[0];
-			normal_i[1] = last_normal[1];
-			normal_i[2] = last_normal[2];
-			normal_i += 3;
-		}
-
-		const float* last_color = findex( color, npoints-1);
-		float* color_i = findex( color, npoints);
-		float* color_end = findex( color, length);
-		while (color_i < color_end) {
-			color_i[0] = last_color[0];
-			color_i[1] = last_color[1];
-			color_i[2] = last_color[2];
-			color_i += 3;
-		}
-	}
-	count = length;
+	arrayprim_color::append_rgb( nv_pos, red, green, blue );
+	double* n = normal.data(count-1);
+	n[0] = nv_normal.x;
+	n[1] = nv_normal.y;
+	n[2] = nv_normal.z;
 }
 
 void
-faces::append_rgb( vector nv_pos, vector nv_normal, float red, float green, float blue)
+faces::append( const vector& nv_pos, const vector& nv_normal, const rgb& nv_color)
 {
-	set_length( count+1);
-	double* pos_data = index( pos, count-1);
-	double* norm_data = index(normal, count-1);
-	float* last_color = findex( color, count-1);
-	pos_data[0] = nv_pos.get_x();
-	pos_data[1] = nv_pos.get_y();
-	pos_data[2] = nv_pos.get_z();
-	norm_data[0] = nv_normal.get_x();
-	norm_data[1] = nv_normal.get_y();
-	norm_data[2] = nv_normal.get_z();
-	if (red != -1)
-		last_color[0] = red;
-	if (green != -1)
-		last_color[1] = green;
-	if (blue != -1)
-		last_color[2] = blue;
+	arrayprim_color::append( nv_pos, nv_color );
+	double* n = normal.data(count-1);
+	n[0] = nv_normal.x;
+	n[1] = nv_normal.y;
+	n[2] = nv_normal.z;
 }
 
 void
-faces::append( vector nv_pos, vector nv_normal, rgb nv_color)
+faces::append( const vector& nv_pos, const vector& nv_normal)
 {
-	set_length( count+1);
-	double* pos_data = index( pos, count-1);
-	double* norm_data = index(normal, count-1);
-	float* color_data = findex(color, count-1);
-	pos_data[0] = nv_pos.get_x();
-	pos_data[1] = nv_pos.get_y();
-	pos_data[2] = nv_pos.get_z();
-	norm_data[0] = nv_normal.get_x();
-	norm_data[1] = nv_normal.get_y();
-	norm_data[2] = nv_normal.get_z();
-	color_data[0] = nv_color.red;
-	color_data[1] = nv_color.green;
-	color_data[2] = nv_color.blue;
-}
-
-void
-faces::append( vector n_pos, vector n_normal)
-{
-	set_length( count+1);
-	double* pos_data = index( pos, count-1);
-	double* norm_data = index(normal, count-1);
-	pos_data[0] = n_pos.get_x();
-	pos_data[1] = n_pos.get_y();
-	pos_data[2] = n_pos.get_z();
-	norm_data[0] = n_normal.get_x();
-	norm_data[1] = n_normal.get_y();
-	norm_data[2] = n_normal.get_z();
+	arrayprim_color::append( nv_pos );
+	double* n = normal.data(count-1);
+	n[0] = nv_normal.x;
+	n[1] = nv_normal.y;
+	n[2] = nv_normal.z;
 }
 
 // Define an ordering for the stl-sorting criteria.
@@ -214,9 +94,9 @@ faces::smooth_shade(bool doublesided)
 	std::map< const vector, vector, stl_cmp_vector> vertices;
 	std::map< const vector, vector, stl_cmp_vector> vertices_backface;
 
-	const double* pos_i = index(pos, 0);
-	double* norm_i = index(normal, 0);
-	const double* pos_end = index( pos, count);
+	const double* pos_i = pos.data();
+	double* norm_i = normal.data();
+	const double* pos_end = pos.end();
 	for ( ; pos_i < pos_end; pos_i+=3, norm_i+=3) {
 		// If there isn't a normal at the specified position, it will be default
 		// initialized to zero.  If there already is one, it will be returned.
@@ -233,8 +113,8 @@ faces::smooth_shade(bool doublesided)
 		}
 	}
 
-	pos_i = index(pos, 0);
-	norm_i = index(normal, 0);
+	pos_i = pos.data();
+	norm_i = normal.data();
 	vector tmp;
 	for ( ; pos_i < pos_end; pos_i+=3, norm_i+=3) {
 		if (doublesided) {
@@ -253,86 +133,11 @@ faces::smooth_shade(bool doublesided)
 		norm_i[2] = tmp.get_z();
 	}
 }
-
-void
-faces::set_pos( const double_array& n_pos)
-{
-	using namespace python;
-
-	std::vector<npy_intp> n_dims = shape(n_pos);
-	std::vector<npy_intp> dims = shape(this->pos);
-
-	if (n_dims.size() == 1 && !n_dims[0]) {
-		set_length(0);
-		return;
-	}
-	if (n_dims.size() != 2)
-		throw std::invalid_argument( "Numeric.array members must be Nx3 arrays.");
-
-	if (n_dims[1] == 2) {
-		set_length( n_dims[0]);
-		pos[make_tuple( slice(0,count), slice(0,2))] = n_pos;
-		pos[make_tuple( slice(0,count), 2)] = 0.0;
-	}
-	else if (n_dims[1] == 3) {
-		set_length( n_dims[0]);
-		pos[slice(0, count)] = n_pos;
-	}
-	else
-		throw std::invalid_argument( "Numeric.array members must be Nx3 arrays.");
+boost::python::object faces::get_normal() {
+	return normal[all()];
 }
 
-boost::python::object
-faces::get_pos()
-{
-	return pos[slice(0, count)];
-}
-
-boost::python::object
-faces::get_color()
-{
-	return color[slice(0, count)];
-}
-
-boost::python::object
-faces::get_normal()
-{
-	return normal[slice(0, count)];
-}
-
-void
-faces::set_color( const double_array& n_color)
-{
-	using namespace boost::python;
-	using cvisual::python::slice;
-
-	std::vector<npy_intp> dims = shape( n_color);
-	if (dims.size() == 1 && dims[0] == 3) {
-		// A single color, broadcast across the entire (used) array.
-		int npoints = (count) ? count : 1;
-		color[slice( 0, npoints)] = n_color;
-		return;
-	}
-	if (dims.size() == 2 && dims[1] == 3) {
-		// An RGB chunk of color
-		set_length( dims[0] );
-		color[slice(1, count+1)] = n_color;
-		return;
-	}
-	throw std::invalid_argument( "color must be an Nx3 array");
-}
-
-void
-faces::set_color_t( rgb c)
-{
-	using boost::python::make_tuple;
-	// Broadcast the new color across the array.
-	int npoints = count ? count : 1;
-	color[slice(0, npoints)] = make_tuple(c.red, c.green, c.blue);
-}
-
-void
-faces::set_normal( const double_array& n_normal)
+void faces::set_normal( const double_array& n_normal)
 {
 	std::vector<npy_intp> dims = shape(n_normal);
 	if (dims.size() == 2 && dims[1] == 3)
@@ -341,8 +146,7 @@ faces::set_normal( const double_array& n_normal)
 	normal[slice(0, count)] = n_normal;
 }
 
-void
-faces::set_normal_v( vector v)
+void faces::set_normal_v( vector v)
 {
 	using boost::python::make_tuple;
 	// Broadcast the new normal across the array.
@@ -363,12 +167,12 @@ faces::gl_render( const view& scene)
 	gl_enable_client normals( GL_NORMAL_ARRAY);
 	gl_enable_client colors( GL_COLOR_ARRAY);
 
-	glNormalPointer( GL_DOUBLE, 0, index( normal, 0));
+	glNormalPointer( GL_DOUBLE, 0, normal.data() );
 
 	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
 		std::vector<vector> tmp( count);
 		spos.swap( tmp);
-		const double* pos_i = index(pos, 0);
+		const double* pos_i = pos.data();
 		for (std::vector<vector>::iterator i = spos.begin(); i != spos.end(); ++i) {
 			*i = vector(pos_i).scale(scene.gcfvec);
 			pos_i += 3;
@@ -376,12 +180,12 @@ faces::gl_render( const view& scene)
 		glVertexPointer( 3, GL_DOUBLE, 0, &*spos.begin());
 	}
 	else
-		glVertexPointer( 3, GL_DOUBLE, 0, index( pos,0));
+		glVertexPointer( 3, GL_DOUBLE, 0, pos.data() );
 
 	if (scene.anaglyph) {
 		std::vector<rgb> tmp( count);
 		tcolor.swap( tmp);
-		const float* color_i = findex( color, 0);
+		const float* color_i = color.data();
 		for (std::vector<rgb>::iterator i = tcolor.begin(); i != tcolor.end(); ++i) {
 			if (scene.coloranaglyph)
 				*i = rgb(color_i[0], color_i[1], color_i[2]).desaturate();
@@ -392,12 +196,12 @@ faces::gl_render( const view& scene)
 		glColorPointer( 3, GL_FLOAT, 0, &*tcolor.begin());
 	}
 	else
-		glColorPointer( 3, GL_FLOAT, 0, findex( color, 0));
+		glColorPointer( 3, GL_FLOAT, 0, color.data() );
 
 	gl_enable cull_face( GL_CULL_FACE);
-	for (int drawn = 0; drawn < count - count%3; drawn += 54) {
+	for (size_t drawn = 0; drawn < count - count%3; drawn += 54) {
 		glDrawArrays( GL_TRIANGLES, drawn,
-			std::min( count - count%3 - drawn, (int)54));
+			std::min( count - count%3 - drawn, (size_t)54));
 	}
 }
 
@@ -411,8 +215,8 @@ vector
 faces::get_center() const
 {
 	vector ret;
-	double* pos_i = index( pos, 0);
-	double* pos_end = index( pos, count - count%3);
+	const double* pos_i = pos.data();
+	const double* pos_end = pos.data( count - count%3 );
 	while (pos_i < pos_end) {
 		ret += vector(pos_i);
 		pos_i += 3; // 3 doubles per vector point
@@ -425,8 +229,8 @@ faces::get_center() const
 void
 faces::grow_extent( extent& world)
 {
-	double* pos_i = index( pos, 0);
-	double* pos_end = index( pos, count - count%3);
+	const double* pos_i = pos.data();
+	const double* pos_end = pos.data( count - count%3 );
 	while (pos_i < pos_end) {
 		world.add_point( vector(pos_i));
 		pos_i += 3; // 3 doubles per vector point
@@ -438,10 +242,10 @@ void
 faces::get_material_matrix( const view& v, tmatrix& out ) {
 	if (degenerate()) return;
 
-	// xxx Add some caching for extent with grow_extent etc; once locking changes so we can trust the primitive not to change during rendering
+	// TODO: Add some caching for extent with grow_extent etc
 	vector min_extent, max_extent;
-	double* pos_i = index( pos, 0);
-	double* pos_end = index( pos, count - count%3);
+	const double* pos_i = pos.data();
+	const double* pos_end = pos.data( count - count%3 );
 	min_extent = max_extent = vector( pos_i ); pos_i += 3;
 	while (pos_i < pos_end)
 		for(int j=0; j<3; j++) {

@@ -8,25 +8,15 @@
 
 #include "renderable.hpp"
 #include "util/sorted_model.hpp"
-
-#include "python/num_util.hpp"
-#include <boost/python/list.hpp>
+#include "python/arrayprim.hpp"
 
 #include <vector>
 
 namespace cvisual { namespace python {
 
-class convex : public renderable
+class convex : public arrayprim
 {
  private:
-	array pos;
-	// The actual amount of storage allocated in the array.
-	size_t preallocated_size;
-	// The number of elements actually used in the array.
-	size_t count;
-	// Optionally grows the pos array to the required size.
-	void set_length( size_t);
-	
 	struct face : triangle
 	{
 		double d;
@@ -57,7 +47,6 @@ class convex : public renderable
 		}
 	};
 	
-	
 	struct jitter_table
 	{
 		enum { mask = 1023 };
@@ -84,14 +73,9 @@ class convex : public renderable
 	
  public:
 	convex();
-	convex( const convex& other);
-	virtual ~convex();
-	void append( vector pos);
+
 	void set_color( const rgb&);
 	rgb get_color();
-	
-	boost::python::object get_pos();
-	void set_pos( const double_array& );
 	
  protected:
 	virtual void gl_render( const view&);

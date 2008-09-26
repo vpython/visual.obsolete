@@ -23,50 +23,10 @@ using boost::python::object;
 
 namespace cvisual { namespace python {
 
-namespace {
-
-// returns a pointer to the ith vector in the array.
-double* index( const array& a, size_t i)
-{
-	// This is technically an unsafe cast since the alignment requirement
-	// goes up for the cast.  It is made safe by padding actions within the Numeric
-	// library itself, but the compiler doesn't know that, so I am just using a
-	// raw cast vice a static_cast<>.
-	return ((double*)data(a)) + (i+1) * 3; // (x,y,z)
-}
-
-float* findex( const array& a, size_t i)
-{
-	return ((float*)data(a)) + (i+1)*3; // (red,green,blue)
-}
-
-} // !namespace visual::(unnamed)
-
-
 curve::curve()
-	: pos( 0), color( 0), antialias( true),
-	radius(0.0),
-	preallocated_size(257),
-	count(0), sides(4)
+	: antialias( true), radius(0.0), sides(4)
 {
-	// Perform initial allocation of storage space.
-	std::vector<npy_intp> dims(2);
-	dims[0] = preallocated_size;
-	dims[1] = 3;
-	pos = makeNum( dims);
-	color = makeNum( dims, NPY_FLOAT);
-	opacity = 1.0; // transparency not yet implmented for curve
-	double* pos_i = index( pos, 0);
-	float* color_i = findex( color, 0);
-	pos_i[0] = 0;
-	pos_i[1] = 0;
-	pos_i[2] = 0;
-	color_i[0] = 1;
-	color_i[1] = 1;
-	color_i[2] = 1;
-
 	int curve_around = sides;
-
 	for (int i=0; i<curve_around; i++) {
 		curve_sc[i]  = (float) std::cos(i * 2 * M_PI / curve_around);
 		curve_sc[i+curve_around] = (float) std::sin(i * 2 * M_PI / curve_around);
@@ -84,345 +44,6 @@ curve::curve()
 	}
 }
 
-curve::curve( const curve& other)
-	: renderable( other), pos( other.pos), color( other.color),
-	antialias( other.antialias),
-	radius( other.radius), preallocated_size( other.preallocated_size),
-	count( other.count)
-{
-	int curve_around = sides;
-	opacity = 1.0; // transparency not yet implmented for curve
-
-	for (int i=0; i<curve_around; i++) {
-		curve_sc[i]  = (float) std::cos(i * 2 * M_PI / curve_around);
-		curve_sc[i+curve_around] = (float) std::sin(i * 2 * M_PI / curve_around);
-	}
-
-	for (int i=0; i<128; i++) {
-		curve_slice[i*2]       = i*curve_around;
-		curve_slice[i*2+1]     = i*curve_around + 1;
-		curve_slice[i*2 + 256] = i*curve_around + (curve_around - 1);
-		curve_slice[i*2 + 257] = i*curve_around;
-	}
-}
-
-curve::~curve()
-{
-}
-
-object
-curve::get_pos()
-{
-	return pos[slice(1, (int)count+1)];
-}
-
-object
-curve::get_color()
-{
-	return color[slice(1, (int)count+1)];
-}
-
-void
-curve::set_length( size_t length)
-{
-	// The number of points that are valid.
-	size_t npoints = count;
-	if (length < npoints) { // A shrink operation
-		const size_t shift = (npoints-length);
-		double* pos_i = index( pos, shift);
-		double* pos_end = index( pos, npoints);
-		while (pos_i < pos_end) {
-			pos_i[0-3*shift] = pos_i[0];
-			pos_i[1-3*shift] = pos_i[1];
-			pos_i[2-3*shift] = pos_i[2];
-			pos_i += 3;
-		}
-
-		float* color_i = findex( color, shift);
-		float* color_end = findex( color, npoints);
-		while (color_i < color_end) {
-			color_i[0-3*shift] = color_i[0];
-			color_i[1-3*shift] = color_i[1];
-			color_i[2-3*shift] = color_i[2];
-			color_i += 3;
-		}
-	}
-	if (npoints == 0)
-		// The first allocation.
-		npoints = 1;
-
-	if (length > preallocated_size-2) {
-		VPYTHON_NOTE( "Reallocating buffers for a curve object.");
-		std::vector<npy_intp> dims(2);
-		dims[0] = 2*length + 2;
-		dims[1] = 3;
-		array n_pos = makeNum( dims);
-		array n_color = makeNum( dims, NPY_FLOAT);
-		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * (npoints + 1));
-		std::memcpy( data( n_color), data( color), sizeof(float) * 3 * (npoints + 1));
-		pos = n_pos;
-		color = n_color;
-		preallocated_size = dims[0];
-	}
-	if (length > npoints) {
-		// Copy the last good element to the new positions.
-		const double* last_pos = index( pos, npoints-1);
-		double* pos_i = index( pos, npoints);
-		double* pos_end = index( pos, length);
-		while (pos_i < pos_end) {
-			pos_i[0] = last_pos[0];
-			pos_i[1] = last_pos[1];
-			pos_i[2] = last_pos[2];
-			pos_i += 3;
-		}
-
-		const float* last_color = findex( color, npoints-1);
-		float* color_i = findex( color, npoints);
-		float* color_end = findex( color, length);
-		while (color_i < color_end) {
-			color_i[0] = last_color[0];
-			color_i[1] = last_color[1];
-			color_i[2] = last_color[2];
-			color_i += 3;
-		}
-	}
-	count = length;
-}
-
-void
-curve::append_rgb( vector npos, float red, float green, float blue, int retain)
-{
-	if (retain >= 0 && (int)count >= retain) {
-		set_length( retain); //move pos and color lists down
-	}
-	set_length( count+1);
-	double* last_pos = index( pos, count-1);
-	float* last_color = findex( color, count-1);
-	last_pos[0] = npos.x;
-	last_pos[1] = npos.y;
-	last_pos[2] = npos.z;
-	if (red != -1)
-		last_color[0] = red;
-	if (green != -1)
-		last_color[1] = green;
-	if (blue != -1)
-		last_color[2] = blue;
-}
-
-void
-curve::append( vector npos, rgb ncolor, int retain)
-{
-	if (retain >= 0 && (int)count >= retain) {
-		set_length( retain); //move pos and color lists down
-	}
-	set_length( count+1);
-	double* last_pos = index( pos, count-1);
-	float* last_color = findex( color, count-1);
-	last_pos[0] = npos.x;
-	last_pos[1] = npos.y;
-	last_pos[2] = npos.z;
-	last_color[0] = ncolor.red;
-	last_color[1] = ncolor.green;
-	last_color[2] = ncolor.blue;
-}
-
-void
-curve::append( vector npos, rgb ncolor)
-{
-	set_length( count+1);
-	double* last_pos = index( pos, count-1);
-	float* last_color = findex( color, count-1);
-	last_pos[0] = npos.x;
-	last_pos[1] = npos.y;
-	last_pos[2] = npos.z;
-	last_color[0] = ncolor.red;
-	last_color[1] = ncolor.green;
-	last_color[2] = ncolor.blue;
-}
-
-void
-curve::append( vector npos, int retain)
-{
-	if (retain >= 0 && (int)count >= retain) {
-		set_length( retain); //move pos and color lists down
-	}
-	set_length( count+1);
-	double* last_pos = index( pos, count-1);
-	last_pos[0] = npos.x;
-	last_pos[1] = npos.y;
-	last_pos[2] = npos.z;
-}
-
-void
-curve::append( vector npos)
-{
-	set_length( count+1);
-	double* last_pos = index( pos, count-1);
-	last_pos[0] = npos.x;
-	last_pos[1] = npos.y;
-	last_pos[2] = npos.z;
-}
-
-void
-curve::set_pos( const double_array& n_pos)
-{
-	std::vector<npy_intp> dims = shape( n_pos );
-	if (dims.size() == 1 && !dims[0]) {
-		// e.g. pos = ()
-		set_length(0);
-		return;
-	}
-	if (dims.size() != 2) {
-		throw std::invalid_argument( "pos must be an Nx3 array");
-	}
-	if (dims[1] == 2) {
-		set_length( dims[0]);
-		pos[make_tuple(slice(1, count+1), slice(0,2))] = n_pos;
-		pos[make_tuple(slice(1, count+1), 2)] = 0.0;
-		return;
-	}
-	else if (dims[1] == 3) {
-		set_length( dims[0]);
-		pos[make_tuple(slice(1, count+1), slice())] = n_pos;
-		return;
-	}
-	else {
-		throw std::invalid_argument( "pos must be an Nx3 array");
-	}
-}
-
-// Interpreted as an initial append operation, with no color specified.
-void
-curve::set_pos_v( const vector& npos)
-{
-	using namespace boost::python;
-	tuple t_pos = make_tuple( npos.x, npos.y, npos.z);
-	set_pos( double_array( array(t_pos) ) );
-}
-
-void
-curve::set_color( const double_array& n_color)
-{
-    std::vector<npy_intp> dims = shape( n_color);
-	if (dims.size() == 1 && dims[0] == 3) {
-		// A single color, broadcast across the entire (used) array.
-		int npoints = (count) ? count : 1;
-		color[slice( 1, npoints+1)] = n_color;
-		return;
-	}
-	if (dims.size() == 2 && dims[1] == 3) {
-		// An RGB chunk of color
-		if (dims[0] != (long)count) {
-			throw std::invalid_argument( "color must be the same length as pos.");
-		}
-		color[slice(1, count+1)] = n_color;
-		return;
-	}
-	throw std::invalid_argument( "color must be an Nx3 or Nx4 array");
-}
-
-void
-curve::set_color_t( const rgb& color)
-{
-	this->set_color( double_array( array( make_tuple(color.red, color.green, color.blue))));
-}
-
-void
-curve::set_red( const double_array& red)
-{
-	set_length( shape(red).at(0));
-	color[make_tuple(slice(1,count+1), 0)] = red;
-}
-
-void
-curve::set_green( const double_array& green)
-{
-	set_length( shape(green).at(0));
-	color[make_tuple(slice(1,count+1), 1)] = green;
-}
-
-void
-curve::set_blue( const double_array& blue)
-{
-	set_length( shape(blue).at(0));
-	color[make_tuple(slice(1,count+1), 2)] = blue;
-}
-
-void
-curve::set_x( const double_array& x)
-{
-	set_length( shape(x).at(0));
-	pos[make_tuple( slice(1, count+1), 0)] = x;
-}
-
-void
-curve::set_y( const double_array& y)
-{
-	set_length( shape(y).at(0));
-	pos[make_tuple( slice(1, count+1), 1)] = y;
-}
-
-void
-curve::set_z( const double_array& z)
-{
-	set_length( shape(z).at(0));
-	pos[make_tuple( slice(1, count+1), 2)] = z;
-}
-
-void
-curve::set_x_d( const double x)
-{
-	if (count == 0) {
-		set_length(1);
-	}
-	pos[make_tuple(slice(1,count+1), 0)] = x;
-}
-
-void
-curve::set_y_d( const double y)
-{
-	if (count == 0) {
-		set_length(1);
-	}
-	pos[make_tuple(slice(1,count+1), 1)] = y;
-}
-
-void
-curve::set_z_d( const double z)
-{
-	if (count == 0) {
-		set_length(1);
-	}
-	pos[make_tuple(slice(1,count+1), 2)] = z;
-}
-
-void
-curve::set_red_d( const double red)
-{
-	if (count == 0) {
-		set_length(1);
-	}
-	color[make_tuple(slice(1,count+1), 0)] = red;
-}
-
-void
-curve::set_green_d( const double green)
-{
-	if (count == 0) {
-		set_length(1);
-	}
-	color[make_tuple(slice(1,count+1), 1)] = green;
-}
-
-void
-curve::set_blue_d( const double blue)
-{
-	if (count == 0) {
-		set_length(1);
-	}
-	color[make_tuple(slice(1,count+1), 2)] = blue;
-}
-
 void
 curve::set_radius( const double& radius)
 {
@@ -435,13 +56,11 @@ curve::set_antialias( bool aa)
 	this->antialias = aa;
 }
 
-
 bool
 curve::degenerate() const
 {
 	return count < 2;
 }
-
 
 bool
 curve::monochrome(float* tcolor, size_t pcount)
@@ -450,11 +69,11 @@ curve::monochrome(float* tcolor, size_t pcount)
 	size_t nn;
 
 	for(nn=0; nn<pcount; nn++)  {
-		if (tcolor[nn] != first_color.red)
+		if (tcolor[nn*3] != first_color.red)
 			return false;
-		if (tcolor[nn+1] != first_color.green)
+		if (tcolor[nn*3+1] != first_color.green)
 			return false;
-		if (tcolor[nn+2] != first_color.blue)
+		if (tcolor[nn*3+2] != first_color.blue)
 			return false;
 	}
 
@@ -485,8 +104,8 @@ curve::get_center() const
 	if (degenerate())
 		return vector();
 	vector ret;
-	const double* pos_i = index( pos, 0);
-	const double* pos_end = index( pos, count);
+	const double* pos_i = pos.data();
+	const double* pos_end = pos.end();
 	while (pos_i < pos_end) {
 		ret.x += pos_i[0];
 		ret.y += pos_i[1];
@@ -511,8 +130,8 @@ curve::grow_extent( extent& world)
 {
 	if (degenerate())
 		return;
-	const double* pos_i = index(pos, 0);
-	const double* pos_end = index( pos, count);
+	const double* pos_i = pos.data();
+	const double* pos_end = pos.end();
 	if (radius == 0.0)
 		for ( ; pos_i < pos_end; pos_i += 3)
 			world.add_point( vector(pos_i));
@@ -783,21 +402,20 @@ curve::gl_render( const view& scene)
 	float tcolor[3*(LINE_LENGTH+3)]; // opacity not yet implemented for curves
 	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
 	if (fstep < 1.0F) fstep = 1.0F;
-	size_t iptr=0, iptr3, cptr, pcount=0;
+	size_t iptr=0, iptr3, pcount=0;
 
-	const double* p_i = (double*)( data(this->pos));
-	const float* c_i = (float*)( data(this->color));
+	const double* p_i = pos.data();
+	const float* c_i = color.data();
 
 	// Choose which points to display
 	for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
-		iptr3 = 3*(iptr+1); // first real point is the second in the data array
-		cptr = 3*(iptr+1); // color is rgb (3 floats)
+		iptr3 = 3*iptr;
 		spos[3*pcount] = p_i[iptr3];
 		spos[3*pcount+1] = p_i[iptr3+1];
 		spos[3*pcount+2] = p_i[iptr3+2];
-		tcolor[3*pcount] = c_i[cptr];
-		tcolor[3*pcount+1] = c_i[cptr+1];
-		tcolor[3*pcount+2] = c_i[cptr+2];
+		tcolor[3*pcount] = c_i[iptr3];
+		tcolor[3*pcount+1] = c_i[iptr3+1];
+		tcolor[3*pcount+2] = c_i[iptr3+2];
 	}
 
 	// Do scaling if necessary
@@ -837,7 +455,14 @@ curve::gl_render( const view& scene)
 	}
 
 	check_gl_error();
+}
 
+void
+curve::outer_render( const view& v ) {
+	if (radius)
+		arrayprim::outer_render(v);
+	else
+		gl_render(v);  //< no materials
 }
 
 void
@@ -848,8 +473,8 @@ curve::get_material_matrix( const view& v, tmatrix& out ) {
 
 	// xxx Add some caching for extent with grow_extent etc; once locking changes so we can trust the primitive not to change during rendering
 	vector min_extent, max_extent;
-	double* pos_i = index( pos, 0);
-	double* pos_end = index( pos, count );
+	const double* pos_i = pos.data();
+	const double* pos_end = pos.end();
 	min_extent = max_extent = vector( pos_i ); pos_i += 3;
 	while (pos_i < pos_end)
 		for(int j=0; j<3; j++) {

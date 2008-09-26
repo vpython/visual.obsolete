@@ -13,27 +13,13 @@
 
 namespace cvisual { namespace python {
 
-namespace {
-// returns a pointer to the ith vector in the array.
-double* index( const array& a, size_t i)
-{
-	// This is technically an unsafe cast since the alignment requirement
-	// goes up for the cast.  It is made safe by padding actions within the Numeric
-	// library itself, but the compiler doesn't know that, so I am just using a
-	// raw cast vice a static_cast<>.
-	return ((double*)data(a)) + i * 3;
-}
-
-} // !namespace (unnamed)
-
-
 convex::jitter_table convex::jitter;
 
 long
 convex::checksum() const
 {
 	boost::crc_32_type engine;
-	engine.process_block( index( pos, 0), index( pos, count));
+	engine.process_block( pos.data(), pos.end() );
 	return engine.checksum();
 }
 
@@ -48,7 +34,7 @@ convex::recalc()
 {
 	hull.clear();
 
-	const double* pos_i = index( pos, 0);
+	const double* pos_i = pos.data();
 	// A face from the first, second, and third vectors.
 	hull.push_back( face( vector(pos_i), vector(pos_i+3), vector(pos_i+3*2)));
 	// The reverse face from the first, third, and second vectors.
@@ -120,120 +106,18 @@ convex::add_point( size_t n, vector pv)
 }
 
 convex::convex()
-	: pos(0), preallocated_size(256), count(0), last_checksum(0)
-{
-	std::vector<npy_intp> dims(2);
-	dims[0] = 256;
-	dims[1] = 3;
-	this->pos = makeNum( dims);
-	double* i = index(pos, 0);
-	i[2] = i[1] = i[0] = 0.0;
-}
-
-convex::convex( const convex& other)
-	: renderable( other), pos( other.pos),
-	preallocated_size( other.preallocated_size), count( other.count),
-	last_checksum(0)
+	: last_checksum(0)
 {
 }
 
-convex::~convex()
-{
-}
-
-boost::python::object
-convex::get_pos()
-{
-	return pos[slice(0, count)];
-}
-
-void
-convex::set_pos( const double_array& n_pos )
-{
-	using namespace boost::python;
-	using python::slice;
-
-	std::vector<npy_intp> dims = shape( n_pos );
-	if (dims.size() == 1 && dims[0]>=2 && dims[0]<=3 && count == 0) {
-		// perform a single append
-		set_length( 1);
-		double* pos_data = index(pos, 0);
-		pos_data[0] = extract<double>(n_pos[0]);
-		pos_data[1] = extract<double>(n_pos[1]);
-		if (dims[0] == 3)
-			pos_data[2] = extract<double>(n_pos[2]);
-		return;
-	}
-	if (dims.size() != 2) {
-		throw std::invalid_argument( "pos must be an Nx3 or Nx2 array");
-	}
-	if (dims[1] == 2) {
-		set_length(dims[0]);
-		pos[make_tuple(slice(0, count), slice(_,1))] = n_pos;
-	}
-	else if (dims[1] == 3) {
-		set_length(dims[0]);
-		pos[slice(0, count)] = n_pos;
-	}
-	else
-		throw std::invalid_argument( "pos must be an Nx3 or Nx2 array");
-}
-
-void
-convex::set_color( const rgb& n_color)
+void convex::set_color( const rgb& n_color)
 {
 	color = n_color;
 }
 
-rgb
-convex::get_color()
+rgb convex::get_color()
 {
 	return color;
-}
-
-void
-convex::set_length( size_t length)
-{
-	size_t npoints = count;
-	if (npoints > length) // A shrink operation - never done by VPython.
-		npoints = length;
-	if (npoints == 0)
-		npoints = 1;
-
-	if (length > preallocated_size) {
-		VPYTHON_NOTE( "Reallocating buffers for a convex object");
-		std::vector<npy_intp> dims(2);
-		dims[0] = 2 * length;
-		dims[1] = 3;
-		array n_pos = makeNum( dims);
-		std::memcpy( data( n_pos), data( pos), sizeof(double) * 3 * npoints);
-		pos = n_pos;
-		preallocated_size = dims[0];
-	}
-	if (length > npoints) {
-		// Copy the last good element to the new positions.
-		const double* last_element = index( pos, npoints-1);
-		double* element_i = index( pos, npoints);
-		double* element_end = index( pos, length);
-		while (element_i < element_end) {
-			element_i[0] = last_element[0];
-			element_i[1] = last_element[1];
-			element_i[2] = last_element[2];
-			element_i += 3;
-		}
-	}
-	count = length;
-}
-
-void
-convex::append( vector nv_pos)
-{
-	set_length( count + 1);
-
-	double* pos_data = index(pos, count - 1);
-	pos_data[0] = nv_pos.get_x();
-	pos_data[1] = nv_pos.get_y();
-	pos_data[2] = nv_pos.get_z();
 }
 
 void

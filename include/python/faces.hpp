@@ -6,29 +6,19 @@
 // See the file authors.txt for a complete list of contributors.
 
 #include "renderable.hpp"
-#include "python/num_util.hpp"
+#include "python/arrayprim.hpp"
 
 #include <boost/python/object.hpp>
-#include <boost/python/list.hpp>
 
 namespace cvisual { namespace python {
 
-class faces : public renderable
+class faces : public arrayprim_color
 {
- private:
-	array pos;    // An array of points defining the triangular faces
-	array color;  // An array of colors for the faces
-	array normal; // An array of normal vectors for the faces.
+ protected:
+	arrayprim_array<double> normal; // An array of normal vectors for the faces.
 
-	int preallocated_size;
-	int count;
-	
-	enum member { POS, COLOR, NORMAL };
-	// Encapsulates the code to set any one of the three array members from a new
-	// array.
-	void set_array_member( member, const array&);
-	void set_length( int);
-	
+	virtual void set_length(size_t);
+
 	bool degenerate() const;
 	virtual void gl_render( const view&);
 	virtual void gl_pick_render( const view&);
@@ -38,26 +28,18 @@ class faces : public renderable
 
  public:
 	faces();
-	faces( const faces& other);
-	virtual ~faces();
 	
 	// Add another vertex, normal, and color to the faces.
-	void append_rgb(vector, vector, float red=-1, float green=-1, float blue=-1);
-	void append( vector, vector, rgb);
-	void append( vector, vector);
+	void append_rgb( const vector&, const vector&, float red=-1, float green=-1, float blue=-1);
+	void append( const vector&, const vector&, const rgb& );
+	void append( const vector&, const vector& );
+
 	// This routine was adapted from faces_heightfield.py.  It averages the normal
 	// vectors at coincident verticies to smooth out boundaries between facets.  
 	// No attempt is made to detect sharp edges.
 	void smooth_shade(bool doublesided = true);
 	
-	// Getters.
-	boost::python::object get_pos();
-	boost::python::object get_color();
 	boost::python::object get_normal();
-	
-	void set_pos( const double_array& pos);
-	void set_color( const double_array& color);
-	void set_color_t( rgb color);
 	void set_normal( const double_array& normal);
 	void set_normal_v( const vector);
 };

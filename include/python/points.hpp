@@ -3,39 +3,16 @@
 
 #include "renderable.hpp"
 #include "python/num_util.hpp"
-
-#include <boost/python/list.hpp>
+#include "python/arrayprim.hpp"
 
 namespace cvisual { namespace python {
-
-using boost::python::list;
-using boost::python::numeric::array;
 
 // TODO: This class shares everything but memory management and rendering with the
 // curve object.  Perhaps they can share a (partial?) base class and use the 
 // mix-in pattern?
-class points : public renderable
+class points : public arrayprim_color
 {
  private:
-	
-	// The pos and color arrays are always overallocated to make appends
-	// faster.  Whenever they are read from Python, we return a slice into the
-	// array that starts at its beginning and runs up to the last used position
-	// in the array.  This is simmilar to many implementations of std::vector<>.
-	array pos;
-	array color;	
-	// the space allocated for storage so far
-	size_t preallocated_size;
-	// the number of vectors currently occupying the allocated storage.
-	// index( , count+1) is the last element in the arrays.
-	// index( , 1) is the first element in the array
-	// index( , 0) is used as the before-the-first element when rendering with
-	//   gle.
-	// index( , count+2) is used as the after-the-last point when rendering with
-	//    gle.
-	size_t count;
-	void set_length( size_t);
-	
 	// Specifies whether or not the size of the points should scale with the
 	// world or with the screen.
 	enum { WORLD, PIXELS } size_units;
@@ -47,9 +24,9 @@ class points : public renderable
 	// The size of the points
 	float size;
 	
-	
 	bool degenerate() const;
 	
+	virtual void outer_render( const view&);
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;
 	virtual void gl_pick_render( const view&);
@@ -57,15 +34,6 @@ class points : public renderable
 	
  public:
 	points();
-	points( const points& other);
-	virtual ~points();
-	
-	void append_rgb( vector, float red=-1, float green=-1, float blue=-1);
-	void append( vector _pos, rgb _color); // Append a single position with new color.
-	void append( vector _pos); // Append a single position element, extend color.
-	
-	boost::python::object get_pos(void);
-	boost::python::object get_color(void);
 	
 	void set_points_shape( const std::string& n_type);
 	std::string get_points_shape( void);
@@ -75,28 +43,6 @@ class points : public renderable
 	
 	void set_size_units( const std::string& n_type);
 	std::string get_size_units( void);
-	
-	void set_pos( const double_array& pos); // An Nx3 array
-	void set_pos_v( const vector& pos); // Interpreted as an initial append().
-	
-	void set_color( const double_array& color); // An Nx3 array of color
-	void set_color_t( const rgb& color); // A single tuple
-	
-	void set_red( const double_array& red);
-	void set_red_d( const float red);
-	void set_blue( const double_array& blue);
-	void set_blue_d( const float blue);
-	void set_green( const double_array& green);
-	void set_green_d( const float green);
-	void set_opacity( const double_array& opacity);
-	void set_opacity_d( const float opacity);
-	void set_x( const double_array& x );
-	void set_x_d( const double x );
-	void set_y( const double_array& y );
-	void set_y_d( const double y );
-	void set_z( const double_array& z );
-	void set_z_d( const double z );
-	
 };
 
 } } // !namespace cvisual::python

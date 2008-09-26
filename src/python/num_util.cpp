@@ -46,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 namespace {
-	const char* rcsid = "$Id: num_util.cpp,v 1.8 2008/09/25 19:26:43 dscherer Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.9 2008/09/26 16:45:42 dscherer Exp $";
 }
 
   // Local function prototypes
@@ -177,9 +177,8 @@ static KindTypeMap kindtypes(kindTypeMapEntries,
                                    kindTypeMapEntries + numTypeEntries);
 
 //Create a Numeric array with dimensions dimens and Numeric type t
-numeric::array makeNum(std::vector<npy_intp> dimens,
-		       NPY_TYPES t){
-  object obj(handle<>(PyArray_SimpleNew(dimens.size(), &dimens[0], t)));
+numeric::array makeNum(const std::vector<npy_intp>& dimens, NPY_TYPES t){
+  object obj(handle<>(PyArray_SimpleNew(dimens.size(), const_cast<npy_intp*>(&dimens[0]), t)));
   return extract<numeric::array>(obj);
 }
 
