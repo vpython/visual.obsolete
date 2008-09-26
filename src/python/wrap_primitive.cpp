@@ -83,7 +83,7 @@ struct textures_to_list
 	}
 };
 
-// This is a "custom lvalue converter". See also: Boost.Python FAQ
+// This is a "custom rvalue converter". See also: Boost.Python FAQ
 struct textures_from_list
 {
 	typedef std::vector<shared_ptr<texture> > V;
