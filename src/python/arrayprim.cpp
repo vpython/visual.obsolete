@@ -8,7 +8,7 @@ using boost::python::make_tuple;
 using boost::python::tuple;
 
 template <class CTYPE>
-arrayprim_array<CTYPE>::arrayprim_array() 
+arrayprim_array<CTYPE>::arrayprim_array()
  : array(NULL), length(0), allocated(256)
 {
 	std::vector<npy_intp> dims(2);
@@ -34,7 +34,7 @@ void arrayprim_array<CTYPE>::set_length( size_t new_len ) {
 		std::vector<npy_intp> dims(2);
 		dims[0] = 2*(new_len-1);
 		dims[1] = 3;
-		
+
 		array n_arr = makeNum( dims, (NPY_TYPES)type_npy_traits<CTYPE>::npy_type );
 		std::memcpy( cvisual::python::data(n_arr), data(0), sizeof(CTYPE) * old_len * dims[1] );
 		array::operator=( n_arr ); // doesn't actually copy
@@ -50,9 +50,12 @@ void arrayprim_array<CTYPE>::set_length( size_t new_len ) {
 	length = new_len;
 }
 
+template class arrayprim_array<double>;
+template class arrayprim_array<float>;
+
 ////////////////////////////////
 
-arrayprim::arrayprim() 
+arrayprim::arrayprim()
 : count(0)
 {
 	double* pos_i = pos.data(0);

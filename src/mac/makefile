@@ -21,7 +21,7 @@ CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-F/System/Library/Frameworks/Carbon.framework \
 	-F/System/Library/Frameworks/OpenGL.framework
 
-OBJS = arrow.o axial.o box.o cone.o cylinder.o display_kernel.o ellipsoid.o \
+OBJS = arrayprim.o arrow.o axial.o box.o cone.o cylinder.o display_kernel.o ellipsoid.o \
 	frame.o label.o material.o mouse_manager.o mouseobject.o primitive.o pyramid.o \
 	rectangular.o renderable.o ring.o sphere.o text.o \
 	atomic_queue.o clipping_plane.o displaylist.o errors.o extent.o \
