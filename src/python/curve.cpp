@@ -26,10 +26,9 @@ namespace cvisual { namespace python {
 curve::curve()
 	: antialias( true), radius(0.0), sides(4)
 {
-	int curve_around = sides;
-	for (int i=0; i<curve_around; i++) {
-		curve_sc[i]  = (float) std::cos(i * 2 * M_PI / curve_around);
-		curve_sc[i+curve_around] = (float) std::sin(i * 2 * M_PI / curve_around);
+	for (size_t i=0; i<sides; i++) {
+		curve_sc[i]  = (float) std::cos(i * 2 * M_PI / sides);
+		curve_sc[i+sides] = (float) std::sin(i * 2 * M_PI / sides);
 	}
 
 	// curve_slice is a list of indices for picking out the correct vertices from
@@ -37,10 +36,10 @@ curve::curve()
 	// indices (0-255) are used for all but one of the sides. The upper indices
 	// (256-511) are used for the final side.
 	for (int i=0; i<128; i++) {
-		curve_slice[i*2]       = i*curve_around;
-		curve_slice[i*2+1]     = i*curve_around + 1;
-		curve_slice[i*2 + 256] = i*curve_around + (curve_around - 1);
-		curve_slice[i*2 + 257] = i*curve_around;
+		curve_slice[i*2]       = i*sides;
+		curve_slice[i*2+1]     = i*sides + 1;
+		curve_slice[i*2 + 256] = i*sides + (sides - 1);
+		curve_slice[i*2 + 257] = i*sides;
 	}
 }
 
@@ -189,23 +188,25 @@ struct converter
 void
 curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount, double scaled_radius)
 {
-	size_t curve_around = sides;
 	std::vector<vector> projected;
 	std::vector<vector> normals;
 	std::vector<rgb> light;
 
 	float *cost = curve_sc;
-	float *sint = cost + curve_around;
+	float *sint = cost + sides;
 
 	vector pts[MAX_SIDES]; // points around the previous segment
 
 	vector lastA; // unit vector of previous segment
 
-	// If closed curve (or very nearly), make (pcount-1) point be
-	// exactly equal to point 0, and add two more points equal
-	// to points 1 and 2. At start of vertex generation, don't add
-	// 0th point to the vertex list; it will be added (with a mitered
-	// joint) when processing the last point.
+	// If closed curve, add three more points equal to points 0, 1, and 2.
+	// spos and tcolor are 3 longer than the max number of points to make this okay.
+	// The vertices that are listed to be processed for a closed curve are these:
+	//    1, 2, 3, ....last, 0, 1, 2 (1 is for direction from 0; 2 is for look-ahead)
+	// The 0th point is added (with a mitered joint) when processing the last point.
+	// Having two identical points, last and first, gives a clean break in the color 
+	// if the color of the first and last points are different.
+	
 	bool closed = false;
 	if (pcount > 3) {
 		if (spos[3*(pcount-1)] == spos[0] &&
@@ -213,8 +214,8 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			spos[3*(pcount-1)+2] == spos[2]) {
 			closed = true;
 			// Add an element with the 0th position and 0th color.
-			// Add an element with the 1st position and color.
-			// Add an element with the 2nd position and color.
+			// Add an element with the 1st position and 1st color.
+			// Add an element with the 2nd position and 2nd color.
 			for (size_t i=0; i<9; i++) {
 				spos[3*pcount+i] = spos[i];
 				tcolor[3*pcount+i] = tcolor[i];
@@ -229,7 +230,6 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	bool mono = adjust_colors( scene, tcolor, pcount);
 
 	for(size_t corner=0; corner < pcount; ++corner, v_i += 3, c_i += 3 ) {
-		// The vector to which v_i currently points towards.
 		vector current( v_i[0], v_i[1], v_i[2] );
 
 		/* For the first point in the curve, create orthogonal unit vectors x and y
@@ -245,10 +245,10 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 		 *
 		 * The result is mitered joints, with no twisting from one joint to the next.
 		 *
-		 * In the case of a closed curve, we added copies of the first three points and
-		 * we don't initial add vertices for the first point (point 0) in the vertex array.
-		 * These get added at the end of the process, with a clean break in the color (if
-		 * the color of the first and last point are different).
+		 * In the case of a closed curve, we add copies of the first three points and
+		 * we don't initially add vertices for the first point (point 0) into the vertex array.
+		 * These get added at the end of the process, with a clean break in the color if
+		 * the color of the first and last point are different.
 		 */
 
 		vector next, A;
@@ -260,22 +260,8 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			A = (next - current).norm();
 		}
 		if (corner == 0) {
+			if (!A) A = vector(1,0,0);
 			lastA = A;
-		}
-		int savecorner = -1; // assume no duplication of neighboring points
-		if (!A) {
-			savecorner = corner;
-			for(corner += 1, v_i += 3, c_i += 3; corner < pcount; ++corner, v_i += 3, c_i += 3 ) {
-				next = vector( v_i[3], v_i[4], v_i[5]);
-				A = (next - current).norm();
-			 	if (!A) continue;
-			 	break;
-			}
-			if (!A) A = lastA;
-			if (!A) A = vector(1,0,0); // desperation
-		}
-
-		if (corner == 0) {
 			vector y = vector(0,1,0);
 			vector x = A.cross(y).norm();
 			if (!x) {
@@ -298,7 +284,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			x *= scaled_radius;
 			y *= scaled_radius;
 
-			for (size_t a=0; a < curve_around; a++) {
+			for (size_t a=0; a < sides; a++) {
 				float c = cost[a];
 				float s = sint[a];
 				vector rel = x*s + y*c; // first point is "up"
@@ -314,7 +300,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			continue;
 		}
 
-		// Make a "mitered" joint; the cross section of the joint is an ellipse.
+		// Make a "mitered" joint; the cross section of the joint is an ellipse (approximated by straight lines).
 		vector joint_axis = lastA.cross(A).norm(); // perpendicular to the plane of lastA and A
 		vector perp = (lastA+A).norm(); // perpendicular to joint cross section
 		double costheta = lastA.dot(perp); // cos of angle new cross section makes with previous segment (0 to pi/2)
@@ -325,22 +311,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			tantheta = sqrt(1.-costheta*costheta)/costheta;
 		}
 
-		if (savecorner >= 0) { // a duplicated point
-			for (size_t a=0; a < curve_around; a++) {
-				vector rel = pts[a];
-				vector rel_ellipse = rel - rel.cross(joint_axis)*tantheta;
-				normals.push_back( rel_ellipse.norm() );
-				projected.push_back( current + rel_ellipse );
-				if (!mono) {
-					light.push_back(
-						rgb( tcolor[3*savecorner],
-							 tcolor[3*savecorner+1],
-							 tcolor[3*savecorner+2]) );
-				}
-			}
-		}
-
-		for (size_t a=0; a < curve_around; a++) {
+		for (size_t a=0; a < sides; a++) {
 			vector rel = pts[a];
 			pts[a] = rel - 2*(rel.dot(perp))*perp;
 			vector rel_ellipse = rel - rel.cross(joint_axis)*tantheta;
@@ -362,19 +333,19 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	}
 
 	int *ind = curve_slice;
-	for (size_t a=0; a < curve_around; a++) {
+	for (size_t a=0; a < sides; a++) {
 		size_t ai = a;
-		if (a == curve_around-1) {
+		if (a == sides-1) {
 			ind += 256; // upper portion of curve_slice indices, for the last side
 			ai = 0;
 		}
 
 		// List all the vertices for the ai-th side of the thick line:
 		for (size_t i = 0; i < pcount; i += 127u) {
-			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*curve_around + ai].x);
+			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*sides + ai].x);
 			if (!mono)
-				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*curve_around + ai)].red );
-			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*curve_around + ai].x);
+				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*sides + ai)].red );
+			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*sides + ai].x);
 			if (pcount-i < 128)
 				glDrawElements(GL_TRIANGLE_STRIP, 2*(pcount-i), GL_UNSIGNED_INT, ind);
 			else
