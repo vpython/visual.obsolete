@@ -900,6 +900,8 @@ display_kernel::render_scene(void)
 	boost::tie( mouse.get_mouse().pick, mouse.get_mouse().pickpos, mouse.get_mouse().position) =
 		pick( mouse.get_x(), mouse.get_y() );
 	
+	on_gl_free.frame();
+
 	return true;
 }
 
