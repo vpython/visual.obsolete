@@ -301,14 +301,25 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 		}
 
 		// Make a "mitered" joint; the cross section of the joint is an ellipse (approximated by straight lines).
+		// If the bend is > 90 degrees, must not make a mitered joint; make the outside of the bend an ellipse.
+		double costheta, tantheta;
+		bool acute = true;
+		vector perp; // perpendicular to joint cross section
 		vector joint_axis = lastA.cross(A).norm(); // perpendicular to the plane of lastA and A
-		vector perp = (lastA+A).norm(); // perpendicular to joint cross section
-		double costheta = lastA.dot(perp); // cos of angle new cross section makes with previous segment (0 to pi/2)
-		double tantheta;
-		if (fabs(costheta) > .99999 || fabs(costheta) < .00001) {
-			tantheta = 0.; // 2nd segment in same or opposite direction to 1st segment, or this is the last point
+		if (!joint_axis) { // straight ahead or straight back
+			costheta = 1.;
+			tantheta = 0.;
+			perp = A;
 		} else {
+			perp = (lastA+A).norm();
+			// cos of angle new cross section makes with cross section of previous segment (0 to pi/2):
+			costheta = lastA.dot(perp);
+			acute = (costheta >= 0.7071068); // theta <= 45 degrees; bend angle <= 90 degrees
 			tantheta = sqrt(1.-costheta*costheta)/costheta;
+			if (!acute) {
+				tantheta = -1./tantheta;
+				perp = joint_axis.cross(perp).norm();
+			}
 		}
 
 		for (size_t a=0; a < sides; a++) {
