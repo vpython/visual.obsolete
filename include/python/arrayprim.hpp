@@ -15,12 +15,10 @@ namespace cvisual { namespace python {
 // should not go anywhere except inside an array primitive, not even as a return
 // value for primitive.pos or whatever.
 template <class CTYPE>
-class arrayprim_array : public array {
+class arrayprim_array : public array, private boost::noncopyable {
 protected:
 	size_t length;     // number of points in the array primitive
 	size_t allocated;  // == shape(*this)[0]
-
-	void operator=( const arrayprim_array& ); //< not defined
 
 public:
 	arrayprim_array();
