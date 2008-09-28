@@ -314,7 +314,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			perp = (lastA+A).norm();
 			// cos of angle new cross section makes with cross section of previous segment (0 to pi/2):
 			costheta = lastA.dot(perp);
-			acute = (costheta >= 0.7071068); // theta <= 45 degrees; bend angle <= 90 degrees
+			acute = (costheta >= 0.707); // theta <= 45+ degrees; bend angle <= 90+ degrees
 			tantheta = sqrt(1.-costheta*costheta)/costheta;
 			if (!acute) {
 				tantheta = -1./tantheta;
