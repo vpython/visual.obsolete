@@ -390,6 +390,10 @@
 				Name="python"
 				>
 				<File
+					RelativePath="..\src\python\arrayprim.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\python\convex.cpp"
 					>
 				</File>
@@ -575,6 +579,10 @@
 			<Filter
 				Name="python"
 				>
+				<File
+					RelativePath="..\include\python\arrayprim.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\include\python\convex.hpp"
 					>
