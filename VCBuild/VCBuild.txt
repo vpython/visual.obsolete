@@ -8,7 +8,7 @@ Building vpython with from Visual Studio C++
 
 	Python25
 		Install Python 2.5.x via the Windows Installer at http://www.python.org/download/.
-		Make sure it is installed on the same drive as vpython-core2, in /Python25/.
+		Make sure it is installed on the same drive as vpython-core2, in \Python25.
                 
     Install Visual C++ 2008 Express Edition, which includes the platform SDK, from
         http://www.microsoft.com/Express/Download/#webInstall
@@ -19,15 +19,21 @@ Building vpython with from Visual Studio C++
         
         These files were obtained from http://www.boostpro.com/products/free
         
-	In Command Prompt, link from Python site-packages to the CVS files
+	On Vista, in Command Prompt, link from Python site-packages to the CVS files
 	(YourCVS is the directory where you have put the CVS files)
         cd \Python25\lib\site-packages
 		mklink /D visual \YourCVS\vpython-core2\site-packages\visual
+	
+	If you are using XP, you will need to copy/update these files 
+		from CVS to C:\Python\Python25\Lib\site-packages:
+			visual, examples, docs
 
 	Build cvisual.pyd
         Open the cvisual.sln project file in Visual Studio Express, make Release the active 
         configuration, then on the Build menu choose "Build Solution".
 
         The .pyd file is placed in vpython-core2\site-packages\visual, ready to run!
+        (On XP, you need to copy this file to C:\Python\Python25\Lib\site-packages\visual)
 
         This is the only step that needs to be repeated as you make changes to the C++ source code.
+        (On XP, you need to copy over any Visual .py files that change.)
