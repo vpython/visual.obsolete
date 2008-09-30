@@ -285,6 +285,11 @@ label::get_linecolor()
 	return linecolor;
 }
 
+void label::grow_extent( extent& e)
+{
+	e.add_point( pos );
+}
+
 void
 label::gl_render( const view& scene)
 {

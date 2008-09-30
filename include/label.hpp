@@ -106,6 +106,7 @@ class label : public renderable
 
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;
+	virtual void grow_extent( extent& );
 };
 
 } // !namespace cvisual
