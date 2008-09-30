@@ -149,7 +149,7 @@ wrap_arrayobjects()
 		.def( "append", pappend_v_r, (arg("pos"), arg("color"), arg("retain")=-1))
 		.def( "append", &points::append_rgb,
 			(arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1))
-		.def( "append", pappend_v, args("pos"))
+		.def( "append", pappend_v, (arg("pos"), arg("retain")=-1))
 		;
 
 	using python::faces;
