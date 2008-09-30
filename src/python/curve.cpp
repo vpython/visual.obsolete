@@ -188,80 +188,37 @@ struct converter
 void
 curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount, double scaled_radius)
 {
-	std::vector<vector> projected;
-	std::vector<vector> normals;
-	std::vector<rgb> light;
-
 	float *cost = curve_sc;
 	float *sint = cost + sides;
 
-	vector pts[MAX_SIDES]; // points around the previous segment
-
 	vector lastA; // unit vector of previous segment
 
-	// If closed curve, add three more points equal to points 0, 1, and 2.
-	// spos and tcolor are 3 longer than the max number of points to make this okay.
-	// The vertices that are listed to be processed for a closed curve are these:
-	//    1, 2, 3, ....last, 0, 1, 2 (1 is for direction from 0; 2 is for look-ahead)
-	// The 0th point is added (with a mitered joint) when processing the last point.
-	// Having two identical points, last and first, gives a clean break in the color 
-	// if the color of the first and last points are different.
-	
-	bool closed = false;
-	if (pcount > 3) {
-		if (spos[3*(pcount-1)] == spos[0] &&
-			spos[3*(pcount-1)+1] == spos[1] &&
-			spos[3*(pcount-1)+2] == spos[2]) {
-			closed = true;
-			// Add an element with the 0th position and 0th color.
-			// Add an element with the 1st position and 1st color.
-			// Add an element with the 2nd position and 2nd color.
-			for (size_t i=0; i<9; i++) {
-				spos[3*pcount+i] = spos[i];
-				tcolor[3*pcount+i] = tcolor[i];
-			}
-			pcount += 2; // the last added point is there only for look-ahead mitering
-		}
-	}
+	if (pcount < 2) return;
+
+	bool closed = vector(&spos[0]) == vector(&spos[(pcount-1)*3]);
+
+	int vcount = (pcount-1)*2 + closed;  // The number of vertices along each edge of the curve
+	std::vector<vector> projected( vcount*sides );
+	std::vector<vector> normals( vcount*sides );
+	std::vector<rgb> light( vcount*sides );
 
 	// pos and color iterators
 	const double* v_i = spos;
 	const float* c_i = tcolor;
+	int i = -(int)sides;
 	bool mono = adjust_colors( scene, tcolor, pcount);
 
-	for(size_t corner=0; corner < pcount; ++corner, v_i += 3, c_i += 3 ) {
-		vector current( v_i[0], v_i[1], v_i[2] );
+	for(size_t corner=0; corner < pcount; ++corner, v_i += 3, c_i += 3, i += 2*sides ) {
+		vector current( &v_i[0] );
 
-		/* For the first point in the curve, create orthogonal unit vectors x and y
-		 * and use these to generate vertices in the cross section of the first segment.
-		 *
-		 * Also save the generated points in the pts array.
-		 *
-		 * At each succeeding point in the curve, use the pts array as the basis
-		 * for generating vertices for the end of the previous segment, on an
-		 * ellipse that is the intersection of the previous and next segments.
-		 * Update the pts array with points reflected through the ellipse, which
-		 * will be used to generate vertices at the end of the new segment.
-		 *
-		 * The result is mitered joints, with no twisting from one joint to the next.
-		 *
-		 * In the case of a closed curve, we add copies of the first three points and
-		 * we don't initially add vertices for the first point (point 0) into the vertex array.
-		 * These get added at the end of the process, with a clean break in the color if
-		 * the color of the first and last point are different.
-		 */
-
-		vector next, A;
-		if ((corner == pcount-1) && !closed) {
-			next = lastA;
-			A = lastA;
-		} else {
-			next = vector( v_i[3], v_i[4], v_i[5]); // The next vector in spos
+		vector next, A, bisecting_plane_normal;
+		if (corner != pcount-1) {
+			next = vector( &v_i[3] ); // The next vector in spos
 			A = (next - current).norm();
+			bisecting_plane_normal = (A + lastA).norm();
 		}
 		if (corner == 0) {
 			if (!A) A = vector(1,0,0);
-			lastA = A;
 			vector y = vector(0,1,0);
 			vector x = A.cross(y).norm();
 			if (!x) {
@@ -285,57 +242,63 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			y *= scaled_radius;
 
 			for (size_t a=0; a < sides; a++) {
-				float c = cost[a];
-				float s = sint[a];
-				vector rel = x*s + y*c; // first point is "up"
-				pts[a] = rel;
-				if (!closed) {
-					normals.push_back( rel.norm());
-					projected.push_back( current + rel );
-					if (!mono) {
-						light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
-					}
-				}
-			}
-			continue;
-		}
+				vector rel = x*sint[a] + y*cost[a]; // first point is "up"
 
-		// Make a "mitered" joint; the cross section of the joint is an ellipse (approximated by straight lines).
-		// If the bend is > 90 degrees, must not make a mitered joint; make the outside of the bend an ellipse.
-		double costheta, tantheta;
-		bool acute = true;
-		vector perp; // perpendicular to joint cross section
-		vector joint_axis = lastA.cross(A).norm(); // perpendicular to the plane of lastA and A
-		if (!joint_axis) { // straight ahead or straight back
-			costheta = 1.;
-			tantheta = 0.;
-			perp = A;
+				normals[a] = rel.norm();
+				projected[a] = current + rel;
+				if (!mono) light[a] = rgb( c_i[0], c_i[1], c_i[2]);
+			}
 		} else {
-			perp = (lastA+A).norm();
-			// cos of angle new cross section makes with cross section of previous segment (0 to pi/2):
-			costheta = lastA.dot(perp);
-			acute = (costheta >= 0.707); // theta <= 45+ degrees; bend angle <= 90+ degrees
-			tantheta = sqrt(1.-costheta*costheta)/costheta;
-			if (!acute) {
-				tantheta = -1./tantheta;
-				perp = joint_axis.cross(perp).norm();
-			}
-		}
+			for (size_t a=0; a < sides; a++) {
+				vector prev_start = projected[i+a-sides];
+				vector prev_end = prev_start - (prev_start-current).dot(lastA)*lastA;
 
-		for (size_t a=0; a < sides; a++) {
-			vector rel = pts[a];
-			pts[a] = rel - 2*(rel.dot(perp))*perp;
-			vector rel_ellipse = rel - rel.cross(joint_axis)*tantheta;
-			normals.push_back( rel_ellipse.norm() );
-			projected.push_back( current + rel_ellipse );
-			if (!mono) {
-				light.push_back( rgb( c_i[0], c_i[1], c_i[2]) );
+				projected[i+a] = prev_end;
+				normals[i+a] = normals[i+a-sides];
+				if (!mono) light[i+a] = rgb( c_i[0], c_i[1], c_i[2] );
+
+				if (corner != pcount-1) {
+					vector next_start = prev_end - 2*(prev_end-current).dot(bisecting_plane_normal)*bisecting_plane_normal;
+
+					projected[i+a+sides] = next_start;
+					normals[i+a+sides] = (next_start - current).norm();
+					if (!mono) light[i+a+sides] = light[i+a];
+				}
 			}
 		}
 		lastA = A;
 	}
 
-	if (closed) pcount -= 1; // correct for extra point added in closed case
+	if (closed) {
+		// Connect the end of the curve to the start... can be ugly because the basis has gotten
+		//   twisted around!
+		int i = (vcount - 1)*sides;
+		for(int a=0; a<sides; a++) {
+			projected[i+a] = projected[a];
+			normals[i+a] = normals[a];
+			if (!mono) light[i+a] = light[a];
+		}
+	} // TODO: else cap open ends!
+
+	// Thick lines are often used to represent smooth curves, so we want
+	// to smooth the normals at the joints.  But that can make a sharp corner
+	// do odd things, so we smoothly disable the smoothing when the joint angle
+	// is too big.  This is somewhat arbitrary but seems to work well.
+	int prev_i = closed ? (vcount-1)*sides : 0;
+	for( i = 0; i < vcount*sides; i += 2*sides ) {
+		for(int a=0; a<sides; a++) {
+			vector& n1 = normals[i+a];
+			vector& n2 = normals[prev_i+a];
+			double smooth_amount = (n1.dot(n2) - .65) * 4.0;
+			smooth_amount = std::min(1.0, std::max(0.0, smooth_amount));
+			if (smooth_amount) {
+				vector n_smooth = (n1+n2).norm() * smooth_amount;
+				n1 = n1 * (1-smooth_amount) + n_smooth;
+				n2 = n2 * (1-smooth_amount) + n_smooth;
+			}
+		}
+		prev_i = i + sides;
+	}
 
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
@@ -352,13 +315,13 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 		}
 
 		// List all the vertices for the ai-th side of the thick line:
-		for (size_t i = 0; i < pcount; i += 127u) {
+		for (size_t i = 0; i < vcount; i += 127u) {
 			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*sides + ai].x);
 			if (!mono)
 				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*sides + ai)].red );
 			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*sides + ai].x);
-			if (pcount-i < 128)
-				glDrawElements(GL_TRIANGLE_STRIP, 2*(pcount-i), GL_UNSIGNED_INT, ind);
+			if (vcount-i < 128)
+				glDrawElements(GL_TRIANGLE_STRIP, 2*(vcount-i), GL_UNSIGNED_INT, ind);
 			else
 				glDrawElements(GL_TRIANGLE_STRIP, 256u, GL_UNSIGNED_INT, ind);
 		}
