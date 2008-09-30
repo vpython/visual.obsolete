@@ -103,7 +103,11 @@ arrow::get_center() const
 void 
 arrow::gl_pick_render( const view& scene)
 {
+	// TODO: material related stuff in this file really needs cleaning up!
+	boost::shared_ptr<material> m;
+	m.swap(mat);
 	gl_render(scene);
+	m.swap(mat);
 }
 
 void

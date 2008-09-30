@@ -16,7 +16,7 @@ shader_program::~shader_program() {
 
 int shader_program::get_uniform_location( const view& v, const char* name ) {
 	// xxx change interface to cache the uniforms we actually want and avoid string comparisons
-	if (program <= 0 || !v.glext.ARB_shader_objects) throw std::runtime_error("get_uniform_location called on an unrealized shader program.");
+	if (program <= 0 || !v.glext.ARB_shader_objects) return -1;
 	int& cache = uniforms[ name ];
 	if (cache == 0)
 		cache = 2 + v.glext.glGetUniformLocationARB( program, name );
