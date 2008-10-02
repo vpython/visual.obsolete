@@ -142,6 +142,8 @@ display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     			return This->on_keyChar(uMsg, wParam, lParam);
 			case WM_GETMINMAXINFO:
 				return This->on_getminmaxinfo( wParam, lParam);
+			case WM_ACTIVATE:
+				return This->on_activate( wParam, lParam );
 		}
 	}
 	return DefWindowProc( hwnd, uMsg, wParam, lParam);
@@ -184,6 +186,13 @@ display::on_showwindow( WPARAM wParam, LPARAM lParam)
 			return DefWindowProc( widget_handle, WM_SHOWWINDOW, wParam, lParam);
 	}
 	return 0;
+}
+
+LRESULT
+display::on_activate( WPARAM wParam, LPARAM lParam ) {
+	if (fullscreen && wParam == WA_INACTIVE )
+		ShowWindow( widget_handle, SW_MINIMIZE );
+	return DefWindowProc( widget_handle, WM_ACTIVATE, wParam, lParam );
 }
 
 LRESULT
@@ -319,7 +328,7 @@ display::create()
 		real_y = screen.top;
 		real_width = screen.right - real_x;
 		real_height = screen.bottom - real_y;
-		style = WS_OVERLAPPED | WS_POPUP | WS_MAXIMIZE | WS_VISIBLE;
+		style = WS_OVERLAPPED | WS_POPUP | WS_MAXIMIZE;
 	}
 	else if (real_x < 0 && real_y < 0 || real_x > screen.right || real_y > screen.bottom) {
 		real_x = CW_USEDEFAULT;

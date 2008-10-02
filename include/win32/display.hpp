@@ -55,6 +55,7 @@ class display : public display_kernel
 	LRESULT on_keyChar( UINT, WPARAM, LPARAM);
 	LRESULT on_size( WPARAM, LPARAM);
 	LRESULT on_move( WPARAM, LPARAM);
+	LRESULT on_activate( WPARAM, LPARAM );
 	
 	void update_size();
 	
