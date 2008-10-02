@@ -217,6 +217,11 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			next = vector( &v_i[3] ); // The next vector in spos
 			A = (next - current).norm();
 			bisecting_plane_normal = (A + lastA).norm();
+			if (!bisecting_plane_normal) {  //< Exactly 180 degree bend
+				bisecting_plane_normal = vector(0,0,1).cross(A);
+				if (!bisecting_plane_normal) 
+					bisecting_plane_normal = vector(0,1,0).cross(A);
+			}
 			sectheta = bisecting_plane_normal.dot( lastA );
 			if (sectheta) sectheta = 1.0 / sectheta;
 		}
