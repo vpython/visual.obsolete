@@ -12,6 +12,7 @@ obj = sphere
 R = 1
 L = 10
 
+scene.visible = 0
 lite = local_light( pos = (0,0,0), color = (0,1,0) )
 lite.m = points( color=(0,1,0), pos=[(0,0,0)], type = "world", size = 0.05 )
 
@@ -20,7 +21,6 @@ N = int(sqrt(len(materials.materials)+1.5))
 xi = -L/2 + 1.5*R
 dx = (L - 3*R)/(N-1)
 for i,mat in enumerate(materials.materials + [None]):
-    #scene.visible = 0
     if mat: print mat.name
     spheres.append( obj( pos = (xi + (i%N)*dx, R, (xi + (i//N)*dx)),
                          radius = R,
@@ -29,9 +29,9 @@ for i,mat in enumerate(materials.materials + [None]):
                          width = sqrt(2)*R,
                          axis = axis,
                          material = mat ) )
-    scene.visible = 1
     
 box( pos = (0,-0.5*R,0), size=(L,R,L), material = materials.wood )
+scene.visible = 1
 
 for s in spheres:
     loc = s.pos-vector(0,R,0)
