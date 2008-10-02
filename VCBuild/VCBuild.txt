@@ -37,3 +37,6 @@ Building vpython with from Visual Studio C++
 
         This is the only step that needs to be repeated as you make changes to the C++ source code.
         (On XP, you need to copy over any Visual .py files that change.)
+    
+    Process MakeVPython.iss with Innosetup (innosetup.org) to build an installer
+    
