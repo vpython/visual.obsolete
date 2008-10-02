@@ -300,7 +300,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	// to smooth the normals at the joints.  But that can make a sharp corner
 	// do odd things, so we smoothly disable the smoothing when the joint angle
 	// is too big.  This is somewhat arbitrary but seems to work well.
-	/*int prev_i = closed ? (vcount-1)*sides : 0;
+	int prev_i = closed ? (vcount-1)*sides : 0;
 	for( i = 0; i < vcount*sides; i += 2*sides ) {
 		for(int a=0; a<sides; a++) {
 			vector& n1 = normals[i+a];
@@ -314,7 +314,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			}
 		}
 		prev_i = i + sides;
-	}*/
+	}
 
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
