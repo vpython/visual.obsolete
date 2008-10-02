@@ -197,7 +197,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 
 	bool closed = vector(&spos[0]) == vector(&spos[(pcount-1)*3]);
 
-	size_t vcount = (pcount-1)*2 + closed;  // The number of vertices along each edge of the curve
+	size_t vcount = pcount*2 - closed;  // The number of vertices along each edge of the curve
 	std::vector<vector> projected( vcount*sides );
 	std::vector<vector> normals( vcount*sides );
 	std::vector<rgb> light( vcount*sides );
@@ -205,10 +205,10 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	// pos and color iterators
 	const double* v_i = spos;
 	const float* c_i = tcolor;
-	int i = -(int)sides;
+	int i = closed ? 0 : sides;
 	bool mono = adjust_colors( scene, tcolor, pcount);
 
-	for(size_t corner=0; corner < pcount; ++corner, v_i += 3, c_i += 3, i += 2*sides ) {
+	for(size_t corner=0; corner < pcount; ++corner, v_i += 3, c_i += 3) {
 		vector current( &v_i[0] );
 
 		vector next, A, bisecting_plane_normal;
@@ -225,6 +225,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			sectheta = bisecting_plane_normal.dot( lastA );
 			if (sectheta) sectheta = 1.0 / sectheta;
 		}
+
 		if (corner == 0) {
 			// TODO: instead, keep searching for the first nonzero A to start the curve
 			if (!A) A = vector(1,0,0);
@@ -253,10 +254,19 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			for (size_t a=0; a < sides; a++) {
 				vector rel = x*sint[a] + y*cost[a]; // first point is "up"
 
-				normals[a] = rel.norm();
-				projected[a] = current + rel;
-				if (!mono) light[a] = rgb( c_i[0], c_i[1], c_i[2]);
+				normals[a+i] = rel.norm();
+				projected[a+i] = current + rel;
+				if (!mono) light[a+i] = rgb( c_i[0], c_i[1], c_i[2]);
+
+				if (!closed) {
+					// Cap start of curve
+					projected[a] = current;
+					normals[a] = -A;
+					if (!mono) light[a] = light[a+i];
+				}
 			}
+
+			i += sides;
 		} else {
 			// TODO: t and A.dot(next-current) can be moved out of loop
 			for (size_t a=0; a < sides; a++) {
@@ -284,8 +294,16 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 					projected[i+a+sides] = next_start;
 					normals[i+a+sides] = (rel - A.dot(next_start-current)*A).norm();
 					if (!mono) light[i+a+sides] = light[i+a];
+				} else if (!closed) {
+					// Cap end of curve
+					for (size_t a=0; a < sides; a++) {
+						projected[i+a+sides] = current;
+						normals[i+a+sides] = A;
+						if (!mono) light[i+a+sides] = light[a+i];
+					}
 				}
 			}
+			i += 2*sides;
 		}
 		lastA = A;
 	}
@@ -299,14 +317,14 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			normals[i+a] = normals[a];
 			if (!mono) light[i+a] = light[a];
 		}
-	} // TODO: else cap open ends!
+	}
 
 	// Thick lines are often used to represent smooth curves, so we want
 	// to smooth the normals at the joints.  But that can make a sharp corner
 	// do odd things, so we smoothly disable the smoothing when the joint angle
 	// is too big.  This is somewhat arbitrary but seems to work well.
 	int prev_i = closed ? (vcount-1)*sides : 0;
-	for( i = 0; i < vcount*sides; i += 2*sides ) {
+	for( i = closed ? 0 : sides; i < vcount*sides; i += 2*sides ) {
 		for(int a=0; a<sides; a++) {
 			vector& n1 = normals[i+a];
 			vector& n2 = normals[prev_i+a];
