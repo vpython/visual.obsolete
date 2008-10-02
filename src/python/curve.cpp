@@ -197,7 +197,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 
 	bool closed = vector(&spos[0]) == vector(&spos[(pcount-1)*3]);
 
-	int vcount = (pcount-1)*2 + closed;  // The number of vertices along each edge of the curve
+	size_t vcount = (pcount-1)*2 + closed;  // The number of vertices along each edge of the curve
 	std::vector<vector> projected( vcount*sides );
 	std::vector<vector> normals( vcount*sides );
 	std::vector<rgb> light( vcount*sides );
@@ -212,12 +212,16 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 		vector current( &v_i[0] );
 
 		vector next, A, bisecting_plane_normal;
+		double sectheta;
 		if (corner != pcount-1) {
 			next = vector( &v_i[3] ); // The next vector in spos
 			A = (next - current).norm();
 			bisecting_plane_normal = (A + lastA).norm();
+			sectheta = bisecting_plane_normal.dot( lastA );
+			if (sectheta) sectheta = 1.0 / sectheta;
 		}
 		if (corner == 0) {
+			// TODO: instead, keep searching for the first nonzero A to start the curve
 			if (!A) A = vector(1,0,0);
 			vector y = vector(0,1,0);
 			vector x = A.cross(y).norm();
@@ -249,9 +253,19 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 				if (!mono) light[a] = rgb( c_i[0], c_i[1], c_i[2]);
 			}
 		} else {
+			// TODO: t and A.dot(next-current) can be moved out of loop
 			for (size_t a=0; a < sides; a++) {
 				vector prev_start = projected[i+a-sides];
-				vector prev_end = prev_start - (prev_start-current).dot(lastA)*lastA;
+				vector rel = prev_start - current;
+
+				double t = -rel.dot(lastA);
+
+				if (corner != pcount-1 && sectheta > 0.0) {
+					double t1 = -(rel.dot(bisecting_plane_normal)) * sectheta;
+					t1 = std::max( t1, t - A.dot(next - current) );
+					t = std::max( 0.0, std::min( t, t1 ) );
+				}
+				vector prev_end = prev_start + t*lastA;
 
 				projected[i+a] = prev_end;
 				normals[i+a] = normals[i+a-sides];
@@ -260,8 +274,10 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 				if (corner != pcount-1) {
 					vector next_start = prev_end - 2*(prev_end-current).dot(bisecting_plane_normal)*bisecting_plane_normal;
 
+					rel = next_start - current;
+
 					projected[i+a+sides] = next_start;
-					normals[i+a+sides] = (next_start - current).norm();
+					normals[i+a+sides] = (rel - A.dot(next_start-current)*A).norm();
 					if (!mono) light[i+a+sides] = light[i+a];
 				}
 			}
@@ -272,8 +288,8 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	if (closed) {
 		// Connect the end of the curve to the start... can be ugly because the basis has gotten
 		//   twisted around!
-		int i = (vcount - 1)*sides;
-		for(int a=0; a<sides; a++) {
+		size_t i = (vcount - 1)*sides;
+		for(size_t a=0; a<sides; a++) {
 			projected[i+a] = projected[a];
 			normals[i+a] = normals[a];
 			if (!mono) light[i+a] = light[a];
@@ -284,7 +300,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	// to smooth the normals at the joints.  But that can make a sharp corner
 	// do odd things, so we smoothly disable the smoothing when the joint angle
 	// is too big.  This is somewhat arbitrary but seems to work well.
-	int prev_i = closed ? (vcount-1)*sides : 0;
+	/*int prev_i = closed ? (vcount-1)*sides : 0;
 	for( i = 0; i < vcount*sides; i += 2*sides ) {
 		for(int a=0; a<sides; a++) {
 			vector& n1 = normals[i+a];
@@ -298,7 +314,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			}
 		}
 		prev_i = i + sides;
-	}
+	}*/
 
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
