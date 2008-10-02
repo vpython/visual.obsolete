@@ -23,6 +23,9 @@ the visual directory in the CVS files.
 
 In the mbuild directory, execute make install to build and install Visual.
 
+In src/mac/PackageMaker is an Apple PackageMaker project file and a Welcome text file
+for creating a VPython installer for the Mac.
+
 The Boost libraries were built by downloading them and executing this:
 
 sudo bjam --toolset=darwin -sPYTHON_ROOT=/usr/bin/python2.5 --build-type=complete
