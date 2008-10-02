@@ -46,10 +46,14 @@ struct double_array_from_python {
 		//   throw an exception later.  This limits overload resolution, but
 		//   most of our functions taking arrays have no overloads.
 		// Legend has it that numpy arrays don't satisfy PySequence_Check so
-		///  we check if x[0] succeeds.
-		PyObject* p = PySequence_GetItem(obj_ptr, 0);
-		if (!p) { PyErr_Clear(); return NULL; }
-		Py_DECREF(p);
+		///  we check if len(x) succeeds.
+		if ( PySequence_Size(obj_ptr) < 0 ) {
+			PyErr_Clear(); 
+			return NULL; 
+		}
+		// Strings have length but definitely don't convert to double_array!
+		if ( PyString_Check(obj_ptr) || PyUnicode_Check(obj_ptr) )
+			return NULL;
 
 		return obj_ptr;
 	}
