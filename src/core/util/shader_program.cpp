@@ -42,8 +42,8 @@ void shader_program::realize( const view& v ) {
 	program = v.glext.glCreateProgramObjectARB();
 	check_gl_error();
 
-	compile( v, GL_VERTEX_SHADER_ARB, getSection("vertex") );
-	compile( v, GL_FRAGMENT_SHADER_ARB, getSection("fragment") );
+	compile( v, GL_VERTEX_SHADER_ARB, getSection("varying")+getSection("vertex") );
+	compile( v, GL_FRAGMENT_SHADER_ARB, getSection("varying")+getSection("fragment") );
 
 	v.glext.glLinkProgramARB( program );
 
