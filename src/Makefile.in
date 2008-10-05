@@ -64,18 +64,17 @@ CPPFLAGS = @CPPFLAGS@
 # Object file list.  Since we are building a shared library with PIC code, we 
 #   follow the libtool convention of using a .lo extension.
 CVISUAL_OBJS = atomic_queue.lo clipping_plane.lo displaylist.lo errors.lo extent.lo \
-	gl_extensions.lo gl_free.lo icososphere.lo light.lo \
-	quadric.lo rgba.lo shader_program.lo texture.lo tmatrix.lo vector.lo \
+	gl_extensions.lo gl_free.lo icososphere.lo \
+	quadric.lo render_manager.cpp rgba.lo shader_program.lo texture.lo tmatrix.lo vector.lo \
 	arrow.lo axial.lo box.lo cone.lo cylinder.lo \
-	display_kernel.lo ellipsoid.lo frame.lo label.lo material.lo \
-	mouseobject.lo mouse_manager.lo primitive.lo pyramid.lo rectangular.lo \
-	renderable.lo ring.lo sphere.lo font_renderer.lo \
-	display.lo random_device.lo render_surface.lo text.lo timer.lo\
-	convex.lo curve.lo cvisualmodule.lo faces.lo num_util.lo \
+	display_kernel.lo ellipsoid.lo frame.lo label.lo light.lo material.lo \
+	mouse_manager.lo mouseobject.lo primitive.lo pyramid.lo rectangular.lo \
+	renderable.lo ring.lo sphere.lo text.lo \
+	display.lo font_renderer.lo random_device.lo render_surface.lo timer.lo\
+	arrayprim.cpp convex.lo curve.lo cvisualmodule.lo faces.lo num_util.lo \
 	numeric_texture.lo points.lo scalar_array.lo slice.lo \
 	vector_array.lo wrap_arrayobjects.lo wrap_display_kernel.lo \
-	wrap_primitive.lo wrap_rgba.lo wrap_vector.lo \
-	render_manager.lo
+	wrap_primitive.lo wrap_rgba.lo wrap_vector.lo 
 
 # Distribution file list.
 DISTFILES = linux-symbols.map osx-symbols.txt core gtk2 python win32
