@@ -1,6 +1,8 @@
 from __future__ import division
 from visual import *
 
+test_materials_individually = False
+
 scene.width = scene.height = 600
 scene.range = 5
 scene.forward = (1,-1,-1)
@@ -21,6 +23,7 @@ N = int(sqrt(len(materials.materials)+1.5))
 xi = -L/2 + 1.5*R
 dx = (L - 3*R)/(N-1)
 for i,mat in enumerate(materials.materials + [None]):
+    if test_materials_individually: scene.visible = 0
     if mat: print mat.name
     spheres.append( obj( pos = (xi + (i%N)*dx, R, (xi + (i//N)*dx)),
                          radius = R,
@@ -29,9 +32,9 @@ for i,mat in enumerate(materials.materials + [None]):
                          width = sqrt(2)*R,
                          axis = axis,
                          material = mat ) )
+    if test_materials_individually: scene.visible = 1
     
 box( pos = (0,-0.5*R,0), size=(L,R,L), material = materials.wood )
-scene.visible = 1
 
 for s in spheres:
     loc = s.pos-vector(0,R,0)
@@ -41,6 +44,8 @@ for s in spheres:
         s.label = label( text = "Legacy", pos = loc )
     if hasattr(s.material, "color"):
         s.color = s.material.color
+
+scene.visible = 1
 
 while 1:
     rate(100)
