@@ -65,7 +65,7 @@ CPPFLAGS = @CPPFLAGS@
 #   follow the libtool convention of using a .lo extension.
 CVISUAL_OBJS = atomic_queue.lo clipping_plane.lo displaylist.lo errors.lo extent.lo \
 	gl_extensions.lo gl_free.lo icososphere.lo \
-	quadric.lo render_manager.cpp rgba.lo shader_program.lo texture.lo tmatrix.lo vector.lo \
+	quadric.lo render_manager.lo rgba.lo shader_program.lo texture.lo tmatrix.lo vector.lo \
 	arrow.lo axial.lo box.lo cone.lo cylinder.lo \
 	display_kernel.lo ellipsoid.lo frame.lo label.lo light.lo material.lo \
 	mouse_manager.lo mouseobject.lo primitive.lo pyramid.lo rectangular.lo \
