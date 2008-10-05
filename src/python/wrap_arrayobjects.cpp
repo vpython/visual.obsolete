@@ -48,8 +48,8 @@ struct double_array_from_python {
 		// Legend has it that numpy arrays don't satisfy PySequence_Check so
 		///  we check if len(x) succeeds.
 		if ( PySequence_Size(obj_ptr) < 0 ) {
-			PyErr_Clear(); 
-			return NULL; 
+			PyErr_Clear();
+			return NULL;
 		}
 		// Strings have length but definitely don't convert to double_array!
 		if ( PyString_Check(obj_ptr) || PyUnicode_Check(obj_ptr) )
@@ -98,8 +98,6 @@ wrap_arrayobjects()
 		.def( init<const curve&>())
 		.add_property( "radius", &curve::get_radius, &curve::set_radius)  // AKA thickness.
 		.def( "get_color", &curve::get_color)
-		// The order of set_color specifications matters.
-		//.def( "set_color", &curve::set_color_t)
 		.def( "set_color", &curve::set_color)
 		.def( "set_red", &curve::set_red_d)
 		.def( "set_red", &curve::set_red)
@@ -107,9 +105,9 @@ wrap_arrayobjects()
 		.def( "set_green", &curve::set_green)
 		.def( "set_blue", &curve::set_blue_d)
 		.def( "set_blue", &curve::set_blue)
-		.def( "set_pos", &curve::set_pos_v)
 		.def( "get_pos", &curve::get_pos)
 		.def( "set_pos", &curve::set_pos)
+		.def( "set_pos", &curve::set_pos_v)
 		.def( "set_x", &curve::set_x_d)
 		.def( "set_x", &curve::set_x)
 		.def( "set_y", &curve::set_y_d)
@@ -142,8 +140,8 @@ wrap_arrayobjects()
 		.def( "set_blue", &points::set_blue_d)
 		.def( "set_blue", &points::set_blue)
 		.def( "get_pos", &points::get_pos)
-		.def( "set_pos", &points::set_pos_v)
 		.def( "set_pos", &points::set_pos)
+		.def( "set_pos", &points::set_pos_v)
 		.def( "set_x", &points::set_x_d)
 		.def( "set_x", &points::set_x)
 		.def( "set_y", &points::set_y_d)

@@ -99,8 +99,8 @@ void arrayprim::set_pos( const double_array& n_pos )
 }
 
 void arrayprim::set_pos_v( const vector& npos ) {
-	tuple t_pos = make_tuple( npos.x, npos.y, npos.z);
-	set_pos( double_array( array(t_pos) ) );
+	set_length(1);
+	pos[all()] = npos;
 }
 
 void arrayprim::set_x( const double_array& arg )

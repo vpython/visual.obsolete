@@ -262,11 +262,9 @@ struct vector_from_seq
 	{
 		using py::handle;
 		using py::allow_null;
-		handle<> obj_iter( allow_null( PyObject_GetIter(obj)));
-		if (!obj_iter.get()) {
-			PyErr_Clear();
-			return 0;
-		}
+
+		object o( handle<>( borrowed(obj) ) );
+
 		int obj_size = PyObject_Length(obj);
 		if (obj_size < 0) {
 			PyErr_Clear();
@@ -274,6 +272,9 @@ struct vector_from_seq
 		}
 		if (obj_size != 2 && obj_size != 3)
 			return 0;
+		for(int i=0; i<obj_size; i++)
+			if (!py::extract<double>(o[i]).check())
+				return 0;
 		return obj;
 	}
 
@@ -346,7 +347,7 @@ wrap_vector()
 	py::def( "comp", comp, "The scalar projection of arg1 to arg2.");
 	py::def( "proj", proj, "The vector projection of arg1 to arg2.");
 	py::def( "diff_angle", diff_angle, "The angle between two vectors, in radians.");
-	py::def( "rotate", rotate, free_rotate( args("vector", "angle", "axis"), 
+	py::def( "rotate", rotate, free_rotate( args("vector", "angle", "axis"),
 		"Rotate a vector about an axis vector through an angle.") );
 
 	//AS added throw()
@@ -398,10 +399,12 @@ wrap_vector()
 		.def( self / double())
 		.def( self /= double())
 		.def( double() * self)
-		
+		.def( self == self )
+		.def( self != self )
+
 		// This doesn't work either (NPY_FLOAT not recognized as a type):
 		//.def( other<NPY_FLOAT>() * self)
-		
+
 		// Suggestion from Jonathan Brandmeyer, which doesn't compile:
 		//.def( "__mul__", &vector::operator*(double), "Multiply vector times scalar")
 		//.def( "__rmul__", &operator*(const double&, const vector&), "Multiply scalar times vector")
