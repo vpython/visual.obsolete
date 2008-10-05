@@ -14,7 +14,7 @@ I.  Prerequisites:
 	of the packages to ensure that the required header files are 
 	available.
 
-	See the file MSWINDOWS.txt for details on how to build Visual on Windows.
+	See the file VCBuild/VCBuild.txt for details on how to build Visual on Windows.
 	See the file MAC-OSX.txt for details on how to build Visual on Mac OS X.
 	This file is maintained in CVS at sourceforge.
 	
@@ -206,15 +206,16 @@ IV.  Install
 	with a program like `sudo` or `su`. Just run `sudo make install`.
 	
 	On MS Windows, you CANNOT use "make install".
-	Instead, you need to install innosetup (www.jrsoftware.org/isinfo.php).
+	Instead, you need to install innosetup (innosetup.org).
 	1) Make sure that C:\Python25\Lib\idlelib\config-main.def has edit startup and 
 	autosave set to 1 and that help is set for Visual before building the package.
-	2) Double-click MakeVPython.iss in the make directory. 
+	2) Double-click MakeVPython.iss. 
 	3) Near the start of the file, update AppVerName if necessary.
 	4) Do Build > Compile to produce a Windows installer.
 	5) Run the installer, then run compilevisual.py from the Visual source package to
-	Python-compile all the Visual .py files (produces .pyc files).
+	   Python-compile all the Visual .py files (produces .pyc files).
 	6) Run inno setup again, but uncomment the line that copies .pyc files.
+	
 	This produces a Windows installer that can be used by an administrator to
 	install a fully-compiled Visual into a protected area that users can't write
 	to. Without this second inno setup to get the .pyc files, every user would
