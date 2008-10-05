@@ -84,7 +84,7 @@ fi
 AC_SUBST([PYTHONPATH], "$python_path")
 
 AC_CONFIG_FILES( Makefile src/Makefile site-packages/visual/Makefile 
-	docs/Makefile examples/Makefile MakeVPython.iss bin/vpython)
+	docs/Makefile examples/Makefile bin/vpython)
 AM_CONFIG_HEADER( include/config.h)
 
 AC_OUTPUT()
