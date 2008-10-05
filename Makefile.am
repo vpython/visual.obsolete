@@ -6,11 +6,8 @@ AUTOMAKE_OPTIONS = foreign dist-bzip2
 SUBDIRS = site-packages/visual src
 
 # Logic to distribute the header files and miscellaneous files.
-# compilevisual.py and MakeVPython.iss are included for building
-# on MSWindows starting from the Linux tarball.
-EXTRA_DIST = include HACKING.txt INSTALL.txt MSWINDOWS.txt \
+EXTRA_DIST = include HACKING.txt INSTALL.txt \
 	MAC-OSX.txt authors.txt license.txt \
-	compilevisual.py MakeVPython.iss.in \
 	mkdist_osx.sh NEWS.txt
 dist-hook:
 	rm -rf `find $(distdir)/include -name CVS` $(distdir)/include/config.h
