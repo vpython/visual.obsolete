@@ -132,8 +132,8 @@
     invokes &quot;right&quot; button.</p>
   <p class="Normal"></p>
   <P CLASS="Normal"><font color="#0000A0">Getting events</font></P>
-  <P CLASS="Normal">There are four kinds of mouse events: press, click, drag, 
-    and drop:</P>
+  <P CLASS="Normal">There are five kinds of mouse events: press, click, drag,
+     drop, and release:</P>
   <P CLASS="Normal">&nbsp;&nbsp;&nbsp;A press event occurs when a mouse button 
     is depressed. </P>
   <P CLASS="Normal">&nbsp;&nbsp;&nbsp;A click event occurs when all mouse buttons 
@@ -144,8 +144,10 @@
     slightly after a press event, with mouse buttons still down.<br>
     &nbsp;&nbsp;&nbsp;This can be used to signal the beginning of dragging an 
     object. See <a href="mouse_drag.html">Drag example</a>.</P>
-  <P CLASS="Normal">&nbsp;&nbsp;&nbsp;A drop event occurs when the mouse buttons 
-    are released after a drag event. </P>
+  <P CLASS="Normal">&nbsp;&nbsp;&nbsp;A drop event occurs when the mouse buttons
+     are released after a drag event. </P>
+  <P CLASS="Normal">&nbsp;&nbsp;&nbsp;A release event occurs when the mouse buttons
+    are released after a click or drag event. </P>
   <P CLASS="Normal">Between a drag event (start of dragging) and a drop event 
     (end of dragging), there are no mouse events but you can examine the continuously 
     updated position of the mouse indicated by <span class="attribute">scene.mouse.pos</span>. 
