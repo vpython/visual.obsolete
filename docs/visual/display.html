@@ -150,17 +150,20 @@
     <P CLASS="attributes"><span class="attribute">ambient</span> Amount of nondirectional 
       (&quot;ambient&quot;) lighting. Default is 0.2. Also see the following <span class="attribute">lights</span> 
       attribute.</P>
-    <P CLASS="attributes"><span class="attribute">lights</span> List of light 
-      objects created for this display. By default, a display has two lights: 
-      <span class="attribute">light (pos=(0.22, 0.44, 0.87), local=False, color=0.8)</span> 
-      and <span class="attribute">light(pos=(-0.87, -0.22, -0.44), local=False, 
-      color=0.3)</span> . These are equivalent to the default lights in Visual 
-      prior to version 4. Note that you can get rid of these default llights with 
-      <span class="attribute">scene.lights = []</span>. The color of light objects 
-      and the amount of <font color="#FF0000">light.ambient</font> must be specified 
-      with some care, because if the total lighting intensity exceeds 1 anywhere 
-      in the scene the results are unpredictable. See the <a href="texture-opacity-lighting.html">notes</a> 
-      on the new Visual 4 for more information about creating lights.<br>
+    <P CLASS="attributes"><span class="attribute">lights</span> List of light
+       objects created for this display. By default, a display has two lights: 
+      <span class="attribute">distant_light (direction=(0.22, 0.44, 0.88), color=0.8)</span> 
+      and <span class="attribute">distant_light(direction=(-0.88, -0.22, -0.44),
+      color=0.3)</span> .
+      These are equivalent to the default lights in Visual prior to version 4.
+      Note that you can get rid of these default lights with 
+      <span class="attribute">scene.lights = []</span>. The
+      color of light objects and the amount of <font color="#FF0000">light.ambient</font> must
+      be specified with some care, because if the total lighting intensity exceeds
+      1 anywhere in the scene the results are unpredictable. See the <a href="texture-opacity-lighting.html">notes</a> 
+      on the new Visual 4 for more information about creating lights, including
+      &quot;local&quot; lights; <span class="attribute">scene.lights</span> is
+      a list of any lights you have created, distant or local. <br>
       <br>
       Previous to Visual version 4, you set up a light by specifying a vector 
       in the direction to the light from the origin, and the magnitude of the 
@@ -168,7 +171,7 @@
       = [vector(1,0,0)]</span> with <span class="attribute">scene.ambient = 0</span> 
       will light the scene with full intensity from the right side, with no ambient 
       lighting on the left. In Visual version 4 and later, this scheme for specifying 
-      lights still works, but it is preferable to create light objects.</P>
+    lights still works, but it is preferable to create light objects.</P>
     <P CLASS="attributes"><span class="attribute">cursor.visible</span> By setting 
       <span class="attribute">scene.cursor.visible = 0</span>, the mouse cursor 
       becomes invisible. This is often appropriate while dragging an object using 
