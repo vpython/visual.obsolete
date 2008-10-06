@@ -141,7 +141,6 @@ wrap_display_kernel(void)
 		// Functions for the internal use of renderable and light classes.
 		.def( "add_renderable", &display_kernel::add_renderable)
 		.def( "remove_renderable", &display_kernel::remove_renderable)
-		.add_property( "objects", &display_kernel::get_objects)
 		.add_property( "ambient", &display_kernel::get_ambient,
 			&display_kernel::set_ambient)
 		.add_property( "up",
@@ -203,6 +202,8 @@ wrap_display_kernel(void)
 		.def( "_set_range", &display_kernel::set_range_d)
 		.def( "_set_range", &display_kernel::set_range)
 		.def( "_get_range", &display_kernel::get_range)
+
+		.def( "_get_objects", &display_kernel::get_objects)
 
 		.def_readwrite( "enable_shaders", &display_kernel::enable_shaders)
 		;
