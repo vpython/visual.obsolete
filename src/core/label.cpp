@@ -21,8 +21,8 @@ label::label()
 	xoffset(0),
 	yoffset(0),
 	border(5),
-	font_description(), // also tried "sans", which seems equivalent
-	font_size(-1), // also tried 10, which seems equivalent
+	font_description(), // equivalent to label.font="sans"
+	font_size(-1), // equivalent to label.height=13 (see text.cpp)
 	box_enabled(true),
 	line_enabled(true),
 	linecolor( color),
