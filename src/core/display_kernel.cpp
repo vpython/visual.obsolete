@@ -39,8 +39,8 @@ void set_display_visible( display_kernel*, bool visible ) {
 	else displays_visible--;
 	displays_visible_condition.notify_all();
 }
-void 
-display_kernel::waitWhileAnyDisplayVisible() 
+void
+display_kernel::waitWhileAnyDisplayVisible()
 {
 	python::gil_release gil;
 
@@ -140,17 +140,18 @@ display_kernel::calc_camera()
 }
 
 display_kernel::display_kernel()
-	: 
-	exit(true), 
-	visible(false), 
+	:
+	exit(true),
+	visible(false),
 	explicitly_invisible(false),
-	fullscreen(false), 
+	fullscreen(false),
 	title( "VPython" ),
 	window_x(-1), window_y(-1), window_width(430), window_height(450),
 	view_x(-1), view_y(-1), view_width(-1), view_height(-1),
 	center(0, 0, 0),
 	forward(0, 0, -1),
 	up(0, 1, 0),
+	internal_up(0,1,0),
 	range(10, 10, 10),
 	forward_changed(true),
 	cycles_since_extent(4),
@@ -198,23 +199,20 @@ display_kernel::report_closed() {
 void
 display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 {
-	// This stuff handles automatic movement of the camera in responce to user
-	// input.  See also view_to_world_transform for how the affected variables
+	// This stuff handles automatic movement of the camera in response to user
+	// input. See also view_to_world_transform for how the affected variables
 	// are used to actually position the camera.
 
 	// Scaling conventions:
-	// the full width of the widget rotates the scene horizontally by 120
-	//     degrees.
-	// the full height of the widget rotates the scene vertically by 120
-	//     degrees.
+	// the full width of the widget rotates the scene horizontally by 120 degrees.
+	// the full height of the widget rotates the scene vertically by 120 degrees.
 	// the full height of the widget zooms the scene by a factor of 10
 
 	// Panning conventions:
-	// The full height or width of the widget pans the scene by the eye
-	//     distance.
+	// The full height or width of the widget pans the scene by the eye distance.
 
 	// Locking:
-	// center and forward are already synchronized.  The only variable that
+	// center and forward are already synchronized. The only variable that
 	// remains to be synchronized is user_scale.
 
 	// The vertical and horizontal fractions of the window's height that the
@@ -222,9 +220,9 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 	// TODO: Implement ZOOM_ROLL modes.
 	float vfrac = (float)dy / view_height;
 	float hfrac = dx
-		/ ((stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO) ? 
+		/ ((stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO) ?
 		     (view_width*0.5f) : view_width);
-	
+
 	// The amount by which the scene should be shifted in response to panning
 	// motion.
 	// TODO: Keep this synchronized with the eye_dist calc in
@@ -262,7 +260,7 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 				case PAN: {
 					// Pan up/down and left/right.
 					// A vector pointing along the camera's horizontal axis.
-					vector horiz_dir = forward.cross(up).norm();
+					vector horiz_dir = forward.cross(internal_up).norm();
 					// A vector pointing along the camera's vertical axis.
 					vector vert_dir = horiz_dir.cross(forward).norm();
 					if (spin_allowed) {
@@ -275,20 +273,20 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 					if (spin_allowed) {
 						// Rotate
 						// First perform the rotation about the up vector.
-						tmatrix R = rotation( -hfrac * 2.0, up.norm());
+						tmatrix R = rotation( -hfrac * 2.0, internal_up.norm());
 						forward = R * forward;
 
 						// Then perform rotation about an axis orthogonal to up and
 						// forward.
 						double vertical_angle = vfrac * 2.0;
-						double max_vertical_angle = up.diff_angle(-forward.norm());
-						R = rotation( -vertical_angle, forward.cross(up).norm());
+						double max_vertical_angle = internal_up.diff_angle(-forward.norm());
+						R = rotation( -vertical_angle, forward.cross(internal_up).norm());
 						forward = R * forward;
 						// Over the top (or under the bottom) rotation
 						if (vertical_angle > max_vertical_angle ||
 							vertical_angle < max_vertical_angle - M_PI)
 							// Over the top (or under the bottom) rotation
-							up = -up;
+							internal_up = -internal_up;
 						forward_changed = true;
 					}
 					break;
@@ -298,7 +296,7 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 	}
 }
 
-void 
+void
 display_kernel::report_resize(	int win_x, int win_y, int win_w, int win_h,
 								int v_x, int v_y, int v_w, int v_h )
 {
@@ -321,7 +319,7 @@ display_kernel::realize()
 		vendor = std::string((const char*)glGetString(GL_VENDOR));
 		version = std::string((const char*)glGetString(GL_VERSION));
 		renderer = std::string((const char*)glGetString(GL_RENDERER));
-		
+
 		// The test is a hack so that subclasses not bothering to implement getProcAddress just
 		//   don't get any extensions.
 		if (getProcAddress("display_kernel::getProcAddress") != notImplemented)
@@ -386,7 +384,7 @@ display_kernel::world_to_view_transform(
 	// This coordinate system is used for most of the calculations below.
 
 	vector scene_center = center.scale(gcfvec);
-	vector scene_up = up.norm();
+	vector scene_up = internal_up.norm();
     vector scene_forward = forward.norm();
 
 	// the horizontal and vertical tangents of half the field of view.
@@ -410,15 +408,15 @@ display_kernel::world_to_view_transform(
 
 	vector scene_camera = scene_center - cam_to_center_without_zoom*user_scale*scene_forward;
 
-	double nearest, farthest; 
+	double nearest, farthest;
 	world_extent.near_and_far(forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
 	nearest = nearest*gcf-scene_center.dot(forward);
 	farthest = farthest*gcf-scene_center.dot(forward);
 
 	double cam_to_center = (scene_center - scene_camera).mag();
 	// Z buffer resolution is highly sensitive to nearclip - a "small" camera will have terrible z buffer
-	//   precision for distant objects.  PLEASE don't fiddle with this unless you know what kind of 
-	//   test cases you need to see the results, including at nonstandard fields of view and 24 bit 
+	//   precision for distant objects.  PLEASE don't fiddle with this unless you know what kind of
+	//   test cases you need to see the results, including at nonstandard fields of view and 24 bit
 	//   z buffers!
 	// The equation for nearclip below is designed to give similar z buffer resolution at all fields of
 	//   view.  It's a little weird, but seems to give acceptable results in all the cases I've been able
@@ -428,7 +426,7 @@ display_kernel::world_to_view_transform(
 	//   scaling the scene up.  There is actually a difference since the camera has a finite "size".
 	//   Unfortunately, following this model leads to a problem with zooming in a lot!  The problem is
 	//   especially pronounced at tiny fields of view, which typically have an enormous camera very far away;
-	//   when you try to zoom in the big camera "crashes" into the tiny scene!  So instead we use the 
+	//   when you try to zoom in the big camera "crashes" into the tiny scene!  So instead we use the
 	//   slightly odd model of scaling the scene, or equivalently making the camera smaller as you zoom in.
 	double fwz = cam_to_center_without_zoom + 1.0;
 	double nearclip = fwz * fwz / (100 + fwz) * user_scale;
@@ -442,7 +440,7 @@ display_kernel::world_to_view_transform(
 	// TODO: This should be doable with a simple glTranslated() call, but I haven't
 	// found the magic formula for it.
 	vector camera_stereo_delta = camera_stereo_offset
-		* up.cross( scene_camera).norm() * whicheye;
+		* internal_up.cross( scene_camera).norm() * whicheye;
 	scene_camera += camera_stereo_delta;
 	scene_center += camera_stereo_delta;
 	// A multiple of the number of cam_to_center's away from the camera to place
@@ -490,10 +488,10 @@ display_kernel::world_to_view_transform(
 		scene_camera.x, scene_camera.y, scene_camera.z,
 		scene_center.x, scene_center.y, scene_center.z,
 		scene_up.x, scene_up.y, scene_up.z);
-		
+
 	tmatrix world_camera; world_camera.gl_modelview_get();
 	inverse( geometry.camera_world, world_camera );
-	
+
 	//vector scene_range = range * gcf;
 	//glScaled( 1.0/scene_range.x, 1.0/scene_range.y, 1.0/scene_range.z);
 
@@ -507,14 +505,14 @@ display_kernel::world_to_view_transform(
 	else if (whicheye == 0) {
 		frustum_stereo_offset = 0;
 	}
-	
+
 	if (nearclip<=0 || farclip<=nearclip || tan_hfov_x<=0 || tan_hfov_y<=0) {
 		std::ostringstream msg;
 		msg << "VPython degenerate projection: " << nearclip << " " << farclip << " " << tan_hfov_x << " " << tan_hfov_y;
 		VPYTHON_CRITICAL_ERROR( msg.str());
 		std::exit(1);
 	}
-	
+
 	glFrustum(
 		-nearclip * tan_hfov_x + frustum_stereo_offset,
 		nearclip * tan_hfov_x + frustum_stereo_offset,
@@ -535,7 +533,7 @@ display_kernel::world_to_view_transform(
 	geometry.tan_hfov_y = tan_hfov_y;
 	// The true viewing vertical direction is not the same as what is needed for
 	// gluLookAt().
-	geometry.up = forward.cross_b_cross_c(up, forward).norm();
+	geometry.up = forward.cross_b_cross_c(internal_up, forward).norm();
 }
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
@@ -587,9 +585,9 @@ display_kernel::recalc_extent(void)
         // We should NEVER deliberately set range to zero on any axis.
 		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
 	}
-	
+
 	double scale = 1.0/(std::max(std::max(range.x,range.y),range.z));
-	
+
 	// xxx Instead of changing gcf so much, we should change it only when it is 2x
 	// off, and keep a separate OpenGL scaling factor, to aid primitives whose caching
 	// may depend on gcf.
@@ -599,7 +597,7 @@ display_kernel::recalc_extent(void)
 	}
 
 	gcfvec = vector(gcf,gcf,gcf);
-	
+
 	if (!uniform) {
 		gcf_changed = true;
 		double width = (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
@@ -663,7 +661,7 @@ display_kernel::draw(
 			i = layer_world.erase(i.base());
 			continue;
 		}
-		
+
 		i->outer_render( scene_geometry);
 		++i;
 	}
@@ -681,7 +679,7 @@ display_kernel::draw(
 		j->outer_render( scene_geometry );
 		++j;
 	}
-	
+
 	// Render all objects in screen space.
 	disable_lights();
 	gl_disable depth_test( GL_DEPTH_TEST);
@@ -706,7 +704,7 @@ display_kernel::render_scene(void)
 	// xxx Exception handling?
 	if (!realized) {
 		realize();
-		
+
 		lock L(realize_lock);
 		realized = true;
 		realize_condition.notify_all();
@@ -724,7 +722,7 @@ display_kernel::render_scene(void)
 		scene_geometry.lod_adjust = lod_adjust;
 		scene_geometry.enable_shaders = enable_shaders;
 		clear_gl_error();
-		
+
 		on_gl_free.frame();
 
 		glClearColor( background.red, background.green, background.blue, 0);
@@ -841,17 +839,17 @@ display_kernel::render_scene(void)
 		}
 		if (show_rendertime) {
 			double render_time = render_timer.elapsed()-start_time, flush_time = -1;
-			
+
 			#if 0 // xxx Only for performance measurement; disable in shipping code
 			glFinish();
-			
+
 			flush_time = render_timer.elapsed() - start_time - render_time;
 			#endif
-			
+
 			std::wostringstream render_msg;
 			render_msg.precision(3);
 			// render time does not include pick time, which may be negligible
-			render_msg << "cycle: " << int(1000*cycle) << 
+			render_msg << "cycle: " << int(1000*cycle) <<
 			   " render: " << int(1000*(render_time));
 			if (flush_time>=0) render_msg << " flush: " << int(1000*flush_time);
 			glColor3f(
@@ -894,12 +892,12 @@ display_kernel::render_scene(void)
 	if (show_rendertime) {
 		render_time = render_timer.elapsed()-start_time;
 	}
-	
+
 	// xxx Can we delay picking until the Python program actually wants one of these attributes?
 	mouse.get_mouse().cam = camera;
 	boost::tie( mouse.get_mouse().pick, mouse.get_mouse().pickpos, mouse.get_mouse().position) =
 		pick( mouse.get_x(), mouse.get_y() );
-	
+
 	on_gl_free.frame();
 
 	return true;
@@ -1100,7 +1098,15 @@ display_kernel::zoom_is_allowed(void) const
 void
 display_kernel::set_up( const vector& n_up)
 {
-	up = n_up;
+	if (n_up == vector())
+		throw std::invalid_argument( "Up cannot be zero.");
+	vector temp_up = n_up.norm();
+	if (temp_up.cross(forward) == vector()) { // if forward parallel to up, move internal_up away from forward
+		internal_up = (temp_up + 0.0001*(forward.cross(internal_up)).cross(forward)).norm();
+	} else {
+		internal_up = temp_up;
+	}
+	up = temp_up;
 }
 
 shared_vector&
@@ -1114,7 +1120,11 @@ display_kernel::set_forward( const vector& n_forward)
 {
 	if (n_forward == vector())
 		throw std::invalid_argument( "Forward cannot be zero.");
-	forward = n_forward.norm();
+	vector v = n_forward.norm();
+	if (v.cross(up) == vector()) { // if forward parallel to up, move internal_up away from forward
+		internal_up = (internal_up + 0.0001*v.dot(internal_up)*(forward.cross(internal_up)).cross(internal_up)).norm();
+	}
+	forward = v;
 	forward_changed = true;
 }
 
@@ -1347,7 +1357,7 @@ display_kernel::get_objects() const
 
 	// ret[i]->get_children appends the immediate children of ret[i] to ret.  Since
 	//   ret.size() keeps increasing, we keep going until we have all the objects in the tree.
-	for(int i=0; i<ret.size(); i++)
+	for(size_t i=0; i<ret.size(); i++)
 		ret[i]->get_children(ret);
 
 	return ret;
@@ -1375,7 +1385,7 @@ display_kernel::info()
 	}
 }
 
-void 
+void
 display_kernel::set_x( float n_x)
 {
 	if (visible)
