@@ -1121,9 +1121,9 @@ display_kernel::set_forward( const vector& n_forward)
 	if (n_forward == vector())
 		throw std::invalid_argument( "Forward cannot be zero.");
 	vector v = n_forward.norm();
-	if (v.cross(up) == vector()) { // if forward parallel to up, move internal_up away from forward
-		internal_up = (internal_up + 0.0001*v.dot(internal_up)*(forward.cross(internal_up)).cross(internal_up)).norm();
-	} else if (v.cross(internal_up) == vector()) { // or if forward parallel to internal_up, can now use up
+	if (v.cross(up) == vector()) { // if new forward parallel to up, move internal_up away from forward
+		internal_up = (up + 0.0001*v.dot(up)*(forward.cross(internal_up)).cross(internal_up)).norm();
+	} else { // since new forward not parallel to up, can now use up internally
 		internal_up = up;
 	}
 	forward = v;
