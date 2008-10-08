@@ -1123,6 +1123,8 @@ display_kernel::set_forward( const vector& n_forward)
 	vector v = n_forward.norm();
 	if (v.cross(up) == vector()) { // if forward parallel to up, move internal_up away from forward
 		internal_up = (internal_up + 0.0001*v.dot(internal_up)*(forward.cross(internal_up)).cross(internal_up)).norm();
+	} else if (v.cross(internal_up) == vector()) { // or if forward parallel to internal_up, can now use up
+		internal_up = up;
 	}
 	forward = v;
 	forward_changed = true;
