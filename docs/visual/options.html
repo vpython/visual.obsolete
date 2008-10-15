@@ -117,19 +117,22 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           In a list of visible objects provided by <a href="display.html">scene.objects</a>, 
           if <span class="attribute">obj</span> is in this list you can determine the 
           class of the object with <span class="attribute">obj.__class__</span>. </p>
-        <p class="attributes"><span class="attribute">__copy()__</span> Makes a copy 
-          of an object. There are two underscores before and after the <span class="attribute">copy()</span>. 
-          Without any arguments, this results in creating a second object in the exact 
-          same position as the first, which is probably not what you want. The <font color="#FF0000">__copy__()</font> function takes a list of keyword=value argument pairs which are applied to 
-          the new object before making it visible. For example, to clone an object from 
-          one display to another, you would execute: <font color="#FF0000">new_object 
-            = old_object.__copy__( display=new_display)</font>. Restriction: If the original 
-          object is within a frame, and the new object is on a different display, you 
-          must supply both a new display and a new frame for the new object (the new 
-          frame may be None). This is due to the restriction that an object may not 
-          be located within a frame that is in a separate display.</p>
+        <p class="attributes"><span class="attribute">__copy__</span><span class="attribute">()</span> Makes
+          a copy  of an object. There are two underscores before and after <span class="attribute">copy</span>.
+           Without any arguments, this results in creating a second object in
+          the exact  same position as the first, which is probably not what you
+          want. The <font color="#FF0000">__copy__()</font> function takes a
+          list of keyword=value argument pairs which are applied to  the new
+          object before making it visible. For example, to clone an object from
+           one display to another, you would execute: <font color="#FF0000">new_object
+            = old_object.__copy__( display=new_display)</font>. Restriction:
+            If the original  object is within a frame, and the new object is
+            on a different display, you  must supply both a new display and a
+            new frame for the new object (the new  frame may be None). This is
+            due to the restriction that an object may not  be located within
+            a frame that is in a separate display.</p>
 
-          <p>Here is an example that uses the __copy__() function. The following routine 
+      <p>Here is an example that uses the <span class="attribute">__copy__()</span> function. The following routine 
             copies all of the Visual objects currently existing in one display into 
             a previously defined second display:</p>
 
@@ -139,7 +142,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             &nbsp;&nbsp;&nbsp;&nbsp;frames = {} # create empty dictionary <br />
             &nbsp;&nbsp;&nbsp;&nbsp;for obj in old_display.objects:<br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if obj.__class__ == frame:<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;frames[obj] = obj.__copy__( frame=None, display=new_display)<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;frames[obj] = obj.__copy__( frame=None, <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            display=new_display)<br />
             &nbsp;&nbsp;&nbsp;&nbsp;# For each old frame within another reference frame,<br />
             &nbsp;&nbsp;&nbsp;&nbsp;# place the new  frame in appropriate frame in  new<br />
             &nbsp;&nbsp;&nbsp;&nbsp;# display. Here old is an object and new is its<br />
@@ -156,7 +160,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
             Initialize with the corresponding  frame<br /> 
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# in the new display:<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.__copy__( display=new_display, frame=frames[obj.frame])<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.__copy__( display=new_display, <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            frame=frames[obj.frame])<br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:<br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
             No frame issue;<br />

@@ -122,42 +122,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             white. Example: <span class="attribute">scene.foreground = (1,0,0)</span> </p>
           <p class="attributes"> <span class="attribute">background</span> Set color 
             to be used to fill the display window; default is black.</p>
-          <p class="attributes"><span class="attribute">stereo</span> Stereoscopic option; <span class="attribute">scene.stereo = 'redcyan'</span> will generate a 
-            scene for the left eye and a scene for the right eye, to be viewed with 
-            red-cyan glasses, with the red lens over the left eye. (There are also <span class="attribute">'redblue'</span> and <span class="attribute">'yellowblue'</span> options; note that objects 
-            that were not originally white may be somewhat dim.) <br />
-            <br />
-            Setting <span class="attribute">scene.stereo = 'crosseyed'</span> produces 
-            side-by-side images which if small enough can be seen in 3D by crossing 
-            your eyes but focusing on the screen (this takes some practice). Setting <span class="attribute">scene.stereo = 'passive'</span> produces side-by-side 
-            images which if small enough can be seen in 3D by looking &quot;wall-eyed&quot;, 
-            looking into the far distance but focusing on the screen (this too takes 
-            some practice). <span class="attribute"><br />
-            <br />
-              scene.stereo = 'active'</span> will render alternating left eye/right eye 
-            images for viewing through shutter glasses if the graphics system supports 
-            quad buffered stereo. If stereo equipment is not available, setting the 
-            option has no effect, and <span class="attribute">scene.stereo</span> will 
-            have the value <span class="attribute">'nostereo'</span>. You can also use <span class="attribute">scene.stereo = 'passive'</span> with quad buffered 
-            stereo for display using two polarized projectors (for stereo viewing using 
-            simple passive polarized glasses). (Quad buffered 'active' stereo is only 
-            available on specialised graphics systems that have the necessary hardware 
-            and shutter glass connector, such as PCs with CRT displays and nVidia Quadro graphics cards. 
-            It generates the illusion of depth by rendering each frame twice from slightly 
-            different viewpoints corresponding to the left and right eyes. Special shutter 
-            glasses are synchronised with the alternating images so that each eye sees 
-            only the matching frame, and your brain does the rest. It's called 'quad 
-            buffered' because there is an OpenGL buffer per eye, both double-buffered 
-            for smooth updating. 'Passive' stereo requires a video card that can drive 
-            two monitors, or two projectors.) </p>
-          <p class="attributes"><span class="attribute">stereodepth</span> By default, 
-            the front of the scene is located at the location of the physical screen, 
-            which reduces eye strain. Setting <span class="attribute">scene.stereodepth 
-              = 1</span> moves the center of the scene to the location of the physical 
-            screen, with the front half of the scene seeming to stick dramatically out 
-            of the screen. <span class="attribute">scene.stereodepth = 2</span> moves 
-            the scene fully in front of the physical screen, for maximally dramatic 
-            stereo effect.</p>
+          <p class="attributes">&nbsp;</p>
           <p class="attributes"><span class="attribute">ambient</span> Amount of nondirectional 
             (&quot;ambient&quot;) lighting. Default is 0.2. Also see the following <span class="attribute">lights</span> attribute.</p>
           <p class="attributes"><span class="attribute">lights</span> List of light
@@ -188,9 +153,49 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
               side, with no ambient  lighting on the left. In Visual version
               5 and later, this scheme for specifying  lights still works, but
               it is preferable to create light objects.</p>
-          <p class="attributes"><span class="attribute">objects</span> A list of all 
-            the visible objects in the display; invisible objects and lights are not listed (scene.lights is a list of existing lights). For 
-            example, the following makes all boxes in the scene red: </p>
+          <p class="attributes"><span class="attribute">stereo</span> Stereoscopic
+            option; <span class="attribute">scene.stereo = 'redcyan'</span> will
+            generate a scene for the left eye and a scene for the right eye,
+            to be viewed with red-cyan glasses, with the red lens over the left
+            eye. (There are also <span class="attribute">'redblue'</span> and <span class="attribute">'yellowblue'</span> options;
+            note that objects that were not originally white may be somewhat
+            dim.) <br />
+            <br />
+Setting <span class="attribute">scene.stereo = 'crosseyed'</span> produces side-by-side
+images which if small enough can be seen in 3D by crossing your eyes but focusing
+on the screen (this takes some practice). Setting <span class="attribute">scene.stereo
+= 'passive'</span> produces side-by-side images which if small enough can be
+seen in 3D by looking &quot;wall-eyed&quot;, looking into the far distance but
+focusing on the screen (this too takes some practice). <span class="attribute"><br />
+            <br />
+scene.stereo = 'active'</span> will render alternating left eye/right eye images
+for viewing through shutter glasses if the graphics system supports quad buffered
+stereo. If stereo equipment is not available, setting the option has no effect,
+and <span class="attribute">scene.stereo</span> will have the value <span class="attribute">'nostereo'</span>.
+You can also use <span class="attribute">scene.stereo = 'passive'</span> with
+quad buffered stereo for display using two polarized projectors (for stereo viewing
+using simple passive polarized glasses). (Quad buffered 'active' stereo is only
+available on specialised graphics systems that have the necessary hardware and
+shutter glass connector, such as PCs with CRT displays and nVidia Quadro graphics
+cards. It generates the illusion of depth by rendering each frame twice from
+slightly different viewpoints corresponding to the left and right eyes. Special
+shutter glasses are synchronised with the alternating images so that each eye
+sees only the matching frame, and your brain does the rest. It's called 'quad
+buffered' because there is an OpenGL buffer per eye, both double-buffered for
+smooth updating. 'Passive' stereo requires a video card that can drive two monitors,
+or two projectors.) </p>
+          <p class="attributes"><span class="attribute">stereodepth</span> By
+            default, the front of the scene is located at the location of the
+            physical screen, which reduces eye strain. Setting <span class="attribute">scene.stereodepth
+            = 1</span> moves the center of the scene to the location of the physical
+            screen, with the front half of the scene seeming to stick dramatically
+            out of the screen. <span class="attribute">scene.stereodepth = 2</span> moves
+            the scene fully in front of the physical screen, for maximally dramatic
+            stereo effect.</p>
+          <p class="attributes"><span class="attribute">objects</span> A list
+            of all the visible objects in the display; invisible objects and
+            lights are not listed (scene.lights is a list of existing lights).
+            For example, the following makes all visible boxes in the scene red: </p>
           <p class="program">&nbsp;&nbsp;&nbsp;&nbsp;for obj in scene2.objects: <br />
             &nbsp;&nbsp;&nbsp;&nbsp;if obj.__class__ == box # can say either box or 
             'box'<br />
