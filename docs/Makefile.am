@@ -13,14 +13,14 @@ docfiles = index.html \
 	visual/cylinder.html visual/defaults.html visual/delete.html visual/display.html \
 	visual/ellipsoid.html visual/faces.html visual/factorial.html visual/float.html \
 	visual/frame.html visual/graph.html visual/helix.html visual/index.html \
-	visual/keyboard.html visual/label.html visual/license.txt visual/mouse_click.html \
-	visual/mouse_drag.html visual/mouse.html new_in_visual_4.html visual/options.html \
+	visual/keyboard.html visual/label.html visual/license.txt \
+	visual/materials.html visual/mouse.html visual/mouse_click.html \
+	visual/mouse_drag.html new_features.html visual/options.html visual/points.html \
 	visual/pyramid.html visual/rate.html visual/ring.gif visual/ring.html \
 	visual/rotation.html visual/sphere.html visual/spherebox.gif visual/vector.html \
-	visual/VisualIntro.css visual/VisualIntro.html visual/VisualRef.css \
+	visual/VisualIntro.html visual/VisualRef.css \
 	visual/VisualRef-1.gif visual/VisualRef-2.gif visual/VisualRef-3.gif \
-	visual/VisualRef-4.gif visual/VisualRef-5.gif visual/VisualRef-6.gif \
-	visual/VisualRef-7.gif 
+	visual/VisualRef-4.gif visual/VisualRef-6.gif visual/VisualRef-7.gif 
 else
 docfiles = 
 endif
