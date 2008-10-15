@@ -15,7 +15,7 @@ docfiles = index.html \
 	visual/frame.html visual/graph.html visual/helix.html visual/index.html \
 	visual/keyboard.html visual/label.html visual/license.txt \
 	visual/materials.html visual/mouse.html visual/mouse_click.html \
-	visual/mouse_drag.html new_features.html visual/options.html visual/points.html \
+	visual/mouse_drag.html visual/new_features.html visual/options.html visual/points.html \
 	visual/pyramid.html visual/rate.html visual/ring.gif visual/ring.html \
 	visual/rotation.html visual/sphere.html visual/spherebox.gif visual/vector.html \
 	visual/VisualIntro.html visual/VisualRef.css \
