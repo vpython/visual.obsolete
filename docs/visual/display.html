@@ -69,13 +69,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="controls.html">Buttons and Sliders</option>
         </select>
       </p>
-      <p><a href="vector.html" target="mainFrame">Vector operations </a></p>
-      <p><a href="graph.html" target="mainFrame">Graphs</a></p>
-    <p><a href="factorial.html" target="mainFrame">factorial/combin</a></p>
-    <p>What's new in <a href="new_in_visual_4.html">Visual 4</a></p>
+      <p><a href="vector.html">Vector operations </a></p>
+      <p><a href="graph.html">Graphs</a></p>
+    <p><a href="factorial.html">factorial/combin</a></p>
+    <p>What's new in <a href="new_features.html">Visual 5</a></p>
     <p><a href="http://python.org" target="_blank">VPython web site</a><br />
       <a href="license.txt" target="_blank">Visual license</a><br />
-      <a href="http://www.python.org">Python web site</a> <br />
+      <a href="http://www.python.org" target="_blank">Python web site</a> <br />
       <a href="http://www.python.org/doc/2.5.2/lib/module-math.html" target="_blank">Math module</a> (sqrt etc.)<br />
       <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
     <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
@@ -166,11 +166,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             <span class="attribute">&nbsp;&nbsp;&nbsp;distant_light(direction=(-0.88, -0.22, -0.44),
               color=0.3)</span> .
               <br />
-            These are equivalent to the default lights in Visual prior to version 4.
-          You can get rid of these default lights with <span class="attribute">scene.lights = []</span>. The
+            These are equivalent to the default lights in Visual prior to version
+            5. You can get rid of these default lights with <span class="attribute">scene.lights
+            = []</span>. The
             color of light objects and the amount of <font color="#FF0000">scene.ambient</font> must
-            be specified with some care, because if the total lighting intensity exceeds
-            1 anywhere in the scene the results are unpredictable. <span class="attribute">scene.lights</span> is
+            be specified with some care, because if the total lighting intensity
+            exceeds 1 anywhere in the scene the results are unpredictable. <span class="attribute">scene.lights</span> is
             a list of any lights you have created. <br />
             </p>
           <p class="Normal">            You  can create lights that are local, near other objects. The following
@@ -178,12 +179,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="program">            lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
           <p class="Normal">A distant red light located in the <em>direction</em> (x,y,z) is created like this:</p>
           <p class="program">distant_light(direction=(x,y,z), color=color.red)</p>
-          <p class="Normal">            Previous to Visual version 4, you set up a light by specifying a vector 
-            in the direction to the light from the origin, and the magnitude of the 
-            vector was the intensity. For example, <span class="attribute">scene.lights 
-              = [vector(1,0,0)]</span> with <span class="attribute">scene.ambient = 0</span> will light the scene with full intensity from the right side, with no ambient 
-            lighting on the left. In Visual version 4 and later, this scheme for specifying 
-            lights still works, but it is preferable to create light objects.</p>
+          <p class="Normal">            Previous to Visual version 5, you set
+            up a light by specifying a vector  in the direction to the light
+            from the origin, and the magnitude of the  vector was the intensity.
+            For example, <span class="attribute">scene.lights 
+              = [vector(1,0,0)]</span> with <span class="attribute">scene.ambient
+              = 0</span> will light the scene with full intensity from the right
+              side, with no ambient  lighting on the left. In Visual version
+              5 and later, this scheme for specifying  lights still works, but
+              it is preferable to create light objects.</p>
           <p class="attributes"><span class="attribute">objects</span> A list of all 
             the visible objects in the display; invisible objects and lights are not listed (scene.lights is a list of existing lights). For 
             example, the following makes all boxes in the scene red: </p>
@@ -191,10 +195,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             &nbsp;&nbsp;&nbsp;&nbsp;if obj.__class__ == box # can say either box or 
             'box'<br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.color = color.red</p>
-          <p class="attributes"><span class="attribute">cursor.visible</span> By setting <span class="attribute">scene.cursor.visible = 0</span>, the mouse cursor 
-            becomes invisible. This is often appropriate while dragging an object using 
-            the mouse. Restore the cursor with <span class="attribute">scene.cursor.visible 
-              = 1</span>.  <em>NOT YET IMPLEMENTED IN VISUAL 4.</em> </p>
+          <p class="attributes"><span class="attribute">cursor.visible</span> By
+            setting <span class="attribute">scene.cursor.visible = 0</span>,
+            the mouse cursor  becomes invisible. This is often appropriate while
+            dragging an object using  the mouse. Restore the cursor with <span class="attribute">scene.cursor.visible
+             = 1</span>.  <em>NOT YET IMPLEMENTED IN VISUAL 5.</em> </p>
         </div>
       </div>
       <p class="attributes"><span class="attribute"><font color="#000000">To obtain </font>camera position</span>, see <a href="mouse.html">Mouse Interactions</a>.</p>
