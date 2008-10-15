@@ -1,219 +1,210 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
-  <meta http-equiv="Content-Type"
- content="text/html; charset=ISO-8859-1">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <meta name="GENERATOR"
- content="Adobe FrameMaker 5.5/HTML Export Filter">
-  <link rel="STYLESHEET" href="VisualRef.css" charset="ISO-8859-1"
- type="text/css">
-  <title>Description of Objects in VPython</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>curve</title>
+<!-- InstanceEndEditable -->
+<!-- InstanceBeginEditable name="head" -->
+<link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable -->
+<script type="text/javascript">
+<!--
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+//-->
+</script>
 </head>
-<body bgcolor="#ffffff">
-<div class="navigation">
-<table align="center" width="100%" cellpadding="0" cellspacing="2">
-  <tbody>
-    <tr>
-      <td><a href="ellipsoid.html"><img src="icons/previous.gif"
- border="0" height="32" alt="Previous Page" width="32"></a></td>
-      <td><a href="index.html"><img src="icons/up.gif" border="0"
- height="32" alt="Up One Level" width="32"></a></td>
-      <td><a href="helix.html"><img src="icons/next.gif" border="0"
- height="32" alt="Next Page" width="32"></a></td>
-      <td align="center" width="100%">Visual Reference</td>
-      <td><a href="index.html"><img src="icons/contents.gif" border="0"
- height="32" alt="Contents" width="32"></a></td>
-      <td><img src="icons/blank.gif" border="0" height="32" alt=""
- width="32"></td>
-      <td><img src="icons/blank.gif" border="0" height="32" alt=""
- width="32"></td>
-    </tr>
-  </tbody>
-</table>
-<b class="navlabel">Previous:</b> <a class="sectref"
- href="ellipsoid.html">The ellipsoid Object</a> <b class="navlabel">Up:</b>
-<a class="sectref" href="index.html">Contents</a> <b class="navlabel">Next:</b>
-<a class="sectref" href="helix.html">The helix Object</a> <br>
-<hr></div>
-<div>
-<h1 class="Heading-1"> <font color="#0000a0">The curve Object</font></h1>
-</div>
-<div>
-<p class="Normal">The curve object displays straight lines between
-points, and if the points are sufficiently close together you get the
-appearance of a smooth curve. In addition to its basic use for
-displaying curves, the curve object has powerful capabilities for other
-uses, such as efficient plotting of functions.</p>
-<p class="Normal"> Some attributes, such as <span class="attribute">pos</span>
-and <span class="attribute">color</span>, can be different for each
-point in the curve. These attributes are stored as numpy arrays. The
-numpy module for Python provides powerful array processing
-capabilities; for example, two entire arrays can be added together.
-Numpy arrays can be accessed using standard Python rules for
-referring to the nth item in a sequence (that is, <span
+
+<body>
+<table width="800" border="0" cellpadding="0" cellspacing="0">
+  <!--DWLayoutDefaultTable-->
+  <tr>
+    <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
+    </td>
+    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+      <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
+      <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
+          <option>3D objects</option>
+          <option value="arrow.html">arrow</option>
+          <option value="box.html">box</option>
+          <option value="cone.html">cone</option>
+          <option value="convex.html">convex</option>
+          <option value="curve.html">curve</option>
+          <option value="cylinder.html">cylinder</option>
+          <option value="ellipsoid.html">ellipsoid</option>
+          <option value="faces.html">faces</option>
+          <option value="frame.html">frame</option>
+          <option value="helix.html">helix</option>
+          <option value="label.html">label</option>
+          <option value="pyramid.html">pyramid</option>
+          <option value="ring.html">ring</option>
+          <option value="sphere.html">sphere</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Working with objects</option>
+          <option value="color.html">Color</option>
+          <option value="color.html">Opacity</option>
+          <option value="color.html">Material</option>
+          <option value="defaults.html">Defaults</option>
+          <option value="rate.html">Animation Speed</option>
+          <option value="rotation.html">Rotations</option>
+          <option value="options.html">Additional Options</option>
+          <option value="delete.html">Delete an Object</option>
+          <option value="float.html">3/4 = 0?</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Windows and events</option>
+          <option value="display.html">Windows</option>
+          <option value="mouse.html">Mouse Events</option>
+          <option value="keyboard.html">Keyboard Events</option>
+          <option value="controls.html">Buttons and Sliders</option>
+        </select>
+      </p>
+      <p><a href="vector.html" target="mainFrame">Vector operations </a></p>
+      <p><a href="graph.html" target="mainFrame">Graphs</a></p>
+    <p><a href="factorial.html" target="mainFrame">factorial/combin</a></p>
+    <p>What's new in <a href="new_in_visual_4.html">Visual 4</a></p>
+    <p><a href="http://python.org" target="_blank">VPython web site</a><br />
+      <a href="license.txt" target="_blank">Visual license</a><br />
+      <a href="http://www.python.org">Python web site</a> <br />
+      <a href="http://www.python.org/doc/2.5.2/lib/module-math.html" target="_blank">Math module</a> (sqrt etc.)<br />
+      <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
+    <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
+    <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
+      <div>
+        <h1 class="Heading-1"> <font color="#0000a0">The curve Object</font></h1>
+      </div>
+      <div>
+        <p class="Normal">The curve object displays straight lines between
+          points, and if the points are sufficiently close together you get the
+          appearance of a smooth curve. In addition to its basic use for
+          displaying curves, the curve object has powerful capabilities for other
+          uses, such as efficient plotting of functions.</p>
+        <p class="Normal"> Some attributes, such as <span class="attribute">pos</span> and <span class="attribute">color</span>, can be different for each
+          point in the curve. These attributes are stored as numpy arrays. The
+          numpy module for Python provides powerful array processing
+          capabilities; for example, two entire arrays can be added together.
+          Numpy arrays can be accessed using standard Python rules for
+          referring to the nth item in a sequence (that is, <span
  class="attribute">seq[0]</span> is the first item in <span
- class="attribute">seq</span>, <span class="attribute">seq[1]</span>
-is the second, <span class="attribute">seq[2]</span> is the third,
-etc). For example, <span class="attribute">anycurve.pos[0]</span> is
-the position of the first point in <span class="attribute">anycurve</span>.</p>
-<p class="Normal">
-You can give curve an explicit list of coordinates enclosed in
-brackets, like all Python sequences. Here is an example of a 2D square:</p>
-<div>
-<h2 class="program0">square = curve(pos=[(0,0),(0,1),(1,1),(1,0),(0,0)])</h2>
-<p class="Normal">
-Essentially, (1,1) is shorthand for (1,1,0). However, you cannot mix 2D
-and 3D points in one list.</p>
-<p class="Normal">
-Curves can have thickness, specified by the radius of a cross section
-of the curve (the curve has a thickness or diameter that is twice this
-radius):</p>
-</div>
-<div>
-<h2 class="program0">curve(pos=[(0,0,0), (1,0,0), (2,1,0)], radius=0.05)</h2>
-<p class="Normal">
-The default radius is 0, which draws a thin curve. A nonzero radius
-makes a "thick" curve, but a very small radius may make a curve that is
-too thin to see.</p>
-<p class="Normal"> In the following example, the <span
+ class="attribute">seq</span>, <span class="attribute">seq[1]</span> is the second, <span class="attribute">seq[2]</span> is the third,
+          etc). For example, <span class="attribute">anycurve.pos[0]</span> is
+          the position of the first point in <span class="attribute">anycurve</span>.</p>
+        <p class="Normal"> You can give curve an explicit list of coordinates enclosed in
+          brackets, like all Python sequences. Here is an example of a 2D square:</p>
+        <div>
+          <p class="program">square = curve(pos=[(0,0),(0,1),(1,1),(1,0),(0,0)])</p>
+          <p class="Normal"> Essentially, (1,1) is shorthand for (1,1,0). However, you cannot mix 2D
+            and 3D points in one list.</p>
+          <p class="Normal"> Curves can have thickness, specified by the radius of a cross section
+            of the curve (the curve has a thickness or diameter that is twice this
+            radius):</p>
+        </div>
+        <div>
+          <p class="program">curve(pos=[(0,0,0), (1,0,0), (2,1,0)], radius=0.05)</p>
+          <p class="Normal"> The default radius is 0, which draws a thin curve. A nonzero radius
+            makes a &quot;thick&quot; curve, but a very small radius may make a curve that is
+            too thin to see.</p>
+          <p class="Normal"> In the following example, the <span
  class="attribute">arange()</span> function (provided by the Python
-numpy module, which is imported by the Visual module, gives a
-sequence of values from 0 to 20 in steps of 0.1 (not including the last
-value, 20).</p>
-</div>
-<div>
-<h2 class="program0">c = curve( x = arange(0,20,0.1) ) # Draw a helix</h2>
-<p class="program">
-c.y = sin( 2.0*c.x )</p>
-<p class="program">
-c.z = cos( 2.0*c.x )</p>
-<p class="Normal"> The <span class="attribute">x</span>, <span
- class="attribute">y</span>, and <span class="attribute">z</span>
-attributes allow curves to be used to graph functions easily:</p>
-</div>
-<div>
-<h2 class="program0">curve( x=arange(100), y=arange(100)**0.5,
-color=color.red)</h2>
-<p class="Normal">
-A function grapher looks like this (a complete program!):</p>
-</div>
-<div>
-<h2 class="program0"> eqn = raw_input('Equation in x: ')</h2>
-<p class="program">
-x = arange( 0, 10, 0.1 )</p>
-<p class="program">
-curve( x=x, y=eval(eqn) )</p>
-<p class="Normal">Parametric graphing is also easy:</p>
-</div>
-<div>
-<h2 class="program0">t = arange(0, 10, 0.1)</h2>
-<p class="program">
-curve( x = sin(t), y = 1.0/(1+t), z = t**0.5,<br>
-red = cos(t), green = 0, blue = 0.5*(1-cos(t)) )</p>
-<p class="Normal">
-Here are the curve attributes:</p>
-<p class="attributes"> <span class="attribute">pos[]</span> Array of
-position of points in the curve: pos[0], pos[1], pos[2]....<br>
-The current number of points is given by len(curve.pos)</p>
-<p class="attributes"> <span class="attribute">x[ ]</span>, <span
- class="attribute">y[ ]</span>, <span class="attribute">z[ ]</span>
-Components of pos; each defaults to [0,0,0,0,...]</p>
-<p class="attributes"> <span class="attribute">color[ ]</span> Color
-of points in the curve</p>
-<p class="attributes"> <span class="attribute">red[ ]</span>, <span
- class="attribute">green[ ]</span>, <span class="attribute">blue[ ]</span>
-Color components of points in the curve</p>
-<p class="attributes"> <span class="attribute">radius</span> Radius of
-cross-section of curve<br>
-The default radius=0 makes a thin curve</p>
-<p class="attributes"><span class="attribute">retain</span> The  option curve.retain = 500 means that only the 500 most recently added points of a curve will be displayed; the earlier ones are deleted  (curve.retain = 0 is the default and means that all points are retained). This is a nice option for having a moving object leave a tail behind itself</p>
-<p class="Normal">&nbsp; </p>
-<p class="Normal"><font color="#0000a0">Adding more points to a curve</font></p>
-<p class="Normal"> Curves can be created incrementally with the <span
+            numpy module, which is imported by the Visual module, gives a
+            sequence of values from 0 to 20 in steps of 0.1 (not including the last
+            value, 20).</p>
+        </div>
+        <div>
+          <p class="program">c = curve( x = arange(0,20,0.1) ) # Draw a helix<br />
+          c.y = sin( 2.0*c.x )<br />
+          c.z = cos( 2.0*c.x )</p>
+          <p class="Normal"> The <span class="attribute">x</span>, <span
+ class="attribute">y</span>, and <span class="attribute">z</span> attributes allow curves to be used to graph functions easily:</p>
+        </div>
+        <div>
+          <p class="program">curve( x=arange(100), y=arange(100)**0.5, <br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;color=color.red)</p>
+          <p class="Normal"> A function grapher looks like this (a complete program!), where &quot;raw_input&quot; is a Python function that accepts input typed in the Python Shell window:</p>
+        </div>
+        <div>
+          <p class="program"> eqn = raw_input('Equation in x: ')<br />
+          x = arange( 0, 10, 0.1 )<br />
+          curve( x=x, y=eval(eqn) )</p>
+          <p class="Normal">Parametric graphing is also easy:</p>
+        </div>
+        <div>
+          <p class="program">t = arange(0, 10, 0.1)<br />
+            curve( x = sin(t), y = 1.0/(1+t), &nbsp;&nbsp;&nbsp;&nbsp;z = t**0.5,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;red = cos(t), green = 0, blue = 0.5*(1-cos(t)) )</p>
+          <p class="Normal"> Here are the curve attributes:</p>
+          <p class="attributes"> <span class="attribute">pos[]</span> Array of
+            position of points in the curve: pos[0], pos[1], pos[2]....<br />
+            The current number of points is given by len(curve.pos)</p>
+          <p class="attributes"> <span class="attribute">x[ ]</span>, <span
+ class="attribute">y[ ]</span>, <span class="attribute">z[ ]</span> Components of pos; each defaults to [0,0,0,0,...]</p>
+          <p class="attributes"> <span class="attribute">color[ ]</span> Color
+            of points in the curve</p>
+          <p class="attributes"> <span class="attribute">red[ ]</span>, <span
+ class="attribute">green[ ]</span>, <span class="attribute">blue[ ]</span> Color components of points in the curve</p>
+          <p class="attributes"> <span class="attribute">radius</span> Radius of
+            cross-section of curve<br />
+            The default radius=0 makes a thin curve</p>
+          <p class="Normal"><font color="#0000a0">Adding more points to a curve</font></p>
+          <p class="Normal"> Curves can be created incrementally with the <span
  class="attribute">append()</span> function. A new point by default
-shares the characteristics of the last point.</p>
-</div>
-<div>
-<h2 class="program0">helix = curve( color = color.cyan )</h2>
-<p class="program">
-for t in arange(0, 2*pi, 0.1):</p>
-<p class="program">
-&nbsp;&nbsp;&nbsp;&nbsp;helix.append( pos=(t,sin(t),cos(t)) )</p>
-<p class="Normal"> One of the many uses of curves is to leave a trail
-behind a moving object. For example, if <span class="attribute">ball</span>
-is a moving sphere, this will add a point to its trail: </p>
-</div>
-<div>
-<h2 class="program0">trail = curve()</h2>
-<p class="program">
-ball = sphere()</p>
-<p class="program">
-...# Every time you update the position of the ball:</p>
-<p class="program">
-trail.append(pos=ball.pos)</p>
-<p class="Normal">&nbsp; </p>
-<p class="Normal"><font color="#0000a0">Interpolation</font></p>
-<p class="Normal">
-The curve machinery interpolates from one point to the next. For
-example, suppose the first three points are red but the fourth point is
-blue, as in the following example. The lines connecting the first three
-points are all red, but the line going from the third point (red) to
-the fourth point (blue) is displayed with a blend going from red to
-blue.</p>
-</div>
-<div>
-<h2 class="program0">c = curve( pos=[(0,0,0), (1,0,0)], color=color.red
-)</h2>
-<p class="program">
-c.append( pos=(1,1,0) ) # add a red point</p>
-<p class="program">
-c.append( pos=(0,1,0), color=color.blue) # add blue point</p>
-<p class="Normal">
-If you want an abrupt change in color or thickness, simply add another
-point at the same location. In the following example, adding a blue
-point at the same location as the third (red) point makes the final
-line be purely blue.</p>
-</div>
-<div>
-<h2 class="program0">c = curve( pos=[(0,0,0), (1,0,0)], color=color.red
-)</h2>
-<p class="program">
-c.append( pos=(1,1,0) ) # add a red point</p>
-<p class="program">
-c.append( pos=(1,1,0), color=color.blue) # same point, blue</p>
-<p class="program">
-c.append( pos=(0,1,0) ) # add blue point</p>
-</div>
-</div>
-<div>
-  <p class="Heading-1">Technical note: No matter how many points are in a curve, only 10000 are displayed, selected evenly over the full set of points, in order that the display of a very long curve doesn't slow down unacceptably. </p>
-</div>
-<hr>
-<div class="navigation">
-<table align="center" width="100%" cellpadding="0" cellspacing="2">
-  <tbody>
-    <tr>
-      <td><a href="ellipsoid.html"><img src="icons/previous.gif"
- border="0" height="32" alt="Previous Page" width="32"></a></td>
-      <td><a href="index.html"><img src="icons/up.gif" border="0"
- height="32" alt="Up One Level" width="32"></a></td>
-      <td><a href="helix.html"><img src="icons/next.gif" border="0"
- height="32" alt="Next Page" width="32"></a></td>
-      <td align="center" width="100%">Visual Reference</td>
-      <td><a href="index.html"><img src="icons/contents.gif" border="0"
- height="32" alt="Contents" width="32"></a></td>
-      <td><img src="icons/blank.gif" border="0" height="32" alt=""
- width="32"></td>
-      <td><img src="icons/blank.gif" border="0" height="32" alt=""
- width="32"></td>
-    </tr>
-  </tbody>
+            shares the characteristics of the last point.</p>
+        <div>
+          <p class="program">spiral = curve( color = color.cyan )<br />
+          for t in arange(0, 2*pi, 0.1):<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;spiral.append( pos=(t,sin(t),cos(t)) )</p>
+          <p class="Normal"> One of the many uses of curves is to leave a trail
+            behind a moving object. For example, if <span class="attribute">ball</span> is a moving sphere, this will add a point to its trail: </p>
+        </div>
+        <div>
+          <p class="program">trail = curve()<br />
+          ball = sphere()<br />
+            # .... Every time you update the position of the ball:<br />
+          trail.append(pos=ball.pos)</p>
+          <p class="Normal">When appending to a curve, you can optionally choose to retain only the last N points, including the one you're adding:</p>
+          <p class="program">trail.append(pos=ball.pos, retain=50) # last 50 points</p>
+          <p class="Normal"><font color="#0000a0">Interpolation</font></p>
+          <p class="Normal"> The curve machinery interpolates from one point to the next. For
+            example, suppose the first three points are red but the fourth point is
+            blue, as in the following example. The lines connecting the first three
+            points are all red, but the line going from the third point (red) to
+            the fourth point (blue) is displayed with a blend going from red to
+            blue.</p>
+        </div>
+        <div>
+          <p class="program">c = curve( pos=[(0,0,0), (1,0,0)], color=color.red)<br />
+          c.append( pos=(1,1,0) ) # add a red point<br />
+          c.append( pos=(0,1,0), color=color.blue) # add blue point</p>
+          <p class="Normal"> If you want an abrupt change in color or thickness,  add another
+            point at the same location. In the following example, adding a blue
+            point at the same location as the third (red) point makes the final
+            line be purely blue.</p>
+        </div>
+        <div>
+          <p class="program">c = curve( pos=[(0,0,0), (1,0,0)], color=color.red)<br />
+          c.append( pos=(1,1,0) ) # add a red point<br />
+          c.append( pos=(1,1,0), color=color.blue) # same point<br />
+          c.append( pos=(0,1,0) ) # add blue point</p>
+        </div>
+      </div>
+      <div>
+        <p class="Heading-1">Technical note: No matter how many points are in a curve, only 1000 are displayed, selected evenly over the full set of points, in order that the display of a very long curve doesn't slow down unacceptably. </p>
+      </div>
+    <!-- InstanceEndEditable --></td>
+  </tr>
+  <tr>
+    <td height="16" colspan="3"></td>
+  </tr>
 </table>
-  <b class="navlabel">Previous:</b> <a class="sectref"
- href="ellipsoid.html">The ellipsoid Object</a> <b class="navlabel">Up:</b> <a class="sectref" href="index.html">Contents</a> 
-  <b class="navlabel">Next:</b> <a class="sectref" href="helix.html">The helix 
-  Object</a> <br>
-<hr></div>
 </body>
-</html>
+<!-- InstanceEnd --></html>

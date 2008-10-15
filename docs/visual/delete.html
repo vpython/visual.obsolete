@@ -1,138 +1,102 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
-
-<HEAD>
-
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
-
-<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
-
-<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
-
-<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
-
-<TITLE> Description of Objects in VPython</TITLE>
-
-</HEAD>
-
-<BODY BGCOLOR="#ffffff">
-
-<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
-
-<tr>
-
-      <td><A HREF="color.html"><img src="icons/previous.gif" border="0" height="32"
-
-  alt="Previous Page" width="32"></A></td>
-
-      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
-
-  alt="Up One Level" width="32"></A></td>
-
-      <td><A HREF="rate.html"><img src="icons/next.gif" border="0" height="32"
-
-  alt="Next Page" width="32"></A></td>
-
-<td align="center" width="100%">Visual Reference</td>
-
-      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
-
-  alt="Contents" width="32"></A></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-</tr></table>
-
-  <b class="navlabel">Previous:</b> <a class="sectref" HREF="color.html">Specifying 
-
-  Colors<b class="navlabel"></b></A><b class="navlabel"> Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
-
-  <b class="navlabel">Next:</b> <a class="sectref" HREF="rate.html">Limiting the 
-
-  Animation Rate</A> <br>
-
-  <hr>
-
-</DIV>
-
-<DIV>
-
-  <H1 CLASS="Heading-1"> <font color="#0000A0">Deleting an Object</font></H1>
-
-</DIV>
-
-<DIV> 
-
-  <P CLASS="Normal"> To delete a Visual object just make it invisible: <span class="attribute">ball.visible 
-    = 0</span></P>
-  <P CLASS="Normal">Technical detail: If you later re-use the name <span class="attribute">ball</span>, 
-    for example by creating a new object and naming it <span class="attribute">ball</span>, 
-    Python will be free to release the memory used by the object formerly named 
-    <span class="attribute">ball</span> (assuming no other names currently refer 
-    to that object).</P>
-</DIV>
-<DIV>
-  <DIV>
-<P CLASS="Normal">&nbsp;</P>
-
-  </DIV>
-
-</DIV>
-
-<DIV> </DIV>
-
-<hr>
-
-<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
-
-<tr>
-
-      <td><A HREF="color.html"><img src="icons/previous.gif" border="0" height="32"
-
-  alt="Previous Page" width="32"></A></td>
-
-      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
-
-  alt="Up One Level" width="32"></A></td>
-
-      <td><A HREF="rate.html"><img src="icons/next.gif" border="0" height="32"
-
-  alt="Next Page" width="32"></A></td>
-
-<td align="center" width="100%">Visual Reference</td>
-
-      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
-
-  alt="Contents" width="32"></A></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-</tr></table>
-
-  <b class="navlabel">Previous:</b> <a class="sectref" href="color.html">Specifying 
-
-  Colors</a> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
-
-  <b class="navlabel">Next:</b> <a class="sectref" HREF="rate.html">Limiting the 
-
-  Animation Rate</A> <br>
-
-  <hr>
-
-</DIV>
-
-</BODY>
-
-</HTML>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>delete</title>
+<!-- InstanceEndEditable -->
+<!-- InstanceBeginEditable name="head" -->
+<link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable -->
+<script type="text/javascript">
+<!--
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+//-->
+</script>
+</head>
+
+<body>
+<table width="800" border="0" cellpadding="0" cellspacing="0">
+  <!--DWLayoutDefaultTable-->
+  <tr>
+    <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
+    </td>
+    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+      <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
+      <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
+          <option>3D objects</option>
+          <option value="arrow.html">arrow</option>
+          <option value="box.html">box</option>
+          <option value="cone.html">cone</option>
+          <option value="convex.html">convex</option>
+          <option value="curve.html">curve</option>
+          <option value="cylinder.html">cylinder</option>
+          <option value="ellipsoid.html">ellipsoid</option>
+          <option value="faces.html">faces</option>
+          <option value="frame.html">frame</option>
+          <option value="helix.html">helix</option>
+          <option value="label.html">label</option>
+          <option value="pyramid.html">pyramid</option>
+          <option value="ring.html">ring</option>
+          <option value="sphere.html">sphere</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Working with objects</option>
+          <option value="color.html">Color</option>
+          <option value="color.html">Opacity</option>
+          <option value="color.html">Material</option>
+          <option value="defaults.html">Defaults</option>
+          <option value="rate.html">Animation Speed</option>
+          <option value="rotation.html">Rotations</option>
+          <option value="options.html">Additional Options</option>
+          <option value="delete.html">Delete an Object</option>
+          <option value="float.html">3/4 = 0?</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Windows and events</option>
+          <option value="display.html">Windows</option>
+          <option value="mouse.html">Mouse Events</option>
+          <option value="keyboard.html">Keyboard Events</option>
+          <option value="controls.html">Buttons and Sliders</option>
+        </select>
+      </p>
+      <p><a href="vector.html" target="mainFrame">Vector operations </a></p>
+      <p><a href="graph.html" target="mainFrame">Graphs</a></p>
+    <p><a href="factorial.html" target="mainFrame">factorial/combin</a></p>
+    <p>What's new in <a href="new_in_visual_4.html">Visual 4</a></p>
+    <p><a href="http://python.org" target="_blank">VPython web site</a><br />
+      <a href="license.txt" target="_blank">Visual license</a><br />
+      <a href="http://www.python.org">Python web site</a> <br />
+      <a href="http://www.python.org/doc/2.5.2/lib/module-math.html" target="_blank">Math module</a> (sqrt etc.)<br />
+      <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
+    <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
+    <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
+      <div>
+        <h1 class="Heading-1"> <font color="#0000A0">Deleting an Object</font></h1>
+      </div>
+      <div>
+        <p class="Normal"> To delete a Visual object just make it invisible: <span class="attribute">ball.visible 
+          = 0</span></p>
+        <p class="Normal">Technical detail: If you later re-use the name <span class="attribute">ball</span>, 
+          for example by creating a new object and naming it <span class="attribute">ball</span>, 
+          Python will be free to release the memory used by the object formerly named <span class="attribute">ball</span> (assuming no other names currently refer 
+          to that object).</p>
+      </div>
+      <div> </div>
+    <!-- InstanceEndEditable --></td>
+  </tr>
+  <tr>
+    <td height="16" colspan="3"></td>
+  </tr>
+</table>
+</body>
+<!-- InstanceEnd --></html>

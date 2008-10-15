@@ -1,132 +1,143 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
-<HEAD>
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
-<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
-<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
-<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
-<TITLE> Description of Objects in VPython</TITLE>
-</HEAD>
-<BODY BGCOLOR="#ffffff">
-<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
-<tr>
-      <td><A HREF="ring.html"><img src="icons/previous.gif" border="0" height="32"
-  alt="Previous Page" width="32"></A></td>
-      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
-  alt="Up One Level" width="32"></A></td>
-      <td><A HREF="ellipsoid.html"><img src="icons/next.gif" border="0" height="32"
-  alt="Next Page" width="32"></A></td>
-<td align="center" width="100%">Visual Reference</td>
-      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
-  alt="Contents" width="32"></A></td>
-      <td><img src="icons/blank.gif" border="0" height="32"
-  alt="" width="32"></td>
-      <td><img src="icons/blank.gif" border="0" height="32"
-  alt="" width="32"></td>
-</tr></table>
-  <b class="navlabel">Previous:</b> <a class="sectref" HREF="ring.html">The ring 
-  Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
-  <b class="navlabel">Next:</b> <a class="sectref" HREF="ellipsoid.html">The ellipsoid 
-  Object</A> <br>
-  <hr>
-</DIV>
-<DIV>
-  <H1 CLASS="Heading-1"> <font color="#0000A0">The box Object</font></H1>
-</DIV>
-<DIV>
-<P CLASS="Normal">
-In the first diagram we show a simple example of a box object:<IMG SRC="VisualRef-6.gif" ALIGN="RIGHT">
-</P>
-<DIV>
-<H2 CLASS="program0">
-mybox = box(pos=(x0,y0,z0), length=L, height=H, width=W) </H2>
-    <P CLASS="Normal"> The given position is in the center of the box, at (x0, 
-      y0, z0). This is different from cylinder, whose pos attribute is at one 
-      end of the cylinder. Just as with a cylinder, we can refer to the individual 
-      vector components of the box as<span class="attribute"> mybox.x</span>, 
-      <span class="attribute">mybox.y</span>, and <span class="attribute">mybox.z</span>. 
-      The length (along the x axis) is L , the height (along the y axis) is H 
-      , and the width is W (along the z axis). For this box, we have <span class="attribute">mybox.axis 
-      = (L, 0, 0)</span> . Note that the axis of a box is just like the axis of 
-      a cylinder. </P>
-<P CLASS="Normal">
-For a box that isn't aligned with the coordinate axes, additional issues come into play. The orientation of the length of the box is given by the axis (see second diagram):</P>
-</DIV>
-<DIV>
-<H2 CLASS="program0">
-mybox = box(pos=(x0,y0,z0), axis=(a,b,c), length=L,<BR>
-height=H, width=W) </H2>
-<P CLASS="Normal">
-The axis attribute gives a direction for the length of the box, and the length, height, and width of the box are given as before (if a length attribute is not given, the length is set to the magnitude of the axis vector). </P>
-    <P CLASS="Normal"> There remains the issue of how to orient the box rotationally 
-      around the specified axis. The rule that Visual uses is to orient the width 
-      to lie in a plane perpendicular to the display &quot;up&quot; direction, 
-      which by default is the y axis. Therefore in the diagram you see that the 
-      width lies parallel to the x-z plane. The height of the box is oriented 
-      perpendicular to the width, and to the specified axis of the box. It helps 
-      to think of length initially as going along the x axis, height along the 
-      y axis, and width along the z axis, and when the axis is tipped the width 
-      stays in the x-z plane.</P>
-<P CLASS="Normal">
-You can rotate the box around its own axis by changing which way is &quot;up&quot; for the box, by specifying an up attribute for the box that is different from the up vector of the coordinate system:</P>
-</DIV>
-<DIV>
-<H2 CLASS="program0">
-mybox = box(pos=(x0,y0,z0), axis=(a,b,c), length=L,<BR>
-height=H, width=W, up=(q,r,s))</H2>
-<P CLASS="Normal">
-With this statement, the width of the box will lie in a plane perpendicular to the (q,r,s) vector, and the height of the box will be perpendicular to the width and to the (a,b,c) vector.</P>
-    <P CLASS="Normal"> The box object has the following attributes and default 
-      values, like those for cylinders: <span class="attribute">pos<font color="#000000"> 
-      (0,0,0)</font></span>, <span class="attribute">x</span><span class="attribute"><font color="#000000"> 
-      (0)</font></span>, <span class="attribute">y<font color="#000000">(0)</font></span>, 
-      <span class="attribute">z<font color="#000000">(0)</font></span>, <span class="attribute">axis<font color="#000000"> 
-      (1,0,0)</font></span>, <span class="attribute">length<font color="#000000"> 
-      (1)</font></span>, <span class="attribute">color<font color="#000000"> (1,1,1) 
-      which is color.white</font></span>, <span class="attribute">red<font color="#000000"> 
-      (1)</font></span>, <span class="attribute">green<font color="#000000"> (1)</font></span>, 
-      <span class="attribute">blue<font color="#000000"> (1)</font></span>, and 
-      <span class="attribute">up<font color="#000000"> (0,1,0)</font></span>. 
-      Additional box attributes:</P>
-    <P CLASS="attributes"> <span class="attribute">height</span> In the y direction 
-      in the simple case, default is 1</P>
-    <P CLASS="attributes"> <span class="attribute">width</span> In the z direction 
-      in the simple case, default is 1</P>
-    <P CLASS="attributes"> <span class="attribute">size</span> (length, height, 
-      width), default is (1,1,1)<BR>
-      <span class="attribute"> mybox.size=(20,10,12) </span>sets length=20, height=10, 
-      width=12</P>
-    <P CLASS="Normal"> Note that the <span class="attribute">pos</span> attribute 
-      for cylinder, arrow, cone, and pyramid corresponds to one end of the object, 
-      whereas for a box, sphere, or ring it corresponds to the center of the object. 
-    </P>
-  </DIV>
-</DIV>
-<DIV>
-  <H1 CLASS="Heading-1"><br>
-  </H1>
-</DIV>
-<hr>
-<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
-<tr>
-      <td><A HREF="ring.html"><img src="icons/previous.gif" border="0" height="32"
-  alt="Previous Page" width="32"></A></td>
-      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
-  alt="Up One Level" width="32"></A></td>
-      <td><A HREF="ellipsoid.html"><img src="icons/next.gif" border="0" height="32"
-  alt="Next Page" width="32"></A></td>
-<td align="center" width="100%">Visual Reference</td>
-      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
-  alt="Contents" width="32"></A></td>
-      <td><img src="icons/blank.gif" border="0" height="32"
-  alt="" width="32"></td>
-      <td><img src="icons/blank.gif" border="0" height="32"
-  alt="" width="32"></td>
-</tr></table>
-  <b class="navlabel">Previous:</b> <a class="sectref" HREF="ring.html">The ring 
-  Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
-  <b class="navlabel">Next:</b> <a class="sectref" HREF="ellipsoid.html">The ellipsoid 
-  Object</A> <br>
-  <hr>
-</DIV>
-</BODY>
-</HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>box</title>
+<!-- InstanceEndEditable -->
+<!-- InstanceBeginEditable name="head" -->
+<link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable -->
+<script type="text/javascript">
+<!--
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+//-->
+</script>
+</head>
+
+<body>
+<table width="800" border="0" cellpadding="0" cellspacing="0">
+  <!--DWLayoutDefaultTable-->
+  <tr>
+    <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
+    </td>
+    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+      <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
+      <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
+          <option>3D objects</option>
+          <option value="arrow.html">arrow</option>
+          <option value="box.html">box</option>
+          <option value="cone.html">cone</option>
+          <option value="convex.html">convex</option>
+          <option value="curve.html">curve</option>
+          <option value="cylinder.html">cylinder</option>
+          <option value="ellipsoid.html">ellipsoid</option>
+          <option value="faces.html">faces</option>
+          <option value="frame.html">frame</option>
+          <option value="helix.html">helix</option>
+          <option value="label.html">label</option>
+          <option value="pyramid.html">pyramid</option>
+          <option value="ring.html">ring</option>
+          <option value="sphere.html">sphere</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Working with objects</option>
+          <option value="color.html">Color</option>
+          <option value="color.html">Opacity</option>
+          <option value="color.html">Material</option>
+          <option value="defaults.html">Defaults</option>
+          <option value="rate.html">Animation Speed</option>
+          <option value="rotation.html">Rotations</option>
+          <option value="options.html">Additional Options</option>
+          <option value="delete.html">Delete an Object</option>
+          <option value="float.html">3/4 = 0?</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Windows and events</option>
+          <option value="display.html">Windows</option>
+          <option value="mouse.html">Mouse Events</option>
+          <option value="keyboard.html">Keyboard Events</option>
+          <option value="controls.html">Buttons and Sliders</option>
+        </select>
+      </p>
+      <p><a href="vector.html" target="mainFrame">Vector operations </a></p>
+      <p><a href="graph.html" target="mainFrame">Graphs</a></p>
+    <p><a href="factorial.html" target="mainFrame">factorial/combin</a></p>
+    <p>What's new in <a href="new_in_visual_4.html">Visual 4</a></p>
+    <p><a href="http://python.org" target="_blank">VPython web site</a><br />
+      <a href="license.txt" target="_blank">Visual license</a><br />
+      <a href="http://www.python.org">Python web site</a> <br />
+      <a href="http://www.python.org/doc/2.5.2/lib/module-math.html" target="_blank">Math module</a> (sqrt etc.)<br />
+      <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
+    <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
+    <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
+      <div>
+        <h1 class="Heading-1"> <font color="#0000A0">The box Object</font></h1>
+      </div>
+      <div>
+        <p class="Normal"> In the first diagram we show a simple example of a box object:<img src="VisualRef-6.gif" alt="box" align="right" /> </p>
+        <div>
+          <p class="program"> mybox = box(pos=(x0,y0,z0), length=L, height=H, width=W) </p>
+          <p class="Normal"> The given position is in the center of the box, at (x0, 
+            y0, z0). This is different from cylinder, whose pos attribute is at one 
+            end of the cylinder. Just as with a cylinder, we can refer to the individual 
+            vector components of the box as<span class="attribute"> mybox.x</span>, <span class="attribute">mybox.y</span>, and <span class="attribute">mybox.z</span>. 
+            The length (along the x axis) is L , the height (along the y axis) is H 
+            , and the width is W (along the z axis). For this box, we have <span class="attribute">mybox.axis 
+              = (L, 0, 0)</span> . Note that the axis of a box is just like the axis of 
+            a cylinder. </p>
+          <p class="Normal"> For a box that isn't aligned with the coordinate axes, additional issues come into play. The orientation of the length of the box is given by the axis (see second diagram):</p>
+        </div>
+        <div>
+          <p class="program"> mybox = box(pos=(x0,y0,z0), &nbsp;&nbsp;&nbsp;&nbsp;axis=(a,b,c), length=L,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;height=H, width=W) </p>
+          <p class="Normal"> The axis attribute gives a direction for the length of the box, and the length, height, and width of the box are given as before (if a length attribute is not given, the length is set to the magnitude of the axis vector). </p>
+          <p class="Normal"> There remains the issue of how to orient the box rotationally 
+            around the specified axis. The rule that Visual uses is to orient the width 
+            to lie in a plane perpendicular to the display &quot;up&quot; direction, 
+            which by default is the y axis. Therefore in the diagram you see that the 
+            width lies parallel to the x-z plane. The height of the box is oriented 
+            perpendicular to the width, and to the specified axis of the box. It helps 
+            to think of length initially as going along the x axis, height along the 
+            y axis, and width along the z axis, and when the axis is tipped the width 
+            stays in the x-z plane.</p>
+          <p class="Normal"> You can rotate the box around its own axis by changing which way is &quot;up&quot; for the box, by specifying an up attribute for the box that is different from the up vector of the coordinate system:</p>
+        </div>
+        <div>
+          <p class="program"> mybox = box(pos=(x0,y0,z0), axis=(a,b,c), length=L,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;height=H, width=W, up=(q,r,s))</p>
+          <p class="Normal"> With this statement, the width of the box will lie in a plane perpendicular to the (q,r,s) vector, and the height of the box will be perpendicular to the width and to the (a,b,c) vector.</p>
+          <p class="Normal"> The box object has the following attributes and default 
+            values, like those for cylinders: <span class="attribute">pos<font color="#000000"> (0,0,0)</font></span>, <span class="attribute">x</span><span class="attribute"><font color="#000000"> (0)</font></span>, <span class="attribute">y<font color="#000000">(0)</font></span>, <span class="attribute">z<font color="#000000">(0)</font></span>, <span class="attribute">axis<font color="#000000"> (1,0,0)</font></span>, <span class="attribute">length<font color="#000000"> (1)</font></span>, <span class="attribute">color<font color="#000000"> (1,1,1) 
+              which is color.white</font></span>, <span class="attribute">red<font color="#000000"> (1)</font></span>, <span class="attribute">green<font color="#000000"> (1)</font></span>, <span class="attribute">blue<font color="#000000"> (1)</font></span>, and <span class="attribute">up<font color="#000000"> (0,1,0)</font></span>. 
+            Additional box attributes:</p>
+          <p class="attributes"> <span class="attribute">height</span> In the y direction 
+            in the simple case, default is 1</p>
+          <p class="attributes"> <span class="attribute">width</span> In the z direction 
+            in the simple case, default is 1</p>
+          <p class="attributes"> <span class="attribute">size</span> (length, height, 
+            width), default is (1,1,1)<br />
+            <span class="attribute"> mybox.size=(20,10,12) </span>sets length=20, height=10, 
+            width=12</p>
+          <p class="Normal"> Note that the <span class="attribute">pos</span> attribute 
+            for cylinder, arrow, cone, and pyramid corresponds to one end of the object, 
+            whereas for a box, sphere, or ring it corresponds to the center of the object. </p>
+        </div>
+      </div>
+    <!-- InstanceEndEditable --></td>
+  </tr>
+  <tr>
+    <td height="16" colspan="3"></td>
+  </tr>
+</table>
+</body>
+<!-- InstanceEnd --></html>

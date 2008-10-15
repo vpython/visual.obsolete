@@ -1,154 +1,134 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>faces</title>
+<!-- InstanceEndEditable -->
+<!-- InstanceBeginEditable name="head" -->
+<link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable -->
+<script type="text/javascript">
+<!--
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+//-->
+</script>
+</head>
 
-<HEAD>
-
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
-
-<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
-
-<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
-
-<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
-
-<TITLE> Description of Objects in VPython</TITLE>
-
-</HEAD>
-
-<BODY BGCOLOR="#ffffff">
-
-<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
-
-<tr>
-
-      <td><A HREF="curve.html"><img src="icons/previous.gif" border="0" height="32"
-
-  alt="Previous Page" width="32"></A></td>
-
-      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
-
-  alt="Up One Level" width="32"></A></td>
-
-      <td><A HREF="label.html"><img src="icons/next.gif" border="0" height="32"
-
-  alt="Next Page" width="32"></A></td>
-
-<td align="center" width="100%">Visual Reference</td>
-
-      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
-
-  alt="Contents" width="32"></A></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-</tr></table>
-
-  <b class="navlabel">Previous:</b> <a class="sectref" HREF="frame.html">The frame 
-  object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
-  <b class="navlabel">Next:</b> <a class="sectref" HREF="options.html">Additional 
-  Attributes</A> <br>
-  <hr>
-
-</DIV>
-
-<DIV>
-
-  <H1 CLASS="Heading-1"> <font color="#0000A0">The faces Object</font></H1>
-  
-</DIV>
-<DIV>
-  <p>The "faces" primitive takes a list of triangles (position, color, and normal 
-    for each vertex). This is useful for writing routines in Python to import 
-    3D models made with other 3D modeling tools. You would still need to do lots 
-    of calculations of normals and so on, but you would not need to do C coding 
-    to import an arbitrary model file.</p>
-  <p>The faces object is an array primitive (like curve, convex, etc), so you 
-    have to use a frame to move it around. It consists of a set of one-sided triangles 
-    with user-specified vertices, colors, and normals. The <font color="#FF0000">pos</font>, 
-    <font color="#FF0000">color</font>, and <font color="#FF0000">normal</font> 
-    attributes look like this:</p>
-  <p class="program"> pos = [ t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t2v0, t2v1, 
-    t2v2, ... ] </p>
-  <p>where t0v0 is the position of vertex 0 of triangle 0, t0v1 is vertex 1 of 
-    triangle 0, etc.</p>
-  <p>Each face is a one-sided surface. Which side is illuminated is determined 
-    by the &quot;winding&quot; order of the face. When you are looking at a face, 
-    it is illuminated if the order of the vertices in the <span class="attribute">pos</span> 
-    list goes counter-clockwise. If you need the triangle to be visible from either 
-    side, you must create another triangle with the opposite winding order.</p>
-  <p>If you don't specify normals at the vertices, the face is illuminated only 
-    by &quot;ambient&quot; light. In order for the main lighting to affect the 
-    appearance, you must specify normals to the surface at the vertices. In the 
-    simplest case, a normal at a vertex is perpendicular to the face, and adjoining 
-    faces have a hard edge where they join. A soft edge can be produced by averaging 
-    the normals to the two faces at their common vertices. The brightness of a 
-    face is proportional to the cosine of the angle between the normal and the 
-    light. </p>
-  <p>If you specify different colors at the vertices of one triangular face, VPython 
-    interpolates across the face, in which case the face is not all one color. 
-    There is a similar interpolation for normals if there are different normals 
-    at the vertices, in which case the face is not all one brightness.</p>
-  <p>The faces object is intended to help with writing model importers and other 
-    new primitives in Python, not for direct manipulation by normal programs. 
-    It is considerably lower-level than any of the other objects in Visual (although 
-    it is not necessarily any faster, at least right now). It is flexible enough 
-    to implement smooth or facet shading, per-vertex coloration, two-sided or 
-    one-sided lighting, etc, but all of these calculations must be made by the 
-    programmer (when setting up <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, 
-    <font color="#FF0000">normal</font>). </p>
-  <p>For examples of the use of the faces object, see the faces demo programs.</p>
-  </DIV>
-
-<DIV></DIV>
-
-<hr>
-
-<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
-
-<tr>
-
-      <td><A HREF="curve.html"><img src="icons/previous.gif" border="0" height="32"
-
-  alt="Previous Page" width="32"></A></td>
-
-      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
-
-  alt="Up One Level" width="32"></A></td>
-
-      <td><A HREF="label.html"><img src="icons/next.gif" border="0" height="32"
-
-  alt="Next Page" width="32"></A></td>
-
-<td align="center" width="100%">Visual Reference</td>
-
-      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
-
-  alt="Contents" width="32"></A></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-</tr></table>
-
-  <b class="navlabel">Previous:</b> <a class="sectref" HREF="frame.html">The frame 
-  Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
-  <b class="navlabel">Next:</b> <a class="sectref" HREF="options.html">Additional 
-  Attributes</A> <br>
-  <hr>
-
-</DIV>
-
-</BODY>
-
-</HTML>
-
+<body>
+<table width="800" border="0" cellpadding="0" cellspacing="0">
+  <!--DWLayoutDefaultTable-->
+  <tr>
+    <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
+    </td>
+    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+      <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
+      <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
+          <option>3D objects</option>
+          <option value="arrow.html">arrow</option>
+          <option value="box.html">box</option>
+          <option value="cone.html">cone</option>
+          <option value="convex.html">convex</option>
+          <option value="curve.html">curve</option>
+          <option value="cylinder.html">cylinder</option>
+          <option value="ellipsoid.html">ellipsoid</option>
+          <option value="faces.html">faces</option>
+          <option value="frame.html">frame</option>
+          <option value="helix.html">helix</option>
+          <option value="label.html">label</option>
+          <option value="pyramid.html">pyramid</option>
+          <option value="ring.html">ring</option>
+          <option value="sphere.html">sphere</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Working with objects</option>
+          <option value="color.html">Color</option>
+          <option value="color.html">Opacity</option>
+          <option value="color.html">Material</option>
+          <option value="defaults.html">Defaults</option>
+          <option value="rate.html">Animation Speed</option>
+          <option value="rotation.html">Rotations</option>
+          <option value="options.html">Additional Options</option>
+          <option value="delete.html">Delete an Object</option>
+          <option value="float.html">3/4 = 0?</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Windows and events</option>
+          <option value="display.html">Windows</option>
+          <option value="mouse.html">Mouse Events</option>
+          <option value="keyboard.html">Keyboard Events</option>
+          <option value="controls.html">Buttons and Sliders</option>
+        </select>
+      </p>
+      <p><a href="vector.html" target="mainFrame">Vector operations </a></p>
+      <p><a href="graph.html" target="mainFrame">Graphs</a></p>
+    <p><a href="factorial.html" target="mainFrame">factorial/combin</a></p>
+    <p>What's new in <a href="new_in_visual_4.html">Visual 4</a></p>
+    <p><a href="http://python.org" target="_blank">VPython web site</a><br />
+      <a href="license.txt" target="_blank">Visual license</a><br />
+      <a href="http://www.python.org">Python web site</a> <br />
+      <a href="http://www.python.org/doc/2.5.2/lib/module-math.html" target="_blank">Math module</a> (sqrt etc.)<br />
+      <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
+    <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
+    <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
+      <div>
+        <h1 class="Heading-1"> <font color="#0000A0">The faces Object</font></h1>
+      </div>
+      <div>
+        <p>The &quot;faces&quot; primitive takes a list of triangles (position, color, and normal 
+          for each vertex). This is useful for writing routines in Python to import 
+          3D models made with other 3D modeling tools. You would still need to do lots 
+          of calculations of normals and so on, but you would not need to do C coding 
+          to import an arbitrary model file.</p>
+        <p>The faces object is an array primitive (like curve, convex, etc), so you 
+          have to use a frame to move it around. It consists of a set of one-sided triangles 
+          with user-specified vertices, colors, and normals. The <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, and <font color="#FF0000">normal</font> attributes look like this:</p>
+        <p class="program"> pos = [ t0v0, t0v1, t0v2, <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          t1v0, t1v1, t1v2, <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          t2v0, t2v1, 
+          t2v2, ... ] </p>
+        <p>where t0v0 is the position of vertex 0 of triangle 0, t0v1 is vertex 1 of 
+          triangle 0, etc.</p>
+        <p>Each face is a one-sided surface. Which side is illuminated is determined 
+          by the &quot;winding&quot; order of the face. When you are looking at a face, 
+          it is illuminated if the order of the vertices in the <span class="attribute">pos</span> list goes counter-clockwise. If you need the triangle to be visible from either 
+          side, you must create another triangle with the opposite winding order.</p>
+        <p>If you don't specify normals at the vertices, the face is illuminated only 
+          by &quot;ambient&quot; light. In order for the main lighting to affect the 
+          appearance, you must specify normals to the surface at the vertices. In the 
+          simplest case, a normal at a vertex is perpendicular to the face, and adjoining 
+          faces have a hard edge where they join. A soft edge can be produced by averaging 
+          the normals to the two faces at their common vertices. The brightness of a 
+          face is proportional to the cosine of the angle between the normal and the 
+          light. </p>
+        <p>If you specify different colors at the vertices of one triangular face, VPython 
+          interpolates across the face, in which case the face is not all one color. 
+          There is a similar interpolation for normals if there are different normals 
+          at the vertices, in which case the face is not all one brightness.</p>
+        <p>The faces object is intended to help with writing model importers and other 
+          new primitives in Python, not for direct manipulation by normal programs. 
+          It is considerably lower-level than any of the other objects in Visual (although 
+          it is not necessarily any faster, at least right now). It is flexible enough 
+          to implement smooth or facet shading, per-vertex coloration, two-sided or 
+          one-sided lighting, etc, but all of these calculations must be made by the 
+          programmer (when setting up <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, <font color="#FF0000">normal</font>). </p>
+        <p>For examples of the use of the faces object, see the faces demo programs.</p>
+      </div>
+      <div></div>
+    <!-- InstanceEndEditable --></td>
+  </tr>
+  <tr>
+    <td height="16" colspan="3"></td>
+  </tr>
+</table>
+</body>
+<!-- InstanceEnd --></html>

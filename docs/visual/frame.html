@@ -1,196 +1,135 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>frame</title>
+<!-- InstanceEndEditable -->
+<!-- InstanceBeginEditable name="head" -->
+<link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable -->
+<script type="text/javascript">
+<!--
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+//-->
+</script>
+</head>
 
-<HEAD>
-
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
-
-<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
-
-<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 5.5/HTML Export Filter">
-
-<LINK REL="STYLESHEET" HREF="VisualRef.css" CHARSET="ISO-8859-1" TYPE="text/css">
-
-<TITLE> Description of Objects in VPython</TITLE>
-
-</HEAD>
-
-<BODY BGCOLOR="#ffffff">
-
-<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
-
-<tr>
-
-      <td><A HREF="label.html"><img src="icons/previous.gif" border="0" height="32"
-
-  alt="Previous Page" width="32"></A></td>
-
-      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
-
-  alt="Up One Level" width="32"></A></td>
-
-      <td><A HREF="options.html"><img src="icons/next.gif" border="0" height="32"
-
-  alt="Next Page" width="32"></A></td>
-
-<td align="center" width="100%">Visual Reference</td>
-
-      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
-
-  alt="Contents" width="32"></A></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-</tr></table>
-
-  <b class="navlabel">Previous:</b> <a class="sectref" HREF="label.html">The label 
-  Object</A> <b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
-  <b class="navlabel">Next:</b> <a class="sectref" HREF="faces.html">The faces 
-  object</A> <br>
-
-  <hr>
-
-</DIV>
-
-<DIV>
-
-  <H1 CLASS="Heading-1"> <font color="#0000A0">Composite Objects with frame</font></H1>
-
-</DIV>
-
-<DIV>
-
-<P CLASS="Normal">
-
-You can group objects together to make a composite object that can be moved and rotated as though it were a single object. Create a frame object, and associate objects with that frame:</P>
-
-<DIV>
-
-<H2 CLASS="program0">
-
-f = frame()</H2>
-
-<P CLASS="program">
-
-cylinder(frame=f, pos=(0,0,0), radius=0.1, length=1, color=color.cyan)</P>
-
-<P CLASS="program">
-
-sphere(frame=f, pos=(1,0,0), radius=0.2, color=color.red)</P>
-
-<P CLASS="program">
-
-f.axis = (0,1,0)</P>
-
-<P CLASS="program">
-
-f.pos = (-1,0,0)</P>
-
-    <P CLASS="Normal"> By default, frame() has a position of (0,0,0) and axis 
-      in the x direction (1,0,0). The cylinder and sphere are created within the 
-      frame. When any of the frame attributes are changed (<span class="attribute">pos</span>, 
-      <span class="attribute">x</span>, <span class="attribute">y</span>, <span class="attribute">z</span>, 
-      <span class="attribute">axis</span>, <span class="attribute">up<font color="#000000">, 
-      or </font><span class="attribute">scale</span></span>), the composite object 
-      is reoriented and repositioned.</P>
-    <P CLASS="Normal">You can set the <font color="#FF0000">scale</font> attribute, 
-      a vector, to change the size of all the objects in the frame. For example, 
-      for a frame f, </P>
-    <DIV> 
-      <H2 CLASS="program0"> f.scale = vector(2,-1,1)</H2>
-    </DIV>
-
-<P CLASS="Normal">stretches the objects by a factor of 2 along the x axis 
-      of the frame, flips the objects along the y axis of the frame, and leaves 
-      the z coordinates unchanged.</P>
-    <P CLASS="Normal">You can make all the objects in a frame invisible or visible 
-      by setting the frame's <font color="#FF0000">visible</font> attribute.</P>
-    <P CLASS="Normal">Another frame attribute is <span class="attribute">objects</span>, 
-      which is a list of currently visible objects contained in the frame (the 
-      list does not include objects that are currently invisible). If you want 
-      to make all the objects in a frame be red, do the following (assume the 
-      frame is named f):</P>
-    <div> 
-      <h2 class="program0"> for obj in f.objects:<br>
-        obj.color = color.red</h2>
+<body>
+<table width="800" border="0" cellpadding="0" cellspacing="0">
+  <!--DWLayoutDefaultTable-->
+  <tr>
+    <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
+    </td>
+    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+      <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
+      <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
+          <option>3D objects</option>
+          <option value="arrow.html">arrow</option>
+          <option value="box.html">box</option>
+          <option value="cone.html">cone</option>
+          <option value="convex.html">convex</option>
+          <option value="curve.html">curve</option>
+          <option value="cylinder.html">cylinder</option>
+          <option value="ellipsoid.html">ellipsoid</option>
+          <option value="faces.html">faces</option>
+          <option value="frame.html">frame</option>
+          <option value="helix.html">helix</option>
+          <option value="label.html">label</option>
+          <option value="pyramid.html">pyramid</option>
+          <option value="ring.html">ring</option>
+          <option value="sphere.html">sphere</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Working with objects</option>
+          <option value="color.html">Color</option>
+          <option value="color.html">Opacity</option>
+          <option value="color.html">Material</option>
+          <option value="defaults.html">Defaults</option>
+          <option value="rate.html">Animation Speed</option>
+          <option value="rotation.html">Rotations</option>
+          <option value="options.html">Additional Options</option>
+          <option value="delete.html">Delete an Object</option>
+          <option value="float.html">3/4 = 0?</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Windows and events</option>
+          <option value="display.html">Windows</option>
+          <option value="mouse.html">Mouse Events</option>
+          <option value="keyboard.html">Keyboard Events</option>
+          <option value="controls.html">Buttons and Sliders</option>
+        </select>
+      </p>
+      <p><a href="vector.html" target="mainFrame">Vector operations </a></p>
+      <p><a href="graph.html" target="mainFrame">Graphs</a></p>
+    <p><a href="factorial.html" target="mainFrame">factorial/combin</a></p>
+    <p>What's new in <a href="new_in_visual_4.html">Visual 4</a></p>
+    <p><a href="http://python.org" target="_blank">VPython web site</a><br />
+      <a href="license.txt" target="_blank">Visual license</a><br />
+      <a href="http://www.python.org">Python web site</a> <br />
+      <a href="http://www.python.org/doc/2.5.2/lib/module-math.html" target="_blank">Math module</a> (sqrt etc.)<br />
+      <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
+    <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
+    <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
+      <div>
+        <h1 class="Heading-1"> <font color="#0000A0">Composite Objects with frame</font></h1>
       </div>
+      <div>
+        <p class="Normal"> You can group objects together to make a composite object that can be moved and rotated as though it were a single object. Create a frame object, and associate objects with that frame:</p>
+        <div>
+          <p class="program"> f = frame()<br />
+          cylinder(frame=f, pos=(0,0,0), radius=0.1, length=1,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          color=color.cyan)<br />
+          sphere(frame=f, pos=(1,0,0), radius=0.2, color=color.red)<br />
+          f.axis = (0,1,0) # change orientation of both objects<br />
+          f.pos = (-1,0,0) # change position of both objects</p>
+          <p class="Normal"> By default, frame() has a position of (0,0,0) and axis 
+            in the x direction (1,0,0). The cylinder and sphere are created within the 
+            frame. When any of the frame attributes are changed (<span class="attribute">pos</span>, <span class="attribute">x</span>, <span class="attribute">y</span>, <span class="attribute">z</span>, <span class="attribute">axis</span>, <span class="attribute">up<font color="#000000">, 
+              or </font>scale</span>), the composite object 
+            is reoriented and repositioned.</p>
+          <p class="Normal">You can make all the objects in a frame invisible or visible 
+            by setting the frame's <font color="#FF0000">visible</font> attribute.</p>
+          <p class="Normal">Another frame attribute is <span class="attribute">objects</span>, 
+            which is a list of currently visible objects contained in the frame (the 
+            list does not include objects that are currently invisible, not lights, which are found in scene.lights). If you want 
+            to make all the objects in a frame be red, do the following (assume the 
+            frame is named f):</p>
+          <div>
+            <p class="program"> for obj in f.objects:<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;obj.color = color.red</p>
+          </div>
+          <p class="Normal">If you use this method to make all the objects invisible, 
+            the f.objects list will be empty. If you need a list containing all the 
+            objects, both visible and invisible, you need to maintain your own list 
+            of objects.</p>
+          <p class="Normal"> If <span class="program0"><font color="#FF0000">ball</font></span> is an object in a frame, <font color="#FF0000">ball.pos</font> is the position 
+            local to the frame, not the actual position in &quot;world space&quot;. 
+            Here is a routine that will calculate the position of a vector such as <font color="#FF0000">ball.pos</font> in world space:</p>
 
-    <P CLASS="Normal">If you use this method to make all the objects invisible, 
-      the f.objects list will be empty. If you need a list containing all the 
-      objects, both visible and invisible, you need to maintain your own list 
-      of objects.</P>
-    <P CLASS="Normal"> If <span class="program0"><font color="#FF0000">ball</font></span> 
-      is an object in a frame, <font color="#FF0000">ball.pos</font> is the position 
-      local to the frame, not the actual position in &quot;world space&quot;. 
-      Here is a routine that will calculate the position of a vector such as <font color="#FF0000">ball.pos</font> 
-      in world space:</P>
-    <div> 
-      <h2 class="program0"> def world_space_pos(frame, local):<br>
-        &quot;&quot;&quot;Returns the position of local in world space.&quot;&quot;&quot;<br>
-        x_axis = norm(frame.axis)<br>
-        z_axis = norm(cross(frame.axis, frame.up))<br>
-        y_axis = norm(cross(z_axis, x_axis))<br>
-        return frame.pos+local.x*x_axis+local.y*y_axis+local.z*z_axis<br>
-      </h2>
-      <DIV>
-        <DIV></DIV>
-      </DIV>
-    </div>
-    </DIV>
+            <p class="program"> def world_space_pos(frame, local):<br />
+              &quot;&quot;&quot;Returns the position of local in world space.&quot;&quot;&quot;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;x_axis = norm(frame.axis)<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;z_axis = norm(cross(frame.axis, frame.up))<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;y_axis = norm(cross(z_axis, x_axis))<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;return<br />
+              <br /> 
+              frame.pos+local.x*x_axis+local.y*y_axis+local.z*z_axis</p>
 
-</DIV>
-
-<DIV> </DIV>
-
-<hr>
-
-<DIV CLASS="navigation"><table align="center" width="100%" cellpadding="0" cellspacing="2">
-
-<tr>
-
-      <td><A HREF="label.html"><img src="icons/previous.gif" border="0" height="32"
-
-  alt="Previous Page" width="32"></A></td>
-
-      <td><A HREF="index.html"><img src="icons/up.gif" border="0" height="32"
-
-  alt="Up One Level" width="32"></A></td>
-
-      <td><A HREF="options.html"><img src="icons/next.gif" border="0" height="32"
-
-  alt="Next Page" width="32"></A></td>
-
-<td align="center" width="100%">Visual Reference</td>
-
-      <td><A HREF="index.html"><img src="icons/contents.gif" border="0" height="32"
-
-  alt="Contents" width="32"></A></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-      <td><img src="icons/blank.gif" border="0" height="32"
-
-  alt="" width="32"></td>
-
-</tr></table>
-
-  <b class="navlabel">Previous:</b> <a class="sectref" href="label.html">The label 
-  Object</a><b class="navlabel">Up:</b> <a class="sectref" HREF="index.html">Contents</A> 
-  <b class="navlabel">Next:</b> <a class="sectref" href="faces.html">The faces 
-  object</a><br>
-
-  <hr>
-
-</DIV>
-
-</BODY>
-
-</HTML>
-
+    <!-- InstanceEndEditable --></td>
+  </tr>
+  <tr>
+    <td height="16" colspan="3"></td>
+  </tr>
+</table>
+</body>
+<!-- InstanceEnd --></html>

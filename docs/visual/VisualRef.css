@@ -1,13 +1,8 @@
-A.link {
-	color: blue;
-	text-decoration: underline;
+a:link, a:visited, a:hover {
+	color: #006699;
+	text-decoration: none;
 }
-A.visited {
-	color: purple;
-	text-decoration: underline;
-}
-A.active {
-	color: red;
+a:hover {
 	text-decoration: underline;
 }
 P.attributes {
@@ -150,19 +145,19 @@ P.Normal {
 P.program {
 	display: block;
 	text-align: left;
-	text-indent: -36.000000pt;
-	margin-top: 0.000000pt;
-	margin-bottom: 0.000000pt;
+	text-indent: 0.000000pt;
+	margin-top: 6.000000pt;
+	margin-bottom: 6.000000pt;
 	margin-right: 0.000000pt;
-	margin-left: 54.000000pt;
-	font-size: 12.000000pt;
-	font-weight: Bold;
-	font-style: Regular;
+	margin-left: 10.000000pt;
+	font-size: 12pt;
+	font-weight: bold;
+	font-style: normal;
 	color: #000000;
 	text-decoration: none;
 	vertical-align: baseline;
 	text-transform: none;
-	font-family: "Courier";
+	font-family: Courier;
 }
 H1.program0, H2.program0, H3.program0, H4.program0, H5.program0, H6.program0 {
 	display: block;
@@ -217,4 +212,3 @@ EM.Symbol {
                           font-size: 110%;
                           margin: 0pt;
                           padding: 0pt; }
-

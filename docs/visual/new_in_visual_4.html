@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>new features</title>
+<!-- InstanceEndEditable -->
+<!-- InstanceBeginEditable name="head" -->
+<link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable -->
+<script type="text/javascript">
+<!--
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+//-->
+</script>
+</head>
+
+<body>
+<table width="800" border="0" cellpadding="0" cellspacing="0">
+  <!--DWLayoutDefaultTable-->
+  <tr>
+    <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
+    </td>
+    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+      <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
+      <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
+          <option>3D objects</option>
+          <option value="arrow.html">arrow</option>
+          <option value="box.html">box</option>
+          <option value="cone.html">cone</option>
+          <option value="convex.html">convex</option>
+          <option value="curve.html">curve</option>
+          <option value="cylinder.html">cylinder</option>
+          <option value="ellipsoid.html">ellipsoid</option>
+          <option value="faces.html">faces</option>
+          <option value="frame.html">frame</option>
+          <option value="helix.html">helix</option>
+          <option value="label.html">label</option>
+          <option value="pyramid.html">pyramid</option>
+          <option value="ring.html">ring</option>
+          <option value="sphere.html">sphere</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Working with objects</option>
+          <option value="color.html">Color</option>
+          <option value="color.html">Opacity</option>
+          <option value="color.html">Material</option>
+          <option value="defaults.html">Defaults</option>
+          <option value="rate.html">Animation Speed</option>
+          <option value="rotation.html">Rotations</option>
+          <option value="options.html">Additional Options</option>
+          <option value="delete.html">Delete an Object</option>
+          <option value="float.html">3/4 = 0?</option>
+        </select>
+      </p>
+      <p>
+        <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
+          <option>Windows and events</option>
+          <option value="display.html">Windows</option>
+          <option value="mouse.html">Mouse Events</option>
+          <option value="keyboard.html">Keyboard Events</option>
+          <option value="controls.html">Buttons and Sliders</option>
+        </select>
+      </p>
+      <p><a href="vector.html" target="mainFrame">Vector operations </a></p>
+      <p><a href="graph.html" target="mainFrame">Graphs</a></p>
+    <p><a href="factorial.html" target="mainFrame">factorial/combin</a></p>
+    <p>What's new in <a href="new_in_visual_4.html">Visual 4</a></p>
+    <p><a href="http://python.org" target="_blank">VPython web site</a><br />
+      <a href="license.txt" target="_blank">Visual license</a><br />
+      <a href="http://www.python.org">Python web site</a> <br />
+      <a href="http://www.python.org/doc/2.5.2/lib/module-math.html" target="_blank">Math module</a> (sqrt etc.)<br />
+      <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
+    <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
+    <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
+      <h2 align="center">Summary of new features in  Visual 4</h2>
+      <h3>Beta release</h3>
+      <p>This beta release is experimental in the sense that there are known bugs described <a href="#bugs">below</a>. Feel free to play with the exciting new features, 
+        but be aware that you may encounter problems.</p>
+      <p>There is a new example program <strong>texture_and_lighting.py</strong> that displays many of 
+        the new features: a swinging light illuminates a translucent  ball 
+        that rolls on a wood-texture table. Also see the
+        example programs <strong>material_test.py</strong>, <strong>stonehenge.py</strong>, and <strong>boxlighttest.py</strong>.</p>
+      <h3>Transparency/opacity</h3>
+      <p>You can make most objects be  transparent by specifying a value from
+        0-1 inclusive for the attribute &quot;opacity&quot;. For example, box(color=color.red,
+        opacity=0.8) is slightly transparent. An opacity value of 0 means totally
+        transparent, 
+        and 1 means totally opaque. Currently curve, convex, faces, points, and helix objects
+        do not allow transparency. </p>
+      <h3>Materials</h3>
+      <p>You can give a material property such as wood to an object: </p>
+      <p class="program">box(color=color.orange, material=materials.wood)</p>
+      <p>Materials currently available include wood, plastic,
+        marble, earth (continents and oceans), rough, diffuse, and unshaded (that is,
+        display the specified color unaffected by existing lights). The example program
+        <strong>material_test.py</strong> shows examples of all of these materials.</p>
+      <p><em><strong>Specifying a material has an effect only on computers with modern graphics capabilities such as NVIDIA or Radeon graphics cards. On  computers without such graphics capabilities, objects are displayed without material properties.</strong></em></p>
+      <p>Some materials such as wood are oriented to the specified axis. For example,
+        a wood box with default axis = (1,0,0) shows tree rings on its yz surfaces
+        and stripes on the other faces. Changing the axis changes which face you see
+        the tree rings on. </p>
+      <p>You can create a texture object and then apply it to the surface of an object. 
+        A surface texture 
+        is an M by N array of 1, 2, 3, or 4 numerical values (a list or tuple). M and 
+        N must be powers of 2 (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, etc.). The numerical values can represent red, green, blue, luminance (brightness), or opacity.</p>
+      <p>Here are the possible values 
+        for each slot in the array:</p>
+      <p>1 value: channels must be [ &quot;luminance&quot;] (how bright) or
+        [&quot;opacity&quot;]</p>
+      <p>2 values (luminance and opacity): channels must be [&quot;luminance&quot;,&quot;opacity&quot;]</p>
+      <p>3 values (red,green,blue): channels must be [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;] </p>
+      <p>4 values (red,green,blue,opacity): channels must be [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;,&quot;opacity&quot;] </p>
+      <p>You can create a numeric array of zeros in various formats, then assign values:</p>
+      <p>zeros([...], ubyte) means an 8-bit unsigned integer 0-255<br />
+        zeros([...], short) means a 16-bit integer plus or minus 0-32767<br />
+        zeros([...], int) means a 32-bit integer plus or minus 0-2147483648<br />
+        zeros([...], float) means a floating-point (fractional) number</p>
+      <p>Here is an example program in which a checkerboard texture is created and
+        applied  to a box. (An &quot;array&quot; is a numerical array supported by the numpy
+        module which is imported when you import &quot;visual&quot;.) </p>
+      <p class="program">from visual import *<br />
+	  checkerboard = array([[0,1,0,1], <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,0,1,0],<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,1,0,1],<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,0,1,0]], float)<br />lum = materials.texture( data=checkerboard,<br />
+                         &nbsp;&nbsp;&nbsp;&nbsp;channels=[&quot;luminance&quot;],<br />
+                         &nbsp;&nbsp;&nbsp;&nbsp;mapping=&quot;rectangular&quot;,<br />
+						 &nbsp;&nbsp;&nbsp;&nbsp;interpolate=False)<br />
+						 box(axis=(0,0,1), color=color.cyan, material=lum)</p>
+      <p>If you wanted to create a texture containing &quot;rgb&quot; values, you could
+        start with zeros([M,N,3], float), and entries into this array would be the
+        usual 
+        (red,green,blue) triples, with values for each color in the range 0-1 inclusive.</p>
+      <p>The example above uses a &quot;rectangular&quot; mapping, which places the texture on
+        two opposing faces of a box. By default, one of the faces is in the (1,0,0)
+        direction, but this can be changed by specifying a different axis for the box.
+        Other texture mappings are &quot;spherical&quot; and &quot;sign&quot;, the latter being similar
+        to &quot;rectangular&quot; but it is unaffected by the color of the object and appears
+        on only one face of a box (determined by the axis of the box).</p>
+      <p>By default &quot;interpolate&quot; is True, but to get a sharply defined checkerboard
+        in the example above, &quot;interpolate&quot; was set to False. </p>
+      <p>In the example program <strong>texture_and_lighting.py</strong> you will find a creation of
+        a beach ball using spherical mapping. In the example program <strong>stonehenge.py</strong>        you will see an example of a display of a color photograph on a box, together
+        with instructions on how to create a texture from a jpeg photo. </p>
+      <h3>Lighting</h3>
+      <p>In previous versions of Visual, lights were 
+        restricted to being very distant from the scene (&quot;at infinity&quot;).
+        Now you  can create lights that are local, near other objects. The following
+        statement creates a yellow light positioned  at (x,y,z):</p>
+        <p class="program">lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
+      <p>If you continually update lamp.pos, the light will move.</p>
+      <p>If you want to disable all of the  lights, say scene.lights = [], making 
+        an empty list of  lights.</p>
+      <p>A distant red light located in the direction (x,y,z) is created like this:</p>
+        <p class="program">distant_light(direction=(x,y,z), color=color.red)</p>
+      <h3>Points object</h3>
+      <p>A new points object is similar to a curve, but with disconnected points. As with curve, the pos attribute is an array
+        of points, and color can also be an array. If you say shape=&quot;round&quot;, the points are round, which is the default; shape=&quot;square&quot; makes square points. The size of the points is specified by points.size, and the default size is 5 (meaning a square 5  by 5, or a circular disk bounded by a 5 by 5 square). The size attribute is in screen pixels if points.size_units=&quot;pixels&quot; (the default), but if points.size=&quot;world&quot;, the size 
+        is in the usual coordinates. An example of a use for the new object is for the gdots 
+        displayed using visual.graph. These used to be awkward labels using the letter 
+        &quot;o&quot; but have been replaced with points.</p>
+      <p> ??Technical caveats: If the &quot;GL_ARB_point_parameters&quot; property is 
+        shown in scene.info() then type = &quot;world&quot; will work. Otherwise the 
+        type is silently ignored and considered to be &quot;screen&quot;. There is an 
+        implementation-defined size range for either round or square points, which is 
+        not easily visible to programs at this time. Specifying a size outside this 
+        range will cause it to be silently clamped internally to whatever range that 
+        the hardware supports.</p>
+      <h3>New frame option: visible</h3>
+      <p>You can now make a frame visible or invisible, and all objects in the frame
+        will be affected. </p>
+      <h3>New curve append option: retain</h3>
+      <p>If &quot;trail&quot; is a curve, <strong>trail.append(pos=(x,y,z), retain = 50)</strong> means that only the 50 most recently added points of a curve will be displayed; the earlier ones are deleted. This is a nice option for having a moving object leave a tail behind itself, like a comet. </p>
+      <h3>Fonts in labels</h3>
+      <p>You can now specify a font for a label, including font='sans' or 'serif' or 'monospace' (fixed-width). Pyhon Unicode text is supported. </p>
+      <h3>Specifying a gray</h3>
+      <p>For convenience you can now say color=0.7 to mean color=(0.7,0.7,0.7).</p>
+      <h3>Render time </h3>
+      <p>If you say scene.show_rendertime = True, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene). This can be a useful diagnostic of performance issues.</p>
+      <h3>Titlebar height</h3>
+      <p>The height in pixels of the title bar of a window is given by <strong>display.get_titlebar_height()</strong>. These values are true for all windows, and this function is associated with the display class of objects, not with individual displays such as the standard scene, so scene.get_titlebar_height() won't work.</p>
+      <p>If you specify a window to be 400 by 400, the height of the window is 400 pixels, of which part is the title bar. </p>
+      <h3><a name="bugs" id="bugs"></a>Known bugs in this beta version</h3>
+      <p>Here are known bugs:</p>
+      <blockquote>
+        <p><strong>scene.cursor.visible</strong> is not implemented yet and gives an error.</p>
+      </blockquote>
+      <p><a href="index.html">Back to contents</a><br />
+      </p>
+    <!-- InstanceEndEditable --></td>
+  </tr>
+  <tr>
+    <td height="16" colspan="3"></td>
+  </tr>
+</table>
+</body>
+<!-- InstanceEnd --></html>
