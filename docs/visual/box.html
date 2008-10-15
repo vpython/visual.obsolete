@@ -30,6 +30,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
           <option>3D objects</option>
+          <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
           <option value="cone.html">cone</option>
@@ -41,6 +42,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
@@ -50,8 +52,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
           <option value="color.html">Color</option>
-          <option value="color.html">Opacity</option>
-          <option value="color.html">Material</option>
+          <option value="materials.html">Material</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -116,10 +117,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="program"> mybox = box(pos=(x0,y0,z0), axis=(a,b,c), length=L,<br />
             &nbsp;&nbsp;&nbsp;&nbsp;height=H, width=W, up=(q,r,s))</p>
           <p class="Normal"> With this statement, the width of the box will lie in a plane perpendicular to the (q,r,s) vector, and the height of the box will be perpendicular to the width and to the (a,b,c) vector.</p>
-          <p class="Normal"> The box object has the following attributes and default 
-            values, like those for cylinders: <span class="attribute">pos<font color="#000000"> (0,0,0)</font></span>, <span class="attribute">x</span><span class="attribute"><font color="#000000"> (0)</font></span>, <span class="attribute">y<font color="#000000">(0)</font></span>, <span class="attribute">z<font color="#000000">(0)</font></span>, <span class="attribute">axis<font color="#000000"> (1,0,0)</font></span>, <span class="attribute">length<font color="#000000"> (1)</font></span>, <span class="attribute">color<font color="#000000"> (1,1,1) 
-              which is color.white</font></span>, <span class="attribute">red<font color="#000000"> (1)</font></span>, <span class="attribute">green<font color="#000000"> (1)</font></span>, <span class="attribute">blue<font color="#000000"> (1)</font></span>, and <span class="attribute">up<font color="#000000"> (0,1,0)</font></span>. 
-            Additional box attributes:</p>
+          <p class="Normal"> The box object has the following attributes and
+            default  values, like those for cylinders: <span class="attribute">pos<font color="#000000"> (0,0,0)</font></span>, <span class="attribute">x</span><span class="attribute"><font color="#000000"> (0)</font></span>, <span class="attribute">y<font color="#000000">(0)</font></span>, <span class="attribute">z<font color="#000000">(0)</font></span>, <span class="attribute">axis<font color="#000000"> (1,0,0)</font></span>, <span class="attribute">length<font color="#000000"> (1)</font></span>, <span class="attribute">color<font color="#000000"> (1,1,1)
+             which is color.white</font></span>, <span class="attribute">red<font color="#000000"> (1)</font></span>, <span class="attribute">green<font color="#000000"> (1)</font></span>, <span class="attribute">blue<font color="#000000"> (1)</font></span>,
+             <span class="attribute">opacity</span> (1), <a href="materials.html">material</a>, and <span class="attribute">up<font color="#000000"> (0,1,0)</font></span>.
+              Additional box attributes:</p>
           <p class="attributes"> <span class="attribute">height</span> In the y direction 
             in the simple case, default is 1</p>
           <p class="attributes"> <span class="attribute">width</span> In the z direction 

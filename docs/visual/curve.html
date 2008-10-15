@@ -30,6 +30,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
           <option>3D objects</option>
+          <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
           <option value="cone.html">cone</option>
@@ -41,6 +42,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
@@ -50,8 +52,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
           <option value="color.html">Color</option>
-          <option value="color.html">Opacity</option>
-          <option value="color.html">Material</option>
+          <option value="materials.html">Material</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -155,7 +156,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="attributes"> <span class="attribute">radius</span> Radius of
             cross-section of curve<br />
             The default radius=0 makes a thin curve</p>
-          <p class="Normal"><font color="#0000a0">Adding more points to a curve</font></p>
+          <p class="attributes"><span class="attribute">material</span> Material
+            for a thick curve; see <a href="materials.html">Materials</a> for
+            currently available options</p>
+          <p class="Normal">Currently it is not possible to specify the opacity
+          of a curve object.</p>
+          <p class="Normal"><strong><font color="#0000a0">Adding more points to a curve</font></strong></p>
           <p class="Normal"> Curves can be created incrementally with the <span
  class="attribute">append()</span> function. A new point by default
             shares the characteristics of the last point.</p>
@@ -173,7 +179,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           trail.append(pos=ball.pos)</p>
           <p class="Normal">When appending to a curve, you can optionally choose to retain only the last N points, including the one you're adding:</p>
           <p class="program">trail.append(pos=ball.pos, retain=50) # last 50 points</p>
-          <p class="Normal"><font color="#0000a0">Interpolation</font></p>
+          <p class="Normal"><strong><font color="#0000a0">Interpolation</font></strong></p>
           <p class="Normal"> The curve machinery interpolates from one point to the next. For
             example, suppose the first three points are red but the fourth point is
             blue, as in the following example. The lines connecting the first three

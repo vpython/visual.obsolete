@@ -30,6 +30,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
           <option>3D objects</option>
+          <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
           <option value="cone.html">cone</option>
@@ -41,6 +42,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
@@ -50,8 +52,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
           <option value="color.html">Color</option>
-          <option value="color.html">Opacity</option>
-          <option value="color.html">Material</option>
+          <option value="materials.html">Material</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -136,9 +137,14 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             which is color.white</p>
           <p class="attributes"> <span class="attribute">red</span>, <span class="attribute">green</span>, <span class="attribute">blue</span> (can set these color attributes individually), 
             defaults are all 1</p>
-          <p class="attributes"> <span class="attribute">up</span> Which side of the 
-            cylinder is &quot;up&quot;; this has only a subtle effect on the 3D appearance 
-            of the cylinder, default (0,1,0)</p>
+          <p class="attributes"> <span class="attribute">opacity</span> Opacity
+            of object, default = 1; 0 is completely transparent</p>
+          <p class="attributes"><span class="attribute">material</span> Material
+            of object; see <a href="materials.html">Materials</a> for currently available options</p>
+          <p class="attributes"><span class="attribute">up</span> Which side
+            of the  cylinder is &quot;up&quot;; this has only a subtle effect
+            on the 3D appearance  of the cylinder unless a non-smooth material
+            is specified; default (0,1,0)</p>
           <p class="Normal"> Note that the <span class="attribute">pos</span> attribute 
             for cylinder, arrow, cone, and pyramid corresponds to one end of the object, 
             whereas for a box, sphere, or ring it corresponds to the center of the object. </p>

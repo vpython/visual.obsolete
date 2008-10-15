@@ -30,6 +30,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
           <option>3D objects</option>
+          <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
           <option value="cone.html">cone</option>
@@ -41,6 +42,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
@@ -50,8 +52,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
           <option value="color.html">Color</option>
-          <option value="color.html">Opacity</option>
-          <option value="color.html">Material</option>
+          <option value="materials.html">Material</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -162,18 +163,23 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>A distant red light located in the direction (x,y,z) is created like this:</p>
         <p class="program">distant_light(direction=(x,y,z), color=color.red)</p>
       <h3>Points object</h3>
-      <p>A new points object is similar to a curve, but with disconnected points. As with curve, the pos attribute is an array
-        of points, and color can also be an array. If you say shape=&quot;round&quot;, the points are round, which is the default; shape=&quot;square&quot; makes square points. The size of the points is specified by points.size, and the default size is 5 (meaning a square 5  by 5, or a circular disk bounded by a 5 by 5 square). The size attribute is in screen pixels if points.size_units=&quot;pixels&quot; (the default), but if points.size=&quot;world&quot;, the size 
-        is in the usual coordinates. An example of a use for the new object is for the gdots 
-        displayed using visual.graph. These used to be awkward labels using the letter 
-        &quot;o&quot; but have been replaced with points.</p>
-      <p> ??Technical caveats: If the &quot;GL_ARB_point_parameters&quot; property is 
-        shown in scene.info() then type = &quot;world&quot; will work. Otherwise the 
-        type is silently ignored and considered to be &quot;screen&quot;. There is an 
-        implementation-defined size range for either round or square points, which is 
-        not easily visible to programs at this time. Specifying a size outside this 
-        range will cause it to be silently clamped internally to whatever range that 
-        the hardware supports.</p>
+      <p>A new points object is similar to a curve, but with disconnected points.
+        As with curve, the pos attribute is an array of points, and color can
+        also be an array. If you say <span class="attribute">shape=&quot;round&quot;</span>,
+        the points are round, which is the default; <span class="attribute">shape=&quot;square&quot;</span> makes
+        square points. The size of the points is specified by <span class="attribute">size</span>,
+        and the default size is 5 (meaning a square 5 by 5, or a circular disk
+        bounded by a 5 by 5 square). The size attribute is in screen pixels if <span class="attribute">size_units=&quot;pixels&quot;</span> (the
+        default), but if <span class="attribute">size_units=&quot;world&quot;</span>,
+        the size  is in the usual coordinates. <span class="Normal">The maximum
+        size of a point is about 50 by 50 pixels; specifying a larger size than
+        the maximum does not increase the size</span>. Lighting does not affect the appearance, which
+        is determined solely by the color. <span class="Normal">You cannot specify
+        a material for points, and currently it is not possible to specify the
+        opacity of a points object.</span></p>
+      <p> Technical caveat: If the &quot;GL_ARB_point_parameters&quot; property
+        is  shown in scene.info() then type = &quot;world&quot; will work. Otherwise
+        the  type is silently ignored and considered to be &quot;pixels&quot;.        </p>
       <h3>New frame option: visible</h3>
       <p>You can now make a frame visible or invisible, and all objects in the frame
         will be affected. </p>

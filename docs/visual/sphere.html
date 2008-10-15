@@ -30,6 +30,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
           <option>3D objects</option>
+          <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
           <option value="cone.html">cone</option>
@@ -41,6 +42,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
@@ -50,8 +52,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
           <option value="color.html">Color</option>
-          <option value="color.html">Opacity</option>
-          <option value="color.html">Material</option>
+          <option value="materials.html">Material</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -87,11 +88,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 
           <p class="program"> ball = sphere(pos=(1,2,1), radius=0.5)</p>
           <p class="Normal"> This produces a sphere centered at location (1,2,1) with radius = 0.5, with the current foreground color.</p>
-          <p class="Normal"> The sphere object has the following attributes and default 
-            values, like those for cylinders except that there is no length attribute: <span class="attribute">pos<font color="#000000"> (0,0,0)</font></span>, <span class="attribute">x</span><span class="attribute"><font color="#000000"> (0)</font></span>, <span class="attribute">y<font color="#000000">(0)</font></span>, <span class="attribute">z<font color="#000000">(0)</font></span>, <span class="attribute">axis<font color="#000000"> (1,0,0)</font></span>, <span class="attribute">color<font color="#000000"> (1,1,1) which is color.white</font></span>, <span class="attribute">red<font color="#000000"> (1)</font></span>, <span class="attribute">green<font color="#000000"> (1)</font></span>, <span class="attribute">blue<font color="#000000"> (1)</font></span>, and <span class="attribute">up<font color="#000000"> (0,1,0)</font></span>. 
-            As with cylinders, <span class="attribute">up</span> and <span class="attribute">axis</span> attributes  affect the orientation of the sphere and have only a 
-            subtle effect on appearance unless a material is specified. The magnitude of the axis attribute is irrelevant. 
-            Additional sphere attributes:</p>
+          <p class="Normal"> The sphere object has the following attributes and
+            default  values, like those for cylinders except that there is no
+            length attribute: <span class="attribute">pos<font color="#000000"> (0,0,0)</font></span>, <span class="attribute">x</span><span class="attribute"><font color="#000000"> (0)</font></span>, <span class="attribute">y<font color="#000000">(0)</font></span>, <span class="attribute">z<font color="#000000">(0)</font></span>, <span class="attribute">axis<font color="#000000"> (1,0,0)</font></span>, <span class="attribute">color<font color="#000000"> (1,1,1)
+            which is color.white</font></span>, <span class="attribute">red<font color="#000000"> (1)</font></span>, <span class="attribute">green<font color="#000000"> (1)</font></span>, <span class="attribute">blue<font color="#000000"> (1)</font></span>,<span class="attribute"> opacity</span> (1), <a href="materials.html">material</a>,
+            and <span class="attribute">up<font color="#000000"> (0,1,0)</font></span>.
+             As with cylinders, <span class="attribute">up</span> and <span class="attribute">axis</span> attributes
+             affect the orientation of the sphere but have only a  subtle effect
+             on appearance unless a non-smooth material is specified. The magnitude
+             of the axis attribute is irrelevant. Additional sphere attributes:</p>
           <p class="attributes"> <span class="attribute">radius</span> Radius of the 
             sphere, default = 1</p>
           <p class="Normal"> Note that the <span class="attribute">pos</span> attribute 

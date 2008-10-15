@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- InstanceBeginEditable name="doctitle" -->
-<title>ellipsoid</title>
+<title>helix</title>
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
 <link href="VisualRef.css" rel="stylesheet" type="text/css" />
@@ -82,56 +82,34 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
       <div>
-        <h1 class="Heading-1"> <font color="#0000A0">The ellipsoid Object</font></h1>
+        <h1 class="Heading-1"> <font color="#0000a0">The points Object</font></h1>
       </div>
       <div>
-        <p class="Normal"> A long ellipsoid object looks like a cigar; a short one looks 
-          like somewhat like a pill. Its cross sections are circles or ellipses. The 
-          elllipsoid object has the same attributes as the <a href="box.html">box object</a> and it can be thought of as fitting inside a box of the same dimensions:</p>
+        <p class="Normal">The points object takes a list of points for <span
+ class="attribute">pos</span>, like the curve object. The following statement
+          will display two points, each of radius 50 pixels:</p>
         <div>
-          <p class="program"> myell = ellipsoid(pos=(x0,y0,z0), <br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            length=L, height=H, 
-            width=W) </p>
-          <p class="Normal"> The given position is in the center of the ellipsoid, at 
-            (x0, y0, z0). This is different from cylinder, whose pos attribute is at 
-            one end of the cylinder. Just as with a cylinder, we can refer to the individual 
-            vector components of the ellipsoid as<span class="attribute"> myell.x</span>, <span class="attribute">myell.y</span>, and <span class="attribute">myell.z</span>. 
-            The length from end to end (along the x axis) is L , the height (along the 
-            y axis) is H , and the width is W (along the z axis). For this ellipsoid, 
-            we have <span class="attribute">myell.axis = (L, 0, 0)</span> . Note that 
-            the axis of an ellipsoid is just like the axis of a cylinder. </p>
-          <p class="Normal"> For an ellipsoid that isn't aligned with the coordinate 
-            axes, additional issues come into play. The orientation of the length of 
-            the ellipsoid is given by the axis (see diagrams shown with the documentation 
-            on the <a href="box.html">box object</a>):</p>
-        </div>
-        <div>
-          <p class="program"> myell = ellipsoid(pos=(x0,y0,z0), axis=(a,b,c), <br />
-&nbsp;&nbsp;&nbsp;&nbsp;            &nbsp;&nbsp;&nbsp;&nbsp;length=L, height=H, width=W) </p>
-          <p class="Normal"> The axis attribute gives a direction for the length of 
-            the ellipsoid, and the length, height, and width of the ellipsoid are given 
-            as before (if a length attribute is not given, the length is set to the 
-            magnitude of the axis vector). </p>
-          <p class="Normal"> The ellipsoid object has the following attributes and default 
-            values, like those for cylinders: <span class="attribute">pos<font color="#000000"> (0,0,0)</font></span>, <span class="attribute">x</span><span class="attribute"><font color="#000000"> (0)</font></span>, <span class="attribute">y<font color="#000000">(0)</font></span>, <span class="attribute">z<font color="#000000">(0)</font></span>, <span class="attribute">axis<font color="#000000"> (1,0,0)</font></span>, <span class="attribute">length<font color="#000000"> (1)</font></span>, <span class="attribute">color<font color="#000000"> (1,1,1) 
-              which is color.white</font></span>, <span class="attribute">red<font color="#000000"> (1)</font></span>, <span class="attribute">green<font color="#000000"> (1)</font></span>, <span class="attribute">blue<font color="#000000"> (1)</font></span>, <span class="attribute">opacity</span> (1), <a href="materials.html">material</a>, and <span class="attribute">up<font color="#000000"> (0,1,0)</font></span>. 
-            Additional  attributes, similar to those for a box:</p>
-        </div>
-        <div>
-          <p class="attributes"> <span class="attribute">height</span> In the y direction 
-            in the simple case, default is 1</p>
-          <p class="attributes"> <span class="attribute">width</span> In the z direction 
-            in the simple case, default is 1</p>
-          <p class="attributes"> <span class="attribute">size</span> (length, height, 
-            width), default is (1,1,1)<br />
-            <span class="attribute"> myell.size=(20,10,12) </span>sets length=20, height=10, 
-            width=12</p>
-          <p class="Normal"> Note that the <span class="attribute">pos</span> attribute 
-            for cylinder, arrow, cone, and pyramid corresponds to one end of the object, 
-            whereas for an ellipsoid, box, sphere, or ring it corresponds to the center 
-            of the object. </p>
-        </div>
-      </div>
+          <p class="program">points(pos=[(-1,0,0), (1,0,0)], size=50, color=color.cyan)</p>
+          <p class="Normal">A new points object is similar to a curve, but with
+            disconnected points. As with curve, the pos attribute is an array
+            of points, and color can also be an array. If you say <span class="attribute">shape=&quot;round&quot;</span>,
+            the points are round, which is the default; <span class="attribute">shape=&quot;square&quot;</span> makes
+            square points. The size of the points is specified by <span class="attribute">size</span>,
+            and the default size is 5 (meaning a square 5 by 5, or a circular
+            disk bounded by a 5 by 5 square). The size attribute is in screen
+            pixels if <span class="attribute">size_units=&quot;pixels&quot;</span> (the
+            default), but if <span class="attribute">size_units=&quot;world&quot;</span>,
+            the size is in the usual coordinates. The maximum size of a point
+          is about 50 by 50 pixels; specifying a larger size than the maximum
+            does not increase the size. </p>
+          <p class="Normal">Lighting does not affect the appearance,
+            which is determined solely by the color. You cannot specify a material
+          for points, and currently it is not possible to specify the opacity
+          of a points object.</p>
+          <p class="Normal">&nbsp;</p>
+          <p class="Normal"><span class="Normal">Technical caveat: If the &quot;GL_ARB_point_parameters&quot; property
+            is shown in scene.info() then type = &quot;world&quot; will wo</span>rk.
+          Otherwise the type is silently ignored and considered to be &quot;pixels&quot;.</p>
     <!-- InstanceEndEditable --></td>
   </tr>
   <tr>

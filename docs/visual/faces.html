@@ -30,6 +30,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
           <option>3D objects</option>
+          <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
           <option value="cone.html">cone</option>
@@ -41,6 +42,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
@@ -50,8 +52,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
           <option value="color.html">Color</option>
-          <option value="color.html">Opacity</option>
-          <option value="color.html">Material</option>
+          <option value="materials.html">Material</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -121,6 +122,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           to implement smooth or facet shading, per-vertex coloration, two-sided or 
           one-sided lighting, etc, but all of these calculations must be made by the 
           programmer (when setting up <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, <font color="#FF0000">normal</font>). </p>
+        <p><span class="Normal">You can specify a  <a href="materials.html">material</a>, </span>but
+          currently you can not specify opacity for faces.</p>
         <p>For examples of the use of the faces object, see the faces demo programs.</p>
       </div>
       <div></div>
