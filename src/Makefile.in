@@ -52,13 +52,13 @@ GTHREAD_LIBS = @GTHREAD_LIBS@
 GTHREAD_CFLAGS = @GTHREAD_CFLAGS@
 
 # Option flags for the compiler, constructed from the above.
-# Note that I am forcing no debugging symbols by default.
 CVISUAL_CPPFLAGS = $(BOOST_INCLUDES) $(PYTHON_INCLUDES) -DHAVE_CONFIG_H \
         -I$(top_srcdir)/dependencies/threadpool/include \
-	-I$(top_srcdir)/include -I$(top_builddir)/include
+		-I$(top_srcdir)/include -I$(top_builddir)/include
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 CXXFLAGS = @CXXFLAGS@ -ftemplate-depth-120
+#CPPFLAGS = @CPPFLAGS@ -DNDEBUG
 CPPFLAGS = @CPPFLAGS@
 
 # Object file list.  Since we are building a shared library with PIC code, we 

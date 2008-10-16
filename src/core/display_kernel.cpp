@@ -166,6 +166,7 @@ display_kernel::display_kernel()
 	last_range_mag(0.0),
 	gcf_changed(false),
 	ambient( 0.2f, 0.2f, 0.2f),
+	show_toolbar( false),
 	show_rendertime( false),
 	last_time(0),
 	background(0, 0, 0), //< Transparent black.

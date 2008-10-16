@@ -186,8 +186,9 @@ wrap_display_kernel(void)
 		.add_property( "title", &display_kernel::get_title, &display_kernel::set_title)
 		.add_property( "fullscreen", &display_kernel::is_fullscreen,
 			&display_kernel::set_fullscreen)
-		.add_property( "toolbar", &display_kernel::is_showing_toolbar,
-			&display_kernel::set_show_toolbar)
+		// Omit toolbar for now; not yet available on Windows or Mac
+		//.add_property( "toolbar", &display_kernel::is_showing_toolbar,
+		//	&display_kernel::set_show_toolbar)
 		.add_property( "visible", &display_kernel::get_visible, &display_kernel::set_visible)
 		.add_property( "exit", &display_kernel::get_exit, &display_kernel::set_exit)
 		.add_property( "kb", py::make_function(

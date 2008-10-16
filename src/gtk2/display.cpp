@@ -34,14 +34,10 @@ using boost::lexical_cast;
 namespace cvisual {
 using boost::thread;
 
-#ifdef _WIN32
-	const int border_width = 8;
-	const int border_height = 3;
-#else
-	// Ubuntu Linux; unknown what situation is on Mac
-	const int border_width = 9;
-	const int border_height = 6;
-#endif
+
+// Ubuntu Linux
+const int border_width = 9;
+const int border_height = 6;
 
 namespace {
 Glib::ustring dataroot = "";
@@ -58,7 +54,7 @@ display::display()
 }
 
 display::~display()
-{	
+{
 }
 
 void
@@ -76,22 +72,18 @@ display::activate( bool active )
 int
 display::get_titlebar_height()
 {
-#ifndef _WIN32
-	return 23;
-#else
-	return 25; // Ubuntu Linux; unknown what situation is on Mac
-#endif
+	return 24; // Ubuntu Linux
 }
 
 int
 display::get_toolbar_height()
 {
-	return 37;
+	return 37; // Ubuntu Linux
 }
 
 namespace {
 
-inline void 
+inline void
 widget_fail( const Glib::ustring& name)
 {
 	std::ostringstream msg;
@@ -116,7 +108,7 @@ void
 display::create()
 {
 	area.reset( new render_surface(*this, mouse, stereo_mode == ACTIVE_STEREO));
-	
+
 	// window_width and window_height give the size of the window (including borders and such)
 	// determine the size of the render_surface
 	// xxx Some way to use less magic constants here?
@@ -126,12 +118,13 @@ display::create()
 	if (show_toolbar) h -= get_toolbar_height();
 	if (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
 		w *= 2;
-	
+
 	area->set_size_request( w, h );
 	area->signal_key_press_event().connect(
 		sigc::mem_fun( *this, &display::on_key_pressed));
-	
+
 	// Glade-based UI.
+	// Turned off toolbar in display initialization for now; not yet available on Windows or Mac
 	if (show_toolbar) {
 		glade_file = Gnome::Glade::Xml::create( dataroot + "vpython.glade");
 		get_widget<Gtk::ToolButton>(glade_file, "quit_button")->signal_clicked().connect(
@@ -147,19 +140,20 @@ display::create()
 		window = get_widget<Gtk::Window>(glade_file, "window1");
 		get_widget<Gtk::VBox>( glade_file, "vbox1")->pack_start( *area);
 	}
-	else { // this does not work; it crashes:
+	else {
 		glade_file = Gnome::Glade::Xml::create( dataroot + "vpython_notoolbar.glade");
 		window = get_widget<Gtk::Window>(glade_file, "window1");
 		get_widget<Gtk::VBox>( glade_file, "vbox1")->pack_start( *area);
 	}
 
+
 	window->set_title( title);
-	
+
 	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
-	
+
 	window->move( window_x, window_y);
 	window->show_all(); // this will update the actual x,y
-	
+
 	if (fullscreen)
 		window->fullscreen();
 	area->grab_focus();
@@ -227,7 +221,7 @@ display::on_window_delete(GdkEventAny*)
 		}
 		gui_main::quit();
 	}
-		
+
 	return true;
 }
 
@@ -243,7 +237,7 @@ display::on_quit_clicked()
 bool
 display::on_key_pressed( GdkEventKey* key)
 {
-	// Note that this algorithm will proably fail if the user is using anything 
+	// Note that this algorithm will proably fail if the user is using anything
 	// other than a US keyboard.
 	guint k = key->keyval;
 	std::string ctrl_str;
@@ -258,7 +252,7 @@ display::on_key_pressed( GdkEventKey* key)
 		if ( !isprint(k) )
 			ctrl_str += "shift+";
 	}
-	
+
 	// Specials, try to match those in wgl.cpp
 	std::string key_str;
 	switch (k) {
@@ -302,7 +296,7 @@ display::on_key_pressed( GdkEventKey* key)
 			break;
 		case GDK_Down:
 			key_str += "down";
-			break;	
+			break;
 		case GDK_Print:
 			key_str += "print screen";
 			break;
@@ -335,7 +329,7 @@ display::on_key_pressed( GdkEventKey* key)
 				gui_main::quit();
 			return false;
 	}
-  
+
 	if (!key_str.empty()) {
 		// A special key.
 		ctrl_str += key_str;
@@ -350,7 +344,7 @@ display::on_key_pressed( GdkEventKey* key)
 		// Anything else.
 		keys.push( std::string( key->string));
 	}
-	
+
 	return true;
 }
 
@@ -366,7 +360,7 @@ condition* gui_main::init_signal = 0;
 
 
 gui_main::gui_main()
-	: kit( 0, 0), caller( 0), returned( false), 
+	: kit( 0, 0), caller( 0), returned( false),
 	thread_exited(false), shutting_down( false)
 {
 	Gtk::GL::init( 0, 0);
@@ -391,15 +385,15 @@ gui_main::poll()
 {
 	// Called in gui thread when it's time to render
 	if (shutting_down) return false;
-	
-	
+
+
 	int interval = (int)(1000 * render_manager::paint_displays( displays, true ));
-	
+
 	Glib::signal_timeout().connect( sigc::mem_fun( *this, &gui_main::poll), interval, Glib::PRIORITY_HIGH_IDLE);
 	return false; // We connect a new timeout every time, so we don't want this timeout to repeat
 }
 
-void 
+void
 gui_main::thread_proc(void)
 {
 	assert( init_lock);
@@ -446,7 +440,7 @@ gui_main::add_display( display* d)
 	if (self->shutting_down) {
 		return;
 	}
-	VPYTHON_NOTE( std::string("Adding new display object at address ") 
+	VPYTHON_NOTE( std::string("Adding new display object at address ")
 		+ lexical_cast<std::string>(d));
 	self->caller = d;
 	self->returned = false;
@@ -470,9 +464,9 @@ void
 gui_main::remove_display( display* d)
 {
 	assert( self);
-	VPYTHON_NOTE( std::string("Removing existing display object at address ") 
+	VPYTHON_NOTE( std::string("Removing existing display object at address ")
 		+ lexical_cast<std::string>(d));
-	
+
 	lock L(self->call_lock);
 	self->caller = d;
 	self->returned = false;
@@ -535,7 +529,7 @@ gui_main::quit()
 	assert( self != 0);
 	lock L(self->call_lock);
 	self->shutting_down = true;
-	for (std::vector<display*>::iterator i = self->displays.begin(); 
+	for (std::vector<display*>::iterator i = self->displays.begin();
 			i != self->displays.end(); ++i) {
 		(*i)->destroy();
 	}
