@@ -63,8 +63,8 @@ arrayprim::arrayprim()
 }
 
 void arrayprim::set_length( size_t new_len ) {
-	count = new_len;
 	pos.set_length(new_len);
+	count = new_len;
 }
 
 object arrayprim::get_pos() {
