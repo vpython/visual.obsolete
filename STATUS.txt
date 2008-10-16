@@ -1,48 +1,7 @@
-Started 2008/4/7 as a place to record the status of Visual 4 on various platforms
+Started 2008/4/7 as a place to record the status of Visual 5 on various platforms
 
-Need to correct docs/visual/mouse.html: there are FIVE mouse events, including "release".
-
-helix doesn't take extra arguments in the constructor.
-
-For those programs (gas, stars) that are different between Numeric and numpy, should
-use "try" to set a flag and make the programs run either way.
-
-Bruce office Dell 2008/9/11 (XP)
-
-Serious bug with back clipping plane in gas.py and when you
-rotate and zoom in texture_and_lighting.py.
-
-Should make improvements to texturetest.py.
-
-DS working on rings: rings look much thinner in hanoi.py than they do in Visual 3.
-Same in 18_Erings2.
-
-Zoomed out too far:
-boxlighttest, faces_heightfield, colorsliders, hanoi, lathe, toroid, toroid_drag,
-04_speed_of_sound, 07_quantum_oscillator, 07_spectrum, 09_Rutherford_dist_PRIVATE,
-10_drop_clay, 10_wheel_L, 12_carnot (BIG effect), 13_E_dipole_step_PRIVATE,
-21_Gauss_2win (BIG effect when you choose an option)
-
-03_Moon_Voyage_PRIVATE.py 4.7 s (0.01 years) in Visual 3, 5.4 s in Visual 4.
-
-threebody.py "Show Energy" too wide for the controls button it's on.
-Similar problem in fields.py.
-
-Would help in graph.py to show a small point where the plotting currently is.
-
-Serious bug with thick line in 09_alpha_on_alpha; during early part of motion
-the target trail is an infinitely long blue line going through the two particles.
-Change to thin line, no problem. Similar in 09_alpha_on_electron. Problem lasts
-longer in 09_alpha_on_gold_PRIVATE.
-
-23_Radiation3D.py: Briefly see sphere that fills the window before autoscaling of
-other stuff kicks in. Could we do anything to suppress these transients?
-
-VAIO 2008 June 14 (XP)
-
-Kill windows, IDLE lingers without redisplaying (but new run deletes old window).
-
----------------------------
+This has mostly been superseded by a google doc used by the developers in
+the run-up to making a release.
 
 Scherer: Things certainly shouldn't be twice as fast in Linux as XP!  
 If that was ever true, it's probably been fixed.
