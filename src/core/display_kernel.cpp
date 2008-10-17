@@ -150,8 +150,8 @@ display_kernel::display_kernel()
 	view_x(-1), view_y(-1), view_width(-1), view_height(-1),
 	center(0, 0, 0),
 	forward(0, 0, -1),
+	internal_forward(0, 0, -1),
 	up(0, 1, 0),
-	internal_up(0,1,0),
 	range(10, 10, 10),
 	forward_changed(true),
 	cycles_since_extent(4),
@@ -245,7 +245,7 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 				case PAN:
 					// Pan front/back.
 					if (spin_allowed)
-						center += pan_rate * vfrac * forward.norm();
+						center += pan_rate * vfrac * internal_forward.norm();
 					break;
 				case ZOOM_ROLL: case ZOOM_ROTATE:
 					// Zoom in/out.
@@ -261,9 +261,9 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 				case PAN: {
 					// Pan up/down and left/right.
 					// A vector pointing along the camera's horizontal axis.
-					vector horiz_dir = forward.cross(internal_up).norm();
+					vector horiz_dir = internal_forward.cross(up).norm();
 					// A vector pointing along the camera's vertical axis.
-					vector vert_dir = horiz_dir.cross(forward).norm();
+					vector vert_dir = horiz_dir.cross(internal_forward).norm();
 					if (spin_allowed) {
 						center += -horiz_dir * pan_rate * hfrac;
 						center += vert_dir * pan_rate * vfrac;
@@ -274,21 +274,21 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 					if (spin_allowed) {
 						// Rotate
 						// First perform the rotation about the up vector.
-						tmatrix R = rotation( -hfrac * 2.0, internal_up.norm());
-						forward = R * forward;
+						tmatrix R = rotation( -hfrac * 2.0, up.norm());
+						internal_forward = R * internal_forward;
 
-						// Then perform rotation about an axis orthogonal to up and
-						// forward.
+						// Then perform rotation about an axis orthogonal to up and forward.
 						double vertical_angle = vfrac * 2.0;
-						double max_vertical_angle = internal_up.diff_angle(-forward.norm());
-						R = rotation( -vertical_angle, forward.cross(internal_up).norm());
-						forward = R * forward;
+						double max_vertical_angle = up.diff_angle(-internal_forward.norm());
+
 						// Over the top (or under the bottom) rotation
-						if (vertical_angle > max_vertical_angle ||
-							vertical_angle < max_vertical_angle - M_PI)
+						if (!(vertical_angle >= max_vertical_angle ||
+							vertical_angle <= max_vertical_angle - M_PI)) {
 							// Over the top (or under the bottom) rotation
-							internal_up = -internal_up;
-						forward_changed = true;
+							R = rotation( -vertical_angle, internal_forward.cross(up).norm());
+							forward = internal_forward = R*internal_forward;
+							forward_changed = true;
+						}
 					}
 					break;
 				}
@@ -385,8 +385,8 @@ display_kernel::world_to_view_transform(
 	// This coordinate system is used for most of the calculations below.
 
 	vector scene_center = center.scale(gcfvec);
-	vector scene_up = internal_up.norm();
-    vector scene_forward = forward.norm();
+	vector scene_up = up.norm();
+    vector scene_forward = internal_forward.norm();
 
 	// the horizontal and vertical tangents of half the field of view.
 	double tan_hfov_x;
@@ -410,9 +410,9 @@ display_kernel::world_to_view_transform(
 	vector scene_camera = scene_center - cam_to_center_without_zoom*user_scale*scene_forward;
 
 	double nearest, farthest;
-	world_extent.near_and_far(forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
-	nearest = nearest*gcf-scene_center.dot(forward);
-	farthest = farthest*gcf-scene_center.dot(forward);
+	world_extent.near_and_far(internal_forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
+	nearest = nearest*gcf-scene_center.dot(internal_forward);
+	farthest = farthest*gcf-scene_center.dot(internal_forward);
 
 	double cam_to_center = (scene_center - scene_camera).mag();
 	// Z buffer resolution is highly sensitive to nearclip - a "small" camera will have terrible z buffer
@@ -441,7 +441,7 @@ display_kernel::world_to_view_transform(
 	// TODO: This should be doable with a simple glTranslated() call, but I haven't
 	// found the magic formula for it.
 	vector camera_stereo_delta = camera_stereo_offset
-		* internal_up.cross( scene_camera).norm() * whicheye;
+		* up.cross( scene_camera).norm() * whicheye;
 	scene_camera += camera_stereo_delta;
 	scene_center += camera_stereo_delta;
 	// A multiple of the number of cam_to_center's away from the camera to place
@@ -534,7 +534,7 @@ display_kernel::world_to_view_transform(
 	geometry.tan_hfov_y = tan_hfov_y;
 	// The true viewing vertical direction is not the same as what is needed for
 	// gluLookAt().
-	geometry.up = forward.cross_b_cross_c(internal_up, forward).norm();
+	geometry.up = internal_forward.cross_b_cross_c(up, internal_forward).norm();
 }
 
 // Calculate a new extent for the universe, adjust gcf, center, and world_scale
@@ -671,7 +671,7 @@ display_kernel::draw(
 	if (layer_world_transparent.size() > 1)
 		std::stable_sort(
 			layer_world_transparent.begin(), layer_world_transparent.end(),
-			z_comparator( forward.norm()));
+			z_comparator( internal_forward.norm()));
 
 	// Render translucent objects in world space.
 	world_trans_iterator j( layer_world_transparent.begin());
@@ -718,7 +718,7 @@ display_kernel::render_scene(void)
 	}
 	try {
 		recalc_extent();
-		view scene_geometry( forward.norm(), center, view_width,
+		view scene_geometry( internal_forward.norm(), center, view_width,
 			view_height, forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
 		scene_geometry.enable_shaders = enable_shaders;
@@ -954,7 +954,7 @@ display_kernel::pick( int x, int y, float d_pixels)
 		glMatrixMode( GL_PROJECTION);
 		glLoadIdentity();
 		gluPickMatrix( (float)x, (float)(view_height - y), d_pixels, d_pixels, viewport_bounds);
-		view scene_geometry( forward.norm(), center, view_width, view_height,
+		view scene_geometry( internal_forward.norm(), center, view_width, view_height,
 			forward_changed, gcf, gcfvec, gcf_changed, glext);
 		scene_geometry.lod_adjust = lod_adjust;
 		world_to_view_transform( scene_geometry, 0, true);
@@ -1101,13 +1101,16 @@ display_kernel::set_up( const vector& n_up)
 {
 	if (n_up == vector())
 		throw std::invalid_argument( "Up cannot be zero.");
-	vector temp_up = n_up.norm();
-	if (temp_up.cross(forward) == vector()) { // if forward parallel to up, move internal_up away from forward
-		internal_up = (temp_up + 0.0001*(forward.cross(internal_up)).cross(forward)).norm();
-	} else {
-		internal_up = temp_up;
+	vector v = n_up.norm();
+	if (v.cross(internal_forward) == vector()) { // if internal_forward parallel to new up, move it away from new up
+		if (v.cross(forward) == vector()) {
+			// old internal_forward was not parallel to old up
+			internal_forward = (forward - 0.0001*up).norm();
+		} else {
+			internal_forward = forward;
+		}
 	}
-	up = temp_up;
+	up = v;
 }
 
 shared_vector&
@@ -1122,10 +1125,11 @@ display_kernel::set_forward( const vector& n_forward)
 	if (n_forward == vector())
 		throw std::invalid_argument( "Forward cannot be zero.");
 	vector v = n_forward.norm();
-	if (v.cross(up) == vector()) { // if new forward parallel to up, move internal_up away from forward
-		internal_up = (up + 0.0001*v.dot(up)*(forward.cross(internal_up)).cross(internal_up)).norm();
-	} else { // since new forward not parallel to up, can now use up internally
-		internal_up = up;
+	if (v.cross(up) == vector()) { // if new forward parallel to up, move internal_forward away from up
+		// old internal_forward was not parallel to up
+		internal_forward = ( v.dot(up)*up + 0.0001*up.cross(internal_forward.cross(up)) ).norm();
+	} else { // since new forward not parallel to up, new forward is okay
+		internal_forward = v;
 	}
 	forward = v;
 	forward_changed = true;

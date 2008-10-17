@@ -54,7 +54,7 @@ class display_kernel
 	shared_vector center; ///< The observed center of the display, in world space.
 	shared_vector forward; ///< The direction of the camera, in world space.
 	shared_vector up; ///< The vertical orientation of the scene, in world space.
-	vector internal_up; ///< When "scene.up" points down in the view, internal_up is -1.
+	vector internal_forward; ///< Do not permit internal_forward to be +up or -up
 	vector range; ///< The range that each axis of the scene should cover in the view.
 	vector camera; //< World coordinates of camera location
 
