@@ -24,7 +24,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
   <tr>
     <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
     </td>
-    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+    <td width="167" valign="top" bgcolor="#CCCCCC"><p><a href="index.html" target="mainFrame">Home</a></p>
       <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p>
@@ -66,6 +66,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option>Windows and events</option>
           <option value="display.html">Windows</option>
           <option value="mouse.html">Mouse Events</option>
+          <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
+          <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
           <option value="keyboard.html">Keyboard Events</option>
           <option value="controls.html">Buttons and Sliders</option>
         </select>
@@ -81,22 +83,21 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
     <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
-      <div>
+
         <h1 class="Heading-1"> <font color="#0000A0">Controlling One or More Visual 
           
           Display Windows</font></h1>
-      </div>
-      <div> Initially, there is one Visual display window named <span class="attribute">scene</span>. 
+      <p class="Normal"> Initially, there is one Visual display window named <span class="attribute">scene</span>. 
         Display objects do not create windows on the screen unless they are used, so 
         if you immediately create your own display object early in your program you 
         will not need to worry about scene. If you simply begin creating objects such 
-        as sphere they will go into scene.
+        as sphere they will go into scene.</p>
         <p class="attributes"> <span class="attribute">display()</span> Creates a display 
           with the specified attributes, makes it the selected display, and returns 
           it. For example, the following creates another Visual display window 600 by 
           200, with its upper left corner at the upper left corner of the screen (y is measured down from the top of the screen), with 'Examples of Tetrahedrons' in the title bar, centered on location (5,0,0), and with 
           a background color of cyan filling the window.</p>
-        <div>
+
             <p class="program"> scene2 = display(title='<span class="attributes">Examples of Tetrahedrons</span>',<br />
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x=0, y=0, width=600, height=200,<br />
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;center=(5,0,0), background=(0,1,1))</p>
@@ -104,26 +105,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="attributes"> <span class="attribute">select()</span> Makes the specified 
             display the &quot;selected display&quot;, so that objects will be drawn 
             into this display by default; e.g. <span class="attribute">scene.select() </span></p>
-        </div>
-      </div>
-      <blockquote>
-        <blockquote>
-          <blockquote>
-            <div class="attributes">
-              <div>The function <font color="#FF0000">display.get_selected()</font> returns a reference to the display in which objects are currently being 
-                created.</div>
-            </div>
-          </blockquote>
-        </blockquote>
-      </blockquote>
-      <div>
-        <div>
+ 
+            <p class="Normal">The function <font color="#FF0000">display.get_selected()</font> returns a reference to the display in which objects are currently being 
+                created.</p>
+
           <p class="attributes"> <span class="attribute">foreground</span> Set color 
             to be used by default in creating new objects such as sphere; default is 
             white. Example: <span class="attribute">scene.foreground = (1,0,0)</span> </p>
           <p class="attributes"> <span class="attribute">background</span> Set color 
             to be used to fill the display window; default is black.</p>
-          <p class="attributes">&nbsp;</p>
           <p class="attributes"><span class="attribute">ambient</span> Amount of nondirectional 
             (&quot;ambient&quot;) lighting. Default is 0.2. Also see the following <span class="attribute">lights</span> attribute.</p>
           <p class="attributes"><span class="attribute">lights</span> List of light

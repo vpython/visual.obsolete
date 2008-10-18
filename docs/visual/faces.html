@@ -24,7 +24,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
   <tr>
     <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
     </td>
-    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+    <td width="167" valign="top" bgcolor="#CCCCCC"><p><a href="index.html" target="mainFrame">Home</a></p>
       <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p>
@@ -66,6 +66,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option>Windows and events</option>
           <option value="display.html">Windows</option>
           <option value="mouse.html">Mouse Events</option>
+          <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
+          <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
           <option value="keyboard.html">Keyboard Events</option>
           <option value="controls.html">Buttons and Sliders</option>
         </select>
@@ -85,25 +87,26 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <h1 class="Heading-1"> <font color="#0000A0">The faces Object</font></h1>
       </div>
       <div>
-        <p>The &quot;faces&quot; primitive takes a list of triangles (position, color, and normal 
-          for each vertex). This is useful for writing routines in Python to import 
-          3D models made with other 3D modeling tools. You would still need to do lots 
-          of calculations of normals and so on, but you would not need to do C coding 
-          to import an arbitrary model file.</p>
-        <p>The faces object is an array primitive (like curve, convex, etc), so you 
+        <p class="Normal">The &quot;faces&quot; primitive takes a list
+            of triangles (position, color, and normal for each vertex). This
+            is useful for writing routines in Python to import 3D models made
+            with other 3D modeling tools. You would still need to do lots of
+            calculations of normals and so on, but you would not need to do C
+          coding to import an arbitrary model file.</p>
+        <p class="Normal">The faces object is an array primitive (like curve, convex, etc), so you 
           have to use a frame to move it around. It consists of a set of one-sided triangles 
           with user-specified vertices, colors, and normals. The <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, and <font color="#FF0000">normal</font> attributes look like this:</p>
         <p class="program"> pos = [ t0v0, t0v1, t0v2, <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          t1v0, t1v1, t1v2, <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          t2v0, t2v1, 
           t2v2, ... ] </p>
-        <p>where t0v0 is the position of vertex 0 of triangle 0, t0v1 is vertex 1 of 
+        <p class="Normal">where t0v0 is the position of vertex 0 of triangle 0, t0v1 is vertex 1 of 
           triangle 0, etc.</p>
-        <p>Each face is a one-sided surface. Which side is illuminated is determined 
+        <p class="Normal">Each face is a one-sided surface. Which side is illuminated is determined 
           by the &quot;winding&quot; order of the face. When you are looking at a face, 
           it is illuminated if the order of the vertices in the <span class="attribute">pos</span> list goes counter-clockwise. If you need the triangle to be visible from either 
           side, you must create another triangle with the opposite winding order.</p>
-        <p>If you don't specify normals at the vertices, the face is illuminated only 
+        <p class="Normal">If you don't specify normals at the vertices, the face is illuminated only 
           by &quot;ambient&quot; light. In order for the main lighting to affect the 
           appearance, you must specify normals to the surface at the vertices. In the 
           simplest case, a normal at a vertex is perpendicular to the face, and adjoining 
@@ -111,20 +114,20 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           the normals to the two faces at their common vertices. The brightness of a 
           face is proportional to the cosine of the angle between the normal and the 
           light. </p>
-        <p>If you specify different colors at the vertices of one triangular face, VPython 
+        <p class="Normal">If you specify different colors at the vertices of one triangular face, VPython 
           interpolates across the face, in which case the face is not all one color. 
           There is a similar interpolation for normals if there are different normals 
           at the vertices, in which case the face is not all one brightness.</p>
-        <p>The faces object is intended to help with writing model importers and other 
+        <p class="Normal">The faces object is intended to help with writing model importers and other 
           new primitives in Python, not for direct manipulation by normal programs. 
           It is considerably lower-level than any of the other objects in Visual (although 
           it is not necessarily any faster, at least right now). It is flexible enough 
           to implement smooth or facet shading, per-vertex coloration, two-sided or 
           one-sided lighting, etc, but all of these calculations must be made by the 
           programmer (when setting up <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, <font color="#FF0000">normal</font>). </p>
-        <p><span class="Normal">You can specify a  <a href="materials.html">material</a>, </span>but
+        <p class="Normal">You can specify a  <a href="materials.html">material</a>, but
           currently you can not specify opacity for faces.</p>
-        <p>For examples of the use of the faces object, see the faces demo programs.</p>
+        <p class="Normal">For examples of the use of the faces object, see the faces demo programs.</p>
       </div>
       <div></div>
     <!-- InstanceEndEditable --></td>

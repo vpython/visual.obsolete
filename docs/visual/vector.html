@@ -24,7 +24,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
   <tr>
     <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
     </td>
-    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+    <td width="167" valign="top" bgcolor="#CCCCCC"><p><a href="index.html" target="mainFrame">Home</a></p>
       <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p>
@@ -66,6 +66,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option>Windows and events</option>
           <option value="display.html">Windows</option>
           <option value="mouse.html">Mouse Events</option>
+          <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
+          <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
           <option value="keyboard.html">Keyboard Events</option>
           <option value="controls.html">Buttons and Sliders</option>
         </select>
@@ -81,28 +83,26 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
     <td width="15" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
-      <div>
+
         <h1 class="Heading-1"> <font color="#0000a0">The vector Object</font></h1>
-      </div>
-      <div>
+
         <p class="Normal"> The vector object is not a displayable object but is
           a powerful aid to 3D computations. Its properties are similar to
           vectors used in science and engineering. It can be used together with
           Numeric arrays. (Numeric is a module added to Python to provide
           high-speed computational capability through optimized array processing.
           The Numeric module is imported automatically by Visual.)</p>
-        <div>
-          <h2 class="program0">vector(x,y,z)</h2>
+
+          <p class="program">vector(x,y,z)</p>
           <p class="Normal"> Returns a vector object with the given components, which are made to be
             floating-point (that is, 3 is converted to 3.0).</p>
           <p class="Normal"> Vectors can be added or subtracted from each other, or multiplied by an
             ordinary number. For example,</p>
-        </div>
-        <div>
-          <h2 class="program0">v1 = vector(1,2,3)</h2>
-          <p class="program"> v2 = vector(10,20,30)</p>
-          <p class="program"> print v1+v2 # displays (11 22 33)</p>
-          <p class="program"> print 2*v1 # displays (2 4 6)</p>
+
+          <p class="program">v1 = vector(1,2,3)<br />
+          v2 = vector(10,20,30)<br />
+          print v1+v2 # displays (11 22 33)<br />
+          print 2*v1 # displays (2 4 6)</p>
           <p class="Normal"> You can refer to individual components of a vector:</p>
           <p class="Normal"> <span class="attribute">v2.x</span> is 10, <span
  class="attribute">v2.y</span> is 20, <span class="attribute">v2.z</span> is 30</p>
@@ -112,49 +112,36 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="Normal"> A vector is a Python sequence, so <span
  class="attribute">v2.x</span> is the same as <span class="attribute">v2[0]</span>, <span class="attribute">v2.y</span> is the same as <span
  class="attribute">v2[1]</span>, and <span class="attribute">v2.z</span> is the same as <span class="attribute">v2[2]</span>.</p>
-        </div>
-        <div>
-          <h2 class="program0"> mag( vector ) # calculates length of vector </h2>
-          <h2 class="program0"> mag(vector(1,1,1)) # is equal to sqrt(3)</h2>
-          <h2 class="program0">mag2(vector(1,1,1)) # is equal to 3, the magnitude
-            squared</h2>
+
+          <p class="program"> mag( vector ) # calculates length of vector <br />
+          mag(vector(1,1,1)) # is equal to sqrt(3)<br />
+          mag2(vector(1,1,1)) # is equal to 3, the magnitude
+            squared</p>
           <p class="Normal"> You can also obtain the magnitude in the form <span
  class="attribute">v2.mag</span> and the square of the magnitude as <span
  class="attribute">v2.mag2</span>.</p>
           <p class="Normal">It is possible to reset the magnitude or the
             magnitude squared of a vector:</p>
-          <div>
-            <p class="Normal"></p>
-          </div>
-          <div>
-            <h2 class="program0"> v2.mag = 5 # sets magnitude of v2 to 5 </h2>
-            <h2 class="program0"> v2.mag2 = 2.7 # sets squared magnitude of v2 to
-              2.7</h2>
-          </div>
+
+            <p class="program"> v2.mag = 5 # sets magnitude of v2 to 5 <br />
+            v2.mag2 = 2.7 # sets squared magnitude of v2 to
+              2.7</p>
+
           <p class="Normal">You can reset the magnitude to 1 with norm():</p>
-        </div>
-        <div>
-          <h2 class="program0">norm( vector ) # normalized; magnitude of 1</h2>
-          <h2 class="program0">norm(vector(1,1,1)) equals vector(1,1,1)/sqrt(3)</h2>
+
+          <p class="program">norm( vector ) # normalized; magnitude of 1<br />
+          norm(vector(1,1,1)) equals vector(1,1,1)/sqrt(3)</p>
           <p class="Normal">You can also write <span class="attribute">v1.norm()</span><span
  class="attribute"></span>. For convenience, <span class="attribute">norm(vector(0,0,0))</span> is calculated to be <span class="attribute">vector(0,0,0)</span>. <span class="attribute"></span> </p>
-          <div>
-            <div>
-              <div>
+  
                 <p class="Normal">To calculate the angle between two vectors (the &quot;difference&quot; 
                   of the angles of the two vectors).</p>
-              </div>
-            </div>
-            <div>
-              <h2 class="program0"></h2>
-            </div>
-            <h2 class="program0">v1.diff_angle(v2)</h2>
+
+            <p class="program">v1.diff_angle(v2)</p>
             <p class="Normal"> You can also write <span class="attribute">v1.diff_angle(v1,v2)</span><span
  class="attribute"></span>. For convenience, if either of the vectors has zero 
               magnitude, the difference of the angles is calculated to be zero<span class="attribute"></span>.</p>
-          </div>
-        </div>
-        <div>
+
           <p class="Normal"> There is a function for the cross product of two vectors, 
             which is a vector perpendicular to the plane defined by vector1 and vector2, 
             in a direction defined by the right-hand rule: if the fingers of the right 
@@ -162,31 +149,26 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             of the cross product. The magnitude of this vector is equal to the product 
             of the magnitudes of vector1 and vector2, times the sine of the angle between 
             the two vectors.</p>
-        </div>
-        <div>
-          <h2 class="program0">cross( vector1, vector2 )</h2>
+
+          <p class="program">cross( vector1, vector2 )</p>
           <p class="Normal"> There is a function for the dot product of two vectors, 
             which is an ordinary number equal to the product of the magnitudes of vector1 
             and vector2, times the cosine of the angle between the two vectors. If the 
             two vectors are normalized, the dot product gives the cosine of the angle 
             between the vectors, which is often useful.</p>
-          <div>
-            <p class="Normal"></p>
-          </div>
-          <div>
-            <h2 class="program0">dot( vector1, vector2 )</h2>
-          </div>
+
+            <p class="program">dot( vector1, vector2 )</p>
+
           <p class="Normal">You can also say <span class="attribute">vector1.cross(vector2)</span> or <span class="attribute">vector1.dot(vector2)</span>).</p>
           <p class="Normal"><font color="#0000a0">Rotating a vector</font></p>
           <p class="Normal"> There is a function for rotating a vector:<font color="#0000a0"></font></p>
-          <h2 class="program0"> v2 = rotate(v1, angle=theta, axis=(1,1,1))</h2>
+          <p class="program"> v2 = rotate(v1, angle=theta, axis=(1,1,1))</p>
           <p class="Normal">The default axis is (0,0,1), for a rotation in the xy plane 
             around the z axis. There is no origin for rotating a vector. You can also 
             write <span class="attribute">v2 = v1.rotate(angle=theta, axis=(1,1,1))</span>. 
             There is also a <a href="rotation.html">rotate capability for 
               objects</a>.</p>
-          <p class="Normal">&nbsp;</p>
-          <p class="Normal"><font color="#0000a0">Convenient conversion</font></p>
+          <p class="Normal"><strong><font color="#0000a0">Convenient conversion</font></strong></p>
           <p class="Normal"> For convenience Visual automatically converts (a,b,c) into 
             vector(a,b,c), with floating-point values, when creating Visual objects: 
             sphere.pos=(1,2,3) is equivalent to sphere.pos=vector(1.,2.,3.). However, 
@@ -194,9 +176,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             because (a,b,c) isn't a vector; write vector(a,b,c) instead.</p>
           <p class="Normal">You can convert a vector <font color="#FF0000">vec1</font> to a Python tuple (a,b,c) by <font color="#FF0000">tuple(vec1)</font> or 
             by the much faster option <font color="#FF0000">vec1.astuple(</font>).</p>
-        </div>
-      </div>
-      <br />
+
 <!-- InstanceEndEditable --></td>
   </tr>
   <tr>

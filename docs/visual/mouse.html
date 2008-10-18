@@ -24,7 +24,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
   <tr>
     <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
     </td>
-    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+    <td width="167" valign="top" bgcolor="#CCCCCC"><p><a href="index.html" target="mainFrame">Home</a></p>
       <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p>
@@ -66,6 +66,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option>Windows and events</option>
           <option value="display.html">Windows</option>
           <option value="mouse.html">Mouse Events</option>
+          <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
+          <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
           <option value="keyboard.html">Keyboard Events</option>
           <option value="controls.html">Buttons and Sliders</option>
         </select>
@@ -96,12 +98,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           did something with the mouse buttons. If the user has not already done something 
           with the mouse buttons, <span class="attribute">getevent()</span> and <span class="attribute">getclick()</span> will stop program execution until this happens.</p>
         <p class="Normal"><strong><font color="#0000A0">Different kinds of mouse</font></strong></p>
-        <p class="Normal">The mouse routines can handle a three-button mouse, with &quot;left&quot;, 
-          &quot;right&quot;, and &quot;middle&quot; buttons. For systems with a two-button 
-          mouse, the &quot;middle&quot; button consists of the left and right buttons 
-          pressed together. For systems with a one button mouse, the right button is 
-          invoked by holding down the SHIFT key, and the middle button is invoked by 
-          holding down the CTRL key. </p>
+        <p class="Normal">The mouse routines can handle a three-button mouse,
+          with &quot;left&quot;, 
+          &quot;right&quot;, and &quot;middle&quot; buttons. For systems with
+          a two-button  mouse, the &quot;middle&quot; button consists of the
+          left and right buttons  pressed together. For systems with a one button
+          mouse, the right button is  invoked by holding down the Command key,
+          and the middle button is invoked by holding down the Option key. </p>
         <p class="Normal"><strong> <font color="#0000A0">Current state of mouse</font></strong></p>
         <p class="attributes"> <span class="attribute">pos</span> The current 3D position 
           of the mouse cursor; <span class="attribute">scene.mouse.pos</span>. Visual 
@@ -136,11 +139,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="attributes"><span class="attribute">shift</span> = 1 if the SHIFT 
           key is down, otherwise 0 (for a one-button mouse, meaningful only if mouse 
           buttons up)</p>
-        <p class="attributes">Note that programs that depend on modifying a mouse event 
-          with CTRL or SHIFT will not work properly with a one-button mouse (e.g. most 
-          Macintosh systems), since CTRL invokes &quot;middle&quot; button, and SHIFT 
-          invokes &quot;right&quot; button.</p>
-        <p class="Normal"></p>
+      <p class="Normal"></p>
         <p class="Normal"><strong><font color="#0000A0">Getting events</font></strong></p>
         <p class="Normal">There are five kinds of mouse events: press, click, drag,
           drop, and release:</p>

@@ -13,14 +13,14 @@ P.attributes {
 	margin-bottom: 0.000000pt;
 	margin-right: 0.000000pt;
 	margin-left: 72.000000pt;
-	font-size: 12pt;
+	font-size: 10pt;
 	font-weight: medium;
 	font-style: Regular;
 	color: #000000;
 	text-decoration: none;
 	vertical-align: baseline;
 	text-transform: none;
-	font-family: "Times New Roman", Times, serif;
+	font-family: sans-serif;
 }
 P.Body {
 	display: block;
@@ -30,14 +30,14 @@ P.Body {
 	margin-bottom: 0.000000pt;
 	margin-right: 0.000000pt;
 	margin-left: 0.000000pt;
-	font-size: 12pt;
+	font-size: 10pt;
 	font-weight: medium;
 	font-style: Regular;
 	color: #000000;
 	text-decoration: none;
 	vertical-align: baseline;
 	text-transform: none;
-	font-family: "Times New Roman";
+	font-family: sans-serif;
 ; top: 6pt; clip:  rect(   )
 }
 P.Body-Text {
@@ -48,14 +48,14 @@ P.Body-Text {
 	margin-bottom: 0.000000pt;
 	margin-right: 0.000000pt;
 	margin-left: 0.000000pt;
-	font-size: 12.000000pt;
+	font-size: 10pt;
 	font-weight: medium;
 	font-style: Regular;
 	color: #000000;
 	text-decoration: none;
 	vertical-align: baseline;
 	text-transform: none;
-	font-family: "Times New Roman";
+	font-family: sans-serif;
 }
 P.Footer {
 	display: block;
@@ -133,14 +133,14 @@ P.Normal {
 	margin-bottom: 0.000000pt;
 	margin-right: 0.000000pt;
 	margin-left: 0.000000pt;
-	font-size: 12pt;
+	font-size: 10pt;
 	font-weight: medium;
 	font-style: Regular;
 	color: #000000;
 	text-decoration: none;
 	vertical-align: baseline;
 	text-transform: none;
-	font-family: "Times New Roman", Times, serif;
+	font-family: sans-serif;
 }
 P.program {
 	display: block;

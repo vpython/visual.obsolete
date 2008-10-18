@@ -24,7 +24,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
   <tr>
     <td width="11" height="272" valign="top" bgcolor="#F0F0F0"><p>&nbsp;</p>
     </td>
-    <td width="167" valign="top" bgcolor="#F0F0F0"><p><a href="index.html" target="mainFrame">Home</a></p>
+    <td width="167" valign="top" bgcolor="#CCCCCC"><p><a href="index.html" target="mainFrame">Home</a></p>
       <p>If you're new to Python and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p>A VPython <a href="http://vpython.org/VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p>
@@ -66,6 +66,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option>Windows and events</option>
           <option value="display.html">Windows</option>
           <option value="mouse.html">Mouse Events</option>
+          <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
+          <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
           <option value="keyboard.html">Keyboard Events</option>
           <option value="controls.html">Buttons and Sliders</option>
         </select>
@@ -109,10 +111,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 
           <p class="program">scene2 = display( title = &quot;Act IV, Scene 2&quot; ) <br />
           rod = cylinder( display = scene2 )</p>
-          The function <font color="#FF0000">display.get_selected()</font> returns a reference to the display in which objects are currently being 
-              created.
-
-        <p class="attributes"><span class="attribute">__class__</span> Name of the class 
+          <p class="Normal">The function <font color="#FF0000">display.get_selected()</font> returns a reference to the display in which objects are currently being 
+              created.          </p>
+      <p class="attributes"><span class="attribute">__class__</span> Name of the class 
           of object. For example, <span class="attribute">ball.__class__ is sphere</span> is true if <span class="attribute">ball</span> is a sphere object. There are 
           two underscores before and after the word <span class="attribute">class</span>. 
           In a list of visible objects provided by <a href="display.html">scene.objects</a>, 
@@ -133,11 +134,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             due to the restriction that an object may not  be located within
             a frame that is in a separate display.</p>
 
-      <p>Here is an example that uses the <span class="attribute">__copy__()</span> function. The following routine 
+      <p class="Normal">Here is an example that uses the <span class="attribute">__copy__()</span> function. The following routine 
             copies all of the Visual objects currently existing in one display into 
             a previously defined second display:</p>
 
-          <p class="program">def clone_universe( new_display, old_display):<br />
+<p class="program">def clone_universe( new_display, old_display):<br />
             &nbsp;&nbsp;&nbsp;&nbsp;# Create a dictionary of frames in  old display to <br />
             &nbsp;&nbsp;&nbsp;&nbsp;# the corresponding frames in the new display.<br />
             &nbsp;&nbsp;&nbsp;&nbsp;frames = {} # create empty dictionary <br />
