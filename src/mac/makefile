@@ -1,13 +1,13 @@
 # Place this make file in a directory parallel to vpython-core2
-# Be sure to specify what version of Python is in /usr/bin (typically /usr/bin/python2.5)
+# Be sure to specify what version of Python
 
-PYTHON_VERSION = 2.5
+PYTHON_VERSION = 2.6
 PYTHON_FRAMEWORK = /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/
 SITE_PACKAGES = $(PYTHON_FRAMEWORK)lib/python$(PYTHON_VERSION)/site-packages/
 TOP = ../vpython-core2
 DEPENDS = $(TOP)/dependencies
 SRC = $(TOP)/src
-BOOST = $(TOP)/dependencies/boost_1_35_0/mac_lib
+BOOST = $(TOP)/dependencies/boost_files/mac_libs
 VPATH = $(SRC)/mac $(SRC)/core/util $(SRC)/core $(SRC)/python $(SRC)
 
 CXX = /usr/bin/g++
@@ -16,7 +16,7 @@ CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-I$(TOP)/include/mac -I$(TOP)/include \
 	-I$(PYTHON_FRAMEWORK)/include/python$(PYTHON_VERSION) \
 	-I$(SITE_PACKAGES)/numpy/core/include \
-	-I$(DEPENDS)/boost_1_35_0 -I$(DEPENDS)/threadpool/include \
+	-I$(DEPENDS)/boost_files -I$(DEPENDS)/threadpool/include \
 	-F/System/Library/Frameworks/AGL.framework \
 	-F/System/Library/Frameworks/Carbon.framework \
 	-F/System/Library/Frameworks/OpenGL.framework
@@ -34,7 +34,7 @@ OBJS = arrayprim.o arrow.o axial.o box.o cone.o cylinder.o display_kernel.o elli
 	wrap_rgba.o wrap_vector.o
 
 cvisual.so : $(OBJS)
-	$(CXX) -bundle -bundle_loader /usr/bin/python$(PYTHON_VERSION) -o cvisual.so \
+	$(CXX) -bundle -bundle_loader /usr/local/bin/python$(PYTHON_VERSION) -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
 	$(BOOST)/libboost_python-mt-s-1_35.a \
