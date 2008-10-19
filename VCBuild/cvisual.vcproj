@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\include\win32;..\include;&quot;\Python25\Lib\site-packages\numpy\core\include&quot;;..\dependencies\boost_1_35_0;\Python25\include;.;..\dependencies\threadpool\include\;$(NOINHERIT)"
+				AdditionalIncludeDirectories="..\include\win32;..\include;\Python26\Lib\site-packages\numpy\core\include;..\dependencies\boost_files;\Python26\include;.;..\dependencies\threadpool\include\;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;BOOST_PYTHON_STATIC_LIB"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -75,10 +75,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="python25.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
+				AdditionalDependencies="python26.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
 				OutputFile="$(ProjectDir)\..\site-packages\visual\cvisual.pyd"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="libs;\Python25\libs;..\dependencies\boost_1_35_0\lib"
+				AdditionalLibraryDirectories="libs;\Python26\libs;..\dependencies\boost_files\win_libs"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="libs/cvisual-debug.pdb"
 				SubSystem="0"
@@ -136,7 +136,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\include\win32;..\include;c:\Python25\Lib\site-packages\numpy\core\include;..\dependencies\boost_1_35_0;c:\Python25\include;.;..\dependencies\threadpool\include\;$(NOINHERIT)"
+				AdditionalIncludeDirectories="..\include\win32;..\include;c:\Python26\Lib\site-packages\numpy\core\include;..\dependencies\boost_files;c:\Python26\include;.;..\dependencies\threadpool\include\;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;_USRDLL;MSC;BOOST_PYTHON_STATIC_LIB;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -166,12 +166,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="python25.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
+				AdditionalDependencies="python26.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)\..\site-packages\visual\cvisual.pyd"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="libs;c:\Python25\libs;..\dependencies\boost_1_35_0\lib"
+				AdditionalLibraryDirectories="libs;c:\Python26\libs;..\dependencies\boost_files\win_libs"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="libs/cvisual-release.pdb"
 				SubSystem="0"
@@ -722,206 +722,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-		</Filter>
-		<Filter
-			Name="GTK2 (not used)"
-			>
-			<File
-				RelativePath="..\src\gtk2\display.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\include\gtk2\display.hpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\src\gtk2\font_renderer.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(InputName)1.obj"
-						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(InputName)1.obj"
-						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\include\gtk2\font_renderer.hpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\src\Makefile.in"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\src\gtk2\random_device.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\src\gtk2\rate.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\src\gtk2\render_surface.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\include\gtk2\render_surface.hpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\src\gtk2\timer.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\VTune\cvisual.vpj"
