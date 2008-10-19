@@ -1,6 +1,6 @@
 HOW TO BUILD VISUAL 4 USING CARBON
 Install XcodeTools from the optional materials on the Mac installation DVD.
-Installing XcodeTools automatically installs the large number of individual
+Installing XcodeTools automatically installs the large number of individualvp
 components also listed on the DVD.
 
 Install Python for the Mac ("MacPython") from python.org.
@@ -9,16 +9,16 @@ because this isn't always the case, and because the Python community seems to
 strongly prefer it, we will base Visual on MacPython, which is /usr/local/bin/python.
 
 Download the source for numpy and unpack it (http://www.scipy.org/Download).
-In the numpy directory, execute "sudo /usr/local/bin/python setup.py install".
+In the numpy directory, execute "sudo /usr/local/bin/python2.6 setup.py install".
 This installs the numpy module which includes needed header files.
 
 You need Boost libraries for the Mac. In the dependencies section of CVS, unzip the
-zip file boost_1_35_0.zip. You should end up with a folder in dependencies named boost_1_35_0,
-containing boost (the include files), lib (for Windows), and mac_lib (for Mac).
+zip file. You should end up with a folder in dependencies named boost_files,
+containing boost (the include files), win_libs (for Windows), and mac_libs (for Mac).
 
-In src/mac, execute make setup.
+In src/mac, execute sudo make setup.
 This creates a build directory mbuild parallel to the CVS files, and creates links
-from /Library/Frameworks/Python.framework/Versions/2.5/lib/python2.5/site-packages to
+from /Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages to
 the visual directory in the CVS files.
 
 In the mbuild directory, execute make install to build and install Visual.
@@ -26,17 +26,30 @@ In the mbuild directory, execute make install to build and install Visual.
 In src/mac/PackageMaker is an Apple PackageMaker project file and a Welcome text file
 for creating a VPython installer for the Mac.
 
-The Boost libraries were built by downloading them and executing this:
+The Boost libraries were built by downloading them and the bjam tool.
+Make sure that "which python" is the one you want, then do this:
+bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.6 --build-type=complete --with-date_time --with-python --with-thread --with-signals stage
 
-sudo bjam --toolset=darwin -sPYTHON_ROOT=/usr/bin/python2.5 --build-type=complete
-
-This took a long time; "complete" means "make various variants of the libraries".
-Look in bin.v2/libs to find these static multithreading library files:
-libboost_python-mt-1_35.a
-libboost_signals-mt-1_35.a
-libboost_thread-mt-1_35.a
+The files you want will be in stage/lib.
+Move these files to dependencies/build_files/mac_libs:
 libboost_date_time-mt-1_35.a
+libboost_date_time-mt-d-1_35.a
+libboost_date_time-mt-s-1_35.a
+libboost_date_time-mt-sd-1_35.a
+libboost_python-mt-1_35.a
+libboost_python-mt-d-1_35.a
+libboost_python-mt-s-1_35.a
+libboost_python-mt-sd-1_35.a
+libboost_signals-mt-1_35.a
+libboost_signals-mt-d-1_35.a
+libboost_signals-mt-s-1_35.a
+libboost_signals-mt-sd-1_35.a
+libboost_thread-mt-1_35.a
+ibboost_thread-mt-d-1_35.a
+ibboost_thread-mt-s-1_35.a
+ibboost_thread-mt-sd-1_35.a
 
+----------
 I built Boost libraries on a PowerPC running OS X 10.4 and tried using them
 on a PowerPC running OS X 10.5. Example programs ran okay, but in each case
 there was the following warning:
