@@ -14,10 +14,15 @@ Building vpython with from Visual Studio C++
         http://www.microsoft.com/Express/Download/#webInstall
 
     Unzip Boost
-        Extract the files in vpython-core2/dependencies/boost_1_35_0.zip so that there
-        is a folder vpython-core2/dependencies/boost_1_35_0 containing boost and lib directories.
+        Extract the files in vpython-core2/dependencies/boost_1_35_0.zip so that 
+        there is a folder vpython-core2/dependencies/boost_files containing 
+        boost (include files) and win_libs folders.
         
         These files were obtained from http://www.boostpro.com/products/free
+        (If these files are not up to date with the current Python, you may have to
+        build the Boost libraries from source. See below. This was the case in 
+        Oct. 2008 when the standard release of Python was 2.6, but the boostpro 
+        libraries had been built for Python 2.5.)
         
 	On Vista, in Command Prompt, link from Python site-packages to the CVS files
 	(YourCVS is the directory where you have put the CVS files)
@@ -40,3 +45,32 @@ Building vpython with from Visual Studio C++
     
     Process MakeVPython.iss with Innosetup (innosetup.org) to build an installer
     
+BUILDING BOOST FROM SOURCE
+Download a precompiled version of the 'bjam' tool from www.boost.org.
+
+Download latest Boost (boost_1_35_0.zip, for example) from www.boost.org.
+Unzip into boost_1_35_0, for example.
+
+The following must be done from a Windows typescript, NOT from Msys.
+(From Start/Run, execute cmd.)
+> cd boost_1_35_0
+
+Make sure that the target Python is the only Python installed (-a means rebuild all):
+bjam --toolset=msvc --build-type=complete --with-python --with-thread --with-signals stage
+
+"complete" means "make various variants of the libraries".
+Look in stage/lib to find the static multithreading library files:
+libboost_python-vc90-mt-1_35.lib
+libboost_python-vc90-mt-gd-1_35.lib
+libboost_python-vc90-mt-s-1_35.lib
+libboost_python-vc90-mt-sgd-1_35.lib
+libboost_signals-vc90-mt-1_35.lib
+libboost_signals-vc90-mt-gd-1_35.lib
+libboost_signals-vc90-mt-s-1_35.lib
+libboost_signals-vc90-mt-sgd-1_35.lib
+libboost_thread-vc90-mt-1_35.lib
+libboost_thread-vc90-mt-gd-1_35.lib
+libboost_thread-vc90-mt-s-1_35.lib
+libboost_thread-vc90-mt-sgd-1_35.lib
+
+These go into dependencies\boost\win_libs 
