@@ -7,8 +7,8 @@ are provided here.
 Boost
 -----
 
-The files in boost_1_35_0.zip are a subset of the Boost library and should be extracted 
-(into vpython-core2/dependencies/boost_1_35_0/) before building.
+The files in boost_1_35_0.zip are a subset of the Boost library for Python 2.5 
+and should be extracted (into vpython-core2/dependencies/boost_1_35_0/) before building.
 
 After extraction, the folder boost_1_35_0 will contain the following folders:
 
@@ -20,6 +20,9 @@ After extraction, the folder boost_1_35_0 will contain the following folders:
 
 The Boost libraries can be found at www.boost.org; the BoostPro installer 
 containing the Windows binary libraries is at www.boost-consulting.com.
+
+The files in boost_files.zip are similar, for Python 2.6. They should be extracted so
+as to have a folder boost_files containing boost, win_libs, and mac_libs.
 
 ----------
 threadpool
