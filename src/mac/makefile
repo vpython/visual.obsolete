@@ -1,7 +1,7 @@
 # Place this make file in a directory parallel to vpython-core2
 # Be sure to specify what version of Python
 
-PYTHON_VERSION = 2.6
+PYTHON_VERSION = 2.5
 PYTHON_FRAMEWORK = /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/
 SITE_PACKAGES = $(PYTHON_FRAMEWORK)lib/python$(PYTHON_VERSION)/site-packages/
 TOP = ../vpython-core2
