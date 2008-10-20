@@ -7,22 +7,23 @@ are provided here.
 Boost
 -----
 
-The files in boost_1_35_0.zip are a subset of the Boost library for Python 2.5 
-and should be extracted (into vpython-core2/dependencies/boost_1_35_0/) before building.
+The files in boost_files2.5.zip are a subset of the Boost library for Python 2.5 
+and should be extracted (into vpython-core2/dependencies/boost_files/) before building.
 
-After extraction, the folder boost_1_35_0 will contain the following folders:
+After extraction, the folder boost_files should contain the following folders:
 
    boost: header files (valid for all platforms -- Windows, Mac, Linux)
-   lib: static libraries for Windows
-   mac_lib: static libraries for Intel Macs running OS X 10.5
+   win_libs: static libraries for Windows
+   mac_libs: static libraries for Intel Macs running OS X 10.5
+      and the following (currently missing):
    mac_ppc_104_lib: static libraries for PowerPC Macs running OS X 10.4
    mac_ppc_105_lib: static libraries for PowerPC Macs running OS X 10.5
 
 The Boost libraries can be found at www.boost.org; the BoostPro installer 
 containing the Windows binary libraries is at www.boost-consulting.com.
 
-The files in boost_files.zip are similar, for Python 2.6. They should be extracted so
-as to have a folder boost_files containing boost, win_libs, and mac_libs.
+The files in boost_files2.6.zip are for Python 2.6. If you use these, you need
+to adjust the build project to refer to 2.6 instead of 2.5.
 
 ----------
 threadpool
