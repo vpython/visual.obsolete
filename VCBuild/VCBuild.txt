@@ -14,7 +14,7 @@ Building vpython with from Visual Studio C++
         http://www.microsoft.com/Express/Download/#webInstall
 
     Unzip Boost
-        Extract the files in vpython-core2/dependencies/boost_1_35_0.zip so that 
+        Extract the files in vpython-core2/dependencies/boost_files2.5.zip so that 
         there is a folder vpython-core2/dependencies/boost_files containing 
         boost (include files) and win_libs folders.
         
@@ -74,3 +74,24 @@ libboost_thread-vc90-mt-s-1_35.lib
 libboost_thread-vc90-mt-sgd-1_35.lib
 
 These go into dependencies\boost\win_libs 
+
+2008/10/19 and attempt was made to use Boost 1_36_0 with Python 2.6 which failed.
+Built python, thread, signals Boost libraries 1_36_0 for Python 2.6 and got these 
+errors when building Visual using msvc:
+
+1>c:\workspace\vpython-core2\dependencies\boost
+\boost/python/detail/translate_exception.hpp(34) : error C2143: syntax error : missing 
+';' before '<'
+
+1>        c:\workspace\vpython-core2\dependencies\boost
+\boost/python/detail/translate_exception.hpp(63) : see reference to class template
+ instantiation 'boost::python::detail::translate_exception<ExceptionType,Translate>'
+ being compiled
+
+1>c:\workspace\vpython-core2\dependencies\boost
+\boost/python/detail/translate_exception.hpp(34) : error C4430: missing type specifier -
+ int assumed. Note: C++ does not support default-int
+
+1>c:\workspace\vpython-core2\dependencies\boost
+\boost/python/detail/translate_exception.hpp(36) : error C2238: unexpected token(s) 
+preceding ';'
