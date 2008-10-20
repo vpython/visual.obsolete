@@ -7,6 +7,11 @@
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
 <link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+<!--
+.style1 {color: #0000A0}
+-->
+</style>
 <!-- InstanceEndEditable -->
 <script type="text/javascript">
 <!--
@@ -53,8 +58,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
-          <option value="color.html">Color</option>
-          <option value="materials.html">Material</option>
+          <option value="color.html">Color &amp; Opacity</option>
+          <option value="materials.html">Materials &amp; Textures</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -86,7 +91,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <td width="23" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td width="590" rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
       <div>
-        <h1 class="Heading-1"><font color="#0000A0">Specifying Colors</font></h1>
+        <h1 class="Heading-1"><font color="#0000A0">Color </font></h1>
       </div>
       <div>
         <p class="Normal"> In the RGB color system, you specify a color in terms of fractions of red, green, and blue, corresponding to how strongly glowing are the tiny red, green, and blue dots of the computer screen. In the RGB scheme, white is the color with a maximum of red, blue, and green (1, 1, 1). Black has minimum amounts (0, 0, 0). The brightest red is represented by (1, 0, 0); that is, it has the full amount of red, no green, and no blue.</p>
@@ -132,6 +137,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           print c3	# (1, 1, 0)</p>
           <p class="Normal"> Another example: <b>sphere(radius=2, color=hsv_to_rgb( 
             (0.5,1,0.8) ) </b></p>
+          <h1 class="Heading-1 style1"><font color="#0000A0">Opacity</font></h1>
+          <p class="Normal">You can make most objects be  transparent by specifying a value from
+        0-1 inclusive for the attribute &quot;opacity&quot;. For example, box(color=color.red,
+        opacity=0.8) is slightly transparent. An opacity value of 0 means totally
+        transparent, 
+        and 1 means totally opaque. Currently curve, convex, faces, points, and helix objects
+        do not allow transparency. </p>
         </div>
       </div>
     <!-- InstanceEndEditable --></td>

@@ -7,6 +7,11 @@
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
 <link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+<!--
+.style1 {color: #0000A0}
+-->
+</style>
 <!-- InstanceEndEditable -->
 <script type="text/javascript">
 <!--
@@ -53,8 +58,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
-          <option value="color.html">Color</option>
-          <option value="materials.html">Material</option>
+          <option value="color.html">Color &amp; Opacity</option>
+          <option value="materials.html">Materials &amp; Textures</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -86,7 +91,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <td width="23" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td width="590" rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
 
-        <h1 class="Heading-1"> <font color="#0000A0">Material</font></h1>
+        <h1 class="Heading-1"> <font color="#0000A0">Materials &amp; Textures </font></h1>
 
         <p class="Normal">You can specify a material such as wood for any object
           other than a points object:</p>
@@ -100,10 +105,64 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     	materials.wood<br />
     	materials.marble<br />
     	materials.earth</p>
-        <p class="Normal">The example program material_test.py displays all of
-          these materials.</p>
-        <p class="Normal">On computers without modern graphics cards, which cannot
-          display materials, the material specification is ignored.</p>
+        <p class="Normal">The example program <strong>material_test.py</strong> displays all of
+        these materials. The unshaded material is particularly appropriate for simulating the appearance of a  light glowing with the specified color. This apparent light has no lighting effect on other objects, but you can place a local_light at the same location. </p>
+        <p class="Normal"><em><strong>Specifying a material has an effect only on computers with modern graphics capabilities such as NVIDIA or Radeon graphics cards. On  computers without such graphics capabilities, objects are displayed without material properties.</strong></em></p>
+        <p class="Normal">Some materials such as wood are oriented to the specified axis. For example,
+        a wood box with default axis = (1,0,0) shows tree rings on its yz surfaces
+        and stripes on the other faces. Changing the axis changes which face you see
+        the tree rings on. </p>
+        <p class="Normal style1"><strong><font color="#0000A0">Creating your own texture</font> </strong></p>
+        <p class="Normal">You can create a texture object and then apply it to the surface of an object. 
+          A surface texture 
+          is an M by N array of 1, 2, 3, or 4 numerical values (a list or tuple). M and 
+          N must be powers of 2 (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, etc.). The numerical values can represent red, green, blue, luminance (brightness), or opacity.</p>
+        <p class="Normal">Here are the possible values 
+          for each slot in the array:</p>
+        <p class="Normal">1 value: channels must be [ &quot;luminance&quot;] (how bright) or
+          [&quot;opacity&quot;]</p>
+        <p class="Normal">2 values (luminance and opacity): channels must
+          be [&quot;luminance&quot;,&quot;opacity&quot;]</p>
+        <p class="Normal">3 values (red,green,blue): channels must be [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;] </p>
+        <p class="Normal">4 values (red,green,blue,opacity): channels must
+          be [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;,&quot;opacity&quot;] </p>
+        <p class="Normal">You can create a numeric array of zeros in various formats, then assign values:</p>
+        <p class="Normal">zeros([...], ubyte) means an 8-bit unsigned integer 0-255<br />
+          zeros([...], short) means a 16-bit integer plus or minus 0-32767<br />
+          zeros([...], int) means a 32-bit integer plus or minus 0-2147483648<br />
+          zeros([...], float) means a floating-point (fractional) number</p>
+        <p class="Normal">Here is an example program in which a checkerboard
+          texture is created and applied to a box.  (An &quot;array&quot; is a numerical array supported by the numpy
+          module which is imported when you import &quot;visual&quot;.) </p>
+        <p class="program">from visual import *<br />
+          checkerboard = array([[0,1,0,1], <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,0,1,0],<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,1,0,1],<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,0,1,0]], float)<br />
+          lum = materials.texture( data=checkerboard,<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;channels=[&quot;luminance&quot;],<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;mapping=&quot;rectangular&quot;,<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;interpolate=False)<br />
+          box(axis=(0,0,1), color=color.cyan, material=lum)</p>
+        <p class="Normal">If you wanted to create a texture containing &quot;rgb&quot; values,
+          you could start with zeros([M,N,3], float), and entries into this array
+          would be the usual
+          (red,green,blue) triples, with values for each color in the range 0-1
+          inclusive.</p>
+        <p class="Normal">The example above uses a &quot;rectangular&quot; mapping, which places the texture on
+          two opposing faces of a box, with stripes along the sides. By default, one of the faces is in the (1,0,0)
+          direction, but this can be changed by specifying a different axis for the box, as was done in the example above.
+          Other texture mappings are &quot;spherical&quot; (wraps around the entire object) and &quot;sign&quot;. The latter is similar
+          to &quot;rectangular&quot; but  is unaffected by the color of the object
+          and appears on only one face of a box (determined by the axis of the
+          box).</p>
+        <p class="Normal">By default &quot;interpolate&quot; is True, but to get a sharply defined checkerboard
+          in the example above, &quot;interpolate&quot; was set to False. </p>
+        <p class="Normal">In the example program <strong>texture_and_lighting.py</strong> you will find a creation of
+          a beach ball using spherical mapping. In the example program <strong>stonehenge.py</strong> you will see an example of a display of a color photograph on a box, together
+          with instructions on how to create a texture from a jpeg photo.</p>
+        <p class="Normal"><strong><font color="#0000A0">Creating your own materials </font></strong></p>
+        <p class="Normal">Creating your own materials is technically somewhat challenging. The Visual component program materials.py contains the shader models for wood and other materials, and it also contains instructions on how to build your own materials. Shader models are written in a C-like language, GLSL (OpenGL Shader Language).</p>
     <!-- InstanceEndEditable --></td>
   </tr>
   <tr>

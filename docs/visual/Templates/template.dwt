@@ -51,8 +51,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
-          <option value="../color.html">Color</option>
-          <option value="../materials.html">Material</option>
+          <option value="../color.html">Color &amp; Opacity</option>
+          <option value="../materials.html">Materials &amp; Textures</option>
           <option value="../defaults.html">Defaults</option>
           <option value="../rate.html">Animation Speed</option>
           <option value="../rotation.html">Rotations</option>

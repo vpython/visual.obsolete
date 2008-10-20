@@ -53,8 +53,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
-          <option value="color.html">Color</option>
-          <option value="materials.html">Material</option>
+          <option value="color.html">Color &amp; Opacity</option>
+          <option value="materials.html">Materials &amp; Textures</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -103,7 +103,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             <p class="program"> scene2 = display(title='<span class="attributes">Examples of Tetrahedrons</span>',<br />
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x=0, y=0, width=600, height=200,<br />
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;center=(5,0,0), background=(0,1,1))</p>
-          <p class="Normal"> <font color="#0000A0">General-purpose options</font></p>
+          <p class="Normal"><strong> <font color="#0000A0">General-purpose options</font></strong></p>
           <p class="attributes"> <span class="attribute">select()</span> Makes the specified 
             display the &quot;selected display&quot;, so that objects will be drawn 
             into this display by default; e.g. <span class="attribute">scene.select() </span></p>
@@ -131,7 +131,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             be specified with some care, because if the total lighting intensity
             exceeds 1 anywhere in the scene the results are unpredictable. <span class="attribute">scene.lights</span> is
             a list of any lights you have created. <br />
-            </p>
+      </p>
           <p class="Normal">            You  can create lights that are local, near other objects. The following
         statement creates a yellow light <em>positioned</em>  at (x,y,z), and if you continually update lamp.pos, the light will move.</p>
           <p class="program">            lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
@@ -193,20 +193,19 @@ or two projectors.) </p>
             &nbsp;&nbsp;&nbsp;&nbsp;if obj.__class__ == box # can say either box or 
             'box'<br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.color = color.red</p>
+          <p class="attributes"><span class="attribute">show_rendertime</span> If you set <span class="attribute">scene.show_rendertime = 1</span>, in the lower left corner of the display you will see something like &quot;cycle: 27 render: 5&quot;, meaning 27 milliseconds between renderings of the scene, taking 5 milliseconds to render, in which case 22 out of 27 milliseconds were devoted to executing your Python statements. </p>
           <p class="attributes"><span class="attribute">cursor.visible</span> By
             setting <span class="attribute">scene.cursor.visible = 0</span>,
             the mouse cursor  becomes invisible. This is often appropriate while
             dragging an object using  the mouse. Restore the cursor with <span class="attribute">scene.cursor.visible
-             = 1</span>.  <em>NOT YET IMPLEMENTED IN VISUAL 5.</em> </p>
-        </div>
-      </div>
-      <p class="attributes"><span class="attribute"><font color="#000000">To obtain </font>camera position</span>, see <a href="mouse.html">Mouse Interactions</a>.</p>
+             = 1</span>.  <em>NOT YET IMPLEMENTED IN VISUAL 5.</em></p>
+        <p class="attributes"><span class="attribute"><font color="#000000">To obtain </font>camera position</span>, see <a href="mouse.html">Mouse Interactions</a>.</p>
       <div>
         <div> </div>
       </div>
       <div>
         <div>
-          <p class="Normal"><font color="#0000A0">Controlling the window</font></p>
+          <p class="Normal"><strong><font color="#0000A0">Controlling the window</font></strong></p>
           <p class="attributes"> <span class="attribute">x</span>, <span class="attribute">y</span> Position of the window on the screen (pixels from upper left)</p>
           <p class="attributes"> <span class="attribute">width</span>, <span class="attribute">height</span> Width and height of the display area in pixels: scene.height = 200 (includes title bar). The height in pixels of the titlebar is given by <span class="attribute">display.get_titlebar_height()</span>, valid for all windows, and this function is associated with the display class of objects, not with individual displays such as the standard scene. So scene.get_titlebar_height() won't work.</p>
           <p class="attributes"> <span class="attribute">title</span> Text in the window's 
@@ -226,7 +225,8 @@ or two projectors.) </p>
           <p class="attributes"> <span class="attribute">exit</span> If <span class="attribute">sceneb.exit 
             = 0</span>, the program does not quit when the close box of the <span class="attribute">sceneb</span> display is clicked. The default is <span class="attribute">sceneb.exit = 
               1</span>, in which case clicking the close box does make the program quit. </p>
-          <p class="Normal"> <font color="#0000A0">Controlling the view</font></p>
+          <p class="attributes"><span class="attribute">display.get_titlebar() </span><span class="Normal">gives the height in pixels of the title bar of a window</span>. <span class="Normal">This value is true for all windows, and this function is associated with the display class of objects, not with individual displays such as the standard scene, so scene.get_titlebar_height() won't work. If you specify a window to be 400 by 400, the total height of the window is 400 pixels, of which part is the title bar. </span></p>
+          <p class="Normal"><strong> <font color="#0000A0">Controlling the view</font></strong></p>
           <p class="attributes"> <span class="attribute">center</span> Location at which 
             
             the camera continually looks, even as the user rotates the position of the 
