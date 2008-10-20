@@ -1,6 +1,7 @@
-; Create installer for VPython using Inno Setup Compiler Version 5.
-; Tested with Inno Setup 5.2.3 (www.innosetup.com)
+; Create installer for VPython using Inno Setup Compiler (www.innosetup.com)
 ; Assumes Python and numpy already installed.
+
+; Make sure version numbers are correct for VPython and numpy.
 
 [Setup]
 AppName=VPython for Python 2.5
@@ -47,7 +48,7 @@ Source: "c:\workspace\vpython-core2\docs\visual\*.txt"; DestDir: "{app}\Lib\site
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
-Name: numpy; Description: "numpy 1.0 {code:NumpyStatus|C:\Python25}"; Types: full; Check: CheckNumpy( 'C:\Python25' )
+Name: numpy; Description: "numpy 1.2.0 {code:NumpyStatus|C:\Python25}"; Types: full; Check: CheckNumpy( 'C:\Python25' )
 
 [Tasks]
 Name: desktopicon; Description: "Create a desktop icon";
