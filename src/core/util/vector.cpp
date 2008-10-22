@@ -115,7 +115,7 @@ vector::repr( void) const
 {
 	std::stringstream ret;
 	ret.precision( std::numeric_limits<double>::digits10);
-	// Since this function is inteded to produce Python code that can be used to
+	// Since this function is intended to produce Python code that can be used to
 	// rebuild this object, we use the full precision of the data type here.
 	ret << "vector(" << x << ", " << y << ", " << z << ")";
 	return ret.str();
@@ -124,7 +124,7 @@ vector::repr( void) const
 vector
 vector::rotate( double angle, vector axis) throw()
 {
-	tmatrix R = rotation( angle, axis);
+	tmatrix R = rotation( angle, axis.norm());
 	return R * *this;
 }
 
