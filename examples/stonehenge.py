@@ -98,7 +98,7 @@ for i in range(Nslabs):
         slab = box(pos=(R*c, h/2., R*s), axis=(c,0,s),
                    size=(d,h,w), color=grey)
         if i == 0:
-            photo = materials.new_texture(filename="flower128", mapping="rectangular")
+            photo = materials.texture(filename="flower128", mapping="rectangular")
         if i != 6:
             for x in range(2):
                 for y in range(2):
