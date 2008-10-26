@@ -17,8 +17,7 @@ for i in range(len(bands)):
             col = [color.blue, color.green, color.red,
                    color.yellow, color.cyan][i//2 % 5]
         bands[i][j] = (col[0], col[1], col[2], op)
-stripes = materials.texture(data = bands,
-                       channels = ["red","green","blue","opacity"],
+stripes = materials.new_texture(data = bands,
                        mapping = "spherical",
                        interpolate = False)
 

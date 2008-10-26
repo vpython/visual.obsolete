@@ -14,7 +14,7 @@ leftpole.color=(.5,.5,.5)
 midpole=cylinder(pos=(0,-3,0), radius=0.3, axis=(0,6,0))
 midpole.color=(.5,.5,.5)
 rightpole=cylinder(pos=(2*spacing,-3,0), radius=0.3, axis=(0,6,0))
-floor=box(pos=(0,-3.5,0), axis=(0,.99,0), height=23, width=5,
+floor=box(pos=(0,-3.5,0), size=(23,.99,5),
           color=(1.0,0.5,0), material=materials.wood)
 
 poles=[leftpole,midpole,rightpole]
@@ -35,7 +35,8 @@ while 1:
         m = scene.mouse.getevent()
         if m.drag:  # identify pole clicked on
             mx=m.project(normal=vector(0,0,1)).x
-            pole1=int((mx+floor.height/2.)/(floor.height/3.))
+            pole1=int((mx+floor.length/2.)/(floor.length/3.))
+            print pole1
             # pick up a ring
             if len(stack[pole1])>0:
                 select=stack[pole1][-1]     # remove ring from stack
@@ -44,7 +45,7 @@ while 1:
                     select.pos=scene.mouse.project(normal=vector(0,0,1))
                     rate(60)
                 mx=select.x
-                pole2=int((mx+floor.height/2.)/(floor.height/3.))
+                pole2=int((mx+floor.length/2.)/(floor.length/3.))
                 # put down a ring
                 if len(stack[pole2])>0:      # stack not empty
                     if stack[pole2][-1].radius > select.radius:  # legal move

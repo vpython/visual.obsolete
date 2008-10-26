@@ -7,12 +7,11 @@ checkerboard = array([[0.,0.,1.,1.],
 		      [0.,0.,1.,1.],
 		      [1.,1.,0.,0.],
 		      [1.,1.,0.,0.]])
-lum = materials.texture( data=checkerboard,
-                         channels=["luminance"],
+lum = materials.new_texture( data=checkerboard,
                          mapping="rectangular",
                          interpolate=False)
-alp = materials.texture( data=checkerboard,
-                         channels=["opacity"],
+alp = materials.new_texture( data=checkerboard,
+                         luminance=False,
                          mapping="rectangular",
                          interpolate=False)
 balp1 = box( axis=(0,0,1), color=color.orange, material=alp)
@@ -32,12 +31,11 @@ save = array(checkerboard[1,:])
 checkerboard[1,:] = checkerboard[2,:]
 checkerboard[2,:] = save
 # Recreate and reassign the textures; Visual doesn't check for texture changes
-lum = materials.texture( data=checkerboard,
-                         channels=["luminance"],
+lum = materials.new_texture( data=checkerboard,
                          mapping="rectangular",
                          interpolate=False)
-alp = materials.texture( mipmap = False, data=checkerboard,
-                         channels=["opacity"],
+alp = materials.new_texture( mipmap=False, data=checkerboard,
+                         luminance=False,
                          mapping="rectangular",
                          interpolate=False)
 balp1.material = alp
