@@ -106,7 +106,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     	materials.marble<br />
     	materials.earth</p>
         <p class="Normal">The example program <strong>material_test.py</strong> displays all of
-        these materials. The unshaded material is particularly appropriate for simulating the appearance of a  light glowing with the specified color. This apparent light has no lighting effect on other objects, but you can place a local_light at the same location. </p>
+        these materials. The unshaded material is particularly appropriate for simulating the appearance of a  light glowing with the specified color. This apparent light has no lighting effect on other objects, but you may wish to place a local_light at the same location. </p>
         <p class="Normal"><em><strong>Specifying a material has an effect only on computers with modern graphics capabilities such as NVIDIA or Radeon graphics cards. On  computers without such graphics capabilities, objects are displayed without material properties.</strong></em></p>
         <p class="Normal">Some materials such as wood are oriented to the specified axis. For example,
         a wood box with default axis = (1,0,0) shows tree rings on its yz surfaces
@@ -115,41 +115,27 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="Normal style1"><strong><font color="#0000A0">Creating your own texture</font> </strong></p>
         <p class="Normal">You can create a texture object and then apply it to the surface of an object. 
           A surface texture 
-          is an M by N array of 1, 2, 3, or 4 numerical values (a list or tuple). M and 
-          N must be powers of 2 (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, etc.). The numerical values can represent red, green, blue, luminance (brightness), or opacity.</p>
-        <p class="Normal">Here are the possible values 
-          for each slot in the array:</p>
-        <p class="Normal">1 value: channels must be [ &quot;luminance&quot;] (how bright) or
-          [&quot;opacity&quot;]</p>
-        <p class="Normal">2 values (luminance and opacity): channels must
-          be [&quot;luminance&quot;,&quot;opacity&quot;]</p>
-        <p class="Normal">3 values (red,green,blue): channels must be [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;] </p>
-        <p class="Normal">4 values (red,green,blue,opacity): channels must
-          be [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;,&quot;opacity&quot;] </p>
-        <p class="Normal">You can create a numeric array of zeros in various formats, then assign values:</p>
-        <p class="Normal">zeros([...], ubyte) means an 8-bit unsigned integer 0-255<br />
-          zeros([...], short) means a 16-bit integer plus or minus 0-32767<br />
-          zeros([...], int) means a 32-bit integer plus or minus 0-2147483648<br />
-          zeros([...], float) means a floating-point (fractional) number</p>
-        <p class="Normal">Here is an example program in which a checkerboard
+          is an M by N numpy array of slots containing 1, 2, 3, or 4 numerical values. M and 
+          N must be powers of 2 (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, etc.). The numerical values can represent color, luminance (brightness or shades of gray), or opacity.</p>
+      <p class="Normal">Here are the possible values 
+          for each slot in the numpy array:</p>
+        <p class="Normal">1 value: can represent luminance (the default), or specify luminance=False to represent opacity</p>
+        <p class="Normal">2 values (luminance and opacity)</p>
+      <p class="Normal">3 values (red,green,blue) </p>
+      <p class="Normal">4 values (red,green,blue,opacity)</p>
+      <p class="Normal">Here is an example program in which a checkerboard
           texture is created and applied to a box.  (An &quot;array&quot; is a numerical array supported by the numpy
-          module which is imported when you import &quot;visual&quot;.) </p>
-        <p class="program">from visual import *<br />
-          checkerboard = array([[0,1,0,1], <br />
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,0,1,0],<br />
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,1,0,1],<br />
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,0,1,0]], float)<br />
-          lum = materials.texture( data=checkerboard,<br />
-  &nbsp;&nbsp;&nbsp;&nbsp;channels=[&quot;luminance&quot;],<br />
-  &nbsp;&nbsp;&nbsp;&nbsp;mapping=&quot;rectangular&quot;,<br />
-  &nbsp;&nbsp;&nbsp;&nbsp;interpolate=False)<br />
-          box(axis=(0,0,1), color=color.cyan, material=lum)</p>
-        <p class="Normal">If you wanted to create a texture containing &quot;rgb&quot; values,
-          you could start with zeros([M,N,3], float), and entries into this array
-          would be the usual
-          (red,green,blue) triples, with values for each color in the range 0-1
-          inclusive.</p>
-        <p class="Normal">The example above uses a &quot;rectangular&quot; mapping, which places the texture on
+      module which is imported when you import &quot;visual&quot;.) </p>
+      <p class="program">from visual import *<br />
+      checkerboard = array([[0,1,0,1], <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,0,1,0],<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,1,0,1],<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,0,1,0]])<br />
+      tex = materials.texture(data=checkerboard,<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mapping=&quot;rectangular&quot;,<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;interpolate=False)<br />
+      box(axis=(0,0,1), color=color.cyan, material=tex)</p>
+    <p class="Normal">The example above uses a &quot;rectangular&quot; mapping, which places the texture on
           two opposing faces of a box, with stripes along the sides. By default, one of the faces is in the (1,0,0)
           direction, but this can be changed by specifying a different axis for the box, as was done in the example above.
           Other texture mappings are &quot;spherical&quot; (wraps around the entire object) and &quot;sign&quot;. The latter is similar
@@ -158,11 +144,25 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           box).</p>
         <p class="Normal">By default &quot;interpolate&quot; is True, but to get a sharply defined checkerboard
           in the example above, &quot;interpolate&quot; was set to False. </p>
-        <p class="Normal">In the example program <strong>texture_and_lighting.py</strong> you will find a creation of
+        <p class="Normal">You can save the texture for later use by supplying a file name, like this:</p>
+        <p class="program">tex = materials.texture(filename=&quot;checks&quot;,<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data=checkerboard,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mapping=&quot;rectangular&quot;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;interpolate=False)</p>
+        <p class="Normal">This saves the checkboard pattern in a file &quot;checks.tga&quot;, a targa file which many graphics applications can display. In later programs you can use this texture without recreating it. Just give the file name but no data:</p>
+        <p class="program">tex = materials.texture(filename=&quot;checks&quot;, # no data=...<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mapping=&quot;rectangular&quot;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;interpolate=False)</p>
+        <p class="Normal">You can create a numpy array of zeros in various formats, then assign values:</p>
+        <p class="program">pattern = zeros((4,8,3)) # 4 by 8 by 3 numpy array of 0's<br />
+          pattern[0][0] = (1,.5,.7) # assign first set of rgb<br />
+        </p>
+      <p class="Normal">In the example program <strong>texture_and_lighting.py</strong> you will find a creation of
           a beach ball using spherical mapping. In the example program <strong>stonehenge.py</strong> you will see an example of a display of a color photograph on a box, together
           with instructions on how to create a texture from a jpeg photo.</p>
-        <p class="Normal"><strong><font color="#0000A0">Creating your own materials </font></strong></p>
-        <p class="Normal">Creating your own materials is technically somewhat challenging. The Visual component program materials.py contains the shader models for wood and other materials, and it also contains instructions on how to build your own materials. Shader models are written in a C-like language, GLSL (OpenGL Shader Language).</p>
+      <p class="Normal">If you create a texture that is M by N (just 1 value for each location), each value can represent either luminance (brightness, or shade of gray) or opacity. In the latter case you must specify <span class="attribute">luminance=False</span>.</p>
+      <p class="Normal"><strong><font color="#0000A0">Creating your own materials </font></strong></p>
+        <p class="Normal">Creating your own materials (in contrast to creating textures) is technically somewhat challenging. The program materials.py, a component of the Visual module, contains the shader models for wood and other materials, and it also contains instructions on how to build your own materials. Shader models are written in a C-like language, GLSL (OpenGL Shader Language).</p>
     <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
