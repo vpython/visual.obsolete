@@ -78,7 +78,9 @@ sphere(pos=(0,h,0), radius=0.5, color=(1,0,0))
 ### Optional cropping:
 ###im = im.crop((x1,y1,x2,y2)) # (0,0) is upper left
 ##im = im.resize((width,height), Image.ANTIALIAS)
-##materials.saveBTX( name+".btx", im )
+##data = reshape( array( im.getdata(), ubyte ),
+##                        (im.size[0],im.size[1],len(im.getbands())) )
+##materials.saveTGA(name,data)
 
 for i in range(Nslabs):
     theta = i*2*pi/Nslabs
@@ -98,7 +100,7 @@ for i in range(Nslabs):
         slab = box(pos=(R*c, h/2., R*s), axis=(c,0,s),
                    size=(d,h,w), color=grey)
         if i == 0:
-            photo = materials.texture(filename="flower128", mapping="rectangular")
+            photo = materials.texture(data=materials.loadTGA("flower128"), mapping="rectangular")
         if i != 6:
             for x in range(2):
                 for y in range(2):
