@@ -298,7 +298,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 					// Cap end of curve
 					for (size_t a=0; a < sides; a++) {
 						projected[i+a+sides] = current;
-						normals[i+a+sides] = A;
+						normals[i+a+sides] = lastA;
 						if (!mono) light[i+a+sides] = light[a+i];
 					}
 				}
