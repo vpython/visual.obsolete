@@ -28,8 +28,8 @@ faces::faces()
 }
 
 void faces::set_length(size_t new_len) {
-	arrayprim_color::set_length(new_len);
 	normal.set_length(new_len);
+	arrayprim_color::set_length(new_len);
 }
 
 void
