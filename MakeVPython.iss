@@ -24,7 +24,7 @@ Source: "Lib\idlelib\config-main.def"; DestDir: "{app}\Lib\idlelib\"; Flags: uni
 
 Source: "c:\workspace\vpython-core2\site-packages\visual\cvisual.pyd"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 Source: "c:\workspace\vpython-core2\site-packages\visual\*.py"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "c:\workspace\vpython-core2\site-packages\visual\*.btx"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "c:\workspace\vpython-core2\site-packages\visual\*.tga"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 
 ; Execute compilevisual.py from the CVS files to compile the .pyc files:
 Source: "Lib\site-packages\visual\*.pyc"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
@@ -36,7 +36,7 @@ Source: "Lib\site-packages\numpy*egg-info"; DestDir: "{app}\Lib\site-packages\";
 Source: "Lib\site-packages\numpy\*"; DestDir: "{app}\Lib\site-packages\numpy\"; Components: numpy; Flags: recursesubdirs
 ;
 Source: "c:\workspace\vpython-core2\examples\*.py"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
-Source: "c:\workspace\vpython-core2\examples\*.btx"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
+Source: "c:\workspace\vpython-core2\examples\*.tga"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
 ;
 Source: "c:\workspace\vpython-core2\docs\index.html"; DestDir: "{app}\Lib\site-packages\visual\docs\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.html"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
