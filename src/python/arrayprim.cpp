@@ -27,7 +27,7 @@ void arrayprim_array<CTYPE>::set_length( size_t new_len ) {
 		// Shrink, keeping the last points (for retain)
 		//(*this)[ slice(0,new_len) ] = (*this)[ slice(old_len-new_len,old_len) ];
 		// Avoid array operations because they release the lock.
-		memmove( data(0), data(old_len-new_len), sizeof(CTYPE) * new_len * dims[1] );
+		memmove( data(0), data(old_len-new_len), sizeof(CTYPE) * new_len * 3 );
 	}
 	if (!old_len && allocated) old_len = 1;  // The very first point is meaningful even when length is 0; that's how an empty curve can have a color
 
