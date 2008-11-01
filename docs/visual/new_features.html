@@ -90,10 +90,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
     <td width="23" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td width="590" rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
-      <h2 align="center" class="attribute">Summary of new features in  Visual 5</h2>
-      <h3 class="style1">Beta release</h3>
-      <p class="Normal">This beta release is experimental in the sense that there are known bugs described <a href="#bugs">below</a>. Feel free to play with the exciting new features, 
-        but be aware that you may encounter problems.</p>
+      <h2 align="center" class="attribute">Summary of new features in  Visual 5.00</h2>
+      <h3 class="style1">New version</h3>
+      <p class="Normal">This new version has a few known bugs described <a href="#bugs">below</a>. Because this new version has not been tested by large numbers of people, we advise not deploying this yet in critical situations.</p>
       <p class="Normal">There is a new example program <strong>texture_and_lighting.py</strong> that displays many of 
         the new features: a swinging light illuminates a translucent  ball 
         that rolls on a wood-texture table. Also see the
@@ -119,7 +118,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         Now you  can <a href="display.html"><strong>create lights</strong></a> that are local, near other objects. The following
         statement creates a yellow light positioned  at (x,y,z):</p>
         <p class="program">lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
-      <p class="Normal">If you continually update lamp.p<span class="Normal">os, the light will move.</span></p>
+      <p class="Normal">If you continually update lamp.p<span class="Normal">os, the light will move.</span> You may wish to place an unshaded sphere or box at the same location so that the lamp behaves like a lamp.</p>
       <p class="Normal">If you want to disable all of the  lights, say scene.lights = [], making 
         an empty list of  lights.</p>
       <p class="Normal">A distant red light located in the direction (x,y,z) is created like this:</p>
@@ -150,13 +149,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <h3 class="style1">Fonts in labels</h3>
       <p class="Normal">You can now specify a font for a label, including font='sans' or 'serif' or 'monospace' (fixed-width). Pyhon Unicode text is supported. </p>
       <h3 class="style1">Specifying a gray</h3>
-      <p class="Normal">For convenience you can now say <span class="attribute">color=0.7</span> to mean color=(0.7,0.7,0.7).</p>
+      <p class="Normal">For convenience you can now say <span class="attribute">color=color.gray(0.7)</span> to mean color=(0.7,0.7,0.7).</p>
       <h3 class="style1">Render time </h3>
       <p class="Normal">If you say <span class="attribute">scene.show_rendertime = True</span>, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene). This can be a useful diagnostic of performance issues.</p>
       <h3 class="style1">Titlebar height</h3>
       <p class="Normal">The height in pixels of the title bar of a window is given by <span class="attribute">display.get_titlebar_height()</span>. These values are true for all windows, and this function is associated with the display class of objects, not with individual displays such as the standard scene, so scene.get_titlebar_height() won't work.</p>
       <p class="Normal">If you specify a window to be 400 by 400, the total height of the window is 400 pixels, of which part is the title bar. </p>
-      <h3><a name="bugs" id="bugs"></a><span class="style1">Known bugs in this beta version</span></h3>
+      <h3><a name="bugs" id="bugs"></a><span class="style1">Known bugs in this new version</span></h3>
       <p class="Normal">Here are known bugs:</p>
       <blockquote>
         <p class="Normal"><strong>scene.cursor.visible</strong> is not implemented yet and gives an error.<br />
