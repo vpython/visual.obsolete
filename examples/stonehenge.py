@@ -74,13 +74,11 @@ sphere(pos=(0,h,0), radius=0.5, color=(1,0,0))
 ##width = 128 # must be power of 2
 ##height = 128 # must be power of 2
 ##im = Image.open(name+".jpg")
-##print im.size # see size of image
+###print im.size # optionally see size of image
 ### Optional cropping:
 ###im = im.crop((x1,y1,x2,y2)) # (0,0) is upper left
 ##im = im.resize((width,height), Image.ANTIALIAS)
-##data = reshape( array( im.getdata(), ubyte ),
-##                        (im.size[0],im.size[1],len(im.getbands())) )
-##materials.saveTGA(name,data)
+##materials.saveTGA(name,im)
 
 for i in range(Nslabs):
     theta = i*2*pi/Nslabs
