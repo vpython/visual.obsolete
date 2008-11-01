@@ -138,23 +138,22 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       box(axis=(0,0,1), color=color.cyan, material=tex)</p>
     <p class="Normal">The example above uses a <span class="attribute">rectangular</span> mapping, which places the texture on
           two opposing faces of a box, with stripes along the sides. By default, one of the faces is in the (1,0,0)
-          direction, but this can be changed by specifying a different axis for the box, as was done in the example above. The <span class="attribute">sign</span> mapping is similar
+          direction, but this can be changed by specifying a different axis for the box, as was done in the example above. A <span class="attribute">sign</span> mapping is similar
           to rectangular but  is unaffected by the color of the object
           and appears on only one face of a box (determined by the axis of the
           box).
-          The   <span class="attribute">spherical</span> mapping wraps around the entire object.</p>
+          A   <span class="attribute">spherical</span> mapping wraps around the entire object. In the example program <strong>texture_and_lighting.py</strong> you can find a creation of
+          a beach ball using spherical mapping.</p>
       <p class="Normal">By default <span class="attribute">interpolate</span> is True, but to get a sharply defined checkerboard
           in the example above, it was set to False. </p>
         <p class="Normal">You can save the texture data in a  file for later use::</p>
       <p class="program">materials.saveTGA(&quot;checks&quot;, checkerboard)</p>
-        <p class="Normal">This saves the checkboard pattern in a file &quot;checks.tga&quot;, a targa file which many graphics applications can display. In later programs you can use this texture without recreating it:</p>
+        <p class="Normal">This saves the checkboard pattern in a file &quot;checks.tga&quot;, a targa file which many graphics applications can display. In later programs you can use this data without recreating it:</p>
         <p class="program">data = materials.loadTGA(&quot;checks&quot;)</p>
         <p class="Normal">One way to create a pattern is to start by creating a numpy array of zeros, then assign values to individual slots:</p>
         <p class="program">pattern = zeros((4,8,3)) # 4 by 8 by 3 numpy array of 0's<br />
           pattern[0][0] = (1,.5,.7) # assign first rgb triple<br />
         </p>
-      <p class="Normal">In the example program <strong>texture_and_lighting.py</strong> you can find a creation of
-          a beach ball using spherical mapping.</p>
       <p class="Normal"><strong><font color="#0000A0">Another  example </font></strong></p>
       <p class="Normal">Here is an example of placing a  &quot;sign&quot; on one face of a box, consisting of a 2 by 2 by 3 grid of color components: </p>
       <p class="program">from visual import *<br />
@@ -165,7 +164,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;interpolate=False)<br />
       box(axis=(0,0,1), material=tgrid)</p>
       <p class="Normal style1"><strong><font color="#0000A0">Making a texture from a photo</font></strong></p>
-      <p class="Normal">A texture can be created from a targa file, and various graphics applications can convert photos in jpeg or other formats to targa files. One tool for doing this is PIL, the Python Imaging Library, which can be downloaded and installed (you can find it with a web search). Here is an example of PIL code which converts a jpeg photo into a targa file which can be used to create a texture for displaying the image, as in the example program <strong>stonehenge.py</strong>. The array and reshape functions are part of numpy, the numeric array library that is automatically imported into Visual.</p>
+      <p class="Normal">A texture can be created from a targa file, and various graphics applications can convert photos in jpeg or other formats to targa files. One tool for doing this is PIL, the Python Imaging Library, which can be downloaded and installed (you can find it with a web search). Here is an example of PIL code which converts a jpeg photo into a targa file which can be used to create a texture for displaying the image, as in the example program <strong>stonehenge.py</strong>.</p>
       <p class="program">from visual import *<br />
         import Image # Must install PIL<br />
         name = &quot;flower&quot;<br />
@@ -194,7 +193,7 @@ materials.saveTGA(name,im)</p>
         <p class="Normal">3 values: <span class="attribute">channels=</span><span class="attribute">[&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;]</span> </p>
         <p class="Normal">4 values: <span class="attribute">channels=[&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;,&quot;opacity&quot;]</span></p>
       </blockquote>
-      <p class="Normal">Except for specifying that a pattern represents opacity rather than luminance (brightness, or shade of gray), it isn't necessary to specify channels when constructing a texture because the channel options shown above are the only possible sets of channels. However, it is expected that in the future there may be additional channels available, such as glossiness.</p>
+      <p class="Normal">Except for specifying that a pattern represents opacity rather than luminance (brightness, or shade of gray), it isn't necessary to specify channels when constructing a texture because the channel options shown above are currently the only valid sets of channels. However, it is expected that in the future there may be additional channels available, such as glossiness.</p>
       <p class="Normal"><strong><font color="#0000A0">Creating your own materials </font></strong></p>
       <p class="Normal">Creating your own materials (in contrast to creating textures) is technically somewhat challenging. The program <strong>materials.py</strong>, a component of the Visual module, contains the shader models for wood and other materials, and it also contains instructions on how to build your own materials. Shader models are written in a C-like language, GLSL (OpenGL Shader Language).</p>
     <!-- InstanceEndEditable --></td>
