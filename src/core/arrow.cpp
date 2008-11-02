@@ -11,7 +11,7 @@
 #include "material.hpp"
 
 namespace cvisual {
-	
+
 bool
 arrow::degenerate()
 {
@@ -24,10 +24,10 @@ arrow::arrow()
 }
 
 arrow::arrow( const arrow& other)
-	: primitive(other), fixedwidth( other.fixedwidth), 
-	headwidth( other.headwidth), headlength( other.headlength), 
+	: primitive(other), fixedwidth( other.fixedwidth),
+	headwidth( other.headwidth), headlength( other.headlength),
 	shaftwidth( other.shaftwidth)
-{	
+{
 }
 
 arrow::~arrow()
@@ -43,9 +43,10 @@ arrow::set_headwidth( double hw)
 double
 arrow::get_headwidth()
 {
-	return headwidth;
+	if (headwidth) return headwidth;
+	return 0.2*axis.mag();
 }
-	
+
 void
 arrow::set_headlength( double hl)
 {
@@ -55,9 +56,10 @@ arrow::set_headlength( double hl)
 double
 arrow::get_headlength()
 {
-	return headlength;
+	if (headlength) return headlength;
+	return 0.3*axis.mag();
 }
-	
+
 void
 arrow::set_shaftwidth( double sw)
 {
@@ -67,9 +69,10 @@ arrow::set_shaftwidth( double sw)
 double
 arrow::get_shaftwidth()
 {
-	return shaftwidth;
+	if (shaftwidth) return shaftwidth;
+	return 0.1*axis.mag();
 }
-	
+
 void
 arrow::set_fixedwidth( bool fixed)
 {
@@ -81,7 +84,7 @@ arrow::is_fixedwidth()
 {
 	return fixedwidth;
 }
-	
+
 void
 arrow::set_length( double l)
 {
@@ -100,7 +103,7 @@ arrow::get_center() const
 	return (pos + axis)/2.0;
 }
 
-void 
+void
 arrow::gl_pick_render( const view& scene)
 {
 	// TODO: material related stuff in this file really needs cleaning up!
@@ -199,8 +202,8 @@ void arrow::init_model()
 PRIMITIVE_TYPEINFO_IMPL(arrow)
 
 void
-arrow::effective_geometry( 
-	double& eff_headwidth, double& eff_shaftwidth, double& eff_length, 
+arrow::effective_geometry(
+	double& eff_headwidth, double& eff_shaftwidth, double& eff_length,
 	double& eff_headlength, double gcf)
 {
 	// First calculate the actual geometry based on the specs for headwidth,
@@ -212,7 +215,7 @@ arrow::effective_geometry(
 	static const double def_hl = 3.0; // default headlength multiplier. (x shaftwidth)
 	// maximum fraction of the total arrow length allocated to the head.
 	static const double max_headlength = 0.5;
-	
+
 	eff_length = axis.mag() * gcf;
 	if (shaftwidth)
 		eff_shaftwidth = shaftwidth * gcf;
@@ -223,12 +226,12 @@ arrow::effective_geometry(
 		eff_headwidth = headwidth * gcf;
 	else
 		eff_headwidth = eff_shaftwidth * def_hw;
-	
+
 	if (headlength)
 		eff_headlength = headlength * gcf;
 	else
 		eff_headlength = eff_shaftwidth * def_hl;
-	
+
 	if (fixedwidth) {
 		if (eff_headlength > max_headlength * eff_length)
 			eff_headlength = max_headlength * eff_length;
