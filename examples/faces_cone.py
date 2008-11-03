@@ -42,8 +42,6 @@ for vertex in range(3*N):
 
 ##model.color = model.pos/2 + (0.5,0,0.5) # alternative coloring
 
-##model.color[0::3] = (1,1,1)   # show where the triangles are
-
 while 1:
     rate(100)
     f.rotate(angle=0.01)

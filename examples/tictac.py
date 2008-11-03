@@ -12,7 +12,6 @@ gray = (1,1,1)
 yo=2.       
 base=grid (n=4, ds=1, gridcolor=gray)
 base.pos=base.pos+vector(-0.5, -2., -0.5)
-base.radius=0.02
 
 second=grid(n=4, ds=1, gridcolor=gray)
 second.pos=second.pos+vector(-0.5, -1., -0.5)

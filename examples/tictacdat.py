@@ -2,7 +2,7 @@ from visual import *
 
 def grid(n=5, ds = 1., gridcolor = (.6, .6, .6)):
     assert n > 2, "n must be > 2"
-    j=n/2
+    j=n//2
     k=j*2
     if k==n: offset=0
     else: offset = ds/2.

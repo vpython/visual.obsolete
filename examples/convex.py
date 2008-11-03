@@ -1,6 +1,8 @@
 from visual import *
 from random import uniform
 
+scene.range = 3
+
 a = convex(color=(0.5,0,0))
 b = convex(color=(0,0.5,0))
 c = convex(color=(0,0,0.5))
