@@ -194,6 +194,8 @@ materials.saveTGA(name,im)</p>
         <p class="Normal">4 values: <span class="attribute">channels=[&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;,&quot;opacity&quot;]</span></p>
       </blockquote>
       <p class="Normal">Except for specifying that a pattern represents opacity rather than luminance (brightness, or shade of gray), it isn't necessary to specify channels when constructing a texture because the channel options shown above are currently the only valid sets of channels. However, it is expected that in the future there may be additional channels available, such as glossiness.</p>
+      <p class="Normal"><strong><font color="#0000A0">mipmap </font></strong></p>
+      <p class="Normal">When an object in the scene is small and far away, there is no need to display its texture in full detail. With the default <span class="attribute">mipmap=True</span>, Visual prepares a set of smaller textures to use when appropriate. These additional textures take some time to prepare for later use, and they double the amount of memory used, but they can speed up the rendering of a scene. It should rarely be the case that you would need to set mipmap=False. </p>
       <p class="Normal"><strong><font color="#0000A0">Creating your own materials </font></strong></p>
       <p class="Normal">Creating your own materials (in contrast to creating textures) is technically somewhat challenging. The program <strong>materials.py</strong>, a component of the Visual module, contains the shader models for wood and other materials, and it also contains instructions on how to build your own materials. Shader models are written in a C-like language, GLSL (OpenGL Shader Language).</p>
     <!-- InstanceEndEditable --></td>
