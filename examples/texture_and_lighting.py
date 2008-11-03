@@ -50,7 +50,7 @@ sphere(pos=(0.15*width,R/4,0.3*depth), radius=R/4, color=color.yellow, material=
 sphere(pos=(0.15*width,R/4,-0.3*depth), radius=R/4, color=color.green, material=materials.marble)
 sphere(pos=(0.1*width,R/4,-0.45*depth), radius=R/4, color=color.cyan, material=materials.marble)
 scene.lights = []
-scene.ambient = 0.25
+scene.ambient = color.gray(0.25)
 l1 = distant_light(direction=(6,2,4), color=color.gray(0.3))
 l2 = distant_light(direction=(-10,2,4), color=color.gray(0.2))
 lamplight = local_light(frame=pendulum, pos=(L,0,0), color=color.gray(0.5))

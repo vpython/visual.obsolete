@@ -54,11 +54,6 @@ struct rgb_from_seq
 		void* storage = (
 			(py::converter::rvalue_from_python_storage<rgb>*)
 			data)->storage.bytes;
-		if (PyFloat_Check(_obj) || PyInt_Check(_obj)) {
-			new (storage) rgb( py::extract<float>(obj));
-			data->convertible = storage;
-			return;
-		}
 		new (storage) rgb(
 			py::extract<float>(obj[0]),
 			py::extract<float>(obj[1]),
@@ -107,11 +102,6 @@ struct rgba_from_seq
 		void* storage = (
 			(py::converter::rvalue_from_python_storage<rgba>*)
 			data)->storage.bytes;
-		if (PyFloat_Check(_obj) || PyInt_Check(_obj)) {
-			new (storage) rgba( py::extract<float>(obj));
-			data->convertible = storage;
-			return;
-		}
 		int obj_size = PyObject_Length(_obj);
 		if (obj_size == 3)
 			new (storage) rgba(
