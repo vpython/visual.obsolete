@@ -44,16 +44,16 @@ back = box(pos=(0,height/2-thick,-(depth/2+thick/2)), size=(width+2*thick,height
 ceiling = box(pos=(0,H+thick/2,0), size=(width/10,thick,width/10), color=color.orange, material=materials.wood)
 pendulum = frame(pos=(0,H,0), axis=(0,-1,0))
 wire = curve(frame=pendulum, pos=[(0,0,0),(L,0,0)])
-lamp = sphere(frame=pendulum, pos=(L,0,0), radius=0.03*L, color=1, material=materials.unshaded)
+lamp = sphere(frame=pendulum, pos=(L,0,0), radius=0.03*L, color=color.white, material=materials.unshaded)
 sphere(pos=(0.1*width,R/4,0.45*depth), radius=R/4, color=color.red, material=materials.marble)
 sphere(pos=(0.15*width,R/4,0.3*depth), radius=R/4, color=color.yellow, material=materials.marble)
 sphere(pos=(0.15*width,R/4,-0.3*depth), radius=R/4, color=color.green, material=materials.marble)
 sphere(pos=(0.1*width,R/4,-0.45*depth), radius=R/4, color=color.cyan, material=materials.marble)
 scene.lights = []
 scene.ambient = 0.25
-l1 = distant_light(direction=(6,2,4), color=0.3)
-l2 = distant_light(direction=(-10,2,4), color=0.2)
-lamplight = local_light(frame=pendulum, pos=(L,0,0), color=0.5)
+l1 = distant_light(direction=(6,2,4), color=color.gray(0.3))
+l2 = distant_light(direction=(-10,2,4), color=color.gray(0.2))
+lamplight = local_light(frame=pendulum, pos=(L,0,0), color=color.gray(0.5))
 scene.center = (0,0.4*H,0)
 scene.range = 0.45*H
 

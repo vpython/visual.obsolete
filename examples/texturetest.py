@@ -1,7 +1,7 @@
 from visual import *
 
 # Jonathan Brandmeyer
-scene.background = 0.8
+scene.background = color.gray(0.8)
 
 checkerboard = array([[0,0,1,1], 
 		      [0,0,1,1],

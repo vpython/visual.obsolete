@@ -14,9 +14,9 @@ lorenz = curve( color = color.black, radius=0.3 )
 
 # Draw grid
 for x in arange(0,51,10):
-    box(pos=(x,0,0), axis=(0,0,50), height=0.4, width=0.4, color=0.6)
+    box(pos=(x,0,0), axis=(0,0,50), height=0.4, width=0.4, color=(0.6,0.6,0.6) )
 for z in arange(-25,26,10):
-    box(pos=(25,0,z), axis=(50,0,0), height=0.4, width=0., color=0.6 )
+    box(pos=(25,0,z), axis=(50,0,0), height=0.4, width=0., color=(0.6,0.6,0.6) )
 
 dt = 0.01
 y = vector(35, -10, -7)
