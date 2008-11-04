@@ -184,10 +184,6 @@ public: // Public Data.
 	*/
 	int lod_adjust;
 
-	/** Change the background ambient lighting. */
-	void set_ambient( const rgb& color) { ambient = color; }
-	rgb get_ambient() { return ambient; }
-
 	/** Add a normal renderable object to the list of objects to be rendered into
 	 *  world space.
 	 */
@@ -309,6 +305,10 @@ public: // Public Data.
 	void set_range_d( double);
 	void set_range( const vector&);
 	vector get_range();
+
+	void set_ambient_f( float);
+	void set_ambient( const rgb&);
+	rgb get_ambient();
 
 	// TODO: Implement me too.  Right now it is fixed since changing it didn't
 	// appear to work right when moving the scene into the page.

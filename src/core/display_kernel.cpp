@@ -1280,6 +1280,24 @@ display_kernel::is_showing_rendertime()
 }
 
 void
+display_kernel::set_ambient_f( float a)
+{
+	ambient = rgb( a, a, a);
+}
+
+void
+display_kernel::set_ambient( const rgb& a)
+{
+	ambient = a;
+}
+
+rgb
+display_kernel::get_ambient()
+{
+	return ambient;
+}
+
+void
 display_kernel::set_range_d( double r)
 {
 	if (r == 0.0)

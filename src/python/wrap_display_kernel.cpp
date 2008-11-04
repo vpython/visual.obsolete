@@ -141,8 +141,6 @@ wrap_display_kernel(void)
 		// Functions for the internal use of renderable and light classes.
 		.def( "add_renderable", &display_kernel::add_renderable)
 		.def( "remove_renderable", &display_kernel::remove_renderable)
-		.add_property( "ambient", &display_kernel::get_ambient,
-			&display_kernel::set_ambient)
 		.add_property( "up",
 			py::make_function( &display_kernel::get_up,
 				py::return_internal_reference<>()),
@@ -199,6 +197,10 @@ wrap_display_kernel(void)
 		.staticmethod( "set_selected")
 		.def( "get_selected", &display_kernel::get_selected)
 		.staticmethod( "get_selected")
+
+		.def( "_set_ambient", &display_kernel::set_ambient_f)
+		.def( "_set_ambient", &display_kernel::set_ambient)
+		.def( "_get_ambient", &display_kernel::get_ambient)
 
 		.def( "_set_range", &display_kernel::set_range_d)
 		.def( "_set_range", &display_kernel::set_range)
