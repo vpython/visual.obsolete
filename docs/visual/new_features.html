@@ -59,6 +59,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
           <option value="color.html">Color &amp; Opacity</option>
+          <option value="display.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
@@ -93,27 +94,26 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <h2 align="center" class="attribute">Summary of new features in  Visual 5.00</h2>
       <h3 class="style1">New version</h3>
       <p class="Normal">This new version has a few known bugs described <a href="#bugs">below</a>. Because this new version has not been tested by large numbers of people, we advise not deploying this yet in critical situations.</p>
-      <p class="Normal">There is a new example program <strong>texture_and_lighting.py</strong> that displays many of 
-        the new features: a swinging light illuminates a translucent  ball 
-        that rolls on a wood-texture table. Also see the
+      <p class="Normal">There is a new example program <strong>texture_and_lighting.py</strong> that
+        displays many of the new features: a swinging light illuminates a translucent
+        ball that rolls on a wood table. Also see the
         example programs <strong>material_test.py</strong>, <strong>stonehenge.py</strong>, and <strong>boxlighttest.py</strong>.</p>
+      <h3 class="Normal"><span class="style1">Credits</span></h3>
       <p class="Normal">Visual 5 was created by David Scherer and Bruce Sherwood.
         Jonathan Brandmeyer provided support for opacity, local lighting, and
         textures, and some architectural changes, in Visual 4beta but had to
         stop work on the project before it was completed.  Further development
         has led to API changes which are incompatible with the Visual 4beta release,
-        so this release is version 5 instead of 4.<br />
-        <br />
-The late Arthur Siegel implemented dependence on the currently supported numpy
-library in place of Numeric, which is no longer supported. Hugh Fisher provided
-a big start on the native-mode Mac version. Michael Temkine fixed some bugs and
-implemented keyboard handling for Windows.<br />
-<br />
-Previous to Visual 4beta, Jonathan Brandmeyer made several major contributions
-to Visual 3, including changing the connection between Python and C++ from CXX,
-which was no longer supported, to the Boost C++ libraries, and implementing auto-configurable
-installations for Linux.<br />
-</p>
+      so this release is version 5 instead of 4.</p>
+      <p class="Normal">        The late Arthur Siegel implemented dependence on the currently supported
+          numpy library in place of Numeric, which is no longer supported. Hugh
+          Fisher provided a big start on the native-mode Mac version. Michael
+      Temkine fixed some bugs and implemented keyboard handling for Windows.</p>
+      <p class="Normal">        Previous to Visual 4beta, Jonathan Brandmeyer made several major contributions
+        to Visual 3, including changing the connection between Python and C++
+        from CXX, which was no longer supported, to the Boost C++ libraries,
+        and implementing auto-configurable installations for Linux.<br />
+            </p>
       <h3 class="style1">Transparency/opacity</h3>
       <p class="Normal">You can make most objects be  transparent by specifying a value from
         0-1 inclusive for the attribute &quot;<a href="color.html"><strong>opacity</strong></a>&quot;. For example, <span class="attribute"><strong>box(color=color.red,
@@ -151,12 +151,20 @@ installations for Linux.<br />
       </p>
       <h3 class="style1">Lighting</h3>
       <p class="Normal">In previous versions of Visual, lights were 
-        restricted to being very distant from the scene (&quot;at infinity&quot;).
-        Now you  can <a href="display.html"><strong>create lights</strong></a> that are local, near other objects. The following
-        statement creates a yellow light positioned  at (x,y,z):</p>
+        restricted to being white and  very distant from the scene (&quot;at
+        infinity&quot;).
+        Now you  can <a href="display.html"><strong>create lights</strong></a> that
+        are local, near other objects, and you can specify colors for lights.
+        The following statement creates a yellow light positioned at (x,y,z):</p>
         <p class="program">lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
-      <p class="Normal">If you continually update lamp.p<span class="Normal">os, the light will move.</span> You may wish to place an unshaded sphere or box at the same location so that the lamp behaves like a lamp.</p>
-      <p class="Normal">If you want to disable all of the  lights, say scene.lights = [], making 
+      <p class="Normal">If you continually update lamp.p<span class="Normal">os,
+          the light will move.</span> You
+        may wish to place a sphere or box with material=materials.unshaded at
+        the same location so that the lamp looks like a lamp (an unshaded object
+      is unaffected by other lights and seems to glow).</p>
+      <p class="Normal">If you want to disable all of the  lights, so that the
+        only light is ambient light (scene.ambient), say <span class="attribute">scene.lights
+          = []</span>, making 
         an empty list of  lights.</p>
       <p class="Normal">A distant red light located in the direction (x,y,z) is created like this:</p>
       <p class="program">distant_light(direction=(x,y,z), color=color.red)</p>

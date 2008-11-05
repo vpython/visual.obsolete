@@ -54,6 +54,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Working with objects</option>
           <option value="color.html">Color &amp; Opacity</option>
+          <option value="display.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
@@ -134,8 +135,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             exceeds 1 anywhere in the scene the results are unpredictable. <span class="attribute">scene.lights</span> is
             a list of any lights you have created. <br />
       </p>
-          <p class="Normal">            You  can create lights that are local, near other objects. The following
-        statement creates a yellow light <em>positioned</em>  at (x,y,z), and if you continually update lamp.pos, the light will move.</p>
+          <p class="Normal">            You  can create lights that are local,
+            near other objects. The following statement creates a yellow light <em>positioned</em>  at
+            (x,y,z), and if you continually update lamp.pos, the light will move.
+            You may wish to place a sphere or box with material=materials.unshaded
+            at the same location so that the lamp looks like a lamp (an unshaded
+            object is unaffected by other lights and seems to glow).</p>
           <p class="program">            lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
           <p class="Normal">A distant red light located in the <em>direction</em> (x,y,z) is created like this:</p>
           <p class="program">distant_light(direction=(x,y,z), color=color.red)</p>
