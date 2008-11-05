@@ -28,8 +28,6 @@ struct rgb_from_seq
 	{
 		using py::handle;
 		using py::allow_null;
-		if (PyInt_Check(obj) || PyFloat_Check(obj))
-			return obj;
 
 		handle<> obj_iter( allow_null( PyObject_GetIter(obj)));
 		if (!obj_iter.get()) {
@@ -41,7 +39,7 @@ struct rgb_from_seq
 			PyErr_Clear();
 			return 0;
 		}
-		if (obj_size != 3 && obj_size != 4)
+		if (obj_size != 3)
 			return 0;
 		return obj;
 	}
