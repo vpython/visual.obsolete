@@ -111,9 +111,10 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           for points, and currently it is not possible to specify the opacity
           of a points object.</p>
           <p class="Normal">&nbsp;</p>
-          <p class="Normal"><span class="Normal">Technical caveat: If the &quot;GL_ARB_point_parameters&quot; property
-            is shown in scene.info() then type = &quot;world&quot; will wo</span>rk.
-          Otherwise the type is silently ignored and considered to be &quot;pixels&quot;.</p>
+          <p class="Normal"><span class="Normal"><em>Technical
+                caveat:</em> size_units=&quot;world&quot;          may not work on very old video drivers which do not support OpenGL
+          1.4 or the ARB_POINT_PARAMETERS extension. &nbsp;If you have problems,
+          upgrade your video driver.</span></p>
     <!-- InstanceEndEditable --></td>
   </tr>
   <tr>

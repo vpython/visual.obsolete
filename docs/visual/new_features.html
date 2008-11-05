@@ -104,6 +104,16 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         transparent, 
         and 1 means totally opaque. Currently curve, convex, faces, points, and helix objects
         do not allow transparency. </p>
+      <p class="Normal">You may see incorrect rendering any time there is a translucent
+        object (opacity
+        &lt; 1.0) which is not convex (e.g. ring), or two translucent objects which
+        overlap on the screen and also in their depth extents (distance of their
+        centers from the camera along scene.forward).&nbsp;The objects need not
+        actually overlap in 3D space to have problems.&nbsp;The incorrect rendering
+        will usually have the effect of making the more distant object disappear
+        (fail to show through the nearer object). These incorrect behaviors are
+        currently unavoidable in the context of VPython's rapid real-time 3D
+        graphics environment.</p>
       <h3 class="style1">Materials</h3>
       <p class="Normal">You can give a <a href="materials.html"><strong>material property</strong></a> such as wood to an object: </p>
       <p class="program">box(color=color.orange, material=materials.wood)</p>
@@ -111,7 +121,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         marble, earth (continents and oceans), rough, diffuse, and unshaded (that is,
         display the specified color unaffected by existing lights). The example program
         <strong>material_test.py</strong> shows examples of all of these materials.</p>
-      <p class="Normal"><em><strong>Specifying a material has an effect only on computers with modern graphics capabilities such as NVIDIA or Radeon graphics cards. On  computers without such graphics capabilities, objects are displayed without material properties.</strong></em></p>
+      <p class="Normal">Materials will work with graphics cards that support
+        Pixel Shader 3.0 (&quot;PS 3.0&quot;). For details, see<br />
+        <a href="http://en.wikipedia.org/wiki/Pixel_shader#Hardware" target="_blank">http://en.wikipedia.org/wiki/Pixel_shader#Hardware</a>.
+        <em>Some</em> materials may work with graphics cards that support PS
+        2.0, but other materials may need to be manually disabled; see instructions
+        in the Visual support program <strong>site-settings.py</strong>. If the
+        graphics hardware does not support pixel shaders, the material property
+        is ignored.<br />
+      </p>
       <h3 class="style1">Lighting</h3>
       <p class="Normal">In previous versions of Visual, lights were 
         restricted to being very distant from the scene (&quot;at infinity&quot;).
@@ -128,19 +146,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         As with curve, the pos attribute is an array of points, and color can
         also be an array. If you say <span class="attribute"><strong>shape=&quot;round&quot;</strong></span>,
         the points are round, which is the default; <span class="attribute"><strong>shape=&quot;square&quot;</strong></span> makes
-        square points. The size of the points is specified by <span class="attribute"><strong>size</strong></span>,
-        and the default size is 5 (meaning a square 5 by 5, or a circular disk
-        bounded by a 5 by 5 square). The size attribute is in screen pixels if <span class="attribute"><strong>size_units=&quot;pixels&quot;</strong></span> (the
-        default), but if <span class="attribute"><strong>size_units=&quot;world&quot;</strong></span>,
-        the size  is in the usual coordinates. <span class="Normal">The maximum
-        size of a point is about 50 by 50 pixels; specifying a larger size than
-        the maximum does not increase the size</span>. Lighting does not affect the appearance, which
-        is determined solely by the color. <span class="Normal">You cannot specify
-        a material for points, and currently it is not possible to specify the
-        opacity of a points object.</span></p>
-      <p class="Normal"> Technical caveat: If the &quot;GL_ARB_point_parameters&quot; property
-        is  shown in scene.info() then type = &quot;world&quot; will work. Otherwise
-        the  type is silently ignored and considered to be &quot;pixels&quot;.        </p>
+        square points. </p>
       <h3 class="style1">New frame option: visible</h3>
       <p class="Normal">You can now make a frame visible or invisible, and all objects in the frame
         will be affected. </p>
