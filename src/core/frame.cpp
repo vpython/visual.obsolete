@@ -421,4 +421,8 @@ void frame::get_children( std::vector< boost::shared_ptr<renderable> >& all )
 	all.insert( all.end(), trans_children.begin(), trans_children.end() );
 }
 
+void frame::outer_render(const cvisual::view& v) {
+  gl_render(v);
+}
+
 } // !namespace cvisual
