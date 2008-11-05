@@ -68,10 +68,10 @@ apply_material::apply_material( const view& v, material* m, tmatrix& model_mater
 	if ( (loc = m->shader->get_uniform_location( v, "light_count" )) >= 0 )
 		v.glext.glUniform1iARB( loc, v.light_count[0] );
 
-	if ( (loc = m->shader->get_uniform_location( v, "light_pos" )) >= 0 )
+	if ( (loc = m->shader->get_uniform_location( v, "light_pos" )) >= 0 && v.light_count[0])
 		v.glext.glUniform4fvARB( loc, v.light_count[0], &v.light_pos[0] );
 
-	if ( (loc = m->shader->get_uniform_location( v, "light_color" )) >= 0 )
+	if ( (loc = m->shader->get_uniform_location( v, "light_color" )) >= 0 && v.light_count[0] )
 		v.glext.glUniform4fvARB( loc, v.light_count[0], &v.light_color[0] );
 }
 
