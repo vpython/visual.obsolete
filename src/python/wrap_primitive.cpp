@@ -264,7 +264,8 @@ wrap_primitive()
 		.add_property( "data", &numeric_texture::get_data, &numeric_texture::set_data)
 		.add_property( "type", &numeric_texture::get_type, &numeric_texture::set_type)
 		.add_property( "mipmap", &numeric_texture::is_mipmapped, &numeric_texture::set_mipmapped)
-		.add_property( "interpolate", &numeric_texture::is_antialiased, &numeric_texture::set_antialias);
+		.add_property( "interpolate", &numeric_texture::is_antialiased, &numeric_texture::set_antialias)
+		.add_property( "clamp", &numeric_texture::get_clamp, &numeric_texture::set_clamp)
 		;
 
 	boost::python::to_python_converter< std::vector< shared_ptr<texture> >, textures_to_list>();

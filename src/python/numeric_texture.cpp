@@ -43,9 +43,9 @@ boost::crc_32_type engine;
 numeric_texture::numeric_texture()
 	: texdata(0),
 	data_width(0), data_height(0), data_depth(0), data_channels(0), data_type(NPY_NOTYPE),
-		data_textype( 0), data_mipmapped(true), data_antialias(false),
+		data_textype( 0), data_mipmapped(true), data_antialias(false), data_clamp(false),
 	tex_width(0), tex_height(0), tex_depth(0), tex_channels(0), tex_type(NPY_NOTYPE),
-		tex_textype( 0), tex_mipmapped(true), tex_antialias(false)
+		tex_textype( 0), tex_mipmapped(true), tex_antialias(false), tex_clamp(false)
 {
 }
 
@@ -71,6 +71,7 @@ numeric_texture::should_reinitialize(void) const
 	return (
 		data_channels != tex_channels ||
 		data_mipmapped != tex_mipmapped ||
+		data_clamp != tex_clamp ||
 		data_type != tex_type ||
 		(
 			!tex_mipmapped &&
@@ -118,11 +119,11 @@ numeric_texture::gl_init( const view& v )
 			data_antialias ? GL_LINEAR : GL_NEAREST);
 	}
 	tex_antialias = data_antialias;
-	/*glTexParameteri( type, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri( type, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri( type, GL_TEXTURE_WRAP_R, GL_CLAMP);*/
+	glTexParameteri( type, GL_TEXTURE_WRAP_S, data_clamp ? GL_CLAMP : GL_REPEAT );
+	glTexParameteri( type, GL_TEXTURE_WRAP_T, data_clamp ? GL_CLAMP : GL_REPEAT );
+	glTexParameteri( type, GL_TEXTURE_WRAP_R, data_clamp ? GL_CLAMP : GL_REPEAT );
+	tex_clamp = data_clamp;
 	check_gl_error();
-
 
 	// Something is damaged.  Either the texture must be reinitialized
 	// or just its data has changed.
@@ -288,8 +289,8 @@ numeric_texture::set_data( boost::python::numeric::array data)
 
 	damage();
 	texdata = data;
-	data_width = dims[0];
-	data_height = dims[1];
+	data_width = dims[1];
+	data_height = dims[0];
 	if (dims.size() == 4) data_depth = dims[2]; else data_depth = 0;
 	data_channels = channels;
 	have_opacity = (

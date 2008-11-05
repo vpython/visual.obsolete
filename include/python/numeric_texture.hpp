@@ -42,6 +42,7 @@ class numeric_texture : public texture
 	GLenum data_textype; // The type of GL texture object (GL_ALPHA, GL_RGB, etc)
 	bool data_mipmapped; // true if the data should be mipmapped
 	bool data_antialias;
+    bool data_clamp;
 
 	size_t tex_width;
 	size_t tex_height;
@@ -51,6 +52,7 @@ class numeric_texture : public texture
 	GLenum tex_textype;
 	bool tex_mipmapped;
 	bool tex_antialias;
+    bool tex_clamp;
 
 	bool degenerate() const;
 	bool should_reinitialize() const;
@@ -76,6 +78,9 @@ class numeric_texture : public texture
 
 	void set_antialias( bool);
 	bool is_antialiased( void);
+
+	void set_clamp(bool x) { data_clamp = x; }
+	bool get_clamp() { return data_clamp; }
 };
 
 } } // !namespace cvisual::python
