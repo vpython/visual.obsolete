@@ -144,6 +144,17 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         transparent, 
         and 1 means totally opaque. Currently curve, convex, faces, points, and helix objects
         do not allow transparency. </p>
+          <p class="Normal">You may see incorrect rendering any time there is
+            a translucent object (opacity
+        &lt; 1.0) which is not convex (e.g. ring), or two translucent objects
+         which overlap on the screen and also in their depth extents (distances
+         from the camera to the nearest and farthest planes perpendicular to
+         scene.forward which intersect the object).&nbsp;The objects need not
+         actually overlap in 3D space to have problems.&nbsp;The incorrect rendering
+         will usually have the effect of making the more distant object disappear
+         (fail to show through the nearer object). Accurate rendering of ad hoc
+         scenes with translucency is difficult and expensive, and we did not
+         want to wait for a perfect solution before introducing this useful enhancement.</p>
         </div>
       </div>
     <!-- InstanceEndEditable --></td>

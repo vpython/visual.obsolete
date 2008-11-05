@@ -97,6 +97,23 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         the new features: a swinging light illuminates a translucent  ball 
         that rolls on a wood-texture table. Also see the
         example programs <strong>material_test.py</strong>, <strong>stonehenge.py</strong>, and <strong>boxlighttest.py</strong>.</p>
+      <p class="Normal">Visual 5 was created by David Scherer and Bruce Sherwood.
+        Jonathan Brandmeyer provided support for opacity, local lighting, and
+        textures, and some architectural changes, in Visual 4beta but had to
+        stop work on the project before it was completed.  Further development
+        has led to API changes which are incompatible with the Visual 4beta release,
+        so this release is version 5 instead of 4.<br />
+        <br />
+The late Arthur Siegel implemented dependence on the currently supported numpy
+library in place of Numeric, which is no longer supported. Hugh Fisher provided
+a big start on the native-mode Mac version. Michael Temkine fixed some bugs and
+implemented keyboard handling for Windows.<br />
+<br />
+Previous to Visual 4beta, Jonathan Brandmeyer made several major contributions
+to Visual 3, including changing the connection between Python and C++ from CXX,
+which was no longer supported, to the Boost C++ libraries, and implementing auto-configurable
+installations for Linux.<br />
+</p>
       <h3 class="style1">Transparency/opacity</h3>
       <p class="Normal">You can make most objects be  transparent by specifying a value from
         0-1 inclusive for the attribute &quot;<a href="color.html"><strong>opacity</strong></a>&quot;. For example, <span class="attribute"><strong>box(color=color.red,
@@ -106,14 +123,16 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         do not allow transparency. </p>
       <p class="Normal">You may see incorrect rendering any time there is a translucent
         object (opacity
-        &lt; 1.0) which is not convex (e.g. ring), or two translucent objects which
-        overlap on the screen and also in their depth extents (distance of their
-        centers from the camera along scene.forward).&nbsp;The objects need not
+        &lt; 1.0) which is not convex (e.g. ring), or two translucent objects
+        which overlap on the screen and also in their depth extents (distances
+        from the camera to the nearest and farthest planes perpendicular to scene.forward
+        which intersect the object).&nbsp;The objects need not
         actually overlap in 3D space to have problems.&nbsp;The incorrect rendering
         will usually have the effect of making the more distant object disappear
-        (fail to show through the nearer object). These incorrect behaviors are
-        currently unavoidable in the context of VPython's rapid real-time 3D
-        graphics environment.</p>
+        (fail to show through the nearer object). Accurate  rendering
+        of ad hoc scenes with translucency is difficult and expensive, and we
+        did not want to wait for a perfect solution before introducing this useful
+        enhancement.</p>
       <h3 class="style1">Materials</h3>
       <p class="Normal">You can give a <a href="materials.html"><strong>material property</strong></a> such as wood to an object: </p>
       <p class="program">box(color=color.orange, material=materials.wood)</p>
@@ -126,9 +145,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <a href="http://en.wikipedia.org/wiki/Pixel_shader#Hardware" target="_blank">http://en.wikipedia.org/wiki/Pixel_shader#Hardware</a>.
         <em>Some</em> materials may work with graphics cards that support PS
         2.0, but other materials may need to be manually disabled; see instructions
-        in the Visual support program <strong>site-settings.py</strong>. If the
-        graphics hardware does not support pixel shaders, the material property
-        is ignored.<br />
+        in the <strong>site-settings.py</strong> module in the Visual package
+        in your site-packages folder. If the graphics hardware does not support
+        pixel shaders, the material property is ignored.<br />
       </p>
       <h3 class="style1">Lighting</h3>
       <p class="Normal">In previous versions of Visual, lights were 
