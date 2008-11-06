@@ -162,9 +162,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             are <span class="attribute">x=0</span>, <span class="attribute">y=0</span>, <span class="attribute">width=800</span>, <span class="attribute">height=400</span>, 
             
             no titles, fully autoscaled.</p>
-          <p class="Normal"> Every gdisplay has the attribute <span class="attribute">display</span>, 
-            
-            so you can place additional labels or manipulate  the graphing window:</p>
+          <p class="Normal"> Every gdisplay has the attribute <span class="attribute">display</span>,
+             
+            so you can place additional labels or manipulate  the graphing window.
+            The only objects that you can place in the graphing window are labels,
+            curves, faces, and points.</p>
           <p class="program">graph1 = gdisplay()<br />
 		  label(display=graph1.display, pos=(3,2), text=&quot;P&quot;)<br />
           graph1.display.visible = 0 # make the display invisible </p>
