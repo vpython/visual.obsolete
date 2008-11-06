@@ -117,7 +117,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           window in IDLE and run it (press F5, or use the Run menu), you will see 
           a display like the one shown in the figure. </p>
         <p class="program"> from visual import *<br />
-        redbox=box(pos=vector(4,2,3),size=(8,4,6),color=color.red)<br />
+        redbox=box(pos=vector(4,2,3),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        size=(8,4,6),color=color.red)<br />
         ball=sphere(pos=vector(4,7,3),radius=2,color=color.green)</p>
         <p class="Normal"> <span class="Heading-1"><img src="spherebox.gif" alt="sphere" align="right" /></span>Visual is the name of the 3D graphics module used with 
           
@@ -186,7 +187,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 
           <h3 class="Heading2"><font color="#0000A0">Vector magnitude</font> </h3>
           <p class="program">s = mag(c) # s is a scalar<br />
-          z = mag(c)**2 # you can't square a vector; just its magnitude</p>
+          z = mag(c)**2 # you can square the magnitude of a vector</p>
 
           <h3 class="Heading2"><font color="#0000A0">Vector products</font> </h3>
           <p class="program">f = cross(a,b) # cross product<br />
@@ -213,7 +214,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 
         <p class="Normal"> Variables can be created anywhere in a Python program, simply by assigning a variable name to a value. The type of the variable is determined by the assignment statement.</p>
         <p class="program"> a = 3 # an integer<br />
-        b = -2. # a floating-point number<<br />
+        b = -2. # a floating-point number<br />
         c = vector(0.4, 3e3, -1e1) # a vector<br />
         Earth = sphere(pos=(0,0,0), radius=6.4e6) # an object<br />
         bodies = [ship, Earth, Moon]	
@@ -221,15 +222,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           # a list of objects</p>
         <p class="Normal"> Basic Visual objects such as sphere() and box() have
           a set  
-          of attributes such as color, and you can define additional attributes
+          of &quot;attributes&quot; such as color, and you can define additional attributes
           such  
           as mass or velocity. Other objects, such as vector(), have built-in
           attributes 
-          but you cannot create additional attributes. Numbers, lists, and other
-          built-in  
-          objects do not have attributes.</p>
+          but you cannot create additional attributes. </p>
 
-        <h3 class="Heading2"><font color="#0000A0">Warning about division</font></h3>
+      <h3 class="Heading2"><font color="#0000A0">Warning about division</font></h3>
         <p class="Normal"> Division of integers will not come out the way you may expect, since the result is rounded down to the nearest integer. Thus:</p>
         <p class="program"> a = 3/4 <br />
         print a		# a is 0</p>
@@ -240,7 +239,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 
           <p class="Normal">We recommend putting the following statement as the
             first line of your program, in which case 3/4 will be 0.75; there
-            are two underscores before and after the word &quot;future&quot;:</p>
+            are two underscores before the word &quot;future&quot; and two after the word &quot;future&quot;:</p>
           <p class="program"> from __future__ import division</p>
           <h3 class="Heading2"><font color="#0000A0">Exponentiation</font></h3>
 
@@ -304,8 +303,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="program"> moons = [Io, Europa, Ganymede, Callisto]</p>
         <p class="Normal"> The function &quot;arange&quot; (short for &quot;arrayrange&quot;)
            creates an array of numbers:</p>
-        <p class="program"> angles = arange (0., 2.*pi, pi/100.) <br />
-        # numbers from 0. to 2.*pi-(pi/100.) in steps of (pi/100.)<br />
+        <p class="program"> angles = arange (0., 2*pi, pi/100) <br />
+        # from 0 to 2*pi-(pi/100) in steps of (pi/100)<br />
         <br />
         numbers = arange(10) # integer argument -&gt; integers<br />
         print numbers # [0,1,2,3,4,5,6,7,8,9] </p>
