@@ -187,10 +187,6 @@ III.  Build
 	DESTDIR may be used to prepend DESTDIR to the 'prefix' specified when running
 	configure.  This option is mostly useful to binary redistributors of VPython.
 	
-	If you want debugging symbols in your build (adds roughly 70 MB of data to the
-	final object file), you must manually edit cvisual/Makefile and remove `-g0` from
-	the CXXFLAGS variable.
-	
 	The Makefiles support the following targets:
 	all: (the default) compiles all the required software
 	clean: deletes files created by the compiler
