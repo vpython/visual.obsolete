@@ -72,12 +72,7 @@ void
 box::grow_extent( extent& e)
 {
 	tmatrix tm = model_world_transform( 1.0, vector( axis.mag(), height, width ) * 0.5 );
-
-	for (int i=-1; i<=1; i+=2)
-		for (int j=-1; j<=1; j+=2)
-			for (int k=-1; k<=1; k+=2)
-				e.add_point( tm * vector(i,j,k) );
-
+	e.add_box( tm, vector(-1,-1,-1), vector(1,1,1) );
 	e.add_body();
 }
 

@@ -366,22 +366,19 @@ frame::gl_pick_render( const view& scene)
 void
 frame::grow_extent( extent& world)
 {
-	world.push_frame();
-	extent local;
+	extent local( world, frame_world_transform(1.0) );
 	child_iterator i( children.begin());
 	child_iterator i_end( children.end());
 	for (; i != i_end; ++i) {
 		i->grow_extent( local);
-		world.add_body();
+		local.add_body();
 	}
 	trans_child_iterator j( trans_children.begin());
 	trans_child_iterator j_end( trans_children.end());
 	for ( ; j != j_end; ++j) {
 		j->grow_extent( local);
-		world.add_body();
+		local.add_body();
 	}
-	world.merge_local( frame_world_transform( 1.0), local);
-	world.pop_frame();
 }
 
 void frame::render_lights( view& world ) {

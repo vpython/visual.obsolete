@@ -55,17 +55,16 @@ class display_kernel
 	shared_vector forward; ///< The direction of the camera, in world space.
 	shared_vector up; ///< The vertical orientation of the scene, in world space.
 	vector internal_forward; ///< Do not permit internal_forward to be +up or -up
-	vector range; ///< The range that each axis of the scene should cover in the view.
+	vector range; ///< Explicitly specified scene.range, or (0,0,0)
 	vector camera; //< World coordinates of camera location
+	double range_auto;	//< Automatically determined camera z from autoscale
 
 	/** True initally and whenever the camera direction changes.  Set to false
 	 * after every render cycle.
 	 */
 	bool forward_changed;
 
-	extent world_extent; ///< The extent of the current world.
-	/** The number of scene renderings since the last extent calculation */
-	unsigned cycles_since_extent;
+	extent_data world_extent; ///< The extent of the current world.
 
 	double fov; ///< The field of view, in radians
 	bool autoscale; ///< True if Visual should scale the camera's position automatically.
@@ -84,7 +83,6 @@ class display_kernel
 	 Affects just curve, points, faces, label, and frame.
 	*/
 	vector gcfvec;
-	double last_range_mag;
 
 	/** True if the gcf has changed since the last render cycle.  Set to false
 	 * after every rendering cycle.

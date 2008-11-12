@@ -152,9 +152,7 @@ display_kernel::display_kernel()
 	forward(0, 0, -1),
 	internal_forward(0, 0, -1),
 	up(0, 1, 0),
-	range(10, 10, 10),
 	forward_changed(true),
-	cycles_since_extent(4),
 	fov( 60 * M_PI / 180.0),
 	autoscale(true),
 	autocenter(false),
@@ -163,7 +161,6 @@ display_kernel::display_kernel()
 	user_scale(1.0),
 	gcf(1.0),
 	gcfvec(vector(1.0,1.0,1.0)),
-	last_range_mag(0.0),
 	gcf_changed(false),
 	ambient( 0.2f, 0.2f, 0.2f),
 	show_toolbar( false),
@@ -176,7 +173,11 @@ display_kernel::display_kernel()
 	stereo_mode( NO_STEREO),
 	lod_adjust(0),
 	realized(false),
-	mouse( *this ){
+	mouse( *this ),
+	range_auto(0.0),
+	range(0,0,0),
+	world_extent(0.0)
+{
 }
 
 display_kernel::~display_kernel()
@@ -379,7 +380,7 @@ display_kernel::world_to_view_transform(
 	// See http://www.stereographics.com/support/developers/pcsdk.htm for a
 	// discussion regarding the design basis for the frustum offset code.
 
-	// gcf scales the region encompassed by scene.range into a 2x2x2 cube.
+	// gcf scales the region encompassed by scene.range_* into a ROUGHLY 2x2x2 cube.
 	// Note that this is NOT necessarily the entire world, since scene.range
 	//   can be changed.
 	// This coordinate system is used for most of the calculations below.
@@ -400,19 +401,42 @@ display_kernel::world_to_view_transform(
 	else
 		cot_hfov = 1.0 / std::max(tan_hfov_x, tan_hfov_y);
 
+	// The camera position is chosen by the tightest of the enabled range_* modes.
+	double cam_to_center_without_zoom = 1e150;
+	/*if (range_sphere_radius)
+		cam_to_center_without_zoom = std::min(cam_to_center_without_zoom,
+			range_sphere_radius / sin( fov * 0.5 ) );
+	if (range_box_size.nonzero()) {
+		if (range_unrotated) {
+			cam_to_center_without_zoom = std::min(cam_to_center_without_zoom,
+				std::max(range_box_size.x, range_box_size.y) * 0.5 * cot_hfov + range_box_size.z * 0.5);
+		} else
+			cam_to_center_without_zoom = std::min(cam_to_center_without_zoom,
+				range_box_size.mag() * 0.5 / sin( fov * 0.5 ) );
+	}*/
+	if (range_auto)
+		cam_to_center_without_zoom = std::min(cam_to_center_without_zoom, 
+			range_auto);
+	if (range.nonzero())
+		cam_to_center_without_zoom = std::min(cam_to_center_without_zoom,
+			range.x * cot_hfov / 1.02);
+	if (cam_to_center_without_zoom >= 1e150)
+		cam_to_center_without_zoom = 10.0 / sin( fov * 0.5 );
+	cam_to_center_without_zoom *= gcf * 1.02;
+
 	// Position camera so that a sphere containing the box range will fit on the screen
 	//   OR a 2*user_scale cube will fit.  The former is tighter for "non cubical" ranges
 	//   and the latter is tighter for cubical ones.
-	double radius = range.mag() * gcf * user_scale;
+	/*double radius = range.mag() * gcf * user_scale;
 	double cam_to_center_without_zoom = 1.02 * std::min( radius / sin( fov * 0.5 ),
-		                                                 cot_hfov + 1.0 );
+		                                                 cot_hfov + 1.0 );*/
 
 	vector scene_camera = scene_center - cam_to_center_without_zoom*user_scale*scene_forward;
 
 	double nearest, farthest;
-	world_extent.near_and_far(internal_forward, nearest, farthest); // nearest and farthest points relative to <0,0,0> when projected onto forward
-	nearest = nearest*gcf-scene_center.dot(internal_forward);
-	farthest = farthest*gcf-scene_center.dot(internal_forward);
+	world_extent.get_near_and_far(internal_forward, nearest, farthest); // nearest and farthest points relative to scene.center when projected onto forward
+	nearest = nearest*gcf;
+	farthest = farthest*gcf;
 
 	double cam_to_center = (scene_center - scene_camera).mag();
 	// Z buffer resolution is highly sensitive to nearclip - a "small" camera will have terrible z buffer
@@ -542,68 +566,66 @@ display_kernel::world_to_view_transform(
 void
 display_kernel::recalc_extent(void)
 {
-	world_extent.reset();
-	world_iterator i( layer_world.begin());
-	world_iterator end( layer_world.end());
-	while (i != end) {
-		i->grow_extent( world_extent);
-		++i;
-	}
-	world_trans_iterator j( layer_world_transparent.begin());
-	world_trans_iterator j_end( layer_world_transparent.end());
-	while (j != j_end) {
-		j->grow_extent( world_extent);
-		++j;
-	}
-	cycles_since_extent = 0;
-	if (autocenter) {
-		// Move the camera to accomodate the new center of the scene
-		center = world_extent.center();
-	}
-	if (autoscale) {
-		// Compute range such that the three axes, centered at center,
-		// will contain the entire scene.
-		vector new_range = world_extent.range( center);
-		bool new_range_valid = new_range.x || new_range.y || new_range.z;
-		if (!new_range.x) new_range.x = 1.0;
-		if (!new_range.y) range.y = 1.0;
-		if (!new_range.z) range.z = 1.0;
-		if (new_range.mag() > 1e150)
-			VPYTHON_CRITICAL_ERROR( "Cannot represent scene geometry with"
-				" an extent greater than about 1e154 units.");
+	double tan_hfov_x;
+	double tan_hfov_y;
+	tan_hfov( &tan_hfov_x, &tan_hfov_y );
+	double tan_hfov = std::max(tan_hfov_x, tan_hfov_y);
 
-		double mag = std::max(std::max(new_range.x,new_range.y),new_range.z);
-		if (!uniform || !last_range_mag || mag > last_range_mag) {
-			range = new_range;
-			if (new_range_valid)
-				last_range_mag = mag;
-		} else if ( mag * 3.0 < last_range_mag ) {
-			range = new_range * 3.0;
-			if (new_range_valid)
-				last_range_mag = mag * 3.0;
+	while (1) {  //< Might have to do this twice for autocenter
+		world_extent = extent_data( tan_hfov );
+
+		tmatrix l_cw;
+		l_cw.translate( -center );
+		extent ext( world_extent, l_cw );
+
+		world_iterator i( layer_world.begin());
+		world_iterator end( layer_world.end());
+		while (i != end) {
+			i->grow_extent( ext);
+			++i;
 		}
-
-        // We should NEVER deliberately set range to zero on any axis.
-		assert(range.x != 0.0 || range.y != 0.0 || range.z != 0.0);
+		world_trans_iterator j( layer_world_transparent.begin());
+		world_trans_iterator j_end( layer_world_transparent.end());
+		while (j != j_end) {
+			j->grow_extent( ext);
+			++j;
+		}
+		if (autocenter) {
+			vector c = world_extent.get_center() + center;
+			if ( (center-c).mag2() > (center.mag2() + c.mag2()) * 1e-6 ) {
+				// Change center and recalculate extent (since camera_z depends on center)
+				center = c;
+				continue;
+			}
+		}
+		break;
+	}
+	if (autoscale && uniform) {
+		double r = world_extent.get_camera_z();
+		if (r > range_auto) range_auto = r;
+		else if ( 3.0*r < range_auto ) range_auto = 3.0*r;
 	}
 
-	double scale = 1.0/(std::max(std::max(range.x,range.y),range.z));
+	// Rough scale calculation for gcf.  Doesn't need to be exact.
+	// TODO: If extent and range are very different in scale, we are using extent to drive
+	//   gcf.  Both options have pros and cons.
+	double mr = world_extent.get_range(vector(0,0,0)).mag();
+	double scale = mr ? 1.0 / mr : 1.0;
 
-	// xxx Instead of changing gcf so much, we should change it only when it is 2x
-	// off, and keep a separate OpenGL scaling factor, to aid primitives whose caching
-	// may depend on gcf.
-	if (gcf != scale) {
-		gcf = scale;
+	if (!uniform && range.nonzero()) {
 		gcf_changed = true;
-	}
-
-	gcfvec = vector(gcf,gcf,gcf);
-
-	if (!uniform) {
-		gcf_changed = true;
+		gcf = 1.0 / std::max( std::max( range.x, range.y ), range.z );
 		double width = (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
 			? view_width*0.5 : view_width;
 		gcfvec = vector(1.0/range.x, (view_height/width)/range.y, 0.1/range.z);
+	} else {
+		// TODO: Instead of changing gcf so much, we could change it only when it is 2x
+		// off, to aid primitives whose caching may depend on gcf (but are there any?)
+		if (gcf != scale) {
+			gcf = scale;
+			gcf_changed = true;
+		}
+		gcfvec = vector(gcf,gcf,gcf);
 	}
 }
 
@@ -880,7 +902,6 @@ display_kernel::render_scene(void)
 
 		// Cleanup
 		check_gl_error();
-		cycles_since_extent++;
 		gcf_changed = false;
 		forward_changed = false;
 	}
@@ -1149,14 +1170,15 @@ display_kernel::set_scale( const vector& n_scale)
 			"The scale of each axis must be non-zero.");
 
 	vector n_range = vector( 1.0/n_scale.x, 1.0/n_scale.y, 1.0/n_scale.z);
-	autoscale = false;
-	range = n_range;
+	set_range( n_range );
 }
 
 vector
 display_kernel::get_scale()
 {
-	return vector( 1/range.x, 1/range.y, 1/range.z);
+	if (autoscale || !range.nonzero())
+		throw std::logic_error("Reading .scale and .range is not supported when autoscale is enabled.");
+	return vector( 1.0/range.x, 1.0/range.y, 1.0/range.z );
 }
 
 void
@@ -1244,8 +1266,13 @@ display_kernel::get_foreground()
 void
 display_kernel::set_autoscale( bool n_autoscale)
 {
-	if (!n_autoscale && autoscale)
+	if (!n_autoscale && autoscale) {
+		// Autoscale is disabled, but range_auto remains
+		//   set to the current autoscaled scene, until and unless
+		//   range is set explicitly.
 		recalc_extent();
+		range = vector(0,0,0);
+	}
 	autoscale = n_autoscale;
 }
 
@@ -1300,11 +1327,7 @@ display_kernel::get_ambient()
 void
 display_kernel::set_range_d( double r)
 {
-	if (r == 0.0)
-		throw std::invalid_argument(
-			"attribute visual.display.range may not be zero.");
-	autoscale = false;
-	range = vector( r, r, r);
+	set_range( vector(r,r,r) );
 }
 
 void
@@ -1315,11 +1338,14 @@ display_kernel::set_range( const vector& n_range)
 			"attribute visual.display.range may not be zero.");
 	autoscale = false;
 	range = n_range;
+	range_auto = 0.0;
 }
 
 vector
 display_kernel::get_range()
 {
+	if (autoscale || !range.nonzero())
+		throw std::logic_error("Reading .scale and .range is not supported when autoscale is enabled.");
 	return range;
 }
 
