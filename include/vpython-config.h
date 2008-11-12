@@ -12,6 +12,7 @@
 # pragma warning(disable: 4005)
 # pragma warning(disable: 4715)
 # pragma warning(disable: 4244)
+#define isnan _isnan
 #endif
 
 #define BOOST_DATE_TIME_NO_LIB

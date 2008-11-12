@@ -6,19 +6,11 @@
 #include "util/extent.hpp"
 #include <algorithm>
 #include <iostream>
-
-#ifdef __GNUC__
-#define EXPECT(boolean_expression, boolean_constant) \
-	__builtin_expect( boolean_expression, boolean_constant)
-#else
-#define EXPECT(boolean_expression, boolean_constant) \
-	boolean_expression
-#endif	
-
+#include <cfloat>
 #include <limits>
 #define QNAN (std::numeric_limits<double>::quiet_NaN())
 
-namespace cvisual {	
+namespace cvisual {
 
 extent_data::extent_data(double tan_hfov)
 : mins(QNAN,QNAN,QNAN),
@@ -30,7 +22,7 @@ extent_data::extent_data(double tan_hfov)
 	invsin_hfov = 1.0 / sin( atan( tan_hfov ) );
 }
 
-bool extent_data::is_empty() const { return _isnan(mins.x); }
+bool extent_data::is_empty() const { return std::isnan(mins.x); }
 
 vector extent_data::get_center() const {
 	if (is_empty()) return vector();
@@ -43,7 +35,7 @@ void extent_data::get_near_and_far( const vector& forward, double& nearest, doub
 		// The only way that this should happen is if the scene is empty.
 		nearest = 1.0;
 		farthest = 10.0;
-	} 
+	}
     double corners[] = {
        maxs.dot(forward), // front upper right
        vector( mins.x, mins.y, maxs.z).dot(forward), // front lower left
@@ -103,11 +95,11 @@ extent::add_point( vector point)
 	data.mins.z = std::min( point.z, data.mins.z);
 	data.maxs.z = std::max( point.z, data.maxs.z);
 
-	data.camera_z  = std::max( data.camera_z, 
+	data.camera_z  = std::max( data.camera_z,
 		std::max(fabs(point.x),fabs(point.y))*data.cot_hfov + fabs(point.z) );
 }
 
-void 
+void
 extent::add_sphere( vector center, double radius)
 {
 	radius = fabs(radius); //<TODO: why?
@@ -120,9 +112,9 @@ extent::add_sphere( vector center, double radius)
 	data.mins.z = std::min( center.z - radius, data.mins.z );
 	data.maxs.z = std::max( center.z + radius, data.maxs.z );
 
-	data.camera_z  = std::max( data.camera_z, 
+	data.camera_z  = std::max( data.camera_z,
 		std::max(fabs(center.x),fabs(center.y))*data.cot_hfov
-			+ fabs(center.z) 
+			+ fabs(center.z)
 			+ radius * data.invsin_hfov );
 }
 
@@ -138,7 +130,7 @@ extent::add_box( const tmatrix& fwt, const vector& a, const vector& b ) {
 	add_point( fwt * b );
 }
 
-void 
+void
 extent::add_body()
 {
 	data.buffer_depth += 4 + frame_depth;
