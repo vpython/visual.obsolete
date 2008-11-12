@@ -71,6 +71,8 @@ public:
 	operator!( void) const throw()
 	{ return !x && !y && !z; }
 
+	bool nonzero() const throw() { return x || y || z; }
+
     // Overloaded assignment: +=, -=, *=, /=
 	inline const vector&
 	operator+=( const vector& v) throw()
