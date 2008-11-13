@@ -55,7 +55,6 @@ l1 = distant_light(direction=(6,2,4), color=color.gray(0.3))
 l2 = distant_light(direction=(-10,2,4), color=color.gray(0.2))
 lamplight = local_light(frame=pendulum, pos=(L,0,0), color=color.gray(0.5))
 scene.center = (0,0.4*H,0)
-scene.range = 0.45*H
 
 ball = sphere(pos=(width/4,R,0), radius=R, up=(0,1,1), material=stripes)
 xlimit = 0.5*width-R*sin(acos(1-(height-thick)/R))

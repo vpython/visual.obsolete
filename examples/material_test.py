@@ -4,7 +4,7 @@ from visual import *
 test_materials_individually = False
 
 scene.width = scene.height = 600
-scene.range = 5
+scene.range = 7
 scene.forward = (1,-1,-1)
 
 axis = (1,0,0)
