@@ -1,4 +1,8 @@
 # Place this make file in a directory parallel to vpython-core2
+# Then return to vpython-core2/src/mac and execute sudo make setup to establish links
+# Note however that apparently $(abspath makefile) and $(abspath ../../site-packages/visual)
+#    are ignored on OSX 10.4, which led to some puzzled grief, and other attempts to
+#    place a link in site-packages failed. It was necessary (as on XP) to copy files.
 # Be sure to specify what version of Python
 
 PYTHON_VERSION = 2.5
