@@ -32,7 +32,7 @@ render_cone_model( size_t n_sides, size_t n_stacks = 1)
 #if 0
 	// I've swapped out this algorithm for the GLU version, but I'm keeping it
 	// around in case I need it for something else later. -JDB
-	
+
 	// A rotation matrix to generate the edge vertexes and normals.
 	tmatrix rotator = rotation( -2 * M_PI / n_sides, vector( 1, 0, 0));
 	// A buffer to hold the last calculated ring.
@@ -40,7 +40,7 @@ render_cone_model( size_t n_sides, size_t n_stacks = 1)
 	// Another buffer to hold the normal vectors (it is only initialized once,
 	// and not overwritten later).
 	scoped_array<vector> normals( new vector[n_sides+1]);
-	
+
 	// Render the base and calculate the normals and the first ring of vertexes.
 	vertexes[0] = vector(0, 1, 0);
 	normals[0] = vector(1,1,0).norm();
@@ -54,7 +54,7 @@ render_cone_model( size_t n_sides, size_t n_stacks = 1)
 	}
 	vertexes[n_sides].gl_render();
 	glEnd();
-	
+
 	// Render the body of the cone.
 	double steps[] = { 0.3, 0.25, 0.2, 0.15, 0.1 };
 	for (size_t i = 0; i < 5; ++i) {
@@ -113,7 +113,7 @@ cone::init_model()
 	}
 }
 
-void 
+void
 cone::gl_pick_render( const view& scene)
 {
 	if (degenerate())
@@ -122,7 +122,7 @@ cone::gl_pick_render( const view& scene)
 
 	size_t lod = 2;
 	clear_gl_error();
-	
+
 	gl_matrix_stackguard guard;
 	const double length = axis.mag();
 	model_world_transform( scene.gcf, vector( length, radius, radius ) ).gl_mult();
@@ -131,7 +131,7 @@ cone::gl_pick_render( const view& scene)
 	check_gl_error();
 }
 
-void 
+void
 cone::gl_render( const view& scene)
 {
 	if (degenerate())
@@ -163,7 +163,7 @@ cone::gl_render( const view& scene)
 		lod = 0;
 	else if (lod > 5)
 		lod = 5;
-	
+
 	gl_matrix_stackguard guard;
 	const double length = axis.mag();
 	model_world_transform( scene.gcf, vector( length, radius, radius ) ).gl_mult();
@@ -172,11 +172,11 @@ cone::gl_render( const view& scene)
 
 	if (translucent()) {
 		gl_enable cull_face( GL_CULL_FACE);
-				
+
 		// Render the back half.
 		glCullFace( GL_FRONT);
 		cone_simple_model[lod].gl_render();
-		
+
 		// Render the front half.
 		glCullFace( GL_BACK);
 		cone_simple_model[lod].gl_render();
@@ -184,21 +184,21 @@ cone::gl_render( const view& scene)
 	else {
 		cone_simple_model[lod].gl_render();
 	}
-	
+
 	check_gl_error();
 }
 
-void 
+void
 cone::grow_extent( extent& e)
 {
 	if (degenerate())
 		return;
-	e.add_sphere( pos, radius);
+	e.add_circle( pos, axis.norm(), radius );
 	e.add_point( pos + axis);
 	e.add_body();
 }
 
-vector 
+vector
 cone::get_center() const
 {
 	return pos + axis/2.0;

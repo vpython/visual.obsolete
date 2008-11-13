@@ -15,7 +15,7 @@ class extent_data {
 private:
 	friend class extent;
 
-	double cot_hfov, invsin_hfov;
+	double cot_hfov, invsin_hfov, sin_hfov, cos_hfov;
 
 	vector mins, maxs;
 	double camera_z;
@@ -46,8 +46,8 @@ public:
 	size_t get_select_buffer_depth() { return buffer_depth; }
 };
 
-/** A helper class to determine the extent of the rendered universe in world 
-	space. 
+/** A helper class to determine the extent of the rendered universe in world
+	space.
 	*/
 class extent
 {
@@ -61,8 +61,8 @@ class extent
 	~extent(); //< Might be necessary to "flush" local cached results into parent
 
 	// The following functions represent the interface for renderable objects.
-	/** Extend the range to include this point. 
- 		@param point a point in world space coordinates. 
+	/** Extend the range to include this point.
+ 		@param point a point in world space coordinates.
  	*/
 	void add_point( vector point);
 	/** Extend the range to include this sphere.
@@ -73,7 +73,9 @@ class extent
 	/** Extend the range to include the region of local coordinate system
 	    from min to max **/
 	void add_box( const tmatrix& local_to_world, const vector& min, const vector& max );
-	
+	/** Extend the range to include this circle */
+	void add_circle( const vector& center, const vector& normal, double radius );
+
 	/** Report the number of bodies that this object represents.  This is used
 	 *  for the calculation of the hit buffer size.
 	 */

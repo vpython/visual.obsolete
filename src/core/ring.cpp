@@ -95,7 +95,12 @@ ring::grow_extent( extent& world)
 {
 	if (degenerate())
 		return;
-	world.add_sphere( pos, radius + (thickness ? thickness : (radius * 0.1)));
+	// TODO: Not perfectly accurate (a couple more circles would help)
+	vector a = axis.norm();
+	double t = thickness ? thickness : radius * .1;
+	world.add_circle( pos, a, radius + t );
+	world.add_circle( pos + a*t, a, radius );
+	world.add_circle( pos - a*t, a, radius );
 	world.add_body();
 }
 

@@ -168,21 +168,16 @@ arrow::grow_extent( extent& world)
 {
 	if (degenerate())
 		return;
-#if 1
-	// Hmm.  A more accurate, but much slower calc of the extent of this body.
-	double hl;
-	double hw;
-	double len;
-	double sw;
+	double hl, hw, len, sw;
 	effective_geometry( hw, sw, len, hl, 1.0);
-	// A sphere large enough to contain all four corners of the head.
-	world.add_sphere( pos + axis.norm()*(len-hl), hw * 1.414213562);
-	// A sphere large enough to contain all four corners of the base.
-	world.add_sphere( pos, sw * 1.414213562);
-#else
-	world.add_point( pos);
-#endif
-	// The tip.
+	vector x = axis.cross(up).norm() * 0.5;
+	vector y = axis.cross(x).norm() * 0.5;
+	vector base = pos + axis.norm()*(len-hl);
+	for(int i=-1; i<=+1; i+=2)
+		for(int j=-1; j<=+1; j+=2) {
+			world.add_point( pos + x*(i*sw) + y*(j*sw) );
+			world.add_point( base + x*(i*hw) + y*(j*hw) );
+		}
 	world.add_point( pos + axis);
 	world.add_body();
 }

@@ -6,8 +6,8 @@
 #include "util/extent.hpp"
 #include <algorithm>
 #include <iostream>
-#include <cfloat>
 #include <limits>
+#include <float.h>
 #define QNAN (std::numeric_limits<double>::quiet_NaN())
 
 namespace cvisual {
@@ -19,10 +19,12 @@ extent_data::extent_data(double tan_hfov)
   buffer_depth(0)
 {
 	cot_hfov = 1.0 / tan_hfov;
-	invsin_hfov = 1.0 / sin( atan( tan_hfov ) );
+	sin_hfov = sin( atan(tan_hfov) );
+	cos_hfov = sqrt( 1 - sin_hfov*sin_hfov );
+	invsin_hfov = 1.0 / sin_hfov;
 }
 
-bool extent_data::is_empty() const { return std::isnan(mins.x); }
+bool extent_data::is_empty() const { return !(mins.x == mins.x); } //< return isnan(mins.x)
 
 vector extent_data::get_center() const {
 	if (is_empty()) return vector();
@@ -35,6 +37,7 @@ void extent_data::get_near_and_far( const vector& forward, double& nearest, doub
 		// The only way that this should happen is if the scene is empty.
 		nearest = 1.0;
 		farthest = 10.0;
+		return;
 	}
     double corners[] = {
        maxs.dot(forward), // front upper right
@@ -95,6 +98,10 @@ extent::add_point( vector point)
 	data.mins.z = std::min( point.z, data.mins.z);
 	data.maxs.z = std::max( point.z, data.maxs.z);
 
+	// TODO: it might be more elegant (and even faster) to compute extents along
+	//   specified axes (normal to the sides of the view frustum) and then display_kernel
+	//   could compute camera_z from that.  The downside is that taking the fabs(point.z) out
+	//   means 4 axes are needed instead of 2.
 	data.camera_z  = std::max( data.camera_z,
 		std::max(fabs(point.x),fabs(point.y))*data.cot_hfov + fabs(point.z) );
 }
@@ -128,6 +135,32 @@ extent::add_box( const tmatrix& fwt, const vector& a, const vector& b ) {
 	add_point( fwt * vector(b.x,a.y,b.z) );
 	add_point( fwt * vector(b.x,b.y,a.z) );
 	add_point( fwt * b );
+}
+
+void extent::add_circle( const vector& center, const vector& normal, double r ) {
+	vector c = l_cw * center;
+	vector n = l_cw.times_v(normal);
+
+	vector n2( n.x*n.x, n.y*n.y, n.z*n.z );
+	vector r_proj( sqrt(1.0 - n2.x), sqrt(1.0 - n2.y), sqrt(1.0 - n2.z) );
+
+	data.mins.x = std::min( c.x - r_proj.x, data.mins.x );
+	data.maxs.x = std::max( c.x + r_proj.x, data.maxs.x );
+	data.mins.y = std::min( c.y - r_proj.y, data.mins.y );
+	data.maxs.y = std::max( c.y + r_proj.y, data.maxs.y );
+	data.mins.z = std::min( c.z - r_proj.z, data.mins.z );
+	data.maxs.z = std::max( c.z + r_proj.z, data.maxs.z );
+
+	double nxd = n.z*data.sin_hfov - n.x*data.cos_hfov;
+	double nyd = n.z*data.sin_hfov - n.y*data.cos_hfov;
+	data.camera_z  = std::max( data.camera_z,
+		fabs(c.x)*data.cot_hfov
+			+ fabs(c.z)
+			+ r * sqrt(1.0 - nxd*nxd) * data.invsin_hfov );
+	data.camera_z  = std::max( data.camera_z,
+		fabs(c.y)*data.cot_hfov
+			+ fabs(c.z)
+			+ r * sqrt(1.0 - nyd*nyd) * data.invsin_hfov );
 }
 
 void

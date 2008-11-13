@@ -74,7 +74,7 @@ cylinder::get_length()
 	return axis.mag();
 }
 
-void 
+void
 cylinder::gl_pick_render( const view& scene)
 {
 	if (degenerate())
@@ -92,7 +92,7 @@ cylinder::gl_pick_render( const view& scene)
 	check_gl_error();
 }
 
-void 
+void
 cylinder::gl_render( const view& scene)
 {
 	if (degenerate())
@@ -123,19 +123,19 @@ cylinder::gl_render( const view& scene)
 		lod = 0;
 	else if (lod > 5)
 		lod = 5;
-	
+
 	gl_matrix_stackguard guard;
 	const double length = axis.mag();
 	model_world_transform( scene.gcf, vector( length, radius, radius ) ).gl_mult();
-	
+
 	if (translucent()) {
 		gl_enable cull_face( GL_CULL_FACE);
 		color.gl_set(opacity);
-				
+
 		// Render the back half.
 		glCullFace( GL_FRONT);
 		cylinder_simple_model[lod].gl_render();
-		
+
 		// Render the front half.
 		glCullFace( GL_BACK);
 		cylinder_simple_model[lod].gl_render();
@@ -144,22 +144,23 @@ cylinder::gl_render( const view& scene)
 		color.gl_set(opacity);
 		cylinder_simple_model[lod].gl_render();
 	}
-	
+
 	// Cleanup.
 	check_gl_error();
 }
 
-void 
+void
 cylinder::grow_extent( extent& e)
 {
 	if (degenerate())
 		return;
-	e.add_sphere( pos, radius);
-	e.add_sphere( pos + axis, radius);
+	vector a = axis.norm();
+	e.add_circle(pos, a, radius);
+	e.add_circle(pos+axis, a, radius);
 	e.add_body();
 }
-	
-vector 
+
+vector
 cylinder::get_center() const
 {
 	return pos + axis*0.5;

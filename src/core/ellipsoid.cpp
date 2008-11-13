@@ -12,49 +12,49 @@ ellipsoid::ellipsoid()
 {
 }
 
-void 
+void
 ellipsoid::set_length( double l)
 {
 	axis = axis.norm() * l;
 }
 
-double 
+double
 ellipsoid::get_length()
 {
 	return axis.mag();
 }
-	
-void 
+
+void
 ellipsoid::set_height( double h)
 {
 	height = h;
 }
 
-double 
+double
 ellipsoid::get_height()
 {
 	return height;
 }
-	
-void 
+
+void
 ellipsoid::set_width( double w)
 {
 	width = w;
 }
 
-double 
+double
 ellipsoid::get_width()
 {
 	return width;
 }
-	
-vector 
+
+vector
 ellipsoid::get_size()
 {
 	return vector(axis.mag(), height, width);
 }
 
-void 
+void
 ellipsoid::set_size( const vector& s)
 {
 	axis = axis.norm() * s.x;
@@ -79,7 +79,11 @@ ellipsoid::grow_extent( extent& world)
 {
 	if (degenerate())
 		return;
-	world.add_sphere( pos, std::max( width, std::max( height, axis.mag())));
+	//world.add_sphere( pos, std::max( width, std::max( height, axis.mag())));
+	// TODO: not accurate (overestimates extent)
+	vector s = vector(axis.mag(),height,width)*0.5;
+	world.add_box( model_world_transform(1.0), -s, s );
+
 	world.add_body();
 }
 
