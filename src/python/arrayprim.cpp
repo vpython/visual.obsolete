@@ -158,7 +158,7 @@ void arrayprim::append( const vector& npos, int retain )
 ////////////////////////////////
 
 arrayprim_color::arrayprim_color() {
-	float* color_i = color.data(0);
+	double* color_i = color.data(0);
 	for(int i=0; i<3; i++) color_i[i] = 1.f;
 }
 
@@ -235,16 +235,16 @@ void arrayprim_color::set_blue_d( const double arg )
 void arrayprim_color::append( const vector& npos, const rgb& ncolor, int retain )
 {
 	append( npos, retain );
-	float* last_color = color.data( count-1 );
+	double* last_color = color.data( count-1 );
 	last_color[0] = ncolor.red;
 	last_color[1] = ncolor.green;
 	last_color[2] = ncolor.blue;
 }
 
-void arrayprim_color::append_rgb( const vector& npos, float red, float green, float blue, int retain)
+void arrayprim_color::append_rgb( const vector& npos, double red, double green, double blue, int retain)
 {
 	append( npos, retain );
-	float* last_color = color.data( count-1 );
+	double* last_color = color.data( count-1 );
 	if (red != -1) last_color[0] = red;
 	if (green != -1) last_color[1] = green;
 	if (blue != -1)	last_color[2] = blue;

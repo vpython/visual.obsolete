@@ -103,8 +103,8 @@ points::gl_render( const view& scene)
 	const double* pos_i = pos.data();
 	const double* pos_end = pos.end();
 
-	const float* color_i = color.data();
-	const float* color_end = color.end();
+	const double* color_i = color.data();
+	const double* color_end = color.end();
 
 	// First classify each point based on whether or not it is translucent
 	if (points_shape == ROUND) { // Every point must be depth sorted
@@ -239,17 +239,12 @@ points::gl_render( const view& scene)
 vector
 points::get_center() const
 {
-	if (degenerate())
+	if (degenerate() || points_shape != ROUND)
 		return vector();
 	vector ret;
 	const double* pos_i = pos.data();
-	const double* pos_end = pos.end();
-	const float* color_i = color.data();
-	const float* color_end = color.end();
-	for ( ;pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 3) {
-		if (points_shape == ROUND) // || opacity)
-			ret += vector(pos_i);
-	}
+	for(int i=0; i<count; i++, pos_i+=3)
+		ret += vector(pos_i);
 	ret /= count;
 	return ret;
 }

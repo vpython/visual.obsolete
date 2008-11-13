@@ -269,7 +269,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 
 				normals[a+i] = rel.norm();
 				projected[a+i] = current + rel;
-				if (!mono) light[a+i] = rgb( c_i[0], c_i[1], c_i[2]);
+				if (!mono) light[a+i] = rgb( c_i );
 
 				if (!closed) {
 					// Cap start of curve
@@ -297,7 +297,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 
 				projected[i+a] = prev_end;
 				normals[i+a] = normals[i+a-sides];
-				if (!mono) light[i+a] = rgb( c_i[0], c_i[1], c_i[2] );
+				if (!mono) light[i+a] = rgb( c_i );
 
 				if (corner != pcount-1) {
 					vector next_start = prev_end - 2*(prev_end-current).dot(bisecting_plane_normal)*bisecting_plane_normal;
@@ -402,7 +402,7 @@ curve::gl_render( const view& scene)
 	size_t iptr=0, iptr3, pcount=0;
 
 	const double* p_i = pos.data();
-	const float* c_i = color.data();
+	const double* c_i = color.data();
 
 	// Choose which points to display
 	for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {

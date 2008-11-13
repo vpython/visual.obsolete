@@ -66,7 +66,7 @@ class arrayprim_color : public arrayprim {
 protected:
 	virtual void set_length(size_t);
 
-	arrayprim_array<float> color;
+	arrayprim_array<double> color;
 
 public:
 	arrayprim_color();
@@ -84,7 +84,7 @@ public:
 	void set_green_d( const double green );
 
 	using arrayprim::append;
-	void append_rgb( const vector& _pos, float red=-1, float green=-1, float blue=-1, int retain=-1 );
+	void append_rgb( const vector& _pos, double red=-1, double green=-1, double blue=-1, int retain=-1 );
 	void append( const vector& _pos, const rgb& _color, int retain ); // Append a single position with new color.
 	void append( const vector& _pos, const rgb& _color ) { append( _pos, _color, -1 ); }
 };

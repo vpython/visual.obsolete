@@ -185,18 +185,18 @@ faces::gl_render( const view& scene)
 	if (scene.anaglyph) {
 		std::vector<rgb> tmp( count);
 		tcolor.swap( tmp);
-		const float* color_i = color.data();
+		const double* color_i = color.data();
 		for (std::vector<rgb>::iterator i = tcolor.begin(); i != tcolor.end(); ++i) {
 			if (scene.coloranaglyph)
-				*i = rgb(color_i[0], color_i[1], color_i[2]).desaturate();
+				*i = rgb(color_i).desaturate();
 			else
-				*i =  rgb(color_i[0], color_i[1], color_i[2]).grayscale();
+				*i =  rgb(color_i).grayscale();
 			color_i += 3;
 		}
 		glColorPointer( 3, GL_FLOAT, 0, &*tcolor.begin());
 	}
 	else
-		glColorPointer( 3, GL_FLOAT, 0, color.data() );
+		glColorPointer( 3, GL_DOUBLE, 0, color.data() );
 
 	gl_enable cull_face( GL_CULL_FACE);
 	for (size_t drawn = 0; drawn < count - count%3; drawn += 54) {

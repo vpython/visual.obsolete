@@ -66,6 +66,8 @@ class rgb
 	{}
 	inline explicit rgb( const float* c)
 		: red(c[0]), green(c[1]), blue(c[2]) {}
+	inline explicit rgb( const double* c)
+		: red(c[0]), green(c[1]), blue(c[2]) {}
 	inline rgb( const rgb& other)
 		: red( other.red), green( other.green), blue(other.blue)
 	{}
