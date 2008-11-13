@@ -57,8 +57,7 @@ CVISUAL_CPPFLAGS = $(BOOST_INCLUDES) $(PYTHON_INCLUDES) -DHAVE_CONFIG_H \
 		-I$(top_srcdir)/include -I$(top_builddir)/include
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-CXXFLAGS = @CXXFLAGS@ -ftemplate-depth-120
-#CXXFLAGS = @CXXFLAGS@ -ftemplate-depth-120 -DNDEBUG
+CXXFLAGS = @CXXFLAGS@ -ftemplate-depth-120 -DNDEBUG
 CPPFLAGS = @CPPFLAGS@
 
 # Object file list.  Since we are building a shared library with PIC code, we 
