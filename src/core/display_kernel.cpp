@@ -415,7 +415,7 @@ display_kernel::world_to_view_transform(
 				range_box_size.mag() * 0.5 / sin( fov * 0.5 ) );
 	}*/
 	if (range_auto)
-		cam_to_center_without_zoom = std::min(cam_to_center_without_zoom, 
+		cam_to_center_without_zoom = std::min(cam_to_center_without_zoom,
 			range_auto);
 	if (range.nonzero())
 		cam_to_center_without_zoom = std::min(cam_to_center_without_zoom,
@@ -1054,7 +1054,7 @@ display_kernel::pick( int x, int y, float d_pixels)
         // TODO: Replace the calls to gluUnProject() with own tmatrix inverse
         // and such for optimization
         vector tcenter;
-        gluProject( center.x, center.y, center.z,
+        gluProject( center.x*gcf, center.y*gcf, center.z*gcf,
            	modelview.matrix_addr(),
             projection.matrix_addr(),
             viewport_bounds,
