@@ -59,10 +59,7 @@ display::display()
  : window_visible(false),
    window(0),
    gl_context(0),
-   buttonState(0),
-   buttonsChanged(0),
-   keyModState(0),
-   mouseLocked(false)
+   keyModState(0)
 {
 }
 
@@ -87,7 +84,6 @@ void
 display::gl_begin()
 {
 	aglSetCurrentContext(gl_context);
-	delete_pending_lists();
 	current = this;
 }
 
@@ -149,38 +145,6 @@ display::activate(bool active) {
 	} else {
 		gui_main::call_in_gui_thread( boost::bind( &display::destroy, this ) );
 	}
-}
-
-void
-display::makeCurrent()
-{
-	SetPortWindowPort(window);
-	aglSetCurrentContext(gl_context);
-	delete_pending_lists();
-}
-
-void
-display::makeNotCurrent()
-{
-	aglSetCurrentContext(NULL);
-}
-
-void
-display::add_pending_glDeleteList(int base, int howmany)
-{
-	// TODO: Cache::write_lock L(list_lock);
-	pending_glDeleteLists.push_back( std::make_pair(base, howmany));
-}
-
-void
-display::delete_pending_lists()
-{
-	// TODO: Cache::write_lock L( list_lock);
-	for (std::vector<std::pair<int, int> >::iterator i = pending_glDeleteLists.begin();
-		i != pending_glDeleteLists.end(); ++i) {
-		glDeleteLists(i->first, i->second);
-	}
-	pending_glDeleteLists.clear();
 }
 
 int
@@ -580,34 +544,6 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 	update_size();
 
 	return true;
-}
-
-bool
-display::isOpen()
-{
-	return window != NULL;
-}
-
-void
-display::lockMouse()
-{
-}
-
-void
-display::unlockMouse()
-{
-}
-
-void
-display::showMouse()
-{
-	ShowCursor();
-}
-
-void
-display::hideMouse()
-{
-	HideCursor();
 }
 
 #include <dlfcn.h>

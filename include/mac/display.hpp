@@ -25,31 +25,11 @@ class display : public display_kernel
 	// Called by the gui_main class below (or render_manager as its agent)
 	void create();
 	void destroy();
-	void show();
-	void hide();
 	void paint();
 	void swap() { gl_swap_buffers(); }
-	
-	void lockMouse();
-	void unlockMouse();
-	void showMouse();
-	void hideMouse();
-
-	int getShiftKey();
-	int getAltKey();
-	int getCtrlKey();
-	
-	// Functions to manipulate the OpenGL context
-	void gl_begin();
-	void gl_end();
-	void gl_swap_buffers();
-
-	OSStatus display::vpWindowHandler (EventHandlerCallRef target, EventRef event);
-	OSStatus display::vpMouseHandler (EventHandlerCallRef target, EventRef event);
-	OSStatus display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event);
 
 	// Tells the application where it can find its data.
-	// Win32 doesn't use this information.
+	// Mac doesn't use this information.
 	static void set_dataroot( const std::wstring& ) {};
 
 	// Implements key display_kernel virtual methods
@@ -57,49 +37,34 @@ class display : public display_kernel
 	EXTENSION_FUNCTION getProcAddress( const char* name );
 	
  private:
-	friend class aglFont;
-	static display* current;
-	
 	bool initWindow( std::string title, int x, int y, int width, int height );
 	void update_size();
-	bool isOpen();
 	void on_destroy();
-	bool user_close; // true if user closed the window
-	int yadjust; // set to height of title bar when creating a window
 	  
-	void makeCurrent();
-	void makeNotCurrent();
-	void swapBuffers();
+	// Functions to manipulate the OpenGL context
+	void gl_begin();
+	void gl_end();
+	void gl_swap_buffers();
 
- 	bool window_visible;
+	OSStatus vpWindowHandler (EventHandlerCallRef target, EventRef event);
+	OSStatus vpMouseHandler (EventHandlerCallRef target, EventRef event);
+	OSStatus vpKeyboardHandler (EventHandlerCallRef target, EventRef event);
 
-    // This is a list of glDeleteLists calls that should be made the next time
-    // the context is made active.
-    mutex list_lock;
-	std::vector<std::pair<int, int> > pending_glDeleteLists;
+	int getShiftKey();
+	int getAltKey();
+	int getCtrlKey();
 
-	inline std::string lastError() { return error_message; }
-    
-	AGLContext getContext () { return gl_context; }
-	
-	//void destroy_context (aglContext * cx);
-	
-	void add_pending_glDeleteList(int base, int howmany);
-	
+ private:  // data
+	static display* current;
+
 	WindowRef	window;
 	AGLContext	gl_context;
-	std::string error_message;
 
-	int buttonState, buttonsChanged;
+	bool user_close; // true if user closed the window
+	int yadjust; // set to height of title bar when creating a window
+ 	bool window_visible;
+
 	UInt32 keyModState;
-	vector mousePos, oldMousePos;
-	bool mouseLocked;
-
- protected:
-	// Implementors of this class should call this function in their implementation
-	// of makeCurrent();
- 	void delete_pending_lists();
-
 };
 
 /***************** gui_main implementation ********************/
@@ -111,6 +76,7 @@ class gui_main
 	static void init_thread(void);
 
 	gui_main();	//< This is the only nonstatic member function that doesn't run in the gui thread!
+	void event_loop();
 	void poll();
 
 	static gui_main* self;
@@ -122,13 +88,6 @@ class gui_main
  public:
 	 // Calls the given function in the GUI thread.
 	 static void call_in_gui_thread( const boost::function< void() >& f );
-	 
-	 static bool doQuit(void * arg);
-	 void event_loop();
-	 
-	 // Calls the given function in the GUI thread.
-	 //static void call_in_gui_thread( const boost::function< void() >& f );
-	 //void timer_callback();
 	
 	 // This signal is invoked when the user closes the program (closes a display
 	 // with display.exit = True).
