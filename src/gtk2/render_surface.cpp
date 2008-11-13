@@ -206,7 +206,8 @@ render_surface::on_button_release_event( GdkEventButton* event)
 void
 render_surface::gl_begin()
 {
-	assert( get_gl_window()->gl_begin(get_gl_context()));
+	bool ok = get_gl_window()->gl_begin(get_gl_context());
+	assert(ok);
 }
 
 void
