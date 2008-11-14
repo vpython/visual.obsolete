@@ -157,7 +157,7 @@ protected:
 	// they are not used in constructing the display (they are outputs of
 	// that process)
 	// This includes both viewports in a side-by-side stereo mode, whereas
-	//   view.view_width does not.  (xxx?)
+	//   view::view_width does not.
 	int view_x, view_y, view_width, view_height;
 
 	bool exit; ///< True when Visual should shutdown on window close.
@@ -307,11 +307,6 @@ public: // Public Data.
 	void set_ambient_f( float);
 	void set_ambient( const rgb&);
 	rgb get_ambient();
-
-	// TODO: Implement me too.  Right now it is fixed since changing it didn't
-	// appear to work right when moving the scene into the page.
-	void set_stereodepth( double);
-	double get_stereodepth();
 
 	// The only mode that cannot be changed after initialization is active,
 	// which will result in a gl_error exception when rendered.  The completing

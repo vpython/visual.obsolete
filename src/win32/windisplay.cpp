@@ -103,8 +103,6 @@ display::display()
 {
 }
 
-// TODO: Change mouse movement handling to lock the mouse in place and continue
-// to process events.
 // This function dispatches incoming messages to the particular message-handler.
 LRESULT CALLBACK
 display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -272,7 +270,7 @@ display::on_destroy(WPARAM wParam,LPARAM lParam)
 	// (e.g. scene.visible = 0)
 	report_closed();
 	// We can only free the OpenGL context if it isn't the one we are using for display list sharing
-	// xxx Display list sharing is the suck
+	// TODO: Eliminate display list sharing!
 	if ( gl_context != root_glrc )
 		wglDeleteContext( gl_context );
 	ReleaseDC( widget_handle, dev_context);

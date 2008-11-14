@@ -173,9 +173,6 @@ convex::grow_extent( extent& world)
 	if (degenerate())
 		return;
 
-	// TODO use min_extent and max_extent, once locking mechanism is changed so that we
-	// can checksum once per frame and trust that things haven't changed before gl_render!
-
 	long check = checksum();
 	if (check != last_checksum) {
 		recalc();

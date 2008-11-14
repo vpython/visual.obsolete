@@ -84,8 +84,8 @@ namespace cvisual { namespace python {
 
   class double_array : public array {
   public:
-  	double_array( const boost::python::handle<>& h ) : array(h) {}
-  	double_array( const array& a ) : array(a) {}  //< TODO: callers are doing unnecessary copying; somewhat type unsafe
+  	explicit double_array( const boost::python::handle<>& h ) : array(h) {}
+  	//double_array( const array& a ) : array(a) {}  //< TODO: callers are doing unnecessary copying; somewhat type unsafe
   };
 
   //!

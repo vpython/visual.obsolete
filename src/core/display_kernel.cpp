@@ -462,8 +462,6 @@ display_kernel::world_to_view_transform(
 	// Translate camera left/right 2% of the viewable width of the scene at
 	// the distance of its center.
 	double camera_stereo_offset = tan_hfov_x * cam_to_center * 0.02;
-	// TODO: This should be doable with a simple glTranslated() call, but I haven't
-	// found the magic formula for it.
 	vector camera_stereo_delta = camera_stereo_offset
 		* up.cross( scene_camera).norm() * whicheye;
 	scene_camera += camera_stereo_delta;
@@ -724,7 +722,7 @@ display_kernel::draw(
 bool
 display_kernel::render_scene(void)
 {
-	// xxx Exception handling?
+	// TODO: Exception handling?
 	if (!realized) {
 		realize();
 
@@ -863,7 +861,7 @@ display_kernel::render_scene(void)
 		if (show_rendertime) {
 			double render_time = render_timer.elapsed()-start_time, flush_time = -1;
 
-			#if 0 // xxx Only for performance measurement; disable in shipping code
+			#if 0 //< Only for performance measurement; disable in shipping code
 			glFinish();
 
 			flush_time = render_timer.elapsed() - start_time - render_time;
@@ -915,7 +913,7 @@ display_kernel::render_scene(void)
 		render_time = render_timer.elapsed()-start_time;
 	}
 
-	// xxx Can we delay picking until the Python program actually wants one of these attributes?
+	// TODO: Can we delay picking until the Python program actually wants one of these attributes?
 	mouse.get_mouse().cam = camera;
 	boost::tie( mouse.get_mouse().pick, mouse.get_mouse().pickpos, mouse.get_mouse().position) =
 		pick( mouse.get_x(), mouse.get_y() );

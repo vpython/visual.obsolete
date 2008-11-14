@@ -111,7 +111,7 @@ display::create()
 
 	// window_width and window_height give the size of the window (including borders and such)
 	// determine the size of the render_surface
-	// xxx Some way to use less magic constants here?
+	// TODO: Some way to determine border_width, border_height, titlebar_height programmatically?
 	int w = window_width, h = window_height;
 	w -= border_width; h -= border_height;
 	h -= get_titlebar_height();
@@ -420,6 +420,8 @@ gui_main::init_thread(void)
 		#if defined(_WIN32)
 			SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
 		#else
+			// TODO: this changes the _process_ priority, which has no effect on the relative
+			// priority of the rendering and python threads!
 			int default_prio = getpriority(PRIO_PROCESS, getpid());
 			setpriority(PRIO_PROCESS, getpid(), std::min(default_prio+5, 19) );
 		#endif

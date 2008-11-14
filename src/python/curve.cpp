@@ -466,9 +466,9 @@ void
 curve::get_material_matrix( const view& v, tmatrix& out ) {
 	if (degenerate()) return;
 
-	// xxx note this code is identical to faces::get_material_matrix, except for considering radius
+	// TODO: note this code is identical to faces::get_material_matrix, except for considering radius
 
-	// xxx Add some caching for extent with grow_extent etc; once locking changes so we can trust the primitive not to change during rendering
+	// TODO: Add some caching for extent with grow_extent etc
 	vector min_extent, max_extent;
 	const double* pos_i = pos.data();
 	const double* pos_end = pos.end();

@@ -189,10 +189,6 @@ void arrayprim_color::set_color( const double_array& n_color)
 	throw std::invalid_argument( "color must be an Nx3 array");
 }
 
-/*void arrayprim_color::set_color_t( const rgb& color ) {
-	set_color( double_array( array( make_tuple(color.red, color.green, color.blue))));
-}*/
-
 void arrayprim_color::set_red( const double_array& arg )
 {
 	if (shape(arg).size() != 1) throw std::invalid_argument("red must be a 1D array.");

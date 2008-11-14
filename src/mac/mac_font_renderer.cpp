@@ -34,14 +34,12 @@ font_renderer::font_renderer( const std::wstring& description, int height ) {
 	// TODO: support generic "sans-serif", "serif", "monospace" families.
 	// Doesn't matter much if Macs always have "verdana", "times new roman", and "courier new".
 
-	// TODO: research suggests kFontUnicodePlatform might not work for all fonts!  Try
-	// kFontMacintoshPlatform and ascii description as well?
 	std::vector<unsigned char> desc;
 	if (!ucs4_to_ascii( description, desc )) return;
 	ATSUFontID fid;
 	if (ATSUFindFontFromName( &desc[0], desc.size()*sizeof(desc[0]), 
-			kFontFamilyName,  //< ?
-			kFontMacintoshPlatform,//kFontUnicodePlatform,
+			kFontFamilyName,
+			kFontMacintoshPlatform,
 			kFontNoScriptCode,
 			kFontNoLanguageCode,
 			&fid))

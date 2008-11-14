@@ -121,7 +121,7 @@ render_surface::mouse_event( E* event, int buttons_toggled ) {
 
 	mouse.report_mouse_state( 3, buttons, event->x, event->y, 3, shiftState, false );
 
-	// xxx Is mouse locking possible with GTK2?
+	// TODO: Is mouse locking possible with GTK2?
 }
 
 bool 

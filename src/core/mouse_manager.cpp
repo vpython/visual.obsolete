@@ -116,7 +116,7 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 		left_down = b;
 	}
 
-	// TODO: Generate mouse events for right (and middle?) buttons.  Very carefully.
+	// TODO: Possibly generate mouse events for right (and middle?) buttons.  Very carefully.
 
 	px = new_px;
 	py = new_py;

@@ -37,7 +37,7 @@ atomic_queue_impl::py_pop_wait( lock& L)
 	
 	gil_release release;
 	
-	// xxx I took the code to call Py_MakePendingCalls() out.  The internet leads
+	// I took the code to call Py_MakePendingCalls() out.  The internet leads
 	// me to believe that it is not necessary.  For example, Python time.sleep() 
 	// doesn't do it.
 	while (empty) {

@@ -16,20 +16,6 @@ namespace cvisual {
 using boost::shared_ptr;
 
 /** A class to assist in managing OpenGL texture resources.
-	TODO: extend this class to represent the abstract interface that Visual
-	objects need to render textures while providing facilities to base classes
-	for implementation of various platform-specific texture loaders and
-	procedural texture-generators.
-
-	This class (and its subclasses) should have initialize-on-first-use
-	semantics.  Instantiation of one of the subclasses should perform first-stage
-	initialization: decode the on-disk file, generate a procedural texture,
-	whatever.  The first time it is used (with gl_activate), the data is
-	transfered to texture memory for subsequent use.  This class should be
-	noncopyable due to its resource allocation/sharing model.  The base class
-	should be able to expose a damage and locking model for mutable textures as
-	well as be immutable.  It is possible that the base class is so abstract as
-	to be non-constructable from Python (simmilar to cvisual.displayobject now).
 */
 class texture
 {

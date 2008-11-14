@@ -7,9 +7,6 @@
 
 namespace cvisual { namespace python {
 
-// TODO: This class shares everything but memory management and rendering with the
-// curve object.  Perhaps they can share a (partial?) base class and use the 
-// mix-in pattern?
 class points : public arrayprim_color
 {
  private:

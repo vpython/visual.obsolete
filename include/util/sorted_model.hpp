@@ -175,49 +175,6 @@ class face_z_comparator
 	{ return forward.dot( lhs.center) > forward.dot( rhs.center); }
 };
 
-/** A depth-sortable model for a static geometry.  Resorting is pretty damn fast
-	when using any of the STL algorithms, but the variability in all of the
-	algorithms except stable_sort is just too unacceptable.  We definately hit 
-	the worst-case sort frequently.  See also test/model_zsort_bench.cpp.
-	Face is any class with a center data member.  nfaces is the number of faces
-	in the body.
-
-	TODO: As of 8/13/2008 this class is not used anywhere... remove it?
-*/
-template <typename Face, size_t nfaces>
-struct z_sorted_model
-{
-	Face faces[nfaces]; ///< The geometry data.
-	/** Sort such that the faces are ordered from farthest away to nearest. 
-		@param n_forward The axis along which to sort.  It should point from
-			the camera towards the body.
-	*/
-	void sort( const vector& n_forward);
-	
-	/** Renders all of this object's polygons, in order.  This member function
-		performs the rendering in immediate mode, which may be too slow for
-		large models.
-	*/
-	void gl_render() const;
-};
-
-template <typename Face, size_t nfaces>
-void
-z_sorted_model<Face, nfaces>::sort( const vector& n_forward)
-{
-	face_z_comparator cmp( n_forward);
-	std::stable_sort( faces, faces + nfaces, cmp);
-}
-
-template <typename Face, size_t nfaces>
-void
-z_sorted_model<Face, nfaces>::gl_render() const
-{
-	for (size_t i = 0; i < nfaces; ++i) {
-		faces[i].gl_render();
-	}
-}
-
 } // !namespace cvisual
 
 #endif // !defined VPYTHON_UTIL_SORTED_MODEL_HPP

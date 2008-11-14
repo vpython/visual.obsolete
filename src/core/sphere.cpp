@@ -15,8 +15,6 @@ namespace cvisual {
 
 displaylist sphere::lod_cache[6];
 
-static std::vector<icososphere> models;
-
 sphere::sphere()
 {
 }
@@ -84,11 +82,7 @@ sphere::gl_render( const view& geometry)
 
 	color.gl_set(opacity);
 
-	// Mode specific rendering code follows
-	// TODO: why are we rendering transparent spheres with one type of model and
-	// opaque ones with another??
-
-	if (translucent()) { // Render a transparent constant color sphere
+	if (translucent()) {
 		// Spheres are convex, so we don't need to sort
 		gl_enable cull_face( GL_CULL_FACE);
 
@@ -118,9 +112,6 @@ void
 sphere::init_model()
 {
 	if (lod_cache[0]) return;
-
-    for (int i = 0; i < 6; ++i)
-		models.push_back( icososphere(i+1));
 
 	clear_gl_error();
 

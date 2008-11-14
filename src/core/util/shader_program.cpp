@@ -15,7 +15,7 @@ shader_program::~shader_program() {
 }
 
 int shader_program::get_uniform_location( const view& v, const char* name ) {
-	// xxx change interface to cache the uniforms we actually want and avoid string comparisons
+	// TODO: change interface to cache the uniforms we actually want and avoid string comparisons
 	if (program <= 0 || !v.glext.ARB_shader_objects) return -1;
 	int& cache = uniforms[ name ];
 	if (cache == 0)
@@ -64,7 +64,7 @@ void shader_program::realize( const view& v ) {
 		v.glext.glGetInfoLogARB( program, length+1, &length, &temp[0] );
 		infoLog.append( &temp[0], length );
 
-		// xxx A way to report infoLog to the program?
+		// TODO: A way to report infoLog to the program?
 		write_stderr( "VPython WARNING: errors in shader program:\n" + infoLog + "\n");
 
 		// Get rid of the program, since it can't be used without generating GL errors.  We set
@@ -90,7 +90,7 @@ void shader_program::realize( const view& v ) {
 	}
 #endif
 
-	// xxx It's probably not technically legal to call glext functions from on_gl_free callbacks,
+	// TODO: It's probably not technically legal to call glext functions from on_gl_free callbacks,
 	// since they might run in a different context, even though the program _handle_ is shared.  Plus
 	// this is kind of ugly.
 	glDeleteObjectARB = v.glext.glDeleteObjectARB;
@@ -160,7 +160,7 @@ void use_shader_program::init(shader_program* program) {
 
 	program->realize(v);
 
-	// xxx For now, nested shader invocations aren't supported.
+	// For now, nested shader invocations aren't supported.
 	//oldProgram = v.glext.glGetHandleARB( GL_PROGRAM_OBJECT_ARB );
 	oldProgram = 0;
 
