@@ -1,8 +1,7 @@
 from __future__ import division
 from visual import *
 # Bruce Sherwood, August 2006
-# Demonstration of transparency (opacity), materials, and local lights in the new
-# Visual 4 created by Jonathan Brandmeyer, reworked by David Scherer
+# Demonstration of transparency (opacity), materials, and local lights in Visual 5
 
 # Create a texture to apply to a sphere to make a beach ball
 bands = zeros([16,16,4], float)
