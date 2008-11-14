@@ -1,4 +1,4 @@
-HOW TO BUILD VISUAL 4 USING CARBON
+HOW TO BUILD VISUAL 5 USING CARBON
 Install XcodeTools from the optional materials on the Mac installation DVD.
 Installing XcodeTools automatically installs the large number of individualvp
 components also listed on the DVD.
