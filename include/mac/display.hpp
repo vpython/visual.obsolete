@@ -35,12 +35,12 @@ class display : public display_kernel
 	// Implements key display_kernel virtual methods
 	virtual void activate( bool active );
 	EXTENSION_FUNCTION getProcAddress( const char* name );
-	
+
  private:
 	bool initWindow( std::string title, int x, int y, int width, int height );
 	void update_size();
 	void on_destroy();
-	  
+
 	// Functions to manipulate the OpenGL context
 	void gl_begin();
 	void gl_end();
@@ -49,6 +49,7 @@ class display : public display_kernel
 	OSStatus vpWindowHandler (EventHandlerCallRef target, EventRef event);
 	OSStatus vpMouseHandler (EventHandlerCallRef target, EventRef event);
 	OSStatus vpKeyboardHandler (EventHandlerCallRef target, EventRef event);
+	static OSStatus vpEventHandler (EventHandlerCallRef target, EventRef event, void * data);
 
 	int getShiftKey();
 	int getAltKey();
@@ -71,7 +72,7 @@ class display : public display_kernel
 
 class gui_main
 {
- private:	
+ private:
 	// Components of the startup sequence.
 	static void init_thread(void);
 
@@ -80,7 +81,7 @@ class gui_main
 	void poll();
 
 	static gui_main* self;
-	
+
 	int gui_thread;
 	mutex init_lock;
 	condition initialized;
@@ -88,7 +89,7 @@ class gui_main
  public:
 	 // Calls the given function in the GUI thread.
 	 static void call_in_gui_thread( const boost::function< void() >& f );
-	
+
 	 // This signal is invoked when the user closes the program (closes a display
 	 // with display.exit = True).
 	 // wrap_display_kernel() connects a signal handler that forces Python to

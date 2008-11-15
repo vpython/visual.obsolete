@@ -385,8 +385,8 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	return noErr;
 }
 
-static OSStatus
-vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
+OSStatus
+display::vpEventHandler (EventHandlerCallRef target, EventRef event, void * data)
 {
 	UInt32	evtClass;
 	display * thiswindow;
