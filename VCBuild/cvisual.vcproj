@@ -329,10 +329,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\core\util\clipping_plane.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\core\util\displaylist.cpp"
 						>
 					</File>
@@ -637,10 +633,6 @@
 				</File>
 				<File
 					RelativePath="..\include\util\bsp_tree.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\include\util\clipping_plane.hpp"
 					>
 				</File>
 				<File

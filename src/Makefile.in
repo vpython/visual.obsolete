@@ -62,7 +62,7 @@ CPPFLAGS = @CPPFLAGS@
 
 # Object file list.  Since we are building a shared library with PIC code, we 
 #   follow the libtool convention of using a .lo extension.
-CVISUAL_OBJS = atomic_queue.lo clipping_plane.lo displaylist.lo errors.lo extent.lo \
+CVISUAL_OBJS = atomic_queue.lo displaylist.lo errors.lo extent.lo \
 	gl_extensions.lo gl_free.lo icososphere.lo \
 	quadric.lo render_manager.lo rgba.lo shader_program.lo texture.lo tmatrix.lo vector.lo \
 	arrow.lo axial.lo box.lo cone.lo cylinder.lo \
