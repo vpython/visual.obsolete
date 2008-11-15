@@ -184,15 +184,7 @@ sees only the matching frame, and your brain does the rest. It's called 'quad
 buffered' because there is an OpenGL buffer per eye, both double-buffered for
 smooth updating. 'Passive' stereo requires a video card that can drive two monitors,
 or two projectors.) </p>
-          <p class="attributes"><span class="attribute">stereodepth</span> By
-            default, the front of the scene is located at the location of the
-            physical screen, which reduces eye strain. Setting <span class="attribute">scene.stereodepth
-            = 1</span> moves the center of the scene to the location of the physical
-            screen, with the front half of the scene seeming to stick dramatically
-            out of the screen. <span class="attribute">scene.stereodepth = 2</span> moves
-            the scene fully in front of the physical screen, for maximally dramatic
-            stereo effect.</p>
-          <p class="attributes"><span class="attribute">objects</span> A list
+      <p class="attributes"><span class="attribute">objects</span> A list
             of all the visible objects in the display; invisible objects and
             lights are not listed (scene.lights is a list of existing lights).
             For example, the following makes all visible boxes in the scene red: </p>
@@ -221,7 +213,9 @@ or two projectors.) </p>
             visible again. This creates a new window with the new attributes;
             all existing objects are still part of the new window.</p>
           <p class="attributes"> <span class="attribute">x</span>, <span class="attribute">y</span> Position of the window on the screen (pixels from upper left)</p>
-          <p class="attributes"> <span class="attribute">width</span>, <span class="attribute">height</span> Width and height of the display area in pixels: scene.height = 200 (includes title bar). The height in pixels of the titlebar is given by <span class="attribute">display.get_titlebar_height()</span>, valid for all windows, and this function is associated with the display class of objects, not with individual displays such as the standard scene. So scene.get_titlebar_height() won't work.</p>
+          <p class="attributes"> <span class="attribute">width</span>, <span class="attribute">height</span> Width
+            and height of the display area in pixels: scene.height = 200 (includes
+          title bar). </p>
           <p class="attributes"> <span class="attribute">title</span> Text in the window's 
             
             title bar: scene.title = 'Planetary Orbit'</p>
@@ -241,7 +235,6 @@ or two projectors.) </p>
           <p class="attributes"> <span class="attribute">exit</span> If <span class="attribute">sceneb.exit 
             = 0</span>, the program does not quit when the close box of the <span class="attribute">sceneb</span> display is clicked. The default is <span class="attribute">sceneb.exit = 
               1</span>, in which case clicking the close box does make the program quit. </p>
-          <p class="attributes"><span class="attribute">display.get_titlebar() </span><span class="Normal">gives the height in pixels of the title bar of a window</span>. <span class="Normal">This value is true for all windows, and this function is associated with the display class of objects, not with individual displays such as the standard scene, so scene.get_titlebar_height() won't work. If you specify a window to be 400 by 400, the total height of the window is 400 pixels, of which part is the title bar. </span></p>
           <p class="Normal"><strong> <font color="#0000A0">Controlling the view</font></strong></p>
           <p class="attributes"> <span class="attribute">center</span> Location at which 
             

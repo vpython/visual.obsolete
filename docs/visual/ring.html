@@ -107,14 +107,18 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             of the  central part of the ring, default = 1, so <br />
             outer radius = radius+thickness<br />
           inner radius = radius-thickness </p>
-          <p class="attributes"> <span class="attribute">thickness</span> Half the thickness of the ring 
-          (1/10th of radius if not specified). The name &quot;thickness&quot; probably should have meant the full thickness of the ring (the difference between the inner and outer radii), but that was not the interpretation in older versions of Visual. For compatibility, the interpretation of &quot;thickness&quot; as half the difference between the inner and outer radii has been preserved. </p>
-          <p class="Normal"> Note that the <span class="attribute">pos</span> attribute 
+          <p class="attributes"> <span class="attribute">thickness</span> The
+            radius of the cross section of the ring (1/10th of radius if not
+            specified), not the full diameter as you might
+            expect.</p>
+      <p class="Normal"> Note that the <span class="attribute">pos</span> attribute 
             for cylinder, arrow, cone, and pyramid corresponds to one end of the object, 
             whereas for a ring, sphere, and box it corresponds to the center of the 
             object.</p>
 
-      <!-- InstanceEndEditable --></td>
+      <p class="Normal">See description of <a href="options.html">Additional
+          Attributes</a> available for all 3D display objects.</p>
+    <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
     <td height="16" colspan="4"></td>

@@ -137,9 +137,10 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             due to the restriction that an object may not  be located within
             a frame that is in a separate display.</p>
 
-      <p class="Normal">Here is an example that uses the <span class="attribute">__copy__()</span> function. The following routine 
-            copies all of the Visual objects currently existing in one display into 
-            a previously defined second display:</p>
+      <p class="Normal">Here is an example that uses the <span class="attribute">__copy__()</span> function.
+        The following routine  copies all of the Visual objects currently existing
+        in one display into  a previously defined second display, as long as
+        there are no nested frames (frames within frames):</p>
 
 <p class="program">def clone_universe( new_display, old_display):<br />
             &nbsp;&nbsp;&nbsp;&nbsp;# Create a dictionary of frames in  old display to <br />
