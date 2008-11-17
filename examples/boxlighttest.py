@@ -12,11 +12,11 @@ a1 = a2 = a3 = 0.0
 arrow(pos=(0, 4, 0), axis=(0, 1, 0), color=color.red)
 boxy = box(size=(3,3,3), color=(0.5, 0.5, 0.5), material=materials.rough)
 b1 = sphere(radius=0.3, pos=(r, 0, 0),
-            color=color.magenta, material=materials.unshaded)
+            color=color.magenta, material=materials.emissive)
 b2 = sphere(radius=0.3, pos=(0, 0, r),
-            color=color.yellow, material=materials.unshaded)
+            color=color.yellow, material=materials.emissive)
 b3 = arrow(radius=0.3, pos=(0, 0, r),
-            color=color.green, material=materials.unshaded)
+            color=color.green, material=materials.emissive)
 l1 = local_light(pos=b1.pos, color=b1.color)
 l2 = local_light(pos=b2.pos, color=b2.color)
 l3 = distant_light(direction=b3.pos, color=b3.color)

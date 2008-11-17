@@ -137,8 +137,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p class="Normal">You can give a <a href="materials.html"><strong>material property</strong></a> such as wood to an object: </p>
       <p class="program">box(color=color.orange, material=materials.wood)</p>
       <p class="Normal">Materials currently available include wood, plastic,
-        marble, earth (continents and oceans), rough, diffuse, and unshaded (that is,
-        display the specified color unaffected by existing lights). The example program
+        marble, earth (continents and oceans), rough, diffuse, emissive, and
+        unshaded (that is, display the specified color unaffected by existing
+        lights). The example program
         <strong>material_test.py</strong> shows examples of all of these materials.</p>
       <p class="Normal">Materials will work with graphics cards that support
         Pixel Shader 3.0 (&quot;PS 3.0&quot;). For details, see<br />
@@ -161,9 +162,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="program">lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
       <p class="Normal">If you continually update lamp.p<span class="Normal">os,
           the light will move.</span> You
-        may wish to place a sphere or box with material=materials.unshaded at
-        the same location so that the lamp looks like a lamp (an unshaded object
-      is unaffected by other lights and seems to glow).</p>
+        may wish to place a sphere or box with material=materials.emissive at
+      the same location so that the lamp looks like a glowing lamp.</p>
       <p class="Normal">If you want to disable all of the  lights, so that the
         only light is ambient light (scene.ambient), say <span class="attribute">scene.lights
           = []</span>, making 

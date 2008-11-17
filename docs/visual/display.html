@@ -138,10 +138,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="Normal">            You  can create lights that are local,
             near other objects. The following statement creates a yellow light <em>positioned</em>  at
             (x,y,z), and if you continually update lamp.pos, the light will move.
-            You may wish to place a sphere or box with material=materials.unshaded
-            at the same location so that the lamp looks like a lamp (an unshaded
-            object is unaffected by other lights and seems to glow).</p>
-          <p class="program">            lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
+            You may wish to place a sphere or box with <span class="attribute">material=materials.emissive</span>            at the same location so that the lamp looks like a glowing lamp.</p>
+      <p class="program">            lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
           <p class="Normal">A distant red light located in the <em>direction</em> (x,y,z) is created like this:</p>
           <p class="program">distant_light(direction=(x,y,z), color=color.red)</p>
           <p class="Normal">            Previous to Visual version 5, you set

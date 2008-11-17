@@ -11,22 +11,18 @@ axis = (1,0,0)
 ##obj = box
 ##obj = cylinder; axis = (0,1,0)
 obj = sphere
-R = 1
+R = 0.9
 L = 10
 
 scene.visible = 0
 lite = local_light( pos = (0,0,0), color = (0,1,0) )
-lite.m = points( color=(0,1,0), pos=[(0,0,0)], type = "world", size = 0.05 )
+lite.m = sphere( pos = lite.pos, radius = 0.1, color = lite.color, material = materials.emissive)
 
 spheres = []
-N = int(sqrt(len(materials.materials)+1.5))
-xi = -L/2 + 1.5*R
-dx = (L - 3*R)/(N-1)
-for i,mat in enumerate(materials.materials + [None]):
+for mat in (materials.materials+[None]):
     if test_materials_individually: scene.visible = 0
     if mat: print mat.name
-    spheres.append( obj( pos = (xi + (i%N)*dx, R, (xi + (i//N)*dx)),
-                         radius = R,
+    spheres.append( obj( radius = R,
                          length = sqrt(2)*R,
                          height = sqrt(2)*R,
                          width = sqrt(2)*R,
@@ -36,7 +32,18 @@ for i,mat in enumerate(materials.materials + [None]):
     
 box( pos = (0,-0.5*R,0), size=(L,R,L), material = materials.wood )
 
-for s in spheres:
+N = 4
+xi = -L/2 + 1.5*R
+dx = (L - 3*R)/(N-1)
+for i,s in enumerate(spheres):
+    if i <= 1:
+        s.pos = (xi + (1-i+0.5)*dx, R, xi)
+    elif 2 <= i <= 5:
+        s.pos = (xi+(5-i)*dx, R, xi+1.5*dx)
+    elif 6 <= i <= 8:
+        s.pos = (xi+(i-6+0.5)*dx, R, xi+3*dx)
+    else:
+        s.pos = (xi+2.5*dx, R, xi)
     loc = s.pos-vector(0,R,0)
     if hasattr(s.material, "name"):
         s.label = label( text = s.material.name, pos = loc )
@@ -51,7 +58,7 @@ while 1:
     rate(100)
     for s in spheres:
         s.rotate( axis=scene.up, angle=.01 )
-    lite.pos = lite.m.pos[0] = scene.mouse.project( point=scene.center, normal=scene.forward )
+    lite.pos = lite.m.pos = scene.mouse.project( point=scene.center, normal=scene.forward )
     if scene.mouse.clicked:
         p = scene.mouse.getclick().pick
         if p and p is not lite.m:
