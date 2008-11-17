@@ -612,7 +612,7 @@ display_kernel::recalc_extent(void)
 
 	if (!uniform && range.nonzero()) {
 		gcf_changed = true;
-		gcf = 1.0 / std::max( std::max( range.x, range.y ), range.z );
+		gcf = 1.0/range.x;
 		double width = (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
 			? view_width*0.5 : view_width;
 		gcfvec = vector(1.0/range.x, (view_height/width)/range.y, 0.1/range.z);
