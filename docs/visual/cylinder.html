@@ -86,21 +86,20 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
     <td width="23" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td width="590" rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
-      <div>
         <h1 class="Heading-1"> <font color="#0000A0">The cylinder Object</font></h1>
-      </div>
-      <div>
-        <p class="Normal"> <img src="VisualRef-1.gif" alt="cylinder" align="right" /> Here is an example 
+        <p class="Normal"><strong>Studying this description of the cylinder object
+            provides an overview of  important aspects common to all of the
+            Visual 3D objects, box, sphere, pyramid, etc. </strong></p>
+      <p class="Normal"> <img src="VisualRef-1.gif" alt="cylinder" align="right" /> Here is an example 
           of how to make a cylinder, naming it &quot;rod&quot; for future reference:</p>
-        <div>
+
           <p class="program"> rod = cylinder(pos=(0,2,1), &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;axis=(5,0,0), radius=1)</p>
           <p class="Normal"> The center of one end of this cylinder is at x=0, y=2, 
             and z=1. Its axis lies along the x axis, with length 5, so that the other 
             end of the cylinder is at (5,2,1), as shown in the accompanying diagram.</p>
           <p class="Normal"> You can modify the position of the cylinder after it has 
             been created, which has the effect of moving it immediately to the new position:</p>
-        </div>
-        <div>
+
           <p class="program"> rod.pos = (15,11,9) # change (x,y,z)<br />
           rod.x = 15 # only change pos.x</p>
           <p class="Normal"> If you create an object such as a cylinder but without 
@@ -110,16 +109,14 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             current &quot;foreground&quot; color (see <a href="display.html">Controlling 
               One or More Visual Display Windows</a>). The default foreground color is 
             white. After creating the cylinder, you can change its color:</p>
-        </div>
-        <div>
+
           <p class="program"> rod.color = (0,0,1) # make rod be blue</p>
           <p class="Normal"> This will make the cylinder suddenly turn blue, using the 
             so-called RGB system for specifying colors in terms of fractions of red, 
             green, and blue. (For details on choosing colors, see <a href="color.html">Specifying 
               Colors</a>.) You can set individual amounts of red, green, and blue like 
             this:</p>
-        </div>
-        <div>
+
           <p class="program"> rod.red = 0.4<br />
           rod.green = 0.7<br />
           rod.blue = 0.8</p>
@@ -163,9 +160,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             can create additional display windows and place objects in them.</p>
           <p class="Normal"><br />
           </p>
-        </div>
-      </div>
-      <div></div>
+
     <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
