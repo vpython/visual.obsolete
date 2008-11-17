@@ -142,7 +142,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p class="program">            lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
           <p class="Normal">A distant red light located in the <em>direction</em> (x,y,z) is created like this:</p>
           <p class="program">distant_light(direction=(x,y,z), color=color.red)</p>
-          <p class="Normal">            Previous to Visual version 5, you set
+      <p class="Normal">            Previous to Visual version 5, you set
             up a light by specifying a vector  in the direction to the light
             from the origin, and the magnitude of the  vector was the intensity.
             For example, <span class="attribute">scene.lights 
@@ -150,8 +150,18 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
               = 0</span> will light the scene with full intensity from the right
               side, with no ambient  lighting on the left. In Visual version
               5 and later, this scheme for specifying  lights still works, but
-              it is preferable to create light objects.</p>
-          <p class="attributes"><span class="attribute">stereo</span> Stereoscopic
+      it is preferable to create light objects.</p>
+               <p class="attributes"><span class="attribute"><font color="#000000">To obtain </font>camera position</span>, see <a href="mouse.html">Mouse Interactions</a>.</p>
+      <p class="attributes"><span class="attribute">objects</span> A list
+            of all the visible objects in the display; invisible objects and
+            lights are not listed (scene.lights is a list of existing lights).
+            For example, the following makes all visible boxes in the scene red: </p>
+          <p class="program">&nbsp;&nbsp;&nbsp;&nbsp;for obj in scene2.objects: <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;if obj.__class__ == box # can say either box or 
+            'box'<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.color = color.red</p>
+          <p class="attributes"><span class="attribute">show_rendertime</span> If you set <span class="attribute">scene.show_rendertime = 1</span>, in the lower left corner of the display you will see something like &quot;cycle: 27 render: 5&quot;, meaning 27 milliseconds between renderings of the scene, taking 5 milliseconds to render, in which case 22 out of 27 milliseconds were devoted to executing your Python statements. </p>
+      <p class="attributes"><span class="attribute">stereo</span> Stereoscopic
             option; <span class="attribute">scene.stereo = 'redcyan'</span> will
             generate a scene for the left eye and a scene for the right eye,
             to be viewed with red-cyan glasses, with the red lens over the left
@@ -182,26 +192,12 @@ sees only the matching frame, and your brain does the rest. It's called 'quad
 buffered' because there is an OpenGL buffer per eye, both double-buffered for
 smooth updating. 'Passive' stereo requires a video card that can drive two monitors,
 or two projectors.) </p>
-      <p class="attributes"><span class="attribute">objects</span> A list
-            of all the visible objects in the display; invisible objects and
-            lights are not listed (scene.lights is a list of existing lights).
-            For example, the following makes all visible boxes in the scene red: </p>
-          <p class="program">&nbsp;&nbsp;&nbsp;&nbsp;for obj in scene2.objects: <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;if obj.__class__ == box # can say either box or 
-            'box'<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.color = color.red</p>
-          <p class="attributes"><span class="attribute">show_rendertime</span> If you set <span class="attribute">scene.show_rendertime = 1</span>, in the lower left corner of the display you will see something like &quot;cycle: 27 render: 5&quot;, meaning 27 milliseconds between renderings of the scene, taking 5 milliseconds to render, in which case 22 out of 27 milliseconds were devoted to executing your Python statements. </p>
           <p class="attributes"><span class="attribute">cursor.visible</span> By
             setting <span class="attribute">scene.cursor.visible = 0</span>,
             the mouse cursor  becomes invisible. This is often appropriate while
             dragging an object using  the mouse. Restore the cursor with <span class="attribute">scene.cursor.visible
-             = 1</span>.  <em>NOT YET IMPLEMENTED IN VISUAL 5.</em></p>
-        <p class="attributes"><span class="attribute"><font color="#000000">To obtain </font>camera position</span>, see <a href="mouse.html">Mouse Interactions</a>.</p>
-      <div>
-        <div> </div>
-      </div>
-      <div>
-        <div>
+             = 1</span>.  <strong><em>NOT YET IMPLEMENTED IN VISUAL 5.</em></strong></p>
+
           <p class="Normal"><strong><font color="#0000A0">Controlling the window</font></strong></p>
           <p class="Normal">The window attributes <span class="attribute">x</span>, <span class="attribute">y</span>, <span class="attribute">width</span>, <span class="attribute">height</span>, <span class="attribute">title</span>,
             and <span class="attribute">fullscreen</span> cannot be changed while
@@ -330,9 +326,7 @@ or two projectors.) </p>
           <p class="attributes"> &nbsp;&nbsp;&nbsp;&nbsp;<span class="attribute">userspin 
             
             = 1</span> user can rotate (default)</p>
-        </div>
-      </div>
-      <br />
+
 <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
