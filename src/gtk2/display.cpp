@@ -422,8 +422,8 @@ gui_main::init_thread(void)
 		#else
 			// TODO: this changes the _process_ priority, which has no effect on the relative
 			// priority of the rendering and python threads!
-			int default_prio = getpriority(PRIO_PROCESS, getpid());
-			setpriority(PRIO_PROCESS, getpid(), std::min(default_prio+5, 19) );
+			//int default_prio = getpriority(PRIO_PROCESS, getpid());
+			//setpriority(PRIO_PROCESS, getpid(), std::min(default_prio+5, 19) );
 		#endif
 
 		VPYTHON_NOTE( "Starting GUI thread.");
