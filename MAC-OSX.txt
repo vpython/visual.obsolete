@@ -9,11 +9,12 @@ because this isn't always the case, and because the Python community seems to
 strongly prefer it, we will base Visual on MacPython, which is /usr/local/bin/python.
 
 Download the source for numpy and unpack it (http://www.scipy.org/Download).
+There may be an installer you can use. If not, you need to build from source:
 In the numpy directory, execute "sudo /usr/local/bin/python2.5 setup.py install".
 This installs the numpy module which includes needed header files.
 
 You need Boost libraries for the Mac. In the dependencies section of CVS, unzip the
-zip file. You should end up with a folder in dependencies named boost_files,
+zip file. You should name the resulting folder in dependencies "boost_files",
 containing boost (the include files), win_libs (for Windows), and mac_libs (for Mac).
 
 In src/mac, execute sudo make setup.
@@ -29,8 +30,8 @@ In src/mac/PackageMaker is an Apple PackageMaker project file and a Welcome text
 for creating a VPython installer for the Mac.
 
 The Boost libraries were built by downloading them and the bjam tool.
-Make sure that "which python" is the one you want, then do this:
-bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.5 --build-type=complete --with-date_time --with-python --with-thread --with-signals stage
+Copy the bjam too into the Boost directory and execute this:
+./bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.5 --build-type=complete --with-date_time --with-python --with-thread --with-signals stage
 
 The files you want will be in stage/lib.
 Move these files to dependencies/build_files/mac_libs:
