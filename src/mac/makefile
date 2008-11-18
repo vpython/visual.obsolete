@@ -8,19 +8,19 @@
 PYTHON_VERSION = 2.5
 PYTHON_FRAMEWORK = /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/
 SITE_PACKAGES = $(PYTHON_FRAMEWORK)lib/python$(PYTHON_VERSION)/site-packages/
-TOP = ../vpython-core2
-DEPENDS = $(TOP)/dependencies
-SRC = $(TOP)/src
-BOOST = $(TOP)/dependencies/boost_files/mac_libs
-VPATH = $(SRC)/mac $(SRC)/core/util $(SRC)/core $(SRC)/python $(SRC)
+TOP = ../vpython-core2/
+DEPENDS = $(TOP)/dependencies/
+SRC = $(TOP)/src/
+BOOST = $(TOP)/dependencies/boost_files/mac_libs/
+VPATH = $(SRC)mac $(SRC)core/util $(SRC)core $(SRC)python $(SRC)
 
 CXX = /usr/bin/g++
 CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-Wno-long-double -DPIC -O2 -g -finline-functions \
-	-I$(TOP)/include/mac -I$(TOP)/include \
-	-I$(PYTHON_FRAMEWORK)/include/python$(PYTHON_VERSION) \
+	-I$(TOP)include/mac -I$(TOP)include \
+	-I$(PYTHON_FRAMEWORK)include/python$(PYTHON_VERSION) \
 	-I$(SITE_PACKAGES)numpy/core/include \
-	-I$(DEPENDS)/boost_files -I$(DEPENDS)/threadpool/include \
+	-I$(DEPENDS)boost_files -I$(DEPENDS)threadpool/include \
 	-F/System/Library/Frameworks/AGL.framework \
 	-F/System/Library/Frameworks/Carbon.framework \
 	-F/System/Library/Frameworks/OpenGL.framework
@@ -41,9 +41,9 @@ cvisual.so : $(OBJS)
 	$(CXX) -bundle -bundle_loader /usr/local/bin/python$(PYTHON_VERSION) -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
-	$(BOOST)/libboost_python-mt-s-1_35.a \
-	$(BOOST)/libboost_signals-mt-s-1_35.a \
-	$(BOOST)/libboost_thread-mt-s-1_35.a
+	$(BOOST)libboost_python-mt-s-1_35.a \
+	$(BOOST)libboost_signals-mt-s-1_35.a \
+	$(BOOST)libboost_thread-mt-s-1_35.a
 
 install : cvisual.so
 	cp cvisual.so ../vpython-core2/site-packages/visual
