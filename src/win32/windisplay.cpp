@@ -418,7 +418,7 @@ void
 display::activate(bool active) {
 	if (active) {
 		VPYTHON_NOTE( "Opening a window from Python.");
-		SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
+		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
 		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
 	} else {
 		VPYTHON_NOTE( "Closing a window from Python.");
