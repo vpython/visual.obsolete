@@ -15,7 +15,7 @@ R = 0.9
 L = 10
 
 scene.visible = 0
-lite = local_light( pos = (0,0,0), color = (0,1,0) )
+lite = local_light( pos = (0,0,0), color = (.6,.6,0.3) )
 lite.m = sphere( pos = lite.pos, radius = 0.1, color = lite.color, material = materials.emissive)
 
 spheres = []
