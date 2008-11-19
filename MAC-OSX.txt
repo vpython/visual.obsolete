@@ -8,8 +8,8 @@ There is already a /usr/bin/python that at the moment (OSX 10.5) up to date, but
 because this isn't always the case, and because the Python community seems to
 strongly prefer it, we will base Visual on MacPython, which is /usr/local/bin/python.
 
+Next you need to install numpy. You may find an installer for it. Otherwise:
 Download the source for numpy and unpack it (http://www.scipy.org/Download).
-There may be an installer you can use. If not, you need to build from source:
 In the numpy directory, execute "sudo /usr/local/bin/python2.5 setup.py install".
 This installs the numpy module which includes needed header files.
 
@@ -30,15 +30,11 @@ In src/mac/PackageMaker is an Apple PackageMaker project file and a Welcome text
 for creating a VPython installer for the Mac.
 
 The Boost libraries were built by downloading them and the bjam tool.
-Copy the bjam too into the Boost directory and execute this:
-./bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.5 --build-type=complete --with-date_time --with-python --with-thread --with-signals stage
+Copy bjam into the Boost directory and execute this:
+./bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.5 --build-type=complete --with-python --with-thread --with-signals stage
 
 The files you want will be in stage/lib.
 Move these files to dependencies/build_files/mac_libs:
-libboost_date_time-mt-1_35.a
-libboost_date_time-mt-d-1_35.a
-libboost_date_time-mt-s-1_35.a
-libboost_date_time-mt-sd-1_35.a
 libboost_python-mt-1_35.a
 libboost_python-mt-d-1_35.a
 libboost_python-mt-s-1_35.a
@@ -55,7 +51,8 @@ ibboost_thread-mt-sd-1_35.a
 ----------
 I built Boost libraries on a PowerPC running OS X 10.4 and tried using them
 on a PowerPC running OS X 10.5. Example programs ran okay, but in each case
-there was the following warning:
+there was the following warning. In retrospect there may have been confusion
+between two different Python 2.5's on the machine.
 
 Warning (from warnings module):
   File "/Library/Python/2.5/site-packages/visual/__init__.py", line 149
