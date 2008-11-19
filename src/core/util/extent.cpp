@@ -142,7 +142,7 @@ void extent::add_circle( const vector& center, const vector& normal, double r ) 
 	vector n = l_cw.times_v(normal);
 
 	vector n2( n.x*n.x, n.y*n.y, n.z*n.z );
-	vector r_proj( sqrt(1.0 - n2.x), sqrt(1.0 - n2.y), sqrt(1.0 - n2.z) );
+	vector r_proj( r*sqrt(1.0 - n2.x), r*sqrt(1.0 - n2.y), r*sqrt(1.0 - n2.z) );
 
 	data.mins.x = std::min( c.x - r_proj.x, data.mins.x );
 	data.maxs.x = std::max( c.x + r_proj.x, data.maxs.x );
