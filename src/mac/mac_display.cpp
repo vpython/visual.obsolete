@@ -244,28 +244,28 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 			switch (code) {
 				// Apple really do number the F keys like this
 				case 122:
-					keyStr += "F1";
+					keyStr += "f1";
 					break;
 				case 120:
-					keyStr += "F2";
+					keyStr += "f2";
 					break;
 				case 99:
-					keyStr += "F3";
+					keyStr += "f3";
 					break;
 				case 118:
-					keyStr += "F4";
+					keyStr += "f4";
 					break;
 				case 96:
-					keyStr += "F5";
+					keyStr += "f5";
 					break;
 				case 97:
-					keyStr += "F6";
+					keyStr += "f6";
 					break;
 				case 98:
-					keyStr += "F7";
+					keyStr += "f7";
 					break;
 				case 100:
-					keyStr += "F8";
+					keyStr += "f8";
 					break;
 				// F9-F12 are reserved by Apple for various purposes
 				case 116:
