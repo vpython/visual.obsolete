@@ -24,39 +24,39 @@ using boost::lexical_cast;
 /*
 How to shut down on Windows (Dave Scherer, 2008/6/22)
 
-There's more than one possible sequence of events leading to shutdown, 
-and can be more than one window. Remember that the program can close windows, 
+There's more than one possible sequence of events leading to shutdown,
+and can be more than one window. Remember that the program can close windows,
 and that the user closing a window does NOT always mean the program terminates.
 
 Here's a high level description of how it works on Windows:
 
 1. In display::destroy(), ask the OS to close the window. Don't do any cleanup.
 
-2. When an event is received indicating that the USER wants to close the window, 
-also ask the OS to close the window. Additionally, if this->exit (equivalent to scene.exit = 1), 
+2. When an event is received indicating that the USER wants to close the window,
+also ask the OS to close the window. Additionally, if this->exit (equivalent to scene.exit = 1),
 ask the event loop to shut down.
 
-3. In the event handler for window destruction (which gets called after either of the above cases), 
+3. In the event handler for window destruction (which gets called after either of the above cases),
 call report_closed() and then clean up the resources used by the window like OpenGL contexts.
 
-4. When the event loop terminates (i.e. returns), call gui_main::on_shutdown(), 
+4. When the event loop terminates (i.e. returns), call gui_main::on_shutdown(),
 which will terminate the program (the actual shutdown logic is in wrap_display_kernel.cpp).
 
-5. If the program closes all its windows programmatically and then terminates itself, 
+5. If the program closes all its windows programmatically and then terminates itself,
 the event loop never terminates; it is killed by the OS when the main thread calls std::exit().
 
 I don't know if this exact design will work on the Mac; it depends somewhat on OS behavior.
-But its behavior needs to be followed closely. 
+But its behavior needs to be followed closely.
 The most obvious possible implementation differences required:
 
  - There might be only a single event for 2 and 3.
-   In that case, you need to clean up resources, and request event loop shutdown 
-   only if this->exit AND this->visible. I believe that check will identify only 
+   In that case, you need to clean up resources, and request event loop shutdown
+   only if this->exit AND this->visible. I believe that check will identify only
    the case where the user is closing the window, as opposed to setting scene.visible = 0.
 
  - 5 might not work, so the program might hang on shutdown in that situation.
- In fact, a quick test revealed that this was broken on Windows due to a bug in display_kernel, 
- which I'll check in a fix to. If there's a problem with this on the Mac, 
+ In fact, a quick test revealed that this was broken on Windows due to a bug in display_kernel,
+ which I'll check in a fix to. If there's a problem with this on the Mac,
  talk to me about it since it's not worth my solving if it isn't a problem.
 */
 
@@ -83,7 +83,7 @@ win32_write_critical(
 	os << "VPython ***Win32 Critical Error*** " << file << ":" << line << ": "
 		<< func << ": " << msg << ": [" << code << "] " << message;
 	write_stderr( os.str() );
-	
+
 	LocalFree(message);
 	std::exit(1);
 }
@@ -216,7 +216,7 @@ display::update_size()
 		GetClientRect( widget_handle, &clientSize );
 		POINT clientPos; clientPos.x = clientPos.y = 0;
 		ClientToScreen( widget_handle, &clientPos);
-		report_resize(	windowRect.left, windowRect.top, windowRect.right-windowRect.left, windowRect.bottom-windowRect.top, 
+		report_resize(	windowRect.left, windowRect.top, windowRect.right-windowRect.left, windowRect.bottom-windowRect.top,
 						clientPos.x, clientPos.y, clientSize.right, clientSize.bottom );
 	}
 }
@@ -277,7 +277,7 @@ display::on_destroy(WPARAM wParam,LPARAM lParam)
 	widgets.erase( widget_handle );
 	return DefWindowProc( widget_handle, WM_DESTROY, wParam, lParam );
 }
- 
+
 void
 display::gl_begin()
 {
@@ -309,18 +309,18 @@ void
 display::create()
 {
 	python::gil_lock gil;  // protect statics like widgets, the shared display list context
-	
+
 	register_win32_class();
 
 	RECT screen;
 	SystemParametersInfo( SPI_GETWORKAREA, 0, &screen, 0);
 	int style = -1;
-	
+
 	int real_x = static_cast<int>(window_x);
 	int real_y = static_cast<int>(window_y);
 	int real_width = static_cast<int>(window_width);
 	int real_height = static_cast<int>(window_height);
-	
+
 	if (fullscreen) {
 		real_x = screen.left;
 		real_y = screen.top;
@@ -400,7 +400,7 @@ display::create()
 		wglShareLists( root_glrc, gl_context);
 
 	ShowWindow( widget_handle, SW_SHOW);
-	
+
 	update_size();
 }
 
@@ -436,14 +436,14 @@ display::on_mouse( WPARAM wParam, LPARAM lParam)
 {
 	bool buttons[] = { wParam & MK_LBUTTON, wParam & MK_RBUTTON };
 	bool shiftState[] = { wParam & MK_SHIFT, wParam & MK_CONTROL, GetKeyState( VK_MENU) < 0 };
-	
+
 	int mouse_x = GET_X_LPARAM(lParam);
 	int mouse_y = GET_Y_LPARAM(lParam);
 	bool was_locked = mouse.is_mouse_locked();
 	int old_x = mouse.get_x(), old_y = mouse.get_y();
-	
+
 	mouse.report_mouse_state( 2, buttons, mouse_x, mouse_y, 3, shiftState, true );
-	
+
 	// This mouse locking code is more complicated but much smoother and the cursor can't escape.
 	if ( mouse.is_mouse_locked() != was_locked ) {
 		if (mouse.is_mouse_locked()) SetCapture( widget_handle );
@@ -471,20 +471,20 @@ display::on_keyUp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 LRESULT
 display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// Note that this algorithm will proably fail if the user is using anything 
+	// Note that this algorithm will proably fail if the user is using anything
 	// other than a US keyboard.
 	char *kNameP;
 	char kStr[60],fStr[4];
-	
+
 	bool Kshift = (GetKeyState(VK_SHIFT) < 0) ||
 		(GetKeyState(VK_CAPITAL) & 1);
 	bool Kalt = GetKeyState(VK_MENU) < 0;
 	bool Kctrl = GetKeyState(VK_CONTROL) < 0;
 	kStr[0] = 0;
 	kNameP = NULL;
-	
+
 	switch (wParam) {
-		
+
 	case VK_F1:
 	case VK_F2:
 	case VK_F3:
@@ -500,61 +500,65 @@ display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		sprintf(fStr,"f%d",wParam-VK_F1+1);
 		kNameP = fStr;
 		break;
-		
+
 	case VK_PRIOR:
 		kNameP = "page up";
 		break;
-		
+
 	case VK_NEXT:
 		kNameP = "page down";
 		break;
-		
+
 	case VK_END:
 		kNameP = "end";
 		break;
-		
+
 	case VK_HOME:
 		kNameP = "home";
 		break;
-		
+
 	case VK_LEFT:
 		kNameP = "left";
 		break;
-		
+
 	case VK_UP:
 		kNameP = "up";
 		break;
-		
+
 	case VK_RIGHT:
 		kNameP = "right";
 		break;
-		
+
 	case VK_DOWN:
 		kNameP = "down";
 		break;
-		
+
 	case VK_SNAPSHOT:
 		kNameP = "print screen";
 		break;
-		
+
 	case VK_INSERT:
 		kNameP = "insert";
 		break;
-		
+
 	case VK_DELETE:
 		kNameP = "delete";
 		break;
-		
+
+	case VK_BACK:
+		kNameP = "backspace";
+		break;
+
 	case VK_NUMLOCK:
 		kNameP = "numlock";
 		break;
-		
+
 	case VK_SCROLL:
 		kNameP = "scrlock";
 		break;
-		
+
 	} // wParam
-	
+
 	if (kNameP) {
 		if (Kctrl) strcat(kStr,"ctrl+");
 		if (Kalt) strcat(kStr,"alt+");
@@ -562,35 +566,35 @@ display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		strcat(kStr,kNameP);
 		keys.push( std::string(kStr));
 	}
-	
+
 	return 0;
 }
 
 LRESULT
 display::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// Note that this algorithm will proably fail if the user is using anything 
+	// Note that this algorithm will proably fail if the user is using anything
 	// other than a US keyboard.
 	int fShift,fAlt,fCtrl;
 	char *kNameP;
 	char kStr[60],wStr[2];
-	
+
 	if ((wParam >= 32) && (wParam <= 126))
 	{
 		char kk[2];
 	    kk[0] = wParam;
 	    kk[1] = 0;
-	    keys.push( std::string(kk)); 
+	    keys.push( std::string(kk));
 	    return 0;
 	}
-	
+
 	fShift = (GetKeyState(VK_SHIFT) < 0) ||
 		(GetKeyState(VK_CAPITAL) & 1);
 	fAlt = GetKeyState(VK_MENU) < 0;
 	fCtrl = GetKeyState(VK_CONTROL) < 0;
 	kStr[0] = 0;
 	kNameP = NULL;
-	
+
 	if (!fCtrl && wParam == VK_RETURN)
 		kNameP = "\n";
 	else if (!fCtrl && wParam == VK_ESCAPE)
@@ -613,12 +617,12 @@ display::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		kNameP = "^";
 	else if (wParam == 31)
 		kNameP = "_";
-	
+
 	if (kNameP) {
 		if (fCtrl) strcat(kStr,"ctrl+");
 		if (fAlt) strcat(kStr,"alt+");
 		if (fShift) strcat(kStr,"shift+");
-		strcat(kStr,kNameP);			
+		strcat(kStr,kNameP);
 		if (strcmp(kStr,"escape") == 0)
 		{
 			// Allow the user to delete a fullscreen window this way
@@ -629,7 +633,7 @@ display::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		keys.push( std::string(kStr));
 	}
-	
+
 	return 0;
 }
 
@@ -650,7 +654,7 @@ LRESULT
 gui_main::threadMessage( int code, WPARAM wParam, LPARAM lParam ) {
 	if (wParam == PM_REMOVE) {
 		MSG& message = *(MSG*)lParam;
-		
+
 		if (message.hwnd ==0 && message.message == CALL_MESSAGE ) {
 			boost::function<void()>* f = (boost::function<void()>*)message.wParam;
 			(*f)();
@@ -667,22 +671,22 @@ void
 gui_main::run()
 {
 	MSG message;
-	
+
 	// Create a message queue and hook thread messages (we can't just check for them in the loop
 	// below, becomes Windows runs modal message loops e.g. when resizing a window)
 	SetWindowsHookEx(WH_GETMESSAGE, &gui_main::threadMessage, NULL, GetCurrentThreadId());
 	PeekMessage(&message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
-	
+
 	// Tell the initializing thread
 	{
 		lock L(init_lock);
 		gui_thread = GetCurrentThreadId();
 		initialized.notify_all();
 	}
-	
+
 	timeBeginPeriod(TIMER_RESOLUTION);
 	atexit( end_period );
-	
+
 	poll();
 
 	// Enter the message loop
