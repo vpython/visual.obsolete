@@ -229,6 +229,7 @@ wrap_primitive()
 		.add_property( "linecolor", &label::get_linecolor, &label::set_linecolor)
 		.add_property( "font", &label::get_font_family, &label::set_font_family)
 		.add_property( "text", &label::get_text, &label::set_text)
+		.add_property( "align", &label::get_alignment, &label::set_alignment)
 		.add_property( "space", &label::get_space, &label::set_space)
 		// .def( self_ns::str(self))
 		;

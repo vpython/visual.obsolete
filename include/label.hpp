@@ -46,9 +46,14 @@ class label : public renderable
 
 	void set_opacity( float);
 	double get_opacity();
-	
+
 	void set_text( const std::wstring& t);
 	std::wstring get_text();
+
+	enum alignment_t { LEFT, CENTER, RIGHT } alignment;
+
+	void set_alignment( std::string t);
+	std::string get_alignment();
 
 	void set_space( double space);
 	double get_space();
