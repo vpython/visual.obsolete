@@ -23,7 +23,6 @@ label::label()
 	border(5),
 	font_description(), // equivalent to label.font="sans"
 	font_size(-1), // equivalent to label.height=13 (see text.cpp)
-	alignment(CENTER),
 	box_enabled(true),
 	line_enabled(true),
 	linecolor( color),
@@ -45,7 +44,6 @@ label::label( const label& other)
 	line_enabled( other.line_enabled),
 	linecolor( other.linecolor),
 	opacity( other.opacity),
-	alignment( other.alignment),
 	text( other.text),
 	text_changed( true)
 {
@@ -170,40 +168,11 @@ label::set_text( const std::wstring& t )
 	text_changed = true;
 }
 
+
 std::wstring
 label::get_text()
 {
 	return text;
-}
-
-void
-label::set_alignment( std::string mode )
-{
-	if (mode == "center")
-		alignment = CENTER;
-	else if (mode == "left")
-		alignment = LEFT;
-	else if (mode == "right")
-		alignment = RIGHT;
-	else
-		throw std::invalid_argument( "Unimplemented or invalid alignment mode");
-}
-
-std::string
-label::get_alignment()
-{
-	switch (alignment) {
-		case CENTER:
-			return "center";
-		case LEFT:
-			return "left";
-		case RIGHT:
-			return "right";
-		default:
-			// Not strictly required, this just silences a warning about control
-			// reaching the end of a non-void function.
-			return "nonaligned";
-	}
 }
 
 void
@@ -374,7 +343,7 @@ label::gl_render( const view& scene)
 
 		glTranslated( origin.x, origin.y, origin.z);
 		glScaled( 2.0/scene.view_width, 2.0/scene.view_height, 1.0);
-		// At this point, all further translations are in direction of label
+		// At this point, all furthur translations are in direction of label
 		//  space.
 		if (space && (xoffset || yoffset)) {
 			// Move the origin away from the body.
@@ -404,16 +373,7 @@ label::gl_render( const view& scene)
 			}
 		}
 		else {
-			switch (alignment) {
-				case LEFT:
-					glTranslated( 0, -box_height*0.5, 0.0);
-					break;
-				case RIGHT:
-					glTranslated( -box_width, -box_height*0.5, 0.0);
-					break;
-				default:
-					glTranslated( -box_width*0.5, -box_height*0.5, 0.0);
-			}
+			glTranslated( -box_width*0.5, -box_height*0.5, 0.0);
 		}
 		if (opacity) {
 			// Occlude objects behind the label.
