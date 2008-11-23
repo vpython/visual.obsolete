@@ -7,6 +7,14 @@
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
 <link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+<!--
+.style1 {
+	color: #FF0000;
+	font-weight: bold;
+}
+-->
+</style>
 <!-- InstanceEndEditable -->
 <script type="text/javascript">
 <!--
@@ -117,22 +125,27 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             <p class="attributes"> <span class="attribute">pos</span>; <span class="attribute">x</span>,<span class="attribute">y</span>,<span class="attribute">z</span> The
               point in world space being labeled. If there are no offsets (see
               diagram), the center of the text is at <span class="attribute">pos</span></p>
-      <p class="attributes"> <span class="attribute">xoffset</span>, <span class="attribute">yoffset</span> The x and y components of the line, in pixels (see diagram)</p>
-            <p class="attributes"> <span class="attribute">text</span> The text to be 
+      <p class="attributes"> <span class="attribute">xoffset</span>, <span class="attribute">yoffset</span> The
+        x and y components of the line, in pixels (see diagram). You can <span class="style1">left
+        justify </span>text
+        by setting xoffset = 1 and line = 0 (so the 1-pixel line doesn't show),
+        or <strong><span class="attribute">right-justify</span></strong> text
+        by setting xoffset = -1 and line = 0.</p>
+      <p class="attributes"> <span class="attribute">text</span> The text to be 
               displayed, such as 'Earth'<br />
               (Line breaks can be included as \n, as in label.text = &quot;Three\nlines\nof 
               text&quot;)</p>
             <p class="attributes"> <span class="attribute">font</span> Name of the desired 
               font; for example, 'sans', or 'serif', or 'monospace' (fixed-width)<br />
             Python Unicode strings are supported.</p>
-            <p class="attributes"> <span class="attribute">height</span> Height of the font 
-              in pixels</p>
+            <p class="attributes"> <span class="attribute">height</span> Height
+              of the font  in pixels; default is 13 pixels</p>
             <p class="attributes"> <span class="attribute">color</span>, <span class="attribute">red</span>, <span class="attribute">green</span>, <span class="attribute">blue</span> Color of the text</p>
             <p class="attributes"> <span class="attribute">opacity</span> Opacity of the 
               background of the box, default 0.66<br />
               (0 transparent, 1 opaque, for objects behind the box)</p>
-            <p class="attributes"> <span class="attribute">border</span> Distance in pixels 
-              from the text to the surrounding box</p>
+            <p class="attributes"> <span class="attribute">border</span> Distance
+              in pixels  from the text to the surrounding box; default is 5 pixels</p>
             <p class="attributes"> <span class="attribute">box</span> 1 if the box should 
               be drawn (default), else 0</p>
             <p class="attributes"> <span class="attribute">line</span> 1 if the line from 
