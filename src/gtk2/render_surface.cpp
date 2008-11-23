@@ -47,14 +47,14 @@ namespace {
 }
 
 render_surface::render_surface( display_kernel& _core, mouse_manager& _mouse, bool activestereo)
-	: 
+	:
 	core( _core),
 	mouse( _mouse )
 {
 	Glib::RefPtr<Gdk::GL::Config> config;
 
 	if (activestereo) {
-		config = Gdk::GL::Config::create( 
+		config = Gdk::GL::Config::create(
 			Gdk::GL::MODE_RGBA
 			| Gdk::GL::MODE_DOUBLE
 			| Gdk::GL::MODE_DEPTH
@@ -72,8 +72,8 @@ render_surface::render_surface( display_kernel& _core, mouse_manager& _mouse, bo
 			}
 		}
 	}
-	else if (!activestereo || !config) {	
-		config = Gdk::GL::Config::create( 
+	else if (!activestereo || !config) {
+		config = Gdk::GL::Config::create(
 			Gdk::GL::MODE_RGBA
 			| Gdk::GL::MODE_DOUBLE
 			| Gdk::GL::MODE_DEPTH
@@ -96,12 +96,12 @@ render_surface::render_surface( display_kernel& _core, mouse_manager& _mouse, bo
 	else {
 		set_gl_capability( config);
 	}
-	
+
 	add_events( Gdk::EXPOSURE_MASK
 		| Gdk::BUTTON_PRESS_MASK
 		| Gdk::BUTTON_RELEASE_MASK
-		| Gdk::POINTER_MOTION_MASK 
-		// | Gdk::ENTER_NOTIFY_MASK //< TODO: Find out why this doesn't work.
+		| Gdk::POINTER_MOTION_MASK
+		| Gdk::ENTER_NOTIFY_MASK
 		| Gdk::BUTTON2_MOTION_MASK
 		| Gdk::BUTTON3_MOTION_MASK);
 	set_size_request( 384, 256);
@@ -110,11 +110,12 @@ render_surface::render_surface( display_kernel& _core, mouse_manager& _mouse, bo
 }
 
 template <class E>
-void 
+void
 render_surface::mouse_event( E* event, int buttons_toggled ) {
+
 	bool buttons[] = { event->state & GDK_BUTTON1_MASK, event->state & GDK_BUTTON3_MASK, event->state & GDK_BUTTON2_MASK };
 	bool shiftState[] = { event->state & GDK_SHIFT_MASK, event->state & GDK_CONTROL_MASK, event->state & GDK_MOD1_MASK };
-	
+
 	buttons[0] = (buttons[0] != bool( buttons_toggled&1 ));
 	buttons[1] = (buttons[1] != bool( buttons_toggled&4 ));
 	buttons[2] = (buttons[2] != bool( buttons_toggled&2 ));
@@ -124,7 +125,7 @@ render_surface::mouse_event( E* event, int buttons_toggled ) {
 	// TODO: Is mouse locking possible with GTK2?
 }
 
-bool 
+bool
 render_surface::on_motion_notify_event( GdkEventMotion* event)
 {
 	python::gil_lock L;
@@ -132,22 +133,28 @@ render_surface::on_motion_notify_event( GdkEventMotion* event)
 	return true;
 }
 
-bool 
+bool
 render_surface::on_enter_notify_event( GdkEventCrossing* event)
 {
 	python::gil_lock L;
+
+	bool buttons[] = { 0,0,0 };
+	bool shiftState[] = { 0,0,0 };
+
+	mouse.report_mouse_state( 3, buttons, event->x, event->y, 3, shiftState, false );
+
 	mouse_event( event );
 	return true;
 }
 
-bool 
+bool
 render_surface::on_configure_event( GdkEventConfigure* event)
 {
 	python::gil_lock L;
 	int x,y,w,h;
 	get_parent_window()->get_position( x, y );
 	get_parent_window()->get_size(w,h);
-	core.report_resize( 
+	core.report_resize(
 		x,y,w,h,
 		x+event->x, y+event->y, event->width, event->height );
 	return true;
@@ -187,7 +194,7 @@ render_surface::on_expose_event( GdkEventExpose*)
 	return true;
 }
 
-bool 
+bool
 render_surface::on_button_press_event( GdkEventButton* event)
 {
 	python::gil_lock L;
@@ -195,7 +202,7 @@ render_surface::on_button_press_event( GdkEventButton* event)
 	return true;
 }
 
-bool 
+bool
 render_surface::on_button_release_event( GdkEventButton* event)
 {
 	python::gil_lock L;
