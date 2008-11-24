@@ -11,6 +11,10 @@ see VCBuild/VCBuild.txt and MAC-OSX.txt.
 
 For Linux:
 
+In src/gtk2 there is a simple non-autoconf makefile for Ubuntu 8 as of Nov. 2008.
+It is unlikely to be kept up to date, but it gives an example of the basic
+elements of what the rather complex autoconf machinery needs to produce.
+
 Makefile.in, configure, and the helper programs for them are not maintained
 in CVS. You will have to run the autogen.sh script after a fresh checkout to 
 create configure. Except on Windows, you need to execute "chmod +x autogen.sh"

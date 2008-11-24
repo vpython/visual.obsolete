@@ -102,6 +102,10 @@ I.  Prerequisites:
 	6) sudo make install
 
 II.   Configuration 
+	In src/gtk2 there is a simple non-autoconf makefile for Ubuntu 8 as of Nov. 2008.
+	It is unlikely to be kept up to date, but it gives an example of the basic
+	elements of what the rather complex autoconf machinery needs to produce.
+
 	On most systems, configuration should be automatic.  Just run './configure'.
 
 	However, configure also provides a large number of options and is sensitive to 
