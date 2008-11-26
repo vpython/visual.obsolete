@@ -545,10 +545,6 @@ display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		kNameP = "delete";
 		break;
 
-	case VK_BACK:
-		kNameP = "backspace";
-		break;
-
 	case VK_NUMLOCK:
 		kNameP = "numlock";
 		break;
