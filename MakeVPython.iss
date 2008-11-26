@@ -43,6 +43,7 @@ Source: "c:\workspace\vpython-core2\docs\visual\*.html"; DestDir: "{app}\Lib\sit
 Source: "c:\workspace\vpython-core2\docs\visual\*.gif"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.css"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.txt"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
+Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\images"; Components: Documentation
 
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
