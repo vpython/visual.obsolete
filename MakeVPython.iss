@@ -40,6 +40,7 @@ Source: "c:\workspace\vpython-core2\examples\*.tga"; DestDir: "{app}\Lib\site-pa
 ;
 Source: "c:\workspace\vpython-core2\docs\index.html"; DestDir: "{app}\Lib\site-packages\visual\docs\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.html"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
+Source: "c:\workspace\vpython-core2\docs\visual\*.pdf"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.gif"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.css"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.txt"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
