@@ -57,6 +57,12 @@ ellipsoid::get_size()
 void
 ellipsoid::set_size( const vector& s)
 {
+	if (s.x < 0)
+		throw std::runtime_error( "length cannot be negative");
+	if (s.y < 0)
+		throw std::runtime_error( "height cannot be negative");
+	if (s.z < 0)
+		throw std::runtime_error( "width cannot be negative");
 	axis = axis.norm() * s.x;
 	height = s.y;
 	width = s.z;

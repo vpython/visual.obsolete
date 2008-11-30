@@ -126,7 +126,6 @@ wrap_arrayobjects()
 
 	class_<points, bases<renderable> >( "points")
 		.def( init<const points&>())
-		.add_property( "size", &points::get_size, &points::set_size)  // AKA thickness.
 		.add_property( "shape", &points::get_points_shape, &points::set_points_shape)
 		.add_property( "size_units", &points::get_size_units, &points::set_size_units)
 		.def( "get_color", &points::get_color)

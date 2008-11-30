@@ -16,51 +16,57 @@ rectangular::~rectangular()
 {
 }
 
-void 
+void
 rectangular::set_length( double l)
 {
 	axis = axis.norm() * l;
 }
 
-double 
+double
 rectangular::get_length()
 {
 	return axis.mag();
 }
-	
-void 
+
+void
 rectangular::set_height( double h)
 {
 	height = h;
 }
 
-double 
+double
 rectangular::get_height()
 {
 	return height;
 }
-	
-void 
+
+void
 rectangular::set_width( double w)
 {
 	width = w;
 }
 
-double 
+double
 rectangular::get_width()
 {
 	return width;
 }
-	
-vector 
+
+vector
 rectangular::get_size()
 {
 	return vector(axis.mag(), height, width);
 }
 
-void 
+void
 rectangular::set_size( const vector& s)
 {
+	if (s.x < 0)
+		throw std::runtime_error( "length cannot be negative");
+	if (s.y < 0)
+		throw std::runtime_error( "height cannot be negative");
+	if (s.z < 0)
+		throw std::runtime_error( "width cannot be negative");
 	axis = axis.norm() * s.x;
 	height = s.y;
 	width = s.z;
@@ -72,8 +78,8 @@ rectangular::apply_transform( const view& scene )
 	// OpenGL needs to invert the modelview matrix to generate the normal matrix,
 	//   so try not to make it singular:
 	double min_scale = std::max( axis.mag(), std::max(height,width) ) * 1e-6;
-	vector size( std::max(min_scale,axis.mag()), 
-				 std::max(min_scale,height), 
+	vector size( std::max(min_scale,axis.mag()),
+				 std::max(min_scale,height),
 			     std::max(min_scale,width) );
 
 	model_world_transform( scene.gcf, size ).gl_mult();
