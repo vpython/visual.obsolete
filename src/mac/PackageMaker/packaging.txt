@@ -10,7 +10,14 @@ Place in stage a copy of
 
 Clean out irrelevant files from these folders (e.g. CVS folders, .in files).
 
-Add to stage a copy of the numpy files.
+Add to stage a copy of the numpy files (two folders).
+
+Ctrl-click the stage folder and choose Get Info.
+Expose Sharing & Permissions.
+Click the lock and enter your password.
+Set "everyone" to have Read & Write acess.
+At the bottom of the window, click the star menu icon and choose "Apply to enclosed items".
+	This is necessary to permit someone to install over an existing installation.
 
 Now go to PackageMaker folder and doubleclick the package manager file.
 Build the installer.
