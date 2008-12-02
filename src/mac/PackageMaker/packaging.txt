@@ -1,0 +1,16 @@
+This is the start of instructions for creating a Mac installer.
+
+To use the Apple Package Manager to create an installer, create a folder named "stage"
+at the same level as vpython-core2. 
+
+Place in stage a copy of 
+	the visual folder (from vpython-core2/site-packages)
+	the examples folder
+	the docs folder
+
+Clean out irrelevant files from these folders (e.g. CVS folders, .in files).
+
+Add to stage a copy of the numpy files.
+
+Now go to PackageMaker folder and doubleclick the package manager file.
+Build the installer.
