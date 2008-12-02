@@ -26,8 +26,8 @@ In the mbuild directory, execute make install to build and install Visual.
 This creates cvisual.so in the CVS site-packages/visual directory, which is
 linked as explained above, ready to run.
 
-In src/mac/PackageMaker is an Apple PackageMaker project file and a Welcome text file
-for creating a VPython installer for the Mac.
+In src/mac/PackageMaker is an Apple PackageMaker project file, a Welcome text file
+for creating a VPython installer for the Mac, and instructions in packaging.txt.
 
 The Boost libraries were built by downloading them and the bjam tool.
 Copy bjam into the Boost directory and execute this:
