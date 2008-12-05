@@ -19,6 +19,8 @@ rectangular::~rectangular()
 void
 rectangular::set_length( double l)
 {
+	if (l < 0)
+		throw std::runtime_error( "length cannot be negative");
 	axis = axis.norm() * l;
 }
 
@@ -31,6 +33,8 @@ rectangular::get_length()
 void
 rectangular::set_height( double h)
 {
+	if (h < 0)
+		throw std::runtime_error( "height cannot be negative");
 	height = h;
 }
 
@@ -43,6 +47,8 @@ rectangular::get_height()
 void
 rectangular::set_width( double w)
 {
+	if (w < 0)
+		throw std::runtime_error( "width cannot be negative");
 	width = w;
 }
 

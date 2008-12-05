@@ -15,6 +15,8 @@ ellipsoid::ellipsoid()
 void
 ellipsoid::set_length( double l)
 {
+	if (l < 0)
+		throw std::runtime_error( "length cannot be negative");
 	axis = axis.norm() * l;
 }
 
@@ -27,6 +29,8 @@ ellipsoid::get_length()
 void
 ellipsoid::set_height( double h)
 {
+	if (h < 0)
+		throw std::runtime_error( "height cannot be negative");
 	height = h;
 }
 
@@ -39,6 +43,8 @@ ellipsoid::get_height()
 void
 ellipsoid::set_width( double w)
 {
+	if (w < 0)
+		throw std::runtime_error( "width cannot be negative");
 	width = w;
 }
 
