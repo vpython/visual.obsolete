@@ -180,8 +180,12 @@ materials.unshaded (unaffected by lighting)</p>
       <p class="program">materials.saveTGA(&quot;checks&quot;, checkerboard)</p>
         <p class="Normal">This saves the checkboard pattern in a file &quot;checks.tga&quot;, a targa file which many graphics applications can display. In later programs you can use this data without recreating it:</p>
         <p class="program">data = materials.loadTGA(&quot;checks&quot;)</p>
+        <p class="Normal">More generally, any targa file whose
+          width and height are both powers of 2 can be read as data using <strong>materials.loadTGA(filename)</strong>.
+          If the actual file name is &quot;checks.tga&quot; you can give the full file
+          name or just &quot;checks&quot;.</p>
         <p class="Normal">One way to create a pattern is to start by creating a numpy array of zeros, then assign values to individual slots:</p>
-        <p class="program">pattern = zeros((4,8,3)) # 4 by 8 by 3 numpy array of 0's<br />
+<p class="program">pattern = zeros((4,8,3)) # 4 by 8 by 3 numpy array of 0's<br />
           pattern[0][0] = (1,.5,.7) # assign first rgb triple<br />
         </p>
       <p class="Normal"><strong><font color="#0000A0">Another  example </font></strong></p>
@@ -206,6 +210,8 @@ materials.unshaded (unaffected by lighting)</p>
         #im = im.crop((x1,y1,x2,y2)) # (0,0) is upper left<br />
         im = im.resize((width,height), Image.ANTIALIAS)<br />
 materials.saveTGA(name,im)</p>
+      <p class="Normal">At a later time you can say <strong>data
+        = materials.loadTGA(name)</strong>        to retrieve the image data from the targa file.</p>
       <p class="Normal">As a convenience, a texture can also be created directly from the PIL image data, like this:</p>
       <p class="program">tex = materials.texture(data=im, mapping=&quot;sign&quot;)</p>
       <p class="Normal"><strong><font color="#0000A0">Efficiency issues</font></strong></p>
