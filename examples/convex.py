@@ -1,6 +1,8 @@
 from visual import *
 from random import uniform
 
+# David Scherer
+
 scene.range = 3
 
 a = convex(color=(0.5,0,0))
