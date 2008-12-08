@@ -90,7 +90,7 @@ for i in range(Nslabs):
         box(pos=(-3.*w/8.,0.75*h/2.,R),
             length=0.5*w/2,height=0.75*h,width=d, color=grey)
         box(pos=(3.*w/8.0,0.75*h/2.,R),
-            length=-0.5*w/2,height=0.75*h,width=d, color=grey)
+            length=0.5*w/2,height=0.75*h,width=d, color=grey)
         box(pos=(0,0.85*h,R),
             length=w,height=0.3*h,width=d, color=grey)
         
