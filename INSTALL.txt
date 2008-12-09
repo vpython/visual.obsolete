@@ -42,7 +42,12 @@ I.  Prerequisites:
 		*** Python they were built for and with. You have to be careful to
 		*** install Boost Python libraries that were built for your version of Python.
 	
-	You also need the threadpool resource: threadpool.sourceforge.net
+	You also need the threadpool resource: sourceforge.net/projects/threadpool.
+	If you are using the 1_35_0 Boost libraries, you need version 0.2.4. 
+	At the same level as the src and include directories, create a directory
+	chain "dependencies/threadpool/include". Copy into the include directory
+	the contents of the boost directory in the threadpool package,
+	which includes a directory named "include" and a file "threadpool.hpp".
 		
 	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
 		the development (dev) package.
