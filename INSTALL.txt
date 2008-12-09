@@ -41,6 +41,8 @@ I.  Prerequisites:
 		*** deal with Python have names that do not reflect what version of
 		*** Python they were built for and with. You have to be careful to
 		*** install Boost Python libraries that were built for your version of Python.
+	
+	You also need the threadpool resource: threadpool.sourceforge.net
 		
 	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
 		the development (dev) package.
