@@ -44,7 +44,18 @@ Building vpython with from Visual Studio C++
         (On XP, you need to copy over any Visual .py files that change.)
     
     Process MakeVPython.iss with Innosetup (innosetup.org) to build an installer
-    
+
+DEBUGGING
+Go to the "System" control panel and choose advanced settings, then environment variables
+Create a user variable "VPYTHON_DEBUG" and give it the value 1.
+
+Run the Windows command prompt, found in Accessories in the program listings, cd to a
+directory with a Python script, and execute this:
+
+\Python25\python.exe sometest.py
+
+You'll get a trace of the VPYTHON_NOTE entries in the source code.
+
 BUILDING BOOST FROM SOURCE
 Download a precompiled version of the 'bjam' tool from www.boost.org.
 
@@ -75,7 +86,7 @@ libboost_thread-vc90-mt-sgd-1_35.lib
 
 These go into dependencies\boost\win_libs 
 
-2008/10/19 and attempt was made to use Boost 1_36_0 with Python 2.6 which failed.
+2008/10/19 an attempt was made to use Boost 1_36_0 with Python 2.6 which failed.
 Built python, thread, signals Boost libraries 1_36_0 for Python 2.6 and got these 
 errors when building Visual using msvc:
 
