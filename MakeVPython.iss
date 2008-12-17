@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=VPython for Python 2.5
-AppVerName=VPython 5.00beta
+AppVerName=VPython 5.0_candidate
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
@@ -13,7 +13,7 @@ SourceDir=C:\Python25
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py2.5-5.00beta
+OutputBaseFilename=VPython-Win-Py2.5-5.0_candidate
 OutputDir=c:\workspace
 
 [Files]
@@ -50,7 +50,7 @@ Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\L
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
-Name: numpy; Description: "numpy 1.2.0 {code:NumpyStatus|C:\Python25}"; Types: full; Check: CheckNumpy( 'C:\Python25' )
+Name: numpy; Description: "numpy 1.2.1 {code:NumpyStatus|C:\Python25}"; Types: full; Check: CheckNumpy( 'C:\Python25' )
 
 [Tasks]
 Name: desktopicon; Description: "Create a desktop icon";
