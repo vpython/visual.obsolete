@@ -35,9 +35,9 @@ font::find_font( const wstring& desc, int height ) {
 		// Attempt to use consistent fonts for generic font families across platforms
 		std::vector<wstring> real_fonts;
 		for(size_t i=0; i<fonts.size(); i++) {
-			if		(fonts[i] == L"sans-serif")	real_fonts.push_back( L"verdana" );
-			else if (fonts[i] == L"serif")		real_fonts.push_back( L"times new roman" );
-			else if (fonts[i] == L"monospace")	real_fonts.push_back( L"courier new" );
+			if		(fonts[i] == L"sans-serif")	real_fonts.push_back( L"Verdana" );
+			else if (fonts[i] == L"serif")		real_fonts.push_back( L"Times New Roman" );
+			else if (fonts[i] == L"monospace")	real_fonts.push_back( L"Courier New" );
 			real_fonts.push_back( fonts[i] );
 		}
 		fonts.swap( real_fonts );
