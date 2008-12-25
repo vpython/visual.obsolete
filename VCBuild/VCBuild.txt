@@ -43,7 +43,20 @@ Building vpython with from Visual Studio C++
         This is the only step that needs to be repeated as you make changes to the C++ source code.
         (On XP, you need to copy over any Visual .py files that change.)
     
-    Process MakeVPython.iss with Innosetup (innosetup.org) to build an installer
+    Process MakeVPython.iss with Innosetup (innosetup.org) to build an installer:
+    1) Run compilevisual.py from the Visual source package to
+	   Python-compile all the Visual .py files (produces .pyc files).
+	2) Make sure that C:\Python25\Lib\idlelib\config-main.def has edit startup and 
+	autosave set to 1 and that help is set for Visual before building the package.
+	3) Double-click MakeVPython.iss. 
+	4) Near the start of the file, update AppVerName if necessary.
+	5) Do Build > Compile to produce a Windows installer.
+	6) Run the installer.
+	This produces a Windows installer that can be used by an administrator to
+	install a fully-compiled Visual into a protected area that users can't write
+	to. Without this second inno setup to get the .pyc files, every user would
+	have to recompile some of the site-packages/visual/*.py files. No big deal,
+	but nicer to have these files already compiled.
 
 DEBUGGING
 Go to the "System" control panel and choose advanced settings, then environment variables

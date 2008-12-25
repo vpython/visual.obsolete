@@ -1,5 +1,8 @@
 The purpose of this file is to fully document the installation
-procedure for VPython from source on all supported platforms.
+procedure for VPython from source on Linux. Specific installers
+for Windows and Mac are available at vpython.org. See HACKING.txt
+for details on how to do development work with the source code for
+Linux.
 
 Table of Contents:
 I:   Prerequisites
@@ -13,21 +16,6 @@ I.  Prerequisites:
 	distributor.  In every case, you must have the "developer" version
 	of the packages to ensure that the required header files are 
 	available.
-
-	See the file VCBuild/VCBuild.txt for details on how to build Visual on Windows.
-	See the file MAC-OSX.txt for details on how to build Visual on Mac OS X.
-	This file is maintained in CVS at sourceforge.
-	
-	A convenient development environment on Linux (and other platforms) is
-	Eclipse. On Ubuntu Linux, the package manager version of Eclipse doesn't
-	seem to work, due to issues with java licensing. The easy thing to do is
-	simply to use the package manager to install java, but to download Eclipse
-	from eclipse.org. 
-	
-	If you use eclipse, choose "CVS Repositories". In the upper right
-	corner of the CVS Repositories frame, click on the icon for "Add CVS
-	Repository". Specify host as visualpython.cvs.sourceforge.net and
-	path as /cvsroot/visualpython. Choose extssh as the connection type.
 	
 	GNU g++ version 3.2.x or >= 3.3.1 (3.4.6 reccomended) (gcc.gnu.org).
 	An implementation of OpenGL.
@@ -132,10 +120,6 @@ II.   Configuration
 	for VPython, specify the correct one by setting the CXX environment variable to
 	its fully-qualified path.
 	
-	If you are using G++ 3.3.x on Darwin, you must set the CXXFLAGS environment 
-	variable to	include "-finline-functions".  You should also include "-O2".  All of 
-	these options must be separated by whitespace.
-	
 	You should generally supply the --prefix option to cause Visual to be installed to
 	the same prefix that Python is installed (default is /usr/local).
 	
@@ -143,7 +127,7 @@ II.   Configuration
 	Make a note of the prefix preceding /bin/python, typically /usr or /usr/local.
 	
 	It is useful to place the visual folder and a folder named "build" at the same level,
-	and configure and make in the build folder by "cd build", then doing this:	
+	and configure and make in the build folder by "cd build", then do this:	
 	(a) If prefix is /usr/local, execute
      	../visual-x.x.x/configure
 	(b) If prefix is something else, and Visual can go into prefix/lib/python/site-packages, execute
@@ -165,19 +149,8 @@ II.   Configuration
 	--disable-dependancy-tracking to make the build itself go a little faster.
 	
 	If your GNOME libraries are installed in a non-standard location (such as 
-	/sw in OSX fink, or /opt/gnome in SUSE), you must set the CPPFLAGS 
-	environment variable to -I/other_prefix/include to ensure that you pick up
-	the gtkglarea header files.
-	
-	Compling a prebuilt binary for MS Windows is configured with (in MSYS):
-	PYTHON=/c/Python25/python.exe CXXFLAGS="-O2 -march=i686" ./configure
-	NOTE: The variable MSC_VER is apparently set only by the Visual Studio
-	build procedure created by Arthur Siegel in early 2007 but not currently used.
-	
-	The prebuilt binary for Apple OSX is configured with (in Bash):
-	CXX=/usr/local/bin/g++-3.3.3 CXXFLAGS="-O2 -finline-functions" \
-	PYTHON=/sw/bin/python2.5 CPPFLAGS=-I/sw/include ../visual-2.9/configure \
-	--prefix=/sw
+	/opt/gnome in SUSE), you must set the CPPFLAGS environment variable to 
+	-I/other_prefix/include to ensure that you pick up the gtkglarea header files.
 	
 	Another interesting configuration is to install VPython into a prefix other than
 	the same prefix that Python is installed in.  This may be useful to test your
@@ -185,7 +158,7 @@ II.   Configuration
 	simultaneously.  After choosing an approprate prefix, such as /home/jonathan, run
 	configure as normally but specify the PYTHONPATH environment variable to be
 	[prefix]/lib/python2.5/site-packages, replacing python2.5 with python2.2 if that
-	is your interpreter.  You must create this PYTHONPATH directory if it does not
+	is your interpreter. You must create this PYTHONPATH directory if it does not
 	already exist.
 	
 III.  Build
@@ -196,9 +169,9 @@ III.  Build
 	LDFLAGS, LIBS, CXXFLAGS, and CPPFLAGS affect options passed to the linker,
 	compiler, and preprocessor, respectively.
 	DESTDIR may be used to prepend DESTDIR to the 'prefix' specified when running
-	configure.  This option is mostly useful to binary redistributors of VPython.
+	configure. This option is mostly useful to binary redistributors of VPython.
 	
-	The Makefiles support the following targets:
+	The makefiles support the following targets:
 	all: (the default) compiles all the required software
 	clean: deletes files created by the compiler
 	distclean: deletes all files created by the configure and make programs.  This
@@ -211,23 +184,6 @@ IV.  Install
 	You must have write privileges to the installation directory to proceed.  Unless
 	you are installing into your home directory, that generally means becoming root
 	with a program like `sudo` or `su`. Just run `sudo make install`.
-	
-	On MS Windows, you CANNOT use "make install".
-	Instead, you need to install innosetup (innosetup.org).
-	1) Make sure that C:\Python25\Lib\idlelib\config-main.def has edit startup and 
-	autosave set to 1 and that help is set for Visual before building the package.
-	2) Double-click MakeVPython.iss. 
-	3) Near the start of the file, update AppVerName if necessary.
-	4) Do Build > Compile to produce a Windows installer.
-	5) Run the installer, then run compilevisual.py from the Visual source package to
-	   Python-compile all the Visual .py files (produces .pyc files).
-	6) Run inno setup again, but uncomment the line that copies .pyc files.
-	
-	This produces a Windows installer that can be used by an administrator to
-	install a fully-compiled Visual into a protected area that users can't write
-	to. Without this second inno setup to get the .pyc files, every user would
-	have to recompile some of the site-packages/visual/*.py files. No big deal,
-	but nicer to have these files already compiled.
 	
 	Alternatively, you may run 'make install-strip' to install a somewhat smaller
 	executable.
