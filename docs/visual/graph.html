@@ -106,8 +106,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             vertical bars (<span class="attribute">gvbars</span>), horizontal bars (<span class="attribute">ghbars</span>), 
             and binned data displayed as vertical bars (<span class="attribute">ghistogram</span>; 
             see later discussion). When creating one of these objects, you can specify 
-            a color attribute. For <span class="attribute">gvbars</span> and <span class="attribute">ghbars</span> you can also specify a <span class="attribute">delta</span> attribute, which 
-            specifies the width of the bar (the default is <span class="attribute">delta=1.</span>).</p>
+            a color attribute. For <span class="attribute">gvbars</span> and <span class="attribute">ghbars</span> you can  specify a <span class="attribute">delta</span> attribute, which 
+            specifies the width of the bar (the default is <span class="attribute">delta=1</span>). For <span class="attribute">gdots</span> you can  specify a <span class="attribute">shape</span> attribute &quot;round&quot; or &quot;square&quot; (default is <span class="attribute">shape=&quot;round&quot;</span>) and a <span class="attribute">size</span> attribute, which 
+            specifies the width of the dot in pixels (default is <span class="attribute">size=5</span>).</p>
           <p class="Normal"> You can plot more than one thing on the same graph:</p>
           <p class="program"> funct1 = gcurve(color=color.cyan) <br />
          funct2 = gvbars(delta=0.05, color=color.blue)<br />
