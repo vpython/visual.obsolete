@@ -18,7 +18,7 @@ using boost::python::make_tuple;
 using boost::python::object;
 
 points::points()
-	: size_units(PIXELS), points_shape(ROUND), size( 1.5)
+	: size_units(PIXELS), points_shape(ROUND), size( 5.0)
 {
 }
 
