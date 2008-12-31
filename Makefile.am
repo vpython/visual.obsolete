@@ -7,8 +7,8 @@ SUBDIRS = site-packages/visual src
 
 # Logic to distribute the header files and miscellaneous files.
 EXTRA_DIST = include HACKING.txt INSTALL.txt \
-	MAC-OSX.txt authors.txt license.txt \
-	mkdist_osx.sh NEWS.txt
+	authors.txt license.txt NEWS.txt \
+	dependencies/Readme.txt dependencies/threadpool
 dist-hook:
 	rm -rf `find $(distdir)/include -name CVS` $(distdir)/include/config.h
 
