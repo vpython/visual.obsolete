@@ -18,11 +18,6 @@ Rtrail = 2e8
 L = 4e10
 vsun = 0.8*sqrt(G*Msun/Rsun)
 
-print """
-Right button drag to rotate view.
-Left button drag up or down to move in or out.
-"""
-
 scene = display(title="Stars", width=win, height=win,
                 range=2*L, forward=(-1,-1,-1))
 
@@ -63,7 +58,6 @@ radius = array(rlist)
 vcm = sum(p)/sum(m) # velocity of center of mass
 p = p-m*vcm # make total initial momentum equal zero
 
-t = 0.0
 dt = 1000.0
 Nsteps = 0
 pos = pos+(p/m)*(dt/2.) # initial half-step
@@ -129,4 +123,4 @@ while 1:
         Nhits = Nhits+1
         pos[jset] = (10.*L*Nhits, 0, 0) # put it far away
 
-    t = t+dt
+    Nsteps += 1

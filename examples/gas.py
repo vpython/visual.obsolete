@@ -1,5 +1,4 @@
 from visual import *
-from time import clock
 from visual.graph import *
 from random import random
 
@@ -79,10 +78,7 @@ m = array(mlist)
 m.shape = (Natoms,1) # Numeric Python: (1 by Natoms) vs. (Natoms by 1)
 radius = array(rlist)
 
-t = 0.0
-Nsteps = 0
 pos = pos+(p/m)*(dt/2.) # initial half-step
-time = clock()
 
 while 1:
     rate(100)
@@ -145,4 +141,3 @@ while 1:
     for i in range(Natoms):
         Atoms[i].pos = pos[i]
 
-    t = t+dt
