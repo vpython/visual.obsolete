@@ -22,6 +22,14 @@
 .style2 {font-size: xx-large}
 -->
 </style>
+<style type="text/css">
+<!--
+.style3 {	font-size: large;
+	font-weight: bold;
+	color: #0000A0;
+}
+-->
+</style>
 <!-- InstanceEndEditable -->
 <script type="text/javascript">
 <!--
@@ -111,7 +119,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         </tr>
       </table>
       <h3><span class="Normal"><span class="style1">New features</span></span></h3>
-      <p class="Normal">This new version has a few known bugs described <a href="#bugs">below</a>. </p>
+      <p class="Normal">This new version has a few known bugs or incompatibilities
+        described <a href="#bugs">below</a>. </p>
       <p class="Normal">There is a new example program <strong>texture_and_lighting.py</strong> that
         displays many of the new features: a swinging light illuminates a translucent
         ball that rolls on a wood table. Also see the
@@ -209,16 +218,60 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         a simple <a href="files.html"><strong>file dialog</strong></a> display for choosing files.</p>
       <h3 class="style1">Render time </h3>
       <p class="Normal">If you say <span class="attribute"><strong>scene.show_rendertime = True</strong></span>, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene). This can be a useful diagnostic of performance issues.</p>
-      <h3><a name="bugs" id="bugs"></a><span class="style1">Known bugs in this new version</span></h3>
-      <p class="Normal">Here are known bugs:</p>
+      <h3><a name="bugs" id="bugs"></a><span class="style3">Known bugs or incompatibilities
+      in this new version</span></h3>
+      <p class="Normal">Here are known bugs or incompatibilities:</p>
       <blockquote>
-        <p class="Normal"><strong>scene.cursor.visible</strong> is not implemented yet and gives an error.</p>
-        <p class="Normal"><strong>stereodepth</strong> is not implemented</p>
+        <p class="Normal"><strong>scene.cursor.visible</strong> has not been
+          implemented yet and gives an error.<br />
+          In Visual 3, this was implemented only on Windows and was a no-op on
+          other platforms.<br />
+          Workaround: comment it out.<br />
+        </p>
+        <p class="Normal"><strong>stereodepth</strong> has not been implemented
+          and gives an error.<br />
+          Workaround: comment it out.<br />
+        </p>
         <p class="Normal">Only left-button events are accessible to the program;
-          right-button and middle-button events are not accessible.<br />
-          </p>
+          right-button and middle-button events have not yet been implemented.<br />
+          Workaround: could use information about ctrl or shift or alt keys being
+          depressed.</p>
+        <p class="Normal"><strong>scene.show()</strong> and <strong>scene.hide()</strong> were
+          never documented; not implemented in Visual 5.<br />
+          Workaround: set <strong>scene.visible</strong>.</p>
+        <p class="Normal">There are some unavoidable incompatibilities due to
+          the fact that the currently supported numerical array package <strong>numpy</strong> differs
+          from its predecessor <strong>Numeric</strong>. The only way to handle
+          some of these incompatibilies is by using the Python &quot;try/except&quot;
+          structure. For examples, see the example programs gas.py or stars.py.<br />
+        </p>
+        <p class="Normal">You can still set <strong>scene.lights</strong> in
+          the same way as in Visual 3, but you cannot read the information in
+          scene.lights in the same way as before, because in Visual 5 scene.lights
+          is a list of <strong>distant_light</strong> (and/or local_light) objects,
+          not a list of vector directions. If you read and used information in
+          scene.lights, you may need to use a Python &quot;try/except&quot; structure
+          to make your program run on both Visual 3 and Visual 5. For example,
+          suppose an old program wanted to have two lights, one 70% as bright
+          as the first light in the scene.lights list, and the other a duplicate
+          except coming from the back, to light both front and back of the scene.
+          Here is code to do this:</p>
+        <p class="program">try:<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;L0 = 0.7*norm(scene.lights[0])<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;L1 = vector(L0.x, L0.y, -L0.z)<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;scene.lights = [L0, L1]<br />
+          except:<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;L0 = scene.lights[0]<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;L0.color = 0.7*vector(L0.color)<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;scene.lights = [L0]<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;d = L0.direction<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;L1 = distant_light(direction=(d.x,d.y,-d.z),<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color=L0.color)</p>
+        <p class="Normal">There are bugs associated with changing the opacity
+          of an object in a frame immediately after creating the object, or placing
+          that frame within another frame.</p>
       </blockquote>
-      <!-- InstanceEndEditable --></td>
+    <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
     <td height="16" colspan="4"></td>
