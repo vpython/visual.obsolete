@@ -450,13 +450,29 @@ display::on_mouse( WPARAM wParam, LPARAM lParam)
 		else ReleaseCapture();
 		ShowCursor( !mouse.is_mouse_locked() );
 	}
+	/*
+	Correction below by CL Cheung to address a problem encountered when
+	trying to use Visual with wxpython (docking and undocking). He says,
+	"Both SetCursorPos call will move the mouse to an incorrect coordinate.
+	It is because WM_MOVE message is not sending to vPython any more after
+	it is reparented. (Also, may be window_x and window_y shall be used
+	instead of view_x, view_y). With the change, Now the mouse cursor is
+	correctly positioned after dragging, no matter if it has been reparented or not.
+	Seems no more crashes now."
+	*/
 	if (mouse.is_mouse_locked() && ( mouse_x < 20 || mouse_x > view_width - 20 || mouse_y < 20 || mouse_y > view_height - 20 ) ) {
 		mouse.report_setcursor( view_width/2, view_height/2 );
-		SetCursorPos( view_x + view_width/2, view_y + view_height/2 );
+		POINT pt;
+		pt.x = pt.y = 0;
+		ClientToScreen(widget_handle, &pt);
+		SetCursorPos( pt.x + view_width/2, pt.y + view_height/2 );
 	}
 	if (was_locked && !mouse.is_mouse_locked()) {
 		mouse.report_setcursor( old_x, old_y );
-		SetCursorPos( view_x + old_x, view_y + old_y );
+		POINT pt;
+		pt.x = pt.y = 0;
+		ClientToScreen(widget_handle, &pt);
+		SetCursorPos( pt.x + old_x,  pt.y + old_y );
 	}
 	return 0;
 }
