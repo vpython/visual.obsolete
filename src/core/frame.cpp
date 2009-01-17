@@ -294,15 +294,17 @@ frame::gl_render( const view& v)
 	{
 		gl_matrix_stackguard guard( fwt);
 
-		for (child_iterator i = children.begin(); i != child_iterator(children.end()); ++i) {
+		child_iterator i(children.begin());
+		child_iterator i_end(children.end());
+		while (i != i_end) {
 			if (i->translucent()) {
 				// See display_kernel::draw().
 				trans_children.push_back( *i.base());
 				i = children.erase(i.base());
 				continue;
 			}
-
 			i->outer_render(local);
+			i++;
 		}
 
 		// Perform a depth sort of the transparent children from forward to backward.
