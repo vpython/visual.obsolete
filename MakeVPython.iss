@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=VPython for Python 2.5
-AppVerName=VPython 5.02_candidate
+AppVerName=VPython 5.03_candidate
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
@@ -13,7 +13,7 @@ SourceDir=C:\Python25
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py2.5-5.02_candidate
+OutputBaseFilename=VPython-Win-Py2.5-5.03_candidate
 OutputDir=c:\workspace
 
 [Files]
