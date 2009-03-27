@@ -29,6 +29,9 @@ linked as explained above, ready to run.
 In src/mac/PackageMaker is an Apple PackageMaker project file, a Welcome text file
 for creating a VPython installer for the Mac, and instructions in packaging.txt.
 
+In site-packages/vidle, execute "python MacBuildApp.py build" to build an app to drive VIDLE,
+an updated alternative to the IDLE shipped with Python.
+
 The Boost libraries were built by downloading them and the bjam tool.
 Copy bjam into the Boost directory and execute this:
 ./bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.5 --build-type=complete --with-python --with-thread --with-signals stage
