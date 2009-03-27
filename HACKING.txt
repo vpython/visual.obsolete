@@ -9,6 +9,10 @@ and in the first line of __init__.py.
 Windows and Mac builds are now special to them; 
 see VCBuild/VCBuild.txt and MAC-OSX.txt.
 
+In site-packages/vidle the file "edit with vidle.reg" contains registry
+settings for enabling correct startup of VIDLE by right-clicking a .py file.
+These settings should be imposed by the VPython installer.
+
 If you do development of the Visual source code:
 
 A convenient development environment on Linux (and other platforms) is
