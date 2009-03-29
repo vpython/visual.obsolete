@@ -74,6 +74,14 @@ void display::paint() {
 
 	{
 		python::gil_lock gil;
+		if (cursor.visible != cursor.last_visible) {
+			cursor.last_visible = cursor.visible;
+			if (cursor.visible) {
+				ShowCursor();
+			} else {
+				HideCursor();
+			}
+		}
 		render_scene();
 	}
 
