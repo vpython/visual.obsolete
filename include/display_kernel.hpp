@@ -15,6 +15,7 @@
 #include "util/gl_extensions.hpp"
 #include "util/atomic_queue.hpp"
 #include "mouse_manager.hpp"
+#include "mouseobject.hpp"
 #include <list>
 #include <vector>
 #include <set>
@@ -27,6 +28,8 @@
 namespace cvisual {
 
 using boost::indirect_iterator;
+
+class cursor_object;
 
 /** A class that manages all OpenGL aspects of a given scene.  This class
 	requires platform-specific support from render_surface to manage an OpenGL
@@ -143,6 +146,7 @@ class display_kernel
 
 protected:
 	// Mouse and keyboard objects
+	cursor_object cursor;
 	mouse_manager mouse;
 	atomic_queue<std::string> keys;
 
@@ -350,6 +354,7 @@ public: // Public Data.
 
 	static bool enable_shaders;
 
+	cursor_object* get_cursor();
 	mouse_t* get_mouse();
 	atomic_queue<std::string>* get_kb();
 

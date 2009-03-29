@@ -36,15 +36,15 @@ class mousebase
 	shared_ptr<renderable> pick;
 	// The position on the object that intersects with ray.
 	vector pickpos;
-	
+
 	/* 'buttonstate' contains the following state flags as defined by 'button'.
 	 */
 	enum modifiers_t { shift, ctrl, alt, command };
-	
+
 	/* 'eventtype' contains state flags as defined by 'event'.
 	 */
 	enum event_t { press, release, click, drag, drop };
-	
+
 	enum button_t { left, middle, right };
 
 
@@ -63,22 +63,22 @@ class mousebase
 	inline vector get_ray() const { return (position - cam).norm(); }
 	inline vector get_pickpos() const { return pickpos; }
 	shared_ptr<renderable> get_pick();
-	
+
 	inline void set_shift( bool _shift) { modifiers.set( shift, _shift); }
 	inline void set_ctrl( bool _ctrl) { modifiers.set( ctrl, _ctrl); }
 	inline void set_alt( bool _alt) { modifiers.set( alt,  _alt); } // option on Mac keyboard
 	inline void set_command( bool _command) { modifiers.set( command,  _command); }
-	
+
 	inline void set_press( bool _press) { eventtype.set( press, _press); }
 	inline void set_release( bool _release) { eventtype.set( release, _release); }
 	inline void set_click( bool _click) { eventtype.set( click, _click); }
 	inline void set_drag( bool _drag) { eventtype.set( drag, _drag); }
 	inline void set_drop( bool _drop) { eventtype.set( drop, _drop); }
-	
+
 	inline void set_leftdown( bool _ld) { buttons.set( left, _ld); }
 	inline void set_rightdown( bool _rd) { buttons.set( right, _rd); }
 	inline void set_middledown( bool _md) { buttons.set( middle, _md); }
-	
+
 	vector project1( vector normal, double dist);
 	vector project2( vector normal, vector point = vector(0,0,0));
 
@@ -93,7 +93,7 @@ class mousebase
 /* Objects of this class represent the state of the mouse at a distinct event:
  * 	either press, release, click, drag, or drop.
  */
-class event: public mousebase 
+class event: public mousebase
 {
  public:
 	event(){}
@@ -110,11 +110,11 @@ class mouse_t : public mousebase
 	// The bool tells whether or not the click was a left click or not.
 	atomic_queue<shared_ptr<event> > events;
 	int click_count; // number of queued events which are left clicks
-	
+
  public:
 	mouse_t() : click_count(0) {}
 	virtual ~mouse_t();
-	
+
 	// The following member functions are synchronized - no additional locking
 	// is requred.
 	int num_events() const;
@@ -124,7 +124,7 @@ class mouse_t : public mousebase
 	shared_ptr<event> pop_event();
     // Exposed as the function mouse.getclick()
 	shared_ptr<event> pop_click();
-	
+
 	/** Push a new event onto the queue.  This function is not exposed to Python.
 	 */
 	void push_event( shared_ptr<event>);
@@ -149,11 +149,11 @@ struct mousebutton
 	bool dragging;
 	float last_down_x;
 	float last_down_y;
-	
-	mousebutton() 
-		: down(false), dragging(false), 
+
+	mousebutton()
+		: down(false), dragging(false),
 		last_down_x(-1.0f), last_down_y(-1.0f) {}
-	
+
 	// When the button is pressed, call this function with its screen
 	// coordinate position.  It returns true if this is a unique event
 	bool press( float x, float y)
@@ -167,9 +167,9 @@ struct mousebutton
 		dragging = false;
 		return true;
 	}
-	
+
 	// Returns true when a drag event should be generated, false otherwise
-	bool is_dragging() 
+	bool is_dragging()
 	{
 		if (down && !dragging) {
 			dragging = true;
@@ -177,7 +177,7 @@ struct mousebutton
 		}
 		return false;
 	}
-	
+
 	// Returns (is_unique, is_drop)
 	std::pair<bool, bool> release()
 	{
@@ -187,6 +187,24 @@ struct mousebutton
 		last_down_y = -1;
 		return std::make_pair(unique, dragging);
 	}
+};
+
+/*
+ * A thin wrapper for buffering cursor visibility information between the python loop
+ * and the rendering loop.
+ */
+class cursor_object
+{
+ public:
+	//mutex mtx;
+
+	bool visible; // whether cursor should be visible
+	bool last_visible; // previous state of cursor visibility
+
+	inline cursor_object() : visible(true), last_visible(true) {}
+	void set_visible( bool vis) { visible = vis; }
+	//bool get_visible() { mutex::lock L(mtx); return visible; }
+	bool get_visible() { return visible; }
 };
 
 } // !namespace cvisual

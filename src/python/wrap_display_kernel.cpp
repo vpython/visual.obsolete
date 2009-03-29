@@ -189,6 +189,8 @@ wrap_display_kernel(void)
 		//	&display_kernel::set_show_toolbar)
 		.add_property( "visible", &display_kernel::get_visible, &display_kernel::set_visible)
 		.add_property( "exit", &display_kernel::get_exit, &display_kernel::set_exit)
+		.add_property( "cursor", py::make_function(
+			&display_kernel::get_cursor, py::return_internal_reference<>()))
 		.add_property( "kb", py::make_function(
 			&display_kernel::get_kb, py::return_internal_reference<>()))
 		.add_property( "mouse", py::make_function(
@@ -228,6 +230,10 @@ wrap_display_kernel(void)
 	py::class_< kb_object, noncopyable>( "kb_object", no_init)
 		.def( "getkey", &kb_object::py_pop, "Returns the next key press value.")
 		.add_property( "keys", &kb_object::size)
+		;
+
+	py::class_< cursor_object, noncopyable>( "cursor_object", no_init)
+		.add_property( "visible", &cursor_object::get_visible, &cursor_object::set_visible)
 		;
 
 	py::class_<display, bases<display_kernel>, noncopyable>( "display")
