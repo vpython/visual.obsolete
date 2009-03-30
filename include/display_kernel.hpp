@@ -373,4 +373,4 @@ public: // Public Data.
 
 } // !namespace cvisual
 
-#endif // !defined VPYTHON_RENDER_SURFACE_HPP
+#endif // !defined VPYTHON_DISPLAY_KERNEL_HPP
