@@ -172,17 +172,34 @@ render_surface::on_realize()
 	assert( share_list);
 }
 
+/* Not yet working; see paint function below
+GdkCursor* arrow_cursor=0;
+GdkCursor* blank_cursor=0;
+*/
+
 void
-render_surface::paint()
+render_surface::paint(Gtk::Window* window, bool change, bool vis) // if change, install appropriate cursor
 {
 	gl_begin();
 	{
 		python::gil_lock L;
+		/* TODO: The following doesn't work because window is a high-level GtkA::Window,
+		 * and we need a low-level GdkWindow in gdk_window_set_cursor. Not clear how to proceed.
+		if (change) {
+			if (!arrow_cursor) {
+				arrow_cursor = gdk_cursor_new(GDK_ARROW);
+				blank_cursor = gdk_cursor_new(GDK_BLANK_CURSOR); // blank cursor not yet available in Ubuntu 20090401
+			}
+			if (vis) {
+				gdk_window_set_cursor(window, arrow_cursor);
+			} else {
+				gdk_window_set_cursor(window, blank_cursor);
+			}
+		}
+		*/
 		core.render_scene(); // render the scene
 	}
 	gl_end();
-
-	return;
 }
 
 bool

@@ -27,24 +27,24 @@ using boost::scoped_ptr;
 
 class display : public display_kernel,
 	public sigc::trackable
-{	
+{
 public:
 	display();
 	virtual ~display();
-	
+
 	// Called by the gui_main class below (or render_manager as its agent)
 	void create();
 	void destroy();
-	void paint() { area->paint(); }
+	void paint();
 	void swap() { area->swap(); }
 
 	// Tells the application where it can find its data.
 	static void set_dataroot( const std::wstring& dataroot);
-	
+
 	// Implements key display_kernel virtual methods
 	virtual void activate(bool);
 	EXTENSION_FUNCTION getProcAddress( const char* name );
-	
+
  private:
 	static int get_titlebar_height();
 	static int get_toolbar_height();
@@ -71,18 +71,18 @@ class gui_main : public sigc::trackable
 {
  private:
 	Gtk::Main kit;
-	
+
 	Glib::Dispatcher signal_add_display;
 	void add_display_impl();
-	
+
 	Glib::Dispatcher signal_remove_display;
 	void remove_display_impl();
-	
+
 	Glib::Dispatcher signal_shutdown;
 	void shutdown_impl();
-	
+
 	bool poll(); //< Runs periodically to update displays
-	
+
 	// Storage used for communication, initialized by the caller, filled by the
 	// callee.  Some of them are marked volitile to inhibit optimizations that
 	// could prevent a read operation from observing the change in state.
@@ -93,9 +93,9 @@ class gui_main : public sigc::trackable
 	volatile bool waiting_allclosed;
 	volatile bool thread_exited;
 	volatile bool shutting_down;
-	
+
 	std::vector<display*> displays;
-	
+
 	// Componants of the startup sequence.
 	gui_main();
 	void run();
@@ -110,11 +110,11 @@ class gui_main : public sigc::trackable
  public:
 	// Force all displays to close and exit the Gtk event loop.
 	static void shutdown();
-	
+
 	// Called by a display to make it visible, or invisible.
 	static void add_display( display*);
 	static void remove_display( display*);
-	
+
 	// Called by a display from within the Gtk loop when closed by the user.
 	static void report_window_delete( display*);
 	static void quit();

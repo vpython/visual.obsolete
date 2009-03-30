@@ -24,14 +24,14 @@ class render_surface : public Gtk::GL::DrawingArea
 {
  private:
 	mouse_manager& mouse;
-    
+
  public:
 	render_surface( display_kernel& _core, mouse_manager& mouse, bool activestereo = false);
 	display_kernel& core;
-	
-	void paint();
+
+	void paint(Gtk::Window* window, bool change, bool vis); // if change, install appropriate cursor
 	void swap() { gl_swap_buffers(); }
- 
+
  protected:
 	// Low-level signal handlers
 	// Called when the user moves the mouse across the screen.
@@ -45,11 +45,11 @@ class render_surface : public Gtk::GL::DrawingArea
 	virtual bool on_expose_event( GdkEventExpose*);
 	virtual bool on_button_press_event( GdkEventButton*);
 	virtual bool on_button_release_event( GdkEventButton*);
- 
+
  private:
 	// Timer function for rendering
 	bool forward_render_scene();
-	
+
 	template <class E>
 	void mouse_event( E* event, int buttons_toggled = 0 );
 

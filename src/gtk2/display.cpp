@@ -69,6 +69,17 @@ display::activate( bool active )
 	}
 }
 
+void
+display::paint()
+{
+	if (cursor.visible != cursor.last_visible) {
+		cursor.last_visible = cursor.visible;
+		area->paint(window, true, cursor.visible);
+	} else {
+		area->paint(window, false, false);
+	}
+}
+
 int
 display::get_titlebar_height()
 {
