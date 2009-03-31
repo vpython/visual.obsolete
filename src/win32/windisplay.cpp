@@ -248,6 +248,14 @@ void display::paint() {
 		python::gil_lock gil;
 		if (cursor.visible != cursor.last_visible) {
 			cursor.last_visible = cursor.visible;
+			// The following code locks the invisible cursor to its window.
+			if (!cursor.visible) {
+				RECT rcClip;
+				GetWindowRect(widget_handle, &rcClip);
+				ClipCursor(&rcClip);
+			} else {
+				ClipCursor(0);
+			}
 			ShowCursor(cursor.visible);
 		}
 		render_scene();
