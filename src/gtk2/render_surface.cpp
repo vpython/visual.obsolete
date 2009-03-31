@@ -183,6 +183,9 @@ render_surface::paint(Gtk::Window* window, bool change, bool vis) // if change, 
 	gl_begin();
 	{
 		python::gil_lock L;
+		if (change and !vis) {
+			std::cerr << "cursor.visible = 0 is not yet supported on Linux." << std::endl;
+		}
 		/* TODO: The following doesn't work because window is a high-level GtkA::Window,
 		 * and we need a low-level GdkWindow in gdk_window_set_cursor. Not clear how to proceed.
 		if (change) {
