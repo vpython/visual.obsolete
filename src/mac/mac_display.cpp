@@ -388,7 +388,8 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	// clicking in content area should bring this window forward.
 	UInt32 kind = GetEventKind(event);
 	if (kind == kEventMouseDown && !fullscreen && !IsWindowActive(window)) {
-		activate(true);
+		//activate(true);
+		return 1; // let standard handler bring window forward
 	}
 	return noErr;
 }
@@ -411,7 +412,7 @@ display::vpEventHandler (EventHandlerCallRef target, EventRef event, void * data
 			return thiswindow->vpKeyboardHandler(target, event);
 			break;
 		case kEventClassMouse:
-			return thiswindow->vpMouseHandler(target, event);
+			if (!thiswindow->vpMouseHandler(target, event)) return noErr; // mouse has been handled
 			break;
 		default:
 			break;
@@ -466,7 +467,7 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 		{ 0, 0 }
 	};
 
-	if (window) { // window already exists; make active an bring to the front
+	if (window) { // window already exists; make active and bring to the front
 		SelectWindow(window);
 		return true;
 	}
