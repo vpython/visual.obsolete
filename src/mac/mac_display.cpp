@@ -146,7 +146,7 @@ display::destroy()
 }
 
 void
-display::activate(bool active) {
+display::activate(bool active) { // This seems not to be called on the Mac
 	if (active) {
 		gui_main::call_in_gui_thread( boost::bind( &display::create, this ) );
 		//SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL );
@@ -388,7 +388,6 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	// clicking in content area should bring this window forward.
 	UInt32 kind = GetEventKind(event);
 	if (kind == kEventMouseDown && !fullscreen && !IsWindowActive(window)) {
-		//activate(true);
 		return 1; // let standard handler bring window forward
 	}
 	return noErr;
