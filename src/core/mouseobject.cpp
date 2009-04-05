@@ -24,10 +24,10 @@ static void init_event( int which, shared_ptr<event> ret, const mouse_t& mouse)
 			ret->set_leftdown( true);
 			break;
 		case 2:
-			ret->set_middledown( true);
+			ret->set_rightdown( true);
 			break;
 		case 3:
-			ret->set_rightdown( true);
+			ret->set_middledown( true);
 			break;
 		default:
 			bool button_is_known = false;
@@ -54,7 +54,7 @@ drop_event( int which, const mouse_t& mouse)
 	return ret;
 }
 
-shared_ptr<event> 
+shared_ptr<event>
 release_event( int which, const mouse_t& mouse)
 {
 	shared_ptr<event> ret( new event());;

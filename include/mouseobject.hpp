@@ -45,7 +45,7 @@ class mousebase
 	 */
 	enum event_t { press, release, click, drag, drop };
 
-	enum button_t { left, middle, right };
+	enum button_t { left, right, middle };
 
 
 	inline bool is_press() const { return eventtype.test( press); }
@@ -133,8 +133,8 @@ class mouse_t : public mousebase
 // Convenience functions for creating event objects.
 // which represents which mouse button is involved:
 // 1 for left
-// 2 for middle
-// 3 for right
+// 2 for right
+// 3 for middle
 // no other number is valid.
 shared_ptr<event> click_event( int which, const mouse_t& mouse);
 shared_ptr<event> drop_event( int which, const mouse_t& mouse);

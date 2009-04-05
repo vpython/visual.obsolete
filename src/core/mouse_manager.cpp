@@ -44,6 +44,8 @@ void mouse_manager::report_mouse_state( int physical_button_count, bool is_butto
 										int shift_state_count, bool shift_state[],
 										bool can_lock_mouse )
 {
+	// In is_button_down array, position 0=left, 1=right, 2=middle
+
 	// A 2-button mouse with shift,ctrl,alt/option,command
 	bool new_buttons[2]; fill(2, new_buttons, physical_button_count, is_button_down );
 	bool new_shift[4]; fill(4, new_shift, shift_state_count, shift_state);
@@ -88,6 +90,8 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 	if (left_down && !left_dragging && (new_px != px || new_py != py))
 		left_semidrag = true;
 	if (!left_down) left_semidrag = false;
+
+	// In reporting with press_event etc., 1=left, 2=right, 3=middle
 
 	if (!new_buttons[1]) { //< Ignore changes in the left button state while the right button is down!
 		bool b = new_buttons[0];
