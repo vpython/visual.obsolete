@@ -168,11 +168,16 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="Normal"><font color="#0000a0">Rotating a vector</font></p>
           <p class="Normal"> There is a function for rotating a vector:<font color="#0000a0"></font></p>
           <p class="program"> v2 = rotate(v1, angle=theta, axis=(1,1,1))</p>
-          <p class="Normal">The default axis is (0,0,1), for a rotation in the xy plane 
-            around the z axis. There is no origin for rotating a vector. You can also 
-            write <span class="attribute">v2 = v1.rotate(angle=theta, axis=(1,1,1))</span>. 
+          <p class="Normal">The angle must be in radians. The default axis is
+            (0,0,1), for a rotation in the xy plane around the z axis. There
+            is no origin for rotating a vector. You can also write <span class="attribute">v2
+            = v1.rotate(angle=theta, axis=(1,1,1))</span>. 
             There is also a <a href="rotation.html">rotate capability for 
               objects</a>.</p>
+          <p class="Normal">There are functions for converting between degrees
+            and radians, where there are 2*pi radians in 360 degrees: </p>
+          <p class="program">radians(360) is equal to 2*pi</p>
+          <p class="program">degrees(2*pi) is equal to 360</p>
           <p class="Normal"><strong><font color="#0000a0">Convenient conversion</font></strong></p>
           <p class="Normal"> For convenience Visual automatically converts (a,b,c) into 
             vector(a,b,c), with floating-point values, when creating Visual objects: 
