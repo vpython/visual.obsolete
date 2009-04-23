@@ -30,6 +30,15 @@ I.  Prerequisites:
 		*** Python they were built for and with. You have to be careful to
 		*** install Boost Python libraries that were built for your version of Python.
 	
+	BUILDING BOOST
+	The Boost libraries are extensions to C++. Among the libraries
+	are python and thread libraries used by Visual. The python library
+	makes connections between Python and C++.
+
+	It is possible to build the Boost libraries needed by Visual from source. 
+	However, the process can take a long time, so precompiled files are 
+	available in the Developers section. See VCBuild.txt for Windows details.
+	
 	You also need the threadpool resource: sourceforge.net/projects/threadpool.
 	If you are using the 1_35_0 Boost libraries, you can use version 0.2.4 which
 	is included in the package (in dependencies). If you use a different version
