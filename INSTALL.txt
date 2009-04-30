@@ -4,6 +4,9 @@ for Windows and Mac are available at vpython.org. See HACKING.txt
 for details on how to do development work with the source code for
 Linux.
 
+Windows and Mac builds are now special to them; 
+see VCBuild/VCBuild.txt and MAC-OSX.txt.
+
 Table of Contents:
 I:   Prerequisites
 II:  Configuration
