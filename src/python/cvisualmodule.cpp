@@ -92,11 +92,6 @@ struct double_from_int
 		py::converter::rvalue_from_python_stage1_data* data)
 	{
 		PyObject* newobj = PyNumber_Float(_obj);
-		//void* storage = (
-		//            (py::converter::rvalue_from_python_storage<double>*)
-		//            data)->storage.bytes;
-		//*(double*)(storage) = py::extract<double>(newobj);
-
         double* storage = (double*)(
             (py::converter::rvalue_from_python_storage<double>*)
             data)->storage.bytes;
