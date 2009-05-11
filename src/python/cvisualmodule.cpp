@@ -7,6 +7,7 @@
 
 #include <stdexcept>
 #include <exception>
+#include <iostream>
 
 #include <boost/python/exception_translator.hpp>
 #include <boost/python/module.hpp>
@@ -59,6 +60,52 @@ py_rate( double freq)
 	rate(freq);
 }
 
+namespace py = boost::python;
+
+struct double_from_int
+{
+	double_from_int()
+	{
+		py::converter::registry::push_back(
+			&convertible,
+			&construct,
+			py::type_id<double>());
+	}
+
+	static void* convertible( PyObject* obj)
+	{
+		PyObject* newobj = PyNumber_Float(obj);
+		if (!PyString_Check(obj) && newobj) {
+			Py_DECREF(newobj);
+			return obj;
+		} else {
+			if (newobj) {
+				Py_DECREF(newobj);
+			}
+			PyErr_Clear();
+			return 0;
+		}
+	}
+
+	static void construct(
+		PyObject* _obj,
+		py::converter::rvalue_from_python_stage1_data* data)
+	{
+		PyObject* newobj = PyNumber_Float(_obj);
+		//void* storage = (
+		//            (py::converter::rvalue_from_python_storage<double>*)
+		//            data)->storage.bytes;
+		//*(double*)(storage) = py::extract<double>(newobj);
+
+        double* storage = (double*)(
+            (py::converter::rvalue_from_python_storage<double>*)
+            data)->storage.bytes;
+        *storage = py::extract<double>(newobj);
+		Py_DECREF(newobj);
+		data->convertible = storage;
+	}
+};
+
 BOOST_PYTHON_MODULE( cvisual)
 {
 	VPYTHON_NOTE( "Importing cvisual from vpython-core2.");
@@ -92,6 +139,7 @@ BOOST_PYTHON_MODULE( cvisual)
 	def( "rate", py_rate, "rate(arg) -> Limits the execution rate of a loop to arg"
 		" iterations per second.");
 
+	double_from_int();
 	wrap_vector();
 	wrap_rgba();
 	wrap_display_kernel();
