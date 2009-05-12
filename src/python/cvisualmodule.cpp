@@ -101,6 +101,45 @@ struct double_from_int
 	}
 };
 
+struct float_from_int
+{
+	float_from_int()
+	{
+		py::converter::registry::push_back(
+			&convertible,
+			&construct,
+			py::type_id<float>());
+	}
+
+	static void* convertible( PyObject* obj)
+	{
+		PyObject* newobj = PyNumber_Float(obj);
+		if (!PyString_Check(obj) && newobj) {
+			Py_DECREF(newobj);
+			return obj;
+		} else {
+			if (newobj) {
+				Py_DECREF(newobj);
+			}
+			PyErr_Clear();
+			return 0;
+		}
+	}
+
+	static void construct(
+		PyObject* _obj,
+		py::converter::rvalue_from_python_stage1_data* data)
+	{
+		PyObject* newobj = PyNumber_Float(_obj);
+        float* storage = (float*)(
+            (py::converter::rvalue_from_python_storage<float>*)
+            data)->storage.bytes;
+        *storage = py::extract<float>(newobj);
+		Py_DECREF(newobj);
+		data->convertible = storage;
+	}
+};
+
 BOOST_PYTHON_MODULE( cvisual)
 {
 	VPYTHON_NOTE( "Importing cvisual from vpython-core2.");
@@ -135,6 +174,7 @@ BOOST_PYTHON_MODULE( cvisual)
 		" iterations per second.");
 
 	double_from_int();
+	float_from_int();
 	wrap_vector();
 	wrap_rgba();
 	wrap_display_kernel();
