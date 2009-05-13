@@ -156,6 +156,7 @@ wrap_display_kernel(void)
 				py::return_internal_reference<>()),
 			&display_kernel::set_center)
 		.add_property( "fov", &display_kernel::get_fov, &display_kernel::set_fov)
+		.add_property( "stereodepth", &display_kernel::get_stereodepth, &display_kernel::set_stereodepth)
 		.add_property( "lod", &display_kernel::get_lod, &display_kernel::set_lod)
 		.add_property( "uniform", &display_kernel::is_uniform,
 		 	&display_kernel::set_uniform)

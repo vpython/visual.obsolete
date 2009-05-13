@@ -171,6 +171,7 @@ display_kernel::display_kernel()
 	zoom_allowed(true),
 	mouse_mode( ZOOM_ROTATE),
 	stereo_mode( NO_STEREO),
+	stereodepth( 0.0f),
 	lod_adjust(0),
 	realized(false),
 	mouse( *this ),
@@ -459,18 +460,43 @@ display_kernel::world_to_view_transform(
 	double farclip = (farthest + cam_to_center) * 1.05;  //< actual maximum z in scene plus a little
 	farclip = std::max( farclip, nearclip * 1.001 ); //< just in case everything is behind the camera!
 
+	// Here is the stereodepth and eye offset machinery from Visual 3, where the docs claimed that
+	// stereodepth=0 was the default (zero-parallax plane at screen surface;
+	// stereodepth=1 moves the center of the scene to the screen surface;
+	// stereodepth=2 moves the back of the scene to the screen surface:
+	/*
+	double farclip = cotfov + ext;
+	double nearclip = 0.0;
+	if ((cam - display->c_center).mag() < display->c_extent.mag()) {
+		// Then the camera is within the scene.  Pick a value that looks OK.
+		nearclip = 0.015;
+	}
+	else {
+		nearclip = cotfov - ext*1.5;
+		if (nearclip < 0.01*farclip)
+			nearclip = 0.01*farclip;
+	}
+	double R = nearclip*hfov;
+	double T = nearclip*vfov;
+
+	double fl = 0.5*ext + ext*stereodepth + nearclip;  //focal length
+	double eyeOffset = eyesign*fl/60.0;  // eye separation 1/30 of focallength
+	double eyeOffset1 = eyeOffset * (nearclip/fl);
+	frustum(proj, iproj, -R-eyeOffset1, R-eyeOffset1, -T, T, nearclip, farclip);
+	*/
+
+	// A multiple of the number of cam_to_center's away from the camera to place
+	// the zero-parallax plane.
+	// The distance from the camera to the zero-parallax plane.
+	double focallength = cam_to_center+0.5*stereodepth;
 	// Translate camera left/right 2% of the viewable width of the scene at
 	// the distance of its center.
-	double camera_stereo_offset = tan_hfov_x * cam_to_center * 0.02;
+	//double camera_stereo_offset = tan_hfov_x * cam_to_center * 0.02;
+	double camera_stereo_offset = tan_hfov_x * focallength * 0.02;
 	vector camera_stereo_delta = camera_stereo_offset
 		* up.cross( scene_camera).norm() * whicheye;
 	scene_camera += camera_stereo_delta;
 	scene_center += camera_stereo_delta;
-	// A multiple of the number of cam_to_center's away from the camera to place
-	// the zero-parallax plane.
-	double stereodepth = 1.0; // TODO: make this value configurable.
-	// The distance from the camera to the zero-parallax plane.
-	double focallength = cam_to_center * stereodepth;
 	// The amount to translate the frustum to the left and right.
 	double frustum_stereo_offset = camera_stereo_offset * nearclip
 		/ focallength * whicheye;
@@ -1345,6 +1371,21 @@ display_kernel::get_range()
 	if (autoscale || !range.nonzero())
 		throw std::logic_error("Reading .scale and .range is not supported when autoscale is enabled.");
 	return range;
+}
+
+float
+display_kernel::get_stereodepth()
+{
+	return stereodepth;
+}
+
+void
+display_kernel::set_stereodepth( float n_stereodepth)
+{
+	if (visible)
+		throw std::runtime_error( "Cannot change parameters of an active window");
+	else
+		stereodepth = n_stereodepth;
 }
 
 void

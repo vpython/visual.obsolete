@@ -70,6 +70,7 @@ class display_kernel
 	extent_data world_extent; ///< The extent of the current world.
 
 	double fov; ///< The field of view, in radians
+	float stereodepth; //< How far in or out of the screen the scene seems to be
 	bool autoscale; ///< True if Visual should scale the camera's position automatically.
 	/** True if Visual should automatically reposition the center of the scene. */
 	bool autocenter;
@@ -311,6 +312,9 @@ public: // Public Data.
 	void set_ambient_f( float);
 	void set_ambient( const rgb&);
 	rgb get_ambient();
+
+	void set_stereodepth( float);
+	float get_stereodepth();
 
 	// The only mode that cannot be changed after initialization is active,
 	// which will result in a gl_error exception when rendered.  The completing
