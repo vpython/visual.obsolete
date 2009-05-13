@@ -9,7 +9,10 @@ namespace cvisual {
    about the details of event handling later. */
 
 mouse_manager::mouse_manager( class display_kernel& display )
- : display(display), px(0), py(0), locked(false), left_down(false), left_dragging(false), left_semidrag(false)
+ : display(display), px(0), py(0), locked(false),
+	 left_down(false), left_dragging(false), left_semidrag(false),
+	 middle_down(false), middle_dragging(false), middle_semidrag(false),
+	 right_down(false), right_dragging(false), right_semidrag(false)
 {
 	buttons[0] = buttons[1] = false;
 }
@@ -78,10 +81,10 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 
 	bool was_locked = locked;
 	locked = (can_lock_mouse && display.zoom_is_allowed() && new_buttons[0] && new_buttons[1]) ||
-	         (can_lock_mouse && display.spin_is_allowed() && new_buttons[1]);
+	         (can_lock_mouse && display.spin_is_allowed() && new_buttons[1] && !new_buttons[0]);
 	if (locked && !was_locked) { locked_px = new_px; locked_py = new_py; }
 
-	if (new_buttons[1])
+	if (new_buttons[1]) // handle spin or zoom if allowed
 		display.report_camera_motion( (new_px - px), (new_py - py),
 									  new_buttons[0] ? display_kernel::MIDDLE : display_kernel::RIGHT );
 
@@ -90,6 +93,18 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 	if (left_down && !left_dragging && (new_px != px || new_py != py))
 		left_semidrag = true;
 	if (!left_down) left_semidrag = false;
+
+	if (!display.spin_is_allowed()) {
+		if (right_down && !right_dragging && (new_px != px || new_py != py))
+			right_semidrag = true;
+		if (!right_down) right_semidrag = false;
+	}
+
+	if (!display.zoom_is_allowed()) {
+		if (middle_down && !middle_dragging && (new_px != px || new_py != py))
+			middle_semidrag = true;
+		if (!middle_down) middle_semidrag = false;
+	}
 
 	// In reporting with press_event etc., 1=left, 2=right, 3=middle
 
@@ -119,8 +134,58 @@ void mouse_manager::update( bool new_buttons[], int new_px, int new_py, bool new
 
 		left_down = b;
 	}
+	if (!display.spin_is_allowed() && !new_buttons[0]) { //< Ignore changes in the left button state while the right button is down!
+		bool b = new_buttons[1];
 
-	// TODO: Possibly generate mouse events for right (and middle?) buttons.  Very carefully.
+		if (b != right_down) {
+			if (b) {
+				if ( !buttons[1] ) //< Releasing the other button of a chord doesn't "press" the right
+					mouse.push_event( press_event(2, mouse) );
+				else
+					b = false;
+			} else if ( right_dragging ) {
+				mouse.push_event( drop_event(2, mouse) );
+				right_dragging = false;
+			} else if ( right_semidrag ) {
+				mouse.push_event( release_event(2, mouse) );
+			} else if (right_down) {
+				mouse.push_event( click_event(2, mouse) );
+			}
+		}
+
+		if ( b && right_down && (new_px != px || new_py != py) && !right_dragging ) {
+			mouse.push_event( drag_event(2, mouse) );
+			right_dragging = true;
+		}
+
+		right_down = b;
+	}
+	if (!display.zoom_is_allowed()) {
+		bool b = (new_buttons[0] && new_buttons[1]);
+
+		if (b != middle_down) {
+			if (b) {
+				if ( !(buttons[0] && buttons[1]) )
+					mouse.push_event( press_event(3, mouse) );
+				else
+					b = false;
+			} else if ( middle_dragging ) {
+				mouse.push_event( drop_event(3, mouse) );
+				middle_dragging = false;
+			} else if ( middle_semidrag ) {
+				mouse.push_event( release_event(3, mouse) );
+			} else if (middle_down) {
+				mouse.push_event( click_event(3, mouse) );
+			}
+		}
+
+		if ( b && middle_down && (new_px != px || new_py != py) && !middle_dragging ) {
+			mouse.push_event( drag_event(3, mouse) );
+			middle_dragging = true;
+		}
+
+		middle_down = b;
+	}
 
 	px = new_px;
 	py = new_py;
