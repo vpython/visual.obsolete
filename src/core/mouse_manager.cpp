@@ -63,12 +63,14 @@ void mouse_manager::report_mouse_state( int physical_button_count, bool is_butto
 	// only sees one change at a time
 	// We choose the order so that the right button is down as much as possible, to
 	// avoid spurious left button activity
-	if (new_buttons[0] != buttons[0] && new_buttons[1] != buttons[1]) {
+	// Not relevant if there is a real (or emulated) button 2 (e.g. Mac option key)
+	if (!new_buttons[2] && !buttons[2] && new_buttons[0] != buttons[0] && new_buttons[1] != buttons[1]) {
 		int b = !new_buttons[1];
 		new_buttons[b] = !new_buttons[b];
 		update( new_buttons, cursor_client_x, cursor_client_y, new_shift, can_lock_mouse );
 		new_buttons[b] = !new_buttons[b];
 	}
+	
 	update( new_buttons, cursor_client_x, cursor_client_y, new_shift, can_lock_mouse );
 }
 
