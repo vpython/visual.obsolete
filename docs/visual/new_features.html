@@ -49,13 +49,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <td width="10" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td width="10" height="272" valign="top" bgcolor="#DDDDDD"><p>&nbsp;</p>    </td>
     <td width="173" valign="top" bgcolor="#DDDDDD"><p class="Normal"><a href="index.html">Home</a></p>
-      <p class="Normal">If you're new to Python<br />
+      <p class="Normal">If you're new to Python <br />
       and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p class="Normal">A VPython <a href="VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p class="Normal"><a href="primitives.html">Pictures</a> of 3D objects</p>
-      <p>
+      <p class="Normal">Choose a 3D object:</p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
-          <option>3D objects</option>
+          <option>Choose an object</option>
           <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
@@ -68,15 +68,16 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="lights.html">lights</option>
           <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
         </select>
-      </p>
-      <p>
+        
+      <p class="Normal">Work with 3D objects:</p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
-          <option>Working with objects</option>
+          <option>Choose an option</option>
           <option value="color.html">Color &amp; Opacity</option>
           <option value="display.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
@@ -87,11 +88,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="delete.html">Delete an Object</option>
           <option value="float.html">3/4 = 0?</option>
         </select>
-      </p>
-      <p>
+        
+      <p class="Normal">Windows, Events, &amp; Files:</p>
         <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
-          <option>Windows/Events/Files</option>
+          <option>Choose a topic</option>
           <option value="display.html">Windows</option>
+          <option value="lights.html">Lighting</option>
           <option value="mouse.html">Mouse Events</option>
           <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
           <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
@@ -99,7 +101,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="controls.html">Buttons and Sliders</option>
           <option value="files.html">Reading/Writing Files</option>
         </select>
-      </p>
+        
       <p class="Normal"><a href="vector.html">Vector operations </a></p>
       <p class="Normal"><a href="graph.html">Graphs</a></p>
     <p class="Normal"><a href="factorial.html">factorial/combin</a></p>
@@ -119,12 +121,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         </tr>
       </table>
       <h3><span class="Normal"><span class="style1">New features</span></span></h3>
-      <p class="Normal">This new version has a few known bugs or incompatibilities
-        described <a href="#bugs">below</a>. </p>
       <p class="Normal">There is a new example program <strong>texture_and_lighting.py</strong> that
         displays many of the new features: a swinging light illuminates a translucent
         ball that rolls on a wood table. Also see the
-        example programs <strong>material_test.py</strong>, <strong>stonehenge.py</strong>, and <strong>boxlighttest.py</strong>.</p>
+      example programs <strong>material_test.py</strong>, <strong>stonehenge.py</strong>, and <strong>boxlighttest.py</strong>. </p>
+      <p class="Normal">There are a couple of known <a href="#incompatibilities">incompatibilities</a> with earlier versions of VPython. </p>
       <h3 class="Normal"><span class="style1">Credits</span></h3>
       <p class="Normal">Visual 5 was created by David Scherer and Bruce Sherwood.
         Jonathan Brandmeyer provided support in Visual 4beta for opacity, local
@@ -218,21 +219,10 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         a simple <a href="files.html"><strong>file dialog</strong></a> display for choosing files.</p>
       <h3 class="style1">Render time </h3>
       <p class="Normal">If you say <span class="attribute"><strong>scene.show_rendertime = True</strong></span>, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene). This can be a useful diagnostic of performance issues.</p>
-      <h3><a name="bugs" id="bugs"></a><span class="style3">Known bugs or incompatibilities
+      <h3><a name="incompatibilities" id="incompatibilities"></a><span class="style3">Known incompatibilities
       in this new version</span></h3>
-      <p class="Normal">Here are known bugs or incompatibilities:</p>
+      <p class="Normal">Here are known incompatibilities:</p>
       <blockquote>
-        <p class="Normal"><strong>stereodepth</strong> has not been implemented
-          and gives an error.<br />
-          Workaround: comment it out.<br />
-        </p>
-        <p class="Normal">Only left-button events are accessible to the program;
-          right-button and middle-button events have not yet been implemented.<br />
-          Workaround: could use information about ctrl or shift or alt keys being
-          depressed.</p>
-        <p class="Normal"><strong>scene.show()</strong> and <strong>scene.hide()</strong> were
-          never documented; not implemented in Visual 5.<br />
-          Workaround: set <strong>scene.visible</strong>.</p>
         <p class="Normal">There are some unavoidable incompatibilities due to
           the fact that the currently supported numerical array package <strong>numpy</strong> differs
           from its predecessor <strong>Numeric</strong>. The only way to handle

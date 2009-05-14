@@ -26,13 +26,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <td width="10" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td width="10" height="272" valign="top" bgcolor="#DDDDDD"><p>&nbsp;</p>    </td>
     <td width="173" valign="top" bgcolor="#DDDDDD"><p class="Normal"><a href="index.html">Home</a></p>
-      <p class="Normal">If you're new to Python<br />
+      <p class="Normal">If you're new to Python <br />
       and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p class="Normal">A VPython <a href="VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p class="Normal"><a href="primitives.html">Pictures</a> of 3D objects</p>
-      <p>
+      <p class="Normal">Choose a 3D object:</p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
-          <option>3D objects</option>
+          <option>Choose an object</option>
           <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
@@ -45,15 +45,16 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="lights.html">lights</option>
           <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
         </select>
-      </p>
-      <p>
+        
+      <p class="Normal">Work with 3D objects:</p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
-          <option>Working with objects</option>
+          <option>Choose an option</option>
           <option value="color.html">Color &amp; Opacity</option>
           <option value="display.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
@@ -64,11 +65,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="delete.html">Delete an Object</option>
           <option value="float.html">3/4 = 0?</option>
         </select>
-      </p>
-      <p>
+        
+      <p class="Normal">Windows, Events, &amp; Files:</p>
         <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
-          <option>Windows/Events/Files</option>
+          <option>Choose a topic</option>
           <option value="display.html">Windows</option>
+          <option value="lights.html">Lighting</option>
           <option value="mouse.html">Mouse Events</option>
           <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
           <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
@@ -76,7 +78,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="controls.html">Buttons and Sliders</option>
           <option value="files.html">Reading/Writing Files</option>
         </select>
-      </p>
+        
       <p class="Normal"><a href="vector.html">Vector operations </a></p>
       <p class="Normal"><a href="graph.html">Graphs</a></p>
     <p class="Normal"><a href="factorial.html">factorial/combin</a></p>
@@ -149,16 +151,16 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="Normal">There are five kinds of mouse events: press, click, drag,
           drop, and release:</p>
         <p class="Normal">&nbsp;&nbsp;&nbsp;A press event occurs when a mouse button 
-          is depressed. </p>
+          is depressed.</p>
         <p class="Normal">&nbsp;&nbsp;&nbsp;A click event occurs when all mouse buttons 
-          are released with no or very slight movement of the mouse.<br />
+          are released with no movement of the mouse. (This is also a release event.)<br />
           &nbsp;&nbsp;&nbsp;Note that a click event happens when the mouse button is <i>released</i>. See <a href="mouse_click.html">Click example</a>.</p>
-        <p class="Normal">&nbsp;&nbsp;&nbsp;A drag event occurs when the mouse is moved 
+      <p class="Normal">&nbsp;&nbsp;&nbsp;A drag event occurs when the mouse is moved 
           slightly after a press event, with mouse buttons still down.<br />
           &nbsp;&nbsp;&nbsp;This can be used to signal the beginning of dragging an 
           object. See <a href="mouse_drag.html">Drag example</a>.</p>
         <p class="Normal">&nbsp;&nbsp;&nbsp;A drop event occurs when the mouse buttons
-          are released after a drag event. </p>
+          are released after a drag event.  (This is also a release event.)</p>
         <p class="Normal">&nbsp;&nbsp;&nbsp;A release event occurs when the mouse buttons
           are released after a click or drag event. </p>
         <p class="Normal">Between a drag event (start of dragging) and a drop event 
@@ -194,24 +196,31 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           getevent() or getclick()</font></strong></p>
         <p class="Normal"> In addition to the information available with <span class="attribute">scene.mouse</span>, <span class="attribute">getevent()</span> and <span class="attribute">getclick()</span> furnish this additional information:</p>
         <p class="attributes"><span class="attribute">press</span> = 'left' 
-          for a press event, or None ('right' 
-          or 'middle' not currently implemented)</p>
+          for a press event, or 'right' 
+          or 'middle', or None</p>
       <p class="attributes"><span class="attribute">click</span> = 'left' for
-        a click event, or None ('right' or 'middle' not currently implemented);
-        in this case <span class="attribute">pos</span> <span class="attribute"></span>and other attributes correspond to the state 
-          of the mouse at the time of the original press event, so as not to lose initial 
-          position information. See <a href="mouse_click.html">Click example</a>.</p>
-        <p class="attributes"><span class="attribute">drag</span> = 'left' for
-          a drag event, or None ('right' or 'middle' not currently implemented);
+        a click event, or 'right' or 'middle', or None. See <a href="mouse_click.html">Click example</a>.</p>
+      <p class="attributes"><span class="attribute">drag</span> = 'left' for
+          a drag event, or 'right' or 'middle', or None;
           in this case <span class="attribute">pos</span> <span class="attribute"></span>and other attributes correspond to the state 
           of the mouse at the time of the original press event, so as not to lose initial 
           position information. See <a href="mouse_drag.html">Drag example</a>.</p>
-        <p class="attributes"><span class="attribute">drop</span> = 'left' for
-          a drop event, or None ('right' or 'middle' not currently implemented)</p>
-        <p class="attributes"><span class="attribute">release</span> = 'left'
+      <p class="attributes"><span class="attribute">drop</span> = 'left' for
+          a drop event, or 'right' or 'middle', or None</p>
+      <p class="attributes"><span class="attribute">release</span> = 'left'
           following click and drop events, indicating which button was released,
-          or None ('right' or 'middle' not currently implemented)</p>
-        <p class="Normal"><font color="#0000A0"><a name="alternative" id="alternative"></a><strong>Projecting 
+          or 'right' or 'middle', or None</p>
+      <p class="Normal">Normally, dragging with right or middle button represents 
+        spin or zoom, and is handled automatically by Visual, so you can check for 
+        left-button drag or drop events simply by checking whether <span class="attribute">drag</span> or <span class="attribute">drop</span> is true (in Python, a nonempty string 
+        such as 'left' is true, None is false). Unless you disable user zoom (<span class="attribute">scene.userzoom 
+          = 0</span>), <span class="attribute">press, click</span>, <span class="attribute">drag, drop</span>, 
+        and <span class="attribute">release</span> with the middle button are invisible 
+        to your program. Unless you disable user spin (<span class="attribute">scene.userspin 
+          = 0</span>), <span class="attribute">press, click</span>, <span class="attribute">drag, drop</span>, 
+        and <span class="attribute">release</span> with the right button are invisible 
+        to your program.</p>
+      <p class="Normal"><font color="#0000A0"><a name="alternative" id="alternative"></a><strong>Projecting 
           mouse position onto a given plane</strong></font></p>
         <p class="Normal"> Here is a way to get the mouse position relative to a particular 
           plane in space:</p>
@@ -230,7 +239,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           The example above is equivalent to</p>
         <p class="program"> temp = scene.mouse.project(normal=(0,1,0), d=3)</p>
 
-    <!-- InstanceEndEditable --></td>
+        <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
     <td height="16" colspan="4"></td>

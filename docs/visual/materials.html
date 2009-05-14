@@ -37,13 +37,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <td width="10" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td width="10" height="272" valign="top" bgcolor="#DDDDDD"><p>&nbsp;</p>    </td>
     <td width="173" valign="top" bgcolor="#DDDDDD"><p class="Normal"><a href="index.html">Home</a></p>
-      <p class="Normal">If you're new to Python<br />
+      <p class="Normal">If you're new to Python <br />
       and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p class="Normal">A VPython <a href="VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p class="Normal"><a href="primitives.html">Pictures</a> of 3D objects</p>
-      <p>
+      <p class="Normal">Choose a 3D object:</p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
-          <option>3D objects</option>
+          <option>Choose an object</option>
           <option value="cylinder.html">Overview</option>
           <option value="arrow.html">arrow</option>
           <option value="box.html">box</option>
@@ -56,15 +56,16 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
           <option value="label.html">label</option>
+          <option value="lights.html">lights</option>
           <option value="points.html">points</option>
           <option value="pyramid.html">pyramid</option>
           <option value="ring.html">ring</option>
           <option value="sphere.html">sphere</option>
         </select>
-      </p>
-      <p>
+        
+      <p class="Normal">Work with 3D objects:</p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
-          <option>Working with objects</option>
+          <option>Choose an option</option>
           <option value="color.html">Color &amp; Opacity</option>
           <option value="display.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
@@ -75,11 +76,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="delete.html">Delete an Object</option>
           <option value="float.html">3/4 = 0?</option>
         </select>
-      </p>
-      <p>
+        
+      <p class="Normal">Windows, Events, &amp; Files:</p>
         <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
-          <option>Windows/Events/Files</option>
+          <option>Choose a topic</option>
           <option value="display.html">Windows</option>
+          <option value="lights.html">Lighting</option>
           <option value="mouse.html">Mouse Events</option>
           <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
           <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
@@ -87,7 +89,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="controls.html">Buttons and Sliders</option>
           <option value="files.html">Reading/Writing Files</option>
         </select>
-      </p>
+        
       <p class="Normal"><a href="vector.html">Vector operations </a></p>
       <p class="Normal"><a href="graph.html">Graphs</a></p>
     <p class="Normal"><a href="factorial.html">factorial/combin</a></p>
@@ -128,6 +130,7 @@ materials.unshaded (unaffected by lighting)</p>
           The appearance of the <strong>unshaded</strong> material  is unaffected
           by lighting and is useful when you want to display an object whose
           appearance is determined solely by its own attributes.</p>
+        <p class="Normal">If you specify <span class="attribute">scene.material = materials.plastic</span>, all objects created thereafter will by default be plastic unless a different material is specifically assigned.</p>
       <p class="Normal">Materials will work with graphics cards that support
           Pixel Shader 3.0 (&quot;PS 3.0&quot;). For details, see<br />
         <a href="http://en.wikipedia.org/wiki/Pixel_shader#Hardware" target="_blank">http://en.wikipedia.org/wiki/Pixel_shader#Hardware</a>. <em>Some</em> materials
