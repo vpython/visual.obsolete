@@ -443,29 +443,6 @@ display::getProcAddress(const char* name) {
 	return (EXTENSION_FUNCTION)::wglGetProcAddress( name );
 }
 
-/*
-void wglContext::showMouse()
-{
-	ShowCursor(true);
-	ClipCursor(0);
-}
-
-void wglContext::hideMouse()
-{
-	if (!hWnd) return;
-
-	POINT p; p.x = 0; p.y = 0;
-	ScreenToClient(hWnd,&p);
-	RECT r;
-	GetClientRect(hWnd,&r);
-	r.left -= p.x; r.right -= p.x;
-	r.top -= p.y; r.bottom -= p.y;
-	ClipCursor(&r);
-
-	ShowCursor(false);
-}
-*/
-
 LRESULT
 display::on_mouse( WPARAM wParam, LPARAM lParam)
 {
