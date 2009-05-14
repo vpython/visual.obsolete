@@ -379,9 +379,16 @@ display::vpMouseHandler (EventHandlerCallRef target, EventRef event)
 	unsigned btnMask = GetCurrentEventButtonState();
 	for(int b=0; b<3; b++) buttons[b] = btnMask & (1<<b);
 
-	// Consider option and command as middle and right buttons
-	if (shiftState[3]) { buttons[1] = true; buttons[0] = false; }
-	if (shiftState[2]) buttons[2] = true;
+	// On a one-button Mac mouse, command and option indicate right and middle buttons: 
+	if (shiftState[3]) { 
+		buttons[1] = buttons[0];
+		buttons[0] = false;
+		buttons[3] = false;
+	} else if (shiftState[2]) { 
+		buttons[2] = buttons[0];
+		buttons[0] = false; 
+		buttons[1] = false; 
+	}
 
 	mouse.report_mouse_state( 3, buttons, pt.h, pt.v-yadjust, 4, shiftState, false );
 
