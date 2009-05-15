@@ -23,7 +23,7 @@ docfiles = index.html \
 	visual/VisualIntro.html visual/VisualRef.css \
 	visual/VisualRef-1.gif visual/VisualRef-2.gif visual/VisualRef-3.gif \
 	visual/VisualRef-4.gif visual/VisualRef-6.gif visual/VisualRef-7.gif \
-	VPython_Intro.pdf \
+	visual/VPython_Intro.pdf \
 	images/arrow.jpg images/box.jpg images/cone.jpg images/controls.jpg \
 	images/convex.jpg images/curve.jpg images/cylinder.jpg images/ellipsoid.jpg \
 	images/faces.jpg images/filedialog.jpg images/graph.jpg images/helix.jpg \
