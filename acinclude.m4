@@ -267,6 +267,36 @@ AC_DEFUN([VISUAL_EXAMPLES],
 
 ])
 
+AC_DEFUN([VISUAL_VIDLE],
+[
+	AC_REQUIRE([AM_PATH_PYTHON])
+	AC_ARG_ENABLE([vidle],
+		AC_HELP_STRING([--disable-vidle], [do not install VIDLE]),
+		[visual_build_vidle=$enableval],
+		[visual_build_vidle="yes"])
+	
+	AC_ARG_WITH([vidle-dir],
+		AC_HELP_STRING([--with-vidle-dir=PATH], [path to install VIDLE=pythondir]),
+		[visual_vidledir=$withval],
+		[visual_vidledir=""])		
+	
+	AC_MSG_CHECKING( where to install VIDLE)
+	
+	if test "x$visual_vidledir" = "x" ; then
+		visualvidledir=${pythondir}/vidle
+	else
+		visualvidledir=$visual_vidledir
+	fi
+	
+	AC_MSG_RESULT( $visualvidledir)
+	AC_SUBST( visualvidledir)
+	
+	AC_MSG_CHECKING( whether to install VIDLE)
+	AM_CONDITIONAL([BUILD_VIDLE], test $visual_build_vidle = "yes")
+	AC_MSG_RESULT( $visual_build_vidle)
+
+])
+
 
 dnl Modified from pyautoconf to use the Automake-supplied macro AM_PATH_PYTHON
 dnl ----------------------------------------------------------------------
