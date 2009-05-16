@@ -220,6 +220,10 @@ IV.  Install
 	
 	Alternatively, you may run 'make install-strip' to install a somewhat smaller
 	executable.
+	
+	Ubuntu 9.04 does not include site-packages on the Python module search path.
+	Copy src/gtk2/site-packages.pth into /usr/lib/python2.6/dist-packages so that
+	Python can find the visual module.
 
 V:   Troubleshooting
 	The single most likely cause of an error in the build is that one or more
