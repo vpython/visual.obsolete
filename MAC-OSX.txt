@@ -26,6 +26,12 @@ In the mbuild directory, execute make install to build and install Visual.
 This creates cvisual.so in the CVS site-packages/visual directory, which is
 linked as explained above, ready to run.
 
+Run compilevisual.py (top of CVS) to compile all Visual Python files.
+
+Another option to compile all of the .py files in a directory is this:
+	import compileall
+	compileall.compile_dir("mylib", force=1)
+
 In src/mac/PackageMaker is an Apple PackageMaker project file, a Welcome text file
 for creating a VPython installer for the Mac, and instructions in packaging.txt.
 
