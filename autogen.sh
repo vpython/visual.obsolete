@@ -16,6 +16,7 @@ if [ -e Makefile.in ] && [ -e aclocal.m4 ] && [ -e config.guess ] \
 	&& [ -e config.sub ] && [ -e configure ] && [ -e install-sh ] \
 	&& [ -e ltmain.sh ] && [ -e missing ] && [ -e py-compile ] \
 	&& [ -e site-packages/visual/Makefile.in ] \
+	&& [ -e site-packages/vidle/Makefile.in ] \
 	&& [ -e examples/Makefile.in ] && [ -e docs/Makefile.in ] ; then
 	echo "Completed successfully"
 else

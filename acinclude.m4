@@ -51,8 +51,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl $prefix/lib/site-python in 1.4 to $prefix/lib/python1.5/site-packages
   dnl in 1.5.
   m4_define([_AM_PYTHON_INTERPRETER_LIST],
-            [python python2 python2.4 python2.3 python2.2 dnl
-python2.1 python2.0 python1.6 python1.5])
+            [python python2.6 python2.5 python2.4])
 
   m4_if([$1],[],[
     dnl No version check is needed.
@@ -264,37 +263,6 @@ AC_DEFUN([VISUAL_EXAMPLES],
 	AC_MSG_CHECKING( whether to install example programs)
 	AM_CONDITIONAL([BUILD_EXAMPLES], test $visual_build_examples = "yes")
 	AC_MSG_RESULT( $visual_build_examples)
-
-])
-
-AC_DEFUN([VISUAL_VIDLE],
-[
-	AC_REQUIRE([AM_PATH_PYTHON])
-	AC_ARG_ENABLE([vidle],
-		AC_HELP_STRING([--disable-vidle], [do not install VIDLE]),
-		[visual_build_vidle=$enableval],
-		[visual_build_vidle="yes"])
-	
-	AC_ARG_WITH([vidle-dir],
-		AC_HELP_STRING([--with-vidle-dir=PATH], [path to install VIDLE=pythondir]),
-		[visual_vidledir=$withval],
-		[visual_vidledir=""])		
-	
-	AC_MSG_CHECKING( where to install VIDLE)
-	
-	if test "x$visual_vidledir" = "x" ; then
-		visualvidledir=${pythondir}/vidle
-	else
-		visualvidledir=$visual_vidledir
-	fi
-	
-	AC_MSG_RESULT( $visualvidledir)
-	AC_SUBST( visualvidledir)
-	
-	AC_MSG_CHECKING( whether to install VIDLE)
-	AM_CONDITIONAL([BUILD_VIDLE], test $visual_build_vidle = "yes")
-	AC_MSG_RESULT( $visual_build_vidle)
-
 ])
 
 

@@ -15,13 +15,13 @@ dist-hook:
 # Logic to install the "vpython" script
 bin_SCRIPTS = bin/vpython
 
-if BUILD_VIDLE
-SUBDIRS += site-packages/vidle
-endif
-
 if BUILD_EXAMPLES
 SUBDIRS += examples
 endif
+
+##if BUILD_VIDLE
+##SUBDIRS += site-packages/vidle
+##endif
 
 if BUILD_DOCS
 SUBDIRS += docs
