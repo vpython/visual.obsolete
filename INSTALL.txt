@@ -66,6 +66,9 @@ I.  Prerequisites:
  
 	 # include <boost/function/function0.hpp>
 	--------------------------------------
+	Although the boost-1.39 file does not include <boost/type_traits/add_reference.hpp>,
+	Visual nevertheless builds okay on a Mac using boost-1.39. Have not tried
+	on other platforms.
 		
 	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
 		the development (dev) package.
