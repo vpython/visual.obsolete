@@ -60,7 +60,12 @@ Name: VIDLE; Description: "VIDLE: improved version of the IDLE program editor"; 
 Name: desktopicon; Description: "Create a desktop icon to start VIDLE"
 
 [Icons]
-Name: "{userdesktop}\VIDLE for VPython"; Filename: "{app}\pythonw.exe"; Parameters: "{app}\Lib\site-packages\vidle\idle.pyw"; WorkingDir: "{app}\Lib\site-packages\visual\examples"; IconFilename: "{app}\DLLs\py.ico"; Tasks: desktopicon
+Name: "{commondesktop}\VIDLE for VPython"; Filename: "{app}\pythonw.exe"; Parameters: "{app}\Lib\site-packages\vidle\idle.pyw"; WorkingDir: "{app}\Lib\site-packages\visual\examples"; IconFilename: "{app}\DLLs\py.ico"; Tasks: desktopicon
+Name: "{commonstartmenu}\VIDLE for VPython"; Filename: "{app}\pythonw.exe"; Parameters: "{app}\Lib\site-packages\vidle\idle.pyw"; WorkingDir: "{app}\Lib\site-packages\visual\examples"; IconFilename: "{app}\DLLs\py.ico"
+; commonstartmenu puts a choice on the "All Programs" list.
+; commonstartup puts a choice inside "All Programs/Startup"
+; commonfavorites puts a choice in Internet Explorer!
+
 
 ; This code file contains a ShouldSkipPage function which looks
 ; for an appropriate version of python.exe,
