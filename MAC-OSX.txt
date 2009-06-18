@@ -35,6 +35,8 @@ Another option to compile all of the .py files in a directory is this:
 In src/mac/PackageMaker is an Apple PackageMaker project file, a Welcome text file
 for creating a VPython installer for the Mac, and instructions in packaging.txt.
 
+Be sure to set the project status to require only OSX 10.4 and above.
+
 In site-packages/vidle, execute "python MacBuildApp.py build" to build an app to drive VIDLE,
 an updated alternative to the IDLE shipped with Python.
 
