@@ -219,6 +219,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         a simple <a href="files.html"><strong>file dialog</strong></a> display for choosing files.</p>
       <h3 class="style1">Render time </h3>
       <p class="Normal">If you say <span class="attribute"><strong>scene.show_rendertime = True</strong></span>, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene). This can be a useful diagnostic of performance issues.</p>
+      <h3 class="Normal"><span class="style1">Design for left-button events if possible </span></h3>
+      <p class="Normal">Visual 5 provides the basic mouse event functionality that was present in Visual 3 for handling events from right and middle buttons when userspin or userzoom is disabled, out of concern for supporting old programs. However, it has become evident that there are limitations to this approach which could preclude some kinds of mouse handling that people might want to do in the future. For example, you might want to allow userspin with right drags yet also pick up right clicks. For that reason it is conceivable that future developments in this area might break existing programs, and therefore for maximum forward compatibility it is prudent to use only left-button interactions in new programs.</p>
       <h3><a name="incompatibilities" id="incompatibilities"></a><span class="style3">Known incompatibilities
       in this new version</span></h3>
       <p class="Normal">Here are known incompatibilities:</p>

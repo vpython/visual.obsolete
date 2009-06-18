@@ -112,7 +112,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           left and right buttons  pressed together. For systems with a one button
           mouse, the right button is  invoked by holding down the Command key,
           and the middle button is invoked by holding down the Option key. </p>
-        <p class="Normal"><strong> <font color="#0000A0">Current state of mouse</font></strong></p>
+        <p class="Normal"><strong><font color="#0000A0">Design for left-button events if possible</font></strong></p>
+        <p class="Normal">Visual 5 provides the basic mouse event functionality that was present in Visual 3 for handling events from right and middle buttons when userspin or userzoom is disabled, out of concern for supporting old programs. However, it has become evident that there are limitations to this approach which could preclude some kinds of mouse handling that people might want to do in the future. For example, you might want to allow userspin with right drags yet also pick up right clicks. For that reason it is conceivable that future developments in this area might break existing programs, and therefore for maximum forward compatibility it is prudent to use only left-button interactions in new programs.</p>
+      <p class="Normal"><strong> <font color="#0000A0">Current state of mouse</font></strong></p>
         <p class="attributes"> <span class="attribute">pos</span> The current 3D position 
           of the mouse cursor; <span class="attribute">scene.mouse.pos</span>. Visual 
           always chooses a point in the plane parallel to the screen and passing through <span class="attribute">display.center</span>. (See <a href="#alternative">Projecting 
