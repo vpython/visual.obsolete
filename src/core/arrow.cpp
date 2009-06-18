@@ -44,6 +44,7 @@ double
 arrow::get_headwidth()
 {
 	if (headwidth) return headwidth;
+	if (shaftwidth) return 2.0*shaftwidth;
 	return 0.2*axis.mag();
 }
 
@@ -57,6 +58,7 @@ double
 arrow::get_headlength()
 {
 	if (headlength) return headlength;
+	if (shaftwidth) return 3.0*shaftwidth;
 	return 0.3*axis.mag();
 }
 
