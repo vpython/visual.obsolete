@@ -48,7 +48,7 @@ I.  Prerequisites:
 	of the Boost libraries, you need to get an appropriate threadpool version and
 	replace the files in "dependencies/threadpool/include". Copy into the include
 	directory the contents of the boost directory in the threadpool package,
-	which includes a directory named "include" and a file "threadpool.hpp".
+	which includes a directory named "threadpool" and a file "threadpool.hpp".
 	
 	Problem bulding; found this on the web:
 	"Furthermore building pyrap with boost-1.37 and gcc-4.3.2 gave an error 
