@@ -54,7 +54,7 @@ I.  Prerequisites:
 	"Furthermore building pyrap with boost-1.37 and gcc-4.3.2 gave an error 
 	due to a missing include. The following patch has to be applied to boost:"
 
-	Index: boost/python/detail/translate_exception.hpp
+	In /usr/include (probably), change /boost/python/detail/translate_exception.hpp
 	===================================================================
 	--- boost/python/detail/translate_exception.hpp (revision 50228)
 	+++ boost/python/detail/translate_exception.hpp (working copy)
@@ -66,6 +66,9 @@ I.  Prerequisites:
  
 	 # include <boost/function/function0.hpp>
 	--------------------------------------
+	(That is, add "# include <boost/type_traits/add_reference.hpp>" after the
+	statement "# include <boost/type_traits/add_const.hpp>".)
+	
 	Although the boost-1.39 file does not include <boost/type_traits/add_reference.hpp>,
 	Visual nevertheless builds okay on a Mac using boost-1.39. Have not tried
 	on other platforms.
@@ -92,7 +95,8 @@ I.  Prerequisites:
 	automatically installed by a package manager when a requested library depends on it:
 	
 	For Ubuntu 8.04, installing libgtkglextmm-x11-dev brought in everything
-	except for libglademm-2.4, which also must be installed.
+	except for libglademm-2.4, which also must be installed. For Ubuntu 9.04, this
+	didn't install many of the needed packages; all had to be checked carefully.
 
 	On Ubuntu 8.04, the packages are named (not including the "dev" part of the name):
 	   libgtk-2.0, libatk-1.0, atkmm-1.6, libsigc++-2.0, 
