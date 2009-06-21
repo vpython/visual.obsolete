@@ -762,6 +762,8 @@ void gui_main::poll() {
 		if (i->second)
 			displays.push_back( i->second );
 
+	// Setting the 2nd, optional argument for paint_displays to true made multiwindow programs work for one user.
+	// Scherer notes, "That isn't acceptable to ship (it is TERRIBLE for performance on many drivers)."
 	int interval = int( 1000. * render_manager::paint_displays( displays ) );
 	CreateTimerQueueTimer( &timer_handle, NULL, &timer_callback, NULL, interval, 0, WT_EXECUTEINTIMERTHREAD );
 }
