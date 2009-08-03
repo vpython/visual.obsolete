@@ -16,10 +16,7 @@ class Model:
         v1 = vector(v1)
         v2 = vector(v2)
         v3 = vector(v3)
-        try:
-            normal = norm( cross(v2-v1, v3-v1) )
-        except:
-            normal = vector(0,0,0)
+        normal = norm( cross(v2-v1, v3-v1) )
         for v in (v1,v2,v3):
             self.model.append( pos=v, color=color, normal=normal )
         if self.twoSided:
