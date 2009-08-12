@@ -98,9 +98,11 @@ I.  Prerequisites:
 	except for libglademm-2.4, which also must be installed. 
 	
 	For Ubuntu 9.04:
-	libgtkglextmm-x11-dev gets libatk1.0, libcairo2, libglib2.0, libgtk2.0,
-	libgtkglext1, libgtkglextmm-x11-1.2, libpango1.0
-	libgtkmm-2.4 gets libcairomm-1.0, libglibmm-2.4, libpangomm-1.4, libsigc++-2.0
+	1) automake gets autoconf
+	2) libgtkglextmm-x11-dev gets libatk1.0, libcairo2, libglib2.0, libgtk2.0,
+	       libgtkglext1, libgtkglextmm-x11-1.2, libpango1.0
+	3) libgtkmm-2.4-dev gets libcairomm-1.0, libglibmm-2.4, libpangomm-1.4, libsigc++-2.0
+	4) libglademm-2.4-dev gets the rest
 
 	On Ubuntu 8.04, the packages are named (not including the "dev" part of the name):
 	   libgtk-2.0, libatk-1.0, atkmm-1.6, libsigc++-2.0, 
