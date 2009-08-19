@@ -177,6 +177,10 @@ frame::world_frame_transform() const
 	// Performs a reorientation transform.
 	// ret = translation o reorientation
 	// ret = ireorientation o itranslation.
+	// Robert Xiao pointed out that this was incorrect, and he proposed
+	// replacing it with inverse(ret, frame_world_transform(1.0)).
+	// However, comparison with Visual 3 showed that there were
+	// simply minor errors to be fixed.
 	tmatrix ret;
 
 	// A unit vector along the z_axis.
@@ -193,24 +197,21 @@ frame::world_frame_transform() const
 
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
-	/*
-	x_axis /= scale.x;
-	y_axis /= scale.y;
-	z_axis /= scale.z;
-	*/
 
 	ret(0,0) = x_axis.x;
 	ret(0,1) = x_axis.y;
 	ret(0,2) = x_axis.z;
-	ret(0,3) = (pos * x_axis).sum();
+	ret(0,3) = -(pos * x_axis).sum();
 	ret(1,0) = y_axis.x;
 	ret(1,1) = y_axis.y;
 	ret(1,2) = y_axis.z;
-	ret(1,3) = (pos * y_axis).sum();
+	ret(1,3) = -(pos * y_axis).sum();
 	ret(2,0) = z_axis.x;
 	ret(2,1) = z_axis.y;
 	ret(2,2) = z_axis.z;
-	ret(2,3) = (pos * z_axis).sum();
+	ret(2,3) = -(pos * z_axis).sum();
+
+	ret.w_row();
 
 	return ret;
 }
