@@ -135,10 +135,10 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       </p>
           <p class="attributes"><span class="attribute"><font color="#000000">To obtain </font>camera position</span>, see <a href="mouse.html">Mouse Interactions</a>.</p>
           <p class="attributes"><span class="attribute">cursor.visible</span> By
-            setting <span class="attribute">scene.cursor.visible = 0</span>,
+            setting <span class="attribute">scene.cursor.visible = False</span>,
             the mouse cursor  becomes invisible. This is often appropriate while
             dragging an object using  the mouse. Restore the cursor with <span class="attribute">scene.cursor.visible
-              = 1</span>. Currently has no effect on Linux.</p>
+              = True</span>. Currently has no effect on Linux.</p>
       <p class="attributes"><span class="attribute">objects</span> A list
             of all the visible objects in the display; invisible objects and
             lights are not listed (<span class="attribute">scene.lights</span> is a list of existing lights).
@@ -146,7 +146,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 <p class="program">&nbsp;&nbsp;&nbsp;&nbsp;for obj in scene2.objects: <br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if isinstance(obj, box):<br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.color = color.red</p>
-          <p class="attributes"><span class="attribute">show_rendertime</span> If you set <span class="attribute">scene.show_rendertime = 1</span>, in the lower left corner of the display you will see something like &quot;cycle: 27 render: 5&quot;, meaning 27 milliseconds between renderings of the scene, taking 5 milliseconds to render, in which case 22 out of 27 milliseconds were devoted to executing your Python statements. </p>
+          <p class="attributes"><span class="attribute">show_rendertime</span> If you set <span class="attribute">scene.show_rendertime = True</span>, in the lower left corner of the display you will see something like &quot;cycle: 27 render: 5&quot;, meaning 27 milliseconds between renderings of the scene, taking 5 milliseconds to render, in which case 22 out of 27 milliseconds were devoted to executing your Python statements. </p>
       <p class="attributes"><span class="attribute">stereo</span> Stereoscopic
             option; <span class="attribute">scene.stereo = 'redcyan'</span> will
             generate a scene for the left eye and a scene for the right eye,
@@ -202,7 +202,7 @@ or two projectors.) </p>
             
             title bar: scene.title = 'Planetary Orbit'</p>
           <p class="attributes"><span class="attribute">fullscreen</span> Full screen 
-            option; <span class="attribute">scene2.fullscreen = 1</span><em class="program"> </em> makes the display named <span class="attribute">scene2</span> take 
+            option; <span class="attribute">scene2.fullscreen = True</span><em class="program"> </em> makes the display named <span class="attribute">scene2</span> take 
             up the entire screen. In this case there is no close box visible; press 
             Escape to exit. <br />
             (There is currently a bug in the fullscreen option for Linux; the Escape key has no effect. If you use the 
@@ -210,14 +210,13 @@ or two projectors.) </p>
             quitting the program.)</p>
           <p class="attributes"> <span class="attribute">visible</span> Make
             sure the display is visible; <span class="attribute">scene2.visible
-            = 1</span><em class="program"> </em> makes the display named <span class="attribute">scene2</span> visible.
+            = True</span><em class="program"> </em> makes the display named <span class="attribute">scene2</span> visible.
             This is automatically called when new primitives are added to the
             display, or the mouse is referenced. Setting <span class="attribute">visible</span> to
-            0 hides the display.</p>
-          <p class="attributes"> <span class="attribute">exit</span> If <span class="attribute">sceneb.exit 
-            = 0</span>, the program does not quit when the close box of the <span class="attribute">sceneb</span> display is clicked. The default is <span class="attribute">sceneb.exit = 
-              1</span>, in which case clicking the close box does make the program quit. </p>
-          <p class="Normal"><strong> <font color="#0000A0">Controlling the view</font></strong></p>
+            False hides the display.</p>
+          <p class="attributes"> <span class="attribute">exit</span> If <span class="attribute">sceneb.exit</span><span class="Body"> is Fals</span><span class="Body">e</span>, the program does not quit when the close box of the <span class="attribute">sceneb</span> display is clicked. The default is <span class="attribute">sceneb.exit = 
+              True</span>, in which case clicking the close box does make the program quit. </p>
+      <p class="Normal"><strong> <font color="#0000A0">Controlling the view</font></strong></p>
           <p class="attributes"> <span class="attribute">center</span> Location at which 
             
             the camera continually looks, even as the user rotates the position of the 
@@ -293,19 +292,19 @@ or two projectors.) </p>
             be the <span class="attribute">up</span> vector, because this is the axis 
             
             about which the camera rotates when you set the <span class="attribute">up</span> attribute. If you want the z axis to point up, first set <span class="attribute">forward</span> to something other than the -z axis, for example (1,0,0).</p>
-          <p class="attributes"> <span class="attribute">autoscale = 0</span> no automatic 
+          <p class="attributes"> <span class="attribute">autoscale = False</span> no automatic 
             
             scaling (set range or scale explicitly);<span class="attribute">&nbsp;autoscale 
               
-              = 1</span> automatic scaling (default). It is often useful to let Visual 
+              = True</span> automatic scaling (default). It is often useful to let Visual 
             
             make an initial display with autoscaling, then turn autoscaling off to prevent 
             
             further automated changes.</p>
-          <p class="attributes"> <span class="attribute">userzoom = 0</span> user cannot zoom in and out of the scene</p>
-          <p class="attributes"><span class="attribute">userzoom = 1</span> user can zoom (default)</p>
-          <p class="attributes"> <span class="attribute">userspin = 0</span> user cannot rotate the scene</p>
-          <p class="attributes"> <span class="attribute">userspin = 1</span> user can rotate (default)</p>
+          <p class="attributes"> <span class="attribute">userzoom = False</span> user cannot zoom in and out of the scene</p>
+          <p class="attributes"><span class="attribute">userzoom = True</span> user can zoom (default)</p>
+          <p class="attributes"> <span class="attribute">userspin = False</span> user cannot rotate the scene</p>
+          <p class="attributes"> <span class="attribute">userspin = True</span> user can rotate (default)</p>
 
 <!-- InstanceEndEditable --></td>
   </tr>

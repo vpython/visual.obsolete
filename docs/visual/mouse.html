@@ -123,8 +123,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           pressed), 'left', 'right', 'middle', or 'wheel' (scroll wheel pressed on some 
           Windows mouses). Example: <span class="attribute">scene.mouse.button == 'left'</span> is true if the left button is currently down.</p>
         <p class="attributes"> <span class="attribute">pick</span> The nearest object 
-          in the scene which falls under the cursor, or None. At present helix and label 
-          objects cannot be picked. The picked object is <span class="attribute">scene.mouse.pick</span>.</p>
+          in the scene which falls under the cursor, or None. At present label and helix cannot be picked. The picked object is <span class="attribute">scene.mouse.pick</span>.</p>
         <p class="attributes"> <span class="attribute">pickpos</span> The 3D point on 
           the surface of the picked object which falls under the cursor, or None; <span class="attribute">scene.mouse.pickpos</span>.</p>
         <p class="attributes"> <span class="attribute">camera</span> The read-only current 
@@ -140,13 +139,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="attributes"><span class="attribute">project()</span> Projects position 
           onto a plane. See <a href="#alternative">Projecting mouse position onto a given 
             plane</a>. </p>
-        <p class="attributes"><span class="attribute">alt</span> = 1 if the ALT key 
-          is down, otherwise 0</p>
-        <p class="attributes"><span class="attribute">ctrl</span> = 1 if the CTRL key 
-          is down, otherwise 0 (for a one-button mouse, meaningful only if mouse buttons 
+        <p class="attributes"><span class="attribute">alt</span> = True if the ALT key 
+          is down, otherwise False</p>
+        <p class="attributes"><span class="attribute">ctrl</span> = True if the CTRL key 
+          is down, otherwise False (for a one-button mouse, meaningful only if mouse buttons 
           up)</p>
-        <p class="attributes"><span class="attribute">shift</span> = 1 if the SHIFT 
-          key is down, otherwise 0 (for a one-button mouse, meaningful only if mouse 
+        <p class="attributes"><span class="attribute">shift</span> = True if the SHIFT 
+          key is down, otherwise False (for a one-button mouse, meaningful only if mouse 
           buttons up)</p>
       <p class="Normal"></p>
         <p class="Normal"><strong><font color="#0000A0">Getting events</font></strong></p>
