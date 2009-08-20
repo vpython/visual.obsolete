@@ -251,6 +251,8 @@ wrap_primitive()
         .def( "rotate", raw_function( &py_rotate<frame>))
 		.def( "add_renderable", &frame::add_renderable)
 		.def( "remove_renderable", &frame::remove_renderable)
+		.def( "frame_to_world", &frame::frame_to_world)
+		.def( "world_to_frame", &frame::world_to_frame)
 		/* frame.scale disabled for Visual 4.0
          .add_property( "scale",
             make_function(&frame::get_scale, return_internal_reference<>()),

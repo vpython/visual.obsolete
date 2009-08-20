@@ -134,14 +134,10 @@ frame::rotate( double angle, const vector& _axis, const vector& origin)
     }
 }
 
-tmatrix
-frame::frame_world_transform( const double gcf) const
+vector
+frame::world_zaxis()
 {
-	// Performs a reorientation transform.
-	// ret = translation o reorientation
-	tmatrix ret;
-	// A unit vector along the z_axis.
-	vector z_axis = vector(0,0,1);
+	vector z_axis;
 	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
 		if (std::fabs(axis.norm().dot( vector(-1,0,0))) > 0.98)
 			z_axis = axis.cross( vector(0,0,1)).norm();
@@ -151,16 +147,52 @@ frame::frame_world_transform( const double gcf) const
 	else {
 		z_axis = axis.cross( up).norm();
 	}
+	return z_axis;
+}
 
+vector
+frame::frame_to_world( const vector& p)
+{
+	vector z_axis = world_zaxis();
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
+	vector inworld = pos + p.x*x_axis + p.y*y_axis + p.z*z_axis;
 
-	/*
-	// I don't understand why removing gcf from the following 3 statements makes frames work (bas):
-	ret.x_column( x_axis * scale.x);
-	ret.y_column( y_axis * scale.y);
-	ret.z_column( z_axis * scale.z);
-	*/
+	return inworld;
+}
+
+vector
+frame::world_to_frame( const vector& p)
+{
+	vector z_axis = world_zaxis();
+	vector y_axis = z_axis.cross(axis).norm();
+	vector x_axis = axis.norm();
+	vector v = p - pos;
+	vector inframe = vector(v.dot(x_axis), v.dot(y_axis), v.dot(z_axis));
+
+	return inframe;
+}
+
+tmatrix
+frame::frame_world_transform( const double gcf) const
+{
+	// Performs a reorientation transform.
+	// ret = translation o reorientation
+	tmatrix ret;
+
+	//vector z_axis = world_zaxis(); // I don't know why I can't use this call
+	vector z_axis;
+	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
+		if (std::fabs(axis.norm().dot( vector(-1,0,0))) > 0.98)
+			z_axis = axis.cross( vector(0,0,1)).norm();
+		else
+			z_axis = axis.cross( vector(-1,0,0)).norm();
+	}
+	else {
+		z_axis = axis.cross( up).norm();
+	}
+	vector y_axis = z_axis.cross(axis).norm();
+	vector x_axis = axis.norm();
 
 	ret.x_column( x_axis);
 	ret.y_column( y_axis);
@@ -183,8 +215,8 @@ frame::world_frame_transform() const
 	// simply minor errors to be fixed.
 	tmatrix ret;
 
-	// A unit vector along the z_axis.
-	vector z_axis = vector(0,0,1);
+	//vector z_axis = world_zaxis(); // I don't know why I can't use this call
+	vector z_axis;
 	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
 		if (std::fabs(axis.norm().dot( vector(-1,0,0))) > 0.98)
 			z_axis = axis.cross( vector(0,0,1)).norm();
@@ -194,7 +226,6 @@ frame::world_frame_transform() const
 	else {
 		z_axis = axis.cross( up).norm();
 	}
-
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
 
