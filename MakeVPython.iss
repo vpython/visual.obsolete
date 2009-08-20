@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=VPython for Python 2.6
-AppVerName=VPython 5.1
+AppVerName=VPython 5.12
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
@@ -13,7 +13,7 @@ SourceDir=C:\Python26
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py2.6-5.1
+OutputBaseFilename=VPython-Win-Py2.6-5.12
 OutputDir=c:\workspace
 
 [Files]
@@ -47,7 +47,14 @@ Source: "c:\workspace\vpython-core2\docs\visual\*.css"; DestDir: "{app}\Lib\site
 Source: "c:\workspace\vpython-core2\docs\visual\*.txt"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\images"; Components: Documentation
 
-Source: "c:\workspace\vpython-core2\site-packages\vidle\*"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "c:\workspace\vpython-core2\site-packages\vidle\*.py"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
+Source: "c:\workspace\vpython-core2\site-packages\vidle\*.pyw"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
+Source: "c:\workspace\vpython-core2\site-packages\vidle\*.def"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
+Source: "c:\workspace\vpython-core2\site-packages\vidle\ChangeLog"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
+Source: "c:\workspace\vpython-core2\site-packages\vidle\idle.bat"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
+Source: "c:\workspace\vpython-core2\site-packages\vidle\*.txt"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
+Source: "c:\workspace\vpython-core2\site-packages\vidle\Icons\*.gif"; DestDir: "{app}\Lib\site-packages\vidle\Icons"; Components: VIDLE
+Source: "c:\workspace\vpython-core2\site-packages\vidle\Icons\*.icns"; DestDir: "{app}\Lib\site-packages\vidle\Icons"; Components: VIDLE
 
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
