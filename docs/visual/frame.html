@@ -122,19 +122,17 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             the f.objects list will be empty. If you need a list containing all the 
             objects, both visible and invisible, you need to maintain your own list 
             of objects.</p>
-          <p class="Normal"> If <span class="program0"><font color="#FF0000">ball</font></span> is an object in a frame, <font color="#FF0000">ball.pos</font> is the position 
-            local to the frame, not the actual position in &quot;world space&quot;. 
-            Here is a routine that will calculate the position of a vector such as <font color="#FF0000">ball.pos</font> in world space:</p>
+          <p class="Normal"> If <span class="program0"><font color="#FF0000">ball</font></span> is
+            an object in a frame, <font color="#FF0000">ball.pos</font> is the
+            position  local to the frame, not the actual position in &quot;world
+            space&quot;. 
+            There are two frame functions for translating between frame and world
+            coordinates. Suppose the name of the frame is <span class="attribute">f</span>, <span class="attribute">frame_pos</span> is
+            a position within that frame, and <span class="attribute">world_pos</span> is
+            the corresponding position in world coordinates:</p>
 
-            <p class="program"> def world_space_pos(frame, local):<br />
-              &quot;&quot;&quot;Returns the position of local in world space.&quot;&quot;&quot;<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;x_axis = norm(frame.axis)<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;z_axis = norm(cross(frame.axis, frame.up))<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;y_axis = norm(cross(z_axis, x_axis))<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;return<br />
-              <br /> 
-              frame.pos+local.x*x_axis+local.y*y_axis+local.z*z_axis</p>
-
+      <p class="program">world_pos = f.frame_to_world(frame_pos)</p>
+      <p class="program">frame_pos = f.world_to_frame(world_pos)</p>
     <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
