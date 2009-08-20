@@ -135,7 +135,7 @@ frame::rotate( double angle, const vector& _axis, const vector& origin)
 }
 
 vector
-frame::world_zaxis()
+frame::world_zaxis() const
 {
 	vector z_axis;
 	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
@@ -151,7 +151,7 @@ frame::world_zaxis()
 }
 
 vector
-frame::frame_to_world( const vector& p)
+frame::frame_to_world( const vector& p) const
 {
 	vector z_axis = world_zaxis();
 	vector y_axis = z_axis.cross(axis).norm();
@@ -162,7 +162,7 @@ frame::frame_to_world( const vector& p)
 }
 
 vector
-frame::world_to_frame( const vector& p)
+frame::world_to_frame( const vector& p) const
 {
 	vector z_axis = world_zaxis();
 	vector y_axis = z_axis.cross(axis).norm();
@@ -180,17 +180,7 @@ frame::frame_world_transform( const double gcf) const
 	// ret = translation o reorientation
 	tmatrix ret;
 
-	//vector z_axis = world_zaxis(); // I don't know why I can't use this call
-	vector z_axis;
-	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
-		if (std::fabs(axis.norm().dot( vector(-1,0,0))) > 0.98)
-			z_axis = axis.cross( vector(0,0,1)).norm();
-		else
-			z_axis = axis.cross( vector(-1,0,0)).norm();
-	}
-	else {
-		z_axis = axis.cross( up).norm();
-	}
+	vector z_axis = world_zaxis();
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
 
@@ -215,17 +205,7 @@ frame::world_frame_transform() const
 	// simply minor errors to be fixed.
 	tmatrix ret;
 
-	//vector z_axis = world_zaxis(); // I don't know why I can't use this call
-	vector z_axis;
-	if (std::fabs(axis.dot(up) / std::sqrt( up.mag2() * axis.mag2())) > 0.98) {
-		if (std::fabs(axis.norm().dot( vector(-1,0,0))) > 0.98)
-			z_axis = axis.cross( vector(0,0,1)).norm();
-		else
-			z_axis = axis.cross( vector(-1,0,0)).norm();
-	}
-	else {
-		z_axis = axis.cross( up).norm();
-	}
+	vector z_axis = world_zaxis();
 	vector y_axis = z_axis.cross(axis).norm();
 	vector x_axis = axis.norm();
 

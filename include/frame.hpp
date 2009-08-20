@@ -49,7 +49,7 @@ class frame : public renderable
  		are rendered.
  		@param gcf: the global correction factor, propogated from gl_render().
  	*/
-	vector world_zaxis();
+	vector world_zaxis() const;
 	tmatrix frame_world_transform( const double gcf) const;
 	tmatrix world_frame_transform() const;
 
@@ -93,8 +93,8 @@ class frame : public renderable
 	void set_up( const vector& n_up);
 	shared_vector& get_up();
 
-	vector frame_to_world(const vector& p);
-	vector world_to_frame(const vector& p);
+	vector frame_to_world(const vector& p) const;
+	vector world_to_frame(const vector& p) const;
 
 	// void set_scale( const vector& n_scale);
 	// shared_vector& get_scale();
