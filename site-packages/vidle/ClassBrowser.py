@@ -10,6 +10,8 @@ XXX TO DO:
 - add base classes to class browser tree
 """
 
+__all__ = ['ClassBrowser']
+
 import os
 import sys
 import pyclbr
@@ -18,6 +20,27 @@ import PyShell
 from WindowList import ListedToplevel
 from TreeWidget import TreeNode, TreeItem, ScrolledCanvas
 from configHandler import idleConf
+
+def collect_objects(d, name=None):
+    items = []
+    objects = {}
+    for key, cl in d.items():
+        if name is None or cl.module == name:
+            s = key
+            if hasattr(cl, 'super') and cl.super:
+                supers = []
+                for sup in cl.super:
+                    if type(sup) is type(''):
+                        sname = sup
+                    else:
+                        sname = sup.name
+                        if sup.module != cl.module:
+                            sname = "%s.%s" % (sup.module, sname)
+                    supers.append(sname)
+                s = s + "(%s)" % ", ".join(supers)
+            items.append((cl.lineno, s))
+            objects[s] = cl
+    return objects, items
 
 class ClassBrowser:
 
@@ -72,8 +95,8 @@ class ModuleBrowserTreeItem(TreeItem):
 
     def GetSubList(self):
         sublist = []
-        for name in self.listclasses():
-            item = ClassBrowserTreeItem(name, self.classes, self.file)
+        for name in self.listobjects():
+            item = ObjectBrowserTreeItem(name, self.classes, self.file)
             sublist.append(item)
         return sublist
 
@@ -87,7 +110,7 @@ class ModuleBrowserTreeItem(TreeItem):
     def IsExpandable(self):
         return os.path.normcase(self.file[-3:]) == ".py"
 
-    def listclasses(self):
+    def listobjects(self):
         dir, file = os.path.split(self.file)
         name, ext = os.path.splitext(file)
         if os.path.normcase(ext) != ".py":
@@ -96,31 +119,11 @@ class ModuleBrowserTreeItem(TreeItem):
             dict = pyclbr.readmodule_ex(name, [dir] + sys.path)
         except ImportError, msg:
             return []
-        items = []
-        self.classes = {}
-        for key, cl in dict.items():
-            if cl.module == name:
-                s = key
-                if hasattr(cl, 'super') and cl.super:
-                    supers = []
-                    for sup in cl.super:
-                        if type(sup) is type(''):
-                            sname = sup
-                        else:
-                            sname = sup.name
-                            if sup.module != cl.module:
-                                sname = "%s.%s" % (sup.module, sname)
-                        supers.append(sname)
-                    s = s + "(%s)" % ", ".join(supers)
-                items.append((cl.lineno, s))
-                self.classes[s] = cl
+        self.classes, items = collect_objects(dict, name)
         items.sort()
-        list = []
-        for item, s in items:
-            list.append(s)
-        return list
+        return [s for item, s in items]
 
-class ClassBrowserTreeItem(TreeItem):
+class ObjectBrowserTreeItem(TreeItem):
 
     def __init__(self, name, classes, file):
         self.name = name
@@ -147,7 +150,7 @@ class ClassBrowserTreeItem(TreeItem):
     def IsExpandable(self):
         if self.cl:
             try:
-                return not not self.cl.methods
+                return not not self.cl.objects
             except AttributeError:
                 return False
 
@@ -155,8 +158,9 @@ class ClassBrowserTreeItem(TreeItem):
         if not self.cl:
             return []
         sublist = []
-        for name in self.listmethods():
-            item = MethodBrowserTreeItem(name, self.cl, self.file)
+        for obj in self.listobjects():
+            classes, item_name = obj
+            item = ObjectBrowserTreeItem(item_name, classes, self.file)
             sublist.append(item)
         return sublist
 
@@ -168,39 +172,17 @@ class ClassBrowserTreeItem(TreeItem):
             lineno = self.cl.lineno
             edit.gotoline(lineno)
 
-    def listmethods(self):
+    def listobjects(self):
         if not self.cl:
             return []
-        items = []
-        for name, lineno in self.cl.methods.items():
-            items.append((lineno, name))
-        items.sort()
-        list = []
-        for item, name in items:
-            list.append(name)
-        return list
 
-class MethodBrowserTreeItem(TreeItem):
+        result = []
+        for name, ob in self.cl.objects.items():
+            classes, items = collect_objects({name:ob})
+            result.append((ob.lineno, classes, items[0][1]))
+        result.sort()
+        return [item[1:] for item in result]
 
-    def __init__(self, name, cl, file):
-        self.name = name
-        self.cl = cl
-        self.file = file
-
-    def GetText(self):
-        return "def " + self.name + "(...)"
-
-    def GetIconName(self):
-        return "python" # XXX
-
-    def IsExpandable(self):
-        return 0
-
-    def OnDoubleClick(self):
-        if not os.path.exists(self.file):
-            return
-        edit = PyShell.flist.open(self.file)
-        edit.gotoline(self.cl.methods[self.name])
 
 def main():
     try:

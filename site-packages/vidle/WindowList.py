@@ -77,9 +77,13 @@ class ListedToplevel(Toplevel):
         # Subclass can override
         return self.wm_title()
 
-    def wakeup(self):
+    def wakeup(self, anystate=False):
+        """Signal the user about something important.
+
+        If anystate is true the window will always come forward, otherwise,
+        this will only happen if the window has been minimized."""
         try:
-            if self.wm_state() == "iconic":
+            if anystate or self.wm_state() == "iconic":
                 self.wm_withdraw()
                 self.wm_deiconify()
             self.tkraise()
