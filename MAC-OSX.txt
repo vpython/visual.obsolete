@@ -26,6 +26,12 @@ In the mbuild directory, execute make install to build and install Visual.
 This creates cvisual.so in the CVS site-packages/visual directory, which is
 linked as explained above, ready to run.
 
+In site-packages/vidle, execute "python MacBuildApp.py build" to build an app to drive VIDLE,
+an updated alternative to the IDLE shipped with Python. However, the resulting launcher seems
+to be not very robust and the resulting launcher has been modified and is found in
+src/mac/PackageMaker/VIDLE_launcher.zip. 
+For more details, see src/mac/PackageMaker/packaging.txt.
+
 Run compilevisual.py (top of CVS) to compile all Visual Python files.
 
 Another option to compile all of the .py files in a directory is this:
@@ -36,9 +42,6 @@ In src/mac/PackageMaker is an Apple PackageMaker project file, a Welcome text fi
 for creating a VPython installer for the Mac, and instructions in packaging.txt.
 
 Be sure to set the project status to require only OSX 10.4 and above.
-
-In site-packages/vidle, execute "python MacBuildApp.py build" to build an app to drive VIDLE,
-an updated alternative to the IDLE shipped with Python.
 
 The Boost libraries were built by downloading them and the bjam tool.
 Copy bjam into the Boost directory and execute this:
