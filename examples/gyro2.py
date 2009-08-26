@@ -33,8 +33,11 @@ alpha = 0 # initial spin angle
 alphadot = 15 # initial rate of change of spin angle (spin ang. velocity)
 phi = -pi/2. # initial azimuthal angle
 phidot = 0 # initial rate of change of azimuthal angle
-# Comment in following line to get pure precession
-##phidot = (-alphadot+sqrt(alphadot**2+2*M*g*r*cos(theta)/I))/cos(theta)
+## Comment in the following statements to get pure precession
+#if abs(cos(theta)) < 1e-8:
+#    phidot = M*g*r/(I*alphadot)
+#else:
+#    phidot = (-alphadot+sqrt(alphadot**2+2*M*g*r*cos(theta)/I))/cos(theta)
 
 pedestal = box(pos=top-vector(0,hpedestal/2.,0),
                  height=hpedestal, length=wpedestal, width=wpedestal,
