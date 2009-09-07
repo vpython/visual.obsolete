@@ -94,8 +94,6 @@ Visual 4.beta0
 	* Simple texturing support (see examples/textest.py)
 	* Advanced lighting support, including spotlights, attenuation, and local
 		 (non-infinity) sources (no demo as yet, see help(light))
-	* Supports integration with other GUI toolkits, such as PyGTK, WxPython,
-		PyObjC, etc (no demo yet)
 	* frame.scale linearly scales all of the frame's children's dimensions
 		Negative values are allowed.
 	
