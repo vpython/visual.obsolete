@@ -7,6 +7,12 @@
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
 <link href="VisualRef.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+<!--
+.style1 {font-size: x-large}
+.style2 {font-size: xx-large}
+-->
+</style>
 <!-- InstanceEndEditable -->
 <script type="text/javascript">
 <!--
@@ -90,8 +96,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
     <a href="http://www.scipy.org/Documentation" target="_blank">Numpy module</a> (arrays)    </p></td>
     <td width="21" valign="top" bgcolor="#FFFFFF"><!--DWLayoutEmptyCell-->&nbsp;</td>
     <td width="586" rowspan="2" valign="top"><!-- InstanceBeginEditable name="content" -->
-        <h1 class="Heading-1"> <font color="#0000A0">Graph Plotting</font></h1>
-        <p class="Normal"> In this section we describe features for plotting graphs 
+      <div>
+        <table width="100%" border="1">
+              <tr>
+                <td width="47%"><div align="center"><span class="style1 style2"><font color="#0000A0">Graphs</font></span></div></td>
+                <td width="53%"><div align="center"><a href="arrow.html"></a><a href="graph.html"><img src="images/graph.jpg" alt="graph" width="450" height="207" /></a></div></td>
+              </tr>
+            </table>
+          </div>
+          <p class="Normal">In this section we describe features for plotting graphs 
           
           with tick marks and labels. Here is a simple example of how to plot a graph (arange creates a numeric array running from 0 to 8, stopping short of 8.1):</p>
           <p class="program"> from visual.graph import *		# import graphing features
@@ -126,8 +139,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 
           <p class="program"> values = [(1,2), (3,4), (-5,2), (-5,-3)]<br />
           data = gdots(pos=values, color=color.blue)</p>
-          <p class="Normal">This list option is available only when creating the <span class="attribute">gdots</span> object.</p>
-          <p class="Normal"><strong><font color="#0000A0">Overall gdisplay options</font></strong></p>
+      <p class="Normal"><strong><font color="#0000A0">Overall gdisplay options</font></strong></p>
           <p class="Normal">You can establish a <span class="attribute">gdisplay</span> to set the size, position, and title for the title bar of the graph window, 
             
             specify titles for the x and y axes, and specify maximum values for each 
