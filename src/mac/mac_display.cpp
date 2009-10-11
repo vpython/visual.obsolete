@@ -434,8 +434,8 @@ display::update_size()
 
 	GetWindowBounds(window, kWindowStructureRgn, &bounds);
 	GetWindowBounds(window, kWindowContentRgn, &drawing);
-	report_resize(	bounds.left, bounds.top-yadjust, bounds.right-bounds.left, bounds.bottom-bounds.top,
-			drawing.left, drawing.top, drawing.right-drawing.left, drawing.bottom-drawing.top );
+	report_window_resize( bounds.left, bounds.top-yadjust, bounds.right-bounds.left, bounds.bottom-bounds.top );
+	report_view_resize(	drawing.right-drawing.left, drawing.bottom-drawing.top );
 }
 
 bool

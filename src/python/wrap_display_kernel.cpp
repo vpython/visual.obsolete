@@ -220,7 +220,8 @@ wrap_display_kernel(void)
 		.def( "_getProcAddress", &py_display_kernel::base_getProcAddress )
 		// Functions for extending this type in Python.
 		.def( "render_scene", &display_kernel::render_scene )
-		.def( "report_resize", &display_kernel::report_resize )
+		.def( "report_window_resize", &display_kernel::report_window_resize )
+		.def( "report_view_resize", &display_kernel::report_view_resize )
 		.def( "report_mouse_state", &py_display_kernel::report_mouse_state )
 		.def( "report_closed", &display_kernel::report_closed )
 		.def( "pick", &display_kernel::pick, pick_overloads(

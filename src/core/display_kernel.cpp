@@ -146,8 +146,8 @@ display_kernel::display_kernel()
 	explicitly_invisible(false),
 	fullscreen(false),
 	title( "VPython" ),
-	window_x(-1), window_y(-1), window_width(430), window_height(450),
-	view_x(-1), view_y(-1), view_width(-1), view_height(-1),
+	window_x(0), window_y(0), window_width(430), window_height(450),
+	view_width(-1), view_height(-1),
 	center(0, 0, 0),
 	forward(0, 0, -1),
 	internal_forward(0, 0, -1),
@@ -192,11 +192,14 @@ display_kernel::report_closed() {
 	if (visible)
 		set_display_visible( this, false );
 
+	VPYTHON_NOTE("report_closed: try to lock realize_lock.");
 	lock L( realize_lock );
+	VPYTHON_NOTE("report_closed: locked realize_lock.");
 	realized = false;
 	visible = false;
 	explicitly_invisible = true;
 	realize_condition.notify_all();
+	VPYTHON_NOTE("report_closed: executed realize_condition.notify_all().");
 }
 
 void
@@ -300,11 +303,15 @@ display_kernel::report_camera_motion( int dx, int dy, mouse_button button )
 }
 
 void
-display_kernel::report_resize(	int win_x, int win_y, int win_w, int win_h,
-								int v_x, int v_y, int v_w, int v_h )
+display_kernel::report_window_resize( int win_x, int win_y, int win_w, int win_h )
 {
 	window_x = win_x; window_y = win_y; window_width = win_w; window_height = win_h;
-	view_x = v_x; view_y = v_y; view_width = std::max(v_w,1); view_height = std::max(v_h,1);
+}
+
+void
+display_kernel::report_view_resize(	int v_w, int v_h )
+{
+	view_width = std::max(v_w,1); view_height = std::max(v_h,1);
 }
 
 void

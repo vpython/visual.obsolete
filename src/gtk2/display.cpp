@@ -157,10 +157,12 @@ display::create()
 		get_widget<Gtk::VBox>( glade_file, "vbox1")->pack_start( *area);
 	}
 
-
 	window->set_title( title);
 
 	window->signal_delete_event().connect( sigc::mem_fun( *this, &display::on_window_delete));
+	
+	//window->add_events(GDK_CONFIGURE);
+	window->signal_configure_event().connect_notify( sigc::mem_fun( *this, &display::on_window_configure));
 
 	window->move( window_x, window_y);
 	window->show_all(); // this will update the actual x,y
@@ -176,6 +178,7 @@ display::create()
 void
 display::destroy()
 {
+	VPYTHON_NOTE( "display::destroy()");
 	window->hide();
 	window = 0;
 	area.reset();
@@ -216,6 +219,20 @@ display::on_rotate_clicked()
 	mouse_mode = ZOOM_ROTATE;
 }
 
+void
+display::on_window_configure(GdkEventConfigure*)
+{
+	python::gil_lock L;
+	int x,y,w,h;
+	window->get_position( x, y );
+	// Experimentally, window->get_size(w,h) gets w and h of drawing area:
+	window->get_size(w,h);
+	w += border_width; h += border_height;
+	h += get_titlebar_height();
+	if (show_toolbar) h += get_toolbar_height();
+	report_window_resize( x, y, w, h);
+}
+
 bool
 display::on_window_delete(GdkEventAny*)
 {
@@ -232,6 +249,7 @@ display::on_window_delete(GdkEventAny*)
 		}
 		gui_main::quit();
 	}
+	VPYTHON_NOTE( "Leaving display::on_window_delete.");
 
 	return true;
 }
@@ -484,19 +502,27 @@ gui_main::remove_display( display* d)
 	self->caller = d;
 	self->returned = false;
 	self->signal_remove_display();
+	VPYTHON_NOTE("Now wait on call_complete");
 	while (!self->returned)
 		self->call_complete.py_wait(L);
+	VPYTHON_NOTE("Finished waiting on call_complete");	
 	self->caller = 0;
+	d->report_closed();
+	VPYTHON_NOTE("End of gui_main::remove_display");
 }
 
 void
 gui_main::remove_display_impl()
 {
 	lock L(call_lock);
+	VPYTHON_NOTE("Start gui_main::remove_display_impl.");
 	caller->destroy();
+	VPYTHON_NOTE("After caller->destroy() in gui_main::remove_display_impl.");
 	displays.erase( std::find(displays.begin(), displays.end(), caller) );
 	returned = true;
+	VPYTHON_NOTE("Before call_complete.notify_all() in gui_main::remove_display_impl.");
 	call_complete.notify_all();
+	VPYTHON_NOTE("End gui_main::remove_display_impl.");
 }
 
 void
@@ -531,9 +557,10 @@ void
 gui_main::report_window_delete( display* window)
 {
 	assert( self != 0);
-
+	VPYTHON_NOTE("Start gui_main::report_window_delete.");
 	lock L(self->call_lock);
 	self->displays.erase( std::find(self->displays.begin(), self->displays.end(), window) );
+	VPYTHON_NOTE("End gui_main::report_window_delete.");
 }
 
 void

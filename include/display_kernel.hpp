@@ -163,7 +163,7 @@ protected:
 	// that process)
 	// This includes both viewports in a side-by-side stereo mode, whereas
 	//   view::view_width does not.
-	int view_x, view_y, view_width, view_height;
+	int view_width, view_height;
 
 	bool exit; ///< True when Visual should shutdown on window close.
 	bool visible; ///< scene.visible
@@ -222,14 +222,14 @@ public: // Public Data.
 	*/
 	void report_camera_motion( int dx, int dy, mouse_button button);
 
-	/** Report that the position and/or size of the widget has changed.
+	/** Report that the position and/or size of the window or drawing area widget has changed.
 		Some platforms might not know about position changes; they can pass (x,y,new_width,new_height)
 
  		win_* give the window rectangle (see this->window_*)
  		v_* give the view rectangle (see this->view_*)
  		*/
-	void report_resize( int win_x, int win_y, int win_w, int win_h,
-						int v_x, int v_y, int v_w, int v_h );
+	void report_window_resize( int win_x, int win_y, int win_w, int win_h );
+	void report_view_resize( int v_w, int v_h );
 
 	/** Determine which object (if any) was picked by the cursor.
  	    @param x the x-position of the mouse cursor, in pixels.

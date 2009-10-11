@@ -150,13 +150,12 @@ render_surface::on_enter_notify_event( GdkEventCrossing* event)
 bool
 render_surface::on_configure_event( GdkEventConfigure* event)
 {
+	// Driven by resize events, not window move events, because
+	//   it's attached to the drawing area, not the window,
+	//   so that a window move doesn't affect the drawing area
 	python::gil_lock L;
-	int x,y,w,h;
-	get_parent_window()->get_position( x, y );
-	get_parent_window()->get_size(w,h);
-	core.report_resize(
-		x,y,w,h,
-		x+event->x, y+event->y, event->width, event->height );
+	// Report width and height of drawing area:
+	core.report_view_resize( event->width, event->height );
 	return true;
 }
 

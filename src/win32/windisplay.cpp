@@ -216,8 +216,8 @@ display::update_size()
 		GetClientRect( widget_handle, &clientSize );
 		POINT clientPos; clientPos.x = clientPos.y = 0;
 		ClientToScreen( widget_handle, &clientPos);
-		report_resize(	windowRect.left, windowRect.top, windowRect.right-windowRect.left, windowRect.bottom-windowRect.top,
-						clientPos.x, clientPos.y, clientSize.right, clientSize.bottom );
+		report_window_resize( windowRect.left, windowRect.top, windowRect.right-windowRect.left, windowRect.bottom-windowRect.top );
+		report_view_resize(	clientSize.right, clientSize.bottom );
 	}
 }
 
@@ -467,8 +467,7 @@ display::on_mouse( WPARAM wParam, LPARAM lParam)
 	trying to use Visual with wxpython (docking and undocking). He says,
 	"Both SetCursorPos call will move the mouse to an incorrect coordinate.
 	It is because WM_MOVE message is not sending to vPython any more after
-	it is reparented. (Also, may be window_x and window_y shall be used
-	instead of view_x, view_y). With the change, Now the mouse cursor is
+	it is reparented. With the change, Now the mouse cursor is
 	correctly positioned after dragging, no matter if it has been reparented or not.
 	Seems no more crashes now."
 	*/

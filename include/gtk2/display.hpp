@@ -53,9 +53,10 @@ public:
 	void on_fullscreen_clicked();
 	void on_pan_clicked();
 	void on_rotate_clicked();
-	bool on_window_delete( GdkEventAny*);
 	void on_quit_clicked();
 	void on_zoom_clicked();
+	bool on_window_delete( GdkEventAny*);
+	void on_window_configure( GdkEventConfigure*);
 	bool on_key_pressed( GdkEventKey*);
 
  private:
