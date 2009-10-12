@@ -31,7 +31,7 @@ R = 2 # radius of ball
 H = 10 # height of underside of ceiling above floor
 L = 5 # length of pendulum to center of hanging lamp
 # top of floor is at y=0 for convenience
-scene.visible = 0
+scene.visible = False
 floor = box(pos=(0,-thick/2,0), size=(width,thick,depth),
             shininess=0, color=color.orange, material=materials.wood)
 left = box(pos=(-(width/2+thick/2),height/2-thick,0), size=(thick,height,depth),
@@ -60,9 +60,9 @@ xlimit = 0.5*width-R*sin(acos(1-(height-thick)/R))
 v = vector(-0.5,0,0)
 dt = 0.03
 t = 0
-scene.visible = 1
+scene.visible = True
 
-while 1:
+while True:
     rate(100)
     ball.pos += v*dt
     ball.rotate(axis=(0,0,1), angle=-v.x*dt/R)

@@ -80,7 +80,7 @@ radius = array(rlist)
 
 pos = pos+(p/m)*(dt/2.) # initial half-step
 
-while 1:
+while True:
     rate(100)
     observation.plot(data=mag(p/m))
 

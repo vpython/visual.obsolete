@@ -71,7 +71,7 @@ s1.value = 70 # update the slider
 setrate(s1) # set the rotation rate of the cube
 setdir(-1) # set the rotation direction of the cube
 
-while 1:
+while True:
     rate(100)
     c.interact() # check for events, drive actions; must be executed repeatedly in a loop
     cube.rotate(axis=(0,1,0), angle=cube.dir*cube.dtheta)

@@ -29,7 +29,7 @@ stack=[rings[:],[],[]]      # list of rings on each pole
 scene.autoscale=0
 moves=0
 
-while 1:
+while True:
     rate(100)
     if scene.mouse.events:
         m = scene.mouse.getevent()

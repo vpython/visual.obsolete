@@ -20,7 +20,7 @@ for a in [giant, dwarf]:
 dt = 86400
 i = 0
 
-while 1:
+while True:
   rate(600)
 
   dist = dwarf.pos - giant.pos

@@ -146,7 +146,7 @@ atoms = tuple(atoms)
 # Evaluate a couple of constants outside the loop
 k_dt = k * dt
 dt_m = dt / m
-while 1:
+while True:
     rate(100)
     for a in atoms:
         r = vector_array(a.nearpos) - a.pos

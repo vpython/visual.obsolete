@@ -21,7 +21,7 @@ l1 = local_light(pos=b1.pos, color=b1.color)
 l2 = local_light(pos=b2.pos, color=b2.color)
 l3 = distant_light(direction=b3.pos, color=b3.color)
 
-while 1:
+while True:
     rate(100)
     l1.pos = b1.pos = r*vector(cos(a1), sin(a1), b1.z)
     a1 += 0.02

@@ -46,15 +46,15 @@ scene.forward = (-1,-.5,-1)
 
 drag = 0
 
-while 1:
+while True:
     rate(100)
     if scene.mouse.events:
         m = scene.mouse.getevent()
         if m.drag:
-            drag = 1
+            drag = True
             obs = None
         elif m.drop:
-            drag = 0
+            drag = False
         elif m.click:
             if m.pick is s_length:
                 if fixtheta:

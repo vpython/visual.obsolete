@@ -51,7 +51,7 @@ point=None
 won=None
 
 while len(balls) < 4*4*4:
-    while 1:
+    while True:
         rate(100)
         if scene.mouse.events:
             p = scene.mouse.getevent()

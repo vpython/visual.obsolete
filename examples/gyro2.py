@@ -62,7 +62,7 @@ dt = 0.0001
 t = 0.
 Nsteps = 20 # number of calculational steps between graphics updates
 
-while 1:
+while True:
     rate(100)
     for step in range(Nsteps): # multiple calculation steps for accuracy
         # Calculate accelerations of the Lagrangian coordinates:

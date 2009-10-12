@@ -66,7 +66,7 @@ scene.autoscale = 0
 dt = 0.001
 t = 0.
 
-while 1:
+while True:
     rate(1./dt)
     # Calculate accelerations of the Lagrangian coordinates:
     atheta1 = ((E*C/B)*sin(theta1)-F*sin(theta2))/(D-E*A/B)

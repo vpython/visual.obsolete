@@ -41,7 +41,7 @@ def revolution(radius, length, slices=32, color = (1,1,1), pos = (0,0,0)):
     return group
 
 if __name__ == '__main__':
-    scene.autocenter = 1
+    scene.autocenter = True
     t = arange(0,1,0.02)
     s = revolution(sin(t*12.)*0.5 + 1.0, 5.0, pos=(3,0,0), color=color.red)
     s.axis = (0,1,0)

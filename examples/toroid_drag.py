@@ -38,7 +38,7 @@ def BField(obs):
         return sum(k*I*cross(delta, r)/rmag**3)
 
 Bvector = arrow(axis=(0,0,0), shaftwidth=vwidth, color=(0,1,1))
-drag = 0
+drag = False
 
 while True:
     rate(100)

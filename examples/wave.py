@@ -29,7 +29,7 @@ for band in bands:
 ##    band.momentum[:,1] = sin(band.x * 4 * pi / 100.0)*2   # standing wave
 ##    band.momentum[25,1] = 20                             # single point impulse (messy)
 
-while 1:
+while True:
     rate(100)
     for band in bands:
         # Keep endpoints fixed:

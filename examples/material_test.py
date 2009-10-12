@@ -54,7 +54,7 @@ for i,s in enumerate(spheres):
 
 scene.visible = 1
 
-while 1:
+while True:
     rate(100)
     for s in spheres:
         s.rotate( axis=scene.up, angle=.01 )

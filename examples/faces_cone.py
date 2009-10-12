@@ -42,6 +42,6 @@ for vertex in range(3*N):
 
 ##model.color = model.pos/2 + (0.5,0,0.5) # alternative coloring
 
-while 1:
+while True:
     rate(100)
     f.rotate(angle=0.01)

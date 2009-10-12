@@ -66,7 +66,7 @@ cube = box(pos=(0,1.2,0), axis=(1,1,1),
 behind = arrow( pos=(-.75, 0, -.75), axis=(1.5, 1, 0), color=color.white)
 dragobj = None
 
-while 1:
+while True:
     rate(50)
     cube.rotate(angle=0.1, axis=scene.up)
     if scene.mouse.events:

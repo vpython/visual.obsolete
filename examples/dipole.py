@@ -25,7 +25,7 @@ def getfield(p):
         f = f + (p-c.pos) * 8.988e9 * c.Q / mag(p-c.pos)**3
     return f
 
-while 1:
+while True:
     p = scene.mouse.getclick().pos
     f = getfield(p)
     m = mag(f)

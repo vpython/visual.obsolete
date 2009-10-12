@@ -64,7 +64,7 @@ pos = pos+(p/m)*(dt/2.) # initial half-step
 time = clock()
 Nhits = 0
 
-while 1:
+while True:
     rate(100)
     
     # Compute all forces on all stars

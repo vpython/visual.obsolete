@@ -77,7 +77,7 @@ Lrotlabel = text(string='L', height=0.06, depth=0.25, visible=arrowsvisible,
 Lrotimpulselabel = text(string='DL', justify='center', visible=arrowsvisible,
                 height=0.06, depth=0.25, color=rotimpulsearrow.color)
 
-while 1:
+while True:
     rate(50)
     if scene.mouse.clicked: # pause the animation with a mouse click
         m = scene.mouse.getclick()

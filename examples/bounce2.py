@@ -26,7 +26,7 @@ side = side - thk*0.5 - ball.radius
 
 dt = 0.5
 t=0.0
-while 1:
+while True:
   rate(100)
   t = t + dt
   ball.pos = ball.pos + (ball.p/ball.mass)*dt

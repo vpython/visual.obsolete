@@ -47,12 +47,13 @@ class analog_clock:
         self.minute = minute
 
 scene.title = "Surreal Stonehenge"
+##scene.stereo = 'redcyan'
 scene.height = 600
 scene.width = 600
 scene.range = (1,1,1)
 scene.center = (0,2,20)
-scene.userspin = 0
-scene.userzoom = 0
+scene.userspin = False
+scene.userzoom = False
 grey = (0.8, 0.8, 0.8)
 Nslabs = 8
 R = 10

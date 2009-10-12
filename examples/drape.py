@@ -40,7 +40,7 @@ for i in range(nspheres):
                 color = (abs(sin(i)),cos(i)**2,(i%10)/10.0) )
     spheres.append( s )
 
-while 1:
+while True:
   rate(1.0 / dt)
 
   if scene.mouse.clicked:

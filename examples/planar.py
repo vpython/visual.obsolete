@@ -36,7 +36,7 @@ box(pos=(0,-0.6,0),width=2*maxgrid,length=2*maxgrid,height=1,color=(0,0,0.1))
 
 # Drag and drop loop
 drag = None
-while 1:
+while True:
   rate(100)
   if scene.mouse.events:
     c = scene.mouse.getevent()
