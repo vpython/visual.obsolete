@@ -45,10 +45,10 @@ Be sure to set the project status to require only OSX 10.4 and above.
 
 The Boost libraries were built by downloading them and the bjam tool.
 Copy bjam into the Boost directory and execute this:
-./bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.5 --build-type=complete --with-python --with-thread --with-signals stage
+./bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.6 --build-type=complete --layout=versioned --with-python --with-thread --with-signals stage
 
 The files you want will be in stage/lib.
-Move these files to dependencies/build_files/mac_libs:
+Move these files to dependencies/build_files/mac_libs (file names will be similar to the following):
 libboost_python-mt-1_35.a
 libboost_python-mt-d-1_35.a
 libboost_python-mt-s-1_35.a
