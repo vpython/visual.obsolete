@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=VPython for Python 2.6
-AppVerName=VPython 5.12
+AppVerName=VPython 5.14
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
@@ -13,7 +13,7 @@ SourceDir=C:\Python26
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py2.6-5.12
+OutputBaseFilename=VPython-Win-Py2.6-5.14
 OutputDir=c:\workspace
 
 [Files]
@@ -58,7 +58,7 @@ Source: "c:\workspace\vpython-core2\site-packages\vidle\Icons\*.icns"; DestDir: 
 
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
-Name: numpy; Description: "numpy 1.3.0 {code:NumpyStatus|C:\Python26}"; Types: full; Check: CheckNumpy( 'C:\Python26' )
+Name: numpy; Description: "numpy 1.4.0 {code:NumpyStatus|C:\Python26}"; Types: full; Check: CheckNumpy( 'C:\Python26' )
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
 Name: VIDLE; Description: "VIDLE: improved version of the IDLE program editor"; Types: full custom
