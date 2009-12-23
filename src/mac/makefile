@@ -1,5 +1,4 @@
-# Place this make file in a directory parallel to vpython-core2
-# Then return to vpython-core2/src/mac and execute sudo make setup to establish links
+# In vpython-core2/src/mac execute sudo make setup to establish links
 # Note however that apparently $(abspath makefile) and $(abspath ../../site-packages/visual)
 #    are ignored on OSX 10.4, which led to some puzzled grief. It was necessary to create
 #    a link in site-packages by hand.
@@ -17,7 +16,8 @@ VPATH = $(SRC)mac $(SRC)core/util $(SRC)core $(SRC)python $(SRC)
 CXX = /usr/bin/g++
 CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-mmacosx-version-min=10.4 \
-	-Wno-long-double -DPIC -O2 -g -finline-functions \
+	-Wno-long-double \
+	-DPIC -O2 -g -finline-functions \
 	-I$(TOP)include/mac -I$(TOP)include \
 	-I$(PYTHON_FRAMEWORK)include/python$(PYTHON_VERSION) \
 	-I$(SITE_PACKAGES)numpy/core/include \
