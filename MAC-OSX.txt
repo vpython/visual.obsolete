@@ -13,9 +13,11 @@ Download the source for numpy and unpack it (http://www.scipy.org/Download).
 In the numpy directory, execute "sudo /usr/local/bin/python2.5 setup.py install".
 This installs the numpy module which includes needed header files.
 
-You need Boost libraries for the Mac. In the dependencies section of CVS, unzip the
-zip file. You should name the resulting folder in dependencies "boost_files",
-containing boost (the include files), win_libs (for Windows), and mac_libs (for Mac).
+You need Boost libraries for the Mac. See below for how to build the Boost libraries.
+(The following may not work, because up-to-date files are not also provided in CVS:
+In the dependencies section of CVS, unzip the zip file. You should name the resulting 
+folder in dependencies "boost_files", containing boost (the include files), 
+win_libs (for Windows), and mac_libs (for Mac).)
 
 In src/mac, execute sudo make setup.
 This creates a build directory mbuild parallel to the CVS files, and creates links
@@ -45,10 +47,10 @@ Be sure to set the project status to require only OSX 10.4 and above.
 
 The Boost libraries were built by downloading them and the bjam tool.
 Copy bjam into the Boost directory and execute this:
-./bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.6 --build-type=complete --layout=versioned --with-python --with-thread --with-signals stage
+./bjam --toolset=darwin -sPYTHON_ROOT=/usr/local/bin/python2.6 --architecture=x86 --build-type=complete --layout=versioned --with-python --with-thread --with-signals stage
 
 The files you want will be in stage/lib.
-Move these files to dependencies/build_files/mac_libs (file names will be similar to the following):
+Move these files to dependencies/boost_files/mac_libs (file names will be similar to the following):
 libboost_python-mt-1_35.a
 libboost_python-mt-d-1_35.a
 libboost_python-mt-s-1_35.a
