@@ -16,7 +16,7 @@ VPATH = $(SRC)mac $(SRC)core/util $(SRC)core $(SRC)python $(SRC)
 CXX = /usr/bin/g++
 CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-mmacosx-version-min=10.4 \
-	-Wno-long-double \
+	-arch i386 \
 	-DPIC -O2 -g -finline-functions \
 	-I$(TOP)include/mac -I$(TOP)include \
 	-I$(PYTHON_FRAMEWORK)include/python$(PYTHON_VERSION) \
