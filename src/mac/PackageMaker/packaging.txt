@@ -6,8 +6,9 @@ at the same level as vpython-core2.
 Place in stage:
 	Files that will go to site-packages:
 		visual folder (from vpython-core2/site-packages)
-		vidle (from vpython-core2/site-packages)
-		numpy files (two folders)
+		vidle (from vpython-core2/site-packages or site-packages)
+		numpy files (folder and file from site-packages)
+	
 	
 	Files that will go to Applications/VPython:
 	VPython/examples folder
@@ -32,4 +33,7 @@ At the bottom of the window, click the star menu icon and choose "Apply to enclo
 	This is necessary to permit someone to install over an existing installation.
 
 Now go to PackageMaker folder and doubleclick the package manager file.
-Build the installer.
+Choose Package > Install Properties to specify the minimum operating system required.
+For the VPython folder component, click the folder in the left panel and highlight
+the Components tab. Make sure that Allow Relocation for VIDLE.app is NOT checked.
+Build the installer. 
