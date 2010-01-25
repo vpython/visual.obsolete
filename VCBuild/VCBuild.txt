@@ -83,19 +83,10 @@ Make sure that the target Python is the only Python installed (-a means rebuild 
 bjam --toolset=msvc --build-type=complete --with-python --with-thread --with-signals stage
 
 "complete" means "make various variants of the libraries".
-Look in stage/lib to find the static multithreading library files:
-libboost_python-vc90-mt-1_35.lib
-libboost_python-vc90-mt-gd-1_35.lib
+Look in stage/lib to find these static multithreading library files:
 libboost_python-vc90-mt-s-1_35.lib
-libboost_python-vc90-mt-sgd-1_35.lib
-libboost_signals-vc90-mt-1_35.lib
-libboost_signals-vc90-mt-gd-1_35.lib
 libboost_signals-vc90-mt-s-1_35.lib
-libboost_signals-vc90-mt-sgd-1_35.lib
-libboost_thread-vc90-mt-1_35.lib
-libboost_thread-vc90-mt-gd-1_35.lib
 libboost_thread-vc90-mt-s-1_35.lib
-libboost_thread-vc90-mt-sgd-1_35.lib
 
 These go into dependencies\boost\win_libs 
 
