@@ -2,6 +2,8 @@
 ## shows how to build a height field (a common feature request)
 ## with it.
 ## David Scherer July 2001
+## Revised January 2010 by Bruce Sherwood to use faces.smooth() function
+##   introduced with VPython 5.2
 
 from visual import *
 
@@ -30,36 +32,7 @@ class Model:
             self.FacetedTriangle( v[0], v[t+1], v[t+2] )
 
     def DoSmoothShading(self):
-        """Change a faceted model to smooth shaded, by averaging normals at
-        coinciding vertices.
-        
-        This is a very slow and simple smooth shading
-        implementation which has to figure out the connectivity of the
-        model and does not attempt to detect sharp edges.
-
-        It attempts to work even in two-sided mode where there are two
-        opposite normals at each vertex.  It may fail somehow in pathological
-        cases. """
-
-        pos = self.model.pos
-        normal = self.model.normal
-
-        vertex_map = {}  # vertex position -> vertex normal
-        vertex_map_backface = {}
-        for i in range( len(pos) ):
-            tp = tuple(pos[i])
-            old_normal = vertex_map.get( tp, (0,0,0) )
-            if dot(old_normal, normal[i]) >= 0:
-                vertex_map[tp] = normal[i] + old_normal
-            else:
-                vertex_map_backface[tp] = normal[i] + vertex_map_backface.get(tp, (0,0,0))
-
-        for i in range( len(pos) ):
-            tp = tuple(pos[i])
-            if dot(vertex_map[tp], normal[i]) >= 0:
-                normal[i] = vector(vertex_map[tp]) and norm( vertex_map[ tp ] )
-            else:
-                normal[i] = vector(vertex_map_backface[tp]) and norm(vertex_map_backface[tp] )
+        self.model.smooth()
 
     def DrawNormal(self, scale):
         pos = self.model.pos
