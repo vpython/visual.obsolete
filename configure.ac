@@ -1,8 +1,8 @@
 
 # Process this file with Autoconf to produce a configure script
 
-AC_INIT( [Visual Python], [5.14_release], [visualpython-users@lists.sourceforge.net])
-AM_INIT_AUTOMAKE( visual, 5.14_release)
+AC_INIT( [Visual Python], [5.2_release], [visualpython-users@lists.sourceforge.net])
+AM_INIT_AUTOMAKE( visual, 5.2_release)
 
 AC_CONFIG_SRCDIR(src/core/arrow.cpp)
 
