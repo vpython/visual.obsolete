@@ -35,5 +35,9 @@ At the bottom of the window, click the star menu icon and choose "Apply to enclo
 Now go to PackageMaker folder and doubleclick the package manager file.
 Choose Package > Install Properties to specify the minimum operating system required.
 For the VPython folder component, click the folder in the left panel and highlight
-the Components tab. Make sure that Allow Relocation for VIDLE.app is NOT checked.
+the Components tab. 
+
+IMPORTANT: Make sure that Allow Relocation for VIDLE.app is NOT checked.
+This must be every time you build the installer; the setting is not saved.
+
 Build the installer. 
