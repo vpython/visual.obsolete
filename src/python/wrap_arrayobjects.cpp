@@ -19,13 +19,6 @@
 #
 namespace cvisual {
 
-namespace {
-using namespace boost::python;
-
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS( faces_smooth_shade,
-	python::faces::smooth_shade, 0, 1)
-}
-
 using python::double_array;
 
 struct double_array_from_python {
@@ -169,9 +162,8 @@ wrap_arrayobjects()
 		.def( "get_color", &faces::get_color)
 		.def( "set_color", &faces::set_color)
 		//.def( "set_color", &faces::set_color_t)
-		.def( "smooth_shade", &faces::smooth_shade,
-			faces_smooth_shade( args("doublesided"),
-			"Average normal vectors at coincident vertexes."))
+		.def( "smooth", &faces::smooth,
+			"Average normal vectors at coincident vertexes.")
 		.def( "append", &faces::append_rgb,
 			(arg("pos"), arg("normal"), arg("red")=-1, arg("green")=-1, arg("blue")=-1))
 		.def( "append", append_default_color, ( arg("pos"), arg("normal") ))

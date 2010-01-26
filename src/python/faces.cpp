@@ -6,6 +6,7 @@
 #include <boost/python/tuple.hpp>
 
 #include <map>
+#include <set>
 #include "wrap_gl.hpp"
 
 #include "python/slice.hpp"
@@ -85,52 +86,63 @@ struct stl_cmp_vector
 };
 
 void
-faces::smooth_shade(bool doublesided)
+faces::smooth()
 {
 	if (shape(pos) != shape(normal))
 		throw std::invalid_argument( "Dimension mismatch between pos and normal.");
 
 	// positions -> normals
-	std::map< const vector, vector, stl_cmp_vector> vertices;
-	std::map< const vector, vector, stl_cmp_vector> vertices_backface;
+	typedef std::map< const vector, std::set<int>, stl_cmp_vector> vmap;
+	vmap vertices;
 
+	// First, map into sets all indices for the same vertex
 	const double* pos_i = pos.data();
-	double* norm_i = normal.data();
 	const double* pos_end = pos.end();
-	for ( ; pos_i < pos_end; pos_i+=3, norm_i+=3) {
-		// If there isn't a normal at the specified position, it will be default
-		// initialized to zero.  If there already is one, it will be returned.
-		if (doublesided) {
-			if (vertices[vector(pos_i)].dot( vector(norm_i)) >= 0.0) {
-				vertices[vector(pos_i)] += vector(norm_i);
-			}
-			else {
-				vertices_backface[vector(pos_i)] += vector(norm_i);
-			}
-		}
-		else {
-			vertices[vector(pos_i)] += vector(norm_i);
-		}
+	int i = 0;
+	for ( ; pos_i < pos_end; pos_i+=3, i+=3) {
+		vertices[vector(pos_i)].insert(i);
 	}
 
-	pos_i = pos.data();
-	norm_i = normal.data();
-	vector tmp;
-	for ( ; pos_i < pos_end; pos_i+=3, norm_i+=3) {
-		if (doublesided) {
-			if (vertices[vector(pos_i)].dot( vector(norm_i)) >= 0.0) {
-				tmp = vertices[vector(pos_i)].norm();
+	// Next, in a set of vertices, find those with similar normals
+	// and average those normals, then find another group of similar normals
+	// in that set and average those; continue until set is exhausted.
+	double* norm_i = normal.data();
+	vmap::iterator iter = vertices.begin();
+	const vmap::iterator iterend = vertices.end();
+	for ( ; iter != iterend; iter++) {
+		while (! (iter->second).empty()) {
+			std::list<int> similar;
+			std::set<int>::iterator setiter = (iter->second).begin();
+			const std::set<int>::iterator setiterend = (iter->second).end();
+			int pt = *setiter;
+			vector thisnorm = vector(norm_i+pt).norm();
+			if (thisnorm == vector(0,0,0) ) {
+				throw std::invalid_argument(
+				       "Normal to a face must not be < 0, 0, 0 >");
 			}
-			else {
-				tmp = vertices_backface[vector(pos_i)].norm();
+			for ( ; setiter != setiterend; setiter++) {
+				if (vector(norm_i+*setiter).norm().dot(thisnorm) >= 0.95) {
+					similar.push_back(*setiter);
+				}
 			}
+			vector average = vector(0,0,0);
+			std::list<int>::iterator viter = similar.begin();
+			const std::list<int>::iterator viterend = similar.end();
+			for ( ; viter != viterend; viter++) {
+				average += vector(norm_i+*viter).norm();
+			}
+			average = average.norm();
+			double averagex = average.get_x();
+			double averagey = average.get_y();
+			double averagez = average.get_z();
+			for ( viter=similar.begin(); viter != viterend; viter++) {
+				norm_i[*viter] = averagex;
+				norm_i[*viter+1] = averagey;
+				norm_i[*viter+2] = averagez;
+				(iter->second).erase(*viter);
+			}
+			similar.clear();
 		}
-		else {
-			tmp = vertices[vector(pos_i)].norm();
-		}
-		norm_i[0] = tmp.get_x();
-		norm_i[1] = tmp.get_y();
-		norm_i[2] = tmp.get_z();
 	}
 }
 boost::python::object faces::get_normal() {

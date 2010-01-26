@@ -28,17 +28,18 @@ class faces : public arrayprim_color
 
  public:
 	faces();
-	
+
 	// Add another vertex, normal, and color to the faces.
 	void append_rgb( const vector&, const vector&, float red=-1, float green=-1, float blue=-1);
 	void append( const vector&, const vector&, const rgb& );
 	void append( const vector&, const vector& );
 
 	// This routine was adapted from faces_heightfield.py.  It averages the normal
-	// vectors at coincident verticies to smooth out boundaries between facets.  
-	// No attempt is made to detect sharp edges.
-	void smooth_shade(bool doublesided = true);
-	
+	// vectors at coincident vertices to smooth out boundaries between facets,
+	// for normals that are within about 15 degrees of each other. The intent
+	// is to smooth what should be smooth but preserve sharp corners.
+	void smooth();
+
 	boost::python::object get_normal();
 	void set_normal( const double_array& normal);
 	void set_normal_v( const vector);
