@@ -1,29 +1,25 @@
 Files in this directory are not part of the VPython project, are not maintained by us, 
 but are included in CVS for the convenience of developers. Compiling the Boost libraries
-from source is a very lengthy process, which is why binaries of the static libraries 
-are provided here.
+from source is a lengthy process, which is why binaries of the static libraries are provided here.
 
 -----
 Boost
 -----
 
-The files in boost_files2.5.zip are a subset of the Boost library for Python 2.5 
+The files in win_boost.zip or mac_boost.zip are a subset of the Boost library
 and should be extracted (into vpython-core2/dependencies/boost_files/) before building.
 
 After extraction, the folder boost_files should contain the following folders:
 
-   boost: header files (valid for all platforms -- Windows, Mac, Linux)
-   win_libs: static libraries for Windows
-   mac_libs: static libraries for Intel Macs running OS X 10.5
-      and the following (currently missing):
-   mac_ppc_104_lib: static libraries for PowerPC Macs running OS X 10.4
-   mac_ppc_105_lib: static libraries for PowerPC Macs running OS X 10.5
+   boost: header files
+   win_libs or mac_libs: static libraries
+   WinBoostNotes.txt or MacBoostNotes.txt: tells what version of Boost, for what version of Python
+   
+The zip files will be updated in CVS to correspond to the current version of Python
+used in released versions of Visual.
 
 The Boost libraries can be found at www.boost.org; the BoostPro installer 
 containing the Windows binary libraries is at www.boost-consulting.com.
-
-The files in boost_files2.6.zip are for Python 2.6. If you use these, you need
-to adjust the build project to refer to 2.6 instead of 2.5.
 
 ----------
 threadpool
