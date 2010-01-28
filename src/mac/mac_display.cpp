@@ -580,13 +580,20 @@ gui_main* gui_main::self = 0;  // Protected by python GIL
 boost::signal<void()> gui_main::on_shutdown;
 
 gui_main::gui_main()
-// : gui_thread(-1)
+ : gui_thread(-1)
 {
 }
 
 void
 gui_main::event_loop ()
 {
+    init_platform();
+	// Tell the initializing thread
+	{
+		lock L(init_lock);
+		gui_thread = 0; //just an arbitrary value != -1
+		initialized.notify_all();
+	}
 	poll();
 	RunApplicationEventLoop();
 	on_shutdown();
@@ -596,7 +603,10 @@ void
 gui_main::init_thread()
 {
 	if (!self) {
-		init_platform();
+        // if we perform this from the current thread (the python one),
+        // the gui thread will _not_ be the Carbon "main" one
+		//init_platform();
+		
 		// We are holding the Python GIL through this process, including the wait!
 		// We can't let go because a different Python thread could come along and mess us up (e.g.
 		//   think that we are initialized and go on to call PostThreadMessage without a valid idThread)
