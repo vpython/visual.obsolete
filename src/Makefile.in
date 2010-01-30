@@ -179,7 +179,7 @@ ifeq ($(PYTHON_PLATFORM),win32)
   CXX_RULE = $(DEFAULT_CXX_RULE)
   LINK_RULE = $(WIN32_DLLRULE)
   CVISUAL_CPPFLAGS += $(WIN32_CPPFLAGS) $(GTK_CFLAGS) $(GTHREAD_CFLAGS)
-  CVISUAL_LIBS += $(WIN32_LIBS) $(GTK_LIBS) $(GTHREAD_LIBS) -lboost_thread -lboost_signals
+  CVISUAL_LIBS += $(WIN32_LIBS) $(GTK_LIBS) $(GTHREAD_LIBS) -lboost_thread-mt -lboost_signals-mt
   CVISUAL_LDFLAGS += $(WIN32_LDFLAGS)
   PLATFORM_TARGET = cvisual.pyd
   PLATFORM_OBJS = winrate.lo
@@ -208,7 +208,7 @@ else
  else
     # Libtoolish rules.  These should apply to all POSIX-like systems.
     CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
-       $(GTHREAD_LIBS) -lboost_python -lboost_thread -lboost_signals)
+       $(GTHREAD_LIBS) -lboost_python-mt -lboost_thread-mt -lboost_signals-mt)
     CXX_RULE = $(LT_CXX_RULE)
     LINK_RULE = $(LT_LINKRULE)
     PLATFORM_TARGET = cvisualmodule.la
