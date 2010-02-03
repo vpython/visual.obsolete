@@ -39,7 +39,8 @@ OBJS = arrayprim.o arrow.o axial.o box.o cone.o cylinder.o display_kernel.o elli
 	wrap_rgba.o wrap_vector.o
 
 cvisual.so : $(OBJS)
-	$(CXX) -bundle -bundle_loader /usr/local/bin/python$(PYTHON_VERSION) -o cvisual.so \
+	$(CXX) -mmacosx-version-min=10.4 \
+     	-bundle -bundle_loader /usr/local/bin/python$(PYTHON_VERSION) -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
 	$(BOOST)libboost_python-mt-s-1_35.a \
