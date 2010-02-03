@@ -13,7 +13,8 @@ SRC = $(TOP)/src/
 BOOST = $(TOP)/dependencies/boost_files/mac_libs/
 VPATH = $(SRC)mac $(SRC)core/util $(SRC)core $(SRC)python $(SRC)
 
-CXX = /usr/bin/g++
+# Use 4.0 compiler rather than 4.2 so as to build in a way compatible with OSX 10.5
+CXX = /usr/bin/g++-4.0
 CXXFLAGS = -fPIC -MMD -DNDEBUG \
 	-mmacosx-version-min=10.4 \
 	-arch i386 \
