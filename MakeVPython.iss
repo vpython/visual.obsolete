@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=VPython for Python 2.6
-AppVerName=VPython 5.14
+AppVerName=VPython 5.24
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
@@ -13,7 +13,7 @@ SourceDir=C:\Python26
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py2.6-5.14
+OutputBaseFilename=VPython-Win-Py2.6-5.24
 OutputDir=c:\workspace
 
 [Files]
@@ -36,6 +36,8 @@ Source: "c:\workspace\vpython-core2\license.txt"; DestDir: "{app}\Lib\site-packa
 Source: "Lib\site-packages\numpy*egg-info"; DestDir: "{app}\Lib\site-packages\"; Components: numpy
 Source: "Lib\site-packages\numpy\*"; DestDir: "{app}\Lib\site-packages\numpy\"; Components: numpy; Flags: recursesubdirs
 
+Source: "Lib\site-packages\vidle\*"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+
 Source: "c:\workspace\vpython-core2\examples\*.py"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
 Source: "c:\workspace\vpython-core2\examples\*.tga"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
 
@@ -47,18 +49,9 @@ Source: "c:\workspace\vpython-core2\docs\visual\*.css"; DestDir: "{app}\Lib\site
 Source: "c:\workspace\vpython-core2\docs\visual\*.txt"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\images"; Components: Documentation
 
-Source: "c:\workspace\vpython-core2\site-packages\vidle\*.py"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
-Source: "c:\workspace\vpython-core2\site-packages\vidle\*.pyw"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
-Source: "c:\workspace\vpython-core2\site-packages\vidle\*.def"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
-Source: "c:\workspace\vpython-core2\site-packages\vidle\ChangeLog"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
-Source: "c:\workspace\vpython-core2\site-packages\vidle\idle.bat"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
-Source: "c:\workspace\vpython-core2\site-packages\vidle\*.txt"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE
-Source: "c:\workspace\vpython-core2\site-packages\vidle\Icons\*.gif"; DestDir: "{app}\Lib\site-packages\vidle\Icons"; Components: VIDLE
-Source: "c:\workspace\vpython-core2\site-packages\vidle\Icons\*.icns"; DestDir: "{app}\Lib\site-packages\vidle\Icons"; Components: VIDLE
-
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
-Name: numpy; Description: "numpy 1.4.0 {code:NumpyStatus|C:\Python26}"; Types: full; Check: CheckNumpy( 'C:\Python26' )
+Name: numpy; Description: "numpy 1.3.0 {code:NumpyStatus|C:\Python26}"; Types: full; Check: CheckNumpy( 'C:\Python26' )
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
 Name: VIDLE; Description: "VIDLE: improved version of the IDLE program editor"; Types: full custom
