@@ -120,8 +120,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           triangle 0, etc.</p>
         <p class="Normal">Each face is a one-sided surface. Which side is illuminated is determined 
           by the &quot;winding&quot; order of the face. When you are looking at a face, 
-          it is illuminated if the order of the vertices in the <span class="attribute">pos</span> list goes counter-clockwise. If you need the triangle to be visible from either 
-          side, you must create another triangle with the opposite winding order.</p>
+          it is illuminated if the order of the vertices in the <span class="attribute">pos</span> list goes counter-clockwise. If you need the triangle to be visible from both 
+          sides, you must create another triangle with the opposite winding order. If you have made a one-sided faces object named myfaces, you can make all faces be two-sided with <font color="#FF0000">myfaces.make_twosided()</font>. This function became available with VPython 5.3.</p>
         <p class="Normal">If you don't specify normals at the vertices, the face is illuminated only 
           by &quot;ambient&quot; light. In order for the main lighting to affect the 
           appearance, you must specify normals to the surface at the vertices. In the 
@@ -129,8 +129,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           faces have a hard edge where they join. A soft edge can be produced by averaging 
           the normals to the two faces at their common vertices. The brightness of a 
           face is proportional to the cosine of the angle between the normal and the 
-          light. </p>
-        <p class="Normal">After creating a faces object named myfaces, <font color="#FF0000">myfaces.smooth()</font> will average similar normals at a vertex and make the object look smoother. You must make sure that all vertices have nonzero normals before using the smooth function; a simple scheme is to make all the normals perpendicular to their respective faces and then let the smooth function adjust them for improved appearance. The smooth function became available with VPython 5.2.</p>
+          light. If you have created a faces object named myfaces without specifying normals, you can create normals perpendicular to all the faces with <font color="#FF0000">myfaces.make_normals()</font>. This function became available with VPython 5.3.</p>
+        <p class="Normal">After creating a faces object named myfaces, <font color="#FF0000">myfaces.smooth()</font> will average similar normals at a vertex and make the object look smoother. You must make sure that all vertices have nonzero normals before using the smooth function; a simple scheme is to use <font color="#FF0000">myfaces.make_normals()</font> to make normals perpendicular to all the faces and then use the smooth function to adjust them for improved appearance. The smooth function became available with VPython 5.2.</p>
         <p class="Normal">If you specify different colors at the vertices of one triangular face, VPython 
           interpolates across the face, in which case the face is not all one color. 
           There is a similar interpolation for normals if there are different normals 
@@ -141,7 +141,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           it is not necessarily any faster, at least right now). It is flexible enough 
           to implement smooth or facet shading, per-vertex coloration, two-sided or 
           one-sided lighting, etc, but all of these calculations must be made by the 
-          programmer (when setting up <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, <font color="#FF0000">normal</font>), except for the smoothing available with the smooth function.</p>
+          programmer (when setting up <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, <font color="#FF0000">normal</font>), although much of this can be done using the make_normals, make_twosided, and smooth functions.</p>
         <p class="Normal">You can specify a  <a href="materials.html">material</a>, but
           currently you can not specify opacity for faces.</p>
         <p class="Normal">See description of <a href="options.html">Additional
