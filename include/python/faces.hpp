@@ -40,6 +40,9 @@ class faces : public arrayprim_color
 	// is to smooth what should be smooth but preserve sharp corners.
 	void smooth();
 
+	void make_normals();
+	void make_twosided();
+
 	boost::python::object get_normal();
 	void set_normal( const double_array& normal);
 	void set_normal_v( const vector);

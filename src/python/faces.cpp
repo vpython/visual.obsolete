@@ -86,6 +86,56 @@ struct stl_cmp_vector
 };
 
 void
+faces::make_normals()
+{
+	// Create normals that are perpendicular to all faces
+	if (count == 0) return;
+	using boost::python::make_tuple;
+	normal[slice(0, count)] = make_tuple( 0, 0, 0);
+	double* norm_i = normal.data();
+	const double* pos_i = pos.data();
+	const double* pos_end = pos.end();
+	int i = 0;
+	for ( ; pos_i < pos_end; pos_i+=9, norm_i+=9, i+=9) {
+		if ((pos_i+9) > pos_end) break;
+		vector v1 = vector(pos_i+3)-vector(pos_i);
+		vector v2 = vector(pos_i+6)-vector(pos_i+3);
+		vector n = v1.cross(v2).norm();
+		double nx = n.get_x();
+		double ny = n.get_y();
+		double nz = n.get_z();
+		norm_i[0] = norm_i[3] = norm_i[6] = nx;
+		norm_i[1] = norm_i[4] = norm_i[7] = ny;
+		norm_i[2] = norm_i[5] = norm_i[8] = nz;
+	}
+}
+
+void
+faces::make_twosided()
+{
+	// Duplicate existing faces with opposite winding and normals
+	if (count == 0) return;
+	double* pos_i = pos.data();
+	double* norm_i = normal.data();
+	double* color_i = color.data();
+	int icount = 3*count;
+	for (int i=0; i<icount; i+=3) {
+		append(vector(pos_i+i), vector(norm_i+i), rgb(color_i+i));
+		for (int n=0; n<3; n++) {
+			norm_i[icount+i+n] = -norm_i[i+n];
+		}
+	}
+	for (int i=0; i<icount; i+=9) {
+		for (int n=0; n<3; n++) {
+			pos_i[icount+i+3+n] = pos_i[i+6+n];
+			pos_i[icount+i+6+n] = pos_i[i+3+n];
+			color_i[icount+i+3+n] = color_i[i+6+n];
+			color_i[icount+i+6+n] = color_i[i+3+n];
+		}
+	}
+}
+
+void
 faces::smooth()
 {
 	if (shape(pos) != shape(normal))

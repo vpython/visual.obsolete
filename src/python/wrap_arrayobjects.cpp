@@ -164,6 +164,10 @@ wrap_arrayobjects()
 		//.def( "set_color", &faces::set_color_t)
 		.def( "smooth", &faces::smooth,
 			"Average normal vectors at coincident vertexes.")
+		.def( "make_normals", &faces::make_normals,
+			"Construct normal vectors perpendicular to all faces.")
+		.def( "make_twosided", &faces::make_twosided,
+			"Add a second side and corresponding normals to all faces.")
 		.def( "append", &faces::append_rgb,
 			(arg("pos"), arg("normal"), arg("red")=-1, arg("green")=-1, arg("blue")=-1))
 		.def( "append", append_default_color, ( arg("pos"), arg("normal") ))
