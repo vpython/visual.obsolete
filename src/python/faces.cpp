@@ -88,6 +88,9 @@ struct stl_cmp_vector
 void
 faces::make_normals()
 {
+	if (shape(pos) != shape(normal))
+		throw std::invalid_argument( "Dimension mismatch between pos and normal.");
+
 	// Create normals that are perpendicular to all faces
 	if (count == 0) return;
 	using boost::python::make_tuple;
@@ -113,21 +116,38 @@ faces::make_normals()
 void
 faces::make_twosided()
 {
+	if (shape(pos) != shape(normal))
+		throw std::invalid_argument( "Dimension mismatch between pos and normal.");
+	if (shape(pos) != shape(color))
+		throw std::invalid_argument( "Dimension mismatch between pos and color.");
+
 	// Duplicate existing faces with opposite windings and normals
-	if (count == 0) return;
+	if (count < 3) return;
 	double* pos_i = pos.data();
 	double* norm_i = normal.data();
 	double* color_i = color.data();
 	// Make sure that there are 3 vertices per triangle
 	if ((count % 3) == 1) {
 		append(vector(pos_i+3*(count-1)), vector(norm_i+3*(count-1)), rgb(color_i+3*(count-1)));
+		// Array may have moved: reestablish the pointers
+		pos_i = pos.data();
+		norm_i = normal.data();
+		color_i = color.data();
 	}
 	if ((count % 3) == 2) {
 		append(vector(pos_i+3*(count-1)), vector(norm_i+3*(count-1)), rgb(color_i+3*(count-1)));
+		// Array may have moved: reestablish the pointers
+		pos_i = pos.data();
+		norm_i = normal.data();
+		color_i = color.data();
 	}
 	int icount = 3*count;
 	for (int i=0; i<icount; i+=3) {
 		append(vector(pos_i+i), vector(norm_i+i), rgb(color_i+i));
+		// Array may have moved: reestablish the pointers
+		pos_i = pos.data();
+		norm_i = normal.data();
+		color_i = color.data();
 		for (int n=0; n<3; n++) {
 			norm_i[icount+i+n] = -norm_i[i+n];
 		}
@@ -174,8 +194,9 @@ faces::smooth()
 			int pt = *setiter;
 			vector thisnorm = vector(norm_i+pt).norm();
 			if (thisnorm == vector(0,0,0) ) {
-				throw std::invalid_argument(
-				       "Normal to a face must not be < 0, 0, 0 >");
+				// Choose a different seed
+				(iter->second).erase(*setiter);
+				continue;
 			}
 			for ( ; setiter != setiterend; setiter++) {
 				if (vector(norm_i+*setiter).norm().dot(thisnorm) >= 0.95) {
