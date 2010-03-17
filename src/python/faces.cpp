@@ -113,11 +113,18 @@ faces::make_normals()
 void
 faces::make_twosided()
 {
-	// Duplicate existing faces with opposite winding and normals
+	// Duplicate existing faces with opposite windings and normals
 	if (count == 0) return;
 	double* pos_i = pos.data();
 	double* norm_i = normal.data();
 	double* color_i = color.data();
+	// Make sure that there are 3 vertices per triangle
+	if ((count % 3) == 1) {
+		append(vector(pos_i+3*(count-1)), vector(norm_i+3*(count-1)), rgb(color_i+3*(count-1)));
+	}
+	if ((count % 3) == 2) {
+		append(vector(pos_i+3*(count-1)), vector(norm_i+3*(count-1)), rgb(color_i+3*(count-1)));
+	}
 	int icount = 3*count;
 	for (int i=0; i<icount; i+=3) {
 		append(vector(pos_i+i), vector(norm_i+i), rgb(color_i+i));
