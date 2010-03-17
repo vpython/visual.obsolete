@@ -4,6 +4,8 @@
 ## David Scherer July 2001
 ## Revised January 2010 by Bruce Sherwood to use faces.smooth() function
 ##   introduced with VPython 5.2
+## Revised March 2010 by Bruce Sherwood to use faces.make_twosided() function
+##   introduced with VPython 5.3
 
 from visual import *
 
@@ -11,7 +13,7 @@ class Model:
     def __init__(self):
         self.frame = frame()
         self.model = faces(frame=self.frame)
-        self.twoSided = true  # add every face twice with opposite normals
+        self.twoSided = True  # add every face twice with opposite normals
 
     def FacetedTriangle(self, v1, v2, v3, color=color.white):
         """Add a triangle to the model, apply faceted shading automatically"""
@@ -20,10 +22,7 @@ class Model:
         v3 = vector(v3)
         normal = norm( cross(v2-v1, v3-v1) )
         for v in (v1,v2,v3):
-            self.model.append( pos=v, color=color, normal=normal )
-        if self.twoSided:
-            for v in (v1,v3,v2):
-                self.model.append( pos=v, color=color, normal=-normal )
+            self.model.append( pos=v, normal=normal, color=color )
 
     def FacetedPolygon(self, *v):
         """Appends a planar polygon of any number of vertices to the model,
@@ -53,6 +52,8 @@ class Mesh (Model):
             for j in range(zvalues.shape[1]-1):
                 self.FacetedPolygon( points[i,j], points[i,j+1],
                                      points[i+1,j+1], points[i+1,j] )
+        if self.twoSided:
+            self.model.make_twosided()
 
 ## Graph a function of two variables (a height field)
 x = arange(-1,1,2./20)
