@@ -116,7 +116,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          t1v0, t1v1, t1v2, <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          t2v0, t2v1, 
           t2v2, ... ] </p>
-        <p class="Normal">where t0v0 is the position vector of vertex 0 of triangle 0, t0v1 is vertex 1 of 
+        <p class="Normal">where t0v0 is the position vector (x,y,z) of vertex 0 of triangle 0, t0v1 is vertex 1 of 
           triangle 0, etc.</p>
         <p class="Normal">Each face is a one-sided surface. Which side is illuminated is determined 
           by the &quot;winding&quot; order of the face. When you are looking at a face, 
@@ -135,14 +135,19 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           interpolates across the face, in which case the face is not all one color. 
           There is a similar interpolation for normals if there are different normals 
           at the vertices, in which case the face is not all one brightness.</p>
+        <p class="Normal">You can append an additional vertex to an existing faces object with one of the following three forms (assuming the object is named f):</p>
+        <p class="program"> f.append(pos=(x,y,z), normal=(nx,ny,nz), color=(r,g,b))<br />
+          f.append(pos=(x,y,z), normal=(nx,ny,nz), <br />
+ &nbsp;&nbsp;&nbsp;&nbsp;         red=r, green=g, blue=b)<br />
+          f.append(pos=(x,y,z), normal=(nx,ny,nz))</p>
         <p class="Normal">The faces object is intended to help with writing model importers and other 
           new primitives in Python, not for direct manipulation by normal programs. 
           It is considerably lower-level than any of the other objects in Visual (although 
           it is not necessarily any faster, at least right now). It is flexible enough 
           to implement smooth or facet shading, per-vertex coloration, two-sided or 
           one-sided lighting, etc, but all of these calculations must be made by the 
-          programmer (when setting up <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, <font color="#FF0000">normal</font>), although much of this can be done using the make_normals, make_twosided, and smooth functions.</p>
-        <p class="Normal">You can specify a  <a href="materials.html">material</a>, but
+        programmer (when setting up <font color="#FF0000">pos</font>, <font color="#FF0000">color</font>, <font color="#FF0000">normal</font>), although much of this can be done using the make_normals, make_twosided, and smooth functions.</p>
+<p class="Normal">You can specify a  <a href="materials.html">material</a>, but
           currently you can not specify opacity for faces.</p>
         <p class="Normal">See description of <a href="options.html">Additional
             Attributes</a> available for all 3D display objects.</p>
