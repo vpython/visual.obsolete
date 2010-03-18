@@ -106,6 +106,12 @@ points::gl_render( const view& scene)
 	const double* color_i = color.data();
 	const double* color_end = color.end();
 
+	// Currently points can not be translucent, so comment out all translucent code
+	for ( ; pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 3) {
+		opaque_points.push_back( point_coord( vector(pos_i), rgb(color_i)));
+	}
+
+	/*
 	// First classify each point based on whether or not it is translucent
 	if (points_shape == ROUND) { // Every point must be depth sorted
 		for ( ; pos_i < pos_end && color_i < color_end; pos_i += 3, color_i += 3) {
@@ -120,6 +126,8 @@ points::gl_render( const view& scene)
 				opaque_points.push_back( point_coord( vector(pos_i), rgb(color_i)));
 		}
 	}
+	*/
+
 	// Now conditionally apply transformations for gcf and anaglyph color
 // Needs work
 //	if (translucent_points.size())
@@ -128,33 +136,41 @@ points::gl_render( const view& scene)
 		for (opaque_iterator i = opaque_points.begin(); i != opaque_points.end(); ++i) {
 			i->center = (i->center).scale(scene.gcfvec);
 		}
+		/*
 		for (translucent_iterator i = translucent_points.begin(); i != translucent_points.end(); ++i) {
 			i->center = (i->center).scale(scene.gcfvec);
 		}
+		*/
 	}
 	if (scene.anaglyph) {
 		if (scene.coloranaglyph) {
 			for (opaque_iterator i = opaque_points.begin(); i != opaque_points.end(); ++i) {
 				i->color = i->color.desaturate();
 			}
+			/*
 			for (translucent_iterator i = translucent_points.begin(); i != translucent_points.end(); ++i) {
 				i->color = i->color.desaturate();
 			}
+			*/
 		}
 		else {
 			for (opaque_iterator i = opaque_points.begin(); i != opaque_points.end(); ++i) {
 				i->color = i->color.grayscale();
 			}
+			/*
 			for (translucent_iterator i = translucent_points.begin(); i != translucent_points.end(); ++i) {
 				i->color = i->color.grayscale();
 			}
+			*/
 		}
 	}
+	/*
 	// Sort the translucent points
 	if (!translucent_points.empty()) {
 		std::stable_sort( translucent_points.begin(), translucent_points.end(),
 			face_z_comparator(scene.forward));
 	}
+	*/
 
 	clear_gl_error();
 
@@ -216,6 +232,7 @@ points::gl_render( const view& scene)
 		}
 	}
 
+	/*
 	// Render translucent points (if any)
 	if (!translucent_points.empty()) {
 		const std::ptrdiff_t chunk = 256;
@@ -229,8 +246,9 @@ points::gl_render( const view& scene)
 			begin += block;
 		}
 	}
+	*/
 
-	if (!(points_shape == ROUND)) {
+	if (points_shape == ROUND) {
 		glDisable( GL_POINT_SMOOTH);
 	}
 	check_gl_error();
