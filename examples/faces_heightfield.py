@@ -4,8 +4,8 @@
 ## David Scherer July 2001
 ## Revised January 2010 by Bruce Sherwood to use faces.smooth() function
 ##   introduced with VPython 5.2
-## Revised March 2010 by Bruce Sherwood to use faces.make_twosided() function
-##   introduced with VPython 5.3
+## Revised March 2010 by Bruce Sherwood to use faces.make_normals() and
+## faces.make_twosided() functions introduced with VPython 5.3
 
 from visual import *
 
@@ -13,27 +13,19 @@ class Model:
     def __init__(self):
         self.frame = frame()
         self.model = faces(frame=self.frame)
-        self.twoSided = True  # add every face twice with opposite normals
+        self.vertices = []
 
     def FacetedTriangle(self, v1, v2, v3, color=color.white):
-        """Add a triangle to the model, apply faceted shading automatically"""
-        v1 = vector(v1)
-        v2 = vector(v2)
-        v3 = vector(v3)
-        normal = norm( cross(v2-v1, v3-v1) )
+        """Add a triangle to the model"""
         for v in (v1,v2,v3):
-            self.model.append( pos=v, normal=normal, color=color )
+            self.vertices.append(v)
 
     def FacetedPolygon(self, *v):
-        """Appends a planar polygon of any number of vertices to the model,
-           applying faceted shading automatically."""
+        """Appends a planar polygon of any number of vertices to the model"""
         for t in range(len(v)-2):
             self.FacetedTriangle( v[0], v[t+1], v[t+2] )
 
-    def DoSmoothShading(self):
-        self.model.smooth()
-
-    def DrawNormal(self, scale):
+    def DrawNormals(self, scale):
         pos = self.model.pos
         normal = self.model.normal
         for i in range(len(pos)):
@@ -52,8 +44,11 @@ class Mesh (Model):
             for j in range(zvalues.shape[1]-1):
                 self.FacetedPolygon( points[i,j], points[i,j+1],
                                      points[i+1,j+1], points[i+1,j] )
-        if self.twoSided:
-            self.model.make_twosided()
+                
+        self.model.pos = self.vertices
+        self.model.make_normals()
+        self.model.smooth()
+        self.model.make_twosided()
 
 ## Graph a function of two variables (a height field)
 x = arange(-1,1,2./20)
@@ -63,6 +58,5 @@ z = zeros( (len(x),len(y)), float )
 x,y = x[:,None]+z, y+z
 
 m = Mesh( x, (sin(x*pi)+sin(y*pi))*0.2, y )
-m.DoSmoothShading()
-##m.DrawNormal(0.05)
+##m.DrawNormals(0.05)
 
