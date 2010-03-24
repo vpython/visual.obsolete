@@ -222,7 +222,16 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <h3 class="style1">Render time </h3>
       <p class="Normal">If you say <span class="attribute"><strong>scene.show_rendertime = True</strong></span>, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene). This can be a useful diagnostic of performance issues.</p>
       <h3 class="style1">New faces options</h3>
-      <p class="Normal">You can now create a faces object <span class="attribute"><strong>f </strong></span>without specifying normals, then use <span class="attribute"><strong>f.make_normals()</strong></span> to create perpendiculars to all faces (available starting with Visual 5.3). You can use <span class="attribute"><strong>f.make_twosided()</strong></span> to make a faces object two-sided (available starting with Visual 5.3). To smooth the object by averaging similar normals on adjacent faces, use <span class="attribute"><strong>f.smooth()</strong></span> (available starting with Visual 5.2).</p>
+      <p class="Normal">You can now create a faces object <span class="attribute"><strong>f </strong></span>without
+        specifying normals, then use <span class="attribute"><strong>f.make_normals()</strong></span> to
+        create perpendiculars to all faces (available  with Visual 5.3).
+        You can use <span class="attribute"><strong>f.make_twosided()</strong></span> to
+        make a faces object two-sided (available  with Visual 5.3). To
+        smooth the object by averaging similar normals on adjacent faces, use <span class="attribute"><strong>f.smooth()</strong></span> (available
+         with Visual 5.2), or <span class="attribute"><strong>f.smooth(minium
+        cosine)</strong></span> (available
+         with Visual 5.3); <span class="attribute"><strong>f.smooth()</strong></span>        corresponds
+        to <span class="attribute"><strong>f.smooth(0.95)</strong></span>.</p>
       <h3 class="style1">New visual.graph options</h3>
       <p class="Normal">For a gcurve in a graph, you can now specify that the current plotting location is highlighted by a dot. This is particularly useful if the gcurve retraces its steps (available starting with Visual 5.3).</p>
       <h3 class="Normal"><span class="style1">Design for left-button events if possible </span></h3>

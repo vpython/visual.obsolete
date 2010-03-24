@@ -116,8 +116,10 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          t1v0, t1v1, t1v2, <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          t2v0, t2v1, 
           t2v2, ... ] </p>
-        <p class="Normal">where t0v0 is the position vector (x,y,z) of vertex 0 of triangle 0, t0v1 is vertex 1 of 
-          triangle 0, etc.</p>
+        <p class="Normal">where t0v0 is the position vector (x,y,z) of vertex
+          0 of triangle 0, t0v1 is vertex 1 of  triangle 0, etc. Other faces
+          attributes are <font color="#FF0000">red</font>, <font color="#FF0000">green</font>,
+          <font color="#FF0000">blue</font>, <font color="#FF0000">visible</font>, <font color="#FF0000">material</font>, <font color="#FF0000">frame</font>, and <font color="#FF0000">display</font>.</p>
         <p class="Normal">Each face is a one-sided surface. Which side is illuminated is determined 
           by the &quot;winding&quot; order of the face. When you are looking at a face, 
           it is illuminated if the order of the vertices in the <span class="attribute">pos</span> list goes counter-clockwise. If you need the triangle to be visible from both 
@@ -130,16 +132,35 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           the normals to the two faces at their common vertices. The brightness of a 
           face is proportional to the cosine of the angle between the normal and the 
           light. If you have created a faces object named myfaces without specifying normals, you can create normals perpendicular to all the faces with <font color="#FF0000">myfaces.make_normals()</font>. This function became available with VPython 5.3.</p>
-        <p class="Normal">After creating a faces object named myfaces, <font color="#FF0000">myfaces.smooth()</font> will average similar normals at a vertex and make the object look smoother. You must make sure that all vertices have nonzero normals before using the smooth function; a simple scheme is to use <font color="#FF0000">myfaces.make_normals()</font> to make normals perpendicular to all the faces and then use the smooth function to adjust them for improved appearance. The smooth function became available with VPython 5.2.</p>
+        <p class="Normal">After creating a faces object named myfaces, <font color="#FF0000">myfaces.smooth()</font> will
+          average similar normals at a vertex and make the object look smoother.
+          The smoothing criterion is that normals will be averaged whose directions
+          differ by an angle whose cosine is greater than or equal to 0.95, which
+          means angles less than 18 degrees. You must make sure that all vertices
+          have nonzero normals before using the smooth function; a simple scheme
+          is to use <font color="#FF0000">myfaces.make_normals()</font> to
+          make normals perpendicular to all the faces and then use the smooth
+          function to adjust them for improved appearance. The smooth function
+          became available with VPython 5.2. With VPython 5.3 you can specify
+          the smoothing criterion. For example, <font color="#FF0000">myfaces.smooth(0.7)</font> will
+          average normals whose directions differ by an angle whose cosine is
+          greater than or equal to 0.7 (angles less than 45 degrees).</p>
         <p class="Normal">If you specify different colors at the vertices of one triangular face, VPython 
           interpolates across the face, in which case the face is not all one color. 
           There is a similar interpolation for normals if there are different normals 
           at the vertices, in which case the face is not all one brightness.</p>
-        <p class="Normal">You can append an additional vertex to an existing faces object with one of the following three forms (assuming the object is named f):</p>
+        <p class="Normal">You can append  additional vertices to an existing
+          faces object with one of the following three forms (assuming the object
+          is named f):</p>
         <p class="program"> f.append(pos=(x,y,z), normal=(nx,ny,nz), color=(r,g,b))<br />
           f.append(pos=(x,y,z), normal=(nx,ny,nz), <br />
  &nbsp;&nbsp;&nbsp;&nbsp;         red=r, green=g, blue=b)<br />
           f.append(pos=(x,y,z), normal=(nx,ny,nz))</p>
+        <p class="Normal">Another convenient way to construct a faces object
+          is to create a list or numpy array of positions, then create the faces
+          object with the <font color="#FF0000">pos</font> attribute set to the
+          list or array. Then use <font color="#FF0000">make_normals()</font> and <font color="#FF0000">smooth()</font> to
+          complete the task.</p>
         <p class="Normal">The faces object is intended to help with writing model importers and other 
           new primitives in Python, not for direct manipulation by normal programs. 
           It is considerably lower-level than any of the other objects in Visual (although 
