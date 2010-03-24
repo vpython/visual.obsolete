@@ -150,16 +150,17 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           There is a similar interpolation for normals if there are different normals 
           at the vertices, in which case the face is not all one brightness.</p>
         <p class="Normal">You can append  additional vertices to an existing
-          faces object with one of the following three forms (assuming the object
+          faces object with one of the following four forms (assuming the object
           is named f):</p>
-        <p class="program"> f.append(pos=(x,y,z), normal=(nx,ny,nz), color=(r,g,b))<br />
-          f.append(pos=(x,y,z), normal=(nx,ny,nz), <br />
- &nbsp;&nbsp;&nbsp;&nbsp;         red=r, green=g, blue=b)<br />
-          f.append(pos=(x,y,z), normal=(nx,ny,nz))</p>
+        <p class="program"> f.append(pos=(x,y,z))<br />
+f.append(pos=(x,y,z), normal=(nx,ny,nz))<br />
+          f.append(pos=(x,y,z), normal=(nx,ny,nz), color=(r,g,b))<br />
+f.append(pos=(x,y,z), normal=(nx,ny,nz), <br />
+ &nbsp;&nbsp;&nbsp;&nbsp;         red=r, green=g, blue=b)</p>
         <p class="Normal">Another convenient way to construct a faces object
           is to create a list or numpy array of positions, then create the faces
           object with the <font color="#FF0000">pos</font> attribute set to the
-          list or array. Then use <font color="#FF0000">make_normals()</font> and <font color="#FF0000">smooth()</font> to
+          list or array. Then use <font color="#FF0000">make_normals()</font>, <font color="#FF0000">make_twosided()</font>, and <font color="#FF0000">smooth()</font> to
           complete the task.</p>
         <p class="Normal">The faces object is intended to help with writing model importers and other 
           new primitives in Python, not for direct manipulation by normal programs. 
