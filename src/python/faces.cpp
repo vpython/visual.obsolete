@@ -63,6 +63,16 @@ faces::append( const vector& nv_pos, const vector& nv_normal)
 	n[2] = nv_normal.z;
 }
 
+void
+faces::append( const vector& nv_pos)
+{
+	arrayprim_color::append( nv_pos );
+	double* n = normal.data(count-1);
+	n[0] = 0.;
+	n[1] = 0.;
+	n[2] = 0.;
+}
+
 // Define an ordering for the stl-sorting criteria.
 struct stl_cmp_vector
 {

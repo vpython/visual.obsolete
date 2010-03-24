@@ -33,6 +33,7 @@ class faces : public arrayprim_color
 	void append_rgb( const vector&, const vector&, float red=-1, float green=-1, float blue=-1);
 	void append( const vector&, const vector&, const rgb& );
 	void append( const vector&, const vector& );
+	void append( const vector& );
 
 	// This routine was adapted from faces_heightfield.py.  It averages the normal
 	// vectors at coincident vertices to smooth out boundaries between facets,

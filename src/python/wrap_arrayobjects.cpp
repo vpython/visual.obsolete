@@ -151,6 +151,7 @@ wrap_arrayobjects()
 
 	void (faces::* append_all_vectors)(const vector&, const vector&, const rgb&) = &faces::append;
 	void (faces::* append_default_color)(const vector&, const vector&) = &faces::append;
+	void (faces::* append_pos)(const vector&) = &faces::append;
 
 	class_<faces, bases<renderable> >("faces")
 		.def( init<const faces&>())
@@ -178,6 +179,7 @@ wrap_arrayobjects()
 			"Add a second side and corresponding normals to all faces.")
 		.def( "append", &faces::append_rgb,
 			(arg("pos"), arg("normal"), arg("red")=-1, arg("green")=-1, arg("blue")=-1))
+		.def( "append", append_pos, ( arg("pos") ))
 		.def( "append", append_default_color, ( arg("pos"), arg("normal") ))
 		.def( "append", append_all_vectors, (arg("pos"), arg("normal"), arg("color")))
 		;
