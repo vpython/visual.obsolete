@@ -148,14 +148,14 @@ faces::make_twosided()
 		pos_i = pos.data();
 		norm_i = normal.data();
 		color_i = color.data();
-		for (int n=0; n<3; n++) {
-			norm_i[icount+i+n] = -norm_i[i+n];
-		}
 	}
 	for (int i=0; i<icount; i+=9) {
 		for (int n=0; n<3; n++) {
 			pos_i[icount+i+3+n] = pos_i[i+6+n];
 			pos_i[icount+i+6+n] = pos_i[i+3+n];
+			norm_i[icount+i+n] = -norm_i[i+n];
+			norm_i[icount+i+3+n] = -norm_i[i+6+n];
+			norm_i[icount+i+6+n] = -norm_i[i+3+n];
 			color_i[icount+i+3+n] = color_i[i+6+n];
 			color_i[icount+i+6+n] = color_i[i+3+n];
 		}
@@ -164,6 +164,12 @@ faces::make_twosided()
 
 void
 faces::smooth()
+{
+	smooth_d(0.95f);
+}
+
+void
+faces::smooth_d(const float cosangle)
 {
 	if (shape(pos) != shape(normal))
 		throw std::invalid_argument( "Dimension mismatch between pos and normal.");
@@ -199,7 +205,7 @@ faces::smooth()
 				continue;
 			}
 			for ( ; setiter != setiterend; setiter++) {
-				if (vector(norm_i+*setiter).norm().dot(thisnorm) >= 0.95) {
+				if (vector(norm_i+*setiter).norm().dot(thisnorm) >= cosangle) {
 					similar.push_back(*setiter);
 				}
 			}
@@ -230,14 +236,18 @@ boost::python::object faces::get_normal() {
 void faces::set_normal( const double_array& n_normal)
 {
 	std::vector<npy_intp> dims = shape(n_normal);
-	if (dims.size() == 2 && dims[1] == 3)
+	if (dims.size() == 2 && dims[1] == 3) {
 		set_length( dims[0] );
+	} else if (dims.size() == 1 && dims[0] == 3) { // Single vector should go to set_normal_v but doesn't
+		set_length( 1 );
+	}
 
 	normal[slice(0, count)] = n_normal;
 }
 
 void faces::set_normal_v( vector v)
 {
+	// We seem never to get here, which I don't understand
 	using boost::python::make_tuple;
 	// Broadcast the new normal across the array.
 	int npoints = count ? count : 1;

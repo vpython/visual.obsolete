@@ -36,13 +36,14 @@ class faces : public arrayprim_color
 
 	// This routine was adapted from faces_heightfield.py.  It averages the normal
 	// vectors at coincident vertices to smooth out boundaries between facets,
-	// for normals that are within about 15 degrees of each other. The intent
-	// is to smooth what should be smooth but preserve sharp corners.
+	// for normals that are within about 15 degrees of each other (cos > .95).
+	// The intent is to smooth what should be smooth but preserve sharp corners.
 	void smooth();
+	void smooth_d(const float);
 
 	void make_normals();
 	void make_twosided();
-
+	
 	boost::python::object get_normal();
 	void set_normal( const double_array& normal);
 	void set_normal_v( const vector);

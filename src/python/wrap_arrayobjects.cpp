@@ -162,7 +162,15 @@ wrap_arrayobjects()
 		.def( "get_color", &faces::get_color)
 		.def( "set_color", &faces::set_color)
 		//.def( "set_color", &faces::set_color_t)
+		.def( "set_red", &faces::set_red_d)
+		.def( "set_red", &faces::set_red)
+		.def( "set_green", &faces::set_green_d)
+		.def( "set_green", &faces::set_green)
+		.def( "set_blue", &faces::set_blue_d)
+		.def( "set_blue", &faces::set_blue)
 		.def( "smooth", &faces::smooth,
+			"Average normal vectors at coincident vertexes.")
+		.def( "smooth", &faces::smooth_d,
 			"Average normal vectors at coincident vertexes.")
 		.def( "make_normals", &faces::make_normals,
 			"Construct normal vectors perpendicular to all faces.")
