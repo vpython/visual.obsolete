@@ -24,13 +24,7 @@ faces::degenerate() const
 
 faces::faces()
 {
-	pos.set_length(1);
-	normal.set_length(1);
-	arrayprim_color::set_length(1);
-
-	double* p = pos.data();
 	double* k = normal.data();
-	p[0] = p[1] = p[2] = 0.0;
 	k[0] = k[1] = k[2] = 0.0;
 }
 
@@ -244,7 +238,13 @@ void faces::set_normal( const double_array& n_normal)
 {
 	std::vector<npy_intp> dims = shape(n_normal);
 	if (dims.size() == 2 && dims[1] == 3) {
-		set_length( dims[0] );
+		if (count == 0) { // This happens if set_normal called before set_pos in constructor
+			set_length( dims[0] );
+		}
+	} else if (dims.size() == 1 && dims[0] == 3) {
+		if (count == 0) { // This happens if set_normal called before set_pos in constructor
+			set_length( 1 );
+		}
 	}
 
 	normal[slice(0, count)] = n_normal;
