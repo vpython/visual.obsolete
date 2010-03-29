@@ -111,71 +111,87 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 
           <table width="100%" border="1">
             <tr>
-              <td width="77%"><div align="center"><span class="style2"><font color="#0000A0">label</font></span></div></td>
-              <td width="23%"><div align="center"><img src="images/label.jpg" width="192" height="159" alt="label" /><a href="arrow.html"></a></div></td>
+              <td width="77%"><div align="center"><span class="style2"><font color="#0000A0">text</font></span></div></td>
+              <td width="23%"><div align="center"><img src="images/text3d.jpg" width="233" height="183" alt="text" /><a href="arrow.html"></a></div></td>
             </tr>
           </table>
-          <p class="Normal"> With the label object you can display 2D text in
-            a box, and the label always faces forward, even if you rotate the
-            scene (for 3D text, see the <a href="text.html"><strong>text</strong></a> object). Here are simple examples
-            (in the second label statement, note the standard Python scheme for
-            formatting numerical values, where 1.5f means 1 figure before the
-</p>
-
-            <p class="program"> box(pos=(0,0,0), color=color.red)<br />
-            label(pos=(0,0.25,0), text='This is a box')<br />
-            label(pos=(0,-0.25,0), text='pi = %1.5f' % pi)
-            <p class="Normal"><img src="VisualRef-7.gif" alt="label" align="right" /> There are many additional 
-            label options. In the accompanying diagram, a sphere representing the Earth 
-            (whose center is at <span class="attribute"> earth.pos</span>) has an associated 
-            label with the text &quot;Earth&quot; in a box, connected to the sphere 
-            by a line which stops at the surface of the sphere:</p>
-
-            <p class="program"> earthlabel = label(pos=earth.pos,<br />
-&nbsp;&nbsp;&nbsp;              text='Earth', xoffset=20,<br />
-&nbsp;&nbsp;&nbsp; yoffset=12, space=earth.radius,<br />
-&nbsp;&nbsp;&nbsp; height=10, border=6,<br />
-&nbsp;&nbsp;&nbsp; font='sans')</p>
-            <p class="Normal"> A unique feature of the label object is that several attributes 
-              are given in terms of screen pixels instead of the usual &quot;world-space&quot; 
-              coordinates. For example, the height of the text is given in pixels, with 
-              the result that the text remains readable even when the sphere object is 
-              moved far away. Other pixel-oriented attributes include <span class="attribute">xoffset</span>, <span class="attribute">yoffset</span>, and <span class="attribute">border</span>. 
-              Here are the label attributes:</p>
+          <p class="Normal"> With the text object you can display 3D text. The
+      3D cyan text shown below was created with this statement:</p>
+      <p class="program"> text(text='My Text', align='center', depth=-.3,
+        color=color.cyan)
+            <p class="Normal"><img src="images/text.jpg" width="655" height="258" alt="text" /></p>
+            <p class="Normal"> Labels were added to the display above to illustrate
+              some of the main attributes of the text object; the full program
+              text3d.py can be seen in the VPython examples. Here
+              is a  list of text attributes:</p>
             <p class="attributes"> <span class="attribute">pos</span>; <span class="attribute">x</span>,<span class="attribute">y</span>,<span class="attribute">z</span> The
-              point in world space being labeled. If there are no offsets (see
-              diagram), the center of the text is at <span class="attribute">pos</span></p>
-      <p class="attributes"> <span class="attribute">xoffset</span>, <span class="attribute">yoffset</span> The
-        x and y components of the line, in pixels (see diagram). You can <span class="style1">left
-        justify </span>text
-        by setting xoffset = 1 and line = 0 (so the 1-pixel line doesn't show),
-        or <strong><span class="attribute">right-justify</span></strong> text
-        by setting xoffset = -1 and line = 0.</p>
-      <p class="attributes"> <span class="attribute">text</span> The text to be 
-              displayed, such as 'Earth'<br />
-              (Line breaks can be included as \n, as in label.text = &quot;Three\nlines\nof 
-              text&quot;)</p>
-            <p class="attributes"> <span class="attribute">font</span> Name of the desired 
-              font; for example, 'sans', or 'serif', or 'monospace' (fixed-width)<br />
-            Python Unicode strings are supported.</p>
+              location of the baseline of the text, to the left, to the right,
+              or at the center of the text, as per align.<span class="attribute"></span><span class="attribute"></span></p>
+            <p class="attributes"> <span class="attribute">frame </span>Every
+              text object is enclosed in a frame, and positions indicated in
+              the figure above are relative to that frame.</p>
+      <p class="attributes"> <span class="attribute">align </span>Specify 'left'
+      (default), 'right', or 'center'.</p>
+      <p class="attributes"> <span class="attribute">text</span> The text to
+        be  displayed, such as My Text in the example above. 
+        Python Unicode strings are supported.</p>
+            <p class="attributes"> <span class="attribute">font</span> Name of
+              the desired  font; for example, 'sans', or 'serif' (default), or
+              'monospace' (fixed-width). You can also give specific names such
+              as &quot;Times&quot; or &quot;Verdana&quot;. An attempt is made to find a font name
+            that best matches the name you supply.</p>
             <p class="attributes"> <span class="attribute">height</span> Height
-              of the font  in pixels; default is 13 pixels</p>
-            <p class="attributes"> <span class="attribute">color</span>, <span class="attribute">red</span>, <span class="attribute">green</span>, <span class="attribute">blue</span> Color of the text</p>
-            <p class="attributes"> <span class="attribute">opacity</span> Opacity of the 
-              background of the box, default 0.66<br />
-              (0 transparent, 1 opaque, for objects behind the box)</p>
-            <p class="attributes"> <span class="attribute">border</span> Distance
-              in pixels  from the text to the surrounding box; default is 5 pixels</p>
-            <p class="attributes"> <span class="attribute">box</span> True if the box should 
-              be drawn (default), else False</p>
-            <p class="attributes"> <span class="attribute">line</span> True if the line from 
-              the box to pos should be drawn (default), else False</p>
-            <p class="attributes"> <span class="attribute">linecolor</span> Color of the line 
-              and box</p>
-            <p class="attributes"> <span class="attribute">space</span> World-space radius 
-              of a sphere surrounding pos,<br />
-      into which the connecting line does not go</p>
+              of an uppercase letter (see above); default is 1.  </p>
+            <p class="attributes"><span class="attribute">width</span> Width
+              of the displayed text.</p>
+            <p class="attributes"><span class="attribute">depth</span> Depth
+              of the  text, which can be a single number or a vector. For a single
+              number, positive means extrude toward you, out of the screen; negative
+              means extruded away from you, into the screen. For a vector, the
+              text is extruded in the direction of the vector. Default depth
+              is 0.2.</p>
+            <p class="attributes"><span class="attribute">axis</span> The axis
+              of the enclosing frame; changing the axis changes the orientation
+              of text.            </p>
+            <p class="attributes"><span class="attribute">descent</span> Height
+              of the descender on lower-case letters such as y (whether or not
+              there is such a letter in the text). This is typically about 0.3 times
+              the height.</p>
+            <p class="attributes"> <span class="attribute">color</span>, <span class="attribute">red</span>, <span class="attribute">green</span>, <span class="attribute">blue</span> Color
+              of the text.</p>
+            <p class="attributes"> <span class="attribute">material</span> Material
+              such as materials.wood..</p>
+            <p class="attributes"> <span class="attribute">upper_left, upper_right,
+                lower_right, lower_left </span>The bounding box of the displayed
+                text, within the text frame. For example, if you create
+                <span class="program"><strong>title = text(text=&quot;My Text&quot;)</strong></span>,
+                you can place a sphere at the upper left corner with the statement 
+              <strong>sphere(frame=title.frame, pos=title.upper_left</strong>).
+              While <span class="attribute">height</span> and <span class="attribute">descent</span> indicate
+              the general properties of the selected font, <span class="attribute">upper_left</span> etc. tell
+              you the  bounding box of the actual text. For example, if the text
+              is &quot;ABC&quot;, <span class="attribute">lower_left</span> will
+              be at the same height as <span class="attribute">start</span>
+              because there are no descenders, and if the text is &quot;mno&quot;, <span class="attribute">upper_left</span> will
+              be lower than <span class="attribute">height</span> above the baseline
+              because
+              there are no upper-case letters.</p>
+            <p class="attributes"> <span class="attribute">start</span> The left-most
+              location on the baseline, within the text frame.</p>
+            <p class="attributes"> <span class="attribute">up</span> Controls
+              the up attribute of the frame; changing up makes the text tip away
+              from the vertical.       </p>
+            <p class="attributes"> <span class="attribute">spacing</span> Makes
+              space between letters, specified as a fraction of height (default
+      is 0.03).</p>
             <p class="Normal"></p>
+            <p class="Normal">The following code will list the True Type fonts
+              on your system that can be used with a text object:</p>
+            <p class="program">t = text()<br />
+              fonts = t.fontlist()<br />
+              for f in fonts:
+              <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;print f            </p>
             <p class="Normal">See description of <a href="options.html">Additional
                 Attributes</a> available for all 3D display objects.</p>
     <!-- InstanceEndEditable --></td>
