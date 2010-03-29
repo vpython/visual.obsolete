@@ -117,8 +117,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           </table>
           <p class="Normal"> With the text object you can display 3D text. The
       3D cyan text shown below was created with this statement:</p>
-      <p class="program"> text(text='My Text', align='center', depth=-.3,
-        color=color.cyan)
+      <p class="program"> text(text='My Text',align='center',depth=-.3,color=color.cyan)
             <p class="Normal"><img src="images/text.jpg" width="655" height="258" alt="text" /></p>
             <p class="Normal"> Labels were added to the display above to illustrate
               some of the main attributes of the text object; the full program
@@ -127,9 +126,6 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             <p class="attributes"> <span class="attribute">pos</span>; <span class="attribute">x</span>,<span class="attribute">y</span>,<span class="attribute">z</span> The
               location of the baseline of the text, to the left, to the right,
               or at the center of the text, as per align.<span class="attribute"></span><span class="attribute"></span></p>
-            <p class="attributes"> <span class="attribute">frame </span>Every
-              text object is enclosed in a frame, and positions indicated in
-              the figure above are relative to that frame.</p>
       <p class="attributes"> <span class="attribute">align </span>Specify 'left'
       (default), 'right', or 'center'.</p>
       <p class="attributes"> <span class="attribute">text</span> The text to
@@ -138,8 +134,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             <p class="attributes"> <span class="attribute">font</span> Name of
               the desired  font; for example, 'sans', or 'serif' (default), or
               'monospace' (fixed-width). You can also give specific names such
-              as &quot;Times&quot; or &quot;Verdana&quot;. An attempt is made to find a font name
-            that best matches the name you supply.</p>
+              as &quot;Times&quot; or &quot;Verdana&quot;. An attempt is made
+              to find a font name that best matches the name you specify. If
+              there is no match, font defaults to 'sans'.</p>
             <p class="attributes"> <span class="attribute">height</span> Height
               of an uppercase letter (see above); default is 1.  </p>
             <p class="attributes"><span class="attribute">width</span> Width
@@ -151,8 +148,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
               text is extruded in the direction of the vector. Default depth
               is 0.2.</p>
             <p class="attributes"><span class="attribute">axis</span> The axis
-              of the enclosing frame; changing the axis changes the orientation
-              of text.            </p>
+              points along the baseline; changing the axis changes the orientation
+              of text. The axis is normalized to have a length of 1.  </p>
             <p class="attributes"><span class="attribute">descent</span> Height
               of the descender on lower-case letters such as y (whether or not
               there is such a letter in the text). This is typically about 0.3 times
@@ -163,21 +160,21 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
               such as materials.wood..</p>
             <p class="attributes"> <span class="attribute">upper_left, upper_right,
                 lower_right, lower_left </span>The bounding box of the displayed
-                text, within the text frame. For example, if you create
+                text. For example, if you create
                 <span class="program"><strong>title = text(text=&quot;My Text&quot;)</strong></span>,
                 you can place a sphere at the upper left corner with the statement 
-              <strong>sphere(frame=title.frame, pos=title.upper_left</strong>).
+              <strong>sphere(pos=title.upper_left</strong>).
               While <span class="attribute">height</span> and <span class="attribute">descent</span> indicate
-              the general properties of the selected font, <span class="attribute">upper_left</span> etc. tell
-              you the  bounding box of the actual text. For example, if the text
-              is &quot;ABC&quot;, <span class="attribute">lower_left</span> will
+              the general properties of the selected font, <span class="attribute">upper_left</span> etc.
+              tell you the bounding box of the actual text. For example, if the
+              text is &quot;ABC&quot;, <span class="attribute">lower_left</span> will
               be at the same height as <span class="attribute">start</span>
               because there are no descenders, and if the text is &quot;mno&quot;, <span class="attribute">upper_left</span> will
-              be lower than <span class="attribute">height</span> above the baseline
+              be less than <span class="attribute">height</span> above the baseline
               because
-              there are no upper-case letters.</p>
+  there are no upper-case letters.</p>
             <p class="attributes"> <span class="attribute">start</span> The left-most
-              location on the baseline, within the text frame.</p>
+        location on the baseline.</p>
             <p class="attributes"> <span class="attribute">up</span> Controls
               the up attribute of the frame; changing up makes the text tip away
               from the vertical.       </p>
