@@ -33,7 +33,7 @@ At the bottom of the window, click the star menu icon and choose "Apply to enclo
 	This is necessary to permit someone to install over an existing installation.
 
 Now go to PackageMaker folder and doubleclick the package manager file.
-Choose Package > Install Properties to specify the minimum operating system required.
+Choose Project > Install Properties to specify the minimum operating system required.
 For the VPython folder component, click the folder in the left panel and highlight
 the Components tab. 
 
