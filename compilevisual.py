@@ -1,9 +1,9 @@
 from visual.graph import *
-from visual.text import *
 from visual.controls import *
 from visual.filedialog import *
 from visual.factorial import *
-sphere(color=color.red, material=materials.wood)
+text(text="3D", color=color.red, material=materials.wood)
+from visual.text import *
 print factorial(4)
 get_file()
 
