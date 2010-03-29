@@ -1,5 +1,10 @@
 from visual.text import *
 
+print """
+This early 3D text machinery is limited to rather crude uppercase letters.
+It has been superceded by the text object introduced in Visual 5.3.
+"""
+
 # Display extruded text (uppercase only at present)
 # By default, display text along x axis, with letters pointing up parallel to y axis
 # Bruce Sherwood, Carnegie Mellon University, begun March 2000

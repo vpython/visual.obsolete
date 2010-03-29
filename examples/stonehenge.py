@@ -1,6 +1,5 @@
 from __future__ import division
 from visual import *
-from visual.text import *
 import time
 
 print """
@@ -107,10 +106,6 @@ for i in range(Nslabs):
                         size=(1.1*d,0.9*2*photocenter,0.9*2*photocenter), axis=(c,0,s),
                         material=photo)
 
-# Decorate the front entrance slab
-text(pos=(0, 0.77*h, R+d/2), string="NO EXIT", color=color.yellow,
-           depth=0.2, height=0.7, justify="center")
-
 # Decorate back slab with a gold box and a clock
 box(pos=(0,h/2,-R+d/2+0.1), size=(w/2,w/2,0.2), 
     color=(1,0.8,0), material=materials.wood, shininess=1)
@@ -123,14 +118,6 @@ for i in range(Nwires):
     theta = i*2*pi/Nwires
     cylinder(pos=(0,h,0), axis=(R*cos(theta),-h-0.1,R*sin(theta)),
              radius=0.02, color=(1,0.7,0))
-
-# Display extruded text
-text( pos=(1.0,-0.3*sin(pi/10),-2), string='A', height=2.0, depth=0.3,
-     color=(0,0,1.0), up=(0,cos(pi/10),-sin(pi/10)) )
-text( pos=(3.2,0,-2), string='B', height=2.0, depth=0.3,
-     color=(1.0,1.0,0), axis=(1,0,0.3))
-text( pos=(5.0,-0.6*sin(pi/18),-1.4), string='C', height=2.0, depth=0.3,
-     color=(1.0,0,1.0), axis=(1,0,0.6), up=(0,cos(pi/18),sin(pi/18)) )
 
 # Display a pyramid
 pyramid(pos=(-4,0,-5), size=(2,2,2), axis=(0,3,0), color=(0,0.6,0), material=materials.marble)
@@ -210,6 +197,18 @@ maxcosine = dhairs/sqrt(rhairs**2+dhairs**2) # if ray inside crosshairs, don't m
 haircolor = color.black
 roam = 0
 
+# Decorate the front entrance slab
+text(pos=(0, 0.77*h, R+d/2), text="No Exit", color=color.yellow,
+           depth=0.3, height=0.7, align="center")
+
+# Display extruded text
+text( pos=(2.0,-0.3*sin(pi/10),-2.0), text='A', height=2.0, depth=0.5,
+     color=(0,0,1.0), up=(0,cos(pi/3.4),-sin(pi/3.4)), axis=(0.5,0,1))
+text( pos=(3.2,0,-2), text='B', height=2.0, depth=0.5,
+     color=(1.0,1.0,0), axis=(1,0,0.3))
+text( pos=(5.0,-0.6*sin(pi/18),-1.4), text='C', height=2.0, depth=0.5,
+     color=(1.0,0,1.0), axis=(1,0,0.6), up=(0,cos(pi/8),sin(pi/8)) )
+
 while True:
     # Toggle roam option
     if scene.mouse.events:
@@ -225,7 +224,7 @@ while True:
         if abs(dot(ray,scene.forward)) < maxcosine: # do something only if outside crosshairs
             newray = norm(vector(ray.x, 0, ray.z))
             angle = arcsin(dot(cross(scene.forward,newray),scene.up))
-            newforward = rotate(scene.forward, axis=scene.up, angle=angle/100)
+            newforward = rotate(scene.forward, axis=scene.up, angle=angle/30)
             scene.center = scene.mouse.camera+newforward*mag(scene.center-scene.mouse.camera)
             scene.forward = newforward
             scene.center = scene.center+scene.forward*ray.y/2.
