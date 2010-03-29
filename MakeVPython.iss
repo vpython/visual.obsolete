@@ -32,9 +32,18 @@ Source: "Lib\site-packages\visual\*.pyc"; DestDir: "{app}\Lib\site-packages\visu
 
 Source: "c:\workspace\vpython-core2\license.txt"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 
-; Need to have installed numpy before building Visual, so components available in site-packages:
+; Need to have installed numpy, FontTools, ttfquery, and Polygon before building Visual, so components available in site-packages:
 Source: "Lib\site-packages\numpy*egg-info"; DestDir: "{app}\Lib\site-packages\"; Components: numpy
 Source: "Lib\site-packages\numpy\*"; DestDir: "{app}\Lib\site-packages\numpy\"; Components: numpy; Flags: recursesubdirs
+
+Source: "Lib\site-packages\FontTools.pth"; DestDir: "{app}\Lib\site-packages\"; Components: FontTools
+Source: "Lib\site-packages\FontTools\*"; DestDir: "{app}\Lib\site-packages\FontTools\"; Components: FontTools; Flags: recursesubdirs
+
+Source: "Lib\site-packages\TTFQuery*egg-info"; DestDir: "{app}\Lib\site-packages\"; Components: ttfquery
+Source: "Lib\site-packages\ttfquery\*"; DestDir: "{app}\Lib\site-packages\ttfquery\"; Components: ttfquery; Flags: recursesubdirs
+
+Source: "Lib\site-packages\Polygon*egg-info"; DestDir: "{app}\Lib\site-packages\"; Components: Polygon
+Source: "Lib\site-packages\Polygon\*"; DestDir: "{app}\Lib\site-packages\Polygon\"; Components: Polygon; Flags: recursesubdirs
 
 Source: "Lib\site-packages\vidle\*"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
 
@@ -52,6 +61,12 @@ Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\L
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
 Name: numpy; Description: "numpy 1.3.0 {code:NumpyStatus|C:\Python26}"; Types: full; Check: CheckNumpy( 'C:\Python26' )
+
+; FontTools, ttfquery, and Polygon are needed by the 3D text object
+Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python26}"; Types: full; Check: CheckFontTools( 'C:\Python26' )
+Name: ttfquery; Description: "ttfquery 1.0.2 {code:ttfqueryStatus|C:\Python26}"; Types: full; Check: Checkttfquery( 'C:\Python26' )
+Name: Polygon; Description: "Polygon 2.0.1 {code:PolygonStatus|C:\Python26}"; Types: full; Check: CheckPolygon( 'C:\Python26' )
+
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
 Name: VIDLE; Description: "VIDLE: improved version of the IDLE program editor"; Types: full custom
@@ -127,4 +142,75 @@ end;
 function CheckNumpy( Param: String): Boolean;
 begin
   Result := not NumpyAvailable( Param);
+end;
+
+//-------------------------------
+
+// FontTools, ttfquery, and Polygon are needed by the 3D text object
+
+// Need a function to determine if FontTools is already installed.
+function FontToolsAvailable( BasePath: String): Boolean;
+begin
+  Result := DirExists( BasePath + '\Lib\site-packages\FontTools');
+end;
+
+// Choose a modifying string for the user-visible FontTools component.
+function FontToolsStatus( Param: String): String;
+begin
+  if FontToolsAvailable( Param) then
+    Result := '(found)'
+  else
+    Result := '(FontTools must be selected)'
+end;
+
+// Don't clobber an existing installation of FontTools
+function CheckFontTools( Param: String): Boolean;
+begin
+  Result := not FontToolsAvailable( Param);
+end;
+
+//-------------------------------
+
+// Need a function to determine if ttfquery is already installed.
+function ttfqueryAvailable( BasePath: String): Boolean;
+begin
+  Result := DirExists( BasePath + '\Lib\site-packages\ttfquery');
+end;
+
+// Choose a modifying string for the user-visible ttfquery component.
+function ttfqueryStatus( Param: String): String;
+begin
+  if ttfqueryAvailable( Param) then
+    Result := '(found)'
+  else
+    Result := '(ttfquery must be selected)'
+end;
+
+// Don't clobber an existing installation of ttfquery
+function Checkttfquery( Param: String): Boolean;
+begin
+  Result := not ttfqueryAvailable( Param);
+end;
+
+//-------------------------------
+
+// Need a function to determine if Polygon is already installed.
+function PolygonAvailable( BasePath: String): Boolean;
+begin
+  Result := DirExists( BasePath + '\Lib\site-packages\Polygon');
+end;
+
+// Choose a modifying string for the user-visible Polygon component.
+function PolygonStatus( Param: String): String;
+begin
+  if PolygonAvailable( Param) then
+    Result := '(found)'
+  else
+    Result := '(Polygon must be selected)'
+end;
+
+// Don't clobber an existing installation of Polygon
+function CheckPolygon( Param: String): Boolean;
+begin
+  Result := not PolygonAvailable( Param);
 end;
