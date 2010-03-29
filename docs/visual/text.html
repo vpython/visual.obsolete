@@ -138,29 +138,31 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
               to find a font name that best matches the name you specify. If
               there is no match, font defaults to 'sans'.</p>
             <p class="attributes"> <span class="attribute">height</span> Height
-              of an uppercase letter (see above); default is 1.  </p>
-            <p class="attributes"><span class="attribute">width</span> Width
-              of the displayed text.</p>
+              of an uppercase letter (see above); default is 1. Specifying the
+              height and depth sets the scale for the entire text display.</p>
             <p class="attributes"><span class="attribute">depth</span> Depth
-              of the  text, which can be a single number or a vector. For a single
+              of the text, which can be a single number or a vector. For a single
               number, positive means extrude toward you, out of the screen; negative
               means extruded away from you, into the screen. For a vector, the
               text is extruded in the direction of the vector. Default depth
               is 0.2.</p>
-            <p class="attributes"><span class="attribute">axis</span> The axis
+            <p class="attributes"><span class="attribute">width</span> Width
+              of the displayed text. This is &quot;read-only&quot; and is determined by
+              the text.</p>
+<p class="attributes"><span class="attribute">axis</span> The axis
               points along the baseline; changing the axis changes the orientation
-              of text. The axis is normalized to have a length of 1.  </p>
+        of text. The axis is normalized to have a length of 1.  </p>
             <p class="attributes"><span class="attribute">descent</span> Height
               of the descender on lower-case letters such as y (whether or not
-              there is such a letter in the text). This is typically about 0.3 times
-              the height.</p>
+              there is such a letter in the text). This is typically about 0.3
+              times the height. This is read-only.</p>
             <p class="attributes"> <span class="attribute">color</span>, <span class="attribute">red</span>, <span class="attribute">green</span>, <span class="attribute">blue</span> Color
               of the text.</p>
             <p class="attributes"> <span class="attribute">material</span> Material
               such as materials.wood..</p>
             <p class="attributes"> <span class="attribute">upper_left, upper_right,
                 lower_right, lower_left </span>The bounding box of the displayed
-                text. For example, if you create
+                text; all of these are read-only. For example, if you create
                 <span class="program"><strong>title = text(text=&quot;My Text&quot;)</strong></span>,
                 you can place a sphere at the upper left corner with the statement 
               <strong>sphere(pos=title.upper_left</strong>).
@@ -174,7 +176,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
               because
   there are no upper-case letters.</p>
             <p class="attributes"> <span class="attribute">start</span> The left-most
-        location on the baseline.</p>
+        location on the baseline. This is read-only.</p>
             <p class="attributes"> <span class="attribute">up</span> Controls
               the up attribute of the frame; changing up makes the text tip away
               from the vertical.       </p>
