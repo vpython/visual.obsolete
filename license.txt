@@ -21,13 +21,25 @@ OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
 USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ---------------------------------------------------------------------
+The following copyright notice applies to the Polygon module distributed 
+with Visual for the convenience of our users under the following terms:
+
+"This distribution contains code from the GPC Library, and/or code 
+resulting from the use of the GPC Library. This usage has been 
+authorized by The University of Manchester, on the understanding 
+that the GPC-related features are used only in the context of this 
+distribution. It is not permitted to extract the GPC code from the 
+distribution as the basis for commercial exploitation, unless a 
+GPC Commercial Use Licence is obtained from The University of 
+Manchester, contact: http://www.cs.man.ac.uk/~toby/gpc/".
+
+---------------------------------------------------------------------
 The following copyright notice applies to the files src/num_util* and 
 include/num_util* which are distributed with Visual for the convenience of
 our users under the following terms:
 
 num_util is Copyright (c) 2003 by Rhys Goldstein, Chris Seymour and 
 Phil Austin.
-
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
