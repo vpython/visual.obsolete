@@ -19,7 +19,8 @@ docfiles = index.html \
 	visual/mouse_drag.html visual/new_features.html visual/options.html \
 	visual/points.html visual/primitives.html \
 	visual/pyramid.html visual/rate.html visual/ring.gif visual/ring.html \
-	visual/rotation.html visual/sphere.html visual/spherebox.gif visual/vector.html \
+	visual/rotation.html visual/sphere.html visual/spherebox.gif 
+	visual/text.html visual/vector.html \
 	visual/VisualIntro.html visual/VisualRef.css \
 	visual/VisualRef-1.gif visual/VisualRef-2.gif visual/VisualRef-3.gif \
 	visual/VisualRef-4.gif visual/VisualRef-6.gif visual/VisualRef-7.gif \
