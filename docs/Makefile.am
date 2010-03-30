@@ -28,7 +28,8 @@ docfiles = index.html \
 	visual/images/convex.jpg visual/images/curve.jpg visual/images/cylinder.jpg visual/images/ellipsoid.jpg \
 	visual/images/faces.jpg visual/images/filedialog.jpg visual/images/graph.jpg visual/images/helix.jpg \
 	visual/images/label.jpg visual/images/material_etc.jpg visual/images/points.jpg \
-	visual/images/pyramid.jpg visual/images/ring.jpg visual/images/sphere.jpg
+	visual/images/pyramid.jpg visual/images/ring.jpg visual/images/sphere.jpg \
+	visual/images/text.jpg visual/images/text3d.jpg
 else
 docfiles = 
 endif

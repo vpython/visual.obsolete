@@ -14,7 +14,7 @@ examplefiles = bounce.py bounce2.py boxlighttest.py colorsliders.py \
 	lorenz.py mandelbrot.py material_test.py orbit.py planar.py randombox.py stars.py \
 	stonehenge.py texttest.py texturetest.py tictac.py tictacdat.py \
 	texture_and_lighting.py flower128.tga \
-	toroid_drag.py toroid.py wave.py
+	text3D.py toroid_drag.py toroid.py wave.py
 else
 examplefiles =
 endif
