@@ -94,6 +94,19 @@ I.  Prerequisites:
 	Here is a list of all the libraries involved. In many cases a library is 
 	automatically installed by a package manager when a requested library depends on it:
 	
+	For Visual 5.3 and later, you need the Python modules FontTools, ttfquery, and Polygon.
+	Note The following copyright notice applies to the Polygon modules when included in
+	the VPython distribution:
+
+	"This distribution contains code from the GPC Library, and/or code 
+	resulting from the use of the GPC Library. This usage has been 
+	authorized by The University of Manchester, on the understanding 
+	that the GPC-related features are used only in the context of this 
+	distribution. It is not permitted to extract the GPC code from the 
+	distribution as the basis for commercial exploitation, unless a 
+	GPC Commercial Use Licence is obtained from The University of 
+	Manchester, contact: http://www.cs.man.ac.uk/~toby/gpc/".
+	
 	For Ubuntu 8.04, installing libgtkglextmm-x11-dev brought in everything
 	except for libglademm-2.4, which also must be installed. 
 	
