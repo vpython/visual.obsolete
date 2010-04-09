@@ -64,7 +64,7 @@ Name: numpy; Description: "numpy 1.3.0 {code:NumpyStatus|C:\Python26}"; Types: f
 
 ; FontTools, ttfquery, and Polygon are needed by the 3D text object
 Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python26}"; Types: full; Check: CheckFontTools( 'C:\Python26' )
-Name: ttfquery; Description: "ttfquery 1.0.2 {code:ttfqueryStatus|C:\Python26}"; Types: full; Check: Checkttfquery( 'C:\Python26' )
+Name: ttfquery; Description: "ttfquery 1.0.4 {code:ttfqueryStatus|C:\Python26}"; Types: full; Check: Checkttfquery( 'C:\Python26' )
 Name: Polygon; Description: "Polygon 2.0.1 {code:PolygonStatus|C:\Python26}"; Types: full; Check: CheckPolygon( 'C:\Python26' )
 
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
