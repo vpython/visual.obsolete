@@ -95,8 +95,10 @@ I.  Prerequisites:
 	automatically installed by a package manager when a requested library depends on it:
 	
 	For Visual 5.3 and later, you need the Python modules FontTools, ttfquery, and Polygon.
-	Note The following copyright notice applies to the Polygon modules when included in
-	the VPython distribution:
+	Be sure to get ttfquery 1.0.4 or later.
+	
+	Note The following copyright notice applies to the Polygon module when included in
+	the VPython distribution concerning Polygon:
 
 	"This distribution contains code from the GPC Library, and/or code 
 	resulting from the use of the GPC Library. This usage has been 
