@@ -8,7 +8,9 @@ Place in stage:
 		visual folder (from vpython-core2/site-packages)
 		vidle (from vpython-core2/site-packages or site-packages)
 		numpy files (folder and file from site-packages)
-	
+		FontTools folder and fonttools .egg-info file
+		Polygon folder and Polygon .egg-info file
+		ttfquery folder and TTFQuery .egg-info file
 	
 	Files that will go to Applications/VPython:
 	VPython/examples folder
@@ -33,11 +35,11 @@ At the bottom of the window, click the star menu icon and choose "Apply to enclo
 	This is necessary to permit someone to install over an existing installation.
 
 Now go to PackageMaker folder and doubleclick the package manager file.
-Choose Project > Install Properties to specify the minimum operating system required.
-For the VPython folder component, click the folder in the left panel and highlight
-the Components tab. 
 
-IMPORTANT: Make sure that Allow Relocation for VIDLE.app is NOT checked.
+Choose Project > Install Properties to specify the minimum operating system required.
+
+For the VPython folder component, click the folder in the left panel and highlight
+the Components tab. IMPORTANT: Make sure that Allow Relocation for VIDLE.app is NOT checked.
 This must be every time you build the installer; the setting is not saved.
 
 Build the installer. 

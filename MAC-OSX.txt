@@ -4,7 +4,7 @@ Installing XcodeTools automatically installs the large number of individualvp
 components also listed on the DVD.
 
 Install Python for the Mac ("MacPython") from python.org.
-There is already a /usr/bin/python that at the moment (OSX 10.5) up to date, but
+There is already a /usr/bin/python that at the moment is up to date, but
 because this isn't always the case, and because the Python community seems to
 strongly prefer it, we will base Visual on MacPython, which is /usr/local/bin/python.
 
@@ -43,7 +43,7 @@ Another option to compile all of the .py files in a directory is this:
 In src/mac/PackageMaker is an Apple PackageMaker project file, a Welcome text file
 for creating a VPython installer for the Mac, and instructions in packaging.txt.
 
-Be sure to set the project status to require only OSX 10.4 and above.
+Be sure to set the project status to require OSX 10.4 and above.
 
 The Boost libraries were built by downloading them and the bjam tool.
 Copy bjam into the Boost directory and execute this:
