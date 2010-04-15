@@ -13,6 +13,21 @@ Download the source for numpy and unpack it (http://www.scipy.org/Download).
 In the numpy directory, execute "sudo /usr/local/bin/python2.5 setup.py install".
 This installs the numpy module which includes needed header files.
 
+For Visual 5.3 and later, you need the Python modules FontTools, ttfquery, and Polygon.
+Be sure to get ttfquery 1.0.4 or later.
+	
+Note The following copyright notice applies to the Polygon module when included in
+the VPython distribution concerning Polygon:
+
+"This distribution contains code from the GPC Library, and/or code 
+resulting from the use of the GPC Library. This usage has been 
+authorized by The University of Manchester, on the understanding 
+that the GPC-related features are used only in the context of this 
+distribution. It is not permitted to extract the GPC code from the 
+distribution as the basis for commercial exploitation, unless a 
+GPC Commercial Use Licence is obtained from The University of 
+Manchester, contact: http://www.cs.man.ac.uk/~toby/gpc/".
+
 You need Boost libraries for the Mac. See below for how to build the Boost libraries.
 (The following may not work, because up-to-date files are not also provided in CVS:
 In the dependencies section of CVS, unzip the zip file. You should name the resulting 
