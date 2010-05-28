@@ -160,10 +160,10 @@ II.   Configuration
 	Ubuntu 9.04. You probably want to use /usr/bin/python2.6 To configure, do this
 	in a folder parallel to vpython-core2:
 	
-	PYTHON=/usr/bin/python ../vpython-core2/configure --prefix=/usr/local
+	../vpython-core2/configure --prefix=/usr
 	
 	You will also need to copy vpython-core2/src/gtk2/site-packages.pth to
-	/usr/lib/python2.6/dist-packages to put /usr/local/lib/python2.6/site-packages
+	/usr/lib/python2.6/dist-packages to put /usr/lib/python2.6/site-packages
 	on the Python search path.
 	
 	In src/gtk2 there is a simple non-autoconf makefile for Ubuntu 8 as of Nov. 2008.
