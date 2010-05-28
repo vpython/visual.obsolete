@@ -50,9 +50,7 @@ I.  Prerequisites:
 	directory the contents of the boost directory in the threadpool package,
 	which includes a directory named "threadpool" and a file "threadpool.hpp".
 	
-	Problem bulding; found this on the web:
-	"Furthermore building pyrap with boost-1.37 and gcc-4.3.2 gave an error 
-	due to a missing include. The following patch has to be applied to boost:"
+	The following change is necessary if you get an error in translate_exception.hpp:
 
 	In /usr/include (probably), change /boost/python/detail/translate_exception.hpp
 	===================================================================
@@ -112,7 +110,7 @@ I.  Prerequisites:
 	For Ubuntu 8.04, installing libgtkglextmm-x11-dev brought in everything
 	except for libglademm-2.4, which also must be installed. 
 	
-	For Ubuntu 9.04:
+	For Ubuntu 9.04-10.04:
 	1) automake gets autoconf
 	2) libgtkglextmm-x11-dev gets libatk1.0, libcairo2, libglib2.0, libgtk2.0,
 	       libgtkglext1, libgtkglextmm-x11-1.2, libpango1.0
