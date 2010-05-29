@@ -66,16 +66,16 @@ I.  Prerequisites:
 	--------------------------------------
 	(That is, add "# include <boost/type_traits/add_reference.hpp>" after the
 	statement "# include <boost/type_traits/add_const.hpp>".)
-	
-	Although the boost-1.39 file does not include <boost/type_traits/add_reference.hpp>,
-	Visual nevertheless builds okay on a Mac using boost-1.39. Have not tried
-	on other platforms.
 		
-	Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
+	Need Python 2.2.x or 2.3.x or 2.4.x or 2.5.x (www.python.org), including
 		the development (dev) package.
-	numpy (numpy.sourceforge.net).
+	Need Python modules Polygon, FontTools, and ttfquery, from pypi.python.org.
+	   For each module, unpack and in a terminal cd to the module folder.
+	   Execute "sudo python setup.py install" to build and install the module.
+	Need numpy (numpy.sourceforge.net).
+	
 	On Ubuntu 7.10, the only package for numpy was for Python 2.4, even though
-	it is Python 2.5 which is installed by default. So it was necessary to download
+	it was Python 2.5 which is installed by default. So it was necessary to download
 	numpy (www.scipy.org/Download). And it was also necessary to install the
 	packages libboost-python-dev, libboost-signals-dev, and libboost-thread-dev
 	before executing in the numpy folder "python setup.py install".
