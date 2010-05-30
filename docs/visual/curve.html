@@ -178,7 +178,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="Normal"><strong><font color="#0000a0">Adding more points to a curve</font></strong></p>
           <p class="Normal"> Curves can be created incrementally with the <span
  class="attribute">append()</span> function. A new point by default
-            shares the characteristics of the last point.</p>
+            shares the characteristics of the last point. You can append pos, color, red, green, or blue, but not radius. For a single curve object, all of the curve must have the same radius.</p>
 
           <p class="program">spiral = curve( color = color.cyan )<br />
           for t in arange(0, 2*pi, 0.1):<br />
@@ -203,7 +203,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <p class="program">c = curve( pos=[(0,0,0), (1,0,0)], color=color.red)<br />
           c.append( pos=(1,1,0) ) # add a red point<br />
           c.append( pos=(0,1,0), color=color.blue) # add blue point</p>
-          <p class="Normal"> If you want an abrupt change in color or thickness,  add another
+          <p class="Normal"> If you want an abrupt change in color,  add another
             point at the same location. In the following example, adding a blue
             point at the same location as the third (red) point makes the final
             line be purely blue.</p>
