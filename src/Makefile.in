@@ -208,7 +208,7 @@ else
  else
     # Libtoolish rules.  These should apply to all POSIX-like systems.
     CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
-       $(GTHREAD_LIBS) -lboost_python -lboost_thread-mt -lboost_signals-mt)
+       $(GTHREAD_LIBS) -lboost_python -lboost_thread -lboost_signals)
     CXX_RULE = $(LT_CXX_RULE)
     LINK_RULE = $(LT_LINKRULE)
     PLATFORM_TARGET = cvisualmodule.la
