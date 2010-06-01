@@ -50,8 +50,14 @@ I.  Prerequisites:
 	directory the contents of the boost directory in the threadpool package,
 	which includes a directory named "threadpool" and a file "threadpool.hpp".
 	
-	The following change is necessary if you get an error in translate_exception.hpp:
+	If you get this error in compiling cvisualmodule.cpp:
+		
+	In file included from /usr/include/boost/python/exception_translator.hpp:12,
+    from ../../vpython-core2/src/python/cvisualmodule.cpp:12:
+	/usr/include/boost/python/detail/translate_exception.hpp:34: error: expected nested-name-specifier before ‘add_reference’
 
+	You need to make this change:
+	
 	In /usr/include (probably), change /boost/python/detail/translate_exception.hpp
 	===================================================================
 	--- boost/python/detail/translate_exception.hpp (revision 50228)
