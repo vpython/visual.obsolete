@@ -76,8 +76,8 @@ Or see below.
 Download latest Boost (boost_1_35_0.zip, for example) from www.boost.org.
 Unzip into boost_1_35_0, for example.
 
-The following must be done from a Windows typescript, NOT from Msys.
-(From Start/Run, execute cmd.)
+The following must be done from a Windows typescript, 
+or the Visual Studio Command Prompt, NOT from Msys.
 > cd boost_1_35_0
 
 If you didn't acquire the bjam tool, execute this: bootstrap.bat
