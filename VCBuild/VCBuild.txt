@@ -71,6 +71,7 @@ You'll get a trace of the VPYTHON_NOTE entries in the source code.
 
 BUILDING BOOST FROM SOURCE
 Download a precompiled version of the 'bjam' tool from www.boost.org.
+Or see below.
 
 Download latest Boost (boost_1_35_0.zip, for example) from www.boost.org.
 Unzip into boost_1_35_0, for example.
@@ -78,6 +79,8 @@ Unzip into boost_1_35_0, for example.
 The following must be done from a Windows typescript, NOT from Msys.
 (From Start/Run, execute cmd.)
 > cd boost_1_35_0
+
+If you didn't acquire the bjam tool, execute this: bootstrap.bat
 
 Make sure that the target Python is the only Python installed (-a means rebuild all):
 bjam --toolset=msvc --build-type=complete --with-python --with-thread --with-signals stage
