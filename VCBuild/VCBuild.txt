@@ -10,8 +10,16 @@ Building vpython with from Visual Studio C++
 		Install Python 2.N via the Windows Installer at http://www.python.org/download/.
 		Make sure it is installed on the same drive as vpython-core2, in \Python2N.
                 
-    Install Visual C++ 2010 Express Edition, which includes the platform SDK (System Development Kit)
+    Install Visual C++ 2008 Express Edition, which includes the platform SDK (System Development Kit)
         from http://www.microsoft.com/Express/Download/#webInstall
+        
+    It is important to use the older 2008 version of Visual C++, because that's what built Python 2.7.
+    However, see the following for how to try to use Visual C++ 2010 with Python 2.7:
+    	http://nukeit.org/compile-python-2-7-packages-with-visual-studio-2010-express
+	Also, make sure that in the Visual Studio 2010 project properties, Linker > Input,
+	you specify "Ignore Specific Default Libraries" to /NODEFAULTLIB:MSVCRT.lib.
+	To avoid the link error Error 1 error LNK1220: '/DELAYSIGN' requires '/KEYFILE' or '/KEYCONTAINER'
+	you need to go to Visual Studio project properties, Linker > Advanced, and clear Delay Sign.
 
     Unzip Boost
         Extract the files in vpython-core2/dependencies/win_boost.zip so that 
@@ -32,11 +40,6 @@ Building vpython with from Visual Studio C++
 	If you are using XP, you will need to copy/update these files 
 		from CVS to C:\Python25\Lib\site-packages:
 			visual, examples, docs
-			
-	Before building, make sure that in the Visual Studio 2010 project properties, Linker > Input,
-	you specify "Ignore Specific Default Libraries" to /NODEFAULTLIB:MSVCRT.lib.
-	To avoid the link error Error 1 error LNK1220: '/DELAYSIGN' requires '/KEYFILE' or '/KEYCONTAINER'
-	you need to go to Visual Studio project properties, Linker > Advanced, and clear Delay Sign.
 
 	Build cvisual.pyd
         Open the cvisual.sln project file in Visual Studio Express, make Release the active 
