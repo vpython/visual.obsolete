@@ -6,39 +6,44 @@ Building vpython with from Visual Studio C++
 	    Check-out the vpython-core2 module from
 		:pserver:anonymous@visualpython.cvs.sourceforge.net:/cvsroot/visualpython
 
-	Python25
-		Install Python 2.5.x via the Windows Installer at http://www.python.org/download/.
-		Make sure it is installed on the same drive as vpython-core2, in \Python25.
+	Python2.N (currently N=7)
+		Install Python 2.N via the Windows Installer at http://www.python.org/download/.
+		Make sure it is installed on the same drive as vpython-core2, in \Python2N.
                 
-    Install Visual C++ 2008 Express Edition, which includes the platform SDK, from
-        http://www.microsoft.com/Express/Download/#webInstall
+    Install Visual C++ 2010 Express Edition, which includes the platform SDK (System Development Kit)
+        from http://www.microsoft.com/Express/Download/#webInstall
 
     Unzip Boost
-        Extract the files in vpython-core2/dependencies/boost_files2.5.zip so that 
+        Extract the files in vpython-core2/dependencies/win_boost.zip so that 
         there is a folder vpython-core2/dependencies/boost_files containing 
         boost (include files) and win_libs folders.
         
         These files were obtained from http://www.boostpro.com/products/free
         (If these files are not up to date with the current Python, you may have to
         build the Boost libraries from source. See below. This was the case in 
-        Oct. 2008 when the standard release of Python was 2.6, but the boostpro 
-        libraries had been built for Python 2.5.)
+        Aug. 2010 when the standard release of Python was 2.7, but the boostpro 
+        libraries had been built for Python 2.6.)
         
 	On Vista, in Command Prompt, link from Python site-packages to the CVS files
 	(YourCVS is the directory where you have put the CVS files)
-        cd C:\Python25\Lib\site-packages
+        cd C:\Python2N\Lib\site-packages
 		mklink /D visual \YourCVS\vpython-core2\site-packages\visual
 	
 	If you are using XP, you will need to copy/update these files 
 		from CVS to C:\Python25\Lib\site-packages:
 			visual, examples, docs
+			
+	Before building, make sure that in the Visual Studio 2010 project properties, Linker > Input,
+	you specify "Ignore Specific Default Libraries" to /NODEFAULTLIB:MSVCRT.lib.
+	To avoid the link error Error 1 error LNK1220: '/DELAYSIGN' requires '/KEYFILE' or '/KEYCONTAINER'
+	you need to go to Visual Studio project properties, Linker > Advanced, and clear Delay Sign.
 
 	Build cvisual.pyd
         Open the cvisual.sln project file in Visual Studio Express, make Release the active 
-        configuration, then on the Build menu choose "Build Solution".
+        configuration, then press F7.
 
         The .pyd file is placed in vpython-core2\site-packages\visual, ready to run!
-        (On XP, you need to copy this file to C:\Python25\Lib\site-packages\visual)
+        (On XP, you need to copy this file to C:\Python2N\Lib\site-packages\visual)
 
         This is the only step that needs to be repeated as you make changes to the C++ source code.
         (On XP, you need to copy over any Visual .py files that change.)
@@ -46,7 +51,7 @@ Building vpython with from Visual Studio C++
     Process MakeVPython.iss with Innosetup (innosetup.org) to build an installer:
     1) Run compilevisual.py from the Visual source package to
 	   Python-compile all the Visual .py files (produces .pyc files).
-	2) Make sure that C:\Python25\Lib\idlelib\config-main.def has edit startup and 
+	2) Make sure that C:\Python2N\Lib\idlelib\config-main.def has edit startup and 
 	autosave set to 1 and that help is set for Visual before building the package.
 	3) Double-click MakeVPython.iss. 
 	4) Near the start of the file, update AppVerName if necessary.
@@ -65,7 +70,7 @@ Create a user variable "VPYTHON_DEBUG" and give it the value 1.
 Run the Windows command prompt, found in Accessories in the program listings, cd to a
 directory with a Python script, and execute this:
 
-\Python25\python.exe sometest.py
+\Python2N\python.exe sometest.py
 
 You'll get a trace of the VPYTHON_NOTE entries in the source code.
 
@@ -91,9 +96,13 @@ libboost_python-vc90-mt-s-1_35.lib
 libboost_signals-vc90-mt-s-1_35.lib
 libboost_thread-vc90-mt-s-1_35.lib
 
-These go into dependencies\boost\win_libs 
+These go into dependencies\boost_file\win_libs 
 
-Problem bulding; found this on the web:
+Also, you need to copy the directory named boost from the Boost files into dependencies\boost_file.
+At least for Boost 1_42_0, in line 21 of boost\python\exception_translator.hpp you need
+to change bind to boost::bind. 
+
+Problem bulding with Boost 1.37; found this on the web (this problem disappeared for Boost 1.42):
 Furthermore building pyrap with boost-1.37 and gcc-4.3.2 gave an error 
 due to a missing include. The following patch has to be applied to boost:
 
