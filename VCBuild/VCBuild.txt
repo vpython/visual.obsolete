@@ -9,6 +9,8 @@ Building vpython with from Visual Studio C++
 	Python2.N (currently N=7)
 		Install Python 2.N via the Windows Installer at http://www.python.org/download/.
 		Make sure it is installed on the same drive as vpython-core2, in \Python2N.
+		
+	Install these Python modules: numpy, FontTools, ttfquery.
                 
     Install Visual C++ 2008 Express Edition, which includes the platform SDK (System Development Kit)
         from http://www.microsoft.com/Express/Download/#webInstall
@@ -50,6 +52,10 @@ Building vpython with from Visual Studio C++
 
         This is the only step that needs to be repeated as you make changes to the C++ source code.
         (On XP, you need to copy over any Visual .py files that change.)
+        
+    Get Polygon module.
+    In setup.py I tried setting withNumPy=True and defaultStyle='STYLE_NUMPY', but it won't compile.
+    In the Polygon directory execute C:\Python2N\python setup.py install
     
     Process MakeVPython.iss with Innosetup (innosetup.org) to build an installer:
     1) Run compilevisual.py from the Visual source package to
@@ -102,7 +108,8 @@ libboost_thread-vc90-mt-s-1_35.lib
 These go into dependencies\boost_file\win_libs 
 
 Also, you need to copy the directory named boost from the Boost files into dependencies\boost_file.
-At least for Boost 1_42_0, in line 21 of boost\python\exception_translator.hpp you need
+
+For Boost 1_42_0, in line 21 of boost\python\exception_translator.hpp you maay need
 to change bind to boost::bind. 
 
 Problem bulding with Boost 1.37; found this on the web (this problem disappeared for Boost 1.42):

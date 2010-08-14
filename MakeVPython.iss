@@ -4,16 +4,16 @@
 ; Make sure version numbers are correct for VPython and numpy.
 
 [Setup]
-AppName=VPython for Python 2.6
+AppName=VPython for Python 2.7
 AppVerName=VPython 5.32
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
-SourceDir=C:\Python26
+SourceDir=C:\Python27
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py2.6-5.32
+OutputBaseFilename=VPython-Win-Py2.7-5.32
 OutputDir=c:\workspace
 
 [Files]
@@ -60,12 +60,12 @@ Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\L
 
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
-Name: numpy; Description: "numpy 1.3.0 {code:NumpyStatus|C:\Python26}"; Types: full; Check: CheckNumpy( 'C:\Python26' )
+Name: numpy; Description: "numpy 1.5.0 {code:NumpyStatus|C:\Python27}"; Types: full; Check: CheckNumpy( 'C:\Python27' )
 
 ; FontTools, ttfquery, and Polygon are needed by the 3D text object
-Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python26}"; Types: full; Check: CheckFontTools( 'C:\Python26' )
-Name: ttfquery; Description: "ttfquery 1.0.4 {code:ttfqueryStatus|C:\Python26}"; Types: full; Check: Checkttfquery( 'C:\Python26' )
-Name: Polygon; Description: "Polygon 2.0.1 {code:PolygonStatus|C:\Python26}"; Types: full; Check: CheckPolygon( 'C:\Python26' )
+Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python27}"; Types: full; Check: CheckFontTools( 'C:\Python27' )
+Name: ttfquery; Description: "ttfquery 1.0.4 {code:ttfqueryStatus|C:\Python27}"; Types: full; Check: Checkttfquery( 'C:\Python27' )
+Name: Polygon; Description: "Polygon 2.0.2 {code:PolygonStatus|C:\Python27}"; Types: full; Check: CheckPolygon( 'C:\Python27' )
 
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
@@ -93,14 +93,14 @@ program Setup;
 function MyConst(Param: String): String;
 var Exist1, Exist2: Boolean;
 begin
-    Exist1 := FileExists( ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.6\InstallPath,}\python.exe'));
+    Exist1 := FileExists( ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.7\InstallPath,}\python.exe'));
     if Exist1 then
-      Result := ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.6\InstallPath,}')
+      Result := ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.7\InstallPath,}')
     else
       begin
-      Exist2 := FileExists( ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.6\InstallPath,}\python.exe'));
+      Exist2 := FileExists( ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.7\InstallPath,}\python.exe'));
       if Exist2 then
-        Result := ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.6\InstallPath,}')
+        Result := ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.7\InstallPath,}')
       else
         Result := 'C:\'
       end
@@ -112,11 +112,11 @@ begin
   case CurPage of
     wpSelectDir:
       begin
-      Result1 := FileExists( ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.6\InstallPath,}\python.exe'));
-      Result2 := FileExists( ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.6\InstallPath,}\python.exe'));
+      Result1 := FileExists( ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.7\InstallPath,}\python.exe'));
+      Result2 := FileExists( ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.7\InstallPath,}\python.exe'));
       Result := Result1 or Result2
       if not Result then
-         MsgBox('Could not locate where Python 2.6 is installed.' #13 'You will be asked where python.exe is located.', mbInformation, MB_OK);
+         MsgBox('Could not locate where Python 2.7 is installed.' #13 'You will be asked where python.exe is located.', mbInformation, MB_OK);
       end
     else
       Result := False;
