@@ -23,9 +23,9 @@ OutputDir=c:\workspace
 ; and help set for Visual before building package.
 ;Source: "Lib\idlelib\config-main.def"; DestDir: "{app}\Lib\idlelib\"; Flags: uninsneveruninstall
 
-Source: "c:\workspace\vpython-core2\site-packages\visual\cvisual.pyd"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "c:\workspace\vpython-core2\site-packages\visual\*.py"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "c:\workspace\vpython-core2\site-packages\visual\*.tga"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "Lib\site-packages\visual\cvisual.pyd"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "Lib\site-packages\visual\*.py"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "Lib\site-packages\visual\*.tga"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 
 ; Execute compilevisual.py from the CVS files to compile the .pyc files:
 Source: "Lib\site-packages\visual\*.pyc"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
@@ -45,7 +45,15 @@ Source: "Lib\site-packages\ttfquery\*"; DestDir: "{app}\Lib\site-packages\ttfque
 Source: "Lib\site-packages\Polygon*egg-info"; DestDir: "{app}\Lib\site-packages\"; Components: Polygon
 Source: "Lib\site-packages\Polygon\*"; DestDir: "{app}\Lib\site-packages\Polygon\"; Components: Polygon; Flags: recursesubdirs
 
-Source: "Lib\site-packages\vidle\*"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.py"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.pyc"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.pyw"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.txt"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.py"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.bat"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.def"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.gif"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
+Source: "Lib\site-packages\vidle\*.icns"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
 
 Source: "c:\workspace\vpython-core2\examples\*.py"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
 Source: "c:\workspace\vpython-core2\examples\*.tga"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
