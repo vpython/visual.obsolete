@@ -60,24 +60,16 @@ for creating a VPython installer for the Mac, and instructions in packaging.txt.
 
 Be sure to set the project status to require OSX 10.4 and above.
 
-The Boost libraries were built by downloading them and the bjam tool.
-Copy bjam into the Boost directory and execute this:
+The Boost libraries were built by downloading the source.
+cd to the Boost directory and execute ./bootstrap.sh to create the bjam tool.
+Then execute this:
 ./bjam --toolset=darwin -sPYTHON_ROOT=/Library/Frameworks/Python.framework/Versions/2.7/bin/python --architecture=x86 --build-type=complete --layout=versioned --with-python --with-thread --with-signals stage
 
 The files you want will be in stage/lib.
 Move these files to dependencies/boost_files/mac_libs (file names will be similar to the following):
-libboost_python-mt-1_35.a
-libboost_python-mt-d-1_35.a
 libboost_python-mt-s-1_35.a
-libboost_python-mt-sd-1_35.a
-libboost_signals-mt-1_35.a
-libboost_signals-mt-d-1_35.a
 libboost_signals-mt-s-1_35.a
-libboost_signals-mt-sd-1_35.a
-libboost_thread-mt-1_35.a
-ibboost_thread-mt-d-1_35.a
 ibboost_thread-mt-s-1_35.a
-ibboost_thread-mt-sd-1_35.a
 
 ----------
 I built Boost libraries on a PowerPC running OS X 10.4 and tried using them
