@@ -3,8 +3,8 @@
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
 
-#include "mac/display.hpp"
 #include "vpython-config.h"
+#include "mac/display.hpp"
 #include "util/render_manager.hpp"
 #include "util/errors.hpp"
 #include "python/gil.hpp"

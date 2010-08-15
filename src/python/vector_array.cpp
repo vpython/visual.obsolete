@@ -1,8 +1,6 @@
 // Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.
-#include "python/vector_array.hpp"
-#include "python/scalar_array.hpp"
 
 #include <boost/python/class.hpp>
 #include <boost/python/object.hpp>
@@ -16,6 +14,9 @@
 #include <boost/python/iterator.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/module.hpp>
+
+#include "python/vector_array.hpp"
+#include "python/scalar_array.hpp"
 
 // TODO: Figure out what to do with this...
 #define PY_ARRAY_UNIQUE_SYMBOL visual_PyArrayHandle

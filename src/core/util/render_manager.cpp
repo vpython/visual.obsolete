@@ -1,7 +1,7 @@
 #include "util/render_manager.hpp"
-#include "display.hpp"
 #include "util/errors.hpp"
 #include <threadpool.hpp>
+#include "display.hpp"
 
 namespace cvisual {
 

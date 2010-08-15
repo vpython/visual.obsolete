@@ -1,12 +1,12 @@
 #ifndef VPYTHON_MAC_DISPLAY_HPP
 #define VPYTHON_MAC_DISPLAY_HPP
 
-#include <map>
-#include <string>
-
 #include "display_kernel.hpp"
 #include "util/atomic_queue.hpp"
 #include "mouseobject.hpp"
+
+#include <map>
+#include <string>
 
 #include <boost/scoped_ptr.hpp>
 
