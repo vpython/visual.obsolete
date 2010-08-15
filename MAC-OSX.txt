@@ -10,7 +10,7 @@ strongly prefer it, we will base Visual on MacPython, which is /usr/local/bin/py
 
 Next you need to install numpy. You may find an installer for it. Otherwise:
 Download the source for numpy and unpack it (http://www.scipy.org/Download).
-In the numpy directory, execute "sudo /usr/local/bin/python2.5 setup.py install".
+In the numpy directory, execute "sudo python setup.py install".
 This installs the numpy module which includes needed header files.
 
 For Visual 5.3 and later, you need the Python modules FontTools, ttfquery, and Polygon.
@@ -39,7 +39,7 @@ This creates a build directory mbuild parallel to the CVS files, and creates lin
 from /Library/Frameworks/Python.framework/Versions/2.5/lib/python2.5/site-packages to
 the visual directory in the CVS files.
 
-In the mbuild directory, execute make install to build and install Visual.
+In the mbuild directory, execute sudo make install to build and install Visual.
 This creates cvisual.so in the CVS site-packages/visual directory, which is
 linked as explained above, ready to run.
 
