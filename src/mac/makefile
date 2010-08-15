@@ -4,7 +4,7 @@
 #    a link in site-packages by hand.
 # Be sure to specify what version of Python
 
-PYTHON_VERSION = 2.6
+PYTHON_VERSION = 2.7
 PYTHON_FRAMEWORK = /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/
 SITE_PACKAGES = $(PYTHON_FRAMEWORK)lib/python$(PYTHON_VERSION)/site-packages/
 TOP = ../vpython-core2/
@@ -41,12 +41,12 @@ OBJS = arrayprim.o arrow.o axial.o box.o cone.o cylinder.o display_kernel.o elli
 
 cvisual.so : $(OBJS)
 	$(CXX) -mmacosx-version-min=10.4 \
-     	-bundle -bundle_loader /usr/local/bin/python$(PYTHON_VERSION) -o cvisual.so \
+     	-bundle -bundle_loader $(PYTHON_FRAMEWORK)bin/python$(PYTHON_VERSION) -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
-	$(BOOST)libboost_python-mt-s-1_35.a \
-	$(BOOST)libboost_signals-mt-s-1_35.a \
-	$(BOOST)libboost_thread-mt-s-1_35.a
+	$(BOOST)libboost_python-xgcc42-mt-s-1_43.a \
+	$(BOOST)libboost_signals-xgcc42-mt-s-1_43.a \
+	$(BOOST)libboost_thread-xgcc42-mt-s-1_43.a
 
 install : cvisual.so
 	cp cvisual.so ../vpython-core2/site-packages/visual
