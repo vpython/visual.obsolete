@@ -15,6 +15,9 @@ This installs the numpy module which includes needed header files.
 
 For Visual 5.3 and later, you need the Python modules FontTools, ttfquery, and Polygon.
 Be sure to get ttfquery 1.0.4 or later.
+Polygon is available at http://polygon.origo.ethz.ch/download
+Currently, use the Polygon 2.0.1 binary for Python 2.6, which works with Python 27;
+have not succeeded in building Polygon from source.
 	
 Note The following copyright notice applies to the Polygon module when included in
 the VPython distribution concerning Polygon:
@@ -63,13 +66,24 @@ Be sure to set the project status to require OSX 10.4 and above.
 The Boost libraries were built by downloading the source.
 cd to the Boost directory and execute ./bootstrap.sh to create the bjam tool.
 Then execute this:
-./bjam --toolset=darwin -sPYTHON_ROOT=/Library/Frameworks/Python.framework/Versions/2.7/bin/python --architecture=x86 --build-type=complete --layout=versioned --with-python --with-thread --with-signals stage
+./bjam architecture=combined
+
+The files you want will be in stage/lib.
+Move these files to dependencies/boost_files/mac_libs:
+libboost_python.a
+libboost_signals.a
+ibboost_thread.a
+
+In the past the following was used, but it seems neither necessary nor sufficient with Python 2.7:
+---------------------
+./bjam --toolset=darwin -sPYTHON_ROOT=/Library/Frameworks/Python.framework/Versions/2.7/bin/python --address-model=32_64 --architecture=x86 --build-type=complete --layout=versioned --with-python --with-thread --with-signals stage
 
 The files you want will be in stage/lib.
 Move these files to dependencies/boost_files/mac_libs (file names will be similar to the following):
 libboost_python-mt-s-1_35.a
 libboost_signals-mt-s-1_35.a
 ibboost_thread-mt-s-1_35.a
+----------------------
 
 ----------
 I built Boost libraries on a PowerPC running OS X 10.4 and tried using them
