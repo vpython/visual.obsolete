@@ -64,22 +64,16 @@ for creating a VPython installer for the Mac, and instructions in packaging.txt.
 Be sure to set the project status to require OSX 10.4 and above.
 
 The Boost libraries were built by downloading the source.
-cd to the Boost directory and execute ./bootstrap.sh to create the bjam tool and project-config.jam.
-In the file project-config.jam, delete these lines (or comment out the non-comment lines):
-   # Compiler configuration. This definition will be used unless
-   # you already have defined some toolsets in your user-config.jam
-   # file.
-   if ! darwin in [ feature.values <toolset> ]
-   {
-       using darwin ; 
-   }
-   
-   project : default-build <toolset>darwin ;
-and insert this line: using gcc : 4.0 : g++-4.0 ;
+cd to the Boost directory and execute 
+
+./bootstrap.sh --with-toolset=gcc --with-python-version=2.7 --with-libraries=python,signals,thread
+
+to create the bjam tool and project-config.jam.
+
+In the file project-config.jam, change "using gcc ;" to "using gcc : 4.0 : g++-4.0 ;"
+
 The purpose is to build Boost libraries using the same g++-4.0 compiler used to build Visual, which
-should enable Visual to run on OSX 10.4 (for which g++-4.2 doesn't work). There are probably more
-elegant ways to configure bjam than this crude manipulation of project-config.jam, but the obvious
-things didn't work, including creating a file user-config.jam containing using gcc : 4.0 : g++-4.0 ;.
+should enable Visual to run on OSX 10.4 (for which g++-4.2 doesn't work). 
 
 Now execute ./bjam to build the Boost libraries.
 
