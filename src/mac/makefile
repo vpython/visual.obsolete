@@ -44,9 +44,9 @@ cvisual.so : $(OBJS)
      	-bundle -bundle_loader $(PYTHON_FRAMEWORK)bin/python$(PYTHON_VERSION) -o cvisual.so \
 	$(OBJS) \
 	-framework AGL -framework Carbon -framework OpenGL -framework Python \
-	$(BOOST)libboost_python-xgcc42-mt-s-1_43.a \
-	$(BOOST)libboost_signals-xgcc42-mt-s-1_43.a \
-	$(BOOST)libboost_thread-xgcc42-mt-s-1_43.a
+	$(BOOST)libboost_python.a \
+	$(BOOST)libboost_signals.a \
+	$(BOOST)libboost_thread.a
 
 install : cvisual.so
 	cp cvisual.so ../vpython-core2/site-packages/visual
