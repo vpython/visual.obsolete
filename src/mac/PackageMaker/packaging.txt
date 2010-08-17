@@ -24,7 +24,7 @@ site-packages/vidle and executing "python MacBuildApp.py build". This produced a
 launcher VIDLE.app which seemed to lack robustness and often failed to run. 
 If you right-click (ctrl-click) VIDLE.app, you can gain access to the contents
 of what is actually a folder. The Python scripts VIDLE and idle.py were edited
-with TextEdit to be very simple. They contain specific references to Python 2.6
+with TextEdit to be very simple. They contain specific references to the Python version
 and so will need to be revised for later versions of Python.
 
 Ctrl-click the stage folder and choose Get Info.
