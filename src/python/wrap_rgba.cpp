@@ -11,6 +11,11 @@
 #include <boost/python/proxy.hpp>
 #include <boost/python/class.hpp>
 
+// Python 2/3 compatibility
+#ifndef PyInt_Check
+#define PyInt_Check   PyLong_Check
+#endif
+
 namespace cvisual {
 namespace py = boost::python;
 

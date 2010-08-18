@@ -231,8 +231,8 @@ namespace cvisual { namespace python {
    */
   NPY_TYPES char2type(char e_type);
 
-  void init_numpy();
-//  void use_numpy_impl();
+  int init_numpy();
+
   size_t typesize( NPY_TYPES t);
 
   template <class T>

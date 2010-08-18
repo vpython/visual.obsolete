@@ -44,9 +44,8 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-
 namespace {
-	const char* rcsid = "$Id: num_util.cpp,v 1.9 2008/09/26 16:45:42 dscherer Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.10 2010/08/18 23:34:23 bsherwood Exp $";
 }
 
   // Local function prototypes
@@ -59,14 +58,15 @@ namespace cvisual{ namespace python {
 
 static bool arrayapi_initialized = false;
 
-
-void
+int
 init_numpy()
 {
+	// Not understood why this needs to be int to compile for Python 3.
+	// With Python 2, it was void (with no explicit return).
 	import_array();
 	arrayapi_initialized = true;
+	return 0;
 }
-
 
 size_t
 typesize( NPY_TYPES t)

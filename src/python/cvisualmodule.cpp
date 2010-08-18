@@ -23,6 +23,11 @@
 #include "python/num_util.hpp"
 #include "python/gil.hpp"
 
+// Python 2/3 compatibility
+#ifndef PyString_Check
+#define PyString_Check   PyUnicode_Check
+#endif
+
 namespace cvisual {
 void wrap_display_kernel();
 void wrap_primitive();
@@ -155,11 +160,9 @@ BOOST_PYTHON_MODULE( cvisual)
 #endif
 #endif
 
-	// Private functions for initializing and choosing the numeric backend
-	//def( "_init_numpy_impl", python::init_numpy_impl);
+	// Private functions for initializing and choosing the numpy backend
 	def("init_numpy", python::init_numpy);
-   // import_array()
-	// Initialize the Python thread system.
+    // Initialize the Python thread system.
 	PyEval_InitThreads();
 
 	// A subset of the python standard exceptions may be thrown from visual

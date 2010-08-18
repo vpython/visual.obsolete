@@ -16,7 +16,11 @@
 #include <boost/python/overloads.hpp>
 #include <boost/python/detail/wrap_python.hpp>
 
-#
+// Python 2/3 compatibility
+#ifndef PyString_Check
+#define PyString_Check   PyUnicode_Check
+#endif
+
 namespace cvisual {
 
 using python::double_array;
