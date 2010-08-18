@@ -84,28 +84,35 @@ directory with a Python script, and execute this:
 You'll get a trace of the VPYTHON_NOTE entries in the source code.
 
 BUILDING BOOST FROM SOURCE
-Download a precompiled version of the 'bjam' tool from www.boost.org.
-Or see below.
-
-Download latest Boost (boost_1_35_0.zip, for example) from www.boost.org.
-Unzip into boost_1_35_0, for example.
+Download latest Boost (boost_1_43_0.zip, for example) from www.boost.org.
+Unzip into boost_1_43_0, for example.
 
 The following must be done from a Windows typescript, 
 or the Visual Studio Command Prompt, NOT from Msys.
-> cd boost_1_35_0
+> cd boost_1_43_0
 
-If you didn't acquire the bjam tool, execute this: bootstrap.bat
+cd to the Boost directory and execute 
 
-Make sure that the target Python is the only Python installed (-a means rebuild all):
-bjam --toolset=msvc --build-type=complete --with-python --with-thread --with-signals stage
+.\bootstrap.bat
+
+to create the bjam tool and project-config.jam.
+
+In the file project-config.jam, add the Python version for which the Boost
+libaries are to be built:
+
+using python : 3.1 ;
+
+To build the Boost libraries, execute
+
+./bjam --build-type=complete --with-python --with-thread --with-signals stage
 
 "complete" means "make various variants of the libraries".
-Look in stage/lib to find these static multithreading library files:
-libboost_python-vc90-mt-s-1_35.lib
-libboost_signals-vc90-mt-s-1_35.lib
-libboost_thread-vc90-mt-s-1_35.lib
 
-These go into dependencies\boost_file\win_libs 
+The files you want will be in stage/lib.
+Move the following multithreaded static libraries to dependencies/boost_files/win_libs:
+libboost_python3-vc90-mt-s-1_43.lib
+libboost_signals-vc90-mt-s-1_43.lib
+libboost_thread-vc90-mt-s-1_43.lib
 
 Also, you need to copy the directory named boost from the Boost files into dependencies\boost_file.
 
