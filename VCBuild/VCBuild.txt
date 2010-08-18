@@ -97,23 +97,34 @@ cd to the Boost directory and execute
 
 to create the bjam tool and project-config.jam.
 
-In the file project-config.jam, add the Python version for which the Boost
+In the file project-config.jam, add the Python version (such as 3.1) for which the Boost
 libaries are to be built:
 
 using python : 3.1 ;
 
-To build the Boost libraries, execute
+To build the Boost libraries, execute this for Python 2.x
 
 ./bjam --build-type=complete --with-python --with-thread --with-signals stage
+
+or this for Python 3.x
+
+./bjam --build-type=complete --with-python --with-thread --with-signals --with-random stage
 
 "complete" means "make various variants of the libraries".
 
 The files you want will be in stage/lib.
-Move the following multithreaded static libraries to dependencies/boost_files/win_libs:
-libboost_python3-vc90-mt-s-1_43.lib
-libboost_random-vc90-mt-s-1_43.lib
+Move the following multithreaded static libraries to dependencies/boost_files/win_libs.
+
+For Python 2.x:
+libboost_python-vc90-mt-s-1_43.lib
 libboost_signals-vc90-mt-s-1_43.lib
 libboost_thread-vc90-mt-s-1_43.lib
+
+For Python 3.x:
+libboost_python3-vc90-mt-s-1_43.lib (and then change the name in win_libs to libboost_python-vc90-mt-s-1_43.lib)
+libboost_signals-vc90-mt-s-1_43.lib
+libboost_thread-vc90-mt-s-1_43.lib
+libboost_random-vc90-mt-s-1_43.lib
 
 Also, you need to copy the directory named boost from the Boost files into dependencies\boost_file.
 
