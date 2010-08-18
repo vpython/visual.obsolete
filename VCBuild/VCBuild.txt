@@ -111,6 +111,7 @@ To build the Boost libraries, execute
 The files you want will be in stage/lib.
 Move the following multithreaded static libraries to dependencies/boost_files/win_libs:
 libboost_python3-vc90-mt-s-1_43.lib
+libboost_random-vc90-mt-s-1_43.lib
 libboost_signals-vc90-mt-s-1_43.lib
 libboost_thread-vc90-mt-s-1_43.lib
 
