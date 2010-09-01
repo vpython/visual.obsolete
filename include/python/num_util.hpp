@@ -231,7 +231,11 @@ namespace cvisual { namespace python {
    */
   NPY_TYPES char2type(char e_type);
 
+#if PY_MAJOR_VERSION < 3
+  void init_numpy();
+#else
   int init_numpy();
+#endif
 
   size_t typesize( NPY_TYPES t);
 
