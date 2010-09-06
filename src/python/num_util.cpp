@@ -45,7 +45,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 namespace {
-	const char* rcsid = "$Id: num_util.cpp,v 1.11 2010/09/01 17:16:54 bsherwood Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.12 2010/09/06 18:59:55 bsherwood Exp $";
 }
 
   // Local function prototypes
@@ -70,7 +70,7 @@ init_numpy()
 int
 init_numpy()
 {
-	// With Python 3, import_array is type int.
+	// With Python 3, init_numpy is type int.
 	import_array();
 	arrayapi_initialized = true;
 	return 0;
