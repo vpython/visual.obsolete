@@ -99,14 +99,14 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl library.
 
   AC_CACHE_CHECK([for $am_display_PYTHON version], [am_cv_python_version],
-    [am_cv_python_version=`$PYTHON -c "import sys; print sys.version[[:3]]"`])
+    [am_cv_python_version=`$PYTHON -c "import sys; print(sys.version[[:3]])"`])
   AC_SUBST([PYTHON_VERSION], [$am_cv_python_version])
 
   dnl At times (like when building shared libraries) you may want
   dnl to know which OS platform Python thinks this is.
 
   AC_CACHE_CHECK([for $am_display_PYTHON platform], [am_cv_python_platform],
-    [am_cv_python_platform=`$PYTHON -c "import sys; print sys.platform"`])
+    [am_cv_python_platform=`$PYTHON -c "import sys; print(sys.platform)"`])
   AC_SUBST([PYTHON_PLATFORM], [$am_cv_python_platform])
 
   dnl Use the values of $prefix and $exec_prefix for the corresponding
@@ -115,8 +115,8 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl general consensus is that you shouldn't need this ability.
 
   if test $PYTHON_PLATFORM = "win32"; then
-    AC_SUBST([PYTHON_PREFIX], [`$PYTHON -c "from distutils import sysconfig; print sysconfig.PREFIX"`])
-    AC_SUBST([PYTHON_EXEC_PREFIX], [`$PYTHON -c "from distutils import sysconfig; print sysconfig.EXEC_PREFIX"`])
+    AC_SUBST([PYTHON_PREFIX], [`$PYTHON -c "from distutils import sysconfig; print(sysconfig.PREFIX)"`])
+    AC_SUBST([PYTHON_EXEC_PREFIX], [`$PYTHON -c "from distutils import sysconfig; print(sysconfig.EXEC_PREFIX)"`])
   else
     AC_SUBST([PYTHON_PREFIX], ['${prefix}'])
     AC_SUBST([PYTHON_EXEC_PREFIX], ['${exec_prefix}'])
@@ -133,7 +133,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl doesn't work.
   AC_CACHE_CHECK([for $am_display_PYTHON script directory],
     [am_cv_python_pythondir],
-    [am_cv_python_pythondir=`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_lib(0,0,prefix='$PYTHON_PREFIX').replace('\\\\\','/')" 2>/dev/null || 
+    [am_cv_python_pythondir=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_lib(0,0,prefix='$PYTHON_PREFIX').replace('\\\\\','/'))" 2>/dev/null || 
     	echo "$PYTHON_PREFIX/lib/python$PYTHON_VERSION/site-packages"`])
   AC_SUBST([pythondir], [$am_cv_python_pythondir])
 
@@ -150,7 +150,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl doesn't work.
   AC_CACHE_CHECK([for $am_display_PYTHON extension module directory],
     [am_cv_python_pyexecdir],
-    [am_cv_python_pyexecdir=`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_lib(1,0,prefix='$PYTHON_EXEC_PREFIX').replace('\\\\\','/')" 2>/dev/null ||
+    [am_cv_python_pyexecdir=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_lib(1,0,prefix='$PYTHON_EXEC_PREFIX').replace('\\\\\','/'))" 2>/dev/null ||
        echo "${PYTHON_EXEC_PREFIX}/lib/python${PYTHON_VERSION}/site-packages"`])
   AC_SUBST([pyexecdir], [$am_cv_python_pyexecdir])
 
@@ -307,7 +307,7 @@ AC_DEFUN([AM_CHECK_PYTHON_HEADERS],
 	dnl directly from Python itself).
 	dnl The following loses backslashes on Windows and gives -Ic:Python25include,
 	dnl but src/Makefile.in does produce the right include statement for Windows.
-	PYTHON_INCLUDES=-I`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_inc()"`
+	PYTHON_INCLUDES=-I`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_inc())"`
 	PYTHON_INCLUDES="$PYTHON_INCLUDES -I$numpyincludedir"
 	AC_SUBST(PYTHON_INCLUDES)
 	dnl check if the headers exist:
