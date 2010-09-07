@@ -1,9 +1,9 @@
 from visual import *
 
-print """
+print("""
 Drag or click to show the magnetic field interactively.
 Mark the magnetic field vector at the end of the drag.
-"""
+""")
 
 scene.width = 600
 scene.height = 600

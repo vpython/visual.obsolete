@@ -41,7 +41,6 @@ L = []
 for t in arange(0,2*pi,0.2):
     for s in arange(0,pi,0.1):
         L.append((cos(t)*sin(s)+2, sin(t)*sin(s)+2, cos(s)))
-print len(L)
 d.pos = L
 
 # modify the disk

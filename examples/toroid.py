@@ -73,8 +73,8 @@ for pt in toroid.pos:
     oldpt=pt
 dlarrow.visible=0
     
-print "computed value at R: ",Barrows[2].axis.mag/bscale
-print "Ampere's law value: ", Bideal
+print("computed value at R: ",Barrows[2].axis.mag/bscale)
+print("Ampere's law value: ", Bideal)
         
         
     

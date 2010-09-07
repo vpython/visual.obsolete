@@ -1,13 +1,13 @@
 from visual import *
 
-print """
+print("""
 Click to place spheres under falling string.
 Right button drag to rotate view.
   On a one-button mouse, right is Command + mouse.
 Middle button drag up or down to zoom in or out.
   On a two-button mouse, middle is left + right.
   On a one-button mouse, middle is Option + mouse.
-"""
+""")
 
 # David Scherer
 

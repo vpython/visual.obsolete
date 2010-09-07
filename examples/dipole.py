@@ -1,6 +1,6 @@
 from visual import *
 
-print """
+print("""
 Click to plot a normalized electric field vector.
 Vectors are blue if low magnitude, red if high.
 Right button drag to rotate camera to view scene.
@@ -8,7 +8,7 @@ Right button drag to rotate camera to view scene.
 Middle button drag up or down to zoom in or out.
   On a two-button mouse, middle is left + right.
   On a one-button mouse, middle is Option + mouse.
-"""
+""")
 
 ec = 1.6e-19  # electron charge
 

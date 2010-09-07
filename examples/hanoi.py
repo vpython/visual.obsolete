@@ -4,7 +4,7 @@ from visual import *
 
 scene.width=800
 scene.title="Tower of Hanoi"
-print "Move the stack to the white pole."
+print("Move the stack to the white pole.")
 
 maxradius=2.5
 thick=.5
@@ -36,7 +36,7 @@ while True:
         if m.drag:  # identify pole clicked on
             mx=m.project(normal=vector(0,0,1)).x
             pole1=int((mx+floor.length/2.)/(floor.length/3.))
-            print pole1
+            print(pole1)
             # pick up a ring
             if len(stack[pole1])>0:
                 select=stack[pole1][-1]     # remove ring from stack
@@ -63,7 +63,7 @@ while True:
                     stack[pole2].append(select)
                     moves=moves+1
         if len(stack[2])==5:    # task completed?
-            print "You won in ",moves," moves."
+            print("You won in ",moves," moves.")
             flash=0
             while flash < 6:
                 rightpole.color=(1,0,0)

@@ -102,6 +102,6 @@ def win():
     return wins
 
 ##a=win()
-print " "
-print "Run 'tictac.py' to play 3D tictactoe."
+print(" ")
+print("Run 'tictac.py' to play 3D tictactoe.")
 

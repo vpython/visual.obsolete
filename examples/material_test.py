@@ -1,4 +1,3 @@
-from __future__ import division
 from visual import *
 
 test_materials_individually = False
@@ -21,7 +20,7 @@ lite.m = sphere( pos = lite.pos, radius = 0.1, color = (1,1,.8), material = mate
 spheres = []
 for mat in (materials.materials+[None]):
     if test_materials_individually: scene.visible = 0
-    if mat: print mat.name
+    if mat: print(mat.name)
     spheres.append( obj( radius = R,
                          length = sqrt(2)*R,
                          height = sqrt(2)*R,

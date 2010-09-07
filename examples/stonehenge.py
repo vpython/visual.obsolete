@@ -1,13 +1,13 @@
-from __future__ import division
+
 from visual import *
 import time
 
-print """
+print("""
 Press to enter roaming mode, release to exit roaming mode.
 In roaming mode, with the mouse button down, move the mouse
 above or below the center of the scene to move forward or
 backward; right or left rotates your direction of motion.
-"""
+""")
 
 # Bruce Sherwood
 

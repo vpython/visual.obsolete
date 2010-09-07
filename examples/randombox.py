@@ -3,13 +3,13 @@ from random import random, randrange
 
 ## this is mostly for experimenting with zooming and rotating
 
-print """
+print("""
 Right button drag to rotate "camera" to view scene.
   On a one-button mouse, right is Command + mouse.
 Middle button to drag up or down to zoom in or out.
   On a two-button mouse, middle is left + right.
   On a one-button mouse, middle is Option + mouse.
-"""
+""")
 
 def random_box ():
     xx = randrange (-55,54)

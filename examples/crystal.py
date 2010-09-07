@@ -53,8 +53,8 @@ def crystal(N=3, delta=1.0, R=None, sradius=None):
                 z = zmin+nz*delta
                 atoms.append(sphere(pos=(x,y,z), radius=R, color=bcolor))
                 atoms[-1].p = vector()
-                atoms[-1].near = range(6)
-                atoms[-1].wallpos = range(6)
+                atoms[-1].near = list(range(6))
+                atoms[-1].wallpos = list(range(6))
                 atoms[-1].natom = natom
                 atoms[-1].indices = (nx,ny,nz)
                 natom = natom+1

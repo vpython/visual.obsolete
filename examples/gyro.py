@@ -4,11 +4,11 @@ from visual.text import *
 # Gyroscope hanging from a spring
 # Bruce Sherwood
 
-print """
+print("""
 Click to pause, click to proceed.
 Click on rotor to see angular momentum and impulse arrows.
 Click again on rotor to hide these arrows.
-"""
+""")
 
 arrowsvisible = 0  # angular momentum and angular impulse arrows
 

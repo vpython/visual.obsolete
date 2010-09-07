@@ -1,11 +1,11 @@
 from visual import *
 # demonstration of vector cross product
 
-print """
+print("""
 Vector cross product: Red cross Green = Yellow
 Drag to change green vector
 Click to toggle fixed angle or fixed length
-"""
+""")
 
 # Ruth Chabay
 

@@ -23,11 +23,11 @@ top.pos=top.pos+vector(-0.5, 1., -0.5)
 # get list of winning combinations
 wins=win()
 
-print "****************************************"
-print "Drag ball up starting from bottom grid."
-print "Release to deposit ball in a square."
-print "****************************************"
-print "  "
+print("****************************************")
+print("Drag ball up starting from bottom grid.")
+print("Release to deposit ball in a square.")
+print("****************************************")
+print("  ")
 
 # make sliders
 bars={}
@@ -63,7 +63,7 @@ while len(balls) < 4*4*4:
     if not (point==None):   
         point=(round(point[0]), round(point[1]), round(point[2]))
         if not (visbar==None): visbar.visible=0
-        if not (bars.has_key(point)):
+        if not (point in bars):
             continue
         visbar=bars[point]
         visbar.visible=1   
@@ -77,7 +77,7 @@ while len(balls) < 4*4*4:
             b.y=y
         scene.mouse.getevent()  # get rid of drop depositing ball
         bpoint=(round(b.x), round(b.y), round(b.z))
-        if not(balls.has_key(bpoint)): # not already a ball there
+        if not(bpoint in balls): # not already a ball there
             b.pos=bpoint
             balls[bpoint]=b
             if bcolor==red: bcolor=blue
@@ -88,23 +88,23 @@ while len(balls) < 4*4*4:
         visbar=None
         # check for four in a row
         for a in wins:
-            a0=balls.has_key(a[0])
-            a1=balls.has_key(a[1])
-            a2=balls.has_key(a[2])
-            a3=balls.has_key(a[3])
+            a0=a[0] in balls
+            a1=a[1] in balls
+            a2=a[2] in balls
+            a3=a[3] in balls
             if a0 and a1 and a2 and a3:
                 ccolor=balls[a[0]].color
                 if balls[a[1]].color==balls[a[2]].color==balls[a[3]].color==ccolor:
                     won=ccolor
-                    print " "
+                    print(" ")
                     if ccolor==red:
-                        print "***********"
-                        print " Red wins!"
-                        print "***********"
+                        print("***********")
+                        print(" Red wins!")
+                        print("***********")
                     else:
-                        print "***********"
-                        print " Blue wins!"
-                        print "***********"
+                        print("***********")
+                        print(" Blue wins!")
+                        print("***********")
                     for flash in arange(0,5):
                         balls[a[0]].color=(1,1,1)
                         balls[a[1]].color=(1,1,1)
@@ -120,4 +120,4 @@ while len(balls) < 4*4*4:
         if not (won==None):
             break
 
-print "game over"
+print("game over")

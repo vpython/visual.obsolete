@@ -2,9 +2,9 @@ from visual import *
 
 # Mikhail Temkine, University of Toronto, April 2007
 
-print """
+print("""
 Box lighting test
-"""
+""")
 
 r = 3
 a1 = a2 = a3 = 0.0
