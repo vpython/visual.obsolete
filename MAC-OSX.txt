@@ -81,7 +81,7 @@ The files you want will be in stage/lib.
 Move the following files to dependencies/boost_files/mac_libs:
 libboost_python.a
 libboost_signals.a
-ibboost_thread.a
+libboost_thread.a
 
 In the past the following was used, but it seems neither necessary nor sufficient with Python 2.7:
 ---------------------
@@ -91,7 +91,7 @@ The files you want will be in stage/lib.
 Move these files to dependencies/boost_files/mac_libs (file names will be similar to the following):
 libboost_python-mt-s-1_35.a
 libboost_signals-mt-s-1_35.a
-ibboost_thread-mt-s-1_35.a
+libboost_thread-mt-s-1_35.a
 ----------------------
 
 ----------
