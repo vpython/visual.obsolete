@@ -163,9 +163,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title='N 
             
             vs. t', xtitle='t', ytitle='N', <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xmax=50, 
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xmax=50., 
             
-            xmin=-20, ymax=5E3, ymin=-2E3, <br />
+            xmin=-20., ymax=5E3, ymin=-2E3, <br />
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;foreground=color.black, 
             
             background=color.white)</p>
@@ -179,7 +179,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             
             will have fixed limits. The horizontal axis will extend from -20 to +50, 
             
-            and the vertical axis will extend from -2000 to +5000 (xmin and ymin must 
+            and the vertical axis will extend from -200. to +5000 (xmin and ymin must 
             
             be negative; xmax and ymax must be positive.) The foreground color (white 
             
@@ -197,7 +197,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             curves, faces, and points.</p>
           <p class="program">graph1 = gdisplay()<br />
 		  label(display=graph1.display, pos=(3,2), text=&quot;P&quot;)<br />
-          graph1.display.visible = 0 # make the display invisible </p>
+          graph1.display.visible = False # make the display invisible </p>
           <p class="Normal">You can have more than one graph window: just create another <span class="attribute"> gdisplay</span>. By default, any graphing objects 
             
             created following a <span class="attribute">gdisplay</span> belong to that 
