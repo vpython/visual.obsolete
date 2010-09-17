@@ -418,15 +418,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\python\scalar_array.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\python\slice.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\python\vector_array.cpp"
 					>
 				</File>
 				<File
@@ -608,15 +600,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\python\scalar_array.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\include\python\slice.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\include\python\vector_array.hpp"
 					>
 				</File>
 				<File
