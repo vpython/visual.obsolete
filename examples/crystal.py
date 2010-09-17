@@ -2,6 +2,7 @@ from visual import *
 from random import random
 
 # Bruce Sherwood; revised by Jonathan Brandmeyer
+# Converted core calculations to numpy, Sept. 2010, Bruce Sherwood
 
 N = 3
 Ntotal = N*N*N
@@ -137,7 +138,7 @@ for a in atoms:
     ptotal = ptotal+a.p
 
 for a in atoms:
-    a.p = a.p-ptotal/(N**2)
+    a.p = array(a.p-ptotal/(N**2))
 
 # Convert to tuples for faster indexing access.  We aren't growing any more of them.
 springs = tuple(springs)
@@ -146,11 +147,13 @@ atoms = tuple(atoms)
 # Evaluate a couple of constants outside the loop
 k_dt = k * dt
 dt_m = dt / m
+
 while True:
     rate(100)
     for a in atoms:
-        r = vector_array(a.nearpos) - a.pos
-        a.p += k_dt *(r.norm()*(r.mag()-L)).sum()
+        r = array(a.nearpos) - a.pos
+        rmag = (sqrt(sum(square(r),-1))).reshape(-1,1) # reshape rmag from row to column
+        a.p += k_dt * sum((1-L/rmag)*r,0) # sum the forces k*dt*(rmag-L)*(r/rmag)
 
     for a in atoms:
         a.pos += a.p * dt_m
@@ -158,7 +161,7 @@ while True:
     for s in springs:
         p1 = s.atom1.pos
         r12 = s.atom2.pos-p1
-        dir = r12.norm()
-        s.pos = p1+Rs*dir
-        s.axis = (r12.mag-2*Rs)*dir
+        direction = r12.norm()
+        s.pos = p1+Rs*direction
+        s.axis = (r12.mag-2*Rs)*direction
 
