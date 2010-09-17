@@ -337,8 +337,9 @@ wrap_vector()
 	def( "norm", norm_a);
 
 	// Free functions for vectors
-	py::def( "det3",a_dot_b_cross_c, "The determinant of the matrix of 3 vectors.");
-	py::def( "cross3",a_cross_b_cross_c, "The vector triple product.");
+	// The following two functions have never been implemented:
+	//py::def( "det3",a_dot_b_cross_c, "The determinant of the matrix of 3 vectors.");
+	//py::def( "cross3",a_cross_b_cross_c, "The vector triple product.");
 	py::def( "dot", dot, "The dot product between two vectors.");
 	py::def( "cross", cross, "The cross product between two vectors.");
 	py::def( "mag", mag, "The magnitude of a vector.");

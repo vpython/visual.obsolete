@@ -1,6 +1,12 @@
 #ifndef VPYTHON_PYTHON_SCALAR_ARRAY_HPP
 #define VPYTHON_PYTHON_SCALAR_ARRAY_HPP
 
+// This alternative to numpy is not currently being used
+// but is retained in CVS for possible future use.
+// In particular, information about array objects such
+// as curve cannot currently be cached because we don't
+// know when a numpy pos array has been changed.
+
 // Copyright (c) 2000, 2001, 2002, 2003 by David Scherer and others.
 // See the file license.txt for complete license terms.
 // See the file authors.txt for a complete list of contributors.

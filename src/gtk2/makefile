@@ -69,8 +69,8 @@ CVISUAL_OBJS = arrayprim.o arrow.o axial.o box.o cone.o cylinder.o display_kerne
 	display.o font_renderer.o random_device.o rate.o render_surface.o timer.o \
 	render_manager.o rgba.o shader_program.o texture.o tmatrix.o vector.o\
 	convex.o curve.o cvisualmodule.o faces.o \
-	num_util.o numeric_texture.o points.o scalar_array.o slice.o \
-	vector_array.o wrap_arrayobjects.o wrap_display_kernel.o wrap_primitive.o \
+	num_util.o numeric_texture.o points.o slice.o \
+	wrap_arrayobjects.o wrap_display_kernel.o wrap_primitive.o \
 	wrap_rgba.o wrap_vector.o
 
 %.o: %.cpp

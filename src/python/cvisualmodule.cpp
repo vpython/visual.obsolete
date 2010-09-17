@@ -35,11 +35,6 @@ void wrap_rgba();
 void wrap_vector();
 void wrap_arrayobjects();
 
-namespace python {
-	void wrap_vector_array();
-	void wrap_scalar_array();
-} // !namespace python
-
 void
 translate_std_out_of_range( std::out_of_range e)
 {
@@ -183,8 +178,6 @@ BOOST_PYTHON_MODULE( cvisual)
 	wrap_display_kernel();
 	wrap_primitive();
 	wrap_arrayobjects();
-	python::wrap_vector_array();
-	python::wrap_scalar_array();
 }
 
 } // !namespace cvisual

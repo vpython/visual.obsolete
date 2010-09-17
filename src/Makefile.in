@@ -71,8 +71,8 @@ CVISUAL_OBJS = atomic_queue.lo displaylist.lo errors.lo extent.lo \
 	renderable.lo ring.lo sphere.lo text.lo \
 	display.lo font_renderer.lo random_device.lo render_surface.lo timer.lo\
 	arrayprim.lo convex.lo curve.lo cvisualmodule.lo faces.lo num_util.lo \
-	numeric_texture.lo points.lo scalar_array.lo slice.lo \
-	vector_array.lo wrap_arrayobjects.lo wrap_display_kernel.lo \
+	numeric_texture.lo points.lo slice.lo \
+	wrap_arrayobjects.lo wrap_display_kernel.lo \
 	wrap_primitive.lo wrap_rgba.lo wrap_vector.lo 
 
 # Distribution file list.
