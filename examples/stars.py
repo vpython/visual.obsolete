@@ -68,22 +68,13 @@ while True:
     rate(100)
     
     # Compute all forces on all stars
-    try:  # numpy
-        r = pos-pos[:,newaxis] # all pairs of star-to-star vectors
-        for n in range(Nstars):
-            r[n,n] = 1e6  # otherwise the self-forces are infinite
-        rmag = sqrt(add.reduce(r*r,-1)) # star-to-star scalar distances
-        hit = less_equal(rmag,radius+radius[:,newaxis])-identity(Nstars)
-        hitlist = sort(nonzero(hit.flat)[0]).tolist() # 1,2 encoded as 1*Nstars+2
-        F = G*m*m[:,newaxis]*r/rmag[:,:,newaxis]**3 # all force pairs
-    except: # old Numeric
-        r = pos-pos[:,NewAxis] # all pairs of star-to-star vectors
-        for n in range(Nstars):
-            r[n,n] = 1e6  # otherwise the self-forces are infinite
-        rmag = sqrt(add.reduce(r*r,-1)) # star-to-star scalar distances
-        hit = less_equal(rmag,radius+radius[:,NewAxis])-identity(Nstars)
-        hitlist = sort(nonzero(hit.flat)) # 1,2 encoded as 1*Nstars+2
-        F = G*m*m[:,NewAxis]*r/rmag[:,:,NewAxis]**3 # all force pairs
+    r = pos-pos[:,newaxis] # all pairs of star-to-star vectors
+    for n in range(Nstars):
+        r[n,n] = 1e6  # otherwise the self-forces are infinite
+    rmag = sqrt(sum(square(r),-1)) # star-to-star scalar distances
+    hit = less_equal(rmag,radius+radius[:,newaxis])-identity(Nstars)
+    hitlist = sort(nonzero(hit.flat)[0]).tolist() # 1,2 encoded as 1*Nstars+2
+    F = G*m*m[:,newaxis]*r/rmag[:,:,newaxis]**3 # all force pairs
         
     for n in range(Nstars):
         F[n,n] = 0  # no self-forces
