@@ -2,18 +2,19 @@
 ; Assumes Python and numpy already installed.
 
 ; Make sure version numbers are correct for VPython and numpy.
+; Also, make sure that vidle\config-main.def has the correct Python version number for documentation
 
 [Setup]
-AppName=VPython for Python 2.7
+AppName=VPython for Python 3.1
 AppVerName=VPython 5.32
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
-SourceDir=C:\Python27
+SourceDir=C:\Python31
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py2.7-5.32
+OutputBaseFilename=VPython-Win-Py3.1-5.32
 OutputDir=c:\workspace
 
 [Files]
@@ -55,8 +56,8 @@ Source: "Lib\site-packages\vidle\*.def"; DestDir: "{app}\Lib\site-packages\vidle
 Source: "Lib\site-packages\vidle\*.gif"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
 Source: "Lib\site-packages\vidle\*.icns"; DestDir: "{app}\Lib\site-packages\vidle\"; Components: VIDLE; Flags: recursesubdirs
 
-Source: "c:\workspace\vpython-core2\examples\*.py"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
-Source: "c:\workspace\vpython-core2\examples\*.tga"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
+Source: "Lib\site-packages\visual\examples\*.py"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
+Source: "Lib\site-packages\visual\examples\*.tga"; DestDir: "{app}\Lib\site-packages\visual\examples\"; Components: Examples
 
 Source: "c:\workspace\vpython-core2\docs\index.html"; DestDir: "{app}\Lib\site-packages\visual\docs\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.html"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
@@ -68,12 +69,12 @@ Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\L
 
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
-Name: numpy; Description: "numpy 1.5.0 {code:NumpyStatus|C:\Python27}"; Types: full; Check: CheckNumpy( 'C:\Python27' )
+Name: numpy; Description: "numpy 1.5.0 {code:NumpyStatus|C:\Python31}"; Types: full; Check: CheckNumpy( 'C:\Python31' )
 
 ; FontTools, ttfquery, and Polygon are needed by the 3D text object
-Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python27}"; Types: full; Check: CheckFontTools( 'C:\Python27' )
-Name: ttfquery; Description: "ttfquery 1.0.4 {code:ttfqueryStatus|C:\Python27}"; Types: full; Check: Checkttfquery( 'C:\Python27' )
-Name: Polygon; Description: "Polygon 2.0.2 {code:PolygonStatus|C:\Python27}"; Types: full; Check: CheckPolygon( 'C:\Python27' )
+Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python31}"; Types: full; Check: CheckFontTools( 'C:\Python31' )
+Name: ttfquery; Description: "ttfquery 1.0.4 {code:ttfqueryStatus|C:\Python31}"; Types: full; Check: Checkttfquery( 'C:\Python31' )
+Name: Polygon; Description: "Polygon 2.0.2 {code:PolygonStatus|C:\Python31}"; Types: full; Check: CheckPolygon( 'C:\Python31' )
 
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
@@ -101,14 +102,14 @@ program Setup;
 function MyConst(Param: String): String;
 var Exist1, Exist2: Boolean;
 begin
-    Exist1 := FileExists( ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.7\InstallPath,}\python.exe'));
+    Exist1 := FileExists( ExpandConstant('{reg:HKLM\Software\Python\PythonCore\3.1\InstallPath,}\python.exe'));
     if Exist1 then
-      Result := ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.7\InstallPath,}')
+      Result := ExpandConstant('{reg:HKLM\Software\Python\PythonCore\3.1\InstallPath,}')
     else
       begin
-      Exist2 := FileExists( ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.7\InstallPath,}\python.exe'));
+      Exist2 := FileExists( ExpandConstant('{reg:HKCU\Software\Python\PythonCore\3.1\InstallPath,}\python.exe'));
       if Exist2 then
-        Result := ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.7\InstallPath,}')
+        Result := ExpandConstant('{reg:HKCU\Software\Python\PythonCore\3.1\InstallPath,}')
       else
         Result := 'C:\'
       end
@@ -120,11 +121,11 @@ begin
   case CurPage of
     wpSelectDir:
       begin
-      Result1 := FileExists( ExpandConstant('{reg:HKLM\Software\Python\PythonCore\2.7\InstallPath,}\python.exe'));
-      Result2 := FileExists( ExpandConstant('{reg:HKCU\Software\Python\PythonCore\2.7\InstallPath,}\python.exe'));
+      Result1 := FileExists( ExpandConstant('{reg:HKLM\Software\Python\PythonCore\3.1\InstallPath,}\python.exe'));
+      Result2 := FileExists( ExpandConstant('{reg:HKCU\Software\Python\PythonCore\3.1\InstallPath,}\python.exe'));
       Result := Result1 or Result2
       if not Result then
-         MsgBox('Could not locate where Python 2.7 is installed.' #13 'You will be asked where python.exe is located.', mbInformation, MB_OK);
+         MsgBox('Could not locate where Python 3.1 is installed.' #13 'You will be asked where python.exe is located.', mbInformation, MB_OK);
       end
     else
       Result := False;
