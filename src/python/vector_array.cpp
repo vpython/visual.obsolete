@@ -313,7 +313,7 @@ namespace cvisual {namespace python {
 			iterator r_i = ret.data.begin();
 			const_iterator v_i = v.data.begin();
 			for (const_iterator i = data.begin(); i != data.end(); ++i, ++r_i, ++v_i) {
-				*r_i = *i + *v_i;
+				*r_i = *i - *v_i;
 			}
 			return ret;
 		}
