@@ -8,6 +8,29 @@ There is already a /usr/bin/python that at the moment is up to date, but
 because this isn't always the case, and because the Python community seems to
 strongly prefer it, we will base Visual on MacPython, which is /usr/local/bin/python.
 
+PYTHON INSTALLERS
+The standard Python installers at python.org for the Mac install into
+   /Library/Frameworks/Python.framework/Versions/
+
+For Python 2.x, the installer modified .profile to add the newly installed Python
+to the application search PATH. The installer also added or changed a link
+   /Library/Frameworks/Python.framework/Versions/Current
+to point to the newly installed Python. However, the Python 3.x installer does
+NOT modify .profile or Current.
+
+For the makefile to pick out the correct Python in building Visual, you need
+to create or modify /Library/Frameworks/Python.framework/Versions/Current. Assume
+that the new Python is in /Library/Frameworks/Python.framework/Versions/3.1:
+   cd /Library/Frameworks/Python.framework/Versions
+   (if necessary, "sudo rm Current" if there already is one)
+   sudo ln -s 3.1 Current
+
+You should also add the following to .profile (in your home directory), so that
+executing "python" in a Terminal will run the newly installed Python:
+   PATH="/Library/Frameworks/Python.framework/Versions/Current/bin:${PATH}"
+   export PATH
+
+INSTALLING MODULES NEEDED BY VISUAL
 Next you need to install numpy. You may find an installer for it. Otherwise:
 Download the source for numpy and unpack it (http://www.scipy.org/Download).
 In the numpy directory, execute "sudo python setup.py install".
@@ -17,7 +40,8 @@ For Visual 5.3 and later, you need the Python modules FontTools, ttfquery, and P
 Be sure to get ttfquery 1.0.4 or later.
 Polygon is available at http://polygon.origo.ethz.ch/download
 Currently, use the Polygon 2.0.1 binary for Python 2.6, which works with Python 27;
-have not succeeded in building Polygon from source.
+I have not succeeded in building Polygon from source. Nor did I succeed with Python 3.1
+but got a Mac binary from the Polygon maintainer Joerg Raedler <joerf@j-raedler.de>.
 	
 Note The following copyright notice applies to the Polygon module when included in
 the VPython distribution concerning Polygon:
@@ -31,6 +55,7 @@ distribution as the basis for commercial exploitation, unless a
 GPC Commercial Use Licence is obtained from The University of 
 Manchester, contact: http://www.cs.man.ac.uk/~toby/gpc/".
 
+BUILD VISUAL
 You need Boost libraries for the Mac. See below for how to build the Boost libraries.
 (The following may not work, because up-to-date files are not also provided in CVS:
 In the dependencies section of CVS, unzip the zip file. You should name the resulting 
@@ -58,15 +83,17 @@ Another option to compile all of the .py files in a directory is this:
 	import compileall
 	compileall.compile_dir("mylib", force=1)
 
+CREATE INSTALLER
 In src/mac/PackageMaker is an Apple PackageMaker project file, a Welcome text file
 for creating a VPython installer for the Mac, and instructions in packaging.txt.
 
 Be sure to set the project status to require OSX 10.4 and above.
 
+BUILDING BOOST LIBRARIES
 The Boost libraries were built by downloading the source.
 cd to the Boost directory and execute 
 
-./bootstrap.sh --with-toolset=gcc --with-python-version=2.7 --with-libraries=python,signals,thread
+./bootstrap.sh --with-toolset=gcc --with-python-version=3.1 --with-python-root=/Library/Frameworks/Python.framework/Versions/3.1 --with-python=python3.1 --with-libraries=python,signals,thread
 
 to create the bjam tool and project-config.jam.
 
