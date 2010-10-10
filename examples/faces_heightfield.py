@@ -12,7 +12,7 @@ from visual import *
 class Model:
     def __init__(self):
         self.frame = frame()
-        self.model = faces(frame=self.frame)
+        self.model = faces(frame=self.frame, color=color.cyan)
         self.vertices = []
 
     def FacetedTriangle(self, v1, v2, v3, color=color.white):
