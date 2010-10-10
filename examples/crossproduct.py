@@ -35,11 +35,11 @@ fixtheta = 0
 avector = array ([0,0,-3.5])
 bvector = vector (0,3,2)
 
-a = arrow(pos=(0,0,0), shaftwidth=R, color=crayola.red)
-b = arrow(pos=(0,0,0), axis=bvector, shaftwidth=R, color=crayola.green)
+a = arrow(pos=(0,0,0), shaftwidth=R, color=color.red)
+b = arrow(pos=(0,0,0), axis=bvector, shaftwidth=R, color=color.green)
 a.axis =avector
 cvector = cross(avector,bvector)
-c = arrow(pos=(0,0,0), axis=cvector, shaftwidth=R, color=crayola.yellow)
+c = arrow(pos=(0,0,0), axis=cvector, shaftwidth=R, color=color.yellow)
 
 scene.autoscale = 0
 scene.forward = (-1,-.5,-1)
