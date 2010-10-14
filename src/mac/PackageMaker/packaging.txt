@@ -19,13 +19,13 @@ Place in stage:
 
 Clean out irrelevant files from these folders (e.g. CVS folders, make files).
 
-The VIDLE launcher was created starting from the launcher created by cd-ing to 
-site-packages/vidle and executing "python MacBuildApp.py build". This produced a
-launcher VIDLE.app which seemed to lack robustness and often failed to run. 
-If you right-click (ctrl-click) VIDLE.app, you can gain access to the contents
-of what is actually a folder. The Python scripts VIDLE and idle.py were edited
-with TextEdit to be very simple. They contain specific references to the Python version
-and so will need to be revised for later versions of Python.
+The VIDLE launcher was created starting from the IDLE launcher found in the
+/Applications/Python X.Y folder. Make a copy of this IDLE launcher.
+If you right-click (ctrl-click) IDLE, you can gain access to the contents
+of what is actually a folder. The Python script Resources/idlemain.py was 
+edited with TextEdit to change idle.PyShell to vidle.PyShell. 
+Doubleclick info.plist to use the plist editor to change IDLE to VIDLE.
+Change the name of the IDLE launcher to VIDLE.
 
 Ctrl-click the stage folder and choose Get Info.
 Expose Sharing & Permissions.
