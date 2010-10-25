@@ -3,7 +3,7 @@
 
 AUTOMAKE_OPTIONS = foreign dist-bzip2
 
-SUBDIRS = site-packages/visual src
+SUBDIRS = site-packages/visual site-packages/vis src
 
 # Logic to distribute the header files and miscellaneous files.
 EXTRA_DIST = include HACKING.txt INSTALL.txt \
