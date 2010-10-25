@@ -1,8 +1,8 @@
 
 # Process this file with Autoconf to produce a configure script
 
-AC_INIT( [Visual Python], [5.32_release], [visualpython-users@lists.sourceforge.net])
-AM_INIT_AUTOMAKE( visual, 5.32_release)
+AC_INIT( [Visual Python], [5.4_release], [visualpython-users@lists.sourceforge.net])
+AM_INIT_AUTOMAKE( visual, 5.4_release)
 
 AC_CONFIG_SRCDIR(src/core/arrow.cpp)
 
@@ -83,7 +83,7 @@ else
 fi
 AC_SUBST([PYTHONPATH], "$python_path")
 
-AC_CONFIG_FILES( Makefile src/Makefile site-packages/visual/Makefile 
+AC_CONFIG_FILES( Makefile src/Makefile site-packages/visual/Makefile site-packages/vis/Makefile 
 	docs/Makefile examples/Makefile bin/vpython)
 AM_CONFIG_HEADER( include/config.h)
 
