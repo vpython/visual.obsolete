@@ -48,10 +48,10 @@ AC_DEFUN([AM_PATH_PYTHON],
  AC_REQUIRE([VISUAL_CHECK_PLATFORM])
   dnl Find a Python interpreter.  Python versions prior to 1.5 are not
   dnl supported because the default installation locations changed from
-  dnl $prefix/lib/site-python in 1.4 to $prefix/lib/python1.5/site-packages
+  dnl $prefix/lib/site-python in 1.4 to $prefix/lib/python1.5/dist-packages
   dnl in 1.5.
   m4_define([_AM_PYTHON_INTERPRETER_LIST],
-            [python python2.6 python2.5 python2.4])
+            [python python 3.1 python2.7 python2.6 python2.5 python2.4])
 
   m4_if([$1],[],[
     dnl No version check is needed.
@@ -125,7 +125,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl Set up 4 directories:
 
   dnl pythondir -- where to install python scripts.  This is the
-  dnl   site-packages directory, not the python standard library
+  dnl   dist-packages directory, not the python standard library
   dnl   directory like in previous automake betas.  This behavior
   dnl   is more consistent with lispdir.m4 for example.
   dnl Query distutils for this directory.  distutils does not exist in
@@ -134,7 +134,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   AC_CACHE_CHECK([for $am_display_PYTHON script directory],
     [am_cv_python_pythondir],
     [am_cv_python_pythondir=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_lib(0,0,prefix='$PYTHON_PREFIX').replace('\\\\\','/'))" 2>/dev/null || 
-    	echo "$PYTHON_PREFIX/lib/python$PYTHON_VERSION/site-packages"`])
+    	echo "$PYTHON_PREFIX/lib/python$PYTHON_VERSION/dist-packages"`])
   AC_SUBST([pythondir], [$am_cv_python_pythondir])
 
   dnl pkgpythondir -- $PACKAGE directory under pythondir.  Was
@@ -151,7 +151,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   AC_CACHE_CHECK([for $am_display_PYTHON extension module directory],
     [am_cv_python_pyexecdir],
     [am_cv_python_pyexecdir=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_lib(1,0,prefix='$PYTHON_EXEC_PREFIX').replace('\\\\\','/'))" 2>/dev/null ||
-       echo "${PYTHON_EXEC_PREFIX}/lib/python${PYTHON_VERSION}/site-packages"`])
+       echo "${PYTHON_EXEC_PREFIX}/lib/python${PYTHON_VERSION}/dist-packages"`])
   AC_SUBST([pyexecdir], [$am_cv_python_pyexecdir])
 
   dnl pkgpyexecdir -- $(pyexecdir)/$(PACKAGE)
