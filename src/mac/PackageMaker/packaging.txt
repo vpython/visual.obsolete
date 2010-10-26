@@ -5,7 +5,7 @@ at the same level as vpython-core2.
 
 Place in stage:
 	Files that will go to site-packages:
-		visual folder (from vpython-core2/site-packages)
+		vis and visual folders (from vpython-core2/site-packages)
 		vidle (from vpython-core2/site-packages or site-packages)
 		numpy files (folder and file from site-packages)
 		FontTools folder and fonttools .egg-info file
