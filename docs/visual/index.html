@@ -162,20 +162,27 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       </p>
       <p class="Normal">&nbsp;</p>
       <p class="Normal">To invoke the Visual
-        module, place the following statement at the start of the file:</p>
-      <p class="program"> from visual import *</p>
-
-          <p class="Normal">To make sure that 3/4 is treated as 0.75 rather than zero, start your program with these statements (there are two underlines before <strong>future</strong> and two underlines after <strong>future</strong>):</p>
-          <p class="program">from __future__ import division<br />
-          from visual import *<br />
-            <br /> 
-          </p>
-<div>
-            <p class="Normal">VPython documentation was produced by Ruth Chabay,
-          David Scherer, and Bruce Sherwood.<br />
-</p>
+      module, place the following statement at the start of the file:</p>
+      <p class="program"> from visual import * </p>
+      <p class="Normal">If you are using Python 2.7 or earlier, to make sure that 3/4 is treated as 0.75 rather than zero, start your program with the following statements (there are two underlines before <strong>future</strong> and two underlines after <strong>future</strong>):</p>
+      <p class="program">from __future__ import division<br />
+        from visual import * </p>
+      <div>
+        <p class="Normal">This is not necessary with Python 3.0 or later, but it doesn't hurt, and including the division statement ensures that ;your program will handle division the same way on all versions of Python.</p>
+        <p class="style1">For experienced programmers</p>
+        <p class="Normal">As a convenience to novice programmers to provide everything needed to get started, &quot;from visual import *&quot; imports all of the Visual features and executes &quot;from math import *&quot; and &quot;from numpy import *&quot;. It also arranges that for routines common to both math and numpy such as sqrt, the much faster math routine is used when possible (when the argument is a scalar rather than an array). </p>
+        <p class="Normal">If you want to import the visual objects selectively, import them from the  vis module. Two simple examples:</p>
+        <p class="program">import vis<br />
+          vis.box(color=vis.color.orange,material=vis.materials.wood)</p>
+        <p class="Normal">&nbsp;</p>
+        <p class="program">from vis import (box, color, materials)<br />
+          box(color=color.orange, material=materials.wood) </p>
+        <p class="Normal">There are  clean modules vis.controls, vis.filedialog, and vis.graph        equivalent to the  modules visual.controls, visual.filedialog, and        visual.graph. The latter versions execute &quot;from visual import *&quot; and are          retained because some programs expect that behavior when importing one        of these modules.</p>
+        <p class="Normal">The documentation is written assuming that &quot;from visual import *&quot; is used. </p>
+        <p class="Normal">VPython documentation was produced by Ruth Chabay,
+          David Scherer, and Bruce Sherwood.</p>
       </div>
-      <!-- InstanceEndEditable --></td>
+    <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
     <td height="16" colspan="4"></td>
