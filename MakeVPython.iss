@@ -6,7 +6,7 @@
 
 [Setup]
 AppName=VPython for Python 3.1
-AppVerName=VPython 5.32
+AppVerName=VPython 5.4
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
@@ -14,7 +14,7 @@ SourceDir=C:\Python31
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py3.1-5.32
+OutputBaseFilename=VPython-Win-Py3.1-5.4
 OutputDir=c:\workspace
 
 [Files]
@@ -24,11 +24,14 @@ OutputDir=c:\workspace
 ; and help set for Visual before building package.
 ;Source: "Lib\idlelib\config-main.def"; DestDir: "{app}\Lib\idlelib\"; Flags: uninsneveruninstall
 
-Source: "Lib\site-packages\visual\cvisual.pyd"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
+Source: "Lib\site-packages\vis\cvisual.pyd"; DestDir: "{app}\Lib\site-packages\vis\"; Components: Visual
+Source: "Lib\site-packages\vis\*.py"; DestDir: "{app}\Lib\site-packages\vis\"; Components: Visual
+Source: "Lib\site-packages\vis\*.tga"; DestDir: "{app}\Lib\site-packages\vis\"; Components: Visual
+
 Source: "Lib\site-packages\visual\*.py"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
-Source: "Lib\site-packages\visual\*.tga"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 
 ; Execute compilevisual.py from the CVS files to compile the .pyc files:
+Source: "Lib\site-packages\vis\*.pyc"; DestDir: "{app}\Lib\site-packages\vis\"; Components: Visual
 Source: "Lib\site-packages\visual\*.pyc"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
 
 Source: "c:\workspace\vpython-core2\license.txt"; DestDir: "{app}\Lib\site-packages\visual\"; Components: Visual
@@ -74,7 +77,7 @@ Name: numpy; Description: "numpy 1.5.0 {code:NumpyStatus|C:\Python31}"; Types: f
 ; FontTools, ttfquery, and Polygon are needed by the 3D text object
 Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python31}"; Types: full; Check: CheckFontTools( 'C:\Python31' )
 Name: ttfquery; Description: "ttfquery 1.0.4 {code:ttfqueryStatus|C:\Python31}"; Types: full; Check: Checkttfquery( 'C:\Python31' )
-Name: Polygon; Description: "Polygon 2.0.2 {code:PolygonStatus|C:\Python31}"; Types: full; Check: CheckPolygon( 'C:\Python31' )
+Name: Polygon; Description: "Polygon 3.0a1 {code:PolygonStatus|C:\Python31}"; Types: full; Check: CheckPolygon( 'C:\Python31' )
 
 Name: Documentation; Description: "Documentation for the Visual extension to Python"; Types: full
 Name: Examples; Description: "Example programs"; Types: full
