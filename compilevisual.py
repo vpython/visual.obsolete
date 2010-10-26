@@ -2,7 +2,6 @@ from visual.graph import *
 from visual.controls import *
 from visual.filedialog import *
 from visual.factorial import *
-from visual.text import *
 text(text="3D", color=color.red, material=materials.wood)
 print(factorial(4))
 get_file()
