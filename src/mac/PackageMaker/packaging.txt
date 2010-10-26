@@ -1,7 +1,8 @@
 Instructions for creating a Mac installer.
 
 To use the Apple Package Manager to create an installer, create a folder named "stage"
-at the same level as vpython-core2. 
+at the same level as vpython-core2, for assembling an installer for Python 3 (if you
+are assembling an installer for Python 2.7, name the folder "stage2"). 
 
 Place in stage:
 	Files that will go to site-packages:
