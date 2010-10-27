@@ -33,6 +33,14 @@ I.  Prerequisites:
 		*** Python they were built for and with. You have to be careful to
 		*** install Boost Python libraries that were built for your version of Python.
 	
+	*********************************************
+	BUG on Ubuntu 10.10: The files /usr/lib/libgdkglextmm-x11-1.2.la and /usr/lib/libgtkglextmm-x11-1.2.la
+	specify dependence on libgdk_pixbuf-2.0.la, which does not exist. A workaround is
+	to edit /usr/lib/libgdkglextmm-x11-1.2.la and /usr/lib/libgtkglextmm-x11-1.2.la,
+	replacing libgdk_pixbuf-2.0.la (missing static library) with libgdk_pixbuf-2.0.so
+	(dynamically loaded library).
+	*********************************************
+	
 	BUILDING BOOST
 	The Boost libraries are extensions to C++. Among the libraries
 	are python and thread libraries used by Visual. The python library
