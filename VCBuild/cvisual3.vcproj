@@ -168,7 +168,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="python31.lib opengl32.lib glu32.lib user32.lib advapi32.lib gdi32.lib"
 				ShowProgress="0"
-				OutputFile="$(ProjectDir)\..\site-packages\visual\cvisual.pyd"
+				OutputFile="$(ProjectDir)\..\site-packages\vis\cvisual.pyd"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="libs;c:\Python31\libs;..\dependencies\boost_files\win_libs"
