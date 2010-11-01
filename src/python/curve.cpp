@@ -16,9 +16,6 @@
 #include <sstream>
 #include <iostream>
 
-using boost::python::make_tuple;
-using boost::python::object;
-
 // Recall that the default constructor for object() is a reference to None.
 
 namespace cvisual { namespace python {
