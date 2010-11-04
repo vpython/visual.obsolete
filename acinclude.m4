@@ -51,7 +51,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl $prefix/lib/site-python in 1.4 to $prefix/lib/python1.5/dist-packages
   dnl in 1.5.
   m4_define([_AM_PYTHON_INTERPRETER_LIST],
-            [python python 3.1 python2.7 python2.6 python2.5 python2.4])
+            [python python3.1 python2.7 python2.6 python2.5 python2.4])
 
   m4_if([$1],[],[
     dnl No version check is needed.
@@ -148,15 +148,18 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl Query distutils for this directory.  distutils does not exist in
   dnl Python 1.5, so we fall back to the hardcoded directory if it
   dnl doesn't work.
-  AC_CACHE_CHECK([for $am_display_PYTHON extension module directory],
-    [am_cv_python_pyexecdir],
-    [am_cv_python_pyexecdir=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_lib(1,0,prefix='$PYTHON_EXEC_PREFIX').replace('\\\\\','/'))" 2>/dev/null ||
-       echo "${PYTHON_EXEC_PREFIX}/lib/python${PYTHON_VERSION}/dist-packages"`])
-  AC_SUBST([pyexecdir], [$am_cv_python_pyexecdir])
+  dnl Change to put cvisualmodule in vis folder
+  dnl AC_CACHE_CHECK([for $am_display_PYTHON extension module directory],
+  dnl   [am_cv_python_pyexecdir],
+  dnl   [am_cv_python_pyexecdir=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_lib(1,0,prefix='$PYTHON_EXEC_PREFIX').replace('\\\\\','/'))" 2>/dev/null ||
+  dnl      echo "${PYTHON_EXEC_PREFIX}/lib/python${PYTHON_VERSION}/dist-packages"`])
+  dnl AC_SUBST([pyexecdir], [$am_cv_python_pyexecdir])
+  
+  AC_SUBST([pyexecdir], [\${pythondir}/vis])
 
-  dnl pkgpyexecdir -- $(pyexecdir)/$(PACKAGE)
-
-  AC_SUBST([pkgpyexecdir], [\${pyexecdir}/$PACKAGE])
+  dnl AC_SUBST([pkgpyexecdir], [\${pyexecdir}/$PACKAGE])
+  
+  AC_SUBST([pkgpyexecdir], [\${pythondir}/$PACKAGE])
 
   dnl Run any user-specified action.
   $2
@@ -234,6 +237,18 @@ AC_DEFUN([VISUAL_NUMERICLIBS],
 	if test $visual_have_numpy = "no"; then
 		AC_MSG_ERROR( [The numpy module could not be found but is required. See numpy.sourceforge.net for downloads.])
 	fi
+])
+
+AC_DEFUN([VISUAL_VIS],
+[
+	AC_REQUIRE([AM_PATH_PYTHON])
+	
+	AC_MSG_CHECKING( where to install vis components)
+
+    visualvisdir=${pythondir}/vis
+	
+	AC_MSG_RESULT( $visualvisdir)
+	AC_SUBST( visualvisdir)
 ])
 
 AC_DEFUN([VISUAL_EXAMPLES],

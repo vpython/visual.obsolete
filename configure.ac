@@ -71,6 +71,9 @@ PKG_CHECK_MODULES( GTHREAD, gthread-2.0 >= 2.0, ,
 AC_SUBST([GTHREAD_CFLAGS])
 AC_SUBST([GTHREAD_LIBS])
 
+# Enable installation of vis folder
+VISUAL_VIS()
+
 # Enable documentation and visualdocdir if desired
 VISUAL_DOCS()
 # Enable demos and visualdemodir if desired
