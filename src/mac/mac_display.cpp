@@ -490,6 +490,8 @@ display::initWindow(std::string title, int x, int y, int width, int height)
 		SetRect(&drawing, 0, 0, width, height);
 	} else {
 		yadjust = GetMBarHeight();
+		if (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
+			width *= 2;
 		SetRect(&drawing, x, y+2*yadjust, x + width, y+yadjust + height);
 	}
 	err = CreateNewWindow(kDocumentWindowClass, kWindowStandardDocumentAttributes, &drawing, &window);
