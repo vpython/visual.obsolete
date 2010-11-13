@@ -693,9 +693,9 @@ display_kernel::remove_renderable( shared_ptr<renderable> obj)
 
 bool
 display_kernel::draw(
-	view& scene_geometry, int whicheye, bool anaglyph, bool coloranaglyph)
+	view& scene_geometry, int whicheye)
 {
-	// Set up the base modelview and projection matricies
+	// Set up the base modelview and projection matrices
 	world_to_view_transform( scene_geometry, whicheye);
 
 	// Render all opaque objects in the world space layer
@@ -807,11 +807,11 @@ display_kernel::render_scene(void)
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 				glViewport( 0, 0, view_width, view_height);
 				glColorMask( GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
-				draw( scene_geometry, -1, true, false);
+				draw( scene_geometry, -1);
 				// Blue channel
 				glColorMask( GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
 				glClear( GL_DEPTH_BUFFER_BIT);
-				draw( scene_geometry, 1, true, false);
+				draw( scene_geometry, 1);
 				// Put everything back
 				glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 				break;
@@ -822,11 +822,11 @@ display_kernel::render_scene(void)
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 				glViewport( 0, 0, view_width, view_height);
 				glColorMask( GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
-				draw( scene_geometry, -1, true, true);
+				draw( scene_geometry, -1);
 				// Green and Blue channels
 				glColorMask( GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 				glClear( GL_DEPTH_BUFFER_BIT);
-				draw( scene_geometry, 1, true, true);
+				draw( scene_geometry, 1);
 				// Put everything back
 				glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 				break;
@@ -837,11 +837,11 @@ display_kernel::render_scene(void)
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 				glViewport( 0, 0, view_width, view_height);
 				glColorMask( GL_TRUE, GL_TRUE, GL_FALSE, GL_TRUE);
-				draw( scene_geometry, -1, true, true);
+				draw( scene_geometry, -1);
 				// Blue channel
 				glColorMask( GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
 				glClear( GL_DEPTH_BUFFER_BIT);
-				draw( scene_geometry, 1, true, true);
+				draw( scene_geometry, 1);
 				// Put everything back
 				glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 				break;
@@ -852,11 +852,11 @@ display_kernel::render_scene(void)
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 				glViewport( 0, 0, view_width, view_height);
 				glColorMask( GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
-				draw( scene_geometry, -1, true, true);
+				draw( scene_geometry, -1);
 				// Red and blue channels
 				glColorMask( GL_TRUE, GL_FALSE, GL_TRUE, GL_TRUE);
 				glClear( GL_DEPTH_BUFFER_BIT);
-				draw( scene_geometry, 1, true, true);
+				draw( scene_geometry, 1);
 				// Put everything back
 				glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 				break;
