@@ -333,6 +333,9 @@ display::create()
 	int real_width = static_cast<int>(window_width);
 	int real_height = static_cast<int>(window_height);
 
+	if (stereo_mode == PASSIVE_STEREO || stereo_mode == CROSSEYED_STEREO)
+		real_width *= 2;
+
 	if (fullscreen) {
 		real_x = screen.left;
 		real_y = screen.top;
