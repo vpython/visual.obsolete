@@ -117,12 +117,12 @@ class display_kernel
 			display_kernel's children.
 		@param eye Which eye is being rendered.  -1 for the left, 0 for the
 			center, and 1 for the right.
-		@param anaglyph  True if using anaglyph stereo requiring color
+		@param scene_geometry.anaglyph  True if using anaglyph stereo requiring color
 			desaturation or grayscaling.
-		@param coloranaglyph  True if colors must be grayscaled, false if colors
+		@param scene_geometry.coloranaglyph  True if colors must be grayscaled, false if colors
 			must be desaturated.
 	*/
-	bool draw( view&, int eye=0, bool anaglyph=false, bool coloranaglyph=false);
+	bool draw( view&, int eye=0);
 
 	/** Opaque objects to be rendered into world space. */
 	std::list<shared_ptr<renderable> > layer_world;
