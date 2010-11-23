@@ -72,7 +72,7 @@ Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\L
 
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
-Name: numpy; Description: "numpy 1.4.0 {code:NumpyStatus|C:\Python26}"; Types: full; Check: CheckNumpy( 'C:\Python26' )
+Name: numpy; Description: "numpy 1.5.1 {code:NumpyStatus|C:\Python26}"; Types: full; Check: CheckNumpy( 'C:\Python26' )
 
 ; FontTools, ttfquery, and Polygon are needed by the 3D text object
 Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python26}"; Types: full; Check: CheckFontTools( 'C:\Python26' )
