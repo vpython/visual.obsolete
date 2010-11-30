@@ -380,7 +380,7 @@ display::create()
 		WIN32_CRITICAL_ERROR( "GetDC()");
 
 	DWORD pfdFormat = PFD_DOUBLEBUFFER;
-	if (stereo_mode == PASSIVE_STEREO)
+	if (stereo_mode == ACTIVE_STEREO)
 		pfdFormat |= PFD_STEREO;
 
 	PIXELFORMATDESCRIPTOR pfd = {
