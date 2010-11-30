@@ -379,12 +379,16 @@ display::create()
 	if (!dev_context)
 		WIN32_CRITICAL_ERROR( "GetDC()");
 
+	DWORD pfdFormat = PFD_DOUBLEBUFFER;
+	if (stereo_mode == PASSIVE_STEREO)
+		pfdFormat |= PFD_STEREO;
+
 	PIXELFORMATDESCRIPTOR pfd = {
 		sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd
 		1,                               // version number
 		PFD_DRAW_TO_WINDOW |             // output to screen (not an image)
 		PFD_SUPPORT_OPENGL |             // support OpenGL
-		PFD_DOUBLEBUFFER,                // double buffered
+		pfdFormat,                		 // double buffered, and possibly stereo
 		PFD_TYPE_RGBA,                   // RGBA type
 		24,                              // 24-bit color depth
 		0, 0, 0, 0, 0, 0,                // color bits ignored
