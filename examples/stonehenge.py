@@ -107,8 +107,8 @@ for i in range(Nslabs):
                         material=photo)
 
 # Decorate back slab with a gold box and a clock
-box(pos=(0,h/2,-R+d/2+0.1), size=(w/2,w/2,0.2), 
-    color=(1,0.8,0), material=materials.wood, shininess=1)
+box(pos=(0,h/2.,-R+d/2+0.1), size=(w/2.,w/2.,0.2), 
+    color=(1,0.8,0), material=materials.wood)
 clock = analog_clock(pos=(0,h/2.,-R+d/2+0.2+0.2*h/10),
                      radius=0.2*w, axis=(0,0,1))
                      
