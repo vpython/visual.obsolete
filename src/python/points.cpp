@@ -261,7 +261,7 @@ points::get_center() const
 		return vector();
 	vector ret;
 	const double* pos_i = pos.data();
-	for(int i=0; i<count; i++, pos_i+=3)
+	for(size_t i=0; i<count; i++, pos_i+=3)
 		ret += vector(pos_i);
 	ret /= count;
 	return ret;

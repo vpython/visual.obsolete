@@ -202,7 +202,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	// pos and color iterators
 	const double* v_i = spos;
 	const float* c_i = tcolor;
-	int i = closed ? 0 : sides;
+	size_t i = closed ? 0 : sides;
 	bool mono = adjust_colors( scene, tcolor, pcount);
 
 	for (size_t corner=0; corner < pcount; ++corner, v_i += 3, c_i += 3) {
@@ -335,7 +335,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 	// is too big.  This is somewhat arbitrary but seems to work well.
 	int prev_i = closed ? (vcount-1)*sides : 0;
 	for( i = closed ? 0 : sides; i < vcount*sides; i += 2*sides ) {
-		for(int a=0; a<sides; a++) {
+		for(size_t a=0; a<sides; a++) {
 			vector& n1 = normals[i+a];
 			vector& n2 = normals[prev_i+a];
 			double smooth_amount = (n1.dot(n2) - .65) * 4.0;
