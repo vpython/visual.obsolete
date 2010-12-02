@@ -49,7 +49,7 @@ cvisual.so : $(OBJS)
 	$(BOOST)libboost_thread.a
 
 install : cvisual.so
-	cp cvisual.so ../vpython-core2/site-packages/visual
+	cp cvisual.so ../vpython-core2/site-packages/vis
 #	sudo cp cvisual.so /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/lib/python$(PYTHON_VERSION)/site-packages/
 #	sudo cp cvisual.so /Library/Python/$(PYTHON_VERSION)/site-packages
 
