@@ -161,24 +161,22 @@ images which if small enough can be seen in 3D by crossing your eyes but focusin
 on the screen (this takes some practice). Setting <span class="attribute">scene.stereo
 = 'passive'</span> produces side-by-side images which if small enough can be
 seen in 3D by looking &quot;wall-eyed&quot;, looking into the far distance but
-focusing on the screen (this too takes some practice). <span class="attribute"><br />
+focusing on the screen (this too takes some practice), or by using inexpensive stereoscopic viewers. <span class="attribute"><br />
             <br />
 scene.stereo = 'active'</span> will render alternating left eye/right eye images
 for viewing through shutter glasses if the graphics system supports quad buffered
-stereo. If stereo equipment is not available, setting the option has no effect,
-and <span class="attribute">scene.stereo</span> will have the value <span class="attribute">'nostereo'</span>.
+stereo. If stereo equipment is not available, setting the option has no effect.
 You can also use <span class="attribute">scene.stereo = 'passive'</span> with
 quad buffered stereo for display using two polarized projectors (for stereo viewing
-using simple passive polarized glasses). (Quad buffered 'active' stereo is only
+using simple passive polarized glasses). Quad buffered 'active' stereo is only
 available on specialised graphics systems that have the necessary hardware and
-shutter glass connector, such as PCs with CRT displays and nVidia Quadro graphics
+shutter glass connector, such as 120 Hz displays and NVIDIA Quadro graphics
 cards. It generates the illusion of depth by rendering each frame twice from
 slightly different viewpoints corresponding to the left and right eyes. Special
 shutter glasses are synchronised with the alternating images so that each eye
 sees only the matching frame, and your brain does the rest. It's called 'quad
 buffered' because there is an OpenGL buffer per eye, both double-buffered for
-smooth updating. 'Passive' stereo requires a video card that can drive two monitors,
-or two projectors.) </p>
+smooth updating.</p>
           <p class="attributes"><span class="attribute">stereodepth</span> By default, 
             the front of the scene is located at the location of the physical screen, 
             which reduces eye strain. Setting <span class="attribute">scene.stereodepth 
