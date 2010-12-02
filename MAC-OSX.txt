@@ -18,7 +18,7 @@ to the application search PATH. The installer also added or changed a link
 to point to the newly installed Python. However, the Python 3.x installer does
 NOT modify .profile or Current.
 
-For the makefile to pick out the correct Python in building Visual, you need
+For the makefile to pick out the correct Python framework in building Visual, you need
 to create or modify /Library/Frameworks/Python.framework/Versions/Current. Assume
 that the new Python is in /Library/Frameworks/Python.framework/Versions/3.1:
    cd /Library/Frameworks/Python.framework/Versions
