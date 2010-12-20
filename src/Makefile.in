@@ -250,8 +250,10 @@ log_message:
 	@echo This is a quiet Makefile.  If make exits with an error, check \
 	src/build.log to see the complete error message\(s\).  In the event \
 	of an error that you cannot debug, please send a message to \
-	visualpython-users@lists.sourceforge.net, including the files config.log \
-	and src/build.log, requesting assistance.
+	visualpython-users@lists.sourceforge.net, including key portions of \
+	the files config.log and src/build.log, requesting assistance. \
+	(If you try to send the entire files, the mailing list will reject \
+	the transmission.)
 	@echo "Spoken once" >> $@
 
 clean:
