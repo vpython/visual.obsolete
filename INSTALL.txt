@@ -62,7 +62,8 @@ I.  Prerequisites:
 		
 	In file included from /usr/include/boost/python/exception_translator.hpp:12,
     from ../../vpython-core2/src/python/cvisualmodule.cpp:12:
-	/usr/include/boost/python/detail/translate_exception.hpp:34: error: expected nested-name-specifier before ‘add_reference’
+	/usr/include/boost/python/detail/translate_exception.hpp:34: 
+	      error: expected nested-name-specifier before "add_reference"
 
 	You need to make this change:
 	
