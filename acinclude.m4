@@ -156,8 +156,6 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl AC_SUBST([pyexecdir], [$am_cv_python_pyexecdir])
   
   AC_SUBST([pyexecdir], [\${pythondir}/vis])
-
-  dnl AC_SUBST([pkgpyexecdir], [\${pyexecdir}/$PACKAGE])
   
   AC_SUBST([pkgpyexecdir], [\${pythondir}/$PACKAGE])
 
