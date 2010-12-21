@@ -172,10 +172,10 @@ II.   Configuration
 	because Visual has to be linked to an appropriate Python, so read below.
 	
 	There have been significant changes in where 3rd-party software is stored on 
-	Ubuntu 9.04. You probably want to use /usr/bin/python2.6 To configure, do this
-	in a folder parallel to vpython-core2:
+	Ubuntu 9.04. You probably want to use /usr/bin/python2.6. To configure, do this
+	in a folder parallel to vpython-core2 (or whatever the source folder is named:
 	
-	../vpython-core2/configure --prefix=/usr
+	PYTHON=/usr/bin/python2.6 ../vpython-core2/configure --prefix=/usr/local
 	
 	You will also need to copy vpython-core2/src/gtk2/site-packages.pth to
 	/usr/lib/python2.6/dist-packages to put /usr/lib/python2.6/site-packages
@@ -187,9 +187,6 @@ II.   Configuration
 
 	However, configure also provides a large number of options and is sensitive to 
 	several environment variables to properly configure VPython for unique use cases. 
-	Additionally, it is a good idea to build VPython in a directory separate from the
-	source tree.  Just run configure with the fully-qualified path to it, eg (from a
-	directory alongside visual-2.9) `../visual-2.9/configure`
 	
 	Run `configure --help` for the complete list of options and brief descriptions.
 	
@@ -223,7 +220,7 @@ II.   Configuration
 	on-line documentation.
 	
 	Here is a specific example of case (c):
-	PYTHON=/usr/bin/python ../visual-x.x.x/configure --prefix=/usr/local
+	PYTHON=/usr/bin/python2.6 ../vpython-core2/configure --prefix=/usr/local
 	(This would make sense only if python has /usr/local/lib/site-packages on its 
 	search path.)
 	
