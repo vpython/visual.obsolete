@@ -252,8 +252,8 @@ log_message:
 	of an error that you cannot debug, please send a message to \
 	visualpython-users@lists.sourceforge.net, including key portions of \
 	the files config.log and src/build.log, requesting assistance. \
-	(If you try to send the entire files, the mailing list will reject \
-	the transmission.)
+	If you try to send the entire files, the mailing list will reject \
+	the transmission.
 	@echo "Spoken once" >> $@
 
 clean:
