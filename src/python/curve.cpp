@@ -242,8 +242,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			vector y = vector(0,1,0);
 			vector x = A.cross(y).norm();
 			if (!x) {
-				x = A.cross( vector(0, 0, 1));
-				if (!x) x = A.cross( vector(0, 1, 0));
+				x = A.cross( vector(0, 0, 1)).norm();
 			}
 			y = x.cross(A).norm();
 
@@ -278,7 +277,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 
 			i += sides;
 		} else {
-			// TODO: t and A.dot(next-current) can be moved out of loop
+			double Adot = A.dot(next - current);
 			for (size_t a=0; a < sides; a++) {
 				vector prev_start = projected[i+a-sides];
 				vector rel = prev_start - current;
@@ -287,7 +286,7 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 
 				if (corner != pcount-1 && sectheta > 0.0) {
 					double t1 = -(rel.dot(bisecting_plane_normal)) * sectheta;
-					t1 = std::max( t1, t - A.dot(next - current) );
+					t1 = std::max( t1, t - Adot );
 					t = std::max( 0.0, std::min( t, t1 ) );
 				}
 				vector prev_end = prev_start + t*lastA;
