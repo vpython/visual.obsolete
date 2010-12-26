@@ -6,7 +6,7 @@
 
 [Setup]
 AppName=VPython for Python 3.1
-AppVerName=VPython 5.4
+AppVerName=VPython 5.41
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
@@ -14,7 +14,7 @@ SourceDir=C:\Python31
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py3.1-5.4
+OutputBaseFilename=VPython-Win-Py3.1-5.41
 OutputDir=c:\workspace
 
 [Files]
@@ -72,7 +72,7 @@ Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\L
 
 [Components]
 Name: Visual; Description: "The Visual extension module for Python"; Types: full compact custom; Flags: fixed
-Name: numpy; Description: "numpy 1.5.0 {code:NumpyStatus|C:\Python31}"; Types: full; Check: CheckNumpy( 'C:\Python31' )
+Name: numpy; Description: "numpy 1.5.1 {code:NumpyStatus|C:\Python31}"; Types: full; Check: CheckNumpy( 'C:\Python31' )
 
 ; FontTools, ttfquery, and Polygon are needed by the 3D text object
 Name: FontTools; Description: "FontTools 2.3 {code:FontToolsStatus|C:\Python31}"; Types: full; Check: CheckFontTools( 'C:\Python31' )
