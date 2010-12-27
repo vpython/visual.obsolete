@@ -45,7 +45,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 namespace {
-	const char* rcsid = "$Id: num_util.cpp,v 1.14 2010/12/26 22:44:03 bsherwood Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.15 2010/12/27 18:06:05 bsherwood Exp $";
 }
 
   // Local function prototypes
@@ -55,6 +55,7 @@ namespace {
   } } // !namespace cvisual::python
 
 namespace cvisual{ namespace python {
+
 
 #if PY_MAJOR_VERSION >= 3
 int

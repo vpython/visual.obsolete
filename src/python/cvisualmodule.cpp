@@ -18,7 +18,6 @@
 //#include <numpy/arrayobject.h>
 
 #include "util/rate.hpp"
-//#include "display.hpp"
 #include "util/errors.hpp"
 #include "python/num_util.hpp"
 #include "python/gil.hpp"
@@ -155,9 +154,7 @@ BOOST_PYTHON_MODULE( cvisual)
 #endif
 #endif
 
-	// Private functions for initializing and choosing the numpy backend
-	def("init_numpy", python::init_numpy);
-    // Initialize the Python thread system.
+	// Initialize the Python thread system.
 	PyEval_InitThreads();
 
 	// A subset of the python standard exceptions may be thrown from visual
@@ -178,6 +175,7 @@ BOOST_PYTHON_MODULE( cvisual)
 	wrap_display_kernel();
 	wrap_primitive();
 	wrap_arrayobjects();
+	python::init_numpy(); // initialize numpy
 }
 
 } // !namespace cvisual
