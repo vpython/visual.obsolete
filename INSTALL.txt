@@ -47,8 +47,12 @@ I.  Prerequisites:
 	makes connections between Python and C++.
 
 	It is possible to build the Boost libraries needed by Visual from source. 
-	However, the process can take a long time, so precompiled files are 
-	available in the Developers section. See VCBuild.txt for Windows details.
+	See VCBuild.txt for Windows details. The basics are these, after cd-ing
+	into the unzipped Boost source, with a folder "build" beside the Boost source:
+	
+	./bootstrap.sh --with-python-version=3.1 --with-libraries=python,signals,thread
+	
+	./bjam --build-dir=../build --layout=versioned
 	
 	You also need the threadpool resource: sourceforge.net/projects/threadpool.
 	If you are using the 1_35_0 Boost libraries, you can use version 0.2.4 which
