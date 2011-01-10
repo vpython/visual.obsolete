@@ -280,12 +280,10 @@ curve::thickline( const view& scene, double* spos, float* tcolor, size_t pcount,
 			double Adot = A.dot(next - current);
 			for (size_t a=0; a < sides; a++) {
 				vector prev_start = projected[i+a-sides];
-				vector rel = prev_start - current;
-
-				double t = -rel.dot(lastA);
-
+				vector rel = current - prev_start;
+				double t = rel.dot(lastA);
 				if (corner != pcount-1 && sectheta > 0.0) {
-					double t1 = -(rel.dot(bisecting_plane_normal)) * sectheta;
+					double t1 = (rel.dot(bisecting_plane_normal)) * sectheta;
 					t1 = std::max( t1, t - Adot );
 					t = std::max( 0.0, std::min( t, t1 ) );
 				}
