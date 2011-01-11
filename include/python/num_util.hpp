@@ -14,7 +14,11 @@
 // Questions or comments about num_util should be directed to Phil Austin at
 // paustin@eos.ubs.ca.
 
-
+// 2011/01/05 obtained additional components of latest num_util from:
+// Copyright 2006  Phil Austin (http://www.eos.ubc.ca/personal/paustin)
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
 
 /*
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -88,9 +92,6 @@ namespace cvisual { namespace python {
   	//double_array( const array& a ) : array(a) {}  //< TODO: callers are doing unnecessary copying; somewhat type unsafe
   };
 
-  //!
-
-
   /**
    *Creates an one-dimensional numpy array of length n and numpy type t.
    * The elements of the array are initialized to zero.
@@ -117,8 +118,6 @@ namespace cvisual { namespace python {
    *@return numpy type enum
    */
 
-
-
   /**
    *A free function that retrieves the numpy type of a numpy array.
    *@param arr a Boost/Python numeric array.
@@ -143,7 +142,6 @@ namespace cvisual { namespace python {
   */
   std::vector<npy_intp> shape(array arr);
 
-
   /**
    *Throws an exception if the actual dimensions of the array are not equal to
    *the expected dimensions.
@@ -153,7 +151,6 @@ namespace cvisual { namespace python {
    */
   void check_shape(array arr,
 		   std::vector<npy_intp> expected_dims);
-
 
   /**
    *Returns true if the array is contiguous.
@@ -176,7 +173,6 @@ namespace cvisual { namespace python {
   void* data(array arr);
   */
 
-
   /**
    *Returns a pointer to the data in the array.
    *@param arr a Boost/Python numeric array.
@@ -184,6 +180,14 @@ namespace cvisual { namespace python {
    */
   // USED
   char* data(const array& arr);
+
+   /**
+    *Copies data into the array.
+    *@param arr a Boost/Python numeric array.
+    *@param new_data a char pointer referencing the new data.
+    *@return -----
+    */
+   void copy_data(boost::python::numeric::array arr, char* new_data);
 
   /**
    *Returns a clone of this array with a new type.

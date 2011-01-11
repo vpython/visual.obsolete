@@ -17,6 +17,12 @@
  * paustin@eos.ubs.ca.
  */
 
+// 2011/01/05 obtained additional components of latest num_util from:
+// Copyright 2006  Phil Austin (http://www.eos.ubc.ca/personal/paustin)
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
 /*
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -45,7 +51,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 namespace {
-	const char* rcsid = "$Id: num_util.cpp,v 1.16 2010/12/27 18:28:30 bsherwood Exp $";
+	const char* rcsid = "$Id: num_util.cpp,v 1.17 2011/01/11 07:18:53 bsherwood Exp $";
 }
 
   // Local function prototypes
@@ -211,16 +217,6 @@ rank(const numeric::array& arr)
 //	return ((PyArrayObject*) arr.ptr())->nd;
 }
 
-//Return the number of dimensions
-//int rank(numeric::array arr){
-//  //std::cout << "inside rank" << std::endl;
-//  if(!PyArray_Check(arr.ptr())){
-//    PyErr_SetString(PyExc_ValueError, "expected a PyArrayObject");
-//    throw_error_already_set();
-//  }
-//  return PyArray_NDIM(arr.ptr());
-//}
-
 std::vector<npy_intp> shape(numeric::array arr){
   std::vector<npy_intp> out_dims;
   if(!PyArray_Check(arr.ptr())){
@@ -250,16 +246,6 @@ void check_contiguous(numeric::array arr)
   return;
 }
 
-//char*
-//data(const numeric::array& arr)
-//{
-//  if(!PyArray_Check(arr.ptr())){
-//    PyErr_SetString(PyExc_ValueError, "expected a PyArrayObject");
-//    throw_error_already_set();
-//  }
-//	return ((PyArrayObject*) arr.ptr())->data;
-//}
-
 char*
 data(const numeric::array& arr){
   if(!PyArray_Check(arr.ptr())){
@@ -269,19 +255,10 @@ data(const numeric::array& arr){
   return PyArray_BYTES(arr.ptr());
 }
 
-//static char*
-//data_impl_numeric(const numeric::array& arr)
-//{
-//	return ((PyArrayObject*) arr.ptr())->data;
-//}
-
-
-
 //Return a clone of this array with a new type
 numeric::array astype(numeric::array arr, NPY_TYPES t){
   return (numeric::array) arr.astype(type2char(t));
 }
-
 
 std::string type2string(NPY_TYPES t_type){
   return kindstrings[t_type];
