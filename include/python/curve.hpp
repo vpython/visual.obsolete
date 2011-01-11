@@ -43,9 +43,6 @@ class curve : public arrayprim_color
 
 	// Returns true if the object is degenarate and should not be rendered.
  	bool degenerate() const;
-	// Compute a checksum over the pcount elements of the temporary
-	// position and color arrays.
-	long checksum( double* spos, float* tcolor, size_t pcount);
 
  public:
 	curve();
