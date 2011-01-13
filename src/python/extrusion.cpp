@@ -66,6 +66,8 @@ void
 extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pcontours,
 		const numpy::array& _strips,  const numpy::array& _pstrips  )
 {
+	// primitives.py sends to set_contours descriptions of the 2D surface; see extrusions.hpp
+	// We store the information in std::vector containers in flattened form.
 	build_contour<double>(_contours, contours);
 	build_contour<int>(_pcontours, pcontours);
 
@@ -76,15 +78,25 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 	if (ncontours == 0) return;
 	size_t npoints = contours.size()/2; // total number of 2D points in all contours
 
+	maxextent = 0.;
+	for (size_t c=0; c < ncontours; c++) {
+		size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
+		size_t base = 2*pcontours[2*c+3]; // location of first (x) member of 2D (x,y) point
+		for (size_t pt=0; pt < nd; pt+=2) {
+			double dist = vector(contours[base+pt],contours[base+pt+1],0.).mag();
+			if (dist > maxextent) maxextent = dist;
+		}
+	}
+
 	// Set up 2D normals used to build GL_QUADS
 	// There are two per vertex, because each face is a quad, and each vertex appears in two adjacent quads
 	normals2D.resize(4*npoints); // each normal is (x,y), two doubles; there are two normals per vertex (2 quads per vertex)
-	int i=0;
+	size_t i=0;
 	for (size_t c=0; c < ncontours; c++) {
-		int nd = 2*pcontours[2*c+2]; // number of doubles in this contour
-		int base = 2*pcontours[2*c+3]; // location of first (x) member of 2D (x,y) point
+		size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
+		size_t base = 2*pcontours[2*c+3]; // location of first (x) member of 2D (x,y) point
 		vector N, Nbefore, Nafter, Navg1, Navg2;
-		for (int pt=0; pt < nd; pt+=2) {
+		for (size_t pt=0; pt < nd; pt+=2) {
 			if (pt == 0) {
 				Nbefore = vector(contours[base+nd-1]-contours[base+1], contours[base]-contours[base+nd-2], 0).norm();
 				N =       vector(contours[base+1]-contours[base+3], contours[base+2]-contours[base], 0).norm();
@@ -181,6 +193,7 @@ extrusion::get_center() const
 void
 extrusion::gl_pick_render( const view& scene)
 {
+	// TODO: Should be able to pick an extrusion, presumably. Old comment about curves:
 	// Aack, I can't think of any obvious optimizations here.
 	// But since Visual 3 didn't permit picking of curves, omit for now.
 	// We can't afford it; serious impact on performance.
@@ -195,8 +208,7 @@ extrusion::grow_extent( extent& world)
 	const double* pos_i = pos.data();
 	const double* pos_end = pos.end();
 	for ( ; pos_i < pos_end; pos_i += 3)
-		world.add_sphere( vector(pos_i), 1);
-		//world.add_sphere( vector(pos_i), radius);
+		world.add_sphere( vector(pos_i), maxextent);
 	world.add_body();
 }
 
@@ -248,6 +260,7 @@ struct converter
 void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
 {
+	// TODO: lighting/winding issues; multicolors; smooth along curve; attributes per contour
 
 	if (pcount < 2) return;
 
@@ -264,6 +277,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	std::vector<vector> tri(spoints), snormals(spoints); // for triangle strips at ends of extrusion
 
 	vector xaxis, yaxis; // local unit-vector axes on the 2D shape
+	vector prevx, prevy; // local axes on previous bisecting plane
 	vector prev;
 
 	bool closed = vector(&spos[0]) == vector(&spos[(pcount-1)*3]);
@@ -285,6 +299,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	for (size_t corner=0; corner < pcount; ++corner, v_i += 3, c_i += 3) {
 		current = vector(&v_i[0]);
 
+		// A is a unit vector pointing from the current location to the next location along the curve.
+		// lastA is a unit vector pointing from the previous location to the current location.
 		vector next, A, bisecting_plane_normal;
 		if (corner != pcount-1) {
 			next = vector( &v_i[3] ); // The next vector in spos
@@ -305,6 +321,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				}
 			}
 
+			// Calculate the normal to the plane which is the intersection of adjacent segments:
 			bisecting_plane_normal = (A + lastA).norm();
 			if (!bisecting_plane_normal) {  //< Exactly 180 degree bend
 				bisecting_plane_normal = vector(0,0,1).cross(A);
@@ -314,6 +331,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 		}
 
 		if (corner == 0) {
+			// Establish local xaxis,yaxis unit vectors that span the 2D surface
 			yaxis = vector(0,1,0);
 			xaxis = A.cross(yaxis).norm();
 			if (!xaxis) {
@@ -331,6 +349,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			 	VPYTHON_WARNING( msg.str());
 			}
 
+			// Use the triangle strips in "strips" to paint the initial 2D surface of the extrusion:
 			for (size_t c=0; c<npstrips; c++) {
 				size_t nd = 2*pstrips[2*c+2]; // number of doubles in this strip
 				size_t base = 2*pstrips[2*c+3]; // initial (x,y) = (strips[base], strips[base+1])
@@ -344,6 +363,9 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
 			}
 
+			prevx = xaxis;
+			prevy = yaxis;
+
 		} else {
 			vector dx = -xaxis.dot(bisecting_plane_normal)*bisecting_plane_normal;
 			vector dy = -yaxis.dot(bisecting_plane_normal)*bisecting_plane_normal;
@@ -355,9 +377,9 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
 				// Quad order is early v0, early v1, late v1, late v0
 				for (size_t pt=0; pt<nd; pt+=2, nbase+=4, proj+=4) {
-					quads[proj  ] = scene.gcf*(prev    + xaxis*contours[base+pt] + yaxis*contours[base+pt+1]);
+					quads[proj  ] = scene.gcf*(prev    + prevx*contours[base+pt] + prevy*contours[base+pt+1]);
 					// Use modulo arithmetic here because last point is the first point:
-					quads[proj+1] = scene.gcf*(prev    + xaxis*contours[base+((pt+2)%nd)] + yaxis*contours[base+((pt+3)%nd)]);
+					quads[proj+1] = scene.gcf*(prev    + prevx*contours[base+((pt+2)%nd)] + prevy*contours[base+((pt+3)%nd)]);
 					quads[proj+2] = scene.gcf*(current +     x*contours[base+((pt+2)%nd)] +     y*contours[base+((pt+3)%nd)]);
 					quads[proj+3] = scene.gcf*(current +     x*contours[base+pt] +     y*contours[base+pt+1]);
 
@@ -368,8 +390,13 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				}
 			}
 
-			xaxis += 2*dx; // shape axes in next section of extrusion
-			yaxis += 2*dy;
+			prevx = x;
+			prevy = y;
+
+			// Think of the bisecting plane as a mirror, and reflect through this
+			// mirror to find the new local axes for the new segment.
+			xaxis = xaxis + 2*dx;
+			yaxis = yaxis + 2*dy;
 
 			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &quads[0]);
 			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[0]);
@@ -380,27 +407,29 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 		prev = current;
 	}
 
-	/*
 	for (size_t c=0; c<npstrips; c++) {
 		size_t nd = 2*pstrips[2*c+2]; // number of doubles in this strip
 		size_t base = 2*pstrips[2*c+3]; // initial (x,y) = (strips[base], strips[base+1])
-		std::cout << "c=" << c << " base=" << base << " nd=" << nd << std::endl;
-		for (size_t pt=nd-2, n=0; pt>=0; pt-=2, n++) {
-			std::cout << "pt=" << pt << " n=" << n << std::endl;
-			std::cout << ": " << strips[base+pt] << ", " << strips[base+pt+1] << std::endl;
-			tri[n] = scene.gcf*(current + xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
-			std::cout << "tri assigned" << std::endl;
+		// Reverse the winding order for back surface of extrusion
+		for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
+			size_t nswap;
+			if (n % 2) { // if odd
+				nswap = n-1;
+			} else {
+				if (pt == nd-2) { // total number of points is odd
+					nswap = n;
+				} else {
+					nswap = n+1;
+				}
+			}
+			tri[nswap] = scene.gcf*(current + xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
 			snormals[n] = lastA;
-			std::cout << "snormals assigned" << std::endl;
 		}
-		std::cout << "Paint this strip" << std::endl;
 		glVertexPointer(3, GL_DOUBLE, sizeof( vector), &tri[0]);
 		glNormalPointer( GL_DOUBLE, sizeof(vector), &snormals[0]);
 		gl_enable cull_face( GL_CULL_FACE);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
-		std::cout << "Painted" << std::endl;
 	}
-	*/
 
 	if (!mono) {
 		glDisableClientState( GL_COLOR_ARRAY);

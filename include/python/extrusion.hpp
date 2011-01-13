@@ -33,7 +33,6 @@ class extrusion : public arrayprim_color
 	// pstrips[2*i] points to (length of ith strip, starting location of ith strip in strips).
 	std::vector<double> contours, strips;
 	std::vector<int> pcontours, pstrips;
-	//std::vector<double> quads2D; // [(x0,y0), (x1,y1)], [(x1,y1), (x2,y2)], etc. positions for 2D shape
 	std::vector<double> normals2D; // [(nx0,ny0), (nx1,ny1)], [(nx1,ny1), (nx2,ny2)], etc. normals for 2D shape
 
 	// Returns true if the object is single-colored.
@@ -43,8 +42,9 @@ class extrusion : public arrayprim_color
 	virtual void gl_render( const view&);
 	virtual vector get_center() const;
 	virtual void gl_pick_render( const view&);
-	virtual void grow_extent( extent&);
 	void get_material_matrix( const view& v, tmatrix& out );
+	virtual void grow_extent( extent&);
+	double maxextent; // maximum distance from curve
 
 	// Returns true if the object is degenarate and should not be rendered.
  	bool degenerate() const;
