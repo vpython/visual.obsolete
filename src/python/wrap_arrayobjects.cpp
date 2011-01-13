@@ -6,6 +6,7 @@
 // This file currently requires 144 MB to compile (optimizing).
 
 #include "python/curve.hpp"
+#include "python/extrusion.hpp"
 #include "python/faces.hpp"
 #include "python/convex.hpp"
 #include "python/points.hpp"
@@ -114,6 +115,40 @@ wrap_arrayobjects()
 		.def( "append", append_v_rgb_retain, ( arg("pos"), arg("color"), arg("retain")=-1 ) )
 		.def( "append", append_v_retain, ( arg("pos"), arg("retain")=-1 ) )
 		.def( "append", &curve::append_rgb, ( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
+		;
+
+	using python::extrusion;
+
+	// TODO: the arrprim inheritance hierarchy could be exposed here; for now I've left the duplication here
+	// to make it easy to control exactly what goes in the API for each array primitive, but arguably they
+	// should be as similar as possible!
+
+	void (extrusion::*exappend_v_rgb_retain)( const vector&, const rgb&, int ) = &extrusion::append;
+	void (extrusion::*exappend_v_retain)( const vector&, int ) = &extrusion::append;
+
+	class_<extrusion, bases<renderable> >( "extrusion")
+		.def( init<const extrusion&>())
+		.def( "get_color", &extrusion::get_color)
+		.def( "set_color", &extrusion::set_color)
+		.def( "set_red", &extrusion::set_red_d)
+		.def( "set_red", &extrusion::set_red)
+		.def( "set_green", &extrusion::set_green_d)
+		.def( "set_green", &extrusion::set_green)
+		.def( "set_blue", &extrusion::set_blue_d)
+		.def( "set_blue", &extrusion::set_blue)
+		.def( "get_pos", &extrusion::get_pos)
+		.def( "set_pos", &extrusion::set_pos)
+		.def( "set_pos", &extrusion::set_pos_v)
+		.def( "set_x", &extrusion::set_x_d)
+		.def( "set_x", &extrusion::set_x)
+		.def( "set_y", &extrusion::set_y_d)
+		.def( "set_y", &extrusion::set_y)
+		.def( "set_z", &extrusion::set_z_d)
+		.def( "set_z", &extrusion::set_z)
+		.def( "set_contours", &extrusion::set_contours) // used by primitives.py to transfer 2D cross section info
+		.def( "append", exappend_v_rgb_retain, ( arg("pos"), arg("color"), arg("retain")=-1 ) )
+		.def( "append", exappend_v_retain, ( arg("pos"), arg("retain")=-1 ) )
+		.def( "append", &extrusion::append_rgb, ( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
 		;
 
 	using python::points;

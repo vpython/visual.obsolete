@@ -31,7 +31,6 @@ extrusion::extrusion()
 	strips.insert(strips.begin(), 0.0);
 	pcontours.insert(pcontours.begin(), 0);
 	pstrips.insert(pstrips.begin(), 0);
-	indices.insert(indices.begin(), 0);
 	normals2D.insert(normals2D.begin(), 0.0);
 }
 
@@ -60,7 +59,6 @@ void build_contour(const numpy::array& _cont, std::vector<T>& cont)
 	T* start = (T*)data(_cont);
 	for(size_t i=0; i<length; i++, start++) {
 		cont[i] = *start;
-		//std::cout << i << "i: " << cont[i] << std::endl;
 	}
 }
 
@@ -70,14 +68,7 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 {
 	build_contour<double>(_contours, contours);
 	build_contour<int>(_pcontours, pcontours);
-	/*
-	for (size_t i=0; i<contours.size(); i++) {
-		std::cout << "contours[" << i << "]=" << contours[i] << std::endl;
-	}
-	for (size_t i=0; i<pcontours.size(); i++) {
-		std::cout << "pcontours[" << i << "]=" << pcontours[i] << std::endl;
-	}
-	*/
+
 	build_contour<double>(_strips, strips);
 	build_contour<int>(_pstrips, pstrips);
 
@@ -85,51 +76,40 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 	if (ncontours == 0) return;
 	size_t npoints = contours.size()/2; // total number of 2D points in all contours
 
-	// Set up indices used in glDrawElements
-	indices.resize(2*npoints+2*ncontours);
-	size_t i=0;
+	// Set up 2D normals used to build GL_QUADS
+	// There are two per vertex, because each face is a quad, and each vertex appears in two adjacent quads
+	normals2D.resize(4*npoints); // each normal is (x,y), two doubles; there are two normals per vertex (2 quads per vertex)
+	int i=0;
 	for (size_t c=0; c < ncontours; c++) {
-		int np = pcontours[2*c+2]; // number of 2D points in this contour
-		int base = pcontours[2*c+3]; // location of first 2D point of this contour
-		for (int pt=0; pt < np; pt++) {
-			indices[i] = base+pt+npoints; // location in 3D vector array cp
-			indices[i+1] = base+pt;
-			i += 2;
-		}
-		indices[i] = base+npoints;
-		indices[i+1] = base;
-		i += 2;
-	}
-
-	// Set up 2D normals in the shape plane; during rendering these are used to generate 3D normals
-	normals2D.resize(2*npoints); // each normal is (x,y), two doubles, relative to origin of shape
-	for (size_t c=0; c < ncontours; c++) {
-		int np = 2*pcontours[2*c+2]; // number of doubles in this contour
+		int nd = 2*pcontours[2*c+2]; // number of doubles in this contour
 		int base = 2*pcontours[2*c+3]; // location of first (x) member of 2D (x,y) point
-		std::cout << "start, c=" << c << " np=" << np << " base=" << base << std::endl;
-		vector N, Navg;
-		vector Nprev = vector(contours[base+np-1]-contours[base+1],contours[base]-contours[base+np-2],0).norm();
-		vector Nlast = Nprev;
-		for (int pt=0; pt < np; pt+=2) {
-			std::cout << "pt=" << pt << std::endl;
-			if (pt < np-2) {
-				N = vector(contours[base+pt+1]-contours[base+pt+3], contours[base+pt+2]-contours[base+pt], 0).norm();
-			} else {
-				N = Nlast;
+		vector N, Nbefore, Nafter, Navg1, Navg2;
+		for (int pt=0; pt < nd; pt+=2) {
+			if (pt == 0) {
+				Nbefore = vector(contours[base+nd-1]-contours[base+1], contours[base]-contours[base+nd-2], 0).norm();
+				N =       vector(contours[base+1]-contours[base+3], contours[base+2]-contours[base], 0).norm();
 			}
-			std::cout << "calculated N" << std::endl;
-			Navg = N;
-			double cosangle = N.dot(Nprev);
+			int after  = (pt+2); // use modulo arithmetic to make the linear sequence effectively circular
+			Nafter  = vector(contours[base+((after+1)%nd)]-contours[base+((after+3)%nd)],
+					         contours[base+((after+2)%nd)]-contours[base+(after%nd)], 0).norm();
+			double cosangle = N.dot(Nbefore);
+			Navg1 = Navg2 = N;
 			if (cosangle > 0.95) {
-				Navg = (N+Nprev).norm();
+				Navg1 = (N+Nbefore).norm();
 			}
-			Nprev = N;
-			normals2D[base+pt] = Navg[0];
-			normals2D[base+pt+1] = Navg[1];
-			std::cout << "< " << Navg[0] << ", " << Navg[1] << " >" << std::endl;
+			cosangle = N.dot(Nafter);
+			if (cosangle > 0.95) {
+				Navg2 = (N+Nafter).norm();
+			}
+			Nbefore = N;
+			N = Nafter;
+			normals2D[i  ] = Navg1[0];
+			normals2D[i+1] = Navg1[1];
+			normals2D[i+2] = Navg2[0];
+			normals2D[i+3] = Navg2[1];
+			i += 4;
 		}
 	}
-
 }
 
 void
@@ -271,18 +251,17 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 	if (pcount < 2) return;
 
-	//std::cout << "--------pcount=" << pcount << std::endl;
-
 	size_t ncontours = pcontours[0];
 	if (ncontours == 0) return;
 	size_t npoints = contours.size()/2; // total number of 2D points in all contours
+	size_t npstrips = pstrips[0]; // number of triangle strips in the cross section
+	size_t spoints = strips.size()/2; // total number of 2D points in all strips
 
-	// cp[:npoints] is previous contour points; cp[npoints:] is current contour points
-	std::vector<vector> cp(2*npoints);
-	std::vector<vector> normals(2*npoints);
+	// 4 positions and normals per quad, and the number of quads = the number of points in the 2D shape
+	std::vector<vector> quads(4*npoints);
+	std::vector<vector> normals(4*npoints);
 
-	glVertexPointer(3, GL_DOUBLE, sizeof( vector), &cp[0]);
-	glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[0]);
+	std::vector<vector> tri(spoints), snormals(spoints); // for triangle strips at ends of extrusion
 
 	vector xaxis, yaxis; // local unit-vector axes on the 2D shape
 	vector prev;
@@ -290,6 +269,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	bool closed = vector(&spos[0]) == vector(&spos[(pcount-1)*3]);
 
 	vector lastA; // unit vector of previous segment, initially <0,0,0>
+	vector current; // point along the curve currently being processed
 
 	// pos and color iterators
 	const double* v_i = spos;
@@ -303,11 +283,9 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	}
 
 	for (size_t corner=0; corner < pcount; ++corner, v_i += 3, c_i += 3) {
-		vector current( &v_i[0] );
-		double sectheta;
+		current = vector(&v_i[0]);
 
 		vector next, A, bisecting_plane_normal;
-		//std::cout << "corner=" << corner << " current=<" << current[0] << "," << current[1] << "," << current[2]<< ">" << std::endl;
 		if (corner != pcount-1) {
 			next = vector( &v_i[3] ); // The next vector in spos
 			A = (next - current).norm();
@@ -333,9 +311,6 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				if (!bisecting_plane_normal)
 					bisecting_plane_normal = vector(0,1,0).cross(A);
 			}
-
-			sectheta = bisecting_plane_normal.dot( lastA );
-			if (sectheta) sectheta = 1.0 / sectheta;
 		}
 
 		if (corner == 0) {
@@ -356,85 +331,77 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			 	VPYTHON_WARNING( msg.str());
 			}
 
-			//std::cout << "initial xaxis, yaxis = " << xaxis << " " << yaxis << std::endl;
-			size_t proj = 0;
-			for (size_t c=0; c < ncontours; c++) {
-				size_t np = pcontours[2*c+2]; // number of 2D points in this contour
-				size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
-				//std::cout <<"initial c=" << c << " np=" << np << " base=" << base << std::endl;
-				for (size_t pt=0; pt < np; pt++, proj++, base+=2) {
-					cp[proj+npoints] = scene.gcf*(current + xaxis*contours[base] + yaxis*contours[base+1]);
-					normals[proj+npoints] = xaxis*normals2D[base] + yaxis*normals2D[base+1];
-					//std::cout << "initial c=" << c << " pt=" << pt << " proj="  << proj << " base=" << base << ": " << cp[proj+npoints]/scene.gcf << std::endl;
+			for (size_t c=0; c<npstrips; c++) {
+				size_t nd = 2*pstrips[2*c+2]; // number of doubles in this strip
+				size_t base = 2*pstrips[2*c+3]; // initial (x,y) = (strips[base], strips[base+1])
+				for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
+					tri[n] = scene.gcf*(current + xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
+					snormals[n] = -A;
 				}
+				glVertexPointer(3, GL_DOUBLE, sizeof( vector), &tri[0]);
+				glNormalPointer( GL_DOUBLE, sizeof(vector), &snormals[0]);
+				gl_enable cull_face( GL_CULL_FACE);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
 			}
 
 		} else {
-			vector relx = current - (prev+xaxis);
-			vector rely = current - (prev+yaxis);
-			//std::cout << "prev=" << prev << " relx, rely = " << relx << " " << rely << std::endl;
-			double dx, dy;
-			if (corner != (pcount-1) && sectheta > 0.0) {
-				dx = (relx.dot(bisecting_plane_normal)) * sectheta;
-				dy = (rely.dot(bisecting_plane_normal)) * sectheta;
-			} else {
-				dx = relx.dot(lastA);
-				dy = rely.dot(lastA);
-			}
-			//std::cout << "dx, dy = " << dx << " " << dy << std::endl;
-			xaxis += prev + dx*lastA - current;
-			yaxis += prev + dy*lastA - current;
+			vector dx = -xaxis.dot(bisecting_plane_normal)*bisecting_plane_normal;
+			vector dy = -yaxis.dot(bisecting_plane_normal)*bisecting_plane_normal;
+			vector x = xaxis + dx;
+			vector y = yaxis + dy;
 
-			/*
-			std::cout << "--cp before---" << std::endl;
-			for (size_t i=0; i<cp.size(); i++) {
-				std::cout << "i=" << i << ": " << cp[i]/scene.gcf << std::endl;
-			}
-			*/
-
-			//std::cout << "xaxis, yaxis = " << xaxis << " " << yaxis << std::endl;
-			size_t proj = 0;
-			for (size_t c=0; c < ncontours; c++) {
-				size_t np = pcontours[2*c+2]; // number of 2D points in this contour
+			for (size_t c=0, nbase=0, proj=0; c < ncontours; c++) {
+				size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
 				size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
-				for (size_t pt=0; pt < np; pt++, proj++, base+=2) {
-					cp[proj+npoints] = scene.gcf*(current + xaxis*contours[base] + yaxis*contours[base+1]);
-					normals[proj+npoints] = xaxis*normals2D[base] + yaxis*normals2D[base+1];
-					//std::cout << "initial c=" << c << " pt=" << pt << " proj="  << proj << " base=" << base << ": " << cp[proj+npoints]/scene.gcf << std::endl;
+				// Quad order is early v0, early v1, late v1, late v0
+				for (size_t pt=0; pt<nd; pt+=2, nbase+=4, proj+=4) {
+					quads[proj  ] = scene.gcf*(prev    + xaxis*contours[base+pt] + yaxis*contours[base+pt+1]);
+					// Use modulo arithmetic here because last point is the first point:
+					quads[proj+1] = scene.gcf*(prev    + xaxis*contours[base+((pt+2)%nd)] + yaxis*contours[base+((pt+3)%nd)]);
+					quads[proj+2] = scene.gcf*(current +     x*contours[base+((pt+2)%nd)] +     y*contours[base+((pt+3)%nd)]);
+					quads[proj+3] = scene.gcf*(current +     x*contours[base+pt] +     y*contours[base+pt+1]);
+
+					normals[proj  ] = xaxis*normals2D[nbase  ] + yaxis*normals2D[nbase+1];
+					normals[proj+1] = xaxis*normals2D[nbase+2] + yaxis*normals2D[nbase+3];
+					normals[proj+2] = xaxis*normals2D[nbase+2] + yaxis*normals2D[nbase+3];
+					normals[proj+3] = xaxis*normals2D[nbase  ] + yaxis*normals2D[nbase+1];
 				}
 			}
 
+			xaxis += 2*dx; // shape axes in next section of extrusion
+			yaxis += 2*dy;
 
-			std::cout << "--cp after---" << std::endl;
-			for (size_t i=0; i<cp.size(); i++) {
-				std::cout << "i=" << i << " " << cp[i]/scene.gcf << ", normals " << normals[i] << std::endl;
-			}
-
-			std::cout << "current=" << current << " npoints=" << npoints << std::endl;
-			for (size_t i=0; i<indices.size(); i++) {
-				std::cout << "i=" << i << ": " << indices[i] << ": " << cp[indices[i]]/scene.gcf;
-				std::cout << " normals" << normals[indices[i]] << std::endl;
-			}
-
-
-			int* ind = &indices[0];
-			for (size_t c=0; c < ncontours; c++) {
-				int np = 2*pcontours[2*c+2]+2;
-				//std::cout << "c=" << c << " np=" << np << std::endl;
-				// Generate triangle strips and normals for this contour of the extrusion:
-				glDrawElements(GL_QUAD_STRIP, np, GL_UNSIGNED_INT, ind);
-				ind += np;
-			}
-
+			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &quads[0]);
+			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[0]);
+			gl_enable cull_face( GL_CULL_FACE);
+			glDrawArrays(GL_QUADS, 0, quads.size());
 		}
 		lastA = A;
 		prev = current;
-		//std::cout << "endloop prev, current = " << prev << " " << current << std::endl;
-		for (size_t i=0; i<npoints; i++) {
-			cp[i] = cp[i+npoints];
-			normals[i] = normals[i+npoints];
-		}
 	}
+
+	/*
+	for (size_t c=0; c<npstrips; c++) {
+		size_t nd = 2*pstrips[2*c+2]; // number of doubles in this strip
+		size_t base = 2*pstrips[2*c+3]; // initial (x,y) = (strips[base], strips[base+1])
+		std::cout << "c=" << c << " base=" << base << " nd=" << nd << std::endl;
+		for (size_t pt=nd-2, n=0; pt>=0; pt-=2, n++) {
+			std::cout << "pt=" << pt << " n=" << n << std::endl;
+			std::cout << ": " << strips[base+pt] << ", " << strips[base+pt+1] << std::endl;
+			tri[n] = scene.gcf*(current + xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
+			std::cout << "tri assigned" << std::endl;
+			snormals[n] = lastA;
+			std::cout << "snormals assigned" << std::endl;
+		}
+		std::cout << "Paint this strip" << std::endl;
+		glVertexPointer(3, GL_DOUBLE, sizeof( vector), &tri[0]);
+		glNormalPointer( GL_DOUBLE, sizeof(vector), &snormals[0]);
+		gl_enable cull_face( GL_CULL_FACE);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
+		std::cout << "Painted" << std::endl;
+	}
+	*/
+
 	if (!mono) {
 		glDisableClientState( GL_COLOR_ARRAY);
 	}
@@ -474,39 +441,6 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	}
 	*/
 
-	/*
-	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
-	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
-	if (!mono) {
-		glEnableClientState( GL_COLOR_ARRAY);
-	}
-
-	// curve_slice had to do with the multi-sided thick curve; this code must change
-	int *ind = extrusion_slice;
-	for (size_t a=0; a < sides; a++) {
-		size_t ai = a;
-		if (a == sides-1) {
-			ind += 256; // upper portion of extrusion_slice indices, for the last side
-			ai = 0;
-		}
-
-		// List all the vertices for the ai-th side of the thick line:
-		for (size_t i = 0; i < vcount; i += 127u) {
-			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &projected[i*sides + ai].x);
-			if (!mono)
-				glColorPointer(3, GL_FLOAT, sizeof( rgb), &light[(i*sides + ai)].red );
-			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[i*sides + ai].x);
-			if (vcount-i < 128)
-				glDrawElements(GL_TRIANGLE_STRIP, 2*(vcount-i), GL_UNSIGNED_INT, ind);
-			else
-				glDrawElements(GL_TRIANGLE_STRIP, 256u, GL_UNSIGNED_INT, ind);
-		}
-	}
-	if (!mono)
-		glDisableClientState( GL_COLOR_ARRAY);
-}
-	*/
-
 void
 extrusion::gl_render( const view& scene)
 {
@@ -539,18 +473,6 @@ extrusion::gl_render( const view& scene)
 		tcolor[3*pcount+1] = c_i[iptr3+1];
 		tcolor[3*pcount+2] = c_i[iptr3+2];
 	}
-
-	/*
-	// Do scaling if necessary
-	std::cout << "scene.gcf=" << scene.gcf << " scene.gcfvec=" << scene.gcfvec << std::endl;
-	if (scene.gcf != 1.0) {
-		for (size_t i = 0; i < pcount; ++i) {
-			spos[3*i] *= scene.gcf;
-			spos[3*i+1] *= scene.gcf;
-			spos[3*i+2] *= scene.gcf;
-		}
-	}
-	*/
 
 	clear_gl_error();
 
