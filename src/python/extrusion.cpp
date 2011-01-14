@@ -88,6 +88,30 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 		}
 	}
 
+	// When there is just one contour, Polygon returns a winding order corresponding to
+	// the winding order of the list of points given to Polygon, whereas if there is more
+	// than one contour, Polygon correctly returns a winding order corresponding to
+	// whether the contour is external (clockwise) or internal (counterclockwise).
+	// Therefore, check for a counterclockwise single contour and reverse it.
+	if (ncontours == 1) {
+		double sum = 0.;
+		for (size_t pt=0; pt<npoints; pt++) {
+			size_t pt2 = (pt+1) % npoints;
+			vector r1 = vector(contours[2*pt], contours[2*pt+1], 0);
+			vector r2 = vector(contours[2*pt2], contours[2*pt2+1], 0);
+			sum += r1.cross(r2).z;
+		}
+		if (sum >= 0.) { // sum > 0 means this contour runs counterclockwise and must be reversed
+			size_t end = npoints;
+			std::vector<double> temp(2*end);
+			for (size_t i=0; i<end; i++) {
+				temp[2*end-2-2*i] = contours[2*i];
+				temp[2*end-1-2*i] = contours[2*i+1];
+			}
+			contours.swap(temp);
+		}
+	}
+
 	// Set up 2D normals used to build GL_QUADS
 	// There are two per vertex, because each face is a quad, and each vertex appears in two adjacent quads
 	normals2D.resize(4*npoints); // each normal is (x,y), two doubles; there are two normals per vertex (2 quads per vertex)
@@ -260,7 +284,7 @@ struct converter
 void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
 {
-	// TODO: lighting/winding issues; multicolors; smooth along curve; attributes per contour
+	// TODO: multicolors; smooth along curve; scaling; attributes per contour
 
 	if (pcount < 2) return;
 
