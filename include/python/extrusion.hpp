@@ -51,7 +51,8 @@ class extrusion : public arrayprim_color
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
 	void extrude( const view&, double* spos, float* tcolor, size_t pcount);
-	void render_end(const vector V, const double gcf, const vector current, const vector xaxis, const vector yaxis);
+	void render_end(const vector V, const double gcf, const vector current,
+			const vector xaxis, const vector yaxis, const float* endcolor);
 
 	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
 	// pcontours[0] is (numper of contours, 0)

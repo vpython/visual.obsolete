@@ -286,24 +286,32 @@ struct converter
 } // !namespace (anonymous)
 
 void
-extrusion::render_end(const vector V, const double gcf, const vector current, const vector xaxis, const vector yaxis)
+extrusion::render_end(const vector V, const double gcf, const vector current,
+		const vector xaxis, const vector yaxis, const float* endcolor)
 {
 	// Use the triangle strips in "strips" to paint an end of the extrusion
 	size_t npstrips = pstrips[0]; // number of triangle strips in the cross section
 	size_t spoints = strips.size()/2; // total number of 2D points in all strips
 
+	glEnableClientState( GL_COLOR_ARRAY);
+
 	for (size_t c=0; c<npstrips; c++) {
 		size_t nd = 2*pstrips[2*c+2]; // number of doubles in this strip
 		size_t base = 2*pstrips[2*c+3]; // initial (x,y) = (strips[base], strips[base+1])
 		std::vector<vector> tristrip(nd/2), snormals(nd/2);
+		std::vector<float> endcolors(3*nd/2);
 
 		for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
 			tristrip[n] = gcf*(current + xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
 			snormals[n] = V;
+			endcolors[3*n  ] = endcolor[0];
+			endcolors[3*n+1] = endcolor[1];
+			endcolors[3*n+2] = endcolor[2];
 		}
 
 		glNormalPointer( GL_DOUBLE, 0, &snormals[0]);
 		glVertexPointer(3, GL_DOUBLE, 0, &tristrip[0]);
+		glColorPointer(3, GL_FLOAT, 0, &endcolors[0]);
 		// nd doubles, nd/2 vertices
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
 
@@ -325,12 +333,13 @@ extrusion::render_end(const vector V, const double gcf, const vector current, co
 		// nd doubles, nd/2 vertices
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
 	}
+	glDisableClientState( GL_COLOR_ARRAY);
 }
 
 void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
 {
-	// TODO: multicolors; smooth along curve; scaling; attributes per contour
+	// TODO: smooth along curve; scaling; attributes per contour
 
 	if (pcount < 2) return;
 
@@ -342,6 +351,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	// times 2 for front and back of each triangle.
 	// Allocate space to hold the largest contour:
 	std::vector<vector> tris(12*maxcontour), normals(12*maxcontour);
+	std::vector<float> tcolors(3*12*maxcontour);
 
 	vector xaxis, yaxis; // local unit-vector axes on the 2D shape
 	vector prevx, prevy; // local axes on previous bisecting plane
@@ -358,7 +368,6 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	bool mono = adjust_colors( scene, tcolor, pcount);
 
 	clear_gl_error();
-	if (!mono) glEnableClientState( GL_COLOR_ARRAY);
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
 	gl_enable cull_face( GL_CULL_FACE);
@@ -421,7 +430,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			 	VPYTHON_WARNING( msg.str());
 			}
 
-			render_end(-A, scene.gcf, current, xaxis, yaxis); // render both sides of first end
+			render_end(-A, scene.gcf, current, xaxis, yaxis, c_i); // render both sides of first end
+			if (!mono) glEnableClientState( GL_COLOR_ARRAY); // re-enable if necessary
 
 		} else {
 			vector dx = -xaxis.dot(bisecting_plane_normal)*bisecting_plane_normal;
@@ -429,9 +439,12 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			vector x = xaxis + dx;
 			vector y = yaxis + dy;
 
-			glVertexPointer(3, GL_DOUBLE, sizeof( vector), &tris[0]);
-			glNormalPointer( GL_DOUBLE, sizeof(vector), &normals[0]);
+			glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
+			glNormalPointer( GL_DOUBLE, 0, &normals[0]);
+			glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
 
+			float rold=c_i[-3], gold=c_i[-2], bold=c_i[-1]; // color at previous location along the curve
+			float rnew=c_i[0], gnew=c_i[1], bnew=c_i[2];    // color at current location along the curve
 			for (size_t c=0, nbase=0; c < ncontours; c++) {
 				size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
 				size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
@@ -444,6 +457,22 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 					tris[3*nd+proj+3] = tris[proj+3] = tris[proj+1];
 					tris[3*nd+proj+5] = tris[proj+4] = scene.gcf*(current +     x*contours[base+((pt+2)%nd)] +     y*contours[base+((pt+3)%nd)]);
 					tris[3*nd+proj+4] = tris[proj+5] = tris[proj+2];
+
+					tcolors[3*proj  ] = tcolors[3*(proj+1)  ] = tcolors[3*(proj+3)  ] = rold;
+					tcolors[3*proj+1] = tcolors[3*(proj+1)+1] = tcolors[3*(proj+3)+1] = gold;
+					tcolors[3*proj+2] = tcolors[3*(proj+1)+2] = tcolors[3*(proj+3)+2] = bold;
+
+					tcolors[3*(proj+2)  ] = tcolors[3*(proj+4)  ] = tcolors[3*(proj+5)  ] = rnew;
+					tcolors[3*(proj+2)+1] = tcolors[3*(proj+4)+1] = tcolors[3*(proj+5)+1] = gnew;
+					tcolors[3*(proj+2)+2] = tcolors[3*(proj+4)+2] = tcolors[3*(proj+5)+2] = bnew;
+
+					tcolors[3*(3*nd+proj)  ] = tcolors[3*(3*nd+proj+1)  ] = tcolors[3*(3*nd+proj+3)  ] = rold;
+					tcolors[3*(3*nd+proj)+1] = tcolors[3*(3*nd+proj+1)+1] = tcolors[3*(3*nd+proj+3)+1] = gold;
+					tcolors[3*(3*nd+proj)+2] = tcolors[3*(3*nd+proj+1)+2] = tcolors[3*(3*nd+proj+3)+2] = bold;
+
+					tcolors[3*(3*nd+proj+2)  ] = tcolors[3*(3*nd+proj+4)  ] = tcolors[3*(3*nd+proj+5)  ] = rnew;
+					tcolors[3*(3*nd+proj+2)+1] = tcolors[3*(3*nd+proj+4)+1] = tcolors[3*(3*nd+proj+5)+1] = gnew;
+					tcolors[3*(3*nd+proj+2)+2] = tcolors[3*(3*nd+proj+4)+2] = tcolors[3*(3*nd+proj+5)+2] = bnew;
 
 					normals[proj  ] = (xaxis*normals2D[nbase  ] + yaxis*normals2D[nbase+1]);
 					normals[proj+1] = (xaxis*normals2D[nbase+2] + yaxis*normals2D[nbase+3]);
@@ -477,7 +506,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 		prev = current;
 	}
 
-	render_end(-lastA, scene.gcf, current, xaxis, yaxis); // render both sides of last end
+	render_end(-lastA, scene.gcf, current, xaxis, yaxis, c_i-3); // render both sides of last end
 
 	if (!mono) glDisableClientState( GL_COLOR_ARRAY);
 	check_gl_error();
