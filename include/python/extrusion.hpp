@@ -26,15 +26,6 @@ class extrusion : public arrayprim_color
 
 	bool antialias;
 
-	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
-	// pcontours[0] is (numper of contours, 0)
-	// pcontours[2*i+2] points to (length of ith contour, starting location of ith contour in contours).
-	// strips are flattened N*2 arrays of points describing strips that span the "solid" part of the 2D surface.
-	// pstrips[2*i] points to (length of ith strip, starting location of ith strip in strips).
-	std::vector<double> contours, strips;
-	std::vector<int> pcontours, pstrips;
-	std::vector<double> normals2D; // [(nx0,ny0), (nx1,ny1)], [(nx1,ny1), (nx2,ny2)], etc. normals for 2D shape
-
 	// Returns true if the object is single-colored.
 	bool monochrome(float* tcolor, size_t pcount);
 
@@ -44,9 +35,8 @@ class extrusion : public arrayprim_color
 	virtual void gl_pick_render( const view&);
 	void get_material_matrix( const view& v, tmatrix& out );
 	virtual void grow_extent( extent&);
-	double maxextent; // maximum distance from curve
 
-	// Returns true if the object is degenarate and should not be rendered.
+	// Returns true if the object is degenerate and should not be rendered.
  	bool degenerate() const;
 
  public:
@@ -61,6 +51,20 @@ class extrusion : public arrayprim_color
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
 	void extrude( const view&, double* spos, float* tcolor, size_t pcount);
+	void render_end(const vector V, const double gcf, const vector current, const vector xaxis, const vector yaxis);
+
+	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
+	// pcontours[0] is (numper of contours, 0)
+	// pcontours[2*i+2] points to (length of ith contour, starting location of ith contour in contours).
+	// strips are flattened N*2 arrays of points describing strips that span the "solid" part of the 2D surface.
+	// pstrips[2*i] points to (length of ith strip, starting location of ith strip in strips).
+	std::vector<double> contours, strips;
+	std::vector<int> pcontours, pstrips;
+	std::vector<double> normals2D; // [(nx0,ny0), (nx1,ny1)], [(nx1,ny1), (nx2,ny2)], etc. normals for 2D shape
+
+	double maxextent; // maximum distance from curve
+	size_t maxcontour; // number of vertices in largest contour
+	bool enabled; // False while processing set_contours
 };
 
 } } // !namespace cvisual::python
