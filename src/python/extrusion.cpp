@@ -66,6 +66,10 @@ void
 extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pcontours,
 		const numpy::array& _strips,  const numpy::array& _pstrips  )
 {
+	// Polygon does not guarantee the winding order of the list of points,
+	// so in primitives.py we force the winding order to be clockwise if
+	// external and counterclockwise if internal (a hole).
+
 	enabled = false; // block rendering while set_contours processes a shape change
 	// primitives.py sends to set_contours descriptions of the 2D surface; see extrusions.hpp
 	// We store the information in std::vector containers in flattened form.
@@ -88,30 +92,6 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 		for (size_t pt=0; pt < nd; pt+=2) {
 			double dist = vector(contours[base+pt],contours[base+pt+1],0.).mag();
 			if (dist > maxextent) maxextent = dist;
-		}
-	}
-
-	// When there is just one contour, Polygon returns a winding order corresponding to
-	// the winding order of the list of points given to Polygon, whereas if there is more
-	// than one contour, Polygon correctly returns a winding order corresponding to
-	// whether the contour is external (clockwise) or internal (counterclockwise).
-	// Therefore, check for a counterclockwise single contour and reverse it.
-	if (ncontours == 1) {
-		double sum = 0.;
-		for (size_t pt=0; pt<npoints; pt++) {
-			size_t pt2 = (pt+1) % npoints;
-			vector r1 = vector(contours[2*pt], contours[2*pt+1], 0);
-			vector r2 = vector(contours[2*pt2], contours[2*pt2+1], 0);
-			sum += r1.cross(r2).z;
-		}
-		if (sum >= 0.) { // sum > 0 means this contour runs counterclockwise and must be reversed
-			size_t end = npoints;
-			std::vector<double> temp(2*end);
-			for (size_t i=0; i<end; i++) {
-				temp[2*end-2-2*i] = contours[2*i];
-				temp[2*end-1-2*i] = contours[2*i+1];
-			}
-			contours.swap(temp);
 		}
 	}
 
@@ -339,7 +319,9 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
 {
-	// TODO: smooth along curve; scaling; attributes per contour
+	// TODO: correct contour windings; smooth along curve; handle up; scaling; attributes per contour
+	// TODO: import Polygon along with extrusion; warnings for text and font modules, extrusion and Polygon module
+	// TODO: library of simple shapes (some provided by Polygon.Shapes)
 
 	if (pcount < 2) return;
 
