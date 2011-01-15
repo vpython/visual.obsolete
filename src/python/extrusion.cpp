@@ -434,17 +434,31 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			if (!mono) glEnableClientState( GL_COLOR_ARRAY); // re-enable if necessary
 
 		} else {
-			vector dx = -xaxis.dot(bisecting_plane_normal)*bisecting_plane_normal;
-			vector dy = -yaxis.dot(bisecting_plane_normal)*bisecting_plane_normal;
-			vector x = xaxis + dx;
-			vector y = yaxis + dy;
+			double xcos = xaxis.dot(bisecting_plane_normal);
+			double ycos = yaxis.dot(bisecting_plane_normal);
+			vector dx = -xcos*bisecting_plane_normal;
+			vector dy = -ycos*bisecting_plane_normal;
+			xcos = fabs(xcos);
+			ycos = fabs(ycos);
+			vector x, y;
+			if (xcos) {
+				x = (xaxis + dx).norm()/sqrt(1.0-xcos*xcos);
+			} else {
+				x = xaxis;
+			}
+			if (ycos) {
+				y = (yaxis + dy).norm()/sqrt(1.0-ycos*ycos);
+			} else {
+				y = yaxis;
+			}
 
 			glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
 			glNormalPointer( GL_DOUBLE, 0, &normals[0]);
 			glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
 
-			float rold=c_i[-3], gold=c_i[-2], bold=c_i[-1]; // color at previous location along the curve
-			float rnew=c_i[0], gnew=c_i[1], bnew=c_i[2];    // color at current location along the curve
+			float r_old=c_i[-3], g_old=c_i[-2], b_old=c_i[-1]; // color at previous location along the curve
+			float r_new=c_i[0], g_new=c_i[1], b_new=c_i[2];    // color at current location along the curve
+			//r_new = r_old; g_new = g_old; b_new = b_old; // testing
 			for (size_t c=0, nbase=0; c < ncontours; c++) {
 				size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
 				size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
@@ -458,21 +472,21 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 					tris[3*nd+proj+5] = tris[proj+4] = scene.gcf*(current +     x*contours[base+((pt+2)%nd)] +     y*contours[base+((pt+3)%nd)]);
 					tris[3*nd+proj+4] = tris[proj+5] = tris[proj+2];
 
-					tcolors[3*proj  ] = tcolors[3*(proj+1)  ] = tcolors[3*(proj+3)  ] = rold;
-					tcolors[3*proj+1] = tcolors[3*(proj+1)+1] = tcolors[3*(proj+3)+1] = gold;
-					tcolors[3*proj+2] = tcolors[3*(proj+1)+2] = tcolors[3*(proj+3)+2] = bold;
+					tcolors[3*proj  ] = tcolors[3*(proj+1)  ] = tcolors[3*(proj+3)  ] = r_old;
+					tcolors[3*proj+1] = tcolors[3*(proj+1)+1] = tcolors[3*(proj+3)+1] = g_old;
+					tcolors[3*proj+2] = tcolors[3*(proj+1)+2] = tcolors[3*(proj+3)+2] = b_old;
 
-					tcolors[3*(proj+2)  ] = tcolors[3*(proj+4)  ] = tcolors[3*(proj+5)  ] = rnew;
-					tcolors[3*(proj+2)+1] = tcolors[3*(proj+4)+1] = tcolors[3*(proj+5)+1] = gnew;
-					tcolors[3*(proj+2)+2] = tcolors[3*(proj+4)+2] = tcolors[3*(proj+5)+2] = bnew;
+					tcolors[3*(proj+2)  ] = tcolors[3*(proj+4)  ] = tcolors[3*(proj+5)  ] = r_new;
+					tcolors[3*(proj+2)+1] = tcolors[3*(proj+4)+1] = tcolors[3*(proj+5)+1] = g_new;
+					tcolors[3*(proj+2)+2] = tcolors[3*(proj+4)+2] = tcolors[3*(proj+5)+2] = b_new;
 
-					tcolors[3*(3*nd+proj)  ] = tcolors[3*(3*nd+proj+1)  ] = tcolors[3*(3*nd+proj+3)  ] = rold;
-					tcolors[3*(3*nd+proj)+1] = tcolors[3*(3*nd+proj+1)+1] = tcolors[3*(3*nd+proj+3)+1] = gold;
-					tcolors[3*(3*nd+proj)+2] = tcolors[3*(3*nd+proj+1)+2] = tcolors[3*(3*nd+proj+3)+2] = bold;
+					tcolors[3*(3*nd+proj)  ] = tcolors[3*(3*nd+proj+1)  ] = tcolors[3*(3*nd+proj+3)  ] = r_old;
+					tcolors[3*(3*nd+proj)+1] = tcolors[3*(3*nd+proj+1)+1] = tcolors[3*(3*nd+proj+3)+1] = g_old;
+					tcolors[3*(3*nd+proj)+2] = tcolors[3*(3*nd+proj+1)+2] = tcolors[3*(3*nd+proj+3)+2] = b_old;
 
-					tcolors[3*(3*nd+proj+2)  ] = tcolors[3*(3*nd+proj+4)  ] = tcolors[3*(3*nd+proj+5)  ] = rnew;
-					tcolors[3*(3*nd+proj+2)+1] = tcolors[3*(3*nd+proj+4)+1] = tcolors[3*(3*nd+proj+5)+1] = gnew;
-					tcolors[3*(3*nd+proj+2)+2] = tcolors[3*(3*nd+proj+4)+2] = tcolors[3*(3*nd+proj+5)+2] = bnew;
+					tcolors[3*(3*nd+proj+2)  ] = tcolors[3*(3*nd+proj+4)  ] = tcolors[3*(3*nd+proj+5)  ] = r_new;
+					tcolors[3*(3*nd+proj+2)+1] = tcolors[3*(3*nd+proj+4)+1] = tcolors[3*(3*nd+proj+5)+1] = g_new;
+					tcolors[3*(3*nd+proj+2)+2] = tcolors[3*(3*nd+proj+4)+2] = tcolors[3*(3*nd+proj+5)+2] = b_new;
 
 					normals[proj  ] = (xaxis*normals2D[nbase  ] + yaxis*normals2D[nbase+1]);
 					normals[proj+1] = (xaxis*normals2D[nbase+2] + yaxis*normals2D[nbase+3]);
