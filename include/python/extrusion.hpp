@@ -24,6 +24,8 @@ class extrusion : public arrayprim_color
 	// array that starts at its beginning and runs up to the last used position
 	// in the array.  This is similar to many implementations of std::vector<>.
 
+	shared_vector up;
+
 	bool antialias;
 
 	// Returns true if the object is single-colored.
@@ -41,6 +43,9 @@ class extrusion : public arrayprim_color
 
  public:
 	extrusion();
+
+	void set_up( const vector& n_up);
+	shared_vector& get_up();
 
 	void set_contours( const array&, const array&, const array&, const array& );
 

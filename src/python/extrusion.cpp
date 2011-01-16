@@ -25,7 +25,8 @@ using boost::python::make_tuple;
 using boost::python::tuple;
 
 extrusion::extrusion()
-	: antialias( true), enabled( false)
+	: antialias( true), enabled( false), up(vector(0,1,0)) // should be scene.up
+	// For some reason I haven't been able to get up connected to Python through Boost....??
 {
 	contours.insert(contours.begin(), 0.0);
 	strips.insert(strips.begin(), 0.0);
@@ -62,6 +63,15 @@ void build_contour(const numpy::array& _cont, std::vector<T>& cont)
 	}
 }
 
+vector
+smooth(const vector& a, const vector& b) { // vectors a and b are assumed to be normalized
+	if (a.dot(b) > 0.95) {
+		return (a+b).norm();
+	} else {
+		return a;
+	}
+}
+
 void
 extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pcontours,
 		const numpy::array& _strips,  const numpy::array& _pstrips  )
@@ -95,8 +105,11 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 		}
 	}
 
-	// Set up 2D normals used to build GL_tris
-	// There are two per vertex, because each face is a quad, and each vertex appears in two adjacent tris
+	// Set up 2D normals used to build OpenGL triangles.
+	// There are two per vertex, because each face of a side of an extrusion segment is a quadrilateral,
+	// and each vertex appears in two adjacent triangles.
+	// The indexing of normals2D follows that of looping through contour, through point. To use normals2D, you need
+	// to use the same nested for-loop structure used here.
 	normals2D.resize(4*npoints); // each normal is (x,y), two doubles; there are two normals per vertex (2 tris per vertex)
 	size_t i=0;
 	for (size_t c=0; c < ncontours; c++) {
@@ -111,15 +124,8 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 			int after  = (pt+2); // use modulo arithmetic to make the linear sequence effectively circular
 			Nafter  = vector(contours[base+((after+1)%nd)]-contours[base+((after+3)%nd)],
 					         contours[base+((after+2)%nd)]-contours[base+(after%nd)], 0).norm();
-			double cosangle = N.dot(Nbefore);
-			Navg1 = Navg2 = N;
-			if (cosangle > 0.95) {
-				Navg1 = (N+Nbefore).norm();
-			}
-			cosangle = N.dot(Nafter);
-			if (cosangle > 0.95) {
-				Navg2 = (N+Nafter).norm();
-			}
+			Navg1 = smooth(N,Nbefore);
+			Navg2 = smooth(N,Nafter);
 			Nbefore = N;
 			N = Nafter;
 			normals2D[i  ] = Navg1[0];
@@ -142,6 +148,16 @@ bool
 extrusion::degenerate() const
 {
 	return count < 2 || !enabled;
+}
+
+void
+extrusion::set_up( const vector& n_up) {
+	up = n_up;
+}
+
+shared_vector&
+extrusion::get_up() {
+	return up;
 }
 
 bool
@@ -319,9 +335,35 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
 {
-	// TODO: correct contour windings; smooth along curve; handle up; scaling; attributes per contour
-	// TODO: import Polygon along with extrusion; warnings for text and font modules, extrusion and Polygon module
+	// TODO: scaling; attributes per contour
+	// TODO: implement extrusion.up, by default equal to scene.up; up should be an array, to permit twisted extrusions.
+	// TODO: import Polygon along with extrusion?; warnings for text and font modules, extrusion and Polygon module
 	// TODO: library of simple shapes (some provided by Polygon.Shapes)
+
+	// The basic architecture of the extrusion object:
+	// Use the Polygon module to create by constructive geometry a 2D surface in the form of a
+	// set of contours, each a sequence of 2D points. In primitives.py these contours are forced to
+	// be ordered CW if external and CCW if internal (holes). In set_contours, 2D normals to these
+	// contours are calculated, with smoothing around the contour. The 2D surface, including the
+	// computed normals, is extruded as a cross section along a curve defined by the pos attribute,
+	// which like other array objects (curve, points, faces, convex) is represented by a numpy array.
+
+	// For efficiency, orthogonal unit vectors (xaxis,yaxis) in the 2D surface are defined so that a
+	// contour point (a,b) relative to the curve is a vector in the plane a*xaxis+b*yaxis.
+	// At a joint between adjacent extrusion segments, from (xaxis,yaxis) that are perpendicular
+	// to the curve, we derive (x,y), orthogonal non-unit vectors in the plane of the joint, such
+	// that positions (a,b) around the joint are calculated as pos+a*x+b*y. These joint positions
+	// are connected to the previous joint positions to form one segment of the extrusion. (We don't
+	// save all the previous positions; rather we simply save the previous values of (x,y) from
+	// which the previous positions can easily be calculated.)
+
+	// The normals to the sides of the extrusion are simply computed from the (nx,ny) normals,
+	// computed in set_contours, as nx*xaxis+ny*yaxis. By look-ahead, using what (xaxis,yaxis) will
+	// be in the next segment, the normals at the end of one segment are smoothed to normals at the
+	// start of the next segment. At the start of the next segment we look behind to smooth the normals.
+
+	// extrusion.shape=Polygon(...) not only sends contour information to set_contours but also
+	// sends triangle strips used to render the front and back surfaces of the extrusion.
 
 	if (pcount < 2) return;
 
@@ -330,12 +372,14 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	size_t npoints = contours.size()/2; // total number of 2D points in all contours
 
 	// 3 positions and normals per triangle, and the number of triangles = 2 times the number of points in the 2D shape,
-	// times 2 for front and back of each triangle.
-	// Allocate space to hold the largest contour:
-	std::vector<vector> tris(12*maxcontour), normals(12*maxcontour);
-	std::vector<float> tcolors(3*12*maxcontour);
+	// times 2 for front and back of each triangle. Allocate space to hold the largest contour:
+	size_t maxtriangles = 12*maxcontour;
+	std::vector<vector> tris(maxtriangles), normals(maxtriangles);
+	std::vector<float> tcolors(3*maxtriangles);
 
 	vector xaxis, yaxis; // local unit-vector axes on the 2D shape
+	vector prevxaxis, prevyaxis; // local unit-vector axes on the 2D shape on preceding segment
+	vector nextxaxis, nextyaxis; // local unit-vector axes on the 2D shape on following segment
 	vector prevx, prevy; // local axes on previous bisecting plane
 	vector prev;
 
@@ -391,11 +435,10 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 		if (corner == 0) {
 			// Establish local xaxis,yaxis unit vectors that span the 2D surface
-			yaxis = vector(0,1,0);
+			yaxis = up;
 			xaxis = A.cross(yaxis).norm();
-			if (!xaxis) {
-				xaxis = A.cross( vector(0, 0, 1)).norm();
-			}
+			if (!xaxis) xaxis = A.cross( vector(0, 0, 1)).norm();
+			if (!xaxis) xaxis = A.cross( vector(1, 0, 0)).norm();
 			yaxis = xaxis.cross(A).norm();
 
 			prevx = xaxis;
@@ -416,6 +459,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			if (!mono) glEnableClientState( GL_COLOR_ARRAY); // re-enable if necessary
 
 		} else {
+			// Calculate (x,y), non-unit vectors lying in the plane of the joint.
+			// A point (a,b) in the 2D surface is located in 3D space at current+a*x+b*y.
 			double xcos = xaxis.dot(bisecting_plane_normal);
 			double ycos = yaxis.dot(bisecting_plane_normal);
 			vector dx = -xcos*bisecting_plane_normal;
@@ -434,6 +479,21 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				y = yaxis;
 			}
 
+			if (corner == pcount-1) { // processing final segment
+				nextxaxis = xaxis;
+				nextyaxis = yaxis;
+			} else {
+				// Think of the bisecting plane as a mirror, and reflect through this
+				// mirror to find the new local axes for the next segment.
+				nextxaxis = xaxis + 2*dx;
+				nextyaxis = yaxis + 2*dy;
+			}
+
+			if (corner == 1) { // processing first segment
+				prevxaxis = xaxis;
+				prevyaxis = yaxis;
+			}
+
 			glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
 			glNormalPointer( GL_DOUBLE, 0, &normals[0]);
 			glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
@@ -441,48 +501,60 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			float r_old=c_i[-3], g_old=c_i[-2], b_old=c_i[-1]; // color at previous location along the curve
 			float r_new=c_i[0], g_new=c_i[1], b_new=c_i[2];    // color at current location along the curve
 			//r_new = r_old; g_new = g_old; b_new = b_old; // testing
+			// The following nested for loops is (necessarily) the same as that used to build the normals2D array.
 			for (size_t c=0, nbase=0; c < ncontours; c++) {
 				size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
 				size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
 				// Triangle order is early v0, early v1, late v0, early v1, late v1, late v0; render front and back of each triangle
-				for (size_t pt=0, proj=0; pt<nd; pt+=2, nbase+=4, proj+=6) {
-					tris[3*nd+proj+1] = tris[proj  ] = scene.gcf*(prev    + prevx*contours[base+pt] + prevy*contours[base+pt+1]);
-					// Use modulo arithmetic here because last point is the first point:
-					tris[3*nd+proj  ] = tris[proj+1] = scene.gcf*(prev    + prevx*contours[base+((pt+2)%nd)] + prevy*contours[base+((pt+3)%nd)]);
-					tris[3*nd+proj+2] = tris[proj+2] = scene.gcf*(current +     x*contours[base+pt] +              y*contours[base+pt+1]);
-					tris[3*nd+proj+3] = tris[proj+3] = tris[proj+1];
-					tris[3*nd+proj+5] = tris[proj+4] = scene.gcf*(current +     x*contours[base+((pt+2)%nd)] +     y*contours[base+((pt+3)%nd)]);
-					tris[3*nd+proj+4] = tris[proj+5] = tris[proj+2];
+				for (size_t pt=0, i=0; pt<nd; pt+=2, i+=6, nbase+=4) {
+					// Use modulo arithmetic here because last point is the first point, going around the sides of the extrusion
+					tris[3*nd+i+1] = tris[i  ] = scene.gcf*(prev    + prevx*contours[base+pt] + prevy*contours[base+pt+1]);
+					tris[3*nd+i  ] = tris[i+1] = scene.gcf*(prev    + prevx*contours[base+((pt+2)%nd)] + prevy*contours[base+((pt+3)%nd)]);
+					tris[3*nd+i+2] = tris[i+2] = scene.gcf*(current +     x*contours[base+pt] +              y*contours[base+pt+1]);
+					tris[3*nd+i+3] = tris[i+3] = tris[i+1];
+					tris[3*nd+i+5] = tris[i+4] = scene.gcf*(current +     x*contours[base+((pt+2)%nd)] +     y*contours[base+((pt+3)%nd)]);
+					tris[3*nd+i+4] = tris[i+5] = tris[i+2];
 
-					tcolors[3*proj  ] = tcolors[3*(proj+1)  ] = tcolors[3*(proj+3)  ] = r_old;
-					tcolors[3*proj+1] = tcolors[3*(proj+1)+1] = tcolors[3*(proj+3)+1] = g_old;
-					tcolors[3*proj+2] = tcolors[3*(proj+1)+2] = tcolors[3*(proj+3)+2] = b_old;
+					tcolors[3*i  ] = tcolors[3*(i+1)  ] = tcolors[3*(i+3)  ] = r_old;
+					tcolors[3*i+1] = tcolors[3*(i+1)+1] = tcolors[3*(i+3)+1] = g_old;
+					tcolors[3*i+2] = tcolors[3*(i+1)+2] = tcolors[3*(i+3)+2] = b_old;
 
-					tcolors[3*(proj+2)  ] = tcolors[3*(proj+4)  ] = tcolors[3*(proj+5)  ] = r_new;
-					tcolors[3*(proj+2)+1] = tcolors[3*(proj+4)+1] = tcolors[3*(proj+5)+1] = g_new;
-					tcolors[3*(proj+2)+2] = tcolors[3*(proj+4)+2] = tcolors[3*(proj+5)+2] = b_new;
+					tcolors[3*(i+2)  ] = tcolors[3*(i+4)  ] = tcolors[3*(i+5)  ] = r_new;
+					tcolors[3*(i+2)+1] = tcolors[3*(i+4)+1] = tcolors[3*(i+5)+1] = g_new;
+					tcolors[3*(i+2)+2] = tcolors[3*(i+4)+2] = tcolors[3*(i+5)+2] = b_new;
 
-					tcolors[3*(3*nd+proj)  ] = tcolors[3*(3*nd+proj+1)  ] = tcolors[3*(3*nd+proj+3)  ] = r_old;
-					tcolors[3*(3*nd+proj)+1] = tcolors[3*(3*nd+proj+1)+1] = tcolors[3*(3*nd+proj+3)+1] = g_old;
-					tcolors[3*(3*nd+proj)+2] = tcolors[3*(3*nd+proj+1)+2] = tcolors[3*(3*nd+proj+3)+2] = b_old;
+					tcolors[3*(3*nd+i)  ] = tcolors[3*(3*nd+i+1)  ] = tcolors[3*(3*nd+i+3)  ] = r_old;
+					tcolors[3*(3*nd+i)+1] = tcolors[3*(3*nd+i+1)+1] = tcolors[3*(3*nd+i+3)+1] = g_old;
+					tcolors[3*(3*nd+i)+2] = tcolors[3*(3*nd+i+1)+2] = tcolors[3*(3*nd+i+3)+2] = b_old;
 
-					tcolors[3*(3*nd+proj+2)  ] = tcolors[3*(3*nd+proj+4)  ] = tcolors[3*(3*nd+proj+5)  ] = r_new;
-					tcolors[3*(3*nd+proj+2)+1] = tcolors[3*(3*nd+proj+4)+1] = tcolors[3*(3*nd+proj+5)+1] = g_new;
-					tcolors[3*(3*nd+proj+2)+2] = tcolors[3*(3*nd+proj+4)+2] = tcolors[3*(3*nd+proj+5)+2] = b_new;
+					tcolors[3*(3*nd+i+2)  ] = tcolors[3*(3*nd+i+4)  ] = tcolors[3*(3*nd+i+5)  ] = r_new;
+					tcolors[3*(3*nd+i+2)+1] = tcolors[3*(3*nd+i+4)+1] = tcolors[3*(3*nd+i+5)+1] = g_new;
+					tcolors[3*(3*nd+i+2)+2] = tcolors[3*(3*nd+i+4)+2] = tcolors[3*(3*nd+i+5)+2] = b_new;
 
-					normals[proj  ] = (xaxis*normals2D[nbase  ] + yaxis*normals2D[nbase+1]);
-					normals[proj+1] = (xaxis*normals2D[nbase+2] + yaxis*normals2D[nbase+3]);
-					normals[proj+2] = normals[proj  ];
-					normals[proj+3] = normals[proj+1];
-					normals[proj+4] = (xaxis*normals2D[nbase+2] + yaxis*normals2D[nbase+3]);
-					normals[proj+5] = normals[proj+2];
+					normals[i  ] = smooth(     xaxis*normals2D[nbase  ] +     yaxis*normals2D[nbase+1],
+							               prevxaxis*normals2D[nbase  ] + prevyaxis*normals2D[nbase+1]);
 
-					normals[3*nd+proj+1] = -normals[proj  ];
-					normals[3*nd+proj  ] = -normals[proj+1];
-					normals[3*nd+proj+2] = -normals[proj+2];
-					normals[3*nd+proj+3] = -normals[proj+3];
-					normals[3*nd+proj+5] = -normals[proj+4];
-					normals[3*nd+proj+4] = -normals[proj+5];
+					normals[i+1] = smooth(     xaxis*normals2D[nbase+2] +     yaxis*normals2D[nbase+3],
+									       prevxaxis*normals2D[nbase+2] + prevyaxis*normals2D[nbase+3]);
+
+					normals[i+2] = smooth(     xaxis*normals2D[nbase  ] +     yaxis*normals2D[nbase+1],
+									       nextxaxis*normals2D[nbase  ] + nextyaxis*normals2D[nbase+1]);
+
+					normals[i+3] = normals[i+1]; // i+1 and i+3 are the same location
+
+					normals[i+4] = smooth(     xaxis*normals2D[nbase+2] +     yaxis*normals2D[nbase+3],
+									       nextxaxis*normals2D[nbase+2] + nextyaxis*normals2D[nbase+3]);
+
+					normals[i+5] = normals[i+2]; // i+2 and i+5 are the same location
+
+					// Normals for other sides of triangles:
+					normals[3*nd+i+1] = -normals[i  ];
+					normals[3*nd+i  ] = -normals[i+1];
+					normals[3*nd+i+2] = -normals[i+2];
+					normals[3*nd+i+3] = -normals[i+3];
+					normals[3*nd+i+5] = -normals[i+4];
+					normals[3*nd+i+4] = -normals[i+5];
+
 				}
 
 				// nd doubles, nd/2 vertices, 2 triangles per vertex, 3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
@@ -492,11 +564,10 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 			prevx = x;
 			prevy = y;
-
-			// Think of the bisecting plane as a mirror, and reflect through this
-			// mirror to find the new local axes for the new segment.
-			xaxis = xaxis + 2*dx;
-			yaxis = yaxis + 2*dy;
+			prevxaxis = xaxis;
+			prevyaxis = yaxis;
+			xaxis = nextxaxis;
+			yaxis = nextyaxis;
 			lastA = A;
 		}
 		prev = current;
