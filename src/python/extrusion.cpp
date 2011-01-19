@@ -25,8 +25,12 @@ using boost::python::make_tuple;
 using boost::python::tuple;
 
 extrusion::extrusion()
-	: antialias( true), enabled( false), up(vector(0,1,0))
+	: antialias( true), enabled( false)
 {
+	double* k = up.data();
+	k[0] = k[2] = 0.0;
+	k[1] = 1.0;
+
 	contours.insert(contours.begin(), 0.0);
 	strips.insert(strips.begin(), 0.0);
 	pcontours.insert(pcontours.begin(), 0);
@@ -149,6 +153,7 @@ extrusion::degenerate() const
 	return count < 2 || !enabled;
 }
 
+/*
 void
 extrusion::set_up( const vector& n_up) {
 	up = n_up;
@@ -158,6 +163,41 @@ shared_vector&
 extrusion::get_up()
 {
 	return up;
+}
+*/
+
+void extrusion::set_length(size_t new_len) {
+	up.set_length(new_len);
+	arrayprim_color::set_length(new_len);
+}
+void extrusion::set_up( const double_array& n_up)
+{
+	std::vector<npy_intp> dims = shape(n_up);
+	if (dims.size() == 2 && dims[1] == 3) {
+		if (count == 0) { // This happens if set_up called before set_pos in constructor
+			set_length( dims[0] );
+		}
+	} else if (dims.size() == 1 && dims[0] == 3) {
+		if (count == 0) { // This happens if set_up called before set_pos in constructor
+			set_length( 1 );
+		}
+	}
+
+	up[slice(0, count)] = n_up;
+	double* up_i = up.data();
+}
+
+void extrusion::set_up_v( vector v)
+{
+	// We seem never to get here, which I don't understand
+	using boost::python::make_tuple;
+	// Broadcast the new normal across the array.
+	int npoints = count ? count : 1;
+	up[slice(0, npoints)] = make_tuple( v.x, v.y, v.z);
+}
+
+boost::python::object extrusion::get_up() {
+	return up[all()];
 }
 
 bool
@@ -178,27 +218,9 @@ extrusion::monochrome(float* tcolor, size_t pcount)
 	return true;
 }
 
-namespace {
-// Determines if two values differ by more than frac of either one.
-bool
-eq_frac( double lhs, double rhs, double frac)
-{
-	if (lhs == rhs)
-		return true;
-	double diff = fabs(lhs - rhs);
-	lhs = fabs(lhs);
-	rhs = fabs(rhs);
-	return lhs*frac > diff && rhs*frac > diff;
-}
-} // !namespace (unnamed)
-
 vector
 extrusion::get_center() const
 {
-	// TODO: Optimize this by only recomputing the center when the checksum of
-	// the entire object has changed.
-	// TODO: Only add the "optimization" if the checksum is actually faster than
-	// computing the average value every time...
 	if (degenerate())
 		return vector();
 	vector ret;
@@ -273,14 +295,6 @@ extrusion::adjust_colors( const view& scene, float* tcolor, size_t pcount)
 	return mono;
 }
 
-namespace {
-template <typename T>
-struct converter
-{
-	T data[3];
-};
-} // !namespace (anonymous)
-
 void
 extrusion::render_end(const vector V, const double gcf, const vector current,
 		const vector xaxis, const vector yaxis, const float* endcolor)
@@ -333,12 +347,10 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 }
 
 void
-extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
+extrusion::extrude( const view& scene, double* spos, double* sup, float* tcolor, size_t pcount)
 {
 	// TODO: scale, should be an Nx2 array
 	// TODO: up should be an Nx3 array, to permit twisted extrusions.
-	//   (Rendering is ready for scaling and up; what is needed is to communicate up between
-	//    Python and C++, and make both up and scale be arrays.)
 	// TODO: attributes per contour
 	// TODO: library of simple shapes (some provided by Polygon.Shapes)
 
@@ -388,6 +400,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 	// pos and color iterators
 	const double* v_i = spos;
+	const double* up_i = sup;
 	const float* c_i = tcolor;
 	const float* current_color = tcolor;
 	const float* prev_color = tcolor;
@@ -398,13 +411,9 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	vector prev; // previous location
 	vector current; // point along the curve currently being processed
 
-	clear_gl_error();
-	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
-	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
-	gl_enable cull_face( GL_CULL_FACE);
-
+	// Skip past duplicate points at start of extrusion
 	size_t corner;
-	for (corner=0; corner < pcount-1; ++corner, v_i += 3, c_i += 3) {
+	for (corner=0; corner < pcount-1; ++corner, v_i += 3, c_i += 3, up_i += 3) {
 		lastA = vector(&v_i[0]) - vector(&spos[0]);
 		if (!lastA) {
 			continue;
@@ -418,7 +427,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	prev_color = c_i;
 
 	// Establish local xaxis,yaxis unit vectors that span the 2D surface
-	yaxis = up;
+	yaxis = vector( &sup[0]);
 	xaxis = A.cross(yaxis).norm();
 	if (!xaxis) xaxis = A.cross( vector(0, 0, 1)).norm();
 	if (!xaxis) xaxis = A.cross( vector(1, 0, 0)).norm();
@@ -437,16 +446,22 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	 	VPYTHON_WARNING( msg.str());
 	}
 
-	render_end(-A, scene.gcf, vector(&spos[0]), xaxis, yaxis, &tcolor[0]); // render both sides of first end
-	if (!mono) glEnableClientState( GL_COLOR_ARRAY); // re-enable if necessary
+	clear_gl_error();
+	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
+	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
+	gl_enable cull_face( GL_CULL_FACE);
 
-	for (; corner < pcount; ++corner, v_i += 3, c_i += 3) {
+	render_end(-A, scene.gcf, vector(&spos[0]), xaxis, yaxis, &tcolor[0]); // render both sides of first end
+	if (!mono) glEnableClientState( GL_COLOR_ARRAY);
+
+	for (; corner < pcount; ++corner, v_i += 3, c_i += 3, up_i += 3) {
 		current_color = c_i;
 		current = vector(&v_i[0]);
 
 		// A is a unit vector pointing from the current location to the next location along the curve.
 		// lastA is a unit vector pointing from the previous location to the current location.
 
+		// Skip over duplicate points (but retain correct color information)
 		if (corner == pcount-1) {
 			A = lastA;
 		} else {
@@ -522,9 +537,12 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 		for (size_t c=0, nbase=0; c < ncontours; c++) {
 			size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
 			size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
-			// Triangle order is early v0, early v1, late v0, early v1, late v1, late v0; render front and back of each triangle
+			// Triangle order is
+			//    previous v0, current v1, current v0, previous v1, current v1, previous v0.
+			// Render front and back of each triangle.
 			for (size_t pt=0, i=0; pt<nd; pt+=2, i+=6, nbase+=4) {
-				// Use modulo arithmetic here because last point is the first point, going around the sides of the extrusion
+				// Use modulo arithmetic here because last point is the first point,
+				//    going around the sides of the extrusion
 				tris[3*nd+i+1] = tris[i  ] = scene.gcf*(prev    + prevx*contours[base+pt] + prevy*contours[base+pt+1]);
 				tris[3*nd+i  ] = tris[i+1] = scene.gcf*(prev    + prevx*contours[base+((pt+2)%nd)] + prevy*contours[base+((pt+3)%nd)]);
 				tris[3*nd+i+2] = tris[i+2] = scene.gcf*(current +     x*contours[base+pt] +              y*contours[base+pt+1]);
@@ -574,7 +592,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 			}
 
-			// nd doubles, nd/2 vertices, 2 triangles per vertex, 3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
+			// nd doubles, nd/2 vertices, 2 triangles per vertex,
+			//    3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
 			glDrawArrays(GL_TRIANGLES, 0, 6*nd);
 
 		}
@@ -590,45 +609,12 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 		prev_color = c_i;
 	}
 
-	render_end(-lastA, scene.gcf, vector(&spos[3*(pcount-1)]), xaxis, yaxis, &tcolor[3*(pcount-1)]); // render both sides of last end
+	// Render both sides of last end
+	render_end(-lastA, scene.gcf, vector(&spos[3*(pcount-1)]), xaxis, yaxis, &tcolor[3*(pcount-1)]);
 
 	if (!mono) glDisableClientState( GL_COLOR_ARRAY);
 	check_gl_error();
 }
-
-	/* Ignore for now
-	if (closed) {
-		// Connect the end of the extrusion to the start... can be ugly because the basis has gotten twisted around!
-		size_t i = (vcount - 1)*sides;
-		for(size_t a=0; a<sides; a++) {
-			projected[i+a] = projected[a];
-			normals[i+a] = normals[a];
-			if (!mono) light[i+a] = light[a];
-		}
-	}
-	*/
-
-	// We want to smooth the normals at the joints.
-	// But that can make a sharp corner do odd things,
-	// so we smoothly disable the smoothing when the joint angle
-	// is too big. This is somewhat arbitrary but seems to work well.
-	/*
-	size_t prev_i = closed ? (vcount-1)*sides : 0;
-	for( i = closed ? 0 : sides; i < vcount*sides; i += 2*sides ) {
-		for(size_t a=0; a<sides; a++) {
-			vector& n1 = normals[i+a];
-			vector& n2 = normals[prev_i+a];
-			double smooth_amount = (n1.dot(n2) - .65) * 4.0;
-			smooth_amount = std::min(1.0, std::max(0.0, smooth_amount));
-			if (smooth_amount) {
-				vector n_smooth = (n1+n2).norm() * smooth_amount;
-				n1 = n1 * (1-smooth_amount) + n_smooth;
-				n2 = n2 * (1-smooth_amount) + n_smooth;
-			}
-		}
-		prev_i = i + sides;
-	}
-	*/
 
 void
 extrusion::gl_render( const view& scene)
@@ -637,14 +623,10 @@ extrusion::gl_render( const view& scene)
 		return;
 
 	const size_t true_size = count;
-	// Set up the leading and trailing points for the joins.  See
-	// glePolyCylinder() for details.  The intent is to create joins that are
-	// perpendicular to the path at the last segment.  When the path appears
-	// to be closed, it should be rendered that way on-screen.
-	// The maximum number of points to display.
-	const int LINE_LENGTH = 1000;
+	const int LINE_LENGTH = 1000; // The maximum number of points to display.
 	// Data storage for the position and color data (plus room for 3 extra points)
 	double spos[3*(LINE_LENGTH+3)];
+	double sup[3*(LINE_LENGTH+3)];
 	float tcolor[3*(LINE_LENGTH+3)]; // opacity not yet implemented for extrusions
 	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
 	if (fstep < 1.0F) fstep = 1.0F;
@@ -652,19 +634,23 @@ extrusion::gl_render( const view& scene)
 
 	const double* p_i = pos.data();
 	const double* c_i = color.data();
+	const double* up_i = up.data();
 
 	// Choose which points to display
 	for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
 		iptr3 = 3*iptr;
-		spos[3*pcount] = p_i[iptr3];
+		spos[3*pcount  ] = p_i[iptr3];
 		spos[3*pcount+1] = p_i[iptr3+1];
 		spos[3*pcount+2] = p_i[iptr3+2];
-		tcolor[3*pcount] = c_i[iptr3];
+		sup[3*pcount  ] = up_i[iptr3];
+		sup[3*pcount+1] = up_i[iptr3+1];
+		sup[3*pcount+2] = up_i[iptr3+2];
+		tcolor[3*pcount  ] = c_i[iptr3];
 		tcolor[3*pcount+1] = c_i[iptr3+1];
 		tcolor[3*pcount+2] = c_i[iptr3+2];
 	}
 
-	extrude( scene, spos, tcolor, pcount);
+	extrude( scene, spos, sup, tcolor, pcount);
 }
 
 void

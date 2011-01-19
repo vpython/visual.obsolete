@@ -85,7 +85,7 @@ wrap_arrayobjects()
 
 	double_array_from_python();
 
-	// TODO: the arrprim inheritance hierarchy could be exposed here; for now I've left the duplication here
+	// TODO: the arrayprim inheritance hierarchy could be exposed here; for now I've left the duplication here
 	// to make it easy to control exactly what goes in the API for each array primitive, but arguably they
 	// should be as similar as possible!
 
@@ -119,12 +119,8 @@ wrap_arrayobjects()
 
 	using python::extrusion;
 
-	// TODO: the arrprim inheritance hierarchy could be exposed here; for now I've left the duplication here
-	// to make it easy to control exactly what goes in the API for each array primitive, but arguably they
-	// should be as similar as possible!
-
-	void (extrusion::*exappend_v_rgb_retain)( const vector&, const rgb&, int ) = &extrusion::append;
-	void (extrusion::*exappend_v_retain)( const vector&, int ) = &extrusion::append;
+	//void (extrusion::*exappend_v_rgb_retain)( const vector&, const rgb&, int ) = &extrusion::append;
+	//void (extrusion::*exappend_v_retain)( const vector&, int ) = &extrusion::append;
 
 	class_<extrusion, bases<renderable> >( "extrusion")
 		.def( init<const extrusion&>())
@@ -145,13 +141,13 @@ wrap_arrayobjects()
 		.def( "set_y", &extrusion::set_y)
 		.def( "set_z", &extrusion::set_z_d)
 		.def( "set_z", &extrusion::set_z)
-		.add_property( "up",
-			make_function(&extrusion::get_up, return_internal_reference<>()),
-			&extrusion::set_up)
+		.def( "get_up", &extrusion::get_up)
+		.def( "set_up", &extrusion::set_up_v)
+		.def( "set_up", &extrusion::set_up)
 		.def( "set_contours", &extrusion::set_contours) // used by primitives.py to transfer 2D cross section info
-		.def( "append", exappend_v_rgb_retain, ( arg("pos"), arg("color"), arg("retain")=-1 ) )
-		.def( "append", exappend_v_retain, ( arg("pos"), arg("retain")=-1 ) )
-		.def( "append", &extrusion::append_rgb, ( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
+		//.def( "append", exappend_v_rgb_retain, ( arg("pos"), arg("color"), arg("retain")=-1 ) )
+		//.def( "append", exappend_v_retain, ( arg("pos"), arg("retain")=-1 ) )
+		//.def( "append", &extrusion::append_rgb, ( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
 		;
 
 	using python::points;

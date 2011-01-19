@@ -24,7 +24,9 @@ class extrusion : public arrayprim_color
 	// array that starts at its beginning and runs up to the last used position
 	// in the array.  This is similar to many implementations of std::vector<>.
 
-	shared_vector up;
+	arrayprim_array<double> up; // An array of up vectors for the extrusion segments
+
+	virtual void set_length(size_t);
 
 	bool antialias;
 
@@ -44,8 +46,15 @@ class extrusion : public arrayprim_color
  public:
 	extrusion();
 
-	void set_up( const vector& n_up);
-	shared_vector& get_up();
+	// Add another vertex, up, and color to the extrusion.
+	void append_rgb( const vector&, const vector&, float red=-1, float green=-1, float blue=-1);
+	void append( const vector&, const vector&, const rgb& );
+	void append( const vector&, const vector& );
+	void append( const vector& );
+
+	boost::python::object get_up();
+	void set_up( const double_array& up);
+	void set_up_v( const vector);
 
 	void set_contours( const array&, const array&, const array&, const array& );
 
@@ -55,7 +64,7 @@ class extrusion : public arrayprim_color
 
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
-	void extrude( const view&, double* spos, float* tcolor, size_t pcount);
+	void extrude( const view&, double* spos, double* sup, float* tcolor, size_t pcount);
 	void render_end(const vector V, const double gcf, const vector current,
 			const vector xaxis, const vector yaxis, const float* endcolor);
 
