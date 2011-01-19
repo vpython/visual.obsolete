@@ -25,8 +25,7 @@ using boost::python::make_tuple;
 using boost::python::tuple;
 
 extrusion::extrusion()
-	: antialias( true), enabled( false), up(vector(0,1,0)) // should be scene.up
-	// For some reason I haven't been able to get up connected to Python through Boost....??
+	: antialias( true), enabled( false), up(vector(0,1,0))
 {
 	contours.insert(contours.begin(), 0.0);
 	strips.insert(strips.begin(), 0.0);
@@ -156,7 +155,8 @@ extrusion::set_up( const vector& n_up) {
 }
 
 shared_vector&
-extrusion::get_up() {
+extrusion::get_up()
+{
 	return up;
 }
 
@@ -335,10 +335,11 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
 {
-	// TODO: need to handle repeated points correctly (with respect to color and to positions)
-	// TODO: scaling; attributes per contour
-	// TODO: implement extrusion.up, by default equal to scene.up; up should be an array, to permit twisted extrusions.
-	//   (The rendering is ready; what is needed is to communicate up between Python and C++, and make it an array.)
+	// TODO: scale, should be an Nx2 array
+	// TODO: up should be an Nx3 array, to permit twisted extrusions.
+	//   (Rendering is ready for scaling and up; what is needed is to communicate up between
+	//    Python and C++, and make both up and scale be arrays.)
+	// TODO: attributes per contour
 	// TODO: library of simple shapes (some provided by Polygon.Shapes)
 
 	// The basic architecture of the extrusion object:

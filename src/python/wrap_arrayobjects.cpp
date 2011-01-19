@@ -145,6 +145,9 @@ wrap_arrayobjects()
 		.def( "set_y", &extrusion::set_y)
 		.def( "set_z", &extrusion::set_z_d)
 		.def( "set_z", &extrusion::set_z)
+		.add_property( "up",
+			make_function(&extrusion::get_up, return_internal_reference<>()),
+			&extrusion::set_up)
 		.def( "set_contours", &extrusion::set_contours) // used by primitives.py to transfer 2D cross section info
 		.def( "append", exappend_v_rgb_retain, ( arg("pos"), arg("color"), arg("retain")=-1 ) )
 		.def( "append", exappend_v_retain, ( arg("pos"), arg("retain")=-1 ) )
