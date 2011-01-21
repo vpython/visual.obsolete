@@ -25,11 +25,12 @@ using boost::python::make_tuple;
 using boost::python::tuple;
 
 extrusion::extrusion()
-	: antialias( true), enabled( false)
+	: antialias( true), enabled( false), up(vector(0,1,0))
 {
-	double* k = up.data();
-	k[0] = k[2] = 0.0;
-	k[1] = 1.0;
+	/*
+	double* k = twist.data();
+	k[0] = 0.0;
+	*/
 
 	contours.insert(contours.begin(), 0.0);
 	strips.insert(strips.begin(), 0.0);
@@ -153,7 +154,6 @@ extrusion::degenerate() const
 	return count < 2 || !enabled;
 }
 
-/*
 void
 extrusion::set_up( const vector& n_up) {
 	up = n_up;
@@ -164,40 +164,63 @@ extrusion::get_up()
 {
 	return up;
 }
-*/
+
 
 void extrusion::set_length(size_t new_len) {
-	up.set_length(new_len);
+	scale.set_length(new_len);
+	twist.set_length(new_len);
 	arrayprim_color::set_length(new_len);
 }
-void extrusion::set_up( const double_array& n_up)
+
+void extrusion::set_scale( const double_array& n_scale)
 {
-	std::vector<npy_intp> dims = shape(n_up);
+	std::vector<npy_intp> dims = shape(n_scale);
 	if (dims.size() == 2 && dims[1] == 3) {
-		if (count == 0) { // This happens if set_up called before set_pos in constructor
+		if (count == 0) { // This happens if set_scale called before set_pos in constructor
 			set_length( dims[0] );
 		}
 	} else if (dims.size() == 1 && dims[0] == 3) {
-		if (count == 0) { // This happens if set_up called before set_pos in constructor
+		if (count == 0) { // This happens if set_scale called before set_pos in constructor
 			set_length( 1 );
 		}
 	}
 
-	up[slice(0, count)] = n_up;
-	double* up_i = up.data();
+	scale[slice(0, count)] = n_scale;
+	double* scale_i = scale.data();
 }
 
-void extrusion::set_up_v( vector v)
+void extrusion::set_scale_v( vector v)
 {
 	// We seem never to get here, which I don't understand
 	using boost::python::make_tuple;
 	// Broadcast the new normal across the array.
 	int npoints = count ? count : 1;
-	up[slice(0, npoints)] = make_tuple( v.x, v.y, v.z);
+	scale[slice(0, npoints)] = make_tuple( v.x, v.y, v.z);
 }
 
-boost::python::object extrusion::get_up() {
-	return up[all()];
+boost::python::object extrusion::get_scale() {
+	return scale[all()];
+}
+
+void extrusion::set_twist( const double_array& n_twist)
+{
+	std::vector<npy_intp> dims = shape(n_twist);
+	if (dims.size() == 2 && dims[1] == 3) {
+		if (count == 0) { // This happens if set_twist called before set_pos in constructor
+			set_length( dims[0] );
+		}
+	} else if (dims.size() == 1 && dims[0] == 3) {
+		if (count == 0) { // This happens if set_twist called before set_pos in constructor
+			set_length( 1 );
+		}
+	}
+
+	twist[slice(0, count)] = n_twist;
+	double* twist_i = twist.data();
+}
+
+boost::python::object extrusion::get_twist() {
+	return twist[all()];
 }
 
 bool
@@ -214,7 +237,6 @@ extrusion::monochrome(float* tcolor, size_t pcount)
 		if (tcolor[nn*3+2] != first_color.blue)
 			return false;
 	}
-
 	return true;
 }
 
@@ -347,12 +369,12 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 }
 
 void
-extrusion::extrude( const view& scene, double* spos, double* sup, float* tcolor, size_t pcount)
+extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
 {
 	// TODO: scale, should be an Nx2 array
-	// TODO: up should be an Nx3 array, to permit twisted extrusions.
-	// TODO: attributes per contour
-	// TODO: library of simple shapes (some provided by Polygon.Shapes)
+	// TODO: twist should be an Nx1 array, to permit twisted extrusions.
+	// TODO: attributes per contour?
+	// TODO: library of simple shapes (one provided by Polygon.Shapes)
 
 	// The basic architecture of the extrusion object:
 	// Use the Polygon module to create by constructive geometry a 2D surface in the form of a
@@ -400,7 +422,6 @@ extrusion::extrude( const view& scene, double* spos, double* sup, float* tcolor,
 
 	// pos and color iterators
 	const double* v_i = spos;
-	const double* up_i = sup;
 	const float* c_i = tcolor;
 	const float* current_color = tcolor;
 	const float* prev_color = tcolor;
@@ -413,7 +434,7 @@ extrusion::extrude( const view& scene, double* spos, double* sup, float* tcolor,
 
 	// Skip past duplicate points at start of extrusion
 	size_t corner;
-	for (corner=0; corner < pcount-1; ++corner, v_i += 3, c_i += 3, up_i += 3) {
+	for (corner=0; corner < pcount-1; ++corner, v_i += 3, c_i += 3) {
 		lastA = vector(&v_i[0]) - vector(&spos[0]);
 		if (!lastA) {
 			continue;
@@ -426,8 +447,10 @@ extrusion::extrude( const view& scene, double* spos, double* sup, float* tcolor,
 	prev = vector(&spos[0]);
 	prev_color = c_i;
 
-	// Establish local xaxis,yaxis unit vectors that span the 2D surface
-	yaxis = vector( &sup[0]);
+	// On the 2D surface position (a,b) is at a*xaxis+b*yaxis, where
+	//    xaxis=(1,0) and yaxis=(0,1) on that 2D surface.
+	// THIS ALGORITHM ISN'T RIGHT; MUST RE-DO
+	yaxis = up;
 	xaxis = A.cross(yaxis).norm();
 	if (!xaxis) xaxis = A.cross( vector(0, 0, 1)).norm();
 	if (!xaxis) xaxis = A.cross( vector(1, 0, 0)).norm();
@@ -454,7 +477,7 @@ extrusion::extrude( const view& scene, double* spos, double* sup, float* tcolor,
 	render_end(-A, scene.gcf, vector(&spos[0]), xaxis, yaxis, &tcolor[0]); // render both sides of first end
 	if (!mono) glEnableClientState( GL_COLOR_ARRAY);
 
-	for (; corner < pcount; ++corner, v_i += 3, c_i += 3, up_i += 3) {
+	for (; corner < pcount; ++corner, v_i += 3, c_i += 3) {
 		current_color = c_i;
 		current = vector(&v_i[0]);
 
@@ -626,7 +649,6 @@ extrusion::gl_render( const view& scene)
 	const int LINE_LENGTH = 1000; // The maximum number of points to display.
 	// Data storage for the position and color data (plus room for 3 extra points)
 	double spos[3*(LINE_LENGTH+3)];
-	double sup[3*(LINE_LENGTH+3)];
 	float tcolor[3*(LINE_LENGTH+3)]; // opacity not yet implemented for extrusions
 	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
 	if (fstep < 1.0F) fstep = 1.0F;
@@ -634,7 +656,6 @@ extrusion::gl_render( const view& scene)
 
 	const double* p_i = pos.data();
 	const double* c_i = color.data();
-	const double* up_i = up.data();
 
 	// Choose which points to display
 	for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
@@ -642,15 +663,12 @@ extrusion::gl_render( const view& scene)
 		spos[3*pcount  ] = p_i[iptr3];
 		spos[3*pcount+1] = p_i[iptr3+1];
 		spos[3*pcount+2] = p_i[iptr3+2];
-		sup[3*pcount  ] = up_i[iptr3];
-		sup[3*pcount+1] = up_i[iptr3+1];
-		sup[3*pcount+2] = up_i[iptr3+2];
 		tcolor[3*pcount  ] = c_i[iptr3];
 		tcolor[3*pcount+1] = c_i[iptr3+1];
 		tcolor[3*pcount+2] = c_i[iptr3+2];
 	}
 
-	extrude( scene, spos, sup, tcolor, pcount);
+	extrude( scene, spos, tcolor, pcount);
 }
 
 void

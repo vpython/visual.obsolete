@@ -24,7 +24,9 @@ class extrusion : public arrayprim_color
 	// array that starts at its beginning and runs up to the last used position
 	// in the array.  This is similar to many implementations of std::vector<>.
 
-	arrayprim_array<double> up; // An array of up vectors for the extrusion segments
+	vector up; // Sets initial orientation of the 2D cross section
+	arrayprim_array<double> scale; // An array of scale vectors for the extrusion segments
+	arrayprim_array<double> twist; // An array of twists for the extrusion segments, relative to previous segment
 
 	virtual void set_length(size_t);
 
@@ -52,9 +54,15 @@ class extrusion : public arrayprim_color
 	void append( const vector&, const vector& );
 	void append( const vector& );
 
-	boost::python::object get_up();
-	void set_up( const double_array& up);
-	void set_up_v( const vector);
+	void set_up(const vector&);
+	shared_vector& get_up();
+
+	void set_twist( const double_array& twist);
+	boost::python::object get_twist();
+
+	void set_scale( const double_array& scale);
+	void set_scale_v( const vector);
+	boost::python::object get_scale();
 
 	void set_contours( const array&, const array&, const array&, const array& );
 
@@ -64,7 +72,7 @@ class extrusion : public arrayprim_color
 
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
-	void extrude( const view&, double* spos, double* sup, float* tcolor, size_t pcount);
+	void extrude( const view&, double* spos, float* tcolor, size_t pcount);
 	void render_end(const vector V, const double gcf, const vector current,
 			const vector xaxis, const vector yaxis, const float* endcolor);
 
