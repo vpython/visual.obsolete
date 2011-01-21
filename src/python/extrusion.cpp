@@ -373,6 +373,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 {
 	// TODO: scale, should be an Nx2 array
 	// TODO: twist should be an Nx1 array, to permit twisted extrusions.
+	// TODO: start and end attributes (slice numbering convention); allows for non-square ends
 	// TODO: attributes per contour?
 	// TODO: library of simple shapes (one provided by Polygon.Shapes)
 
@@ -416,7 +417,9 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	vector xaxis, yaxis; // local unit-vector axes on the 2D shape
 	vector prevxaxis, prevyaxis; // local unit-vector axes on the 2D shape on preceding segment
 	vector nextxaxis, nextyaxis; // local unit-vector axes on the 2D shape on following segment
-	vector prevx, prevy; // local axes on previous bisecting plane
+	vector prevx, prevy; // local axes on previous plane perpendicular to curve
+	vector prevxrot; // local axis in the plane of the joint
+	double prevc11, prevc12, prevc21, prevc22; // previous rotation coefficients on the 2D surface
 
 	bool closed = vector(&spos[0]) == vector(&spos[(pcount-1)*3]);
 
@@ -449,15 +452,16 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 	// On the 2D surface position (a,b) is at a*xaxis+b*yaxis, where
 	//    xaxis=(1,0) and yaxis=(0,1) on that 2D surface.
-	// THIS ALGORITHM ISN'T RIGHT; MUST RE-DO
 	yaxis = up;
 	xaxis = A.cross(yaxis).norm();
 	if (!xaxis) xaxis = A.cross( vector(0, 0, 1)).norm();
 	if (!xaxis) xaxis = A.cross( vector(1, 0, 0)).norm();
 	yaxis = xaxis.cross(A).norm();
 
-	prevx = xaxis;
-	prevy = yaxis;
+	prevxrot = prevx = prevxaxis = xaxis;
+	prevy = prevyaxis = yaxis;
+	prevc11 = prevc22 = 1.0;
+	prevc12 = prevc21 = 0.0;
 
 	if (!xaxis || !yaxis || xaxis == yaxis) {
 		std::ostringstream msg;
@@ -514,25 +518,41 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				bisecting_plane_normal = vector(0,1,0).cross(A);
 		}
 
-		// Calculate (x,y), non-unit vectors lying in the plane of the joint.
-		// A point (a,b) in the 2D surface is located in 3D space at current+a*x+b*y.
+		// A point (a,b) in the 2D surface is located in 3D space at current+a*xaxis+b*yaxis.
+		// Re-express points in the 2D surface in terms of (x,y) axes, where y is parallel
+		// to the "axle" of rotation of the joint, along which points don't rotate.
+		vector y = (lastA.cross(A)).norm(); // parallel to the axle of the joint
+		vector x;
+		if (!y) {
+			y = yaxis; // the joint is perpendicular to the extrusion segment; no change of direction
+			x = xaxis;
+		} else {
+			x = lastA.cross(y);
+		}
+
+		// Calculate rotation coefficients from xaxis,yaxis to x,y in the 2D plane
+		// a*xaxis + b*yaxis = aa*x + bb*y; dot with x and y to obtain this:
+		// aa = (x dot xaxis)*a + (x dot yaxis)*b = c11*a + c12*b
+		// bb = (y dot xaxis)*a + (y dot yaxis)*b = c21*a + c22*b
+		double c11 = x.dot(xaxis);
+		double c12 = x.dot(yaxis);
+		double c21 = y.dot(xaxis);
+		double c22 = y.dot(yaxis);
+
+		// Points not on the axle must be rotated around the axle.
+
+		double axlecos = lastA.dot(bisecting_plane_normal); // angle of rotation about axle
+		vector xrot;
+		if (!axlecos) {
+			xrot = x;
+		} else {
+			xrot = bisecting_plane_normal.cross(y)/axlecos; // make xrot a non-unit vector, in the plane of the joint, to correct for rotation about axle
+		}
+
 		double xcos = xaxis.dot(bisecting_plane_normal);
 		double ycos = yaxis.dot(bisecting_plane_normal);
 		vector dx = -xcos*bisecting_plane_normal;
 		vector dy = -ycos*bisecting_plane_normal;
-		xcos = fabs(xcos);
-		ycos = fabs(ycos);
-		vector x, y;
-		if (xcos) {
-			x = (xaxis + dx).norm()/sqrt(1.0-xcos*xcos);
-		} else {
-			x = xaxis;
-		}
-		if (ycos) {
-			y = (yaxis + dy).norm()/sqrt(1.0-ycos*ycos);
-		} else {
-			y = yaxis;
-		}
 
 		if (corner == pcount-1) { // processing final segment
 			nextxaxis = xaxis;
@@ -544,18 +564,13 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			nextyaxis = yaxis + 2*dy;
 		}
 
-		if (corner == 1) { // processing first segment
-			prevxaxis = xaxis;
-			prevyaxis = yaxis;
-		}
-
 		glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
 		glNormalPointer( GL_DOUBLE, 0, &normals[0]);
 		glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
 
 		float r_old=prev_color[0], g_old=prev_color[1], b_old=prev_color[2]; // color at previous location along the curve
 		float r_new=current_color[0], g_new=current_color[1], b_new=current_color[2];    // color at current location along the curve
-		//r_new = r_old; g_new = g_old; b_new = b_old; // testing
+		double v0x, v0y, v1x, v1y, prevv0x, prevv0y, prevv1x, prevv1y;
 		// The following nested for loops is (necessarily) the same as that used to build the normals2D array.
 		for (size_t c=0, nbase=0; c < ncontours; c++) {
 			size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
@@ -564,13 +579,20 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 			//    previous v0, current v1, current v0, previous v1, current v1, previous v0.
 			// Render front and back of each triangle.
 			for (size_t pt=0, i=0; pt<nd; pt+=2, i+=6, nbase+=4) {
-				// Use modulo arithmetic here because last point is the first point,
-				//    going around the sides of the extrusion
-				tris[3*nd+i+1] = tris[i  ] = scene.gcf*(prev    + prevx*contours[base+pt] + prevy*contours[base+pt+1]);
-				tris[3*nd+i  ] = tris[i+1] = scene.gcf*(prev    + prevx*contours[base+((pt+2)%nd)] + prevy*contours[base+((pt+3)%nd)]);
-				tris[3*nd+i+2] = tris[i+2] = scene.gcf*(current +     x*contours[base+pt] +              y*contours[base+pt+1]);
+				// Use modulo arithmetic here because last point is the first point, going around the sides of the extrusion
+				prevv0x = prevc11*contours[base+pt  ] + prevc12*contours[base+pt+1];
+				prevv0y = prevc21*contours[base+pt  ] + prevc22*contours[base+pt+1];
+				prevv1x = prevc11*contours[base+((pt+2)%nd)] + prevc12*contours[base+((pt+3)%nd)];
+				prevv1y = prevc21*contours[base+((pt+2)%nd)] + prevc22*contours[base+((pt+3)%nd)];
+				v0x = c11*contours[base+pt  ] + c12*contours[base+pt+1];
+				v0y = c21*contours[base+pt  ] + c22*contours[base+pt+1];
+				v1x = c11*contours[base+((pt+2)%nd)] + c12*contours[base+((pt+3)%nd)];
+				v1y = c21*contours[base+((pt+2)%nd)] + c22*contours[base+((pt+3)%nd)];
+				tris[3*nd+i+1] = tris[i  ] = scene.gcf*(prev    + prevxrot*prevv0x + prevy*prevv0y);
+				tris[3*nd+i  ] = tris[i+1] = scene.gcf*(prev    + prevxrot*prevv1x + prevy*prevv1y);
+				tris[3*nd+i+2] = tris[i+2] = scene.gcf*(current +     xrot*v0x     + y*v0y);
 				tris[3*nd+i+3] = tris[i+3] = tris[i+1];
-				tris[3*nd+i+5] = tris[i+4] = scene.gcf*(current +     x*contours[base+((pt+2)%nd)] +     y*contours[base+((pt+3)%nd)]);
+				tris[3*nd+i+5] = tris[i+4] = scene.gcf*(current +     xrot*v1x     + y*v1y);
 				tris[3*nd+i+4] = tris[i+5] = tris[i+2];
 
 				tcolors[3*i  ] = tcolors[3*(i+1)  ] = tcolors[3*(i+3)  ] = r_old;
@@ -623,6 +645,11 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 		prevx = x;
 		prevy = y;
+		prevxrot = xrot;
+		prevc11 = c11;
+		prevc12 = c12;
+		prevc21 = c21;
+		prevc22 = c22;
 		prevxaxis = xaxis;
 		prevyaxis = yaxis;
 		xaxis = nextxaxis;
