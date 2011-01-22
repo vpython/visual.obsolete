@@ -27,10 +27,10 @@ using boost::python::tuple;
 extrusion::extrusion()
 	: antialias( true), enabled( false), up(vector(0,1,0))
 {
-	/*
-	double* k = twist.data();
-	k[0] = 0.0;
-	*/
+	double* k = scale.data();
+	k[0] = 1.0; //scalex
+	k[1] = 1.0; //scaley
+	k[2] = 0.0; // twist
 
 	contours.insert(contours.begin(), 0.0);
 	strips.insert(strips.begin(), 0.0);
@@ -68,11 +68,13 @@ void build_contour(const numpy::array& _cont, std::vector<T>& cont)
 }
 
 vector
-smooth(const vector& a, const vector& b) { // vectors a and b are assumed to be normalized
-	if (a.dot(b) > 0.95) {
-		return (a+b).norm();
+smooth(const vector& a, const vector& b) { // vectors a and b need not be normalized
+	vector A = a.norm();
+	vector B = b.norm();
+	if (A.dot(B) > 0.95) {
+		return (A+B).norm();
 	} else {
-		return a;
+		return A;
 	}
 }
 
@@ -165,62 +167,95 @@ extrusion::get_up()
 	return up;
 }
 
-
-void extrusion::set_length(size_t new_len) {
+void
+extrusion::set_length(size_t new_len) {
 	scale.set_length(new_len);
-	twist.set_length(new_len);
 	arrayprim_color::set_length(new_len);
 }
 
-void extrusion::set_scale( const double_array& n_scale)
+void
+extrusion::set_scale( const double_array& n_scale)
 {
-	std::vector<npy_intp> dims = shape(n_scale);
-	if (dims.size() == 2 && dims[1] == 3) {
-		if (count == 0) { // This happens if set_scale called before set_pos in constructor
-			set_length( dims[0] );
-		}
-	} else if (dims.size() == 1 && dims[0] == 3) {
-		if (count == 0) { // This happens if set_scale called before set_pos in constructor
-			set_length( 1 );
-		}
+	std::vector<npy_intp> dims = shape( n_scale );
+	if (dims.size() == 1 && !dims[0]) { // scale(); reset to size 1
+		scale[make_tuple(all(), slice(0,2))] = 1.0;
+		return;
 	}
-
-	scale[slice(0, count)] = n_scale;
-	double* scale_i = scale.data();
+	if (dims.size() == 1 && dims[0] == 1) { // scale([2])
+		scale[make_tuple(all(), 0)] = n_scale;
+		scale[make_tuple(all(), 1)] = n_scale;
+		return;
+	}
+	if (dims.size() == 2 && dims[0] == 1 && dims[1] == 2) { // scale([(1,2)])
+		scale[make_tuple(all(), slice(0,2))] = n_scale;
+		return;
+	}
+	if (dims.size() == 1 && dims[0] == 2) { // scale(1,2)
+		scale[make_tuple(all(), slice(0,2))] = n_scale;
+		return;
+	}
+	if (dims.size() != 2) {
+		throw std::invalid_argument( "scale must be an Nx2 array");
+	}
+	if (dims[1] == 2) {
+		set_length( dims[0] );
+		scale[make_tuple(all(), slice(0,2))] = n_scale;
+		return;
+	}
+	else {
+		throw std::invalid_argument( "scale must be an Nx2 array");
+	}
 }
 
-void extrusion::set_scale_v( vector v)
+void
+extrusion::set_scale_d( const double n_scale)
 {
-	// We seem never to get here, which I don't understand
-	using boost::python::make_tuple;
-	// Broadcast the new normal across the array.
-	int npoints = count ? count : 1;
-	scale[slice(0, npoints)] = make_tuple( v.x, v.y, v.z);
+	scale[make_tuple(all(), 0)] = n_scale;
+	scale[make_tuple(all(), 1)] = n_scale;
 }
 
 boost::python::object extrusion::get_scale() {
-	return scale[all()];
+	return scale[make_tuple(all(), slice(0,2))];
 }
 
-void extrusion::set_twist( const double_array& n_twist)
+void
+extrusion::set_twist( const double_array& n_twist)
 {
-	std::vector<npy_intp> dims = shape(n_twist);
-	if (dims.size() == 2 && dims[1] == 3) {
-		if (count == 0) { // This happens if set_twist called before set_pos in constructor
-			set_length( dims[0] );
-		}
-	} else if (dims.size() == 1 && dims[0] == 3) {
-		if (count == 0) { // This happens if set_twist called before set_pos in constructor
-			set_length( 1 );
-		}
+	std::vector<npy_intp> dims = shape( n_twist );
+	if (dims.size() == 1 && !dims[0]) { // twist()
+		scale[make_tuple(all(), 2)] = 0.0;
+		return;
 	}
+	if (dims.size() == 1 && dims[0] == 1) { // twist(t)
+		scale[make_tuple(all(), 2)] = n_twist;
+		return;
+	}
+	if (dims.size() == 1) { // twist(1,2,3)
+		set_length( dims[0] );
+		scale[make_tuple(all(), 2)] = n_twist;
+		return;
+	}
+	if (dims.size() != 2) {
+		throw std::invalid_argument( "twist must be an Nx1 array");
+	}
+	if (dims[1] == 1) {
+		set_length( dims[0] );
+		scale[make_tuple(all(), 2)] = n_twist;
+		return;
+	}
+	else {
+		throw std::invalid_argument( "twist must be an Nx1 array");
+	}
+}
 
-	twist[slice(0, count)] = n_twist;
-	double* twist_i = twist.data();
+void
+extrusion::set_twist_d( const double n_twist)
+{
+	scale[make_tuple(all(), 2)] = n_twist;
 }
 
 boost::python::object extrusion::get_twist() {
-	return twist[all()];
+	return scale[make_tuple(all(), 2)];
 }
 
 bool
@@ -369,13 +404,13 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 }
 
 void
-extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcount)
+extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tscale, size_t pcount)
 {
 	// TODO: scale, should be an Nx2 array
 	// TODO: twist should be an Nx1 array, to permit twisted extrusions.
 	// TODO: start and end attributes (slice numbering convention); allows for non-square ends
 	// TODO: attributes per contour?
-	// TODO: library of simple shapes (one provided by Polygon.Shapes)
+	// TODO: library of simple shapes (star provided by Polygon.Shapes)
 
 	// The basic architecture of the extrusion object:
 	// Use the Polygon module to create by constructive geometry a 2D surface in the form of a
@@ -388,16 +423,28 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	// For efficiency, orthogonal unit vectors (xaxis,yaxis) in the 2D surface are defined so that a
 	// contour point (a,b) relative to the curve is a vector in the plane a*xaxis+b*yaxis.
 	// At a joint between adjacent extrusion segments, from (xaxis,yaxis) that are perpendicular
-	// to the curve, we derive (x,y), orthogonal non-unit vectors in the plane of the joint, such
-	// that positions (a,b) around the joint are calculated as pos+a*x+b*y. These joint positions
-	// are connected to the previous joint positions to form one segment of the extrusion. (We don't
-	// save all the previous positions; rather we simply save the previous values of (x,y) from
-	// which the previous positions can easily be calculated.)
+	// to the curve, we derive new unit vectors (x,y) in the plane of 2D surface such that y is
+	// parallel to the "axle" of rotation of the joint, the locus of points for which no rotation
+	// occurs. We determine coefficients such that a*xaxis+b*yaxis = aa*x+bb*y, so that
+	// aa = c11*a + c12*b and bb = c21*a + c22*b. We then create a non-unit vector xrot in the
+	// plane of the joint, perpendicular to y, so that positions in the joint corresponding to (a,b)
+	// are given by aa*xrot + bb*y. These joint positions are connected to the previous joint positions
+	// to form one segment of the extrusion. (We don't save all the previous positions; rather we simply
+	// save the previous values of (x,y) from which the previous positions can easily be calculated.)
 
 	// The normals to the sides of the extrusion are simply computed from the (nx,ny) normals,
 	// computed in set_contours, as nx*xaxis+ny*yaxis. By look-ahead, using what (xaxis,yaxis) will
 	// be in the next segment, the normals at the end of one segment are smoothed to normals at the
 	// start of the next segment. At the start of the next segment we look behind to smooth the normals.
+
+	// Using the scale array of (scalex,scaley) values, the actual position of a point (a,b) in the
+	// 2D surface is given by (scalex*a, scaley*b). Note that the precalculated normal to a vector (a,b)
+	// on the 2D surface is in the direction (-b, a), as can be seen from the dot product being zero.
+	// This means that when nonuniform scaling is in effect (scalex != scaley), the direction of a normal
+	// changes to be in the direction (-scaley*b, scalex*a).
+
+	// The scale array is an array of (scalex, scaley, twist), where twist is the angle (in radians) of
+	// the CCW rotation from the previous point.
 
 	// extrusion.shape=Polygon(...) not only sends contour information to set_contours but also
 	// sends triangle strips used to render the front and back surfaces of the extrusion.
@@ -426,6 +473,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	// pos and color iterators
 	const double* v_i = spos;
 	const float* c_i = tcolor;
+	const double* s_i = tscale;
 	const float* current_color = tcolor;
 	const float* prev_color = tcolor;
 	bool mono = adjust_colors( scene, tcolor, pcount);
@@ -437,7 +485,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 	// Skip past duplicate points at start of extrusion
 	size_t corner;
-	for (corner=0; corner < pcount-1; ++corner, v_i += 3, c_i += 3) {
+	for (corner=0; corner < pcount-1; ++corner, v_i += 3, c_i += 3, s_i += 3) {
 		lastA = vector(&v_i[0]) - vector(&spos[0]);
 		if (!lastA) {
 			continue;
@@ -460,8 +508,9 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 
 	prevxrot = prevx = prevxaxis = xaxis;
 	prevy = prevyaxis = yaxis;
-	prevc11 = prevc22 = 1.0;
-	prevc12 = prevc21 = 0.0;
+	prevc11 = tscale[0];
+	prevc12 = prevc21 = 0;
+	prevc22 = tscale[1];
 
 	if (!xaxis || !yaxis || xaxis == yaxis) {
 		std::ostringstream msg;
@@ -478,10 +527,10 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
 	gl_enable cull_face( GL_CULL_FACE);
 
-	render_end(-A, scene.gcf, vector(&spos[0]), xaxis, yaxis, &tcolor[0]); // render both sides of first end
+	render_end(-A, scene.gcf, vector(&spos[0]), tscale[0]*xaxis, tscale[1]*yaxis, &tcolor[0]); // render both sides of first end
 	if (!mono) glEnableClientState( GL_COLOR_ARRAY);
 
-	for (; corner < pcount; ++corner, v_i += 3, c_i += 3) {
+	for (; corner < pcount; ++corner, v_i += 3, c_i += 3, s_i += 3) {
 		current_color = c_i;
 		current = vector(&v_i[0]);
 
@@ -534,13 +583,12 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 		// a*xaxis + b*yaxis = aa*x + bb*y; dot with x and y to obtain this:
 		// aa = (x dot xaxis)*a + (x dot yaxis)*b = c11*a + c12*b
 		// bb = (y dot xaxis)*a + (y dot yaxis)*b = c21*a + c22*b
-		double c11 = x.dot(xaxis);
-		double c12 = x.dot(yaxis);
-		double c21 = y.dot(xaxis);
-		double c22 = y.dot(yaxis);
+		double c11 = x.dot(xaxis)*s_i[0];
+		double c12 = x.dot(yaxis)*s_i[1];
+		double c21 = y.dot(xaxis)*s_i[0];
+		double c22 = y.dot(yaxis)*s_i[1];
 
 		// Points not on the axle must be rotated around the axle.
-
 		double axlecos = lastA.dot(bisecting_plane_normal); // angle of rotation about axle
 		vector xrot;
 		if (!axlecos) {
@@ -611,19 +659,19 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				tcolors[3*(3*nd+i+2)+1] = tcolors[3*(3*nd+i+4)+1] = tcolors[3*(3*nd+i+5)+1] = g_new;
 				tcolors[3*(3*nd+i+2)+2] = tcolors[3*(3*nd+i+4)+2] = tcolors[3*(3*nd+i+5)+2] = b_new;
 
-				normals[i  ] = smooth(     xaxis*normals2D[nbase  ] +     yaxis*normals2D[nbase+1],
-									   prevxaxis*normals2D[nbase  ] + prevyaxis*normals2D[nbase+1]);
+				normals[i  ] = smooth(     s_i[1]*xaxis*normals2D[nbase  ] +      s_i[0]*yaxis*normals2D[nbase+1],
+						              s_i[-2]*prevxaxis*normals2D[nbase  ] + s_i[-3]*prevyaxis*normals2D[nbase+1]);
 
-				normals[i+1] = smooth(     xaxis*normals2D[nbase+2] +     yaxis*normals2D[nbase+3],
-									   prevxaxis*normals2D[nbase+2] + prevyaxis*normals2D[nbase+3]);
+				normals[i+1] = smooth(     s_i[1]*xaxis*normals2D[nbase+2] +      s_i[0]*yaxis*normals2D[nbase+3],
+						              s_i[-2]*prevxaxis*normals2D[nbase+2] + s_i[-3]*prevyaxis*normals2D[nbase+3]);
 
-				normals[i+2] = smooth(     xaxis*normals2D[nbase  ] +     yaxis*normals2D[nbase+1],
-									   nextxaxis*normals2D[nbase  ] + nextyaxis*normals2D[nbase+1]);
+				normals[i+2] = smooth(     s_i[1]*xaxis*normals2D[nbase  ] +      s_i[0]*yaxis*normals2D[nbase+1],
+						              s_i[-2]*nextxaxis*normals2D[nbase  ] + s_i[-3]*nextyaxis*normals2D[nbase+1]);
 
 				normals[i+3] = normals[i+1]; // i+1 and i+3 are the same location
 
-				normals[i+4] = smooth(     xaxis*normals2D[nbase+2] +     yaxis*normals2D[nbase+3],
-									   nextxaxis*normals2D[nbase+2] + nextyaxis*normals2D[nbase+3]);
+				normals[i+4] = smooth(     s_i[1]*xaxis*normals2D[nbase+2] +      s_i[0]*yaxis*normals2D[nbase+3],
+						              s_i[-2]*nextxaxis*normals2D[nbase+2] + s_i[-3]*nextyaxis*normals2D[nbase+3]);
 
 				normals[i+5] = normals[i+2]; // i+2 and i+5 are the same location
 
@@ -634,7 +682,6 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 				normals[3*nd+i+3] = -normals[i+3];
 				normals[3*nd+i+5] = -normals[i+4];
 				normals[3*nd+i+4] = -normals[i+5];
-
 			}
 
 			// nd doubles, nd/2 vertices, 2 triangles per vertex,
@@ -660,7 +707,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, size_t pcoun
 	}
 
 	// Render both sides of last end
-	render_end(-lastA, scene.gcf, vector(&spos[3*(pcount-1)]), xaxis, yaxis, &tcolor[3*(pcount-1)]);
+	render_end(-lastA, scene.gcf, vector(&spos[3*(pcount-1)]),
+			tscale[3*(pcount-1)]*xaxis, tscale[3*(pcount-1)+1]*yaxis, &tcolor[3*(pcount-1)]);
 
 	if (!mono) glDisableClientState( GL_COLOR_ARRAY);
 	check_gl_error();
@@ -676,6 +724,7 @@ extrusion::gl_render( const view& scene)
 	const int LINE_LENGTH = 1000; // The maximum number of points to display.
 	// Data storage for the position and color data (plus room for 3 extra points)
 	double spos[3*(LINE_LENGTH+3)];
+	double tscale[3*(LINE_LENGTH+3)];
 	float tcolor[3*(LINE_LENGTH+3)]; // opacity not yet implemented for extrusions
 	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
 	if (fstep < 1.0F) fstep = 1.0F;
@@ -683,6 +732,7 @@ extrusion::gl_render( const view& scene)
 
 	const double* p_i = pos.data();
 	const double* c_i = color.data();
+	const double* s_i = scale.data();
 
 	// Choose which points to display
 	for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
@@ -693,9 +743,12 @@ extrusion::gl_render( const view& scene)
 		tcolor[3*pcount  ] = c_i[iptr3];
 		tcolor[3*pcount+1] = c_i[iptr3+1];
 		tcolor[3*pcount+2] = c_i[iptr3+2];
+		tscale[3*pcount  ] = s_i[iptr3];
+		tscale[3*pcount+1] = s_i[iptr3+1];
+		tscale[3*pcount+2] = s_i[iptr3+2];
 	}
 
-	extrude( scene, spos, tcolor, pcount);
+	extrude( scene, spos, tcolor, tscale, pcount);
 }
 
 void
