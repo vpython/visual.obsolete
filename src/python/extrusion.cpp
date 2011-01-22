@@ -579,6 +579,15 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 			x = lastA.cross(y);
 		}
 
+		// If twist is positive, rotate xaxis and yaxis CCW
+		if (s_i[2]) {
+			double cost = cos(s_i[2]);
+			double sint = sin(s_i[2]);
+			vector xtemp = cost*xaxis + sint*yaxis;
+			yaxis = -sint*xaxis + cost*yaxis;
+			xaxis = xtemp;
+		}
+
 		// Calculate rotation coefficients from xaxis,yaxis to x,y in the 2D plane
 		// a*xaxis + b*yaxis = aa*x + bb*y; dot with x and y to obtain this:
 		// aa = (x dot xaxis)*a + (x dot yaxis)*b = c11*a + c12*b
