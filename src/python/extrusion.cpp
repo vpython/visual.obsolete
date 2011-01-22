@@ -369,7 +369,7 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 		std::vector<float> endcolors(3*nd/2);
 
 		for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
-			tristrip[n] = gcf*(current + xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
+			tristrip[n] = current + gcf*(xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
 			snormals[n] = V;
 			endcolors[3*n  ] = endcolor[0];
 			endcolors[3*n+1] = endcolor[1];
@@ -393,7 +393,7 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 					nswap = n+1;
 				}
 			}
-			tristrip[nswap] = gcf*(current + xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
+			tristrip[nswap] = current + gcf*(xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
 			snormals[n] = -V;
 		}
 
@@ -506,8 +506,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	if (!xaxis) xaxis = A.cross( vector(1, 0, 0)).norm();
 	yaxis = xaxis.cross(A).norm();
 
-	prevxrot = prevx = prevxaxis = xaxis;
-	prevy = prevyaxis = yaxis;
+	prevxrot = prevx = prevxaxis = scene.gcf*xaxis;
+	prevy = prevyaxis = scene.gcf*yaxis;
 	prevc11 = tscale[0];
 	prevc12 = prevc21 = 0;
 	prevc22 = tscale[1];
@@ -628,6 +628,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 		float r_old=prev_color[0], g_old=prev_color[1], b_old=prev_color[2]; // color at previous location along the curve
 		float r_new=current_color[0], g_new=current_color[1], b_new=current_color[2];    // color at current location along the curve
 		double v0x, v0y, v1x, v1y, prevv0x, prevv0y, prevv1x, prevv1y;
+		xrot *= scene.gcf;
+		y *= scene.gcf;
 		// The following nested for loops is (necessarily) the same as that used to build the normals2D array.
 		for (size_t c=0, nbase=0; c < ncontours; c++) {
 			size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
@@ -645,11 +647,11 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 				v0y = c21*contours[base+pt  ] + c22*contours[base+pt+1];
 				v1x = c11*contours[base+((pt+2)%nd)] + c12*contours[base+((pt+3)%nd)];
 				v1y = c21*contours[base+((pt+2)%nd)] + c22*contours[base+((pt+3)%nd)];
-				tris[3*nd+i+1] = tris[i  ] = scene.gcf*(prev    + prevxrot*prevv0x + prevy*prevv0y);
-				tris[3*nd+i  ] = tris[i+1] = scene.gcf*(prev    + prevxrot*prevv1x + prevy*prevv1y);
-				tris[3*nd+i+2] = tris[i+2] = scene.gcf*(current +     xrot*v0x     + y*v0y);
+				tris[3*nd+i+1] = tris[i  ] = prev    + prevxrot*prevv0x + prevy*prevv0y;
+				tris[3*nd+i  ] = tris[i+1] = prev    + prevxrot*prevv1x + prevy*prevv1y;
+				tris[3*nd+i+2] = tris[i+2] = current +     xrot*v0x     + y*v0y;
 				tris[3*nd+i+3] = tris[i+3] = tris[i+1];
-				tris[3*nd+i+5] = tris[i+4] = scene.gcf*(current +     xrot*v1x     + y*v1y);
+				tris[3*nd+i+5] = tris[i+4] = current +     xrot*v1x     + y*v1y;
 				tris[3*nd+i+4] = tris[i+5] = tris[i+2];
 
 				tcolors[3*i  ] = tcolors[3*(i+1)  ] = tcolors[3*(i+3)  ] = r_old;
@@ -746,9 +748,9 @@ extrusion::gl_render( const view& scene)
 	// Choose which points to display
 	for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int) (fptr+.5), ++pcount) {
 		iptr3 = 3*iptr;
-		spos[3*pcount  ] = p_i[iptr3];
-		spos[3*pcount+1] = p_i[iptr3+1];
-		spos[3*pcount+2] = p_i[iptr3+2];
+		spos[3*pcount  ] = scene.gcf*p_i[iptr3];
+		spos[3*pcount+1] = scene.gcf*p_i[iptr3+1];
+		spos[3*pcount+2] = scene.gcf*p_i[iptr3+2];
 		tcolor[3*pcount  ] = c_i[iptr3];
 		tcolor[3*pcount+1] = c_i[iptr3+1];
 		tcolor[3*pcount+2] = c_i[iptr3+2];
