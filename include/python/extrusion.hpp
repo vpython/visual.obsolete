@@ -25,8 +25,10 @@ class extrusion : public arrayprim_color
 	// in the array.  This is similar to many implementations of std::vector<>.
 
 	vector up; // Sets initial orientation of the 2D cross section
-	arrayprim_array<double> scale; // An array of scale vectors for the extrusion segments
-	arrayprim_array<double> twist; // An array of twists for the extrusion segments, relative to previous segment
+
+	// scale is an array of scale and twist information for the extrusion segments.
+	// Each triple is < scalex, scaley, twist >
+	arrayprim_array<double> scale;
 
 	virtual void set_length(size_t);
 
@@ -58,10 +60,11 @@ class extrusion : public arrayprim_color
 	shared_vector& get_up();
 
 	void set_twist( const double_array& twist);
+	void set_twist_d( const double twist);
 	boost::python::object get_twist();
 
 	void set_scale( const double_array& scale);
-	void set_scale_v( const vector);
+	void set_scale_d( const double scale);
 	boost::python::object get_scale();
 
 	void set_contours( const array&, const array&, const array&, const array& );
@@ -72,7 +75,7 @@ class extrusion : public arrayprim_color
 
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
-	void extrude( const view&, double* spos, float* tcolor, size_t pcount);
+	void extrude( const view&, double* spos, float* tcolor, double* tscale, size_t pcount);
 	void render_end(const vector V, const double gcf, const vector current,
 			const vector xaxis, const vector yaxis, const float* endcolor);
 

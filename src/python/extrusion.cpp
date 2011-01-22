@@ -406,9 +406,9 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tscale, size_t pcount)
 {
-	// TODO: scale, should be an Nx2 array
-	// TODO: twist should be an Nx1 array, to permit twisted extrusions.
-	// TODO: start and end attributes (slice numbering convention); allows for non-square ends
+	// TODO: It looks like normals might not be quite right when there is twist (or nonuniform scale?).
+	// TODO: start and end attributes (slice numbering convention); allows for non-square ends.
+	// TODO: Enable append options.
 	// TODO: attributes per contour?
 	// TODO: library of simple shapes (star provided by Polygon.Shapes)
 
