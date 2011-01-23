@@ -25,7 +25,7 @@ using boost::python::make_tuple;
 using boost::python::tuple;
 
 extrusion::extrusion()
-	: antialias( true), enabled( false), up(vector(0,1,0))
+	: antialias( true), up(vector(0,1,0))
 {
 	double* k = scale.data();
 	k[0] = 1.0; //scalex
@@ -86,7 +86,8 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 	// so in primitives.py we force the winding order to be clockwise if
 	// external and counterclockwise if internal (a hole).
 
-	enabled = false; // block rendering while set_contours processes a shape change
+	mutex set_contours_lock;
+	lock L(set_contours_lock); // block rendering while set_contours processes a shape change
 	// primitives.py sends to set_contours descriptions of the 2D surface; see extrusions.hpp
 	// We store the information in std::vector containers in flattened form.
 	build_contour<double>(_contours, contours);
@@ -141,7 +142,6 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 			i += 4;
 		}
 	}
-	enabled = true;
 }
 
 void
@@ -153,7 +153,7 @@ extrusion::set_antialias( bool aa)
 bool
 extrusion::degenerate() const
 {
-	return count < 2 || !enabled;
+	return count < 2;
 }
 
 void
@@ -216,6 +216,35 @@ extrusion::set_scale_d( const double n_scale)
 
 boost::python::object extrusion::get_scale() {
 	return scale[make_tuple(all(), slice(0,2))];
+}
+
+void
+extrusion::set_xscale( const double_array& arg )
+{
+	if (shape(arg).size() != 1) throw std::invalid_argument("xscale must be a 1D array.");
+	set_length( shape(arg)[0] );
+	scale[make_tuple( all(), 0)] = arg;
+}
+
+void
+extrusion::set_yscale( const double_array& arg )
+{
+	if (shape(arg).size() != 1) throw std::invalid_argument("yscale must be a 1D array.");
+	set_length( shape(arg)[0] );
+	scale[make_tuple( all(), 1)] = arg;
+}
+
+void
+extrusion::set_xscale_d( const double arg )
+{
+	int npoints = count ? count : 1;
+	scale[make_tuple( all(), 0)] = arg;
+}
+
+void extrusion::set_yscale_d( const double arg )
+{
+	int npoints = count ? count : 1;
+	scale[make_tuple( all(), 1)] = arg;
 }
 
 void
@@ -409,8 +438,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	// TODO: It looks like normals might not be quite right when there is twist (or nonuniform scale?).
 	// TODO: start and end attributes (slice numbering convention); allows for non-square ends.
 	// TODO: Enable append options.
-	// TODO: attributes per contour?
 	// TODO: library of simple shapes (star provided by Polygon.Shapes)
+	// TODO: attributes per contour? Ignore for now until we have more experience.
 
 	// The basic architecture of the extrusion object:
 	// Use the Polygon module to create by constructive geometry a 2D surface in the form of a

@@ -11,6 +11,9 @@
 #include "python/num_util.hpp"
 #include "python/arrayprim.hpp"
 
+#include "util/thread.hpp"
+#include <queue>
+
 namespace cvisual { namespace python {
 
 using boost::python::list;
@@ -65,6 +68,10 @@ class extrusion : public arrayprim_color
 
 	void set_scale( const double_array& scale);
 	void set_scale_d( const double scale);
+	void set_xscale( const double_array& scale);
+	void set_yscale( const double_array& scale);
+	void set_xscale_d( const double scale);
+	void set_yscale_d( const double scale);
 	boost::python::object get_scale();
 
 	void set_contours( const array&, const array&, const array&, const array& );
@@ -90,7 +97,6 @@ class extrusion : public arrayprim_color
 
 	double maxextent; // maximum distance from curve
 	size_t maxcontour; // number of vertices in largest contour
-	bool enabled; // False while processing set_contours
 };
 
 } } // !namespace cvisual::python
