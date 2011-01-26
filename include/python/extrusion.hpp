@@ -11,9 +11,6 @@
 #include "python/num_util.hpp"
 #include "python/arrayprim.hpp"
 
-#include "util/thread.hpp"
-#include <queue>
-
 namespace cvisual { namespace python {
 
 using boost::python::list;
@@ -28,6 +25,8 @@ class extrusion : public arrayprim_color
 	// in the array.  This is similar to many implementations of std::vector<>.
 
 	vector up; // Sets initial orientation of the 2D cross section
+
+	int start, end; // display from start to end (slice notation; -1 is last point)
 
 	// scale is an array of scale and twist information for the extrusion segments.
 	// Each triple is < scalex, scaley, twist >
@@ -62,6 +61,11 @@ class extrusion : public arrayprim_color
 	void set_up(const vector&);
 	shared_vector& get_up();
 
+	void set_start(const int);
+	int get_start();
+	void set_end(const int);
+	int get_end();
+
 	void set_twist( const double_array& twist);
 	void set_twist_d( const double twist);
 	boost::python::object get_twist();
@@ -76,6 +80,9 @@ class extrusion : public arrayprim_color
 
 	void set_contours( const array&, const array&, const array&, const array& );
 
+	void appendpos(const vector&); // position only
+	void appendpos_retain(const vector&, int); // position and retain
+
 	inline bool get_antialias( void) { return antialias; }
 
 	void set_antialias( bool);
@@ -83,8 +90,9 @@ class extrusion : public arrayprim_color
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
 	void extrude( const view&, double* spos, float* tcolor, double* tscale, size_t pcount);
-	void render_end(const vector V, const double gcf, const vector current,
-			const vector xaxis, const vector yaxis, const float* endcolor);
+	void render_end(const vector V, const vector current,
+			const double c11, const double c12, const double c21, const double c22,
+			const vector xrot, const vector y, const float* current_color);
 
 	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
 	// pcontours[0] is (numper of contours, 0)

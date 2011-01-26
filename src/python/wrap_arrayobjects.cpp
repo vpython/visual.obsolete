@@ -81,9 +81,11 @@ void
 wrap_arrayobjects()
 {
 	using namespace boost::python;
-	using python::curve;
 
 	double_array_from_python();
+
+	{
+	using python::curve;
 
 	// TODO: the arrayprim inheritance hierarchy could be exposed here; for now I've left the duplication here
 	// to make it easy to control exactly what goes in the API for each array primitive, but arguably they
@@ -114,13 +116,18 @@ wrap_arrayobjects()
 		.def( "set_z", &curve::set_z)
 		.def( "append", append_v_rgb_retain, ( arg("pos"), arg("color"), arg("retain")=-1 ) )
 		.def( "append", append_v_retain, ( arg("pos"), arg("retain")=-1 ) )
-		.def( "append", &curve::append_rgb, ( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
+		.def( "append", &curve::append_rgb,
+				( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
 		;
+	}
 
+	{
 	using python::extrusion;
 
 	//void (extrusion::*exappend_v_rgb_retain)( const vector&, const rgb&, int ) = &extrusion::append;
 	//void (extrusion::*exappend_v_retain)( const vector&, int ) = &extrusion::append;
+
+	//void (extrusion::*append_posx)( const vector& ) = &extrusion::append;
 
 	class_<extrusion, bases<renderable> >( "extrusion")
 		.def( init<const extrusion&>())
@@ -144,6 +151,8 @@ wrap_arrayobjects()
 		.add_property( "up",
 			make_function(&extrusion::get_up, return_internal_reference<>()),
 			&extrusion::set_up)
+		.add_property( "start", &extrusion::get_start, &extrusion::set_start)
+		.add_property( "end", &extrusion::get_end, &extrusion::set_end)
 		.def( "get_twist", &extrusion::get_twist)
 		.def( "set_twist", &extrusion::set_twist)
 		.def( "set_twist", &extrusion::set_twist_d)
@@ -155,11 +164,12 @@ wrap_arrayobjects()
 		.def( "set_xscale", &extrusion::set_xscale_d)
 		.def( "set_yscale", &extrusion::set_yscale_d)
 		.def( "set_contours", &extrusion::set_contours) // used by primitives.py to transfer 2D cross section info
-		//.def( "append", exappend_v_rgb_retain, ( arg("pos"), arg("color"), arg("retain")=-1 ) )
-		//.def( "append", exappend_v_retain, ( arg("pos"), arg("retain")=-1 ) )
-		//.def( "append", &extrusion::append_rgb, ( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
+		.def( "append", &extrusion::appendpos, (arg("pos"), arg("retain")=-1))
+		.def( "append", &extrusion::appendpos_retain, (arg("pos")))
 		;
+	}
 
+	{
 	using python::points;
 
 	void (points::*pappend_v_r)( const vector&, const rgb&, int ) = &points::append;
@@ -190,11 +200,13 @@ wrap_arrayobjects()
 		.def( "set_z", &points::set_z_d)
 		.def( "set_z", &points::set_z)
 		.def( "append", pappend_v_r, (arg("pos"), arg("color"), arg("retain")=-1))
+		.def( "append", pappend_v, (arg("pos"), arg("retain")=-1))
 		.def( "append", &points::append_rgb,
 			(arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1))
-		.def( "append", pappend_v, (arg("pos"), arg("retain")=-1))
 		;
+	}
 
+	{
 	using python::faces;
 
 	void (faces::* append_all_vectors)(const vector&, const vector&, const rgb&) = &faces::append;
@@ -231,8 +243,11 @@ wrap_arrayobjects()
 		.def( "append", append_default_color, ( arg("pos"), arg("normal") ))
 		.def( "append", append_all_vectors, (arg("pos"), arg("normal"), arg("color")))
 		;
+	}
 
+	{
 	using python::convex;
+
 	void (convex::* append_convex)(const vector&) = &convex::append;
 	class_<convex, bases<renderable> >( "convex")
 		.def( init<const convex&>())
@@ -242,6 +257,7 @@ wrap_arrayobjects()
 		.def( "set_pos", &convex::set_pos)
 		.def( "get_pos", &convex::get_pos)
 		;
+	}
 
 }
 

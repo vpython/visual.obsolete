@@ -25,7 +25,7 @@ using boost::python::make_tuple;
 using boost::python::tuple;
 
 extrusion::extrusion()
-	: antialias( true), up(vector(0,1,0))
+	: antialias( true), up(vector(0,1,0)), start(0), end(-1)
 {
 	double* k = scale.data();
 	k[0] = 1.0; //scalex
@@ -174,6 +174,22 @@ extrusion::set_length(size_t new_len) {
 }
 
 void
+extrusion::appendpos(const vector& n_pos) {
+	set_length( count+1);
+	double* last_pos = pos.data( count-1 );
+	last_pos[0] = n_pos.x;
+	last_pos[1] = n_pos.y;
+	last_pos[2] = n_pos.z;
+}
+
+void
+extrusion::appendpos_retain(const vector& n_pos, int retain) {
+	if (retain >= 0 && count >= (size_t)retain)
+		set_length(retain);		// shifts arrays
+	appendpos(n_pos);
+}
+
+void
 extrusion::set_scale( const double_array& n_scale)
 {
 	std::vector<npy_intp> dims = shape( n_scale );
@@ -287,6 +303,26 @@ boost::python::object extrusion::get_twist() {
 	return scale[make_tuple(all(), 2)];
 }
 
+void
+extrusion::set_start(const int n_start) {
+	start = n_start;
+}
+
+int
+extrusion::get_start(){
+	return start;
+}
+
+void
+extrusion::set_end(const int n_end){
+	end = n_end;
+}
+
+int
+extrusion::get_end() {
+	return end;
+}
+
 bool
 extrusion::monochrome(float* tcolor, size_t pcount)
 {
@@ -382,12 +418,14 @@ extrusion::adjust_colors( const view& scene, float* tcolor, size_t pcount)
 }
 
 void
-extrusion::render_end(const vector V, const double gcf, const vector current,
-		const vector xaxis, const vector yaxis, const float* endcolor)
+extrusion::render_end(const vector V, const vector current,
+		const double c11, const double c12, const double c21, const double c22,
+		const vector xrot, const vector y, const float* current_color)
 {
 	// Use the triangle strips in "strips" to paint an end of the extrusion
 	size_t npstrips = pstrips[0]; // number of triangle strips in the cross section
 	size_t spoints = strips.size()/2; // total number of 2D points in all strips
+	double tx, ty;
 
 	glEnableClientState( GL_COLOR_ARRAY);
 
@@ -398,11 +436,13 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 		std::vector<float> endcolors(3*nd/2);
 
 		for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
-			tristrip[n] = current + gcf*(xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
+			tx = c11*strips[base+pt] + c12*strips[base+pt+1];
+			ty = c21*strips[base+pt] + c22*strips[base+pt+1];
+			tristrip[n] = current + tx*xrot + ty*y;
 			snormals[n] = V;
-			endcolors[3*n  ] = endcolor[0];
-			endcolors[3*n+1] = endcolor[1];
-			endcolors[3*n+2] = endcolor[2];
+			endcolors[3*n  ] = current_color[0];
+			endcolors[3*n+1] = current_color[1];
+			endcolors[3*n+2] = current_color[2];
 		}
 
 		glNormalPointer( GL_DOUBLE, 0, &snormals[0]);
@@ -422,7 +462,9 @@ extrusion::render_end(const vector V, const double gcf, const vector current,
 					nswap = n+1;
 				}
 			}
-			tristrip[nswap] = current + gcf*(xaxis*strips[base+pt] + yaxis*strips[base+pt+1]);
+			tx = c11*strips[base+pt] + c12*strips[base+pt+1];
+			ty = c21*strips[base+pt] + c22*strips[base+pt+1];
+			tristrip[nswap] = current + tx*xrot + ty*y;
 			snormals[n] = -V;
 		}
 
@@ -436,9 +478,7 @@ void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tscale, size_t pcount)
 {
 	// TODO: It looks like normals might not be quite right when there is twist (or nonuniform scale?).
-	// TODO: start and end attributes (slice numbering convention); allows for non-square ends.
 	// TODO: Enable append options.
-	// TODO: library of simple shapes (star provided by Polygon.Shapes)
 	// TODO: attributes per contour? Ignore for now until we have more experience.
 
 	// The basic architecture of the extrusion object:
@@ -497,8 +537,6 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	vector prevxrot; // local axis in the plane of the joint
 	double prevc11, prevc12, prevc21, prevc22; // previous rotation coefficients on the 2D surface
 
-	bool closed = vector(&spos[0]) == vector(&spos[(pcount-1)*3]);
-
 	// pos and color iterators
 	const double* v_i = spos;
 	const float* c_i = tcolor;
@@ -511,55 +549,39 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	vector lastA; // unit vector of previous segment
 	vector prev; // previous location
 	vector current; // point along the curve currently being processed
+	size_t startcorner, endcorner;
 
-	// Skip past duplicate points at start of extrusion
-	size_t corner;
-	for (corner=0; corner < pcount-1; ++corner, v_i += 3, c_i += 3, s_i += 3) {
-		lastA = vector(&v_i[0]) - vector(&spos[0]);
-		if (!lastA) {
-			continue;
+	if (start < 0) {
+		if (((int)pcount+start) < 0) {
+			startcorner = 0;
 		} else {
-			break;
+			startcorner = int(pcount)+start;
+		}
+	} else {
+		startcorner = start;
+	}
+	if (startcorner >= pcount-1) return; // nothing to display
+
+	if (end < 0) {
+		if (((int)pcount+end) <= 0) return; // nothing to display
+		endcorner = (int)pcount+end;
+	} else {
+		if (end > (int)(pcount-1)) {
+			endcorner = pcount-1;
+		} else {
+			endcorner = end;
 		}
 	}
-	if (!lastA) return; // all the points of this extrusion are at the same location; abort
-	A = lastA = lastA.norm();
-	prev = vector(&spos[0]);
-	prev_color = c_i;
-
-	// On the 2D surface position (a,b) is at a*xaxis+b*yaxis, where
-	//    xaxis=(1,0) and yaxis=(0,1) on that 2D surface.
-	yaxis = up;
-	xaxis = A.cross(yaxis).norm();
-	if (!xaxis) xaxis = A.cross( vector(0, 0, 1)).norm();
-	if (!xaxis) xaxis = A.cross( vector(1, 0, 0)).norm();
-	yaxis = xaxis.cross(A).norm();
-
-	prevxrot = prevx = prevxaxis = scene.gcf*xaxis;
-	prevy = prevyaxis = scene.gcf*yaxis;
-	prevc11 = tscale[0];
-	prevc12 = prevc21 = 0;
-	prevc22 = tscale[1];
-
-	if (!xaxis || !yaxis || xaxis == yaxis) {
-		std::ostringstream msg;
-		msg << "Degenerate extrusion case! please report the following "
-			"information to visualpython-users@lists.sourceforge.net: ";
-		msg << "current:" << current
-	 		<< " A:" << A << " x:" << xaxis << " y:" << yaxis
-	 		<< std::endl;
-	 	VPYTHON_WARNING( msg.str());
-	}
+	if (endcorner <= 0) return; // nothing to display
 
 	clear_gl_error();
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
 	gl_enable cull_face( GL_CULL_FACE);
 
-	render_end(-A, scene.gcf, vector(&spos[0]), tscale[0]*xaxis, tscale[1]*yaxis, &tcolor[0]); // render both sides of first end
-	if (!mono) glEnableClientState( GL_COLOR_ARRAY);
 
-	for (; corner < pcount; ++corner, v_i += 3, c_i += 3, s_i += 3) {
+	for (size_t corner = 0; corner <= endcorner; ++corner, v_i += 3, c_i += 3, s_i += 3) {
+		size_t icorner = corner;
 		current_color = c_i;
 		current = vector(&v_i[0]);
 
@@ -567,23 +589,49 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 		// lastA is a unit vector pointing from the previous location to the current location.
 
 		// Skip over duplicate points (but retain correct color information)
-		if (corner == pcount-1) {
-			A = lastA;
-		} else {
-			const double* tv_i = v_i;
-			for (size_t tcorner=corner; tcorner < pcount-1; ++tcorner, tv_i += 3) {
+		const double* tv_i = v_i;
+		for (size_t tcorner=corner; tcorner <= endcorner; ++tcorner, tv_i += 3) {
+			if (corner == startcorner) {
+				current_color = c_i;
+			}
+			if (corner == endcorner) {
+				A = lastA;
+				break;
+			} else {
 				A = (vector( &tv_i[3]) - current).norm();
-				if (!A) {
-					v_i += 3;
-					c_i += 3;
-					corner++;
-					continue;
-				} else {
-					break;
-				}
 			}
 			if (!A) {
-				A = lastA;
+				v_i += 3;
+				c_i += 3;
+				s_i += 3;
+				corner++;
+				continue;
+			} else {
+				break;
+			}
+		}
+		if (!A) {
+			if (icorner == 0) return; // there are no displayable segments
+			A = lastA;
+		}
+
+		if (icorner == 0) {
+			// On the 2D surface position (a,b) is at a*xaxis+b*yaxis, where
+			//    xaxis=(1,0) and yaxis=(0,1) on that 2D surface.
+			yaxis = up;
+			xaxis = A.cross(yaxis).norm();
+			if (!xaxis) xaxis = A.cross( vector(0, 0, 1)).norm();
+			if (!xaxis) xaxis = A.cross( vector(1, 0, 0)).norm();
+			yaxis = xaxis.cross(A).norm();
+
+			if (!xaxis || !yaxis || xaxis == yaxis) {
+				std::ostringstream msg;
+				msg << "Degenerate extrusion case! please report the following "
+					"information to visualpython-users@lists.sourceforge.net: ";
+				msg << "current:" << current
+			 		<< " A:" << A << " x:" << xaxis << " y:" << yaxis
+			 		<< std::endl;
+			 	VPYTHON_WARNING( msg.str());
 			}
 		}
 
@@ -634,100 +682,106 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 		} else {
 			xrot = bisecting_plane_normal.cross(y)/axlecos; // make xrot a non-unit vector, in the plane of the joint, to correct for rotation about axle
 		}
+		xrot *= scene.gcf;
+		y *= scene.gcf;
 
 		double xcos = xaxis.dot(bisecting_plane_normal);
 		double ycos = yaxis.dot(bisecting_plane_normal);
 		vector dx = -xcos*bisecting_plane_normal;
 		vector dy = -ycos*bisecting_plane_normal;
 
-		if (corner == pcount-1) { // processing final segment
-			nextxaxis = xaxis;
-			nextyaxis = yaxis;
-		} else {
-			// Think of the bisecting plane as a mirror, and reflect through this
-			// mirror to find the new local axes for the next segment.
-			nextxaxis = xaxis + 2*dx;
-			nextyaxis = yaxis + 2*dy;
+		// Think of the bisecting plane as a mirror, and reflect through this
+		// mirror to find the new local axes for the next segment.
+		nextxaxis = xaxis + 2*dx;
+		nextyaxis = yaxis + 2*dy;
+
+		if (icorner <= startcorner && startcorner <= corner) {
+			// Use pstrips to paint both sides of the first surface
+			render_end(-A, current, c11, c12, c21, c22, xrot, y, current_color);
+			if (!mono) glEnableClientState( GL_COLOR_ARRAY);
+		} else if (corner > startcorner) {
+
+			glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
+			glNormalPointer( GL_DOUBLE, 0, &normals[0]);
+			glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
+
+			float r_old=prev_color[0], g_old=prev_color[1], b_old=prev_color[2]; // color at previous location along the curve
+			float r_new=current_color[0], g_new=current_color[1], b_new=current_color[2];    // color at current location along the curve
+			double v0x, v0y, v1x, v1y, prevv0x, prevv0y, prevv1x, prevv1y;
+			// The following nested for loops is (necessarily) the same as that used to build the normals2D array.
+			for (size_t c=0, nbase=0; c < ncontours; c++) {
+				size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
+				size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
+				// Triangle order is
+				//    previous v0, current v1, current v0, previous v1, current v1, previous v0.
+				// Render front and back of each triangle.
+				for (size_t pt=0, i=0; pt<nd; pt+=2, i+=6, nbase+=4) {
+					// Use modulo arithmetic here because last point is the first point, going around the sides of the extrusion
+					prevv0x = prevc11*contours[base+pt  ] + prevc12*contours[base+pt+1];
+					prevv0y = prevc21*contours[base+pt  ] + prevc22*contours[base+pt+1];
+					prevv1x = prevc11*contours[base+((pt+2)%nd)] + prevc12*contours[base+((pt+3)%nd)];
+					prevv1y = prevc21*contours[base+((pt+2)%nd)] + prevc22*contours[base+((pt+3)%nd)];
+					v0x = c11*contours[base+pt  ] + c12*contours[base+pt+1];
+					v0y = c21*contours[base+pt  ] + c22*contours[base+pt+1];
+					v1x = c11*contours[base+((pt+2)%nd)] + c12*contours[base+((pt+3)%nd)];
+					v1y = c21*contours[base+((pt+2)%nd)] + c22*contours[base+((pt+3)%nd)];
+					tris[3*nd+i+1] = tris[i  ] = prev    + prevxrot*prevv0x + prevy*prevv0y;
+					tris[3*nd+i  ] = tris[i+1] = prev    + prevxrot*prevv1x + prevy*prevv1y;
+					tris[3*nd+i+2] = tris[i+2] = current +     xrot*v0x     + y*v0y;
+					tris[3*nd+i+3] = tris[i+3] = tris[i+1];
+					tris[3*nd+i+5] = tris[i+4] = current +     xrot*v1x     + y*v1y;
+					tris[3*nd+i+4] = tris[i+5] = tris[i+2];
+
+					tcolors[3*i  ] = tcolors[3*(i+1)  ] = tcolors[3*(i+3)  ] = r_old;
+					tcolors[3*i+1] = tcolors[3*(i+1)+1] = tcolors[3*(i+3)+1] = g_old;
+					tcolors[3*i+2] = tcolors[3*(i+1)+2] = tcolors[3*(i+3)+2] = b_old;
+
+					tcolors[3*(i+2)  ] = tcolors[3*(i+4)  ] = tcolors[3*(i+5)  ] = r_new;
+					tcolors[3*(i+2)+1] = tcolors[3*(i+4)+1] = tcolors[3*(i+5)+1] = g_new;
+					tcolors[3*(i+2)+2] = tcolors[3*(i+4)+2] = tcolors[3*(i+5)+2] = b_new;
+
+					tcolors[3*(3*nd+i)  ] = tcolors[3*(3*nd+i+1)  ] = tcolors[3*(3*nd+i+3)  ] = r_old;
+					tcolors[3*(3*nd+i)+1] = tcolors[3*(3*nd+i+1)+1] = tcolors[3*(3*nd+i+3)+1] = g_old;
+					tcolors[3*(3*nd+i)+2] = tcolors[3*(3*nd+i+1)+2] = tcolors[3*(3*nd+i+3)+2] = b_old;
+
+					tcolors[3*(3*nd+i+2)  ] = tcolors[3*(3*nd+i+4)  ] = tcolors[3*(3*nd+i+5)  ] = r_new;
+					tcolors[3*(3*nd+i+2)+1] = tcolors[3*(3*nd+i+4)+1] = tcolors[3*(3*nd+i+5)+1] = g_new;
+					tcolors[3*(3*nd+i+2)+2] = tcolors[3*(3*nd+i+4)+2] = tcolors[3*(3*nd+i+5)+2] = b_new;
+
+					normals[i  ] = smooth(     s_i[1]*xaxis*normals2D[nbase  ] +      s_i[0]*yaxis*normals2D[nbase+1],
+										  s_i[-2]*prevxaxis*normals2D[nbase  ] + s_i[-3]*prevyaxis*normals2D[nbase+1]);
+
+					normals[i+1] = smooth(     s_i[1]*xaxis*normals2D[nbase+2] +      s_i[0]*yaxis*normals2D[nbase+3],
+										  s_i[-2]*prevxaxis*normals2D[nbase+2] + s_i[-3]*prevyaxis*normals2D[nbase+3]);
+
+					normals[i+2] = smooth(     s_i[1]*xaxis*normals2D[nbase  ] +      s_i[0]*yaxis*normals2D[nbase+1],
+										  s_i[-2]*nextxaxis*normals2D[nbase  ] + s_i[-3]*nextyaxis*normals2D[nbase+1]);
+
+					normals[i+3] = normals[i+1]; // i+1 and i+3 are the same location
+
+					normals[i+4] = smooth(     s_i[1]*xaxis*normals2D[nbase+2] +      s_i[0]*yaxis*normals2D[nbase+3],
+										  s_i[-2]*nextxaxis*normals2D[nbase+2] + s_i[-3]*nextyaxis*normals2D[nbase+3]);
+
+					normals[i+5] = normals[i+2]; // i+2 and i+5 are the same location
+
+					// Normals for other sides of triangles:
+					normals[3*nd+i+1] = -normals[i  ];
+					normals[3*nd+i  ] = -normals[i+1];
+					normals[3*nd+i+2] = -normals[i+2];
+					normals[3*nd+i+3] = -normals[i+3];
+					normals[3*nd+i+5] = -normals[i+4];
+					normals[3*nd+i+4] = -normals[i+5];
+				}
+
+				// nd doubles, nd/2 vertices, 2 triangles per vertex,
+				//    3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
+				glDrawArrays(GL_TRIANGLES, 0, 6*nd);
+			}
 		}
 
-		glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
-		glNormalPointer( GL_DOUBLE, 0, &normals[0]);
-		glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
-
-		float r_old=prev_color[0], g_old=prev_color[1], b_old=prev_color[2]; // color at previous location along the curve
-		float r_new=current_color[0], g_new=current_color[1], b_new=current_color[2];    // color at current location along the curve
-		double v0x, v0y, v1x, v1y, prevv0x, prevv0y, prevv1x, prevv1y;
-		xrot *= scene.gcf;
-		y *= scene.gcf;
-		// The following nested for loops is (necessarily) the same as that used to build the normals2D array.
-		for (size_t c=0, nbase=0; c < ncontours; c++) {
-			size_t nd = 2*pcontours[2*c+2]; // number of doubles in this contour
-			size_t base = 2*pcontours[2*c+3]; // initial (x,y) = (contour[base], contour[base+1])
-			// Triangle order is
-			//    previous v0, current v1, current v0, previous v1, current v1, previous v0.
-			// Render front and back of each triangle.
-			for (size_t pt=0, i=0; pt<nd; pt+=2, i+=6, nbase+=4) {
-				// Use modulo arithmetic here because last point is the first point, going around the sides of the extrusion
-				prevv0x = prevc11*contours[base+pt  ] + prevc12*contours[base+pt+1];
-				prevv0y = prevc21*contours[base+pt  ] + prevc22*contours[base+pt+1];
-				prevv1x = prevc11*contours[base+((pt+2)%nd)] + prevc12*contours[base+((pt+3)%nd)];
-				prevv1y = prevc21*contours[base+((pt+2)%nd)] + prevc22*contours[base+((pt+3)%nd)];
-				v0x = c11*contours[base+pt  ] + c12*contours[base+pt+1];
-				v0y = c21*contours[base+pt  ] + c22*contours[base+pt+1];
-				v1x = c11*contours[base+((pt+2)%nd)] + c12*contours[base+((pt+3)%nd)];
-				v1y = c21*contours[base+((pt+2)%nd)] + c22*contours[base+((pt+3)%nd)];
-				tris[3*nd+i+1] = tris[i  ] = prev    + prevxrot*prevv0x + prevy*prevv0y;
-				tris[3*nd+i  ] = tris[i+1] = prev    + prevxrot*prevv1x + prevy*prevv1y;
-				tris[3*nd+i+2] = tris[i+2] = current +     xrot*v0x     + y*v0y;
-				tris[3*nd+i+3] = tris[i+3] = tris[i+1];
-				tris[3*nd+i+5] = tris[i+4] = current +     xrot*v1x     + y*v1y;
-				tris[3*nd+i+4] = tris[i+5] = tris[i+2];
-
-				tcolors[3*i  ] = tcolors[3*(i+1)  ] = tcolors[3*(i+3)  ] = r_old;
-				tcolors[3*i+1] = tcolors[3*(i+1)+1] = tcolors[3*(i+3)+1] = g_old;
-				tcolors[3*i+2] = tcolors[3*(i+1)+2] = tcolors[3*(i+3)+2] = b_old;
-
-				tcolors[3*(i+2)  ] = tcolors[3*(i+4)  ] = tcolors[3*(i+5)  ] = r_new;
-				tcolors[3*(i+2)+1] = tcolors[3*(i+4)+1] = tcolors[3*(i+5)+1] = g_new;
-				tcolors[3*(i+2)+2] = tcolors[3*(i+4)+2] = tcolors[3*(i+5)+2] = b_new;
-
-				tcolors[3*(3*nd+i)  ] = tcolors[3*(3*nd+i+1)  ] = tcolors[3*(3*nd+i+3)  ] = r_old;
-				tcolors[3*(3*nd+i)+1] = tcolors[3*(3*nd+i+1)+1] = tcolors[3*(3*nd+i+3)+1] = g_old;
-				tcolors[3*(3*nd+i)+2] = tcolors[3*(3*nd+i+1)+2] = tcolors[3*(3*nd+i+3)+2] = b_old;
-
-				tcolors[3*(3*nd+i+2)  ] = tcolors[3*(3*nd+i+4)  ] = tcolors[3*(3*nd+i+5)  ] = r_new;
-				tcolors[3*(3*nd+i+2)+1] = tcolors[3*(3*nd+i+4)+1] = tcolors[3*(3*nd+i+5)+1] = g_new;
-				tcolors[3*(3*nd+i+2)+2] = tcolors[3*(3*nd+i+4)+2] = tcolors[3*(3*nd+i+5)+2] = b_new;
-
-				normals[i  ] = smooth(     s_i[1]*xaxis*normals2D[nbase  ] +      s_i[0]*yaxis*normals2D[nbase+1],
-						              s_i[-2]*prevxaxis*normals2D[nbase  ] + s_i[-3]*prevyaxis*normals2D[nbase+1]);
-
-				normals[i+1] = smooth(     s_i[1]*xaxis*normals2D[nbase+2] +      s_i[0]*yaxis*normals2D[nbase+3],
-						              s_i[-2]*prevxaxis*normals2D[nbase+2] + s_i[-3]*prevyaxis*normals2D[nbase+3]);
-
-				normals[i+2] = smooth(     s_i[1]*xaxis*normals2D[nbase  ] +      s_i[0]*yaxis*normals2D[nbase+1],
-						              s_i[-2]*nextxaxis*normals2D[nbase  ] + s_i[-3]*nextyaxis*normals2D[nbase+1]);
-
-				normals[i+3] = normals[i+1]; // i+1 and i+3 are the same location
-
-				normals[i+4] = smooth(     s_i[1]*xaxis*normals2D[nbase+2] +      s_i[0]*yaxis*normals2D[nbase+3],
-						              s_i[-2]*nextxaxis*normals2D[nbase+2] + s_i[-3]*nextyaxis*normals2D[nbase+3]);
-
-				normals[i+5] = normals[i+2]; // i+2 and i+5 are the same location
-
-				// Normals for other sides of triangles:
-				normals[3*nd+i+1] = -normals[i  ];
-				normals[3*nd+i  ] = -normals[i+1];
-				normals[3*nd+i+2] = -normals[i+2];
-				normals[3*nd+i+3] = -normals[i+3];
-				normals[3*nd+i+5] = -normals[i+4];
-				normals[3*nd+i+4] = -normals[i+5];
-			}
-
-			// nd doubles, nd/2 vertices, 2 triangles per vertex,
-			//    3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
-			glDrawArrays(GL_TRIANGLES, 0, 6*nd);
-
+		if (corner >= endcorner) {
+			// Use pstrips to paint both sides of the first surface
+			render_end(A, current, c11, c12, c21, c22, xrot, y, c_i);
 		}
 
 		prevx = x;
@@ -745,10 +799,6 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 		prev = current;
 		prev_color = c_i;
 	}
-
-	// Render both sides of last end
-	render_end(-lastA, scene.gcf, vector(&spos[3*(pcount-1)]),
-			tscale[3*(pcount-1)]*xaxis, tscale[3*(pcount-1)+1]*yaxis, &tcolor[3*(pcount-1)]);
 
 	if (!mono) glDisableClientState( GL_COLOR_ARRAY);
 	check_gl_error();
