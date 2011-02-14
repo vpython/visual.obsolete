@@ -146,8 +146,10 @@ void arrayprim::set_z_d( const double z)
 
 void arrayprim::append( const vector& npos, int retain )
 {
-	if (retain >= 0 && count >= (size_t)retain)
-		set_length(retain);		// shifts arrays
+	if (retain > 0 && count >= (size_t)(retain-1))
+		set_length(retain-1);		// shifts arrays
+	else if (retain == 0)
+		set_length(0);
 	set_length( count+1);
 	double* last_pos = pos.data( count-1 );
 	last_pos[0] = npos.x;
