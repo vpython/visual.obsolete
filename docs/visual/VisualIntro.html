@@ -237,18 +237,19 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           but you cannot create additional attributes. </p>
 
       <h3 class="Heading2"><font color="#0000A0">Warning about division</font></h3>
-        <p class="Normal"> Division of integers will not come out the way you may expect, since the result is rounded down to the nearest integer. Thus:</p>
+        <p class="Normal"> If you are using a version of Python prior to Python 3.0, division of integers will not come out the way you may expect, since the result is rounded down to the nearest integer. Thus:</p>
         <p class="program"> a = 3/4 <br />
-        print a		# a is 0</p>
+        print(a)		# a is 0</p>
         <p class="Normal"> To avoid this, you can place a decimal point after every number, like 
           this:</p>
         <p class="program"> b = 3./4. <br />
-        print b # b is 0.75, as expected</p>
+        print(b) # b is 0.75, as expected</p>
 
           <p class="Normal">We recommend putting the following statement as the
             first line of your program, in which case 3/4 will be 0.75; there
             are two underscores before the word &quot;future&quot; and two after the word &quot;future&quot;:</p>
           <p class="program"> from __future__ import division</p>
+          <p class="Normal"> This is not necessary for Python versions starting with 3.0, which ignore this statement.</p>
           <h3 class="Heading2"><font color="#0000A0">Exponentiation</font></h3>
 
         <p class="program"> x**2 # Not x^2, which is a bit operation in Python</p>
@@ -315,7 +316,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         # from 0 to 2*pi-(pi/100) in steps of (pi/100)<br />
         <br />
         numbers = arange(10) # integer argument -&gt; integers<br />
-        print numbers # [0,1,2,3,4,5,6,7,8,9] </p>
+        print(numbers) # [0,1,2,3,4,5,6,7,8,9] </p>
 
         <h3 class="Heading2"> <font color="#0000A0">Loops</font></h3>
         <p class="Normal"> The simplest loop in Python is a &quot;while&quot; loop. The loop continues as long as the specified logical expression is true:</p>
@@ -343,14 +344,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <h3 class="Heading2"> <font color="#0000A0">Printing results</font></h3>
         <p class="Normal"> To print a number, a vector, a list, or anything else,
           use the &quot;print&quot; option:</p>
-        <p class="program"> print Europa.momentum</p>
+        <p class="program"> print(Europa.momentum)</p>
         <p class="Normal"> To print a text message, enclose it in quotes:</p>
-        <p class="program"> print &quot;We   crashed on the Moon with speed&quot;, v, &quot;m/s.&quot;</p>
+        <p class="program"> print(&quot;We   crashed on the Moon with speed&quot;, v, &quot;m/s.&quot;)</p>
         <p class="Normal"> Python also offers a formatted print capability. Here
           price will be printed with 3 digits before the decimal place and 2
           digits after, and num will be printed as an integer:</p>
-        <p class="program"> print &quot;It's $%3.2f dollars for %d copies&quot; %
-          (price,num)</p>
+        <p class="program"> print(&quot;It's $%3.2f dollars for %d copies&quot; %
+          (price,num))</p>
+        <p class="Normal"> For Python versions earlier than Python 3.0, the latter two, rather complicated, print statements will look better without the surrounding parentheses. The surrounding parentheses are required for Python versions starting with Python 3.0</p>
         <h3 class="Heading2"><font color="#0000A0">More Information about Python</font></h3>
         <p>We have summarized a  small but important subset of the Python programming
           language. Extensive Python documentation is provided

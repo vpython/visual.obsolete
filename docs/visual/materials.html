@@ -212,7 +212,7 @@ materials.unshaded (unaffected by lighting)</p>
         width = 128 # must be power of 2<br />
         height = 128 # must be power of 2<br />
         im = Image.open(name+&quot;.jpg&quot;)<br />
-        #print im.size # optionally, see size of image<br />
+        #print(im.size) # optionally, see size of image<br />
         # Optional cropping:<br />
         #im = im.crop((x1,y1,x2,y2)) # (0,0) is upper left<br />
         im = im.resize((width,height), Image.ANTIALIAS)<br />
