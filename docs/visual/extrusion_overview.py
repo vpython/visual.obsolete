@@ -151,34 +151,47 @@ def drawcontour(origin, contour, ccolor):
 
 #-------------------------------------------------------------------------
 def intro():
-    L1 = makelabel(-10,8)
+    L1 = makelabel(-10,12)
     L1.text = """
 This is an overview on how to make an extrusion object like the one shown here.
 More information is in the detailed documentation installed with VPython.
+
+This object consists of a 2D shape and an extrusion path.
+Click or press a key to proceed.
 """
     square = shapes.rectangle(width=4)
     hole1 = shapes.circle(pos=(.7,.7), radius=.7)
     hole2 = Polygon([(-1.2,0.8), (1.6,-1.5), (-1.2,-1.5)])
     disk = shapes.circle(pos=(0,2), radius=1)
     f = frame()
-    E = extrusion(frame=f, pos=paths.arc(pos=(-1.5,0,0), radius=6, angle1=.3, angle2=3.2*pi/4),
+    P = paths.arc(pos=(-1.5,2.5,0), radius=6, np=5*32, angle1=.3, angle2=3.2*pi/4)
+    path = list(P.pos)
+    P0 = vector(path[0])
+    path.insert(1,P0+0.01*norm(vector(path[1])-P0))
+    E = extrusion(frame=f, pos=path,
               color=(0.904,0.693,0.595), material=materials.plastic, shape=square+disk-hole1-hole2, scale=1.6)
-    E.y -= 1.5
     f.rotate(angle=pi/10, axis=(1,0,0), origin=(0,0,0))
-    L2 = makelabel(0,-8, centered=True)
+    if pages.pause(): return
+    E.end = 1
+    L2 = makelabel(0,-2, centered=True)
+    L2.text = """
+Make a 2D shape with easy-to-use tools that are provided.
+"""
+    if pages.pause(): return
+    L2.text = "Then extrude this 2D shape along a path."
+    if pages.pause(): return
+    for i in range(1,len(E.pos)):
+        rate(20)
+        E.end = i
+    L2.pos = (0,-9)
+    pages.jumpenabled = True
+    pages.showpages()
     L2.text = """
 Rotate the object to examine this extrusion.
 
-Then click or press a key to proceed. 
-"""
-    if pages.spin(f, (0,0,0)): return
-    L2.pos = (0,-10)
-    L2.text = """
 Throughout this overview, click or press a key to proceed,
 or click on a page number to jump to any page.
 """
-    pages.jumpenabled = True
-    pages.showpages()
     if not pages.spin(f, (0,0,0)): pages.page += 1
 
 #-------------------------------------------------------------------------
@@ -210,8 +223,8 @@ We specify a contour \n(a closed path of 2D points):
     if pages.pause(): return
     lab1 = makelabel(-10,.5)
     lab1.text = """
-We make these contours using the Polygon function,
-by specifying lists of 2D points in the xy plane:
+We can make these contours using the Polygon function, by specifying
+lists of 2D points in the xy plane (or choose from a library of shapes):
 
    c1 = Polygon( [ (0,-5), (-3,3), (3,3) ] )   # 3 points for lower triangle
    c2 = Polygon( [ (-2,2.5), (0,5), (2,2.5) ] )      # upper triangle
@@ -257,7 +270,7 @@ extrusion(pos=[(0,0,0), (0,0,-8)], color=color.orange, shape=c1+c2-c3)
     L1b = makelabel(-3.5,6)
     L1b.text = """
 The pos attribute is like that of a curve object,
-a list of points.
+a list of points (or choose a path from a library).
 
 The first point (0,0,0) is at the front, and
 the second point (0,0,-8) is at the back.
@@ -484,7 +497,7 @@ This works because the 3D rendering of an extrusion object is quite fast.
 def miscellaneous():
     L1 = makelabel(-10, 0.5)
     L1.text = """
-Here are additional features of the extrusion object.
+Here are additional attributes of the extrusion object.
 See the detailed documentation for more information.
 
 
@@ -495,10 +508,20 @@ start or after end are not shown on the screen. The default values
 are start = 0 (pos[0]) and end = -1 (pos[-1] is the last point).
 
 
+show_initial_face, show_final_face
+These are normally True. If you don't want a face to be shown, set
+the corresponding attribute to False. This exposes the interior of
+the extrusion.
+
+
 initial_twist
 The first element of the twist array is ignored. If you need to twist
 the initial face, set initial_twist. Alternatively, you could change
 the "up" attribute (see documentation on the box object).
+
+
+append
+There is an append option similar to that of the curve object.
 
 
 smooth
@@ -508,10 +531,6 @@ which corresponds to an angular difference of 18 degrees. The effect
 is to smooth away sharp breaks between two surfaces whose normals
 don't differ by much. Setting smooth=0.9 will smooth adjoining surfaces
 whose orientation differs by 53 degrees, a much looser criterion.
-
-
-append
-There is an append option similar to that of the curve object.
 """
     if not pages.pause(): pages.page += 1
 
@@ -602,8 +621,12 @@ more details.
     if not pages.pause(): pages.page = 0
     
 #-------------------------------------------------------------------------
-pages = main(12)
-pages.page = 1
+pages = main(11)
+startpage = 1
+pages.page = startpage
+if startpage != 1:
+    pages.jumpenabled = True
+    pages.showpages()
 while True:
     if pages.page == 1:
         pages.jump(1)
