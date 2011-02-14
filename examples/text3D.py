@@ -2,7 +2,7 @@ from visual import *
 
 scene.height = 500
 scene.width = 800
-scene.range = 4
+scene.range = 4.5
 scene.autocenter = True
 title = text(text="My text is\ngreen", align='center', depth=-0.3, color=color.green)
 vertical = (title.upper_left-title.start).norm()
