@@ -6,7 +6,7 @@
 
 [Setup]
 AppName=VPython for Python 2.6
-AppVerName=VPython 5.41
+AppVerName=VPython 5.50
 AppPublisherURL=http://vpython.org
 DefaultDirName={code:MyConst}
 
@@ -14,7 +14,7 @@ SourceDir=C:\Python26
 DisableProgramGroupPage=yes
 DirExistsWarning=no
 DisableStartupPrompt=yes
-OutputBaseFilename=VPython-Win-Py2.6-5.41
+OutputBaseFilename=VPython-Win-Py2.6-5.50
 OutputDir=c:\workspace
 
 [Files]
@@ -68,6 +68,7 @@ Source: "c:\workspace\vpython-core2\docs\visual\*.pdf"; DestDir: "{app}\Lib\site
 Source: "c:\workspace\vpython-core2\docs\visual\*.gif"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.css"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\*.txt"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
+Source: "c:\workspace\vpython-core2\docs\visual\*.py"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\"; Components: Documentation
 Source: "c:\workspace\vpython-core2\docs\visual\images\*.jpg"; DestDir: "{app}\Lib\site-packages\visual\docs\visual\images"; Components: Documentation
 
 [Components]
