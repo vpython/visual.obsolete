@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- InstanceBeginEditable name="doctitle" -->
@@ -41,6 +41,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="curve.html">curve</option>
           <option value="cylinder.html">cylinder</option>
           <option value="ellipsoid.html">ellipsoid</option>
+          <option value="extrusion.html">extrusion</option>
           <option value="faces.html">faces</option>
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
@@ -59,6 +60,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="color.html">Color &amp; Opacity</option>
           <option value="lights.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
+          <option value="shapes.html">Shapes Library</option>
+          <option value="paths.html">Paths Library</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -98,9 +101,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           can be rotated about a specified origin (to rotate these other objects,
           put them in a frame and rotate the frame).</p>
 
-      <p class="program"> obj.rotate(angle=pi/4., axis=axis, origin=pos)</p>
+      <p class="program"> obj.rotate(angle=pi/4, axis=axis, origin=pos)</p>
       <p class="Normal"> The rotate function applies a transformation to the specified object (sphere, box, etc.). The transformation is a rotation of <span class="attribute">angle</span> radians, counterclockwise around the line defined by <span class="attribute">origin</span> and <span class="attribute">origin+axis</span>. By default, rotations are 
-            around the object's own <span class="attribute">pos</span> and <span class="attribute">axis</span>.</p>
+            around the object's own <span class="attribute">pos</span> and <span class="attribute">axis</span>. There are no defaults for the extrusion object, and one must specify all parameters: angle, axis, and origin.</p>
       <p class="Normal">There are functions for converting between degrees and
         radians, where there are 2*pi radians in 360 degrees: </p>
       <p class="program">radians(360) is equal to 2*pi</p>

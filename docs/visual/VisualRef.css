@@ -212,3 +212,11 @@ EM.Symbol {
                           font-size: 110%;
                           margin: 0pt;
                           padding: 0pt; }
+.style3.style4.style5 font {
+	color: #F00;
+}
+.centered {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 16px;
+	text-align: center;
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- InstanceBeginEditable name="doctitle" -->
@@ -29,6 +29,12 @@
 	color: #0000A0;
 }
 -->
+</style>
+<style type="text/css">
+.style31 {font-size: large;
+	font-weight: bold;
+	color: #0000A0;
+}
 </style>
 <!-- InstanceEndEditable -->
 <script type="text/javascript">
@@ -64,6 +70,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="curve.html">curve</option>
           <option value="cylinder.html">cylinder</option>
           <option value="ellipsoid.html">ellipsoid</option>
+          <option value="extrusion.html">extrusion</option>
           <option value="faces.html">faces</option>
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
@@ -82,6 +89,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="color.html">Color &amp; Opacity</option>
           <option value="lights.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
+          <option value="shapes.html">Shapes Library</option>
+          <option value="paths.html">Paths Library</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -121,127 +130,53 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <td width="24%"><img src="images/material_etc.jpg" alt="material etc" width="334" height="235" /></td>
         </tr>
       </table>
-      <h3><span class="Normal"><span class="style1">New features</span></span></h3>
-      <p class="Normal">There is a new example program <strong>texture_and_lighting.py</strong> that
-        displays many of the new features: a swinging light illuminates a translucent
-        ball that rolls on a wood table. Also see the
-      example programs <strong>material_test.py</strong>, <strong>stonehenge.py</strong>, and <strong>boxlighttest.py</strong>. </p>
-      <p class="Normal">There are a couple of known <a href="#incompatibilities">incompatibilities</a> with earlier versions of VPython. </p>
-      <h3 class="Normal"><span class="style1">Credits</span></h3>
+      <table width="585" height="54" border="0">
+        <tr>
+          <td width="364"><p align="center" class="Normal"><span class="centered"><strong>New in Visual 5.50 </strong></span></p>
+          <p class="Normal">The <a href="extrusion.html"><strong>extrusion</strong></a> object enables the easy creation of complex extruded shapes. Aided by the <strong><a href="shapes.html">shapes library</a></strong>, you make a 2D shape that can contain holes. Then, aided by the <strong><a href="paths.html">paths library</a></strong>, you choose a path along which your 2D shape is extruded.</p>
+          <p class="Normal">The curve object can use the new shapes library and paths library for constructing the set of points.</p></td>
+          <td width="211"><img src="images/extrusion.jpg" width="211" height="174" alt="extrusion" /></td>
+        </tr>
+      </table>
+      <p class="Normal"><strong><font color="#0000a0">Choose a topic:</font></strong></p>
+      <blockquote>
+        <p class="Normal"><strong><font color="#0000a0"><a href="#credits">Credits</a></font></strong></p>
+        <p class="Normal"><strong><font color="#0000a0"><a href="#since_Visual3">Changes from the old Visual 3</a></font></strong></p>
+        <p class="Normal"><strong><font color="#0000a0"><a href="#incompatibilities">Known incompatibilities compared to the old Visual 3</a></font></strong></p>
+        <p class="Normal"><strong><font color="#0000a0"><a href="#log">A log of developments since the start of Visual 5</a></font></strong></p>
+      </blockquote>
+      <h3><span class="style1"><a name="credits" id="credits"></a>Credits</span></h3>
       <p class="Normal">Visual 5 was created by David Scherer and Bruce Sherwood.
         Jonathan Brandmeyer provided support in Visual 4beta for opacity, local
         lighting, and textures, and made some important architectural changes,
         but had to stop work on the project before it was completed.  Further
         development has led to API changes which are incompatible with the Visual
         4beta release, so this release is called version 5 instead of 4.</p>
-      <p class="Normal">        The late Arthur Siegel implemented dependence on the currently supported
-          numpy library in place of Numeric, which is no longer supported. Hugh
-          Fisher provided a big start on the native-mode Mac version. Michael
-      Temkine fixed some bugs and implemented keyboard handling for Windows.</p>
-      <p class="Normal">        Previous to Visual 4beta, Jonathan Brandmeyer made several major contributions
+      <p class="Normal"> The late Arthur Siegel implemented dependence on the currently supported
+        numpy library in place of Numeric, which is no longer supported. Hugh
+        Fisher provided a big start on the native-mode Mac version. Michael
+        Temkine fixed some bugs and implemented keyboard handling for Windows.</p>
+      <p class="Normal"> Previous to Visual 4beta, Jonathan Brandmeyer made several major contributions
         to Visual 3, including changing the connection between Python and C++
         from CXX, which was no longer supported, to the Boost C++ libraries,
-        and implementing auto-configurable installations for Linux.<br />
-            </p>
-      <h3 class="style1">Transparency/opacity</h3>
-      <p class="Normal">You can make most objects be  transparent by specifying a value from
-        0-1 inclusive for the attribute &quot;<a href="color.html"><strong>opacity</strong></a>&quot;. For example, <span class="attribute"><strong>box(color=color.red,
-        opacity=0.8)</strong></span> is slightly transparent. An opacity value of 0 means totally
-        transparent, 
-        and 1 means totally opaque. Currently curve, convex, faces, points, and helix objects
-        do not allow transparency. </p>
-      <p class="Normal">You may see incorrect rendering any time there is a translucent
-        object (opacity
-        &lt; 1.0) which is not convex (e.g. ring), or two translucent objects
-        which overlap on the screen and also in their depth extents (distances
-        from the camera to the nearest and farthest planes perpendicular to scene.forward
-        which intersect the object).&nbsp;The objects need not
-        actually overlap in 3D space to have problems.&nbsp;The incorrect rendering
-        will usually have the effect of making the more distant object disappear
-        (fail to show through the nearer object). Accurate  rendering
-        of ad hoc scenes with translucency is difficult and expensive, and we
-        did not want to wait for a perfect solution before introducing this useful
-        enhancement.</p>
-      <h3 class="style1">Materials</h3>
-      <p class="Normal">You can give a <a href="materials.html"><strong>material property</strong></a> such as wood to an object: </p>
-      <p class="program">box(color=color.orange, material=materials.wood)</p>
-      <p class="Normal">Materials currently available include wood, plastic,
-        marble, earth (continents and oceans), rough, diffuse, emissive, and
-        unshaded (that is, display the specified color unaffected by existing
-        lights). The example program
-        <strong>material_test.py</strong> shows examples of all of these materials.</p>
-      <p class="Normal">Materials will work with graphics cards that support
-        Pixel Shader 3.0 (&quot;PS 3.0&quot;). For details, see<br />
-        <a href="http://en.wikipedia.org/wiki/Pixel_shader#Hardware" target="_blank">http://en.wikipedia.org/wiki/Pixel_shader#Hardware</a>.
-        <em>Some</em> materials may work with graphics cards that support PS
-        2.0, but other materials may need to be manually disabled; see instructions
-        in the <strong>site-settings.py</strong> module in the Visual package
-        in your site-packages folder. If the graphics hardware does not support
-        pixel shaders, the material property is ignored. If you think you should
-        be able to use materials but have trouble with their display or performance,
-        we highly recommend upgrading your video card drivers to the latest version.<br />
-      </p>
-      <h3 class="style1">Lighting</h3>
-      <p class="Normal">In previous versions of Visual, lights were 
-        restricted to being white and  very distant from the scene (&quot;at
-        infinity&quot;).
-        Now you  can <a href="lights.html"><strong>create lights</strong></a> that
-        are local, near other objects, and you can specify colors for lights.
-        The following statement creates a yellow light positioned at (x,y,z):</p>
-      <p class="program">lamp = local_light(pos=(x,y,z), color=color.yellow)</p>
-      <p class="Normal">If you continually update lamp.p<span class="Normal">os,
-          the light will move.</span> You
-        may wish to place a sphere or box with material=materials.emissive at
-      the same location so that the lamp looks like a glowing lamp.</p>
-      <p class="Normal">If you want to disable all of the  lights, so that the
-        only light is ambient light (scene.ambient), say <span class="attribute">scene.lights
-          = []</span>, making 
-        an empty list of  lights.</p>
-      <p class="Normal">A distant red light located in the direction (x,y,z) is created like this:</p>
-      <p class="program">distant_light(direction=(x,y,z), color=color.red)</p>
-      <h3 class="style1">3D text object</h3>
-      <p class="Normal">A new <a href="text.html"><strong>text object</strong></a> produces
-        3D text from any True Type font. This supercedes the old, rather primitive
-        visual.text module.</p>
-      <h3 class="style1">Points object</h3>
-      <p class="Normal">A new <a href="points.html"><strong>points object</strong></a> is similar to a curve, but with disconnected points.
-        As with curve, the pos attribute is an array of points, and color can
-        also be an array. If you say <span class="attribute"><strong>shape=&quot;round&quot;</strong></span>,
-        the points are round, which is the default; <span class="attribute"><strong>shape=&quot;square&quot;</strong></span> makes
-        square points. </p>
-      <h3 class="style1">New frame options</h3>
-      <p class="Normal">You can now make a frame visible or invisible, and all objects in the frame
-        will be affected. </p>
-      <p class="Normal">There are now functions for converting between coordinates
-        within a frame and &quot;world&quot; coordinates.</p>
-<h3 class="style1">New curve append option: retain</h3>
-      <p class="Normal">If &quot;trail&quot; is a curve, <span class="attribute"><strong>trail.append(pos=(x,y,z), retain = 50)</strong></span> means that only the 50 most recently added points of a curve will be displayed; the earlier ones are deleted. This is a nice option for having a moving object leave a tail behind itself, like a comet. </p>
-      <h3 class="style1">Fonts in labels</h3>
-      <p class="Normal">You can now specify a font for a label, including font='sans'
-        or 'serif' or 'monospace' (fixed-width). Python Unicode text is supported. </p>
-      <h3 class="style1">Specifying a gray</h3>
-      <p class="Normal">For convenience you can now say <span class="attribute"><strong>color=color.gray(0.7)</strong></span> to mean color=(0.7,0.7,0.7).</p>
-      <h3 class="style1">Reading and writing files</h3>
-      <p class="Normal">The new module <strong>visual.filedialog</strong> provides
+        and implementing auto-configurable installations for Linux.</p>
+      <h3 class="style1"><a name="since_Visual3" id="since_Visual3"></a>Changes from the old Visual 3</h3>
+      <p class="Normal">Here is a brief summary of what is new in Visual 5 compared to the old Visual 3:</p>
+      <p class="Normal">Transparency (<strong><a href="color.html">opacity</a></strong>).</p>
+      <p class="Normal"><a href="materials.html">Materials</a> such as wood and plastic; also used to display images.</p>
+      <p class="Normal">Local lights in addition to distant lights.</p>
+      <p class="Normal">A 3D <strong><a href="text.html">text</a></strong> object.</p>
+      <p class="Normal">A <strong><a href="points.html">points</a></strong> object.</p>
+      <p class="Normal">Changing the visible attribute of a <strong><a href="frame.html">frame</a></strong> affects all objects in the frame, and there are functions for converting between frame and &quot;world&quot; coordinates.</p>
+      <p class="Normal">When appending to a <strong><a href="curve.html">curve</a></strong>, you can specify how many points to retain.</p>
+      <p class="Normal">You can specify a font for a <strong><a href="label.html">label</a></strong>.</p>
+      <p class="Normal">You can say <span class="attribute"><strong>color=color.gray(0.7)</strong></span> to mean color=(0.7,0.7,0.7). </p>
+      <p class="Normal">There is 
         a simple <a href="files.html"><strong>file dialog</strong></a> display for choosing files.</p>
-      <h3 class="style1">Render time </h3>
-      <p class="Normal">If you say <span class="attribute"><strong>scene.show_rendertime = True</strong></span>, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene). This can be a useful diagnostic of performance issues.</p>
-      <h3 class="style1">New faces options</h3>
-      <p class="Normal">You can now create a faces object <span class="attribute"><strong>f </strong></span>without
-        specifying normals, then use <span class="attribute"><strong>f.make_normals()</strong></span> to
-        create perpendiculars to all faces (available  with Visual 5.3).
-        You can use <span class="attribute"><strong>f.make_twosided()</strong></span> to
-        make a faces object two-sided (available  with Visual 5.3). To
-        smooth the object by averaging similar normals on adjacent faces, use <span class="attribute"><strong>f.smooth()</strong></span> (available
-         with Visual 5.2), or <span class="attribute"><strong>f.smooth(minium
-        cosine)</strong></span> (available
-         with Visual 5.3); <span class="attribute"><strong>f.smooth()</strong></span>        corresponds
-        to <span class="attribute"><strong>f.smooth(0.95)</strong></span>.</p>
-      <h3 class="style1">New visual.graph options</h3>
-      <p class="Normal">For a gcurve in a graph, you can now specify that the current plotting location is highlighted by a dot. This is particularly useful if the gcurve retraces its steps (available starting with Visual 5.3).</p>
-      <h3 class="Normal"><span class="style1">Design for left-button events if possible </span></h3>
-      <p class="Normal">Visual 5 provides the basic mouse event functionality that was present in Visual 3 for handling events from right and middle buttons when userspin or userzoom is disabled, out of concern for supporting old programs. However, it has become evident that there are limitations to this approach which could preclude some kinds of mouse handling that people might want to do in the future. For example, you might want to allow userspin with right drags yet also pick up right clicks. For that reason it is conceivable that future developments in this area might break existing programs, and therefore for maximum forward compatibility it is prudent to use only left-button interactions in new programs.</p>
-      <h3><a name="incompatibilities" id="incompatibilities"></a><span class="style3">Known incompatibilities compared to Visual 3</span></h3>
+      <p class="Normal">If you say <span class="attribute"><strong>scene.show_rendertime = True</strong></span>, in the lower left of the graphics window you will see the cycle time (time between renderings of the scene) and the render time (time taken to render the scene).</p>
+      <p class="Normal">There are functions for <a href="faces.html"><strong>faces</strong></a> to create normals, to make two-sided, and to affect smoothing.</p>
+      <p class="Normal">In a <a href="graph.html"><strong>graph</strong></a>, you can highlight the current plotting position.</p>
+      <h3><span class="style31"><a name="incompatibilities" id="incompatibilities"></a>Known incompatibilities compared to the old Visual 3</span></h3>
       <p class="Normal">Here are known incompatibilities:</p>
       <blockquote>
         <p class="Normal">There are some unavoidable incompatibilities due to
@@ -273,6 +208,36 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           &nbsp;&nbsp;&nbsp;&nbsp;L1 = distant_light(direction=(d.x,d.y,-d.z),<br />
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color=L0.color)</p>
       </blockquote>
+      <h3 class="style1"><a name="log" id="log"></a>A log of developments since the start of Visual 5</h3>
+      <p class="Normal">Here is log of changes to Visual since the initial release of  Visual 5.0 in December of 2008. This and earlier history can be found at <a href="http://vpython.org" target="_blank"><strong>vpython.org</strong></a> in the &quot;Recent developments&quot; section.</p>
+      <p class="Normal">2010-12-02 Visual 5.41 for Windows, to fix bugs in active and passive stereo.</p>
+      <p class="Normal">2010-11-22 Visual 5.4 package for Python 2.6 for Windows and Mac, which includes numpy 1.5.1. It was pointed out that there was no scipy module for Python 2.7 or Python 3.1, and the existing Visual 5.32 for Python 2.6 included numpy 1.3, whereas scipy now requires numpy 1.4.</p>
+      <p class="Normal">2010-11-03 Visual 5.4 package for Python 2.5, 2.6, or 2.7 for Linux. This package can presumably also be used to build on Python 3.1, but this would require building Boost libraries for Python 3.1, for which there may not be Linux packages.</p>
+      <p class="Normal">2010-10-27 Visual 5.4 for Python 2.7 and Python 3.1, for Windows and Mac.This release includes a new module, &quot;vis&quot;, which permits selective import of Visual objects without the importing of math and numpy that is done for &quot;from visual import *&quot;. See the main page of the full documentation for details. The font modules included in this VPython installer have been updated to work with Python 3.1, but tested only to the extent that they work with VPython. It is quite possible that additional work is needed to make them fully functional with Python 3.1. Ned Deily fixed a problem with IDLE (and VIDLE) on Macs; it was recently noticed that quitting on the Mac did not prompt you to save unsaved code.</p>
+      <p class="Normal">2010-09-14 Beta test version of Visual 5.32 for Python 3.1, currently only for Windows.</p>
+      <p class="Normal">2010-09-04 Visual 5.32 for Python 2.7 rebuilt for Intel Mac to use production version of numpy 1.5.0..</p>
+      <p class="Normal">2010-08-31 Visual 5.32 for Python 2.7 rebuilt for Windows to use production version of numpy 1.5.0.</p>
+      <p class="Normal">2010-08-16 Visual 5.32 is now available for Python 2.7 for Windows and Intel Macs using beta version of numpy 1.5.0.</p>
+      <p class="Normal">2010-04-10 Visual 5.32 released for all platforms. Now the 3D text object handles multiline text containing newline characters (&quot;\n&quot;), and Kadir Haldenbilen made a 20% speedup in the creation of the text object.</p>
+      <p class="Normal">2010-04-02 Visual 5.31 released for all platforms. Kadir Haldenbilen made further corrections to the ttfquery and FontTools modules, which fixed a variety of errors in rendering 3D text.</p>
+      <p class="Normal">2010-03-30 Visual 5.3 released for all platforms. Thanks to great work by Kadir Haldenbilen, there is a new &quot;text&quot; object that from any True Type (.ttf) font produces extruded 3D text. This supercedes the very limited old visual.text machinery (which however is being left in place for upward compatibility). The Windows and Mac versions install some font-handling modules that include Polygon, for which the following conditions apply: &quot;Polygon is being distributed subject to the following conditions: This distribution contains code from the GPC Library, and/or code resulting from the use of the GPC Library. This usage has been authorized by The University of Manchester, on the understanding that the GPC-related features are used only in the context of this distribution. It is not permitted to extract the GPC code from the distribution as the basis for commercial exploitation, unless a GPC Commercial Use Licence is obtained from The University of Manchester, contact: http://www.cs.man.ac.uk/~toby/gpc/&quot;. There are new faces functions make_normals() and make_twosided(), and you can now specify your own criterion for smooth(). The gcurve object for making graphs now has an option &quot;dot=True&quot; that highlights the currently plotted point on the curve. Some minor bugs were fixed in faces, points, and helix.</p>
+      <p class="Normal">2010-02-17 Gary Pajer pointed out that numpy 1.4.0 had been withdrawn, so Visual 5.24 for Windows and for Mac were built to use numpy 1.3.0 instead.</p>
+      <p class="Normal">2010-02-03 Mirko Bordignon fixed a bug in the Mac build procedure that made Visual 5.22 not work on OSX 10.5. Visual 5.23 for the Mac should work on OSX 10.4 or later.</p>
+      <p class="Normal">2010-01-28 Thanks to work by Mirko Bordignon on threading problems, Visual 5.21 released for the Mac, which may address problems seen on the Mac with VPython refusing to start. It was discovered that 5.21 didn't work on OSX 10.5, so Mirko rebuilt the Boost libraries on OSX 10.5 and verified that VPython would then work on both 10.5 and 10.6, and a Visual 5.22 installer was released based on these libraries.</p>
+      <p class="Normal">2010-01-26 Visual 5.2 released for Windows, Mac, and Linux includes new faces function &quot;smooth()&quot; which averages similar normals at shared vertices to make an object look smoother. See faces documentation.</p>
+      <p class="Normal">2009-12-23 Visual 5.14 released for Windows for any version of Python 2.6. This fixes a problem that until the development of Boost 1.41 it was not possible to build an installer for Visual that worked with Python 2.6.4. Visual 5.14 is otherwise identical to Visual 5.13. Work is proceeding to deal with the same problem on Macintosh (work completed 2010-01-23, thanks to help from Mirko Bordignon). For Linux, simply use Boost 1.41 to build Visual.</p>
+      <p class="Normal">2009-10-13 Visual 5.13 released for Windows (Python 2.6), Mac (Python 2.6, Intel, OSX 10.4 and above), and Linux. Bugs fixed on Linux concerned with making windows visible and invisible, and with reporting correct values of scene.x, scene.y, scene.width, and scene.height. Bugs fixed on all platforms: vector.mag now is ordinary number instead of numpy.ndarray; helix.color is (red,green,blue) instead of an array (the array of colors in the helical curve is helix.helix.color); corrected documentation error which erroneously claimed that that you couldn't specify a list of points for gcurve, gvbars, or ghbars; error in VIDLE corrected by Guilherme Polo -- sometimes initially scrolled so that the first line was not visible.</p>
+      <p class="Normal">2009-08-21 Visual 5.12 released for Windows (Python 2.6), Mac (Python 2.6, Intel, OSX 10.4 and 10.5), and Linux. New: frame_to_world and world_to_frame functions for converting between frame and &quot;world&quot; coordinates, stimulated by a suggestion of Robert Xiao. Fixes: bug in frame manipulations (pointed out by Robert Xiao), bug in helix that didn't permit creating additional attributes when creating a helix. There are significant improvements to VIDLE thanks to Guilherme Polo, including the ability to edit and test without first saving a file, and the shell window coming forward when there is an error, to alert you. The VIDLE startup icon on the Mac (in /Applications/VPython) has been simplified and is probably more robust.</p>
+      <p class="Normal">2009-06-19 Visual 5.11 released for Windows (Python 2. 5 and 2.6 ), Mac (Python 2.6, Intel and PowerPC, OSX 10.4 and 10.5), and Linux. Not yet released for Mac with Python 2.5. Visual 5.11 fixes a minor bug in the handling of arrow attributes fixedwidth, shaftwidth, headwidth, and headlength to make behavior consistent with Visual 3. The documentation on these arrow attributes has been made clearer.</p>
+      <p class="Normal">2009-05-15 Visual 5.1 for Python 2.6 released for Windows, Mac, and Linux. David Scherer provided crucial help for getting Visual to work on Python 2.6. Visual 5.1 includes formerly missing features of Visual 3, including right-button and middle-button mouse event handling. Visual 5 provides the basic mouse event functionality that was present in Visual 3 for handling events from right and middle buttons when userspin or userzoom is disabled, out of concern for supporting old programs. However, it has become evident that there are limitations to this approach which could preclude some kinds of mouse handling that people might want to do in the future. For example, you might want to allow userspin with right drags yet also pick up right clicks. For that reason it is conceivable that future developments in this area might break existing programs, and therefore for maximum forward compatibility it is prudent to use only left-button interactions in new programs.</p>
+      <p class="Normal">2009-03-27 Release of VIDLE, an alternative to IDLE which fixes some long-standing problems; David Scherer, assisted by Bruce Sherwood.</p>
+      <p class="Normal">2009-01-20 Visual 5.03 for all platforms incorporates a fix to handling keyboard events proposed by CL Cheung after his careful analysis of a deadlock condition.</p>
+      <p class="Normal">2009-01-17 Visual 5.02 for all platforms incorporates corrections made by CL Cheung: fixing a bug associated with changing the opacity of an object in a frame, and, on Windows, changing some details of mouse handling which affected docking/undocking operations in the wxpython context. Tests of the frame bug which failed on Windows did not fail on Mac or Ubuntu, but the fix has been incorporated anyway, as there really was a bug in the code.</p>
+      <p class="Normal">2008-12-31 Visual 5.01 for Linux corrects an error in the size attribute of the points object. New documentation of size and shape attributes for graphing gdots. Package now includes threadpool files.</p>
+      <p class="Normal">2008-12-30 Visual 5.01 for Windows and Mac corrects an error in the size attribute of the points object. New documentation of size and shape attributes for graphing gdots.</p>
+      <p class="Normal">2008-12-8 Release of Visual 5.0 by David Scherer and Bruce Sherwood: opacity, local lights, materials such as wood. Includes for the first time a native-mode version for the Mac.</p>
+      <p class="Normal">2008-06-20 John Armstrong contributed an easy-to-use installer for VPython 3.2.11 for Intel Macs running OS X 10.5 (Leopard).</p>
+      <p class="Normal">2008-03-10 A major redesign for Visual-4 Beta is underway. The central goal of the new design is to create an architecture which is more robust, easier to maintain and to extend, and easier to install and to use. The principal architects are David Scherer and Bruce Sherwood. Steve Spicklemire and Ruth Chabay have also been involved in discussions. As a result, a number of changes to the current beta version are likely. Support for textures will change. Rather than creating a texture bitmap, a programmer will be able to specify a material (such as wood). Transparency will be supported. At this point it is unclear exactly what support there will be for bitmapped images; they may be supported only as &quot;decals&quot; which can be applied to flat surfaces. Lighting options may change; it is likely that spotlights will not be supported at first in this version. You can look forward to higher-quality rendering of scenes on computers with modern graphics cards. A Macintosh version which does not require X11 or Fink will be created. Both the Windows version and the Mac version will no longer depend on the large GTK libraries, which will however still be the foundation for Linux. </p>
     <!-- InstanceEndEditable --></td>
   </tr>
   <tr>

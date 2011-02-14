@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- InstanceBeginEditable name="doctitle" -->
@@ -58,6 +58,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="curve.html">curve</option>
           <option value="cylinder.html">cylinder</option>
           <option value="ellipsoid.html">ellipsoid</option>
+          <option value="extrusion.html">extrusion</option>
           <option value="faces.html">faces</option>
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
@@ -76,6 +77,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="color.html">Color &amp; Opacity</option>
           <option value="lights.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
+          <option value="shapes.html">Shapes Library</option>
+          <option value="paths.html">Paths Library</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -156,7 +159,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
               the width of the top line, etc.</p>
 <p class="attributes"><span class="attribute">axis</span> The axis
               points along the baseline; changing the axis changes the orientation
-        of text. The axis is normalized to have a length of 1.  </p>
+        of text. The axis is normalized to have a length of 1. The default is (1,0,0), with text going toward the right.</p>
             <p class="attributes"><span class="attribute">descent</span> Height
               of the descender on lower-case letters such as y (whether or not
               there is such a letter in the text). This is typically about 0.3
@@ -197,8 +200,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             <p class="Normal"></p>
             <p class="Normal">The following code will list the True Type fonts
               on your system that can be used with a text object:</p>
-            <p class="program">t = text()<br />
-              fonts = t.fontlist()<br />
+            <p class="program">fonts = <span class="Normal">shapes.findSystemFonts</span>()<br />
               for f in fonts:
               <br />
             &nbsp;&nbsp;&nbsp;&nbsp;print f            </p>

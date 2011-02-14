@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/visual/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/template.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- InstanceBeginEditable name="doctitle" -->
@@ -80,6 +80,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="curve.html">curve</option>
           <option value="cylinder.html">cylinder</option>
           <option value="ellipsoid.html">ellipsoid</option>
+          <option value="extrusion.html">extrusion</option>
           <option value="faces.html">faces</option>
           <option value="frame.html">frame</option>
           <option value="helix.html">helix</option>
@@ -98,6 +99,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="color.html">Color &amp; Opacity</option>
           <option value="lights.html">Lighting</option>
           <option value="materials.html">Materials &amp; Textures</option>
+          <option value="shapes.html">Shapes Library</option>
+          <option value="paths.html">Paths Library</option>
           <option value="defaults.html">Defaults</option>
           <option value="rate.html">Animation Speed</option>
           <option value="rotation.html">Rotations</option>
@@ -133,14 +136,15 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <table width="100%" border="1">
         <tr>
           <td width="53%"><div align="center"><span class="style3 style4 style5"><font
- color="#ff0000">The Visual Module of VPython</font></span></div>
-          </td>
+ color="#ff0000">The Visual Module of VPython</font></span>          </div>
+            <p class="centered">Version 5.50</p></td>
           <td width="37%"><img src="images/material_etc.jpg" alt="materialetc" width="334" height="235" /></td>
         </tr>
       </table>
       <p class="Normal"> VPython is the Python programming language plus a 3D
         graphics module called &quot;Visual&quot;  originated by David Scherer in 2000. This
         documentation describes all of the Visual capabilities. </p>
+      <p align="center" ><font face="Verdana, Arial, Helvetica, sans-serif"><strong>For a quick introduction, see <a href="http://www.youtube.com/vpythonvideos" target="_blank">youtube.com/vpythonvideos</a></strong><a href="http://www.youtube.com/vpythonvideos" target="_blank"></a></font></p>
       <p class="Normal">Descriptions of the options available in the left margin:</p>
       <blockquote>
         <p class="Normal"><span class="style1 style2"><a href="VisualIntro.html">Introduction:</a></span> The basics of Python and VPython.</p>
@@ -170,7 +174,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <div>
         <p class="Normal">This is not necessary with Python 3.0 or later, but it doesn't hurt, and including the division statement ensures that your program will handle division the same way on all versions of Python.</p>
         <p class="style1">For experienced programmers</p>
-        <p class="Normal">As a convenience to novice programmers to provide everything needed to get started, &quot;from visual import *&quot; imports all of the Visual features and executes &quot;from math import *&quot; and &quot;from numpy import *&quot;. It also arranges that for routines common to both math and numpy such as sqrt, the much faster math routine is used when possible (when the argument is a scalar rather than an array). </p>
+        <p class="Normal">As a convenience to novice programmers to provide everything that is needed to get started, the statement &quot;from visual import *&quot; imports all of the Visual features and executes &quot;from math import *&quot; and &quot;from numpy import *&quot;. It also arranges that for routines common to both math and numpy such as sqrt, the much faster math routine is used when possible (when the argument is a scalar rather than an array). </p>
         <p class="Normal">If you want to import the visual objects selectively, import them from the  vis module. Two simple examples:</p>
         <p class="program">import vis<br />
           vis.box(color=vis.color.orange,material=vis.materials.wood)</p>
