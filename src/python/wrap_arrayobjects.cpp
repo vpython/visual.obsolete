@@ -124,11 +124,6 @@ wrap_arrayobjects()
 	{
 	using python::extrusion;
 
-	//void (extrusion::*exappend_v_rgb_retain)( const vector&, const rgb&, int ) = &extrusion::append;
-	//void (extrusion::*exappend_v_retain)( const vector&, int ) = &extrusion::append;
-
-	//void (extrusion::*append_posx)( const vector& ) = &extrusion::append;
-
 	class_<extrusion, bases<renderable> >( "extrusion")
 		.def( init<const extrusion&>())
 		.def( "get_color", &extrusion::get_color)
@@ -148,11 +143,17 @@ wrap_arrayobjects()
 		.def( "set_y", &extrusion::set_y)
 		.def( "set_z", &extrusion::set_z_d)
 		.def( "set_z", &extrusion::set_z)
+		// There were unsolvable problems with rotate. See comments with intrude routine.
+		//.def( "rotate", &extrusion::rotate, (arg("angle"), arg("axis"), arg("origin")))
 		.add_property( "up",
 			make_function(&extrusion::get_up, return_internal_reference<>()),
 			&extrusion::set_up)
+		.add_property( "show_initial_face", &extrusion::get_show_initial_face, &extrusion::set_show_initial_face)
+		.add_property( "show_final_face", &extrusion::get_show_final_face, &extrusion::set_show_final_face)
 		.add_property( "start", &extrusion::get_start, &extrusion::set_start)
 		.add_property( "end", &extrusion::get_end, &extrusion::set_end)
+		.add_property( "smooth", &extrusion::get_smooth, &extrusion::set_smooth)
+		.add_property( "initial_twist", &extrusion::get_initial_twist, &extrusion::set_initial_twist)
 		.def( "get_twist", &extrusion::get_twist)
 		.def( "set_twist", &extrusion::set_twist)
 		.def( "set_twist", &extrusion::set_twist_d)
@@ -164,8 +165,10 @@ wrap_arrayobjects()
 		.def( "set_xscale", &extrusion::set_xscale_d)
 		.def( "set_yscale", &extrusion::set_yscale_d)
 		.def( "set_contours", &extrusion::set_contours) // used by primitives.py to transfer 2D cross section info
-		.def( "append", &extrusion::appendpos, (arg("pos"), arg("retain")=-1))
-		.def( "append", &extrusion::appendpos_retain, (arg("pos")))
+		.def( "append", &extrusion::appendpos_retain, (arg("pos"), arg("retain")=-1))
+		.def( "append", &extrusion::appendpos_color_retain, (arg("pos"), arg("color"), arg("retain")=-1))
+		.def( "append", &extrusion::appendpos_rgb_retain,
+				( arg("pos"), arg("red")=-1, arg("green")=-1, arg("blue")=-1, arg("retain")=-1 ) )
 		;
 	}
 

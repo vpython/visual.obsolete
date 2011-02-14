@@ -26,7 +26,14 @@ class extrusion : public arrayprim_color
 
 	vector up; // Sets initial orientation of the 2D cross section
 
+	bool show_initial_face, show_final_face; // if false, don't render the face
+
+	double initial_twist; // easier to use than up; note that twist[0] has no effect
+
 	int start, end; // display from start to end (slice notation; -1 is last point)
+	size_t startcorner, endcorner; // after gl_render selects points
+
+	double smooth; // smoothing of normals; default is 0.95 (cosine of 18 degrees)
 
 	// scale is an array of scale and twist information for the extrusion segments.
 	// Each triple is < scalex, scaley, twist >
@@ -61,10 +68,26 @@ class extrusion : public arrayprim_color
 	void set_up(const vector&);
 	shared_vector& get_up();
 
+	void set_initial_normal(const vector&);
+	shared_vector& get_initial_normal();
+	void set_final_normal(const vector&);
+	shared_vector& get_final_normal();
+
+	void set_show_initial_face(const bool);
+	bool get_show_initial_face();
+	void set_show_final_face(const bool);
+	bool get_show_final_face();
+
+	void set_initial_twist(const double);
+	double get_initial_twist();
+
 	void set_start(const int);
 	int get_start();
 	void set_end(const int);
 	int get_end();
+
+	void set_smooth(const double);
+	double get_smooth();
 
 	void set_twist( const double_array& twist);
 	void set_twist_d( const double twist);
@@ -80,8 +103,13 @@ class extrusion : public arrayprim_color
 
 	void set_contours( const array&, const array&, const array&, const array& );
 
-	void appendpos(const vector&); // position only
-	void appendpos_retain(const vector&, int); // position and retain
+	// There were unsolvable problems with rotate. See comments with intrude routine.
+	//void rotate( double angle, const vector& _axis, const vector& origin);
+
+	void appendpos_retain(const vector&, const int); // position and retain
+	void appendpos_color_retain(const vector& n_pos, const double_array& n_color, const int retain);
+	void appendpos_rgb_retain(const vector& n_pos,
+			const double red, const double green, const double blue, const int retain);
 
 	inline bool get_antialias( void) { return antialias; }
 
@@ -94,16 +122,21 @@ class extrusion : public arrayprim_color
 			const double c11, const double c12, const double c21, const double c22,
 			const vector xrot, const vector y, const float* current_color);
 
+	vector smoothing(const vector& a, const vector& b);
+
 	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
-	// pcontours[0] is (numper of contours, 0)
+	// pcontours[0] is (numper of contours, closed), where closed=1 if closed contour, 0 if not
 	// pcontours[2*i+2] points to (length of ith contour, starting location of ith contour in contours).
 	// strips are flattened N*2 arrays of points describing strips that span the "solid" part of the 2D surface.
 	// pstrips[2*i] points to (length of ith strip, starting location of ith strip in strips).
 	std::vector<double> contours, strips;
 	std::vector<int> pcontours, pstrips;
 	std::vector<double> normals2D; // [(nx0,ny0), (nx1,ny1)], [(nx1,ny1), (nx2,ny2)], etc. normals for 2D shape
+	bool shape_closed; // 1 if closed shape contour, 0 if not
 
-	double maxextent; // maximum distance from curve
+	vector center; // center of extrusion (seems like it is not used)
+	double maxextent; // max scaled distance from curve
+	double shape_xmax, shape_ymax; // biggest distances from curve to edges of shape (to calculate max extent)
 	size_t maxcontour; // number of vertices in largest contour
 };
 
