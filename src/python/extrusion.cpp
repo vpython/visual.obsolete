@@ -485,13 +485,44 @@ void
 extrusion::grow_extent( extent& world)
 {
 	maxextent = 0.0; // maximum scaled distance from curve
+	size_t istart, iend;
 	const double* pos_i = pos.data();
-	const double* pos_end = pos.end();
 	const double* s_i = scale.data();
+	if (count == 0) {
+		istart = 0;
+	} else {
+		if (start < 0) {
+			if (((int)count+start) < 0) {
+				return; // nothing to display
+			} else {
+				istart = int(count)+start;
+			}
+		} else {
+			istart = start;
+		}
+		if (istart > count-1) return; // nothing to display
+	}
+
+	if (count == 0) {
+		iend = 0;
+	} else {
+		if (end < 0) {
+			if (((int)count+end) < 0) {
+				return; // nothing to display
+			} else {
+				iend = int(count)+end;
+			}
+		} else {
+			iend = end;
+		}
+		if (iend < startcorner) return; // nothing to display
+	}
+	pos_i += 3*istart;
+	s_i += 3*istart;
 	if (count == 0) { // just show shape
 		world.add_sphere(vector(0,0,0), std::max(shape_xmax*scale.data()[0],shape_ymax*scale.data()[1]));
 	} else {
-		for (size_t i=0; pos_i < pos_end; i++, pos_i+=3, s_i+=3) {
+		for (size_t i=istart; i <= iend; i++, pos_i+=3, s_i+=3) {
 			double xmax = s_i[0]*shape_xmax;
 			double ymax = s_i[1]*shape_ymax;
 			if (ymax > xmax) xmax = ymax;
@@ -623,7 +654,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 {
 	// TODO: A twist of 0.1 shows surface breaks, even with very small smooth....?
 	// TODO: For release....
-	//       Choose new materials.
+	//       Include latest numpy
 	//       Need nice demos for example suite.
 	//       Include in installer the docs for Polygon etc.
 	//       Question: Can one give a numpy array to Polygon?
