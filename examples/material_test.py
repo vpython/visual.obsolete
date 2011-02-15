@@ -1,64 +1,49 @@
 from visual import *
-
-test_materials_individually = False
-
-scene.width = scene.height = 600
-scene.range = 7
-scene.forward = (1,-1,-1)
-
-axis = (1,0,0)
-##obj = box
-##obj = cylinder; axis = (0,1,0)
-obj = sphere
-R = 0.9
-L = 10
-
-scene.visible = 0
-lite = local_light( pos = (0,0,0), color = (.6,.6,0.3) )
-lite.m = sphere( pos = lite.pos, radius = 0.1, color = (1,1,.8), material = materials.emissive)
-
-spheres = []
-for mat in (materials.materials+[None]):
-    if test_materials_individually: scene.visible = 0
-    if mat: print(mat.name)
-    spheres.append( obj( radius = R,
-                         length = sqrt(2)*R,
-                         height = sqrt(2)*R,
-                         width = sqrt(2)*R,
-                         axis = axis,
-                         material = mat ) )
-    if test_materials_individually: scene.visible = 1
-    
-box( pos = (0,-0.5*R,0), size=(L,R,L), material = materials.wood )
-
-N = 4
-xi = -L/2 + 1.5*R
-dx = (L - 3*R)/(N-1)
-for i,s in enumerate(spheres):
-    if i <= 1:
-        s.pos = (xi + (1-i+0.5)*dx, R, xi)
-    elif 2 <= i <= 5:
-        s.pos = (xi+(5-i)*dx, R, xi+1.5*dx)
-    elif 6 <= i <= 8:
-        s.pos = (xi+(i-6+0.5)*dx, R, xi+3*dx)
-    else:
-        s.pos = (xi+2.5*dx, R, xi)
-    loc = s.pos-vector(0,R,0)
-    if hasattr(s.material, "name"):
-        s.label = label( text = s.material.name, pos = loc )
-    else:
-        s.label = label( text = "Legacy", pos = loc )
-    if hasattr(s.material, "color"):
-        s.color = s.material.color
-
-scene.visible = 1
-
+# Must eliminate glass and ice because they show the red box inside
+show_sphere = True
+scene.width = scene.height = 800
+mats = [materials.wood, materials.rough, materials.marble, 
+        materials.plastic, materials.earth, materials.diffuse,
+        materials.emissive, materials.unshaded, # the old materials to here
+        materials.metal,materials.chrome,
+        materials.blazed, materials.silver, 
+        materials.BlueMarble, materials.bricks]
+names = ["wood", "rough", "marble",
+         "plastic", "earth", "diffuse",
+         "emissive", "unshaded",
+         "metal", "chrome",
+         "blazed", "silver",
+         "BlueMarble", "bricks"]
+D = 0.7 # size of box
+R = .4 # radius of sphere
 while True:
-    rate(100)
-    for s in spheres:
-        s.rotate( axis=scene.up, angle=.01 )
-    lite.pos = lite.m.pos = scene.mouse.project( point=scene.center, normal=scene.forward )
-    if scene.mouse.clicked:
-        p = scene.mouse.getclick().pick
-        if p and p is not lite.m:
-            scene.center = p.pos
+    for obj in scene.objects:
+        obj.visible = False
+        del obj
+    scene.range = 2.2
+    scene.fov = 0.01
+    scene.autocenter = True
+    label(pos=(2.5,-.3), text="Click or hit a key\nto toggle between\nspheres and boxes")
+    index = 0
+    for y in range(4):
+        for x in range(4):
+            if index >= 14: break
+            if show_sphere:
+                s = sphere(pos=(x,3-y,0), radius=R, material=mats[index])
+                if names[index] == "bricks":
+                    s.rotate(angle=pi/2, axis=(1,0,0))
+            else:
+                box(pos=(x,3-y,0), size=(D,D,D), material=mats[index])
+            label(pos=(x,3-y-.5), text=names[index])
+            index += 1
+    while True:
+        rate(30)
+        if scene.mouse.events:
+            m = scene.mouse.getevent()
+            if m.click == 'left':
+                show_sphere = (not show_sphere)
+                break
+        elif scene.kb.keys:
+            scene.kb.getkey()
+            show_sphere = (not show_sphere)
+            break
