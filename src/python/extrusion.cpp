@@ -1034,8 +1034,12 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 		}
 
 		if (delay_initial_face) { // now we have valid scaled x, y, and xrot
-			prevxrot = xrot.rotate(-2*alpha,y)*axlecos;
 			prevy = y;
+			if (smoothed) {
+				prevxrot = xrot.rotate(-2*alpha,y)*axlecos;
+			} else {
+				prevxrot = xrot.rotate(-alpha,y)*axlecos;
+			}
 		}
 
 		if (icorner == 0 && !zerodepth) {
