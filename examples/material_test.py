@@ -1,17 +1,16 @@
 from visual import *
-# Must eliminate glass and ice because they show the red box inside
 show_sphere = True
 scene.width = scene.height = 800
 mats = [materials.wood, materials.rough, materials.marble, 
         materials.plastic, materials.earth, materials.diffuse,
         materials.emissive, materials.unshaded, # the old materials to here
-        materials.metal,materials.chrome,
+        materials.shiny,materials.chrome,
         materials.blazed, materials.silver, 
         materials.BlueMarble, materials.bricks]
 names = ["wood", "rough", "marble",
          "plastic", "earth", "diffuse",
          "emissive", "unshaded",
-         "metal", "chrome",
+         "shiny", "chrome",
          "blazed", "silver",
          "BlueMarble", "bricks"]
 D = 0.7 # size of box
