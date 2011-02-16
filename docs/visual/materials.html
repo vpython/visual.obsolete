@@ -125,6 +125,14 @@ materials.earth<br />
 materials.diffuse<br />
         materials.emissive (looks like it glows)<br />
 materials.unshaded (unaffected by lighting)</p>
+        <p class="Normal">New as of VPython 5.50:</p>
+      <p class="program">materials.shiny<br />
+        materials.chrome<br />
+        materials.blazed<br />
+        materials.silver<br />
+        materials.BlueMarbe (earth with clouds)<br />
+        materials.bricks<br />
+        </p>
         <p class="Normal">The example program <strong>material_test.py</strong> displays
           all of these materials. The <strong>emissive</strong> material is particularly
           appropriate for simulating the appearance of a light glowing with the
@@ -133,7 +141,7 @@ materials.unshaded (unaffected by lighting)</p>
           as is done with the swinging light in the example program <strong>texture_and_lighting.py</strong>.
           The appearance of the <strong>unshaded</strong> material  is unaffected
           by lighting and is useful when you want to display an object whose
-          appearance is determined solely by its own attributes.</p>
+      appearance is determined solely by its own attributes.</p>
         <p class="Normal">If you specify <span class="attribute">scene.material = materials.plastic</span>, all objects created thereafter will by default be plastic unless a different material is specifically assigned.</p>
       <p class="Normal">Materials will work with graphics cards that support
           Pixel Shader 3.0 (&quot;PS 3.0&quot;). For details, see<br />
