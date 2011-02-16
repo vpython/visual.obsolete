@@ -28,6 +28,8 @@ class extrusion : public arrayprim_color
 
 	bool show_initial_face, show_final_face; // if false, don't render the face
 
+	vector initial_normal, final_normal;
+
 	double initial_twist; // easier to use than up; note that twist[0] has no effect
 
 	int start, end; // display from start to end (slice notation; -1 is last point)
@@ -68,10 +70,10 @@ class extrusion : public arrayprim_color
 	void set_up(const vector&);
 	shared_vector& get_up();
 
-	void set_initial_normal(const vector&);
 	shared_vector& get_initial_normal();
-	void set_final_normal(const vector&);
+	void set_initial_normal(const vector&);
 	shared_vector& get_final_normal();
+	void set_final_normal(const vector&);
 
 	void set_show_initial_face(const bool);
 	bool get_show_initial_face();

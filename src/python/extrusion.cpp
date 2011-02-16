@@ -27,7 +27,8 @@ using boost::python::tuple;
 extrusion::extrusion()
 	: antialias( true), up(vector(0,1,0)), smooth(0.95),
 	  show_initial_face(true), show_final_face(true),
-	  start(0), end(-1), initial_twist(0.0), center(vector(0,0,0))
+	  start(0), end(-1), initial_twist(0.0), center(vector(0,0,0)),
+	  initial_normal(vector(0,0,0)), final_normal(vector(0,0,0))
 {
 
 	double* k = scale.data();
@@ -191,6 +192,34 @@ shared_vector&
 extrusion::get_up()
 {
 	return up;
+}
+
+// NOTE: These routines are made unavailable in wrap_arrayobjects.cpp for now.
+// The problem is that the initial and final normals are not known until the
+// extrusion has been rendered. So depending on timing, you may get wrong
+// information about initial_normal and final_normal. Needs much thought.
+shared_vector&
+extrusion::get_initial_normal()
+{
+	return initial_normal;
+}
+
+void
+extrusion::set_initial_normal(const vector& n_initial_normal)
+{
+	throw std::invalid_argument( "Cannot set initial_normal; it is read-only.");
+}
+
+shared_vector&
+extrusion::get_final_normal()
+{
+	return final_normal;
+}
+
+void
+extrusion::set_final_normal(const vector& n_final_normal)
+{
+	throw std::invalid_argument( "Cannot set final_normal; it is read-only.");
 }
 
 void
@@ -653,11 +682,6 @@ void
 extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tscale, size_t pcount)
 {
 	// TODO: A twist of 0.1 shows surface breaks, even with very small smooth....?
-	// TODO: For release....
-	//       Include latest numpy
-	//       Need nice demos for example suite.
-	//       Include in installer the docs for Polygon etc.
-	//       Question: Can one give a numpy array to Polygon?
 
 	// The basic architecture of the extrusion object:
 	// Use the Polygon module to create by constructive geometry a 2D surface in the form of a
@@ -1010,7 +1034,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 		}
 
 		if (delay_initial_face) { // now we have valid scaled x, y, and xrot
-			prevxrot = xrot.rotate(-alpha,y)*axlecos;
+			prevxrot = xrot.rotate(-2*alpha,y)*axlecos;
 			prevy = y;
 		}
 
