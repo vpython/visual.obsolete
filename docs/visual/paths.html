@@ -108,7 +108,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       </table>
       <div></div>
       <div>
-        <p class="Normal">The paths library is an auxiliary library to be used together with the 3D extrusion object. It helps in creating paths along which to extrude a 2D shape. In the picture above, the extrusion path (<span class="attribute">pos</span>) is in the shape of a star, and the cross sectional shape is a triangle. </p>
+        <p class="Normal">The paths library is an auxiliary library to be used together with the 3D <strong><a href="extrusion.html">extrusion</a></strong> object. It helps in creating paths along which to extrude a 2D shape. In the picture above, the extrusion path (<span class="attribute">pos</span>) is in the shape of a star, and the cross sectional shape is a triangle. </p>
         <p class="Normal"><strong><font color="#0000a0">Orientation of a path</font></strong></p>
         <p class="Normal">In using the paths library, it is helpful to think of the path as being created in the xy plane, like the star-shaped path above. The path is then tipped back onto the xz plane, with the top of the path pointing in the -z direction. With the path going around in the xz plane, think of the shape (a triangle in the figure above) as starting on the right, in the xy plane, and being extruded along the path. </p>
         <p class="Normal">When you create a path you have the opportunity to specify a different orientation of the path by specifying <span class="attribute">up</span>, which by default is (0,1,0). For example, if you specify <strong>up = (0,0,1)</strong>, the plane of the path will be tipped up into the xy plane, like the figure above.</p>
@@ -179,45 +179,113 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="program">rt = paths.rectangle(width=5, height=3, xscale=3, yscale=2)</p>
         <p class="Normal">creates a rectangle of size 15 x 6.</p>
         <p class="Normal"><strong><font color="#0000a0"><a name="circle" id="circle"></a>circle</font></strong></p>
-        <p class="program">cr = paths.circle(radius=2, np=64)</p>
-        <p class="Normal">          creates a circular path at pos=(0,0), with radius=2 (default 3). There are 64 points used to approximate the circular contour; the default value for the number of points (np) is 32. The circle contour cannot be rotated or rounded, which would have no effect.</p>
+        <p class="Normal"></p>
+        <table width="663" border="0">
+          <tr>
+            <td width="525"><p class="program">cr = paths.circle(radius=2, np=64)</p></td>
+            <td width="128"><img src="images/circle.jpg" width="128" height="122" alt="circle" /></td>
+          </tr>
+        </table>
+<p class="Normal">          creates a circular path at pos=(0,0), with radius=2 (default 3). There are 64 points used to approximate the circular contour; the default value for the number of points (np) is 32. The circle contour cannot be rotated or rounded, which would have no effect.</p>
         <p class="Normal">A circle can be scaled to obtain a different size circle or an elipse.<br />
         </p>
         <p class="Normal"><strong><font color="#0000a0"><a name="ellipse" id="ellipse"></a>ellipse</font></strong></p>
-        <p class="program"><span class="Normal">el = paths.ellipse(width=5, height=3)</span></p>
+        <p class="Normal"></p>
+        <table width="663" border="0">
+          <tr>
+            <td width="525"><p class="program"><span class="Normal">el = paths.ellipse(width=5, height=3)</span></p></td>
+            <td width="128"><img src="images/ellipse.jpg" width="230" height="121" alt="ellipse" /></td>
+          </tr>
+        </table>
         <p class="Normal">creates an elliptical path at pos=(0,0), with width=5 (default 6) and height=3. If height is omitted it is set to be equal to width which causes the output to be a circle. The ellipse can be rotated and scaled but not rounded. </p>
         <p class="Normal"><strong><font color="#0000a0"><a name="line" id="circle3"></a>line</font></strong></p>
         <p class="program">L = paths.line(start=(1,0,0), end=(3,2,0), np=21)</p>
         <p class="Normal"> creates a straight line going from (1,0,0) to (3,2,0), divided into 20 equal lengths (21 points), so that you can color each section differently, or apply interesting twist or scale values. Unlike the other paths, the only attributes for paths.line() are start (default=(0,0,0)), end (default=(0,0,-1), and np (default=2, where 2 points define a single segment). Given the default values, setting pos=paths.line() is a simple way to make an extrusion of 1 unit into the screen (in the -z direction). </p>
 <p class="Normal"><strong><font color="#0000a0"><a name="arc" id="circle2"></a>arc</font></strong></p>
-        <p class="program">ar = paths.arc(radius=2, angle1=0, angle2=pi/2)</p>
-        <p class="Normal"> creates a semicircular arc centered at pos=(0,0), with radius=2. The arc can be rotated and scaled, but not rounded. </p>
+<p class="Normal"></p>
+<table width="663" border="0">
+  <tr>
+    <td width="525"><p class="program">ar = paths.arc(radius=2, angle1=0, angle2=pi/2)</p></td>
+    <td width="128"><img src="images/arc.jpg" width="134" height="121" alt="arc" /></td>
+  </tr>
+</table>
+<p class="Normal"> creates a quarter-circle arc centered at pos=(0,0), with radius=2. The arc can be rotated and scaled, but not rounded. </p>
         <p class="Normal"><strong><font color="#0000a0"><a name="triangle" id="triangle"></a>triangle</font></strong></p>
-        <p class="program"><span class="Normal">tr = paths.triangle(length=5)</span></p>
+        <p class="Normal"></p>
+        <table width="663" border="0">
+          <tr>
+            <td width="525"><p class="program"><span class="Normal">tr = paths.triangle(length=5)</span></p></td>
+            <td width="128"><img src="images/triangle_path.jpg" width="145" height="121" alt="triangle path" /></td>
+          </tr>
+        </table>
         <p class="Normal">creates a triangle path at pos=(0,0), with all sides equal to 5 (the default). The triangle can be rotated and rounded as well as scaled. <br />
-        </p>
+      </p>
         <p class="Normal"><strong><font color="#0000a0"><a name="pentagon" id="pentagon"></a>pentagon</font></strong></p>
-<p class="program"><span class="Normal">pt = paths.pentagon(length=5)</span></p>
-<p class="Normal">creates a pentagonal path at pos=(0,0), with all sides equal to 5 (the default). The pentagon can be rotated and rounded as well as scaled.</p>
+        <p class="Normal"></p>
+        <table width="663" border="0">
+          <tr>
+            <td width="525"><p class="program"><span class="Normal">pt = paths.pentagon(length=5)</span></p></td>
+            <td width="128"><img src="images/pentagon.jpg" width="132" height="122" alt="pentagon" /></td>
+          </tr>
+        </table>
+        <p class="Normal">creates a pentagonal path at pos=(0,0), with all sides equal to 5 (the default). The pentagon can be rotated and rounded as well as scaled.</p>
 <p class="Normal"><strong><font color="#0000a0"><a name="hexagon" id="hexagon"></a>hexagon</font></strong></p>
-<p class="program"><span class="Normal">hx = paths.hexagon(length=5)</span></p>
+<p class="Normal"></p>
+<table width="663" border="0">
+  <tr>
+    <td width="525"><p class="program"><span class="Normal">hx = paths.hexagon(length=5)</span></p></td>
+    <td width="128"><img src="images/hexagon.jpg" width="138" height="122" alt="hexagon" /></td>
+  </tr>
+</table>
 <p class="Normal">creates a hexagonal path at pos=(0,0), with all sides equal to 5 (the default). The hexagon can be rotated and rounded as well as scaled. </p>
 <p class="Normal"><strong><font color="#0000a0"><a name="ngon" id="ngon"></a>ngon</font></strong></p>
-<p class="program"><span class="Normal">poly = paths.ngon(np=7, length=5)</span></p>
+<p class="Normal"></p>
+<table width="663" border="0">
+  <tr>
+    <td width="525"><p class="program"><span class="Normal">poly = paths.ngon(np=7, length=5)</span></p></td>
+    <td width="128"><img src="images/heptagon.jpg" width="127" height="122" alt="heptagon" /></td>
+  </tr>
+</table>
 <p class="Normal">creates a heptagonal path at pos=(0,0), with all seven sides equal to 5 (the default). The heptagon can be rotated and rounded as well as scaled. One can also create an ngon object to fit into a circle with a given radius. In this case the length is calculated automatically:</p>
 <p class="program">poly = paths.ngon(np=7, radius=4)</p>
 <p class="Normal"><strong><font color="#0000a0"><a name="star" id="star"></a>star</font></strong></p>
-<p class="program"><span class="Normal">st = paths.star(np=5)</span></p>
+<p class="Normal"></p>
+<table width="663" border="0">
+  <tr>
+    <td width="525"><p class="program"><span class="Normal">st = paths.star(n=5)</span></p></td>
+    <td width="128"><img src="images/star.jpg" width="127" height="122" alt="star" /></td>
+  </tr>
+</table>
 <p class="Normal">creates a star object at pos=(0,0), with 5 beams (the default), fitting into a circle of radius=3 (the default). As you change the radius value, the beam length changes accordingly, with concave vertices remaining on their original positions.</p>
-<p class="program"><span class="Normal">st = paths.star(np=6, radius=3, iradius=1)</span></p>
+<p class="program"><span class="Normal">st = paths.star(n=6, radius=3, iradius=1)</span></p>
 <p class="Normal">creates a 6-pointed star with outer radius=3, where the tips of the beams are located, and  inner radius=1, where the concave vertices reside. The star can be rotated and rounded as well as scaled.</p>
 <p class="Normal"><strong><font color="#0000a0"><a name="trapezoid" id="any_shape2"></a>trapezoid</font></strong></p>
-<p class="program">tr=paths.trapezoid(pos=(-2,3), width=6, height=1, top=3)<br />
-</p>
+<p class="Normal"></p>
+<table width="663" border="0">
+  <tr>
+    <td width="525"><p class="program">tr=paths.trapezoid(pos=(-2,3), <br />
+&nbsp;&nbsp;&nbsp;&nbsp;width=6, height=1, top=3)<br />
+    </p></td>
+    <td width="128"><img src="images/trapezoid.jpg" width="278" height="121" alt="trapezoid" /></td>
+  </tr>
+</table>
 <p class="Normal">creates  an isosceles trapezoid object with its center at pos=(-2,3) with respect to the extrusion curve points, with width=6 (the default width of the base), height=1 (the default is 3), and top=3. If top is omitted, it is set to be equal to  half of the width. The trapezoid can be rotated and rounded as well as scaled.</p>
 <p class="Normal"><strong><font color="#0000a0"><a name="cross" id="star2"></a>cross</font></strong></p>
-<p class="program"><span class="Normal">st = paths.cross(width=10, thickness=2)</span></p>
+<p class="Normal"></p>
+<table width="663" border="0">
+  <tr>
+    <td width="525"><p class="program"><span class="Normal">st = paths.cross(width=10, thickness=2)</span></p></td>
+    <td width="128"><img src="images/cross.jpg" width="132" height="122" alt="cross" /></td>
+  </tr>
+</table>
 <p class="Normal">creates a object in the shape of a cross, with arms that are 10 across by 2 wide. The very different use of &quot;cross&quot; in the cross product of vectors is not a problem as long as you refer to paths.cross as different from cross.</p>
+<p class="Normal"></p>
+<table width="663" border="0">
+  <tr>
+    <td width="525"><p class="Normal">Here is a cross-shaped path extruding an elliptical shape:</p></td>
+    <td width="128"><img src="images/cross_ellipse.jpg" width="260" height="238" alt="cross-ellipse" /></td>
+  </tr>
+</table>
 <p class="Normal"><strong><font color="#0000a0"><a name="pointlist" id="pointlist"></a>pointlist</font></strong></p>
 <p class="program"><span class="Normal">pl = paths.pointlist(points=[(1,0),(1,1),(-2,3),(1,0)], <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  rotate=pi/4)</span></p>
@@ -231,14 +299,14 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="Normal">          <span class="attribute">height</span> Height of  2D paths like rectangle, ellipse, default = None (Equal to width)</p>
         <p class="Normal">          <span class="attribute">rotate</span> Rotation angle in radians about the center of the 2D path, default = 0.0. A positive value gives a counterclockwise rotation; a negative value rotates clockwise.</p>
         <p class="Normal">          <span class="attribute">np</span> Number of sides of a polygon to approximate objects like circle and ellipse (default = 32); for ngon, np is the number of sides (default = 3). Also the number of points on a star (default = 5).</p>
-        <p class="Normal">          <span class="attribute">iradius</span> Inner radius for the star object, default = 0.5*radius        </p>
+        <p class="Normal"><span class="attribute">n</span> The number of outward-going beams on a star (default = 5).</p>
+<p class="Normal">          <span class="attribute">iradius</span> Inner radius for the star object, default = 0.5*radius.</p>
         <p class="Normal">          <span class="attribute">roundness</span> Radius of curvature for the sharp corners of  2D paths to be rounded. It is used to obtain 2D paths like rectangle, triangle, star with rounded corners, default = 0.0. When specifed as larger than zero, the radius is calculated by multiplying the roundness by the shortest  length. For example, if roundness=0.2, this means the radius will be 20% of the smallest length  of a polygon. Suggested value = 0.1.        </p>
         <p class="Normal"><span class="attribute">invert</span> When used together with the roundness parameter, a circular chamfer is created as opposed to a rounded corner, default = False.<br />
       </p>
         <p class="Normal"><span class="attribute">scale</span> Scaling multiplier to resize the shape objectin both x and y directions, default = 1.0</p>
         <p class="Normal"><span class="attribute">xscale</span> Scaling multiplier in x direction only, default = 1.0</p>
-        <p class="Normal"><span class="attribute">yscale</span> Scaling multiplier in y direction only, default = 1.0</p>
-        <p class="Normal">&nbsp;</p>
+        <p class="Normal"><span class="attribute">yscale</span> Scaling multiplier in y direction only, default = 1.0      </p>
       </div>
       <div> </div>
     <!-- InstanceEndEditable --></td>
