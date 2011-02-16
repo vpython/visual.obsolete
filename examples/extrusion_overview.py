@@ -621,7 +621,7 @@ more details.
     if not pages.pause(): pages.page = 0
     
 #-------------------------------------------------------------------------
-pages = main(11)
+pages = main(12)
 startpage = 1
 pages.page = startpage
 if startpage != 1:
