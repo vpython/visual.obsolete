@@ -194,31 +194,110 @@ extrusion::get_up()
 	return up;
 }
 
-// NOTE: These routines are made unavailable in wrap_arrayobjects.cpp for now.
-// The problem is that the initial and final normals are not known until the
-// extrusion has been rendered. So depending on timing, you may get wrong
-// information about initial_normal and final_normal. Needs much thought.
-shared_vector&
+vector
+extrusion::calculate_normal(const vector prev, const vector current, const vector next) {
+	// Use 3-point fit to circle to determine final normal (at point "next")
+	vector A = (next-current).norm();
+	vector lastA = (current-prev).norm();
+	double alpha;
+	double costheta = lastA.dot(A);
+	if (costheta > 1.0) costheta = 1.0; // under certain conditions, costheta was 1+2e-16, alas
+	if (costheta < -1.0) costheta = -1.0; // just in case...
+	double sintheta = sqrt(1-costheta*costheta);
+	if (costheta > smooth && sintheta > 0.0001) { // not a very large or very small bend
+		alpha = atan(sintheta/((next-current).mag()/(current-prev).mag() + costheta));
+		vector nhat = lastA.cross(A);
+		return A.rotate(alpha, nhat).norm();
+	} else { // rather abrupt change of direction
+		return A;
+	}
+}
+
+vector
 extrusion::get_initial_normal()
 {
-	return initial_normal;
+	if (!initial_normal) {
+		;
+	} else {
+		return initial_normal; // set by user
+	}
+	vector v0 = vector(0,0,-1);
+	if (count == 0) return v0;
+
+	const double* p_i = pos.data();
+	vector prev = vector(&p_i[0]);
+	vector current, next;
+	size_t cnt;
+	for (cnt=1; cnt<count; cnt++) {
+		current = vector(&p_i[3*cnt]);
+		if (!(current-prev)) continue;
+		break;
+	}
+	if (!current) return v0;
+
+	for (cnt++; cnt<count; cnt++) {
+		next = vector(&p_i[3*cnt]);
+		if (!(next-current)) continue;
+		break;
+	}
+	if (!next) return (prev-current).norm();
+
+	return calculate_normal(next, current, prev);
 }
 
 void
 extrusion::set_initial_normal(const vector& n_initial_normal)
 {
+	// Did not implement this for lack of time. Note however that in the
+	// get routine there is a check for whether the normal is (0,0,0), in
+	// which case the user has not set the normal. If the user has set the
+	// normal, it has to be used in the renderer, which involves not merely
+	// making the normal to the face be as specified, but also involves making
+	// the angled joint.
 	throw std::invalid_argument( "Cannot set initial_normal; it is read-only.");
 }
 
-shared_vector&
+vector
 extrusion::get_final_normal()
 {
-	return final_normal;
+	if (!final_normal) {
+		;
+	} else {
+		return final_normal; // set by user
+	}
+	vector v0 = vector(0,0,1);
+	if (count == 0) return v0;
+
+	const double* p_i = pos.data()+3*(count-1);
+	vector next = vector(&p_i[0]);
+	vector prev, current;
+	size_t cnt;
+	for (cnt=1; cnt<count; cnt++) {
+		current = vector(&p_i[-3*cnt]);
+		if (!(next-current)) continue;
+		break;
+	}
+	if (!current) return v0;
+
+	for (cnt++; cnt<count; cnt++) {
+		prev = vector(&p_i[-3*cnt]);
+		if (!(current-prev)) continue;
+		break;
+	}
+	if (!prev) return (next-current).norm();
+
+	return calculate_normal(prev, current, next);
 }
 
 void
 extrusion::set_final_normal(const vector& n_final_normal)
 {
+	// Did not implement this for lack of time. Note however that in the
+	// get routine there is a check for whether the normal is (0,0,0), in
+	// which case the user has not set the normal. If the user has set the
+	// normal, it has to be used in the renderer, which involves not merely
+	// making the normal to the face be as specified, but also involves making
+	// the angled joint.
 	throw std::invalid_argument( "Cannot set final_normal; it is read-only.");
 }
 
@@ -801,6 +880,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	const double* s_i = tscale;
 	const float* current_color = tcolor;
 	const float* prev_color = tcolor;
+	const float* initial_face_color = c_i;
+	const float* final_face_color = c_i+3*(pcount-1);
 
 	bool mono = adjust_colors( scene, tcolor, pcount);
 	bool closed = false;
@@ -979,14 +1060,14 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 
 		// If twist is positive, rotate xaxis and yaxis CCW
 		if (s_i[2] || (icorner == 0 && initial_twist)) {
-			double theta;
+			double angle;
 			if (icorner) {
-				theta = s_i[2];
+				angle = s_i[2];
 			} else {
-				theta = initial_twist; // ignore twist[0]; use initial_twist instead
+				angle = initial_twist; // ignore twist[0]; use initial_twist instead
 			}
-			double cost = cos(theta);
-			double sint = sin(theta);
+			double cost = cos(angle);
+			double sint = sin(angle);
 			vector xtemp = cost*xaxis + sint*yaxis;
 			yaxis = -sint*xaxis + cost*yaxis;
 			xaxis = xtemp;
@@ -1053,7 +1134,9 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 
 			if ((startcorner >= icorner && startcorner <= corner) && ((zerodepth || (closed && !delay_initial_face)) && show_initial)) {
 				// Use pstrips to paint both sides of the first surface
-				render_end(-bisecting_plane_normal, current, c11, c12, c21, c22, xrot, y, current_color);
+				const float* icolor = current_color;
+				if (startcorner == 0) icolor = initial_face_color;
+				render_end(-bisecting_plane_normal, current, c11, c12, c21, c22, xrot, y, icolor);
 			}
 
 			if (delay_initial_face) {
@@ -1061,7 +1144,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 				if (show_initial) {
 					// Use pstrips to paint both sides of the first surface
 					if (startcorner == 0) {
-						render_end(prevxrot.cross(prevy).norm(), prev, prevc11, prevc12, prevc21, prevc22, prevxrot, prevy, prev_color);
+						render_end(prevxrot.cross(prevy).norm(), prev, prevc11, prevc12, prevc21, prevc22, prevxrot, prevy, initial_face_color);
 					} else {
 						if (startcorner <= corner) { // if starting at pos 1
 							render_end(-lastA.rotate(-2*alpha, y), current, c11, c12, c21, c22, xrot, y, current_color);
@@ -1079,7 +1162,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 					xrot = xrot.rotate(lastalpha,y).norm()*scene.gcf;
 				}
 				// Use pstrips to paint both sides of the last surface
-				render_end(lastnormal, current, c11, c12, c21, c22, xrot, y, current_color);
+				render_end(lastnormal, current, c11, c12, c21, c22, xrot, y, final_face_color);
 			}
 
 			if (corner > startcorner && corner <= endcorner) {

@@ -70,9 +70,9 @@ class extrusion : public arrayprim_color
 	void set_up(const vector&);
 	shared_vector& get_up();
 
-	shared_vector& get_initial_normal();
+	vector get_initial_normal();
 	void set_initial_normal(const vector&);
-	shared_vector& get_final_normal();
+	vector get_final_normal();
 	void set_final_normal(const vector&);
 
 	void set_show_initial_face(const bool);
@@ -125,6 +125,8 @@ class extrusion : public arrayprim_color
 			const vector xrot, const vector y, const float* current_color);
 
 	vector smoothing(const vector& a, const vector& b);
+
+	vector calculate_normal(const vector prev, const vector current, const vector next);
 
 	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
 	// pcontours[0] is (numper of contours, closed), where closed=1 if closed contour, 0 if not
