@@ -26,9 +26,9 @@ using boost::python::tuple;
 
 extrusion::extrusion()
 	: antialias( true), up(vector(0,1,0)), smooth(0.95),
-	  show_initial_face(true), show_final_face(true),
+	  show_start_face(true), show_end_face(true),
 	  start(0), end(-1), initial_twist(0.0), center(vector(0,0,0)),
-	  initial_normal(vector(0,0,0)), final_normal(vector(0,0,0))
+	  first_normal(vector(0,0,0)), last_normal(vector(0,0,0))
 {
 
 	double* k = scale.data();
@@ -214,12 +214,12 @@ extrusion::calculate_normal(const vector prev, const vector current, const vecto
 }
 
 vector
-extrusion::get_initial_normal()
+extrusion::get_first_normal()
 {
-	if (!initial_normal) {
+	if (!first_normal) {
 		;
 	} else {
-		return initial_normal; // set by user
+		return first_normal; // set by user
 	}
 	vector v0 = vector(0,0,-1);
 	if (count == 0) return v0;
@@ -246,7 +246,7 @@ extrusion::get_initial_normal()
 }
 
 void
-extrusion::set_initial_normal(const vector& n_initial_normal)
+extrusion::set_first_normal(const vector& n_first_normal)
 {
 	// Did not implement this for lack of time. Note however that in the
 	// get routine there is a check for whether the normal is (0,0,0), in
@@ -254,16 +254,16 @@ extrusion::set_initial_normal(const vector& n_initial_normal)
 	// normal, it has to be used in the renderer, which involves not merely
 	// making the normal to the face be as specified, but also involves making
 	// the angled joint.
-	throw std::invalid_argument( "Cannot set initial_normal; it is read-only.");
+	throw std::invalid_argument( "Cannot set first_normal; it is read-only.");
 }
 
 vector
-extrusion::get_final_normal()
+extrusion::get_last_normal()
 {
-	if (!final_normal) {
+	if (!last_normal) {
 		;
 	} else {
-		return final_normal; // set by user
+		return last_normal; // set by user
 	}
 	vector v0 = vector(0,0,1);
 	if (count == 0) return v0;
@@ -290,7 +290,7 @@ extrusion::get_final_normal()
 }
 
 void
-extrusion::set_final_normal(const vector& n_final_normal)
+extrusion::set_last_normal(const vector& n_last_normal)
 {
 	// Did not implement this for lack of time. Note however that in the
 	// get routine there is a check for whether the normal is (0,0,0), in
@@ -298,7 +298,7 @@ extrusion::set_final_normal(const vector& n_final_normal)
 	// normal, it has to be used in the renderer, which involves not merely
 	// making the normal to the face be as specified, but also involves making
 	// the angled joint.
-	throw std::invalid_argument( "Cannot set final_normal; it is read-only.");
+	throw std::invalid_argument( "Cannot set last_normal; it is read-only.");
 }
 
 void
@@ -481,23 +481,23 @@ extrusion::get_end() {
 }
 
 void
-extrusion::set_show_initial_face(const bool n_show_initial_face) {
-	show_initial_face = n_show_initial_face;
+extrusion::set_show_start_face(const bool n_show_start_face) {
+	show_start_face = n_show_start_face;
 }
 
 bool
-extrusion::get_show_initial_face(){
-	return show_initial_face;
+extrusion::get_show_start_face(){
+	return show_start_face;
 }
 
 void
-extrusion::set_show_final_face(const bool n_show_final_face){
-	show_final_face = n_show_final_face;
+extrusion::set_show_end_face(const bool n_show_end_face){
+	show_end_face = n_show_end_face;
 }
 
 bool
-extrusion::get_show_final_face() {
-	return show_final_face;
+extrusion::get_show_end_face() {
+	return show_end_face;
 }
 
 void
@@ -886,8 +886,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	bool mono = adjust_colors( scene, tcolor, pcount);
 	bool closed = false;
 	if (pcount > 2) closed = ((vector(&spos[0]) - vector(&spos[(pcount-1)*3])).mag() < 0.0001*maxextent*scene.gcf);
-	bool show_initial = show_initial_face;
-	bool show_final = show_final_face;
+	bool show_initial = show_start_face;
+	bool show_final = show_end_face;
 	if (!shape_closed || (closed && startcorner == 0 && endcorner == pcount-1))
 		show_initial = show_final = false;
 

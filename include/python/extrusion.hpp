@@ -26,9 +26,9 @@ class extrusion : public arrayprim_color
 
 	vector up; // Sets initial orientation of the 2D cross section
 
-	bool show_initial_face, show_final_face; // if false, don't render the face
+	bool show_start_face, show_end_face; // if false, don't render the face
 
-	vector initial_normal, final_normal;
+	vector first_normal, last_normal;
 
 	double initial_twist; // easier to use than up; note that twist[0] has no effect
 
@@ -70,15 +70,15 @@ class extrusion : public arrayprim_color
 	void set_up(const vector&);
 	shared_vector& get_up();
 
-	vector get_initial_normal();
-	void set_initial_normal(const vector&);
-	vector get_final_normal();
-	void set_final_normal(const vector&);
+	vector get_first_normal();
+	void set_first_normal(const vector&);
+	vector get_last_normal();
+	void set_last_normal(const vector&);
 
-	void set_show_initial_face(const bool);
-	bool get_show_initial_face();
-	void set_show_final_face(const bool);
-	bool get_show_final_face();
+	void set_show_start_face(const bool);
+	bool get_show_start_face();
+	void set_show_end_face(const bool);
+	bool get_show_end_face();
 
 	void set_initial_twist(const double);
 	double get_initial_twist();

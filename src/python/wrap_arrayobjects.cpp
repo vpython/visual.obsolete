@@ -148,22 +148,10 @@ wrap_arrayobjects()
 		.add_property( "up",
 			make_function(&extrusion::get_up, return_internal_reference<>()),
 			&extrusion::set_up)
-		// NOTE: The following routines are made unavailable in for now.
-		// The problem is that the initial and final normals are not known until the
-		// extrusion has been rendered. So depending on timing, you may get wrong
-		// information about initial_normal and final_normal. Needs much thought.
-		/*
-		add_property( "initial_normal",
-			make_function(&extrusion::get_initial_normal, return_internal_reference<>()),
-			&extrusion::set_initial_normal)
-		add_property( "final_normal",
-			make_function(&extrusion::get_final_normal, return_internal_reference<>()),
-			&extrusion::set_final_normal)
-		*/
-		.add_property( "initial_normal", &extrusion::get_initial_normal, &extrusion::set_initial_normal)
-		.add_property( "final_normal", &extrusion::get_final_normal, &extrusion::set_final_normal)
-		.add_property( "show_initial_face", &extrusion::get_show_initial_face, &extrusion::set_show_initial_face)
-		.add_property( "show_final_face", &extrusion::get_show_final_face, &extrusion::set_show_final_face)
+		.add_property( "first_normal", &extrusion::get_first_normal, &extrusion::set_first_normal)
+		.add_property( "last_normal", &extrusion::get_last_normal, &extrusion::set_last_normal)
+		.add_property( "show_start_face", &extrusion::get_show_start_face, &extrusion::set_show_start_face)
+		.add_property( "show_end_face", &extrusion::get_show_end_face, &extrusion::set_show_end_face)
 		.add_property( "start", &extrusion::get_start, &extrusion::set_start)
 		.add_property( "end", &extrusion::get_end, &extrusion::set_end)
 		.add_property( "smooth", &extrusion::get_smooth, &extrusion::set_smooth)
