@@ -886,10 +886,10 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	bool mono = adjust_colors( scene, tcolor, pcount);
 	bool closed = false;
 	if (pcount > 2) closed = ((vector(&spos[0]) - vector(&spos[(pcount-1)*3])).mag() < 0.0001*maxextent*scene.gcf);
-	bool show_initial = show_start_face;
-	bool show_final = show_end_face;
+	bool show_start = show_start_face;
+	bool show_end = show_end_face;
 	if (!shape_closed || (closed && startcorner == 0 && endcorner == pcount-1))
-		show_initial = show_final = false;
+		show_start = show_end = false;
 
 	bool zerodepth = false; // true if should display just one 2D surface
 
@@ -1132,7 +1132,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 
 		} else {
 
-			if ((startcorner >= icorner && startcorner <= corner) && ((zerodepth || (closed && !delay_initial_face)) && show_initial)) {
+			if ((startcorner >= icorner && startcorner <= corner) && (zerodepth || ((!delay_initial_face) && show_start))) {
 				// Use pstrips to paint both sides of the first surface
 				const float* icolor = current_color;
 				if (startcorner == 0) icolor = initial_face_color;
@@ -1141,7 +1141,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 
 			if (delay_initial_face) {
 				delay_initial_face = false;
-				if (show_initial) {
+				if (show_start) {
 					// Use pstrips to paint both sides of the first surface
 					if (startcorner == 0) {
 						render_end(prevxrot.cross(prevy).norm(), prev, prevc11, prevc12, prevc21, prevc22, prevxrot, prevy, initial_face_color);
@@ -1155,7 +1155,7 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 				}
 			}
 
-			if ((endcorner >= icorner && endcorner <= corner) && (!zerodepth && show_final)) {
+			if ((endcorner >= icorner && endcorner <= corner) && (!zerodepth && show_end)) {
 				vector lastnormal = -bisecting_plane_normal;
 				if (!closed && (corner == lastpoint) && prevsmoothed) {
 					lastnormal = lastnormal.rotate(lastalpha, y);
