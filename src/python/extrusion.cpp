@@ -1162,7 +1162,9 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 					xrot = xrot.rotate(lastalpha,y).norm()*scene.gcf;
 				}
 				// Use pstrips to paint both sides of the last surface
-				render_end(lastnormal, current, c11, c12, c21, c22, xrot, y, final_face_color);
+				const float* icolor = current_color;
+				if (corner == lastpoint) icolor = final_face_color;
+				render_end(lastnormal, current, c11, c12, c21, c22, xrot, y, icolor);
 			}
 
 			if (corner > startcorner && corner <= endcorner) {
