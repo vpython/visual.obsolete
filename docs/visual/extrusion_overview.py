@@ -256,13 +256,13 @@ def extrude():
     f1.rotate(axis=(1,0,0), angle=pi/15)
     f1.rotate(axis=(0,1,0), angle=pi/80)
     E1 = extrusion(frame=f1, pos=[(0,0,0), (0,0,-8)],
-                color=color.orange, shape=c1+c2-c3)
+                shape=c1+c2-c3, color=color.orange)
     E1.scale = 0.8
     L1 = makelabel(-10,12)
     L1.text = """
 The 2D shape created by "c1+c2-c3" can be extruded, like this:
 
-extrusion(pos=[(0,0,0), (0,0,-8)], color=color.orange, shape=c1+c2-c3)
+extrusion(pos=[(0,0,0), (0,0,-8)], shape=c1+c2-c3, color=color.orange)
 """
     if pages.pause(): return
     points(frame=f1, pos=E1.pos, size=8, color=color.red)
@@ -286,13 +286,13 @@ should be near (x,y) = (0,0).
 Rotate the object to examine this multipoint extrusion, with points shown:
 
 extrusion(pos=[(0,0,0),(-1.2,0,-2.9),(-4.1,0,-4.0),(-7.0,0,-2.7),(-8,0,-0.2)],
-                color=color.orange, shape=c1+c2-c3)
+                shape=c1+c2-c3, color=color.orange)
 """
     f2 = frame(pos=(2,-8,0))
     f2.rotate(axis=(1,0,0), angle=pi/30)
     f2.rotate(axis=(0,1,0), angle=-pi/10)
     E2 = extrusion(frame=f2, pos=[(0,0,0),(-1.2,0,-2.9),(-4.1,0,-4.0),(-7.0,0,-2.7),(-8,0,-0.2)],
-                color=color.orange, shape=c1+c2-c3)
+                shape=c1+c2-c3, color=color.orange)
     E2.scale = 0.8
     points(frame=f2, pos=E2.pos, size=8, color=color.red)
     curve(frame=f2, pos=E2.pos, color=color.blue)
@@ -495,10 +495,16 @@ This works because the 3D rendering of an extrusion object is quite fast.
 
 #-------------------------------------------------------------------------
 def miscellaneous():
-    L1 = makelabel(-10, 0.5)
+    L1 = makelabel(-10, 1)
     L1.text = """
 Here are additional attributes of the extrusion object.
 See the detailed documentation for more information.
+
+
+initial_twist
+The first element of the twist array is ignored. If you need to twist
+the initial face, set initial_twist. Alternatively, you could change
+the "up" attribute (see documentation on the box object).
 
 
 start, end
@@ -508,16 +514,16 @@ start or after end are not shown on the screen. The default values
 are start = 0 (pos[0]) and end = -1 (pos[-1] is the last point).
 
 
-show_initial_face, show_final_face
-These are normally True. If you don't want a face to be shown, set
-the corresponding attribute to False. This exposes the interior of
-the extrusion.
+show_start_face, show_end_face
+These are normally True. If you don't want a face at location start
+or end to be shown, set the corresponding attribute to False. This
+exposes the interior of the extrusion.
 
 
-initial_twist
-The first element of the twist array is ignored. If you need to twist
-the initial face, set initial_twist. Alternatively, you could change
-the "up" attribute (see documentation on the box object).
+first_normal, last_normal
+These read-only attributes give you the normals to the first (start=0)
+and last faces (end=-1), whether or not these faces are actually shown;
+these may be useful if you are joining an extrusion to another object.
 
 
 append
@@ -621,7 +627,7 @@ more details.
     if not pages.pause(): pages.page = 0
     
 #-------------------------------------------------------------------------
-pages = main(11)
+pages = main(12)
 startpage = 1
 pages.page = startpage
 if startpage != 1:
