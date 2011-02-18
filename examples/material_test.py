@@ -3,14 +3,15 @@ show_sphere = True
 scene.width = scene.height = 800
     
 names = ['wood', 'rough', 'marble', 'plastic', 'earth', 'diffuse', 'emissive', 'unshaded',
-         'shiny', 'chrome', 'blazed', 'silver', 'bricks', 'BlueMarble']
+         'shiny', 'chrome', 'blazed', 'silver', 'bricks', 'BlueMarble', 'ice', 'glass']
 lookup = {"wood" : materials.wood, "rough" : materials.rough,
          "marble" : materials.marble, "plastic" : materials.plastic,
          "earth" : materials.earth, "diffuse" : materials.diffuse,
          "emissive" : materials.emissive, "unshaded" : materials.unshaded,
          "shiny" : materials.shiny, "chrome" : materials.chrome,
          "blazed" : materials.blazed, "silver" : materials.silver,
-         "bricks" : materials.bricks, "BlueMarble" : materials.BlueMarble}
+         "bricks" : materials.bricks, "BlueMarble" : materials.BlueMarble,
+          "ice" : materials.ice, "glass" : materials.glass}
 
 def destroy():
     for obj in scene.objects:
@@ -18,20 +19,20 @@ def destroy():
         del obj
 
 def show_object(index, x, y, show_sphere):
-    mat = lookup[names[index]]    
+    sphere(pos=(x,y,0), radius=R/5, color=color.red)
+    mat = lookup[names[index]]
     if show_sphere:
         s = sphere(pos=(x,y,0), radius=R, material=mat, index=index)
         if names[index] == "bricks":
             s.rotate(angle=pi/2, axis=(1,0,0))
     else:
         box(pos=(x,y,0), size=(D,D,D), material=mat, index=index)
-    label(pos=(x,y-.5), text=names[index])
+    label(pos=(x,y-.5), box=0, text=names[index])
 
 D = 0.7 # size of box
 R = .4 # radius of sphere
 first = True
 show = -1 # means show all the objects
-print scene.fov
 while True:
     destroy()
     scene.range = 2.2
@@ -42,10 +43,11 @@ while True:
     index = 0
     for y in range(4):
         for x in range(4):
-            if index >= 14: break
+            if index >= 16: break
             show_object(index, x, 3-y, show_sphere)
             index += 1
-    label(pos=(3,-.3), text="Hit a key to toggle between\nspheres and boxes, or\nclick an object to enlarge it.")
+    label(pos=(1.5,3.53), box=0,
+          text="Hit a key to toggle between spheres and boxes, or click an object to enlarge it.")
     if first: scene.visible = True
     first = False
     picked = None
@@ -66,7 +68,7 @@ while True:
                     scene.center = (0,-.1*R,0)
                     scene.range = 1.5*R
                     show_object(m.pick.index, 0, 0, show_sphere)
-                    label(pos=(1.0*R,-1.3*R), text="Hit a key to toggle between\nspheres and boxes, or\nclick to see all materials.")
+                    label(pos=(0,1.2*R), box=0, text="Hit a key to toggle between spheres and boxes, or click to see all materials.")
         elif scene.kb.keys:
             scene.kb.getkey()
             show_sphere = (not show_sphere)
@@ -74,4 +76,4 @@ while True:
             destroy()
             scene.forward = (0,0,-1)
             show_object(m.pick.index, 0, 0, show_sphere)
-            label(pos=(1.0*R,-1.3*R), text="Hit a key to toggle between\nspheres and boxes, or\nclick to see all materials.")
+            label(pos=(0,1.2*R), box=0, text="Hit a key to toggle between spheres and boxes, or click to see all materials.")
