@@ -1,4 +1,6 @@
 from visual import *
+# Kadir Haldenbilen, Feb. 2011
+
 scene.height = scene.width = 800
 scene.center = (0.3,-2.4,0)
 
