@@ -264,6 +264,7 @@ extrusion(pos=p, shape=tri,&nbsp;color=color.yellow)</p></td>
             </tr>
           </table>
           <div>
+            <p class="Normal"><strong><font color="#0000a0">Path orientation</font></strong>            </p>
             <p class="Normal">The extrusion's path is parallel to the xz plane. If you want to change the orientation of the object, specify <span class="attribute">up</span> for the path, which rotates the plane of the object to be perpendicular to <span class="attribute">up</span>. Using the following path will cause  the extrusion to be displayed in the xy plane, perpendicular to (0,0,1):</p>
             <p class="program">p = paths.circle( pos=(5,4,2), radius=10, up=(0,0,1) )</p>
             <div>
@@ -278,12 +279,16 @@ extrusion(pos=p, shape=tri,&nbsp;color=color.yellow)</p></td>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;              shapes.rectangle(pos=(0,4), width=2)              </p>
               <div>
                 <p class="Normal"> The contour <strong>p3</strong> is constructed from the Polygon objects created by the shapes library. Two rectangles have been added together to form a combined shape, with just one (outer) contour. This can be assigned to the <span class="attribute">pos</span> attribute of an extrusion. </p>
-                <p class="Normal">The paths in the paths library all go counterclockwise in the xz plane, as seen from above. That is, if starting from a position on the x axis, they head in the -z direction and bend toward the left. If your shape has something sticking out on the right, it will be on the outer side of the extrusion; something sticking out on the left will be on the inner side of the extrusion. However, if you use constructive geometry to combine shapes to produce a contour to use as a path, be aware that there is no guarantee that the Polygon machinery will generate a  path that goes counterclockwise. Note that if your shape is left/right symmetric, the path direction doesn't matter.</p>
+                <div>
+                  <div></div>
+                </div>
+                <p class="Normal"><strong><font color="#0000a0">Path direction</font></strong></p>
+<p class="Normal">The paths in the paths library all go counterclockwise in the xz plane, as seen from above. That is, if starting from a position on the x axis, they head in the -z direction and bend toward the left. If your shape has something sticking out on the right, it will be on the outer side of the extrusion, whereas something sticking out on the left will be on the inner side of the extrusion. However, if you use constructive geometry to combine shapes to produce a contour to use as a path, be aware that there is no guarantee that the Polygon machinery will generate a  path that goes counterclockwise. If that is the case, note that setting xscale = -1 will reverse left and right in a shape (see next section). If your shape is left/right symmetric, the path direction doesn't matter.</p>
                 <p class="Normal"><strong>Technical note:</strong> What the paths library produces is not a Polygon object. If you want to create a path by combining Polygon objects using constructive geometry (as in  adding two rectangles together to form the contour <strong>p2b</strong>), use the shapes library, which does create Polygon objects.</p>
               </div>
             </div>
 <p class="Normal"><strong><font color="#0000a0"><a name="scaling" id="scaling"></a>Scaling the 2D shape</font></strong></p>
-            <p class="Normal">At each point along the <span class="attribute">pos</span> path, you can specify scaling of the shape, in both x and y. Here are sample forms for scaling:</p>
+            <p class="Normal">At each point along the <span class="attribute">pos</span> path, you can specify scaling of the shape, in both x and y. Scale factors can be negative; for example, xscale= -1 will reverse left and right in a shape. Here are sample forms for scaling:</p>
             <p class="program">scale = (1.5,0.6) # scale all x by 1.5, all y by 0.6<br />
               scale = [(1.5,0.6), (2,1.0)] # 
               scales for points 0 and 1<br />
@@ -305,8 +310,7 @@ yscale = [0.6, 1.0) # yscale for points 0 and 1</p>
                 <td width="200"><img src="images/frustum.jpg" width="200" height="228" alt="frustum" /></td>
               </tr>
             </table>
-            <p class="Normal">&nbsp;</p>
-<p class="Normal"><strong><font color="#0000a0"><a name="twist" id="twist"></a>Twist</font></strong></p>
+            <p class="Normal"><strong><font color="#0000a0"><a name="twist" id="twist"></a>Twist</font></strong></p>
             <p class="Normal">At  each point along the <span class="attribute">pos</span> path, you can specify a <span class="attribute">twist</span> relative to the previous point. The twist is given in radians and is positive for counterclockwise twist, negative for clockwise twist. For example, twist=0.01 will twist each point by 0.01 radians (about 0.6 degrees) relative to the preceding point. The initial face is not twisted (it can be twisted  by setting the <span class="attribute">initial_twist</span> or <span class="attribute">up</span> attributes). Here is an extrusion with a square cross section, twisted clockwise by -pi/8 radians from one point to the next as seen starting from the initial left (cyan) end and heading toward the final right end (the twist looks counterclockwise seen from the right or final end):</p>
             <table width="699" border="0">
               <tr>
