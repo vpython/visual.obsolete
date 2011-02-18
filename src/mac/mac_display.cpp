@@ -232,6 +232,7 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 		if (isprint(key[0])) {
 			// Easy
 			keys.push(std::string(key));
+			return noErr;
 		} else {
 			keyStr = std::string("");
 			GetEventParameter(event, kEventParamKeyModifiers,
@@ -324,9 +325,9 @@ display::vpKeyboardHandler (EventHandlerCallRef target, EventRef event)
 					keyStr += "unknown";
 					break;
 			}
+			keys.push(std::string(keyStr));
+			return noErr;
 		}
-		keys.push(std::string(keyStr));
-		return noErr;
 	} else if (kind == kEventRawKeyModifiersChanged) {
 		GetEventParameter(event, kEventParamKeyModifiers,
 						  typeUInt32, NULL,
