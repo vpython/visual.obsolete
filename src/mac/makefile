@@ -4,7 +4,7 @@
 #    a link in site-packages by hand.
 # Be sure to specify what version of Python
 
-PYTHON_VERSION = 2.7
+PYTHON_VERSION = 3.1
 PYTHON_FRAMEWORK = /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/
 SITE_PACKAGES = $(PYTHON_FRAMEWORK)lib/python$(PYTHON_VERSION)/site-packages/
 TOP = ../vpython-core2/
@@ -34,7 +34,7 @@ OBJS = arrayprim.o arrow.o axial.o box.o cone.o cylinder.o display_kernel.o elli
 	gl_extensions.o gl_free.o icososphere.o light.o quadric.o \
 	mac_display.o mac_font_renderer.o mac_random_device.o mac_rate.o mac_timer.o \
 	render_manager.o rgba.o shader_program.o texture.o tmatrix.o vector.o\
-	convex.o curve.o cvisualmodule.o faces.o \
+	convex.o curve.o cvisualmodule.o extrusion.o faces.o \
 	num_util.o numeric_texture.o points.o slice.o \
 	wrap_arrayobjects.o wrap_display_kernel.o wrap_primitive.o \
 	wrap_rgba.o wrap_vector.o
@@ -50,7 +50,7 @@ cvisual.so : $(OBJS)
 
 install : cvisual.so
 	cp cvisual.so ../vpython-core2/site-packages/vis
-#	sudo cp cvisual.so /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/lib/python$(PYTHON_VERSION)/site-packages/
+	sudo cp cvisual.so /Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)/lib/python$(PYTHON_VERSION)/site-packages/vis
 #	sudo cp cvisual.so /Library/Python/$(PYTHON_VERSION)/site-packages
 
 clean :
