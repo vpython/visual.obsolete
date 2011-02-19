@@ -54,9 +54,9 @@ GTHREAD_CFLAGS = @GTHREAD_CFLAGS@
 
 # Option flags for the compiler, constructed from the above.
 CVISUAL_CPPFLAGS = $(BOOST_INCLUDES) $(PYTHON_INCLUDES) -DHAVE_CONFIG_H \
+        -I$(top_srcdir)/dependencies/boost_files \
         -I$(top_srcdir)/dependencies/threadpool/include \
-		-I$(top_srcdir)/include -I$(top_builddir)/include
-#        -I$(top_srcdir)/dependencies/boost_files \
+#		-I$(top_srcdir)/include -I$(top_builddir)/include
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 CXXFLAGS = @CXXFLAGS@ -ftemplate-depth-120 -DNDEBUG
@@ -67,8 +67,8 @@ CPPFLAGS = @CPPFLAGS@
 CVISUAL_OBJS = atomic_queue.lo displaylist.lo errors.lo extent.lo \
 	gl_extensions.lo gl_free.lo icososphere.lo \
 	quadric.lo render_manager.lo rgba.lo shader_program.lo texture.lo tmatrix.lo vector.lo \
-	arrow.lo axial.lo box.lo cone.lo cylinder.lo \
-	display_kernel.lo ellipsoid.lo frame.lo label.lo light.lo material.lo \
+	arrow.lo axial.lo box.lo cone.lo cylinder.lo display_kernel.lo \
+	ellipsoid.lo extrusion.lo frame.lo label.lo light.lo material.lo \
 	mouse_manager.lo mouseobject.lo primitive.lo pyramid.lo rectangular.lo \
 	renderable.lo ring.lo sphere.lo text.lo \
 	display.lo font_renderer.lo random_device.lo render_surface.lo timer.lo\
@@ -211,6 +211,7 @@ else
     # Libtoolish rules.  These should apply to all POSIX-like systems.
     CVISUAL_LIBS += $(filter-out $(_FILTER_OUT), $(GTK_LIBS) \
        $(GTHREAD_LIBS) -lboost_python -lboost_thread -lboost_signals)
+#       $(GTHREAD_LIBS) -lboost_python-gcc44-mt -lboost_thread-gcc44-mt -lboost_signals-gcc44-mt)
 #    $(GTHREAD_LIBS) \
 #    -l$(top_srcdir)/dependencies/boost_files/linux_libs/boost_python \
 #    -l$(top_srcdir)/dependencies/boost_files/linux_libs/boost_signals \
