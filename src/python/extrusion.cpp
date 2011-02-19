@@ -62,23 +62,12 @@ template <typename T>
 void build_contour(const numpy::array& _cont, std::vector<T>& cont)
 {
 	check_array(_cont);
-	std::vector<npy_intp> dims = shape(_cont);
+	std::vector<npy_intp> dims = shape(_cont); 
 	size_t length = 2*dims[0];
 	cont.resize(length);
 	T* start = (T*)data(_cont);
 	for(size_t i=0; i<length; i++, start++) {
 		cont[i] = *start;
-	}
-}
-
-vector
-extrusion::smoothing(const vector& a, const vector& b) { // vectors a and b need not be normalized
-	vector A = a.norm();
-	vector B = b.norm();
-	if (A.dot(B) > smooth) {
-		return (A+B).norm();
-	} else {
-		return A;
 	}
 }
 
@@ -96,13 +85,13 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 
 	// primitives.py sends to set_contours descriptions of the 2D surface; see extrusions.hpp
 	// We store the information in std::vector containers in flattened form.
-	build_contour<double>(_contours, contours);
-	build_contour<int>(_pcontours, pcontours);
+	build_contour<npy_float64>(_contours, contours);
+	build_contour<npy_int32>(_pcontours, pcontours);
 	shape_closed = (bool)pcontours[1];
 
 	if (shape_closed) {
-		build_contour<double>(_strips, strips);
-		build_contour<int>(_pstrips, pstrips);
+		build_contour<npy_float64>(_strips, strips);
+		build_contour<npy_int32>(_pstrips, pstrips);
 	}
 
 	size_t ncontours = pcontours[0];
@@ -166,8 +155,19 @@ extrusion::set_contours( const numpy::array& _contours,  const numpy::array& _pc
 			normals2D[i+1] = Navg1[1];
 			normals2D[i+2] = Navg2[0];
 			normals2D[i+3] = Navg2[1];
-			i += 4;
+			i += 4; 
 		}
+	}
+}
+
+vector
+extrusion::smoothing(const vector& a, const vector& b) { // vectors a and b need not be normalized
+	vector A = a.norm();
+	vector B = b.norm();
+	if (A.dot(B) > smooth) {
+		return (A+B).norm();
+	} else {
+		return A;
 	}
 }
 
