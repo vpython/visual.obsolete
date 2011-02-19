@@ -129,7 +129,7 @@ class extrusion : public arrayprim_color
 	vector calculate_normal(const vector prev, const vector current, const vector next);
 
 	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
-	// pcontours[0] is (numper of contours, closed), where closed=1 if closed contour, 0 if not
+	// pcontours[0] is (number of contours, closed), where closed=1 if closed contour, 0 if not
 	// pcontours[2*i+2] points to (length of ith contour, starting location of ith contour in contours).
 	// strips are flattened N*2 arrays of points describing strips that span the "solid" part of the 2D surface.
 	// pstrips[2*i] points to (length of ith strip, starting location of ith strip in strips).
