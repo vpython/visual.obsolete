@@ -282,7 +282,7 @@ cfrm.rotate(axis=(0,1,0), angle=pi/2)
 cfrm.rotate(axis=(1,0,0), angle=-pi/2)
 
 # Connect power cables
-angl = pi/200
+angl = pi/400
 run = True
 # Turn on the motor
 while True:
