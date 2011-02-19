@@ -56,7 +56,7 @@ GTHREAD_CFLAGS = @GTHREAD_CFLAGS@
 CVISUAL_CPPFLAGS = $(BOOST_INCLUDES) $(PYTHON_INCLUDES) -DHAVE_CONFIG_H \
         -I$(top_srcdir)/dependencies/boost_files \
         -I$(top_srcdir)/dependencies/threadpool/include \
-#		-I$(top_srcdir)/include -I$(top_builddir)/include
+		-I$(top_srcdir)/include -I$(top_builddir)/include
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 CXXFLAGS = @CXXFLAGS@ -ftemplate-depth-120 -DNDEBUG
