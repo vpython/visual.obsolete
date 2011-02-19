@@ -29,7 +29,7 @@ docfiles = index.html \
 	visual/images/arc_and_triangle_with_hole.jpg visual/images/arc_shape.jpg \
 	visual/images/arc.jpg \
 	visual/images/arrow.jpg visual/images/box.jpg visual/images/circle_frame.jpg \
-	visual/images/circle_shape.jpg visual/images/circle.jpg colors_abutting.jpg \
+	visual/images/circle_shape.jpg visual/images/circle.jpg visual/images/colors_abutting.jpg \
 	visual/images/cone.jpg visual/images/constructive_geometry.jpg \
 	visual/images/controls.jpg visual/images/convex.jpg visual/images/cross_ellipse.jpg \
 	visual/images/cross_shape.jpg visual/images/cross.jpg visual/images/curve.jpg \
