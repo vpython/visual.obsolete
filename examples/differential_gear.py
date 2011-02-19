@@ -1,4 +1,6 @@
 from visual import *
+# Kadir Haldenbilen, Feb. 2011
+
 scene.width = scene.height = 800
 scene.forward = (0.2,-0.6,-0.8)
 scene.title = "Differential Gear"
