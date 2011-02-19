@@ -2,7 +2,7 @@ from visual import *
 
 scene.height = 500
 scene.width = 800
-scene.range = 4.5
+scene.range = 4
 scene.autocenter = True
 title = text(text="My text is\ngreen", align='center', depth=-0.3, color=color.green)
 vertical = (title.upper_left-title.start).norm()
@@ -33,7 +33,7 @@ lr = label(pos=title.lower_right, text='lower_right',
            xoffset=30, yoffset=-30)
 ll = label(pos=title.lower_left, text='lower_left',
            xoffset=-30, yoffset=-30)
-lc = label(text="pos (align='"+title.align+"')",
+lc = label(pos=title.pos, text="pos (align='"+title.align+"')",
            xoffset=-20, yoffset=-20)
 ls = label(pos=title.start, text='start',
            xoffset=-60, yoffset=-30)
