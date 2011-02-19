@@ -238,7 +238,7 @@ stbe = extrusion(frame=mfrm, pos=[(0,0,thk/2.+cl/2.0), (0,0,thk/2.+cl/2.0+thk)],
 tp = []
 # Define the arc path
 pp = shapes.arc(angle1=-pi/3.5, angle2=pi/3.5, radius=3.4)
-cp = pp.contour(0)[0:len(pp.contour(0))/2]
+cp = pp.contour(0)[0:len(pp.contour(0))//2]
 for p in cp:
     tp.append((0,-p[0],p[1]))
 # Create the reverse arc path
