@@ -1,11 +1,7 @@
 from visual import *
-# Kadir Haldenbilen, February 2011
-
 scene.width = scene.height = 800
 scene.forward = (0.2,-0.6,-0.8)
 scene.title = "Differential Gear"
-
-print ("Click to pause or restart.")
 
 def scaler(start=(1.,1.), end=(1.,1.), np=2):
     sl = []
@@ -47,10 +43,10 @@ def bevelGears(R1=5.0, n1=15, t1=2.0, GR=2.0, hole1=False, hole2=False, twist=0.
 
     return R1, n1, R2, n2, eg1, eg2
 
-R1 = 3.
+R1 = 4.
 n1 = 8
 t1 = 3.
-GR1 = 1.5
+GR1 = 1.
 
 R5 = 5.
 n5 = 15
@@ -69,13 +65,30 @@ eg5.color = (1,1,0)
 eg6.color = (0,1,1)
 
 f6 = eg6.frame.frame
-p1 = box(frame=eg6.frame, pos=(0,0,R6/2), size=(R5*2*0.7,R5,R5/4),
+p1 = box(frame=eg6.frame, pos=(0,0,R6/2), size=(R5*2*0.88,R5,R5/4),
          color=(0,0,1), opacity=0.5)
-p2 = box(frame=eg6.frame, pos=(0,0,R6*3./2.), size=(R5*2*0.7,R5,R5/4),
+p2 = box(frame=eg6.frame, pos=(0,0,R6*3./2.), size=(R5*2*0.88,R5,R5/4),
          color=(0,0,1), opacity=0.5)
 shft = cylinder(frame=eg6.frame, pos=p1.pos, axis=p2.pos-p1.pos, radius=0.5,
                 color=(0,1,0))
-dsk = extrusion(frame=eg6.frame, pos=[(5,0,R6),(5.5,0,R6)],
+
+dsk2 = extrusion(frame=eg2.frame, pos=[(-3.75,0,R2),(-4.25,0,R2)],
+               color=eg2.color[0], shape=(shapes.circle(radius=R2+0.4) -
+                shapes.circle(radius=R2/2.)))
+dsk4 = extrusion(frame=eg4.frame, pos=[(-3.75,0,R4),(-4.25,0,R4)],
+               color=eg4.color[0], shape=(shapes.circle(radius=R4+0.4) -
+                shapes.circle(radius=R4/2.)))
+dsk1 = extrusion(frame=eg1.frame, pos=[(0,0,0),(0,0,-0.5)],
+               color=eg1.color[0], shape=(shapes.circle(radius=R1+0.4) -
+                shapes.circle(radius=R1/2.)))
+dsk3 = extrusion(frame=eg3.frame, pos=[(0,0,0),(0,0,-0.5)],
+               color=eg3.color[0], shape=(shapes.circle(radius=R3+0.4) -
+                shapes.circle(radius=R3/2.)))
+dsk5 = extrusion(frame=eg5.frame, pos=[(0,0,0),(0,0,-0.5)],
+               color=eg5.color[0], shape=(shapes.circle(radius=R5+0.4) -
+                shapes.circle(radius=R5/2.)))
+
+dsk6 = extrusion(frame=eg6.frame, pos=[(5,0,R6),(5.5,0,R6)],
                color=eg6.color[0], shape=(shapes.circle(radius=R6+0.4) -
                 shapes.circle(radius=R6/2.)))
 f6.pos = (0,0,-(R6-R2))
@@ -83,7 +96,7 @@ f6.pos = (0,0,-(R6-R2))
 f1.frame = eg6.frame
 f3.frame = eg6.frame
 f3.pos = (0,0, R6+t1*1.5)
-f1.pos = (0,0, R6-t1*1.5)
+f1.pos = (0,0, R6-t1*1.25)
 
 
 mshaft = extrusion(shape=shapes.ngon(np=8, radius=R5/2.), color=eg5.color[0]*0.5,
@@ -92,19 +105,43 @@ raxis = extrusion(shape=shapes.ngon(np=8, radius=R2/4.), color=eg2.color[0]*0.5,
                    pos=[eg2.pos[0], eg2.pos[0]+eg2.frame.axis*15], frame=eg2.frame)
 laxis = extrusion(shape=shapes.ngon(np=8, radius=R4/4.), color=eg4.color[0]*0.5,
                    pos=[eg4.pos[0], eg4.pos[0]+eg4.frame.axis*15], frame=eg4.frame)
+
 sc = extrusion(shape=shapes.rectangle(width=R6+R5/4, height=R5)-shapes.circle(radius=R2/3),
-               pos=[(-3.4,0,R6), (-4.4,0,R6)], frame=eg6.frame, color=(0,0,1),
+               pos=[(-4.4,0,R6), (-5.4,0,R6)], frame=eg6.frame, color=(0,0,1),
                material=materials.glass)
                                      
-run = True
+run = False
 ang = pi/512
 ang2 = ang/(R6/R5)
+strang = ang2*2.0
+lbl = label(yoffset=300, line=0, text="CLICK TO START OR PAUSE\nPRESS  R  OR  L  TO TURN")
+key = "s"
 while True:
-    if run:
-        eg5.frame.rotate(axis=(0,0,1), angle=ang)
-        eg6.frame.rotate(axis=(1,0,0), angle=ang2, origin=(0,0,R6))
-    rate(100)
     if scene.mouse.events:
         m = scene.mouse.getevent()
         if m.click == 'left':
             run = not run
+    if scene.kb.keys:
+        key = scene.kb.getkey()
+        if key == "r" or key == "R":
+            lbl.text = "TURNING RIGHT"
+        if key == "l" or key == "L":
+            lbl.text = "TURNING LEFT"
+        if key == "s" or key == "S":
+            lbl.text = "DRIVING STRAIGHT - PRESS  R  OR  L  TO TURN"
+    if run:
+        eg5.frame.rotate(axis=(0,0,1), angle=ang)
+        eg6.frame.rotate(axis=(1,0,0), angle=ang2, origin=(0,0,R6))
+        if key == "r" or key == "R":
+            eg2.frame.rotate(axis=(1,0,0), angle=+strang, origin=eg2.pos[0])
+            eg4.frame.rotate(axis=(1,0,0), angle=0, origin=eg4.pos[0])
+            eg1.frame.rotate(axis=(0,0,1), angle=+strang*1, origin=eg1.pos[0])
+            eg3.frame.rotate(axis=(0,0,1), angle=+strang*1, origin=eg3.pos[0])
+        if key == "l" or key == "L":
+            eg2.frame.rotate(axis=(1,0,0), angle=0, origin=eg2.pos[0])
+            eg4.frame.rotate(axis=(1,0,0), angle=-strang, origin=eg4.pos[0])
+            eg1.frame.rotate(axis=(0,0,1), angle=-strang*1, origin=eg1.pos[0])
+            eg3.frame.rotate(axis=(0,0,1), angle=-strang*1, origin=eg3.pos[0])
+
+    rate(100)
+            
