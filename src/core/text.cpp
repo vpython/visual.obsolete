@@ -3,6 +3,7 @@
 #include "util/gl_enable.hpp"
 #include "util/errors.hpp"
 #include "boost/algorithm/string.hpp"
+#include "text_adjust.hpp"
 
 namespace cvisual {
 
@@ -13,14 +14,6 @@ typedef std::map< std::pair<wstring, int>, boost::shared_ptr<font> >
 fontcache_t font_cache;
 
 font::font( font_renderer* fr ) : renderer(fr) {}
-
-#if defined(_WIN32)
-	int fudge = 0;
-#elseif defined(__LINUX__)
-	int fudge = -3;
-#else
-	int fudge = 1; // Mac
-#endif
 
 boost::shared_ptr<font>
 font::find_font( const wstring& desc, int height ) {
@@ -52,9 +45,9 @@ font::find_font( const wstring& desc, int height ) {
 	}
 		
 	for(size_t i=0; i<fonts.size(); i++) {
-		boost::shared_ptr<font>& f = font_cache[ std::make_pair( fonts[i], height+fudge) ];
+		boost::shared_ptr<font>& f = font_cache[ std::make_pair( fonts[i], int(height*text_adjust+0.5)) ];
 		if (!f) {
-			f.reset( new font( new font_renderer( fonts[i], height+fudge ) ) );
+			f.reset( new font( new font_renderer( fonts[i], int(height*text_adjust+0.5) ) ) );
 			f->self = f;
 		}
 				
