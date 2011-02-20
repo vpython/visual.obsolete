@@ -226,9 +226,9 @@ We specify a contour \n(a closed path of 2D points):
 We can make these contours using the Polygon function, by specifying
 lists of 2D points in the xy plane (or choose from a library of shapes):
 
-   c1 = Polygon( [ (0,-5), (-3,3), (3,3) ] )   # 3 points for lower triangle
-   c2 = Polygon( [ (-2,2.5), (0,5), (2,2.5) ] )      # upper triangle
-   c3 = Polygon( [ (-2,2), (2,2), (.5,-2), (-.5,-2) ] )   # the trapezoid
+c1 = Polygon( [ (0,-5), (-3,3), (3,3) ] )   # 3 points for lower triangle
+c2 = Polygon( [ (-2,2.5), (0,5), (2,2.5) ] )      # upper triangle
+c3 = Polygon( [ (-2,2), (2,2), (.5,-2), (-.5,-2) ] )   # the trapezoid
 """
     if pages.pause(): return
     L4 = makelabel(-10,-6)
