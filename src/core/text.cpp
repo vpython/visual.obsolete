@@ -14,7 +14,15 @@ fontcache_t font_cache;
 
 font::font( font_renderer* fr ) : renderer(fr) {}
 
-boost::shared_ptr<font> 
+#if defined(_WIN32)
+	int fudge = 0;
+#elseif defined(__LINUX__)
+	int fudge = -3;
+#else
+	int fudge = 1; // Mac
+#endif
+
+boost::shared_ptr<font>
 font::find_font( const wstring& desc, int height ) {
 	if (height <= 0) height = 13;
 
@@ -44,9 +52,9 @@ font::find_font( const wstring& desc, int height ) {
 	}
 		
 	for(size_t i=0; i<fonts.size(); i++) {
-		boost::shared_ptr<font>& f = font_cache[ std::make_pair( fonts[i], height) ];
+		boost::shared_ptr<font>& f = font_cache[ std::make_pair( fonts[i], height+fudge) ];
 		if (!f) {
-			f.reset( new font( new font_renderer( fonts[i], height ) ) );
+			f.reset( new font( new font_renderer( fonts[i], height+fudge ) ) );
 			f->self = f;
 		}
 				
@@ -157,7 +165,7 @@ void layout_texture::set_image( int width, int height, int gl_internal_format, i
 		tx_width = next_power_of_two( width );
 		tx_height = next_power_of_two( height );
 		tc_x = (double)width / tx_width;
-		tc_y = (double)height / tx_height;
+		tc_y = ((double)height) / (tx_height);
 	} else {
 		assert( false );	// TODO: Rectangular texture support
 	}
