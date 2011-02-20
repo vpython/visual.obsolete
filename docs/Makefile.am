@@ -41,7 +41,7 @@ docfiles = index.html \
 	visual/images/heptagon.jpg visual/images/hexagon_shape.jpg visual/images/hexagon.jpg \
 	visual/images/label.jpg visual/images/lathe.jpg \
 	visual/images/material_etc.jpg visual/images/ngon_shape.jpg \
-	visual/images/pentagon_shape.jpg visual/images/pentagon.jpg 
+	visual/images/pentagon_shape.jpg visual/images/pentagon.jpg \
 	visual/images/points.jpg visual/images/pyramid.jpg visual/images/rectangle_chamfered.jpg \
 	visual/images/rectangle_rotated.jpg visual/images/rectangle_rounded.jpg \
 	visual/images/rectangle_shape_chamfered.jpg \
