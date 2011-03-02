@@ -627,11 +627,11 @@ static void call_boost_function( EventLoopTimerRef, void* f_as_pvoid ) {
 	delete f;
 }
 
+EventLoopTimerRef discard;
+
 static void call_in_gui_thread_delayed( double delay, const boost::function< void() >& f) {
-	EventLoopTimerRef discard;
 	EventLoopTimerUPP upp = NewEventLoopTimerUPP(call_boost_function);
 	InstallEventLoopTimer(GetMainEventLoop(), delay, 0, upp, new boost::function<void()>(f), &discard);
-	DisposeEventLoopTimerUPP(upp);
 }
 
 void
@@ -648,6 +648,7 @@ void gui_main::poll() {
 	// We don't need the lock here, because displays can't be created or destroyed from Python
 	// without a message being processed by the GUI thread.  paint_displays() will pick
 	// the lock up as necessary to synchronize access to the actual display contents.
+	RemoveEventLoopTimer(discard);
 
 	std::vector<display*> displays( widgets.begin(), widgets.end() );
 
