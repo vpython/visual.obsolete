@@ -107,43 +107,42 @@ display::display()
 LRESULT CALLBACK
 display::dispatch_messages( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	{
-		python::gil_lock gil;
+	python::gil_lock gil;
 
-		display* This = widgets[hwnd];
-		if (This == 0)
-			return DefWindowProc( hwnd, uMsg, wParam, lParam);
+	display* This = widgets[hwnd];
+	if (This == 0)
+		return DefWindowProc( hwnd, uMsg, wParam, lParam);
 
-		switch (uMsg) {
-			// Handle the cases for the kinds of messages that we are listening for.
-			case WM_CLOSE:
-				return This->on_close( wParam, lParam);
-			case WM_DESTROY:
-				return This->on_destroy( wParam, lParam );
-			case WM_SIZE:
-				return This->on_size( wParam, lParam);
-			case WM_MOVE:
-				return This->on_move( wParam, lParam);
-			case WM_PAINT:
-				return This->on_paint( wParam, lParam);
-			case WM_SHOWWINDOW:
-				return This->on_showwindow( wParam, lParam);
-			case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN:
-			case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
-			case WM_MOUSEMOVE:
-				return This->on_mouse( wParam, lParam);
-    		case WM_KEYUP:
-				return This->on_keyUp(uMsg, wParam, lParam);
-    		case WM_KEYDOWN:
-    			return This->on_keyDown(uMsg, wParam, lParam);
-    		case WM_CHAR:
-    			return This->on_keyChar(uMsg, wParam, lParam);
-			case WM_GETMINMAXINFO:
-				return This->on_getminmaxinfo( wParam, lParam);
-			case WM_ACTIVATE:
-				return This->on_activate( wParam, lParam );
-		}
+	switch (uMsg) {
+		// Handle the cases for the kinds of messages that we are listening for.
+		case WM_CLOSE:
+			return This->on_close( wParam, lParam);
+		case WM_DESTROY:
+			return This->on_destroy( wParam, lParam );
+		case WM_SIZE:
+			return This->on_size( wParam, lParam);
+		case WM_MOVE:
+			return This->on_move( wParam, lParam);
+		case WM_PAINT:
+			return This->on_paint( wParam, lParam);
+		case WM_SHOWWINDOW:
+			return This->on_showwindow( wParam, lParam);
+		case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN:
+		case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP:
+		case WM_MOUSEMOVE:
+			return This->on_mouse( wParam, lParam);
+		case WM_KEYUP:
+			return This->on_keyUp(uMsg, wParam, lParam);
+		case WM_KEYDOWN:
+			return This->on_keyDown(uMsg, wParam, lParam);
+		case WM_CHAR:
+			return This->on_keyChar(uMsg, wParam, lParam);
+		case WM_GETMINMAXINFO:
+			return This->on_getminmaxinfo( wParam, lParam);
+		case WM_ACTIVATE:
+			return This->on_activate( wParam, lParam );
 	}
+	// Default window processing for anything else:
 	return DefWindowProc( hwnd, uMsg, wParam, lParam);
 }
 
@@ -239,7 +238,7 @@ display::on_paint( WPARAM, LPARAM)
 	return 0;
 }
 
-void display::paint() {
+void display::paint() { // called by render_manager "paint_displays"
 	if (!window_visible) return;
 
 	gl_begin();
@@ -505,7 +504,7 @@ display::on_keyUp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 LRESULT
 display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// Note that this algorithm will proably fail if the user is using anything
+	// Note that this algorithm will probably fail if the user is using anything
 	// other than a US keyboard.
 	char *kNameP;
 	char kStr[60],fStr[4];
@@ -603,7 +602,7 @@ display::on_keyDown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 LRESULT
 display::on_keyChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// Note that this algorithm will proably fail if the user is using anything
+	// Note that this algorithm will probably fail if the user is using anything
 	// other than a US keyboard.
 	int fShift,fAlt,fCtrl;
 	char *kNameP;
@@ -700,10 +699,10 @@ void __cdecl end_period() { timeEndPeriod(TIMER_RESOLUTION); }
 void
 gui_main::run()
 {
-	MSG message;
+ 	MSG message;
 
 	// Create a message queue and hook thread messages (we can't just check for them in the loop
-	// below, becomes Windows runs modal message loops e.g. when resizing a window)
+	// below, because Windows runs modal message loops e.g. when resizing a window)
 	SetWindowsHookEx(WH_GETMESSAGE, &gui_main::threadMessage, NULL, GetCurrentThreadId());
 	PeekMessage(&message, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 
@@ -719,7 +718,7 @@ gui_main::run()
 
 	poll();
 
-	// Enter the message loop
+	// Enter the message loop; runs about 60 times per second
 	while (GetMessage(&message, 0, 0, 0) > 0) {
 		TranslateMessage( &message);
 		DispatchMessage( &message);
@@ -752,8 +751,11 @@ gui_main::call_in_gui_thread( const boost::function< void() >& f )
 	PostThreadMessage( self->gui_thread, CALL_MESSAGE, (WPARAM)(new boost::function<void()>(f)), 0);
 }
 
+HANDLE timer_handle; // For some reason there are link errors if this is in display.hpp
+
 VOID CALLBACK gui_main::timer_callback( PVOID, BOOLEAN ) {
 	// Called in high-priority timer thread when it's time to render
+	DeleteTimerQueueTimer(NULL, timer_handle, NULL); // There is a memory leak without this
 	self->call_in_gui_thread( boost::bind( &gui_main::poll, self ) );
 }
 
@@ -764,6 +766,7 @@ void gui_main::poll() {
 	// the lock up as necessary to synchronize access to the actual display contents.
 
 	std::vector<display*> displays;
+
 	for(std::map<HWND, display*>::iterator i = widgets.begin(); i != widgets.end(); ++i )
 		if (i->second)
 			displays.push_back( i->second );
@@ -771,7 +774,8 @@ void gui_main::poll() {
 	// Setting the 2nd, optional argument for paint_displays to true made multiwindow programs work for one user.
 	// Scherer notes, "That isn't acceptable to ship (it is TERRIBLE for performance on many drivers)."
 	int interval = int( 1000. * render_manager::paint_displays( displays ) );
-	CreateTimerQueueTimer( &timer_handle, NULL, &timer_callback, NULL, interval, 0, WT_EXECUTEINTIMERTHREAD );
+	CreateTimerQueueTimer( &timer_handle, NULL, &timer_callback,
+			NULL, interval, 0, WT_EXECUTEINTIMERTHREAD );
 }
 
 } // !namespace cvisual;

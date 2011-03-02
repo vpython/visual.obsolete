@@ -81,8 +81,6 @@ class gui_main
 	DWORD gui_thread;
 	mutex init_lock;
 	condition initialized;
-
- 	HANDLE timer_handle;
 	
 	static LRESULT CALLBACK threadMessage( int, WPARAM, LPARAM );
 
