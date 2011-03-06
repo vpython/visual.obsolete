@@ -67,6 +67,8 @@ class extrusion : public arrayprim_color
 	void append( const vector&, const vector& );
 	void append( const vector& );
 
+	std::vector<npy_float64> faces_render(const view& scene);
+
 	void set_up(const vector&);
 	shared_vector& get_up();
 
@@ -119,7 +121,7 @@ class extrusion : public arrayprim_color
 
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
-	void extrude( const view&, double* spos, float* tcolor, double* tscale, size_t pcount);
+	void extrude( const view&, std::vector<npy_float64>& faces_data, bool make_faces);
 	void render_end(const vector V, const vector current,
 			const double c11, const double c12, const double c21, const double c22,
 			const vector xrot, const vector y, const float* current_color);

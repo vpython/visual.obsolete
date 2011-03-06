@@ -701,6 +701,25 @@ extrusion::rotate( double angle, const vector& _axis, const vector& origin)
 */
 
 void
+extrusion::gl_render( const view& scene)
+{
+	std::vector<npy_float64> faces_data;
+	extrude(scene, faces_data, false);
+}
+
+std::vector<npy_float64>
+extrusion::faces_render(const view& scene)
+{
+	std::vector<npy_float64> faces_data;
+	faces_data.resize(3);
+	faces_data[0] = 10.0;
+	faces_data[1] = 20.0;
+	faces_data[2] = 30.0;
+	//extrude(scene, faces_data, true);
+	return faces_data;
+}
+
+void
 extrusion::render_end(const vector V, const vector current,
 		const double c11, const double c12, const double c21, const double c22,
 		const vector xrot, const vector y, const float* current_color)
@@ -709,8 +728,6 @@ extrusion::render_end(const vector V, const vector current,
 	size_t npstrips = pstrips[0]; // number of triangle strips in the cross section
 	size_t spoints = strips.size()/2; // total number of 2D points in all strips
 	double tx, ty;
-
-	//glEnableClientState( GL_COLOR_ARRAY);
 
 	for (size_t c=0; c<npstrips; c++) {
 		size_t nd = 2*pstrips[2*c+2]; // number of doubles in this strip
@@ -754,11 +771,10 @@ extrusion::render_end(const vector V, const vector current,
 		// nd doubles, nd/2 vertices
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
 	}
-	//glDisableClientState( GL_COLOR_ARRAY);
 }
 
 void
-extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tscale, size_t pcount)
+extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, bool make_faces)
 {
 	// TODO: A twist of 0.1 shows surface breaks, even with very small smooth....?
 
@@ -851,6 +867,111 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	// As a result, the rotate method has been removed from extrusions. As with the other array
 	// objects (curve, points, faces, convex), put the extrusion in a frame and rotate the frame.
 
+	const int LINE_LENGTH = 1000; // The maximum number of points to display.
+	// Data storage for the position and color data (plus room for extra point in the case of a closed contour)
+	double spos[3*(LINE_LENGTH+3+3+3)]; // room for extra point if startcorner and endcorner in same step
+	float tscale[3*(LINE_LENGTH+3+3+3)]; // scale factors, and twist
+	float tcolor[3*(LINE_LENGTH+3+3+3)]; // opacity not yet implemented for extrusions
+	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
+	if (fstep < 1.0F) fstep = 1.0F;
+	size_t iptr=0, iptr3, pcount=0;
+
+	const double* v_i = pos.data();
+	const double* cd_i = color.data();
+	const double* sd_i = scale.data();
+
+	if (count == 0) {
+		startcorner = 0;
+	} else {
+		if (start < 0) {
+			if (((int)count+start) < 0) {
+				return; // nothing to display
+			} else {
+				startcorner = int(count)+start;
+			}
+		} else {
+			startcorner = start;
+		}
+		if (startcorner > count-1) return; // nothing to display
+	}
+
+	if (count == 0) {
+		endcorner = 0;
+	} else {
+		if (end < 0) {
+			if (((int)count+end) < 0) {
+				return; // nothing to display
+			} else {
+				endcorner = int(count)+end;
+			}
+		} else {
+			endcorner = end;
+		}
+		if (endcorner < startcorner) return; // nothing to display
+	}
+
+	if (count < 1) {
+		pcount = 1;
+		spos[0] = spos[1] = spos[2] = 0.0;
+		tcolor[0] = cd_i[0];
+		tcolor[1] = cd_i[1];
+		tcolor[2] = cd_i[2];
+		tscale[0] = sd_i[0];
+		tscale[1] = sd_i[1];
+		tscale[2] = sd_i[2];
+	} else {
+		size_t tstart = startcorner;
+		size_t tend = endcorner;
+		size_t stepsize = (int)(fstep+.5);
+		// Choose which points to display
+		for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int)(fptr+.5), ++pcount) {
+			size_t startoffset = 0;
+			size_t endoffset = 0;
+			// Make sure that startcorner is in the display set
+			if (stepsize > 1 && startcorner >= iptr && startcorner < iptr+stepsize) {
+				startoffset = startcorner-iptr;
+				tstart = pcount;
+			}
+
+			iptr3 = 3*(iptr+startoffset);
+			spos[3*pcount  ] = scene.gcf*v_i[iptr3];
+			spos[3*pcount+1] = scene.gcf*v_i[iptr3+1];
+			spos[3*pcount+2] = scene.gcf*v_i[iptr3+2];
+			tcolor[3*pcount  ] = cd_i[iptr3];
+			tcolor[3*pcount+1] = cd_i[iptr3+1];
+			tcolor[3*pcount+2] = cd_i[iptr3+2];
+			tscale[3*pcount  ] = sd_i[iptr3];
+			tscale[3*pcount+1] = sd_i[iptr3+1];
+			tscale[3*pcount+2] = sd_i[iptr3+2];
+
+			// Make sure that endcorner is in the display set
+			if (stepsize > 1 && endcorner >= iptr && endcorner < iptr+stepsize) {
+				endoffset = endcorner-iptr;
+				if (endcorner == startcorner) {
+					// Already have this point
+					tend = tstart;
+				} else if (iptr == count-1) {
+					tend = pcount;
+				} else {
+					iptr3 = 3*(iptr+endoffset);
+					spos[3*pcount  ] = scene.gcf*v_i[iptr3];
+					spos[3*pcount+1] = scene.gcf*v_i[iptr3+1];
+					spos[3*pcount+2] = scene.gcf*v_i[iptr3+2];
+					tcolor[3*pcount  ] = cd_i[iptr3];
+					tcolor[3*pcount+1] = cd_i[iptr3+1];
+					tcolor[3*pcount+2] = cd_i[iptr3+2];
+					tscale[3*pcount  ] = sd_i[iptr3];
+					tscale[3*pcount+1] = sd_i[iptr3+1];
+					tscale[3*pcount+2] = sd_i[iptr3+2];
+					pcount += 1;
+					tend = pcount;
+				}
+			}
+		}
+		startcorner = tstart;
+		endcorner = tend;
+	}
+
 	size_t ncontours = pcontours[0];
 	if (ncontours == 0) return;
 	size_t npoints = contours.size()/2; // total number of 2D points in all contours
@@ -875,9 +996,10 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	// vector extcenter = vector(0,0,0); // the geometric center of the extrusion (apparently not used)
 
 	// pos and color iterators
-	const double* v_i = spos;
+	v_i = spos;
 	const float* c_i = tcolor;
-	const double* s_i = tscale;
+	const float* s_i = tscale;
+
 	const float* current_color = tcolor;
 	const float* prev_color = tcolor;
 	const float* initial_face_color = c_i;
@@ -1173,8 +1295,8 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 				glNormalPointer( GL_DOUBLE, 0, &normals[0]);
 				glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
 
-				float r_old=prev_color[0], g_old=prev_color[1], b_old=prev_color[2]; // color at previous location along the curve
-				float r_new=current_color[0], g_new=current_color[1], b_new=current_color[2];    // color at current location along the curve
+				double r_old=prev_color[0], g_old=prev_color[1], b_old=prev_color[2]; // color at previous location along the curve
+				double r_new=current_color[0], g_new=current_color[1], b_new=current_color[2];    // color at current location along the curve
 				double v0x, v0y, v1x, v1y, prevv0x, prevv0y, prevv1x, prevv1y;
 				// The following nested for loops is (necessarily) the same as that used to build the normals2D array.
 				for (size_t c=0, nbase=0; c < ncontours; c++) {
@@ -1275,118 +1397,6 @@ extrusion::extrude( const view& scene, double* spos, float* tcolor, double* tsca
 	glDisableClientState( GL_NORMAL_ARRAY);
 	glDisableClientState( GL_COLOR_ARRAY);
 	check_gl_error();
-}
-
-void
-extrusion::gl_render( const view& scene)
-{
-	const int LINE_LENGTH = 1000; // The maximum number of points to display.
-	// Data storage for the position and color data (plus room for extra point in the case of a closed contour)
-	double spos[3*(LINE_LENGTH+3+3+3)]; // room for extra point if startcorner and endcorner in same step
-	double tscale[3*(LINE_LENGTH+3+3+3)]; // scale factors, and twist
-	float tcolor[3*(LINE_LENGTH+3+3+3)]; // opacity not yet implemented for extrusions
-	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
-	if (fstep < 1.0F) fstep = 1.0F;
-	size_t iptr=0, iptr3, pcount=0;
-
-	const double* p_i = pos.data();
-	const double* c_i = color.data();
-	const double* s_i = scale.data();
-
-
-	if (count == 0) {
-		startcorner = 0;
-	} else {
-		if (start < 0) {
-			if (((int)count+start) < 0) {
-				return; // nothing to display
-			} else {
-				startcorner = int(count)+start;
-			}
-		} else {
-			startcorner = start;
-		}
-		if (startcorner > count-1) return; // nothing to display
-	}
-
-	if (count == 0) {
-		endcorner = 0;
-	} else {
-		if (end < 0) {
-			if (((int)count+end) < 0) {
-				return; // nothing to display
-			} else {
-				endcorner = int(count)+end;
-			}
-		} else {
-			endcorner = end;
-		}
-		if (endcorner < startcorner) return; // nothing to display
-	}
-
-	if (count < 1) {
-		pcount = 1;
-		spos[0] = spos[1] = spos[2] = 0.0;
-		tcolor[0] = c_i[0];
-		tcolor[1] = c_i[1];
-		tcolor[2] = c_i[2];
-		tscale[0] = s_i[0];
-		tscale[1] = s_i[1];
-		tscale[2] = s_i[2];
-	} else {
-		size_t tstart = startcorner;
-		size_t tend = endcorner;
-		size_t stepsize = (int)(fstep+.5);
-		// Choose which points to display
-		for (float fptr=0.0; iptr < count && pcount < LINE_LENGTH; fptr += fstep, iptr = (int)(fptr+.5), ++pcount) {
-			size_t startoffset = 0;
-			size_t endoffset = 0;
-			// Make sure that startcorner is in the display set
-			if (stepsize > 1 && startcorner >= iptr && startcorner < iptr+stepsize) {
-				startoffset = startcorner-iptr;
-				tstart = pcount;
-			}
-
-			iptr3 = 3*(iptr+startoffset);
-			spos[3*pcount  ] = scene.gcf*p_i[iptr3];
-			spos[3*pcount+1] = scene.gcf*p_i[iptr3+1];
-			spos[3*pcount+2] = scene.gcf*p_i[iptr3+2];
-			tcolor[3*pcount  ] = c_i[iptr3];
-			tcolor[3*pcount+1] = c_i[iptr3+1];
-			tcolor[3*pcount+2] = c_i[iptr3+2];
-			tscale[3*pcount  ] = s_i[iptr3];
-			tscale[3*pcount+1] = s_i[iptr3+1];
-			tscale[3*pcount+2] = s_i[iptr3+2];
-
-			// Make sure that endcorner is in the display set
-			if (stepsize > 1 && endcorner >= iptr && endcorner < iptr+stepsize) {
-				endoffset = endcorner-iptr;
-				if (endcorner == startcorner) {
-					// Already have this point
-					tend = tstart;
-				} else if (iptr == count-1) {
-					tend = pcount;
-				} else {
-					iptr3 = 3*(iptr+endoffset);
-					spos[3*pcount  ] = scene.gcf*p_i[iptr3];
-					spos[3*pcount+1] = scene.gcf*p_i[iptr3+1];
-					spos[3*pcount+2] = scene.gcf*p_i[iptr3+2];
-					tcolor[3*pcount  ] = c_i[iptr3];
-					tcolor[3*pcount+1] = c_i[iptr3+1];
-					tcolor[3*pcount+2] = c_i[iptr3+2];
-					tscale[3*pcount  ] = s_i[iptr3];
-					tscale[3*pcount+1] = s_i[iptr3+1];
-					tscale[3*pcount+2] = s_i[iptr3+2];
-					pcount += 1;
-					tend = pcount;
-				}
-			}
-		}
-		startcorner = tstart;
-		endcorner = tend;
-	}
-
-	extrude( scene, spos, tcolor, tscale, pcount);
 }
 
 void

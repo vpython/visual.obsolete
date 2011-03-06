@@ -167,6 +167,7 @@ wrap_arrayobjects()
 		.def( "set_xscale", &extrusion::set_xscale_d)
 		.def( "set_yscale", &extrusion::set_yscale_d)
 		.def( "set_contours", &extrusion::set_contours) // used by primitives.py to transfer 2D cross section info
+		.def( "faces_render", &extrusion::faces_render) // obtain pos, normal, and color arrays for the extrusion
 		.def( "append", &extrusion::appendpos_retain, (arg("pos"), arg("retain")=-1))
 		.def( "append", &extrusion::appendpos_color_retain, (arg("pos"), arg("color"), arg("retain")=-1))
 		.def( "append", &extrusion::appendpos_rgb_retain,
