@@ -30,7 +30,7 @@ extrusion::extrusion()
 	  start(0), end(-1), initial_twist(0.0), center(vector(0,0,0)),
 	  first_normal(vector(0,0,0)), last_normal(vector(0,0,0))
 {
-
+	scale.set_length(1);
 	double* k = scale.data();
 	k[0] = 1.0; //scalex
 	k[1] = 1.0; //scaley
@@ -703,26 +703,51 @@ extrusion::rotate( double angle, const vector& _axis, const vector& origin)
 void
 extrusion::gl_render( const view& scene)
 {
-	std::vector<npy_float64> faces_data;
-	extrude(scene, faces_data, false);
+	std::vector<double> faces_info;
+	clear_gl_error();
+	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
+	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
+	gl_enable_client colors( GL_COLOR_ARRAY);
+	gl_enable cull_face( GL_CULL_FACE);
+	extrude(scene, faces_info, false);
+	glDisableClientState( GL_VERTEX_ARRAY);
+	glDisableClientState( GL_NORMAL_ARRAY);
+	glDisableClientState( GL_COLOR_ARRAY);
+	check_gl_error();
 }
 
-std::vector<npy_float64>
-extrusion::faces_render(const view& scene)
-{
-	std::vector<npy_float64> faces_data;
-	faces_data.resize(3);
-	faces_data[0] = 10.0;
-	faces_data[1] = 20.0;
-	faces_data[2] = 30.0;
-	//extrude(scene, faces_data, true);
+boost::python::object extrusion::faces_render() {
+	// Mock up scene machinery:
+	gl_extensions glext;
+	double gcf = 1.0;
+	view scene( vector(0,0,1), vector(0,0,0), 400,
+		400, false, gcf, vector(gcf,gcf,gcf), false, glext);
+
+	std::vector<double> faces_info;
+	std::vector<npy_intp> dimens(2);
+	dimens[0] = 2; // make 2 by 3 array of doubles
+	dimens[1] = 3;
+	array faces_data = makeNum(dimens);
+	faces_data[0][0] = 10.0;
+	faces_data[0][1] = 11.0;
+	faces_data[0][2] = 12.0;
+	faces_data[1][0] = 20.0;
+	faces_data[1][1] = 21.0;
+	faces_data[1][2] = 22.0;
+	/*
+	faces_data[2][0] = 30.0;
+	faces_data[2][1] = 31.0;
+	faces_data[2][2] = 32.0;
+	*/
+	//extrude( scene, faces_info, true);
 	return faces_data;
 }
 
 void
 extrusion::render_end(const vector V, const vector current,
 		const double c11, const double c12, const double c21, const double c22,
-		const vector xrot, const vector y, const float* current_color)
+		const vector xrot, const vector y, const float* current_color,
+		std::vector<double>& faces_info, bool make_faces)
 {
 	// Use the triangle strips in "strips" to paint an end of the extrusion
 	size_t npstrips = pstrips[0]; // number of triangle strips in the cross section
@@ -745,11 +770,13 @@ extrusion::render_end(const vector V, const vector current,
 			endcolors[3*n+2] = current_color[2];
 		}
 
-		glNormalPointer( GL_DOUBLE, 0, &snormals[0]);
-		glVertexPointer(3, GL_DOUBLE, 0, &tristrip[0]);
-		glColorPointer(3, GL_FLOAT, 0, &endcolors[0]);
-		// nd doubles, nd/2 vertices
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
+		if (!make_faces) {
+			glNormalPointer( GL_DOUBLE, 0, &snormals[0]);
+			glVertexPointer(3, GL_DOUBLE, 0, &tristrip[0]);
+			glColorPointer(3, GL_FLOAT, 0, &endcolors[0]);
+			// nd doubles, nd/2 vertices
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
+		}
 
 		for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
 			size_t nswap;
@@ -768,13 +795,15 @@ extrusion::render_end(const vector V, const vector current,
 			snormals[n] = -V;
 		}
 
-		// nd doubles, nd/2 vertices
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
+		if (!make_faces) {
+			// nd doubles, nd/2 vertices
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
+		}
 	}
 }
 
 void
-extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, bool make_faces)
+extrusion::extrude( const view& scene, std::vector<double>& faces_info, bool make_faces)
 {
 	// TODO: A twist of 0.1 shows surface breaks, even with very small smooth....?
 
@@ -1005,7 +1034,7 @@ extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, boo
 	const float* initial_face_color = c_i;
 	const float* final_face_color = c_i+3*(pcount-1);
 
-	bool mono = adjust_colors( scene, tcolor, pcount);
+	if (!make_faces) bool mono = adjust_colors( scene, tcolor, pcount);
 	bool closed = false;
 	if (pcount > 2) closed = ((vector(&spos[0]) - vector(&spos[(pcount-1)*3])).mag() < 0.0001*maxextent*scene.gcf);
 	bool show_start = show_start_face;
@@ -1060,12 +1089,6 @@ extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, boo
 	}
 
 	size_t lastpoint = pcount-1;
-
-	clear_gl_error();
-	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
-	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
-	gl_enable_client colors( GL_COLOR_ARRAY);
-	gl_enable cull_face( GL_CULL_FACE);
 
 	bool delay_initial_face = false; // True if delay rendering of initial face (waiting for normal info)
 
@@ -1258,7 +1281,8 @@ extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, boo
 				// Use pstrips to paint both sides of the first surface
 				const float* icolor = current_color;
 				if (startcorner == 0) icolor = initial_face_color;
-				render_end(-bisecting_plane_normal, current, c11, c12, c21, c22, xrot, y, icolor);
+				render_end(-bisecting_plane_normal, current, c11, c12, c21, c22, xrot, y, icolor,
+							faces_info, make_faces);
 			}
 
 			if (delay_initial_face) {
@@ -1266,12 +1290,15 @@ extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, boo
 				if (show_start) {
 					// Use pstrips to paint both sides of the first surface
 					if (startcorner == 0) {
-						render_end(prevxrot.cross(prevy).norm(), prev, prevc11, prevc12, prevc21, prevc22, prevxrot, prevy, initial_face_color);
+						render_end(prevxrot.cross(prevy).norm(), prev, prevc11, prevc12, prevc21, prevc22,
+								prevxrot, prevy, initial_face_color, faces_info, make_faces);
 					} else {
 						if (startcorner <= corner) { // if starting at pos 1
-							render_end(-lastA.rotate(-2*alpha, y), current, c11, c12, c21, c22, xrot, y, current_color);
+							render_end(-lastA.rotate(-2*alpha, y), current, c11, c12, c21, c22,
+									xrot, y, current_color, faces_info, make_faces);
 						} else if (endcorner <= corner) { // if ending at pos 1
-							render_end(-bisecting_plane_normal, current, c11, c12, c21, c22, xrot, y, current_color);
+							render_end(-bisecting_plane_normal, current, c11, c12, c21, c22,
+									xrot, y, current_color, faces_info, make_faces);
 						}
 					}
 				}
@@ -1286,14 +1313,17 @@ extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, boo
 				// Use pstrips to paint both sides of the last surface
 				const float* icolor = current_color;
 				if (corner == lastpoint) icolor = final_face_color;
-				render_end(lastnormal, current, c11, c12, c21, c22, xrot, y, icolor);
+				render_end(lastnormal, current, c11, c12, c21, c22,
+						xrot, y, icolor, faces_info, make_faces);
 			}
 
 			if (corner > startcorner && corner <= endcorner) {
 
-				glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
-				glNormalPointer( GL_DOUBLE, 0, &normals[0]);
-				glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
+				if (!make_faces) {
+					glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
+					glNormalPointer( GL_DOUBLE, 0, &normals[0]);
+					glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
+				}
 
 				double r_old=prev_color[0], g_old=prev_color[1], b_old=prev_color[2]; // color at previous location along the curve
 				double r_new=current_color[0], g_new=current_color[1], b_new=current_color[2];    // color at current location along the curve
@@ -1369,9 +1399,11 @@ extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, boo
 						normals[3*nd+i+4] = -normals[i+5];
 					}
 
-					// nd doubles, nd/2 vertices, 2 triangles per vertex,
-					//    3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
-					glDrawArrays(GL_TRIANGLES, 0, 6*nd);
+					if (!make_faces) {
+						// nd doubles, nd/2 vertices, 2 triangles per vertex,
+						//    3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
+						glDrawArrays(GL_TRIANGLES, 0, 6*nd);
+					}
 				}
 			}
 		}
@@ -1392,11 +1424,6 @@ extrusion::extrude( const view& scene, std::vector<npy_float64>& faces_data, boo
 		prev_color = c_i;
 		prevsmoothed = smoothed;
 	}
-
-	glDisableClientState( GL_VERTEX_ARRAY);
-	glDisableClientState( GL_NORMAL_ARRAY);
-	glDisableClientState( GL_COLOR_ARRAY);
-	check_gl_error();
 }
 
 void

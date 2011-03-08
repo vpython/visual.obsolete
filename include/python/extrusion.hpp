@@ -67,8 +67,6 @@ class extrusion : public arrayprim_color
 	void append( const vector&, const vector& );
 	void append( const vector& );
 
-	std::vector<npy_float64> faces_render(const view& scene);
-
 	void set_up(const vector&);
 	shared_vector& get_up();
 
@@ -105,6 +103,8 @@ class extrusion : public arrayprim_color
 	void set_yscale_d( const double scale);
 	boost::python::object get_scale();
 
+	boost::python::object faces_render();
+
 	void set_contours( const array&, const array&, const array&, const array& );
 
 	// There were unsolvable problems with rotate. See comments with intrude routine.
@@ -121,10 +121,11 @@ class extrusion : public arrayprim_color
 
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
-	void extrude( const view&, std::vector<npy_float64>& faces_data, bool make_faces);
+	void extrude(const view& scene, std::vector<double>& faces_info, bool make_faces);
 	void render_end(const vector V, const vector current,
 			const double c11, const double c12, const double c21, const double c22,
-			const vector xrot, const vector y, const float* current_color);
+			const vector xrot, const vector y, const float* current_color,
+			std::vector<double>& faces_info, bool make_faces);
 
 	vector smoothing(const vector& a, const vector& b);
 
