@@ -121,18 +121,23 @@ class extrusion : public arrayprim_color
 
  private:
 	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
-	void extrude(const view& scene, std::vector<double>& faces_info, bool make_faces);
+	void extrude(const view& scene,
+			std::vector<vector>& faces_pos,
+			std::vector<vector>& faces_normals,
+			std::vector<float>& faces_colors, bool make_faces);
 	void render_end(const vector V, const vector current,
 			const double c11, const double c12, const double c21, const double c22,
 			const vector xrot, const vector y, const float* current_color,
-			std::vector<double>& faces_info, bool make_faces);
+			std::vector<vector>& faces_pos,
+			std::vector<vector>& faces_normals,
+			std::vector<float>& faces_colors, bool make_faces);
 
 	vector smoothing(const vector& a, const vector& b);
 
 	vector calculate_normal(const vector prev, const vector current, const vector next);
 
 	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
-	// pcontours[0] is (numper of contours, closed), where closed=1 if closed contour, 0 if not
+	// pcontours[0] is (number of contours, closed), where closed=1 if closed contour, 0 if not
 	// pcontours[2*i+2] points to (length of ith contour, starting location of ith contour in contours).
 	// strips are flattened N*2 arrays of points describing strips that span the "solid" part of the 2D surface.
 	// pstrips[2*i] points to (length of ith strip, starting location of ith strip in strips).

@@ -703,13 +703,15 @@ extrusion::rotate( double angle, const vector& _axis, const vector& origin)
 void
 extrusion::gl_render( const view& scene)
 {
-	std::vector<double> faces_info;
+	std::vector<vector> faces_pos;
+	std::vector<vector> faces_normals;
+	std::vector<float> faces_colors;
 	clear_gl_error();
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
 	gl_enable_client colors( GL_COLOR_ARRAY);
 	gl_enable cull_face( GL_CULL_FACE);
-	extrude(scene, faces_info, false);
+	extrude(scene, faces_pos, faces_normals, faces_colors, false);
 	glDisableClientState( GL_VERTEX_ARRAY);
 	glDisableClientState( GL_NORMAL_ARRAY);
 	glDisableClientState( GL_COLOR_ARRAY);
@@ -723,23 +725,22 @@ boost::python::object extrusion::faces_render() {
 	view scene( vector(0,0,1), vector(0,0,0), 400,
 		400, false, gcf, vector(gcf,gcf,gcf), false, glext);
 
-	std::vector<double> faces_info;
+	std::vector<vector> faces_pos;
+	std::vector<vector> faces_normals;
+	std::vector<float> faces_colors;
+	extrude( scene, faces_pos, faces_normals, faces_colors, true);
 	std::vector<npy_intp> dimens(2);
-	dimens[0] = 2; // make 2 by 3 array of doubles
+	dimens[0] = faces_pos.size(); // make N by 3 array of doubles
 	dimens[1] = 3;
 	array faces_data = makeNum(dimens);
-	faces_data[0][0] = 10.0;
-	faces_data[0][1] = 11.0;
-	faces_data[0][2] = 12.0;
-	faces_data[1][0] = 20.0;
-	faces_data[1][1] = 21.0;
-	faces_data[1][2] = 22.0;
-	/*
-	faces_data[2][0] = 30.0;
-	faces_data[2][1] = 31.0;
-	faces_data[2][2] = 32.0;
-	*/
-	//extrude( scene, faces_info, true);
+	size_t d = dimens[0];
+	for(size_t i=0; i<d; i++){
+		faces_data[i] = faces_pos[i];
+		faces_data[i+d] = faces_normals[i];
+		faces_data[i+2*d][0] = faces_colors[3*i  ];
+		faces_data[i+2*d][1] = faces_colors[3*i+1];
+		faces_data[i+2*d][2] = faces_colors[3*i+2];
+	}
 	return faces_data;
 }
 
@@ -747,7 +748,9 @@ void
 extrusion::render_end(const vector V, const vector current,
 		const double c11, const double c12, const double c21, const double c22,
 		const vector xrot, const vector y, const float* current_color,
-		std::vector<double>& faces_info, bool make_faces)
+		std::vector<vector>& faces_pos,
+		std::vector<vector>& faces_normals,
+		std::vector<float>& faces_colors, bool make_faces)
 {
 	// Use the triangle strips in "strips" to paint an end of the extrusion
 	size_t npstrips = pstrips[0]; // number of triangle strips in the cross section
@@ -803,7 +806,10 @@ extrusion::render_end(const vector V, const vector current,
 }
 
 void
-extrusion::extrude( const view& scene, std::vector<double>& faces_info, bool make_faces)
+extrusion::extrude( const view& scene,
+		std::vector<vector>& faces_pos,
+		std::vector<vector>& faces_normals,
+		std::vector<float>& faces_colors, bool make_faces)
 {
 	// TODO: A twist of 0.1 shows surface breaks, even with very small smooth....?
 
@@ -1090,6 +1096,22 @@ extrusion::extrude( const view& scene, std::vector<double>& faces_info, bool mak
 
 	size_t lastpoint = pcount-1;
 
+	if (make_faces) {
+		// Calculate the total number of triangles
+		// contours.size()/2 is number of vertices in the 2D shape
+		// On the sides of the extrusion there are 2*2 double-sided triangles for every contour vertex
+		size_t triangles = 2*contours.size()*(endcorner-startcorner); // doubled-sided triangles on the extrusion sides
+		// strips.size()/2 is the number of vertices in triangle strips on an end face, and there are pstrips.size() strips
+		// If there are N vertices in a triangle strip, there are N-2 single-sided triangles, so there are
+		//    strips.size()/2 - 2*pstrips.size() single-sided triangles on an end face
+		size_t endtriangles = strips.size()-4*pstrips.size(); // double-sided triangles on the extrusion ends
+		if (show_start_face && (!closed || (startcorner > 0))) triangles += endtriangles;
+		if (show_end_face && (!closed || (endcorner < lastpoint))) triangles += endtriangles;
+		faces_pos.reserve(3*triangles); // 3D vectors
+		faces_normals.reserve(3*triangles); // 3D vectors
+		faces_colors.reserve(3*3*triangles); // floats
+	}
+
 	bool delay_initial_face = false; // True if delay rendering of initial face (waiting for normal info)
 
 	bool rendered_initial_face = false; // True when processing the first corner after the beginning
@@ -1282,7 +1304,7 @@ extrusion::extrude( const view& scene, std::vector<double>& faces_info, bool mak
 				const float* icolor = current_color;
 				if (startcorner == 0) icolor = initial_face_color;
 				render_end(-bisecting_plane_normal, current, c11, c12, c21, c22, xrot, y, icolor,
-							faces_info, make_faces);
+						faces_pos, faces_normals, faces_colors, make_faces);
 			}
 
 			if (delay_initial_face) {
@@ -1291,14 +1313,14 @@ extrusion::extrude( const view& scene, std::vector<double>& faces_info, bool mak
 					// Use pstrips to paint both sides of the first surface
 					if (startcorner == 0) {
 						render_end(prevxrot.cross(prevy).norm(), prev, prevc11, prevc12, prevc21, prevc22,
-								prevxrot, prevy, initial_face_color, faces_info, make_faces);
+								prevxrot, prevy, initial_face_color, faces_pos, faces_normals, faces_colors, make_faces);
 					} else {
 						if (startcorner <= corner) { // if starting at pos 1
 							render_end(-lastA.rotate(-2*alpha, y), current, c11, c12, c21, c22,
-									xrot, y, current_color, faces_info, make_faces);
+									xrot, y, current_color, faces_pos, faces_normals, faces_colors, make_faces);
 						} else if (endcorner <= corner) { // if ending at pos 1
 							render_end(-bisecting_plane_normal, current, c11, c12, c21, c22,
-									xrot, y, current_color, faces_info, make_faces);
+									xrot, y, current_color, faces_pos, faces_normals, faces_colors, make_faces);
 						}
 					}
 				}
@@ -1314,7 +1336,7 @@ extrusion::extrude( const view& scene, std::vector<double>& faces_info, bool mak
 				const float* icolor = current_color;
 				if (corner == lastpoint) icolor = final_face_color;
 				render_end(lastnormal, current, c11, c12, c21, c22,
-						xrot, y, icolor, faces_info, make_faces);
+						xrot, y, icolor, faces_pos, faces_normals, faces_colors, make_faces);
 			}
 
 			if (corner > startcorner && corner <= endcorner) {
@@ -1399,7 +1421,11 @@ extrusion::extrude( const view& scene, std::vector<double>& faces_info, bool mak
 						normals[3*nd+i+4] = -normals[i+5];
 					}
 
-					if (!make_faces) {
+					if (make_faces) {
+						faces_pos.insert(faces_pos.end(), &tris[0], &tris[6*nd]);
+						faces_normals.insert(faces_normals.end(), &normals[0], &normals[6*nd]);
+						faces_colors.insert(faces_colors.end(), &tcolors[0], &tcolors[18*nd]);
+					} else {
 						// nd doubles, nd/2 vertices, 2 triangles per vertex,
 						//    3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
 						glDrawArrays(GL_TRIANGLES, 0, 6*nd);
