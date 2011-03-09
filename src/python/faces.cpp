@@ -315,9 +315,9 @@ faces::gl_render( const view& scene)
 		glColorPointer( 3, GL_DOUBLE, 0, color.data() );
 
 	gl_enable cull_face( GL_CULL_FACE);
-	for (size_t drawn = 0; drawn < count - count%3; drawn += 54) {
+	for (size_t drawn = 0; drawn < count - count%3; drawn += 540) {
 		glDrawArrays( GL_TRIANGLES, drawn,
-			std::min( count - count%3 - drawn, (size_t)54));
+			std::min( count - count%3 - drawn, (size_t)540));
 	}
 }
 
