@@ -46,7 +46,7 @@ class extrusion : public arrayprim_color
 	bool antialias;
 
 	// Returns true if the object is single-colored.
-	bool monochrome(float* tcolor, size_t pcount);
+	bool monochrome(double* tcolor, size_t pcount);
 
 	virtual void outer_render( const view&);
 	virtual void gl_render( const view&);
@@ -120,17 +120,17 @@ class extrusion : public arrayprim_color
 	void set_antialias( bool);
 
  private:
-	bool adjust_colors( const view& scene, float* tcolor, size_t pcount);
+	bool adjust_colors( const view& scene, double* tcolor, size_t pcount);
 	void extrude(const view& scene,
 			std::vector<vector>& faces_pos,
 			std::vector<vector>& faces_normals,
-			std::vector<float>& faces_colors, bool make_faces);
+			std::vector<vector>& faces_colors, bool make_faces);
 	void render_end(const vector V, const vector current,
 			const double c11, const double c12, const double c21, const double c22,
-			const vector xrot, const vector y, const float* current_color, bool show_first,
+			const vector xrot, const vector y, const vector current_color, bool show_first,
 			std::vector<vector>& faces_pos,
 			std::vector<vector>& faces_normals,
-			std::vector<float>& faces_colors, bool make_faces);
+			std::vector<vector>& faces_colors, bool make_faces);
 
 	vector smoothing(const vector& a, const vector& b);
 

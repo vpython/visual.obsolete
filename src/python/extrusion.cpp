@@ -511,7 +511,7 @@ extrusion::get_smooth() {
 }
 
 bool
-extrusion::monochrome(float* tcolor, size_t pcount)
+extrusion::monochrome(double* tcolor, size_t pcount)
 {
 	rgb first_color( tcolor[0], tcolor[1], tcolor[2]);
 	size_t nn;
@@ -642,7 +642,7 @@ extrusion::grow_extent( extent& world)
 }
 
 bool
-extrusion::adjust_colors( const view& scene, float* tcolor, size_t pcount)
+extrusion::adjust_colors( const view& scene, double* tcolor, size_t pcount)
 {
 	rgb rendered_color;
 	bool mono = monochrome(tcolor, pcount);
@@ -705,7 +705,7 @@ extrusion::gl_render( const view& scene)
 {
 	std::vector<vector> faces_pos;
 	std::vector<vector> faces_normals;
-	std::vector<float> faces_colors;
+	std::vector<vector> faces_colors;
 	clear_gl_error();
 	gl_enable_client vertex_arrays( GL_VERTEX_ARRAY);
 	gl_enable_client normal_arrays( GL_NORMAL_ARRAY);
@@ -724,33 +724,33 @@ boost::python::object extrusion::faces_render() {
 	double gcf = 1.0;
 	view scene( vector(0,0,1), vector(0,0,0), 400,
 		400, false, gcf, vector(gcf,gcf,gcf), false, glext);
-
 	std::vector<vector> faces_pos;
 	std::vector<vector> faces_normals;
-	std::vector<float> faces_colors;
+	std::vector<vector> faces_colors;
 	extrude( scene, faces_pos, faces_normals, faces_colors, true);
 	std::vector<npy_intp> dimens(2);
 	size_t d = faces_pos.size();
 	dimens[0] = 3*d; // make 3d by 3 array of doubles (pos, normals, colors)
 	dimens[1] = 3;
 	array faces_data = makeNum(dimens);
+	// memmove( data(0), data(old_len-new_len), sizeof(CTYPE) * new_len * 3 );
+
 	for(size_t i=0; i<d; i++){
 		faces_data[i] = faces_pos[i];
 		faces_data[i+d] = faces_normals[i];
-		faces_data[i+2*d][0] = faces_colors[3*i  ];
-		faces_data[i+2*d][1] = faces_colors[3*i+1];
-		faces_data[i+2*d][2] = faces_colors[3*i+2];
+		faces_data[i+2*d] = faces_colors[i];
 	}
+
 	return faces_data;
 }
 
 void
 extrusion::render_end(const vector V, const vector current,
 		const double c11, const double c12, const double c21, const double c22,
-		const vector xrot, const vector y, const float* current_color, bool show_first,
+		const vector xrot, const vector y, const vector current_color, bool show_first,
 		std::vector<vector>& faces_pos,
 		std::vector<vector>& faces_normals,
-		std::vector<float>& faces_colors, bool make_faces)
+		std::vector<vector>& faces_colors, bool make_faces)
 {
 	// if (make_faces && show_first), make the first set of triangles else make the second set
 
@@ -762,29 +762,26 @@ extrusion::render_end(const vector V, const vector current,
 	for (size_t c=0; c<npstrips; c++) {
 		size_t nd = 2*pstrips[2*c+2]; // number of doubles in this strip
 		size_t base = 2*pstrips[2*c+3]; // initial (x,y) = (strips[base], strips[base+1])
-		std::vector<vector> tristrip(nd/2), snormals(nd/2);
-		std::vector<float> endcolors(3*nd/2);
+		std::vector<vector> tristrip(nd/2), snormals(nd/2), endcolors(nd/2);
 
 		for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
 			tx = c11*strips[base+pt] + c12*strips[base+pt+1];
 			ty = c21*strips[base+pt] + c22*strips[base+pt+1];
 			tristrip[n] = current + tx*xrot + ty*y;
 			snormals[n] = V;
-			endcolors[3*n  ] = current_color[0];
-			endcolors[3*n+1] = current_color[1];
-			endcolors[3*n+2] = current_color[2];
+			endcolors[n] = current_color;
 		}
 
 		if (!make_faces) {
 			glNormalPointer( GL_DOUBLE, 0, &snormals[0]);
 			glVertexPointer(3, GL_DOUBLE, 0, &tristrip[0]);
-			glColorPointer(3, GL_FLOAT, 0, &endcolors[0]);
+			glColorPointer(3, GL_DOUBLE, 0, &endcolors[0]);
 			// nd doubles, nd/2 vertices
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
 		} else if (show_first){
 			for (size_t pt=0, n=0; pt<(nd-4); pt+=2, n++) {
 				faces_normals.insert(faces_normals.end(), snormals.begin()+n, snormals.begin()+n+3);
-				faces_colors.insert(faces_colors.end(), endcolors.begin()+3*n, endcolors.begin()+3*n+9);
+				faces_colors.insert(faces_colors.end(), endcolors.begin()+n, endcolors.begin()+n+3);
 				if (n % 2) { // if odd
 					faces_pos.push_back(tristrip[n]);
 					faces_pos.push_back(tristrip[n+2]);
@@ -819,7 +816,7 @@ extrusion::render_end(const vector V, const vector current,
 		} else if (!show_first){
 			for (size_t pt=0, n=0; pt<(nd-4); pt+=2, n++) {
 				faces_normals.insert(faces_normals.end(), snormals.begin()+n, snormals.begin()+n+3);
-				faces_colors.insert(faces_colors.end(), endcolors.begin()+3*n, endcolors.begin()+3*n+9);
+				faces_colors.insert(faces_colors.end(), endcolors.begin()+n, endcolors.begin()+n+3);
 				if (n % 2) { // if odd
 					faces_pos.push_back(tristrip[n]);
 					faces_pos.push_back(tristrip[n+2]);
@@ -836,7 +833,7 @@ void
 extrusion::extrude( const view& scene,
 		std::vector<vector>& faces_pos,
 		std::vector<vector>& faces_normals,
-		std::vector<float>& faces_colors, bool make_faces)
+		std::vector<vector>& faces_colors, bool make_faces)
 {
 	// TODO: A twist of 0.1 shows surface breaks, even with very small smooth....?
 
@@ -932,8 +929,8 @@ extrusion::extrude( const view& scene,
 	const int LINE_LENGTH = 1000; // The maximum number of points to display.
 	// Data storage for the position and color data (plus room for extra point in the case of a closed contour)
 	double spos[3*(LINE_LENGTH+3+3+3)]; // room for extra point if startcorner and endcorner in same step
+	double tcolor[3*(LINE_LENGTH+3+3+3)];
 	float tscale[3*(LINE_LENGTH+3+3+3)]; // scale factors, and twist
-	float tcolor[3*(LINE_LENGTH+3+3+3)]; // opacity not yet implemented for extrusions
 	float fstep = (float)(count-1)/(float)(LINE_LENGTH-1);
 	if (fstep < 1.0F) fstep = 1.0F;
 	size_t iptr=0, iptr3, pcount=0;
@@ -1041,8 +1038,7 @@ extrusion::extrude( const view& scene,
 	// 3 positions and normals per triangle, and the number of triangles = 2 times the number of points in the 2D shape,
 	// times 2 for front and back of each triangle. Allocate space to hold the largest contour:
 	size_t maxtriangles = 12*maxcontour;
-	std::vector<vector> tris(maxtriangles), normals(maxtriangles);
-	std::vector<float> tcolors(3*maxtriangles);
+	std::vector<vector> tris(maxtriangles), normals(maxtriangles), tcolors(maxtriangles);
 
 	vector xaxis, yaxis; // local unit-vector axes on the 2D shape
 	vector prevxaxis, prevyaxis; // local unit-vector axes on the 2D shape on preceding segment
@@ -1059,13 +1055,13 @@ extrusion::extrude( const view& scene,
 
 	// pos and color iterators
 	v_i = spos;
-	const float* c_i = tcolor;
+	const double* c_i = tcolor;
 	const float* s_i = tscale;
 
-	const float* current_color = tcolor;
-	const float* prev_color = tcolor;
-	const float* initial_face_color = c_i;
-	const float* final_face_color = c_i+3*(pcount-1);
+	vector current_color = vector(tcolor[0], tcolor[1], tcolor[2]);
+	vector prev_color = current_color;
+	const vector initial_face_color = vector(c_i[0], c_i[1], c_i[2]);
+	const vector final_face_color = vector(c_i[3*(pcount-1)], c_i[3*(pcount-1)+1], c_i[3*(pcount-1)+2]);
 
 	if (!make_faces) bool mono = adjust_colors( scene, tcolor, pcount);
 	bool closed = false;
@@ -1136,7 +1132,7 @@ extrusion::extrude( const view& scene,
 		if (show_end_face && (!closed || (endcorner < lastpoint))) triangles += endtriangles;
 		faces_pos.reserve(3*triangles); // 3D vectors
 		faces_normals.reserve(3*triangles); // 3D vectors
-		faces_colors.reserve(3*3*triangles); // floats
+		faces_colors.reserve(3*triangles); // 3D vectors
 	}
 
 	bool delay_initial_face = false; // True if delay rendering of initial face (waiting for normal info)
@@ -1146,7 +1142,7 @@ extrusion::extrude( const view& scene,
 	for (size_t corner = 0; corner <= endcorner; ++corner, v_i += 3, c_i += 3, s_i += 3) {
 		size_t icorner = corner;
 		current = vector(&v_i[0]);
-		current_color = c_i;
+		current_color = vector(c_i[0], c_i[1], c_i[2]);
 
 		// A is a unit vector pointing from the current location to the next location along the curve.
 		// lastA is a unit vector pointing from the previous location to the current location.
@@ -1155,7 +1151,7 @@ extrusion::extrude( const view& scene,
 		const double* tv_i = v_i;
 		for (size_t tcorner=corner; tcorner <= endcorner; ++tcorner, tv_i += 3) {
 			if (corner == startcorner) {
-				current_color = c_i;
+				current_color = vector(c_i[0], c_i[1], c_i[2]);
 			}
 			if (!closed && (corner == lastpoint)) {
 				// if (!closed && corner == 0), lastA == (0,0,0) by initialization of lastA.
@@ -1328,7 +1324,7 @@ extrusion::extrude( const view& scene,
 
 			if ((startcorner >= icorner && startcorner <= corner) && (zerodepth || ((!delay_initial_face) && show_start))) {
 				// Use pstrips to paint both sides of the first surface
-				const float* icolor = current_color;
+				vector icolor = current_color;
 				if (startcorner == 0) icolor = initial_face_color;
 				render_end(-bisecting_plane_normal, current, c11, c12, c21, c22, xrot, y, icolor, true,
 						faces_pos, faces_normals, faces_colors, make_faces);
@@ -1360,7 +1356,7 @@ extrusion::extrude( const view& scene,
 					xrot = xrot.rotate(lastalpha,y).norm()*scene.gcf;
 				}
 				// Use pstrips to paint both sides of the last surface
-				const float* icolor = current_color;
+				vector icolor = current_color;
 				if (corner == lastpoint) icolor = final_face_color;
 				render_end(lastnormal, current, c11, c12, c21, c22,
 						xrot, y, icolor, false, faces_pos, faces_normals, faces_colors, make_faces);
@@ -1371,11 +1367,11 @@ extrusion::extrude( const view& scene,
 				if (!make_faces) {
 					glVertexPointer(3, GL_DOUBLE, 0, &tris[0]);
 					glNormalPointer( GL_DOUBLE, 0, &normals[0]);
-					glColorPointer(3, GL_FLOAT, 0, &tcolors[0]);
+					glColorPointer(3, GL_DOUBLE, 0, &tcolors[0]);
 				}
 
-				double r_old=prev_color[0], g_old=prev_color[1], b_old=prev_color[2]; // color at previous location along the curve
-				double r_new=current_color[0], g_new=current_color[1], b_new=current_color[2];    // color at current location along the curve
+				//vector color_old = prev_color; // color at previous location along the curve
+				//vector color_new = current_color; // color at current location along the curve
 				double v0x, v0y, v1x, v1y, prevv0x, prevv0y, prevv1x, prevv1y;
 				// The following nested for loops is (necessarily) the same as that used to build the normals2D array.
 				for (size_t c=0, nbase=0; c < ncontours; c++) {
@@ -1407,6 +1403,14 @@ extrusion::extrude( const view& scene,
 						tris[3*nd+i+5] = tris[i+4] = current +     xrot*v1x     + y*v1y;
 						tris[3*nd+i+4] = tris[i+5] = tris[i+2];
 
+						tcolors[3*nd+i+1] = tcolors[i  ] = prev_color;
+						tcolors[3*nd+i  ] = tcolors[i+1] = prev_color;
+						tcolors[3*nd+i+2] = tcolors[i+2] = current_color;
+						tcolors[3*nd+i+3] = tcolors[i+3] = tcolors[i+1];
+						tcolors[3*nd+i+5] = tcolors[i+4] = current_color;
+						tcolors[3*nd+i+4] = tcolors[i+5] = tcolors[i+2];
+
+						/*
 						tcolors[3*i  ] = tcolors[3*(i+1)  ] = tcolors[3*(i+3)  ] = r_old;
 						tcolors[3*i+1] = tcolors[3*(i+1)+1] = tcolors[3*(i+3)+1] = g_old;
 						tcolors[3*i+2] = tcolors[3*(i+1)+2] = tcolors[3*(i+3)+2] = b_old;
@@ -1422,6 +1426,7 @@ extrusion::extrude( const view& scene,
 						tcolors[3*(3*nd+i+2)  ] = tcolors[3*(3*nd+i+4)  ] = tcolors[3*(3*nd+i+5)  ] = r_new;
 						tcolors[3*(3*nd+i+2)+1] = tcolors[3*(3*nd+i+4)+1] = tcolors[3*(3*nd+i+5)+1] = g_new;
 						tcolors[3*(3*nd+i+2)+2] = tcolors[3*(3*nd+i+4)+2] = tcolors[3*(3*nd+i+5)+2] = b_new;
+						*/
 
 						normals[i  ] = smoothing(     s_i[1]*xaxis*normals2D[nbase  ] +      s_i[0]*yaxis*normals2D[nbase+1],
 												 s_i[-2]*prevxaxis*normals2D[nbase  ] + s_i[-3]*prevyaxis*normals2D[nbase+1]);
@@ -1446,10 +1451,11 @@ extrusion::extrude( const view& scene,
 						normals[3*nd+i+3] = -normals[i+3];
 						normals[3*nd+i+5] = -normals[i+4];
 						normals[3*nd+i+4] = -normals[i+5];
+
 						if (make_faces) {
 							faces_pos.insert(faces_pos.end(), tris.begin()+i, tris.begin()+i+6);
 							faces_normals.insert(faces_normals.end(), normals.begin()+i, normals.begin()+i+6);
-							faces_colors.insert(faces_colors.end(), tcolors.begin()+3*i, tcolors.begin()+3*i+18);
+							faces_colors.insert(faces_colors.end(), tcolors.begin()+i, tcolors.begin()+i+6);
 						}
 					}
 
@@ -1475,7 +1481,7 @@ extrusion::extrude( const view& scene,
 		lastA = A;
 		lastalpha = alpha;
 		prev = current;
-		prev_color = c_i;
+		prev_color = vector(c_i[0], c_i[1], c_i[2]);
 		prevsmoothed = smoothed;
 	}
 }
