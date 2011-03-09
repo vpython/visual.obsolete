@@ -729,18 +729,13 @@ boost::python::object extrusion::faces_render() {
 	std::vector<vector> faces_colors;
 	extrude( scene, faces_pos, faces_normals, faces_colors, true);
 	std::vector<npy_intp> dimens(2);
-	size_t d = faces_pos.size();
-	dimens[0] = 3*d; // make 3d by 3 array of doubles (pos, normals, colors)
+	size_t d = faces_pos.size(); // number of pos vectors (3*d doubles)
+	dimens[0] = 3*d; // make array of vectors 3d long (pos, normals, colors)
 	dimens[1] = 3;
 	array faces_data = makeNum(dimens);
-	// memmove( data(0), data(old_len-new_len), sizeof(CTYPE) * new_len * 3 );
-
-	for(size_t i=0; i<d; i++){
-		faces_data[i] = faces_pos[i];
-		faces_data[i+d] = faces_normals[i];
-		faces_data[i+2*d] = faces_colors[i];
-	}
-
+	memmove( data(faces_data), &faces_pos[0], sizeof(vector)*d );
+	memmove( data(faces_data)+sizeof(vector)*d, &faces_normals[0], sizeof(vector)*d );
+	memmove( data(faces_data)+sizeof(vector)*2*d, &faces_colors[0], sizeof(vector)*d );
 	return faces_data;
 }
 
