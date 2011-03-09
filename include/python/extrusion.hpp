@@ -127,7 +127,7 @@ class extrusion : public arrayprim_color
 			std::vector<float>& faces_colors, bool make_faces);
 	void render_end(const vector V, const vector current,
 			const double c11, const double c12, const double c21, const double c22,
-			const vector xrot, const vector y, const float* current_color,
+			const vector xrot, const vector y, const float* current_color, bool show_first,
 			std::vector<vector>& faces_pos,
 			std::vector<vector>& faces_normals,
 			std::vector<float>& faces_colors, bool make_faces);
@@ -138,9 +138,10 @@ class extrusion : public arrayprim_color
 
 	// contours are flattened N*2 arrays of points describing the 2D surface, one after another.
 	// pcontours[0] is (number of contours, closed), where closed=1 if closed contour, 0 if not
-	// pcontours[2*i+2] points to (length of ith contour, starting location of ith contour in contours).
+	// pcontours[2*i+2] is (length of ith contour, starting location of ith contour in contours).
 	// strips are flattened N*2 arrays of points describing strips that span the "solid" part of the 2D surface.
-	// pstrips[2*i] points to (length of ith strip, starting location of ith strip in strips).
+	// pstrips[0] is (number of strips, closed)
+	// pstrips[2*i] is (length of ith strip, starting location of ith strip in strips).
 	std::vector<npy_float64> contours, strips;
 	std::vector<npy_int32> pcontours, pstrips;
 	std::vector<double> normals2D; // [(nx0,ny0), (nx1,ny1)], [(nx1,ny1), (nx2,ny2)], etc. normals for 2D shape
