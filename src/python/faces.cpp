@@ -285,18 +285,19 @@ faces::gl_render( const view& scene)
 
 	glNormalPointer( GL_DOUBLE, 0, normal.data() );
 
-	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
+	vector gcfvec = scene.gcfvec;
+
+	if ((scene.gcf != 1) || (gcfvec[0] != gcfvec[1])) {
 		std::vector<vector> tmp( count);
 		spos.swap( tmp);
 		const double* pos_i = pos.data();
-		for (std::vector<vector>::iterator i = spos.begin(); i != spos.end(); ++i) {
-			*i = vector(pos_i).scale(scene.gcfvec);
-			pos_i += 3;
+		for (std::vector<vector>::iterator i = spos.begin(); i != spos.end(); ++i, pos_i+=3) {
+			*i = vector(pos_i).scale(gcfvec);
 		}
 		glVertexPointer( 3, GL_DOUBLE, 0, &*spos.begin());
-	}
-	else
+	} else {
 		glVertexPointer( 3, GL_DOUBLE, 0, pos.data() );
+	}
 
 	if (scene.anaglyph) {
 		std::vector<rgb> tmp( count);

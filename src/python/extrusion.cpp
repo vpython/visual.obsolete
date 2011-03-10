@@ -26,7 +26,7 @@ using boost::python::tuple;
 
 extrusion::extrusion()
 	: antialias( true), up(vector(0,1,0)), smooth(0.95),
-	  show_start_face(true), show_end_face(true),
+	  show_start_face(true), show_end_face(true), twosided(true),
 	  start(0), end(-1), initial_twist(0.0), center(vector(0,0,0)),
 	  first_normal(vector(0,0,0)), last_normal(vector(0,0,0))
 {
@@ -481,6 +481,16 @@ extrusion::get_end() {
 }
 
 void
+extrusion::set_twosided(const bool n_twosided){
+	twosided = n_twosided;
+}
+
+bool
+extrusion::get_twosided() {
+	return twosided;
+}
+
+void
 extrusion::set_show_start_face(const bool n_show_start_face) {
 	show_start_face = n_show_start_face;
 }
@@ -767,7 +777,7 @@ extrusion::render_end(const vector V, const vector current,
 			endcolors[n] = current_color;
 		}
 
-		if (!make_faces) {
+		if (!make_faces && show_first) {
 			glNormalPointer( GL_DOUBLE, 0, &snormals[0]);
 			glVertexPointer(3, GL_DOUBLE, 0, &tristrip[0]);
 			glColorPointer(3, GL_DOUBLE, 0, &endcolors[0]);
@@ -805,7 +815,7 @@ extrusion::render_end(const vector V, const vector current,
 			snormals[n] = -V;
 		}
 
-		if (!make_faces) {
+		if (!make_faces && !show_first) {
 			// nd doubles, nd/2 vertices
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
 		} else if (!show_first){
@@ -1391,37 +1401,20 @@ extrusion::extrude( const view& scene,
 						v0y =     c21*contours[b0]     + c22*contours[b1];
 						v1x =     c11*contours[b2]     + c12*contours[b3];
 						v1y =     c21*contours[b2]     + c22*contours[b3];
-						tris[3*nd+i+1] = tris[i  ] = prev    + prevxrot*prevv0x + prevy*prevv0y;
-						tris[3*nd+i  ] = tris[i+1] = prev    + prevxrot*prevv1x + prevy*prevv1y;
-						tris[3*nd+i+2] = tris[i+2] = current +     xrot*v0x     + y*v0y;
-						tris[3*nd+i+3] = tris[i+3] = tris[i+1];
-						tris[3*nd+i+5] = tris[i+4] = current +     xrot*v1x     + y*v1y;
-						tris[3*nd+i+4] = tris[i+5] = tris[i+2];
 
-						tcolors[3*nd+i+1] = tcolors[i  ] = prev_color;
-						tcolors[3*nd+i  ] = tcolors[i+1] = prev_color;
-						tcolors[3*nd+i+2] = tcolors[i+2] = current_color;
-						tcolors[3*nd+i+3] = tcolors[i+3] = tcolors[i+1];
-						tcolors[3*nd+i+5] = tcolors[i+4] = current_color;
-						tcolors[3*nd+i+4] = tcolors[i+5] = tcolors[i+2];
+						tris[i  ] = prev    + prevxrot*prevv0x + prevy*prevv0y;
+						tris[i+1] = prev    + prevxrot*prevv1x + prevy*prevv1y;
+						tris[i+2] = current +     xrot*v0x     + y*v0y;
+						tris[i+3] = tris[i+1];
+						tris[i+4] = current +     xrot*v1x     + y*v1y;
+						tris[i+5] = tris[i+2];
 
-						/*
-						tcolors[3*i  ] = tcolors[3*(i+1)  ] = tcolors[3*(i+3)  ] = r_old;
-						tcolors[3*i+1] = tcolors[3*(i+1)+1] = tcolors[3*(i+3)+1] = g_old;
-						tcolors[3*i+2] = tcolors[3*(i+1)+2] = tcolors[3*(i+3)+2] = b_old;
-
-						tcolors[3*(i+2)  ] = tcolors[3*(i+4)  ] = tcolors[3*(i+5)  ] = r_new;
-						tcolors[3*(i+2)+1] = tcolors[3*(i+4)+1] = tcolors[3*(i+5)+1] = g_new;
-						tcolors[3*(i+2)+2] = tcolors[3*(i+4)+2] = tcolors[3*(i+5)+2] = b_new;
-
-						tcolors[3*(3*nd+i)  ] = tcolors[3*(3*nd+i+1)  ] = tcolors[3*(3*nd+i+3)  ] = r_old;
-						tcolors[3*(3*nd+i)+1] = tcolors[3*(3*nd+i+1)+1] = tcolors[3*(3*nd+i+3)+1] = g_old;
-						tcolors[3*(3*nd+i)+2] = tcolors[3*(3*nd+i+1)+2] = tcolors[3*(3*nd+i+3)+2] = b_old;
-
-						tcolors[3*(3*nd+i+2)  ] = tcolors[3*(3*nd+i+4)  ] = tcolors[3*(3*nd+i+5)  ] = r_new;
-						tcolors[3*(3*nd+i+2)+1] = tcolors[3*(3*nd+i+4)+1] = tcolors[3*(3*nd+i+5)+1] = g_new;
-						tcolors[3*(3*nd+i+2)+2] = tcolors[3*(3*nd+i+4)+2] = tcolors[3*(3*nd+i+5)+2] = b_new;
-						*/
+						tcolors[i  ] = prev_color;
+						tcolors[i+1] = prev_color;
+						tcolors[i+2] = current_color;
+						tcolors[i+3] = tcolors[i+1];
+						tcolors[i+4] = current_color;
+						tcolors[i+5] = tcolors[i+2];
 
 						normals[i  ] = smoothing(     s_i[1]*xaxis*normals2D[nbase  ] +      s_i[0]*yaxis*normals2D[nbase+1],
 												 s_i[-2]*prevxaxis*normals2D[nbase  ] + s_i[-3]*prevyaxis*normals2D[nbase+1]);
@@ -1439,13 +1432,29 @@ extrusion::extrude( const view& scene,
 
 						normals[i+5] = normals[i+2]; // i+2 and i+5 are the same location
 
-						// Normals for other sides of triangles:
-						normals[3*nd+i+1] = -normals[i  ];
-						normals[3*nd+i  ] = -normals[i+1];
-						normals[3*nd+i+2] = -normals[i+2];
-						normals[3*nd+i+3] = -normals[i+3];
-						normals[3*nd+i+5] = -normals[i+4];
-						normals[3*nd+i+4] = -normals[i+5];
+						if (!make_faces && twosided) {
+							// vertices, normals, and colors for other side
+							tris[3*nd+i+1] = tris[i  ];
+							tris[3*nd+i  ] = tris[i+1];
+							tris[3*nd+i+2] = tris[i+2];
+							tris[3*nd+i+3] = tris[i+3];
+							tris[3*nd+i+5] = tris[i+4];
+							tris[3*nd+i+4] = tris[i+5];
+
+							normals[3*nd+i+1] = -normals[i  ];
+							normals[3*nd+i  ] = -normals[i+1];
+							normals[3*nd+i+2] = -normals[i+2];
+							normals[3*nd+i+3] = -normals[i+3];
+							normals[3*nd+i+5] = -normals[i+4];
+							normals[3*nd+i+4] = -normals[i+5];
+
+							tcolors[3*nd+i+1] = tcolors[i  ];
+							tcolors[3*nd+i  ] = tcolors[i+1];
+							tcolors[3*nd+i+2] = tcolors[i+2];
+							tcolors[3*nd+i+3] = tcolors[i+3];
+							tcolors[3*nd+i+5] = tcolors[i+4];
+							tcolors[3*nd+i+4] = tcolors[i+5];
+						}
 
 						if (make_faces) {
 							faces_pos.insert(faces_pos.end(), tris.begin()+i, tris.begin()+i+6);
@@ -1457,7 +1466,11 @@ extrusion::extrude( const view& scene,
 					if (!make_faces) {
 						// nd doubles, nd/2 vertices, 2 triangles per vertex,
 						//    3 points per triangle, 2 sides, so 6*nd vertices per extrusion segment
-						glDrawArrays(GL_TRIANGLES, 0, 6*nd);
+						if (twosided) {
+							glDrawArrays(GL_TRIANGLES, 0, 6*nd);
+						} else {
+							glDrawArrays(GL_TRIANGLES, 0, 3*nd);
+						}
 					}
 				}
 			}

@@ -37,6 +37,8 @@ class extrusion : public arrayprim_color
 
 	double smooth; // smoothing of normals; default is 0.95 (cosine of 18 degrees)
 
+	bool twosided; // default is true (except for faces_render)
+
 	// scale is an array of scale and twist information for the extrusion segments.
 	// Each triple is < scalex, scaley, twist >
 	arrayprim_array<double> scale;
@@ -90,6 +92,9 @@ class extrusion : public arrayprim_color
 
 	void set_smooth(const double);
 	double get_smooth();
+
+	void set_twosided(const bool); // default is true; faces_render is always one-sided
+	bool get_twosided();
 
 	void set_twist( const double_array& twist);
 	void set_twist_d( const double twist);
