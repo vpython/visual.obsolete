@@ -777,7 +777,7 @@ extrusion::render_end(const vector V, const vector current,
 			endcolors[n] = current_color;
 		}
 
-		if (!make_faces && show_first) {
+		if (!make_faces) {
 			glNormalPointer( GL_DOUBLE, 0, &snormals[0]);
 			glVertexPointer(3, GL_DOUBLE, 0, &tristrip[0]);
 			glColorPointer(3, GL_DOUBLE, 0, &endcolors[0]);
@@ -815,7 +815,7 @@ extrusion::render_end(const vector V, const vector current,
 			snormals[n] = -V;
 		}
 
-		if (!make_faces && !show_first) {
+		if (!make_faces) {
 			// nd doubles, nd/2 vertices
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
 		} else if (!show_first){
