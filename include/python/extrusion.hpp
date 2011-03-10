@@ -108,7 +108,7 @@ class extrusion : public arrayprim_color
 	void set_yscale_d( const double scale);
 	boost::python::object get_scale();
 
-	boost::python::object faces_render();
+	boost::python::object _faces_render();
 
 	void set_contours( const array&, const array&, const array&, const array& );
 

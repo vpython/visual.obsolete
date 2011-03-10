@@ -728,7 +728,7 @@ extrusion::gl_render( const view& scene)
 	check_gl_error();
 }
 
-boost::python::object extrusion::faces_render() {
+boost::python::object extrusion::_faces_render() {
 	// Mock up scene machinery:
 	gl_extensions glext;
 	double gcf = 1.0;
