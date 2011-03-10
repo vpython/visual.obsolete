@@ -1,3 +1,4 @@
+
 from __future__ import division
 from visual import *
 from time import clock
@@ -179,6 +180,7 @@ Make a 2D shape with easy-to-use tools that are provided.
 """
     if pages.pause(): return
     L2.text = "Then extrude this 2D shape along a path."
+    curve(frame=f, pos=path, color=color.blue)
     if pages.pause(): return
     for i in range(1,len(E.pos)):
         rate(20)
