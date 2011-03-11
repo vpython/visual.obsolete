@@ -285,6 +285,41 @@ faces::gl_render( const view& scene)
 
 	glNormalPointer( GL_DOUBLE, 0, normal.data() );
 
+	/*
+	// This attempt to minimize loop overhead made no difference in faces rendering speed
+	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
+		double gx = scene.gcfvec[0];
+		double gy = scene.gcfvec[1];
+		double gz = scene.gcfvec[2];
+		std::vector<vector> tmp( count);
+		spos.swap( tmp);
+		const double* p = pos.data();
+		double* s = &spos[0][0];
+		size_t i;
+		for (i=0; i<(3*(count-10)); ) { // reduce loop overhead to a minimum
+			s[i   ] = gx*p[i   ]; s[i+1 ] = gy*p[i+1 ]; s[i+2 ] = gz*p[i+2];
+			s[i+3 ] = gx*p[i+3 ]; s[i+4 ] = gy*p[i+4 ]; s[i+5 ] = gz*p[i+5];
+			s[i+6 ] = gx*p[i+6 ]; s[i+7 ] = gy*p[i+7 ]; s[i+8 ] = gz*p[i+8];
+			s[i+9 ] = gx*p[i+9 ]; s[i+10] = gy*p[i+10]; s[i+11] = gz*p[i+11];
+			s[i+12] = gx*p[i+12]; s[i+13] = gy*p[i+13]; s[i+14] = gz*p[i+14];
+			s[i+15] = gx*p[i+15]; s[i+16] = gy*p[i+16]; s[i+17] = gz*p[i+17];
+			s[i+18] = gx*p[i+18]; s[i+19] = gy*p[i+19]; s[i+20] = gz*p[i+20];
+			s[i+21] = gx*p[i+21]; s[i+22] = gy*p[i+22]; s[i+23] = gz*p[i+23];
+			s[i+24] = gx*p[i+24]; s[i+25] = gy*p[i+25]; s[i+26] = gz*p[i+26];
+			s[i+27] = gx*p[i+27]; s[i+28] = gy*p[i+28]; s[i+29] = gz*p[i+29];
+			i += 30;
+		}
+		for (; i<3*count;) {
+			s[i] = gx*p[i]; s[i+1] = gy*p[i+1]; s[i+2] = gz*p[i+2];
+			i += 3;
+		}
+
+		glVertexPointer( 3, GL_DOUBLE, 0, s);
+	}
+	else
+		glVertexPointer( 3, GL_DOUBLE, 0, pos.data() );
+	*/
+
 	if (scene.gcf != 1.0 || (scene.gcfvec[0] != scene.gcfvec[1])) {
 		std::vector<vector> tmp( count);
 		spos.swap( tmp);
