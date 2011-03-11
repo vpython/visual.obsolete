@@ -111,7 +111,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p align="center" class="program">ex = extrusion(pos=..., shape=...)</p>
 <p class="Normal"> The <span class="attribute">pos</span> attribute is a list of points like the <span class="attribute">pos</span> attribute of a curve object. Various <a href="#path_library"><strong>tools</strong></a> simplify the creation of complicated paths. The <span class="attribute">shape</span> attribute is a Polygon object with contours describing a 2D shape that can contain holes. Various <a href="#shape_library"><strong>tools</strong></a> simplify the creation of complicated 2D shapes. There are options to vary the size (<span class="attribute">scale</span>, <span class="attribute">xscale</span>, <span class="attribute">yscale</span>) and <span class="attribute">twist</span> of the 2D shape along the extrusion path.</p>
 <blockquote>
-        <p class="Normal"><strong>        Before studying the following  details, please run the example program</strong> <strong>extrusion_overview.py, which is  included in the VPython example programs. </strong><br />
+        <p class="Normal"><strong>        Before studying the following  details, please run the example program</strong> <strong>extrusion_overview.py, which is  included in the VPython example programs. </strong>Later, see the example program extrusion_samples.py, which gives more complex examples.<br />
           </p>
         </blockquote>
 <p class="Normal">          The program extrusion_overview.py offers an interactive tutorial on the main features of the extrusion object. Here is a <a href="extrusion_overview.py" target="_blank"><strong>copy</strong></a> of that program.</p>
@@ -129,6 +129,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
   <p class="Normal"><strong><font color="#0000a0"><a href="#numpy">Using numpy to manipulate array attributes</a></font></strong></p>
   <p class="Normal"><strong><font color="#0000a0"><a href="#append">Adding more points to an extrusion path</a></font></strong></p>
   <p class="Normal"><strong><font color="#0000a0"><a href="#colors">Interpolation of colors</a></font></strong></p>
+  <p class="Normal"><strong><a href="#speed">Speed issues</a></strong></p>
   <p class="Normal"><strong><font color="#0000a0"><a href="#skipping">Skipping points</a></font></strong></p>
 </blockquote>
 <p class="Normal"><strong><font color="#0000a0"><a name="basics" id="basics"></a>The three steps to make an extrusion</font></strong></p>
@@ -402,6 +403,18 @@ yscale = [0.6, 1.0) # yscale for points 0 and 1</p>
               <td width="685"><div align="center"><span class="Normal"><img src="images/colors_abutting.jpg" width="312" height="200" alt="colors abutting" /></span></div></td>
             </tr>
           </table>
+<p class="Normal"><strong><font color="#0000a0"><a name="speed" id="numpy2"></a>Speed issues</font></strong></p>
+  <p class="Normal">An extrusion is a complex object that can take longer to render onto the screen than other objects, due to the many calculations required to generate the triangles and normals required for the display. Like all other objects (except for faces), an extrusion object is normally two-sided (so that you see interior &quot;walls&quot; if you zoom inside the object). One  way to get a significant speed-up is to make the object not be two-sided:</p>
+  <p class="program">extrusion(.... twosided=False)</p>
+  <p class="Normal">It is possible to gain up to a factor of two in display speed by converting an extrusion to a faces object, though this has the disadvantage that you lose the ability to change the extrusion attributes dynamically, and the faces object uses much more memory than the equivalent extrusion object. Here is how to carry out the conversion:</p>
+  <p class="program">E = extrusion(.....)<br />
+    F = E.create_faces() #  produces an equivalent faces object</p>
+  <p class="Normal">The conversion routine makes the extrusion object invisible and by default destroys its contents. If you wish to keep the extrusion object for later modification, say <span class="code"><strong>E.create(keep=True)</strong></span>. </p>
+  <p class="Normal">The effect on the speed depends on the details of the extrusion object, If <strong>scene.show_rendertime = True</strong> you can see how much time is required to render a scene, both before and after conversion.</p>
+  <p class="Normal">The following statement provides the <span class="attribute">pos</span>, <span class="attribute">normal</span>, and <span class="attribute">color</span> information needed for creating a faces object:</p>
+  <p class="program">(pos, normal, color) = E.get_faces()  </p>
+  <p class="Normal">The <strong>create_faces()</strong> function uses the <strong>get_faces()</strong> function but also copies into the faces object the <span class="attribute">frame</span>, <span class="attribute">material</span>, and <span class="attribute">up</span> attributes of the extrusion object, makes the extrusion object invisible, and destroys its contents (unless you specify that keep=True).<br />
+</p>
   <p class="program"></p>
   <p class="Normal"><strong><font color="#0000a0"><a name="skipping" id="skipping"></a>Skipping points</font></strong></p>
   <p class="Normal">Technical note: No matter how many points are in

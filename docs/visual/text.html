@@ -205,6 +205,17 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
               for f in fonts:
               <br />
             &nbsp;&nbsp;&nbsp;&nbsp;print(f)</p>
+            <p class="Normal"><strong><font color="#0000a0">Speed issues</font></strong></p>
+            <p class="Normal">A text object is a complex object, based on the extrusion object, that can take longer to render onto the screen than other objects, due to the many calculations required to generate the triangles and normals required for the display. Like all other objects (except for faces), a text object is normally two-sided (so that you see interior &quot;walls&quot; if you zoom inside the object). One  way to get a significant speed-up is to make the object not be two-sided:</p>
+            <p class="program">text(.... twosided=False)</p>
+            <p class="Normal">A text object can be converted to a faces object, which ought to display faster, though with the disadvantage that you lose the ability to change the extrusion attributes dynamically, and the faces object uses much more memory than the equivalent text object. Moreover, for reasons that are not yet understood, the faces object may display <em>slower</em> than the original text object. Here is how to carry out the conversion:</p>
+      <p class="program">T = text(.....)<br />
+        F = T.create_faces() #  produces an equivalent faces object</p>
+            <p class="Normal">The conversion routine makes the text object invisible and by default destroys its contents. If you wish to keep the text object for later modification, say <span class="code"><strong>T.create(keep=True)</strong></span>. The faces object is  single-sided. If you wish to make it two-sided, execute <strong>F.twosided()</strong>.</p>
+            <p class="Normal">The effect on the speed depends on the details of the text object, If <strong>scene.show_rendertime = True</strong> you can see how much time is required to render a scene, both before and after conversion.</p>
+            <p class="Normal">The following statement provides the <span class="attribute">pos</span>, <span class="attribute">normal</span>, and <span class="attribute">color</span> information needed for creating a faces object:</p>
+            <p class="program">(pos, normal, color) = T.get_faces() </p>
+            <p class="Normal">The <strong>create_faces()</strong> function uses the <strong>get_faces()</strong> function but also copies into the faces object the <span class="attribute">frame</span>, <span class="attribute">material</span>, and <span class="attribute">up</span> attributes of the text object, makes the text object invisible, and destroys its contents (unless you specify that keep=True).</p>
             <p class="Normal">See description of <a href="options.html">Additional
                 Attributes</a> available for all 3D display objects.</p>
     <!-- InstanceEndEditable --></td>

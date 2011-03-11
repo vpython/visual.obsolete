@@ -124,6 +124,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           0 of triangle 0, t0v1 is vertex 1 of  triangle 0, etc. Other faces
           attributes are <font color="#FF0000">red</font>, <font color="#FF0000">green</font>,
           <font color="#FF0000">blue</font>, <font color="#FF0000">visible</font>, <font color="#FF0000">material</font>, <font color="#FF0000">frame</font>, and <font color="#FF0000">display</font>.</p>
+        <p class="Normal">Creating a faces object in terms of triangles and normals can be very tedious. A convenient way to create a faces object is to create an <a href="extrusion.html"><strong>extrusion</strong></a> or <a href="text.html"><strong>text</strong></a> object and then use the create_faces() function, as described in the documentation for extrusion and text.</p>
         <p class="Normal">Each face is a one-sided surface. Which side is illuminated is determined 
           by the &quot;winding&quot; order of the face. When you are looking at a face, 
           it is illuminated if the order of the vertices in the <span class="attribute">pos</span> list goes counter-clockwise. If you need the triangle to be visible from both 
@@ -135,7 +136,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           faces have a hard edge where they join. A soft edge can be produced by averaging 
           the normals to the two faces at their common vertices. The brightness of a 
           face is proportional to the cosine of the angle between the normal and the 
-          light. If you have created a faces object named myfaces without specifying normals, you can create normals perpendicular to all the faces with <font color="#FF0000">myfaces.make_normals()</font>. This function became available with VPython 5.3.</p>
+          light. If you have created a faces object named myfaces without specifying normals, you can create normals perpendicular to all the faces with <font color="#FF0000">myfaces.make_normals()</font>. </p>
         <p class="Normal">After creating a faces object named myfaces, <font color="#FF0000">myfaces.smooth()</font> will
           average similar normals at a vertex and make the object look smoother.
           The smoothing criterion is that normals will be averaged whose directions
@@ -144,8 +145,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           have nonzero normals before using the smooth function; a simple scheme
           is to use <font color="#FF0000">myfaces.make_normals()</font> to
           make normals perpendicular to all the faces and then use the smooth
-          function to adjust them for improved appearance. The smooth function
-          became available with VPython 5.2. With VPython 5.3 you can specify
+          function to adjust them for improved appearance. You can specify
           the smoothing criterion. For example, <font color="#FF0000">myfaces.smooth(0.7)</font> will
           average normals whose directions differ by an angle whose cosine is
           greater than or equal to 0.7 (angles less than 45 degrees).</p>
