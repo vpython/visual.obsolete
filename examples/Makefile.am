@@ -10,7 +10,7 @@ examplefiles = bounce.py bounce2.py boxlighttest.py colorsliders.py \
 	conch.py controlstest.py \
 	convex.py crossproduct.py crystal.py differential_gear.py \
 	dipole.py doublependulum.py drape.py \
-	electric_motor.py extruded_columns.py extrusion_overview.py \
+	electric_motor.py extruded_columns.py extrusion_overview.py extrusion_examples.py \
 	faces_cone.py faces_heightfield.py flower128.tga gas.py glinfo.py \
 	graphtest.py gyro.py gyro2.py hanoi.py labels.py lathe.py \
 	lorenz.py mandelbrot.py material_test.py medusa.py \
