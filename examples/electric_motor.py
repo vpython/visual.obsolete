@@ -117,7 +117,7 @@ for i in range(ns):
     wrf = frame(frame=cf, pos=(0,2,thk/2.))
     wrfs.append(wrf)
     # Extrude the winding block per winding path
-    wre = extrusion(frame=wrf, pos=P, shape=S, xscale=-1,
+    wre = extrusion(frame=wrf, pos=P, shape=S,
                     color=(.7,.5,.15), material=materials.rough)
     # Make angular corrections to position on the rotor core
     wrf.rotate(axis=(0,0,1), angle=(i*2*pi/ns+pi/ns), origin=(0,0,0))
