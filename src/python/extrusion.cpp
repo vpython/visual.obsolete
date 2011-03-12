@@ -1331,12 +1331,15 @@ extrusion::extrude( const view& scene,
 				// Use pstrips to paint both sides of the first surface
 				vector icolor = current_color;
 				if (startcorner == 0) icolor = initial_face_color;
+				rendered_initial_face = true;
 				render_end(-bisecting_plane_normal, current, c11, c12, c21, c22, xrot, y, icolor, true,
 						faces_pos, faces_normals, faces_colors, make_faces);
 			}
 
-			if (delay_initial_face) {
+			// This complicated test deals with the situation of a closed path but endcorner < lastpoint.
+			if (delay_initial_face || (closed && !rendered_initial_face && startcorner == 0 && endcorner < lastpoint)) {
 				delay_initial_face = false;
+				rendered_initial_face = true;
 				if (show_start) {
 					// Use pstrips to paint both sides of the first surface
 					if (startcorner == 0) {
