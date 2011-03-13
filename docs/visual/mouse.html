@@ -101,8 +101,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="Normal"> Mouse objects are obtained from the mouse attribute of a 
           display object such as <span class="attribute">scene</span>. For example, 
           to obtain mouse input from the default window created by Visual, refer to <span class="attribute">scene.mouse</span>. For basic examples of mouse handling, 
-          see <a href="mouse_click.html">Click example</a> and <a href="mouse_drag.html">Drag 
-            example</a>.</p>
+          see <a href="mouse_click.html">Click example</a>, <a href="mouse_drag.html">Drag 
+            example</a>, and <a href="#pause">Pausing for either mouse or keyboard input</a>.</p>
         <p class="Normal"> A mouse object has a group of attributes corresponding to 
           the current state of the mouse. It also has functions <span class="attribute">getevent()</span> and <span class="attribute">getclick()</span>, which return an object with 
           similar attributes corresponding to the state of the mouse when the user last 
@@ -243,8 +243,18 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         <p class="Normal">You can instead specify a perpendicular distance <span class="attribute">d</span> from the origin to the plane that is perpendicular to the specified normal. 
           The example above is equivalent to</p>
         <p class="program"> temp = scene.mouse.project(normal=(0,1,0), d=3)</p>
-
-        <!-- InstanceEndEditable --></td>
+        <p class="Normal"><font color="#0000A0"><strong><a name="pause" id="pause"></a>Pausing for mouse or keyboard input</strong></font></p>
+        <p class="Normal"> Often you want to pause for either mouse or keyboard input. Copy the following function into your program, and then insert <strong>pause()</strong> wherever you want to pause.</p>
+        <p class="program">def pause():<br />
+&nbsp;&nbsp;&nbsp;&nbsp;while True:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rate(50)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if scene.mouse.events:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m = scene.mouse.getevent()<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if m.click == 'left': return<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elif scene.kb.keys:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;k = scene.kb.getkey()<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return      </p>
+    <!-- InstanceEndEditable --></td>
   </tr>
   <tr>
     <td height="16" colspan="4"></td>

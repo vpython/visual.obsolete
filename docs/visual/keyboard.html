@@ -137,10 +137,19 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           = '' # erase all text</p>
         <p class="Normal">Note that <a href="mouse.html">mouse events</a> also provide 
           information about the ctrl, alt, and shift keys, which may be used to modify 
-          mouse actions.</p>
-        <div>
-          <p class="Normal">&nbsp; </p>
-        </div>
+          mouse actions.        </p>
+        <p class="Normal"><font color="#0000A0"><strong>Pausing for mouse or keyboard input</strong></font></p>
+        <p class="Normal"> Often you want to pause for either mouse or keyboard input. Copy the following function into your program, and then insert <strong>pause()</strong> wherever you want to pause.</p>
+        <p class="program">def pause():<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;while True:<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rate(50)<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if scene.mouse.events:<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m = scene.mouse.getevent()<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if m.click == 'left': return<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elif scene.kb.keys:<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;k = scene.kb.getkey()<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return        </p>
+        <div></div>
       </div>
     <!-- InstanceEndEditable --></td>
   </tr>
