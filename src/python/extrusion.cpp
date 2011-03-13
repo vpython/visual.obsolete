@@ -1070,7 +1070,14 @@ extrusion::extrude( const view& scene,
 
 	if (!make_faces) bool mono = adjust_colors( scene, tcolor, pcount);
 	bool closed = false;
-	if (pcount > 2) closed = ((vector(&spos[0]) - vector(&spos[(pcount-1)*3])).mag() < 0.0001*maxextent*scene.gcf);
+	if (pcount > 2) {
+		double path_length = 0.0;
+		double* p=spos;
+		for (size_t n=0; n<(pcount-1); n++, p+=3) {
+			path_length += (vector(&p[3]) - vector(&p[0])).mag();
+		}
+		closed = ((vector(&spos[0]) - vector(&spos[(pcount-1)*3])).mag() <= 0.0001*path_length);
+	}
 	bool show_start = show_start_face;
 	bool show_end = show_end_face;
 	if (!shape_closed || (closed && startcorner == 0 && endcorner == pcount-1))
