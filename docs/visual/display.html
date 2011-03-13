@@ -150,7 +150,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 <p class="program">&nbsp;&nbsp;&nbsp;&nbsp;for obj in scene2.objects: <br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if isinstance(obj, box):<br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.color = color.red</p>
-          <p class="attributes"><span class="attribute">show_rendertime</span> If you set <span class="attribute">scene.show_rendertime = True</span>, in the lower left corner of the display you will see something like &quot;cycle: 27 render: 5&quot;, meaning 27 milliseconds between renderings of the scene, taking 5 milliseconds to render, in which case 22 out of 27 milliseconds were devoted to executing your Python statements. </p>
+          <p class="attributes"><span class="attribute">show_rendertime</span> If you set <span class="attribute">scene.show_rendertime = True</span>, in the lower left corner of the display you will see something like &quot;cycle: 40&quot;, meaning 40 milliseconds between renderings of the scene. <span class="Normal">Approximately half of the cycle time is devoted to rendering the scene, and about half to your own computations.</span></p>
       <p class="attributes"><span class="attribute">stereo</span> Stereoscopic
             option; <span class="attribute">scene.stereo = 'redcyan'</span> will
             generate a scene for the left eye and a scene for the right eye,
