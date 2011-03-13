@@ -902,9 +902,17 @@ display_kernel::render_scene(void)
 
 			std::wostringstream render_msg;
 			render_msg.precision(3);
+
 			// render time does not include pick time, which may be negligible
-			render_msg << "cycle: " << int(1000*cycle) <<
-			   " render: " << int(1000*(render_time));
+			//render_msg << "cycle: " << int(1000*cycle) <<
+			//   " render: " << int(1000*(render_time));
+
+			// render_time is only a portion of the actual paint time in render_manager.cpp,
+			// so it is misleading to display it. In render_manager.cpp is measured actual paint time,
+			// and buffer swap time, and it generates the interval to the start of the next paint.
+			// The cycle time assumes only one scene, but at least it is accurate in this important special case.
+			render_msg << "cycle: " << int(1000*cycle);
+
 			if (flush_time>=0) render_msg << " flush: " << int(1000*flush_time);
 			glColor3f(
 				1.0f - background.red, 1.0f-background.green, 1.0f-background.blue);
