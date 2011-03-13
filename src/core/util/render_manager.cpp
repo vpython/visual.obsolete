@@ -48,6 +48,7 @@ double render_manager::paint_displays( const std::vector< display* >& displays, 
 	// of 5ms is to prevent absurd behavior if vertical retrace synchronization is disabled in
 	// the driver, and to ensure that we have some time for event handling if painting is instant.
 	double interval = std::max(.005, paint - swap);
+	if (paint+swap+interval < 0.03) interval = 0.03-paint-swap;
 	
 	#if 0  // for debugging
 	static double lasts = 0.0;
