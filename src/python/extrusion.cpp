@@ -763,72 +763,76 @@ extrusion::render_end(const vector V, const vector current,
 	size_t npstrips = pstrips[0]; // number of triangle strips in the cross section
 	size_t spoints = strips.size()/2; // total number of 2D points in all strips
 	double tx, ty;
+	bool clear = true;
 
 	for (size_t c=0; c<npstrips; c++) {
 		size_t nd = 2*pstrips[2*c+2]; // number of doubles in this strip
 		size_t base = 2*pstrips[2*c+3]; // initial (x,y) = (strips[base], strips[base+1])
-		std::vector<vector> tristrip(nd/2), snormals(nd/2), endcolors(nd/2);
+		std::vector<vector> v(nd/2);
 
 		for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
 			tx = c11*strips[base+pt] + c12*strips[base+pt+1];
 			ty = c21*strips[base+pt] + c22*strips[base+pt+1];
-			tristrip[n] = current + tx*xrot + ty*y;
-			snormals[n] = V;
-			endcolors[n] = current_color;
+			v[n] = current + tx*xrot + ty*y; // create array of nd/2 3D vector strip locations
 		}
 
 		if (!make_faces) {
-			glNormalPointer( GL_DOUBLE, 0, &snormals[0]);
-			glVertexPointer(3, GL_DOUBLE, 0, &tristrip[0]);
-			glColorPointer(3, GL_DOUBLE, 0, &endcolors[0]);
-			// nd doubles, nd/2 vertices
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
-		} else if (show_first){
-			for (size_t pt=0, n=0; pt<(nd-4); pt+=2, n++) {
-				faces_normals.insert(faces_normals.end(), snormals.begin()+n, snormals.begin()+n+3);
-				faces_colors.insert(faces_colors.end(), endcolors.begin()+n, endcolors.begin()+n+3);
+			faces_pos.reserve(nd/2-2);
+			faces_normals.reserve(nd/2-2);
+			faces_colors.reserve(nd/2-2);
+			faces_pos.clear();
+			faces_normals.clear();
+			faces_colors.clear();
+		}
+
+		if (show_first || (!make_faces && twosided)){
+			for (size_t n=0; n<(nd/2-2); n++) {
+				faces_normals.push_back(V);
+				faces_normals.push_back(V);
+				faces_normals.push_back(V);
+				faces_colors.push_back(current_color);
+				faces_colors.push_back(current_color);
+				faces_colors.push_back(current_color);
 				if (n % 2) { // if odd
-					faces_pos.push_back(tristrip[n]);
-					faces_pos.push_back(tristrip[n+2]);
-					faces_pos.push_back(tristrip[n+1]);
+					faces_pos.push_back(v[n  ]);
+					faces_pos.push_back(v[n+2]);
+					faces_pos.push_back(v[n+1]);
 				} else {
-					faces_pos.insert(faces_pos.end(), tristrip.begin()+n, tristrip.begin()+n+3);
+					faces_pos.insert(faces_pos.end(), v.begin()+n, v.begin()+n+3);
 				}
+			}
+			if (!make_faces) {
+				glNormalPointer( GL_DOUBLE, 0, &faces_normals[0]);
+				glVertexPointer(3, GL_DOUBLE, 0, &faces_pos[0]);
+				glColorPointer(3, GL_DOUBLE, 0, &faces_colors[0]);
+				glDrawArrays(GL_TRIANGLES, 0, faces_pos.size());
+				faces_pos.clear();
+				faces_normals.clear();
+				faces_colors.clear();
 			}
 		}
 
-		// Make two-sided:
-		for (size_t pt=0, n=0; pt<nd; pt+=2, n++) {
-			size_t nswap;
-			if (n % 2) { // if odd
-				nswap = n-1;
-			} else {
-				if (pt == nd-2) { // total number of points is odd
-					nswap = n;
+		if (!show_first || (!make_faces && twosided)){
+			for (size_t n=0; n<(nd/2-2); n++) {
+				faces_normals.push_back(-V);
+				faces_normals.push_back(-V);
+				faces_normals.push_back(-V);
+				faces_colors.push_back(current_color);
+				faces_colors.push_back(current_color);
+				faces_colors.push_back(current_color);
+				if (n % 2) { // if odd
+					faces_pos.insert(faces_pos.end(), v.begin()+n, v.begin()+n+3);
 				} else {
-					nswap = n+1;
+					faces_pos.push_back(v[n  ]);
+					faces_pos.push_back(v[n+2]);
+					faces_pos.push_back(v[n+1]);
 				}
 			}
-			tx = c11*strips[base+pt] + c12*strips[base+pt+1];
-			ty = c21*strips[base+pt] + c22*strips[base+pt+1];
-			tristrip[nswap] = current + tx*xrot + ty*y;
-			snormals[n] = -V;
-		}
-
-		if (!make_faces) {
-			// nd doubles, nd/2 vertices
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, nd/2);
-		} else if (!show_first){
-			for (size_t pt=0, n=0; pt<(nd-4); pt+=2, n++) {
-				faces_normals.insert(faces_normals.end(), snormals.begin()+n, snormals.begin()+n+3);
-				faces_colors.insert(faces_colors.end(), endcolors.begin()+n, endcolors.begin()+n+3);
-				if (n % 2) { // if odd
-					faces_pos.push_back(tristrip[n]);
-					faces_pos.push_back(tristrip[n+2]);
-					faces_pos.push_back(tristrip[n+1]);
-				} else {
-					faces_pos.insert(faces_pos.end(), tristrip.begin()+n, tristrip.begin()+n+3);
-				}
+			if (!make_faces) {
+				glNormalPointer( GL_DOUBLE, 0, &faces_normals[0]);
+				glVertexPointer(3, GL_DOUBLE, 0, &faces_pos[0]);
+				glColorPointer(3, GL_DOUBLE, 0, &faces_colors[0]);
+				glDrawArrays(GL_TRIANGLES, 0, faces_pos.size());
 			}
 		}
 	}
