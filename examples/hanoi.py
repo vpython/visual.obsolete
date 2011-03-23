@@ -36,7 +36,6 @@ while True:
         if m.drag:  # identify pole clicked on
             mx=m.project(normal=vector(0,0,1)).x
             pole1=int((mx+floor.length/2.)/(floor.length/3.))
-            print(pole1)
             # pick up a ring
             if len(stack[pole1])>0:
                 select=stack[pole1][-1]     # remove ring from stack
