@@ -5,7 +5,7 @@ from visual.graph import *
 # If xmax, xmin, ymax, or ymin specified, the related axis is not autoscaled
 # Can turn off autoscaling with
 #    oscillation.autoscale[0]=0 for x or oscillation.autoscale[1]=0 for y
-oscillation = gdisplay(xtitle='Time', ytitle='Response')
+oscillation = gdisplay(xtitle='Time', ytitle='Response (click and drag mouse to see coordinates)')
 funct1 = gcurve(color=color.cyan)
 funct2 = gvbars(delta=0.5, color=color.red)
 funct3 = gdots(color=color.yellow)
@@ -21,3 +21,4 @@ data = ghistogram(bins=arange(-20, 80, 10), color=color.red)
 data.plot(data=datalist1) 
 datalist2 = [7, 23, 25, 72, -15]
 data.plot(data=datalist2, accumulate=1)
+

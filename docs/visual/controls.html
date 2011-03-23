@@ -121,9 +121,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           you create a special controls window and add control objects to that window, 
           specifying what actions should take place when the controls are manipulated. 
           For example, an action associated with a button might be the execution of 
-          a function to change the color of a Visual object. After creating the controls, 
-          you repeatedly call an interact routine to check for user manipulation of 
-          the controls, which trigger actions. For a detailed example, see the VPython 
+          a function to change the color of a Visual object. For a detailed example, see the VPython 
           demo program <span class="attribute">controlstest.py</span>. </p>
         <p class="Normal">Here is a small example. All it does is change the button text when you click 
           the button. The Python construction &quot;lambda:&quot; is required for the 
@@ -142,13 +140,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
         # Create a button in the controls window:<br />
         b = button( pos=(0,0), width=60, height=60, <br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text='Click 
-          me', action=lambda: change() )<br />
-        while True:<br />
-        &nbsp;&nbsp;&nbsp;&nbsp;c.interact() 
-          # Check for mouse; drive  actions<br />
-      </div>
-      <p class="attributes">&nbsp; </p>
-      <p class="Normal"><font color="#0000A0">Controls window</font></p>
+          me', action=lambda: change() )        
+        <p class="Normal"></p>
+        <p class="Normal">Technical note: It used to be necessary to call c.interact() repeatedly in order for the controls to be active, but this is no longer necessary. The interact function still exists for backward compatibility, but it does nothing.</p>
+</div>
+<p class="Normal"><font color="#0000A0">Controls window</font></p>
       <p class="attributes"> <span class="attribute">controls()</span> Creates a controls 
         window with the specified attributes, and returns it. For example, the following 
         creates a controls window 300 by 300, located at (0,400) with respect to the 

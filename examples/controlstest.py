@@ -73,6 +73,5 @@ setdir(-1) # set the rotation direction of the cube
 
 while True:
     rate(100)
-    c.interact() # check for events, drive actions; must be executed repeatedly in a loop
     cube.rotate(axis=(0,1,0), angle=cube.dir*cube.dtheta)
        
