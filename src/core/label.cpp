@@ -29,6 +29,7 @@ label::label()
 	opacity(0.66f),
 	text_changed(true)
 {
+	background = rgb(0., 0., 0.);
 }
 
 label::label( const label& other)
@@ -47,6 +48,7 @@ label::label( const label& other)
 	text( other.text),
 	text_changed( true)
 {
+	background = rgb(0., 0., 0.);
 }
 
 label::~label()
@@ -285,6 +287,18 @@ label::get_linecolor()
 	return linecolor;
 }
 
+void
+label::set_background( const rgb& n_background)
+{
+	background = n_background;
+}
+
+rgb
+label::get_background()
+{
+	return background;
+}
+
 void label::grow_extent( extent& e)
 {
 	e.add_point( pos );
@@ -377,7 +391,7 @@ label::gl_render( const view& scene)
 		}
 		if (opacity) {
 			// Occlude objects behind the label.
-			rgba( 0, 0, 0, opacity).gl_set();
+			rgba( background[0], background[1], background[2], opacity).gl_set();
 			glBegin( GL_QUADS);
 				vector().gl_render();
 				vector( box_width, 0).gl_render();

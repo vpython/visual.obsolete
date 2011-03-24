@@ -77,6 +77,9 @@ class label : public renderable
 	void set_linecolor( const rgb& color);
 	rgb get_linecolor();
 
+	void set_background( const rgb& color);
+	rgb get_background();
+
  protected:
 	// In world space:
 	shared_vector pos;
@@ -98,6 +101,8 @@ class label : public renderable
 	// bitmap_font* font;
 	rgb linecolor; ///< The color of the lines in the label. (color is for text)
 	float opacity; ///< The opacity of the background for the text.
+
+	rgb background; // by default, the color of scene.background
 
 	std::wstring text;
 
