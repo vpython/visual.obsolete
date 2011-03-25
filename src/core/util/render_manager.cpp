@@ -4,12 +4,17 @@
 #include "display.hpp"
 
 #include <boost/python/detail/wrap_python.hpp>
+
+/* No longer used:
 #include <boost/python/import.hpp>
+*/
 
 namespace cvisual {
 
+/* No longer used:
 using boost::python::object;
 using boost::python::import;
+*/
 
 double render_manager::paint_displays( const std::vector< display* >& displays, bool swap_single_threaded ) {
 	// If there are no active displays, poll at a reasonable rate.  The platform driver
@@ -62,9 +67,11 @@ double render_manager::paint_displays( const std::vector< display* >& displays, 
 	lasts = start;
 	#endif
 
+	/* No longer used:
 	python::gil_lock gil;
 	object handlemouse = import("vis.primitives").attr("handlemouse");
 	handlemouse(); // check for mouse events for graph and controls
+	*/
 	
 	return interval;
 }
