@@ -3,7 +3,13 @@
 #include <threadpool.hpp>
 #include "display.hpp"
 
+#include <boost/python/detail/wrap_python.hpp>
+#include <boost/python/import.hpp>
+
 namespace cvisual {
+
+using boost::python::object;
+using boost::python::import;
 
 double render_manager::paint_displays( const std::vector< display* >& displays, bool swap_single_threaded ) {
 	// If there are no active displays, poll at a reasonable rate.  The platform driver
@@ -55,6 +61,10 @@ double render_manager::paint_displays( const std::vector< display* >& displays, 
 	printf("%0.3f (+%0.3f) %0.3f %0.3f %0.3f\n", start, start-lasts, paint, swap, interval);
 	lasts = start;
 	#endif
+
+	python::gil_lock gil;
+	object handlemouse = import("vis.primitives").attr("handlemouse");
+	handlemouse(); // check for mouse events for graph and controls
 	
 	return interval;
 }
