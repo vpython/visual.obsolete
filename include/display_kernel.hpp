@@ -84,7 +84,7 @@ class display_kernel
 	*/
 	double gcf;
 	/** Vector version of the global scaling factor used when scene.uniform=0.
-	 Affects just curve, points, faces, label, and frame.
+	 Affects just curve, points, faces, label, frame, and conversion of mouse coordinates.
 	*/
 	vector gcfvec;
 
