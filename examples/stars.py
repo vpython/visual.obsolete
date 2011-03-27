@@ -14,7 +14,6 @@ G = 6.7e-11 # Universal gravitational constant
 # Typical values
 Msun = 2E30
 Rsun = 2E9
-Rtrail = 2e8
 L = 4e10
 vsun = 0.8*sqrt(G*Msun/Rsun)
 
@@ -38,8 +37,8 @@ for i in range(Nstars):
     y = -L+2*L*random()
     z = -L+2*L*random()
     r = Rsun/2+Rsun*random()
-    Stars = Stars+[sphere(pos=(x,y,z), radius=r, color=colors[i % 6])]
-    Stars[-1].trail = curve(pos=[Stars[-1].pos], color=colors[i % 6], radius=Rtrail)
+    Stars = Stars+[sphere(pos=(x,y,z), radius=r, color=colors[i % 6],
+                   trail=True, interval=10)]
     mass = Msun*r**3/Rsun**3
     px = mass*(-vsun+2*vsun*random())
     py = mass*(-vsun+2*vsun*random())
@@ -86,8 +85,6 @@ while True:
     # Update positions of display objects; add trail
     for i in range(Nstars):
         Stars[i].pos = pos[i]
-        if Nsteps % 10 == 0:
-            Stars[i].trail.append(pos=pos[i])
 
     # If any collisions took place, merge those stars
     for ij in hitlist:
@@ -107,7 +104,7 @@ while True:
         m[iset,0] = newmass
         pos[iset] = newpos
         p[iset] = newp
-        Stars[jset].trail.visible = 0
+        Stars[jset].trail_object.visible = False
         Stars[jset].visible = 0
         p[jset] = vector(0,0,0)
         m[jset,0] = Msun*1E-30  # give it a tiny mass
