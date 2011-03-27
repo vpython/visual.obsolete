@@ -11,7 +11,11 @@
 
 #include <typeinfo>
 
+#include <boost/python/object.hpp>
+
 namespace cvisual {
+
+using boost::python::object;
 
 // All primitive subclasses should use this pair of macros to help with standard
 // error messages.  This allows functions to use the exact name of a virtual class.
@@ -28,6 +32,10 @@ class primitive : public renderable
 	shared_vector axis;
 	shared_vector up;
 	shared_vector pos;
+
+	bool trail;
+	boost::python::object primitive_object;
+	boost::python::object trail_update;
 
 	// Returns a tmatrix that performs reorientation of the object from model
 	// orientation to world (and view) orientation.
@@ -82,6 +90,12 @@ class primitive : public renderable
 	
 	void set_opacity( float x);
 	double get_opacity();
+
+	void set_trail( bool x);
+	bool get_trail();
+
+	void set_primitive_object( boost::python::object x);
+	boost::python::object get_primitive_object();
 };
 
 } // !namespace cvisual
