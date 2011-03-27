@@ -38,7 +38,7 @@ for i in range(Nstars):
     z = -L+2*L*random()
     r = Rsun/2+Rsun*random()
     Stars = Stars+[sphere(pos=(x,y,z), radius=r, color=colors[i % 6],
-                   trail=True, interval=10)]
+                   make_trail=True, interval=10)]
     mass = Msun*r**3/Rsun**3
     px = mass*(-vsun+2*vsun*random())
     py = mass*(-vsun+2*vsun*random())

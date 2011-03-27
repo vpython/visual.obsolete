@@ -146,7 +146,7 @@ wrap_primitive()
 		.add_property( "green", &primitive::get_green, &primitive::set_green)
 		.add_property( "blue", &primitive::get_blue, &primitive::set_blue)
 		.add_property( "opacity", &primitive::get_opacity, &primitive::set_opacity)
-		.add_property( "trail", &primitive::get_trail, &primitive::set_trail)
+		.add_property( "make_trail", &primitive::get_make_trail, &primitive::set_make_trail)
 		.add_property( "primitive_object", &primitive::get_primitive_object, &primitive::set_primitive_object)
 		 .def( "rotate", raw_function( &py_rotate<primitive>))
 		;

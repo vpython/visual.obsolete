@@ -105,7 +105,7 @@ void
 primitive::set_pos( const vector& n_pos)
 {
 	pos = n_pos;
-	if (trail_initialized && trail) {
+	if (trail_initialized && make_trail) {
 		if (obj_initialized) {
 			python::gil_lock gil;
 			trail_update(primitive_object);
@@ -123,7 +123,7 @@ void
 primitive::set_x( double x)
 {
 	pos.set_x( x);
-	if (trail_initialized && trail) {
+	if (trail_initialized && make_trail) {
 		if (obj_initialized) {
 			python::gil_lock gil;
 			trail_update(primitive_object);
@@ -141,7 +141,7 @@ void
 primitive::set_y( double y)
 {
 	pos.set_y( y);
-	if (trail_initialized && trail) {
+	if (trail_initialized && make_trail) {
 		if (obj_initialized) {
 			python::gil_lock gil;
 			trail_update(primitive_object);
@@ -159,7 +159,7 @@ void
 primitive::set_z( double z)
 {
 	pos.set_z( z);
-	if (trail_initialized && trail) {
+	if (trail_initialized && make_trail) {
 		if (obj_initialized) {
 			python::gil_lock gil;
 			trail_update(primitive_object);
@@ -258,22 +258,22 @@ primitive::get_opacity()
 }
 
 void
-primitive::set_trail( bool t)
+primitive::set_make_trail( bool t)
 {
 	if (t && !obj_initialized)
-		throw std::runtime_error( "Can't set trail=True unless object was created with trail specified");
+		throw std::runtime_error( "Can't set make_trail=True unless object was created with make_trail specified");
 	if (startup) {
 		trail_update = import("vis.primitives").attr("trail_update");
 		startup = false;
 	}
-	trail = t;
+	make_trail = t;
 	trail_initialized = true;
 }
 
 bool
-primitive::get_trail()
+primitive::get_make_trail()
 {
-	return trail;
+	return make_trail;
 }
 
 void

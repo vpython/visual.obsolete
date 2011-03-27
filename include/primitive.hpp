@@ -33,7 +33,7 @@ class primitive : public renderable
 	shared_vector up;
 	shared_vector pos;
 
-	bool trail, trail_initialized, obj_initialized;
+	bool make_trail, trail_initialized, obj_initialized;
 	boost::python::object primitive_object;
 
 	// Returns a tmatrix that performs reorientation of the object from model
@@ -90,8 +90,8 @@ class primitive : public renderable
 	void set_opacity( float x);
 	double get_opacity();
 
-	void set_trail( bool x);
-	bool get_trail();
+	void set_make_trail( bool x);
+	bool get_make_trail();
 
 	void set_primitive_object( boost::python::object x);
 	boost::python::object get_primitive_object();
