@@ -33,9 +33,8 @@ class primitive : public renderable
 	shared_vector up;
 	shared_vector pos;
 
-	bool trail;
+	bool trail, trail_initialized, obj_initialized;
 	boost::python::object primitive_object;
-	boost::python::object trail_update;
 
 	// Returns a tmatrix that performs reorientation of the object from model
 	// orientation to world (and view) orientation.

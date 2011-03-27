@@ -63,18 +63,15 @@ primitive::get_center() const
 	return pos;
 }
 
-bool startup = true;
-
 using boost::python::import;
 using boost::python::object;
 
+bool startup = true;
+boost::python::object trail_update;
+
 primitive::primitive()
-	: axis(1,0,0), up(0,1,0), pos(0,0,0), primitive_object(0)
+	: axis(1,0,0), up(0,1,0), pos(0,0,0), trail_initialized(false), obj_initialized(false)
 {
-	if (startup) {
-		trail_update = import("vis.primitives").attr("trail_update");
-		startup = false;
-	}
 }
 
 primitive::primitive( const primitive& other)
@@ -108,9 +105,11 @@ void
 primitive::set_pos( const vector& n_pos)
 {
 	pos = n_pos;
-	if (trail) {
-		python::gil_lock gil;
-		trail_update(primitive_object);
+	if (trail_initialized && trail) {
+		if (obj_initialized) {
+			python::gil_lock gil;
+			trail_update(primitive_object);
+		}
 	}
 }
 
@@ -124,9 +123,11 @@ void
 primitive::set_x( double x)
 {
 	pos.set_x( x);
-	if (trail) {
-		python::gil_lock gil;
-		trail_update(primitive_object);
+	if (trail_initialized && trail) {
+		if (obj_initialized) {
+			python::gil_lock gil;
+			trail_update(primitive_object);
+		}
 	}
 }
 
@@ -140,9 +141,11 @@ void
 primitive::set_y( double y)
 {
 	pos.set_y( y);
-	if (trail) {
-		python::gil_lock gil;
-		trail_update(primitive_object);
+	if (trail_initialized && trail) {
+		if (obj_initialized) {
+			python::gil_lock gil;
+			trail_update(primitive_object);
+		}
 	}
 }
 
@@ -156,9 +159,11 @@ void
 primitive::set_z( double z)
 {
 	pos.set_z( z);
-	if (trail) {
-		python::gil_lock gil;
-		trail_update(primitive_object);
+	if (trail_initialized && trail) {
+		if (obj_initialized) {
+			python::gil_lock gil;
+			trail_update(primitive_object);
+		}
 	}
 }
 
@@ -255,9 +260,14 @@ primitive::get_opacity()
 void
 primitive::set_trail( bool t)
 {
-	if (t && !primitive_object)
+	if (t && !obj_initialized)
 		throw std::runtime_error( "Can't set trail=True unless object was created with trail specified");
+	if (startup) {
+		trail_update = import("vis.primitives").attr("trail_update");
+		startup = false;
+	}
 	trail = t;
+	trail_initialized = true;
 }
 
 bool
@@ -270,6 +280,7 @@ void
 primitive::set_primitive_object( boost::python::object obj)
 {
 	primitive_object = obj;
+	obj_initialized = true;
 }
 
 boost::python::object
