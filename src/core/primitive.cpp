@@ -69,7 +69,7 @@ using boost::python::import;
 using boost::python::object;
 
 primitive::primitive()
-	: axis(1,0,0), up(0,1,0), pos(0,0,0)
+	: axis(1,0,0), up(0,1,0), pos(0,0,0), primitive_object(0)
 {
 	if (startup) {
 		trail_update = import("vis.primitives").attr("trail_update");
@@ -256,7 +256,7 @@ void
 primitive::set_trail( bool t)
 {
 	if (t && !primitive_object)
-		throw std::runtime_error( "Can't set trail=True unless object was created with trail=True");
+		throw std::runtime_error( "Can't set trail=True unless object was created with trail specified");
 	trail = t;
 }
 
