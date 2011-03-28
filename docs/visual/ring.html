@@ -36,7 +36,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p class="Normal">A VPython <a href="VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p class="Normal"><a href="primitives.html">Pictures</a> of 3D objects</p>
-      <p class="Normal">Choose a 3D object:</p>
+      <p class="Normal">Choose an object:</p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
           <option>Choose an object</option>
           <option value="cylinder.html">Overview</option>
@@ -60,12 +60,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="text.html">text</option>
         </select>
         
-      <p class="Normal">Work with 3D objects:</p>
+      <p class="Normal">Work with objects:</p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Choose an option</option>
-          <option value="color.html">Color &amp; Opacity</option>
-          <option value="lights.html">Lighting</option>
-          <option value="materials.html">Materials &amp; Textures</option>
+          <option value="color.html">Color/Opacity</option>
+          <option value="materials.html">Materials/Textures</option>
           <option value="shapes.html">Shapes Library</option>
           <option value="paths.html">Paths Library</option>
           <option value="defaults.html">Defaults</option>
@@ -74,24 +73,25 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="options.html">Additional Options</option>
           <option value="delete.html">Delete an Object</option>
           <option value="float.html">3/4 = 0?</option>
+          <option value="controls.html">Buttons/Sliders</option>
+          <option value="graph.html">Graphs</option>
+          <option value="lights.html">Lighting</option>
+          <option value="files.html">Read/Write Files</option>
+          <option value="trail.html">Leaving a Trail</option>
+          <option value="vector.html">Vector Operations </option>
+          <option value="factorial.html">factorial/combin</option>
         </select>
         
-      <p class="Normal">Windows, Events, &amp; Files:</p>
+      <p class="Normal">Windows &amp Events:</p>
         <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
           <option>Choose a topic</option>
           <option value="display.html">Windows</option>
-          <option value="lights.html">Lighting</option>
           <option value="mouse.html">Mouse Events</option>
           <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
           <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
           <option value="keyboard.html">Keyboard Events</option>
-          <option value="controls.html">Buttons and Sliders</option>
-          <option value="files.html">Reading/Writing Files</option>
         </select>
         
-      <p class="Normal"><a href="vector.html">Vector operations </a></p>
-      <p class="Normal"><a href="graph.html">Graphs</a></p>
-    <p class="Normal"><a href="factorial.html">factorial/combin</a></p>
     <p class="Normal">What's new in <a href="new_features.html">Visual 5</a></p>
     <p class="Normal"><a href="http://vpython.org" target="_blank">VPython web site</a><br />
       <a href="license.txt" target="_blank">Visual license</a><br />
@@ -133,7 +133,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p class="Normal"> Note that the <span class="attribute">pos</span> attribute 
             for cylinder, arrow, cone, and pyramid corresponds to one end of the object, 
             whereas for a ring, sphere, and box it corresponds to the center of the 
-            object.</p>
+            object. </p>
+      <p class="Normal">If you include <span class="attribute">make_trail=True</span> when you create the object, a trail will be left behind the object as you move it. For related options, see <a href="trail.html"><strong>Leaving a Trail</strong></a>.</p>
 
       <p class="Normal">See description of <a href="options.html">Additional
           Attributes</a> available for all 3D display objects.</p>

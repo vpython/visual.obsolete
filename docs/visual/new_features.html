@@ -59,7 +59,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       and VPython: <a href="VisualIntro.html">Introduction</a></p>
       <p class="Normal">A VPython <a href="VPython_Intro.pdf" target="_blank">tutorial</a></p>
       <p class="Normal"><a href="primitives.html">Pictures</a> of 3D objects</p>
-      <p class="Normal">Choose a 3D object:</p>
+      <p class="Normal">Choose an object:</p>
         <select name="jumpMenu4" id="jumpMenu4" onchange="MM_jumpMenu('parent',this,0)">
           <option>Choose an object</option>
           <option value="cylinder.html">Overview</option>
@@ -83,12 +83,11 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="text.html">text</option>
         </select>
         
-      <p class="Normal">Work with 3D objects:</p>
+      <p class="Normal">Work with objects:</p>
         <select name="jumpMenu4" id="jumpMenu5" onchange="MM_jumpMenu('parent',this,0)">
           <option>Choose an option</option>
-          <option value="color.html">Color &amp; Opacity</option>
-          <option value="lights.html">Lighting</option>
-          <option value="materials.html">Materials &amp; Textures</option>
+          <option value="color.html">Color/Opacity</option>
+          <option value="materials.html">Materials/Textures</option>
           <option value="shapes.html">Shapes Library</option>
           <option value="paths.html">Paths Library</option>
           <option value="defaults.html">Defaults</option>
@@ -97,24 +96,25 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <option value="options.html">Additional Options</option>
           <option value="delete.html">Delete an Object</option>
           <option value="float.html">3/4 = 0?</option>
+          <option value="controls.html">Buttons/Sliders</option>
+          <option value="graph.html">Graphs</option>
+          <option value="lights.html">Lighting</option>
+          <option value="files.html">Read/Write Files</option>
+          <option value="trail.html">Leaving a Trail</option>
+          <option value="vector.html">Vector Operations </option>
+          <option value="factorial.html">factorial/combin</option>
         </select>
         
-      <p class="Normal">Windows, Events, &amp; Files:</p>
+      <p class="Normal">Windows &amp Events:</p>
         <select name="jumpMenu4" id="jumpMenu6" onchange="MM_jumpMenu('parent',this,0)">
           <option>Choose a topic</option>
           <option value="display.html">Windows</option>
-          <option value="lights.html">Lighting</option>
           <option value="mouse.html">Mouse Events</option>
           <option value="mouse_click.html">&nbsp;&nbsp;&nbsp;Mouse Click</option>
           <option value="mouse_drag.html">&nbsp;&nbsp;&nbsp;Mouse Drag</option>
           <option value="keyboard.html">Keyboard Events</option>
-          <option value="controls.html">Buttons and Sliders</option>
-          <option value="files.html">Reading/Writing Files</option>
         </select>
         
-      <p class="Normal"><a href="vector.html">Vector operations </a></p>
-      <p class="Normal"><a href="graph.html">Graphs</a></p>
-    <p class="Normal"><a href="factorial.html">factorial/combin</a></p>
     <p class="Normal">What's new in <a href="new_features.html">Visual 5</a></p>
     <p class="Normal"><a href="http://vpython.org" target="_blank">VPython web site</a><br />
       <a href="license.txt" target="_blank">Visual license</a><br />
@@ -135,11 +135,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           <td width="364" height="244"><p align="center" class="Normal"><span class="centered"><strong>New in Visual</strong></span></p>
           <p class="Normal">The <a href="extrusion.html"><strong>extrusion</strong></a> object introduced with Visual 5.50 enables the easy creation of complex extruded shapes. Aided by the <strong><a href="shapes.html">shapes library</a></strong>, you make a 2D shape that can contain holes. Then, aided by the <strong><a href="paths.html">paths library</a></strong>, you choose a path along which your 2D shape is extruded.</p>
           <p class="Normal">The curve object can use the  shapes library and paths library for constructing the set of points.</p>
-          <p class="Normal">Visual 5.60 adds facilities to extract faces data from extrusion and text objects, the ability to make these objects single-sided for increased speed, and improved gear facilities in the shapes library, including rack gears.</p>
-          <p class="Normal">Visual 5.61 adds mouse crosshairs to graphs, simplifies the use of controls (no need to call interact), fixes a long-standing inconsistency in the background of a label object's box, and fixes bugs in materials.bricks and in the checking for the presence of Polygon and font modules.</p></td>
+          <p class="Normal">Visual 5.60 adds facilities to extract faces data from extrusion and text objects, the ability to make these objects single-sided for increased speed, and improved gear facilities in the shapes library, including rack gears.</p></td>
           <td width="211"><img src="images/extrusion.jpg" width="244" height="198" alt="extrusion" /></td>
         </tr>
       </table>
+      <p class="Normal">Visual 5.61 adds mouse crosshairs to graphs, simplifies the use of controls (no need to call interact), fixes a long-standing inconsistency in the background of a label object's box, and fixes bugs in materials.bricks and in the checking for the presence of Polygon and font modules.</p>
+      <p class="Normal">Visual 5.70 adds an easy way to <a href="trail.html"><strong>leave a trail</strong></a> behind a moving object.</p>
       <p class="Normal"><strong><font color="#0000a0">Choose a topic:</font></strong></p>
       <blockquote>
         <p class="Normal"><strong><font color="#0000a0"><a href="#credits">Credits</a></font></strong></p>
@@ -213,6 +214,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       </blockquote>
       <h3 class="style1"><a name="log" id="log"></a>A log of developments since the start of Visual 5</h3>
       <p class="Normal">Here is a log of changes to Visual since the initial release of  Visual 5.0 in December of 2008. This and earlier history can be found at <a href="http://vpython.org" target="_blank"><strong>vpython.org</strong></a> in the &quot;Recent developments&quot; section.</p>
+      <p class="Normal">2011-03-27 Visual 5.70: Adds an easy to use way to <strong><a href="trail.html">leave a trail</a></strong> behind a moving object..</p>
       <p class="Normal">2011-03-23 Visual 5.61: Adds mouse crosshairs to graphs, simplifies the use of controls (no need to call interact), fixes a long-standing inconsistency in the background of a label object's box, and fixes bugs in materials.bricks and in the checking for the presence of Polygon and font modules.</p>
       <p class="Normal">2011-03-13 Visual 5.60: Add facilities to extract faces data from extrusion and text objects, and to make extrusion and text objects single-sided for speed. Kadir Haldenbilen contributed improved gear facilities to the shapes library, including rack gears.</p>
       <p class="Normal">2011-03-01 Visual 5.51: Fix memory leak on Windows and Mac. Correct errors in assigning color and material to a text object.</p>
