@@ -21,7 +21,7 @@ docfiles = index.html \
 	visual/paths.html visual/points.html visual/primitives.html \
 	visual/pyramid.html visual/rate.html visual/ring.gif visual/ring.html \
 	visual/rotation.html visual/shapes.html visual/sphere.html visual/spherebox.gif \
-	visual/text.html visual/vector.html \
+	visual/text.html visual/trail.html visual/vector.html \
 	visual/VisualIntro.html visual/VisualRef.css \
 	visual/VisualRef-1.gif visual/VisualRef-2.gif visual/VisualRef-3.gif \
 	visual/VisualRef-4.gif visual/VisualRef-6.gif visual/VisualRef-7.gif \
@@ -42,6 +42,7 @@ docfiles = index.html \
 	visual/images/label.jpg visual/images/lathe.jpg \
 	visual/images/material_etc.jpg visual/images/ngon_shape.jpg \
 	visual/images/pentagon_shape.jpg visual/images/pentagon.jpg \
+	visual/images/rackgear.jpg \
 	visual/images/points.jpg visual/images/pyramid.jpg visual/images/rectangle_chamfered.jpg \
 	visual/images/rectangle_rotated.jpg visual/images/rectangle_rounded.jpg \
 	visual/images/rectangle_shape_chamfered.jpg \
@@ -53,6 +54,7 @@ docfiles = index.html \
 	visual/images/star.jpg visual/images/starpath.jpg visual/images/text_extrusion.jpg \
 	visual/images/text_inverse.jpg visual/images/text_shape.jpg \
 	visual/images/text.jpg visual/images/text3d.jpg \
+	visual/images/trail.jpg \
 	visual/images/trapezoid_shape.jpg visual/images/trapezoid.jpg \
 	visual/images/triangle_circular_hole.jpg visual/images/triangle_frame.jpg \
 	visual/images/triangle_path.jpg visual/images/triangle_shape.jpg \
