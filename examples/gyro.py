@@ -1,5 +1,4 @@
 from visual import *
-from visual.text import *
 
 # Gyroscope hanging from a spring
 # Bruce Sherwood
@@ -10,7 +9,7 @@ Click on rotor to see angular momentum and impulse arrows.
 Click again on rotor to hide these arrows.
 """)
 
-arrowsvisible = 0  # angular momentum and angular impulse arrows
+arrowsvisible = False  # angular momentum and angular impulse arrows
 
 scene.title = 'Gyroscope'
 scene.visible = 0
@@ -72,10 +71,12 @@ Lrotscale = 0.2
 rotimpulsearrow = arrow(length=0, shaftwidth=Lrotarrow.shaftwidth,
                     color=color.cyan, visible=arrowsvisible)
 rotimpulsescale = 5.
-Lrotlabel = text(string='L', height=0.06, depth=0.25, visible=arrowsvisible,
-                 justify='center', color=Lrotarrow.color)
-Lrotimpulselabel = text(string='DL', justify='center', visible=arrowsvisible,
-                height=0.06, depth=0.25, color=rotimpulsearrow.color)
+Lrotlabel = text(text='L', height=0.1, depth=0.01, 
+                 align='center', color=Lrotarrow.color)
+Lrotlabel.visible = arrowsvisible
+Lrotimpulselabel = text(text='DL', align='center', 
+                height=0.1, depth=0.01, color=rotimpulsearrow.color)
+Lrotimpulselabel.visible = arrowsvisible
 
 while True:
     rate(50)
@@ -85,12 +86,10 @@ while True:
             arrowsvisible = not arrowsvisible
             Lrotarrow.visible = arrowsvisible
             rotimpulsearrow.visible = arrowsvisible
-            for obj in Lrotlabel.objects:
-                obj.visible = arrowsvisible
-            for obj in Lrotimpulselabel.objects:
-                obj.visible = arrowsvisible
+            Lrotlabel.visible = arrowsvisible
+            Lrotimpulselabel.visible = arrowsvisible
         else:
-            while 1:
+            while True:
                 if scene.mouse.clicked:
                     scene.mouse.getclick()
                     break
