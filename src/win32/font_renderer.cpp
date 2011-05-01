@@ -104,7 +104,9 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 		bmp = CreateDIBSection( dc, (BITMAPINFO*)&hdr, DIB_RGB_COLORS, &bits, NULL, 0 );
 		if (!bmp) throw win32_exception("CreateDIBSection failed.");
 		
-		int biPitch = (hdr.biWidth*3 + ((-hdr.biWidth*3)&3));
+		int databytes = hdr.biWidth*3; // the actual BGR data
+		int padbytes = (-hdr.biWidth*3)&3; // row is padded to have  multiple of 4 bytes
+		int biPitch = databytes + padbytes;
 		memset(bits, 0, biPitch * hdr.biHeight);
 		
 		SetTextColor(dc, 0xFFFFFF);
@@ -114,6 +116,16 @@ void font_renderer::gl_render_to_texture( const view&, const wstring& text, layo
 		DrawTextW( dc, text.c_str(), text.size(), &rect, 0 );
 		SelectObject(dc, prevBmp);
 		
+		/*
+		for (int row=0; row<hdr.biHeight; row++) {
+			memset((char *)bits+(biPitch*row), 0xFF, 3);                // Clear left edge of texture
+			memset((char *)bits+(biPitch*(row+1)-3-padbytes), 0, 3); // Clear right edge of texture
+		}
+		*/
+
+		//memset((char *)bits, 0, biPitch);                          // Clear bottom edge of texture
+		//memset((char *)bits+biPitch*(hdr.biHeight-1), 0, biPitch); // Clear top edge of texture
+
 		SelectObject(dc, prevFont);
 		DeleteDC( dc ); dc = NULL;
 		

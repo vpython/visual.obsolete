@@ -323,7 +323,7 @@ label::gl_render( const view& scene)
 	// Compute the positions of the text in the text box, and the height of the
 	// text box.  The text positions are relative to the lower left corner of
 	// the text box.
-	double box_height = border*2.0 + extents.y;
+	double box_height = extents.y + 2.0*border;
 
 	vector text_pos( border, box_height - border);
 
@@ -336,6 +336,24 @@ label::gl_render( const view& scene)
 		lst = lst * translate;
 	}
 	vector origin = (lst * vertex(vector(), 1.0)).project();
+
+	// It is very important to make sure that the texture is positioned
+	// accurately at a screen pixel location, to avoid artifacts around the texture.
+	double kx = scene.view_width/2.0;
+	double ky = scene.view_height/2.0;
+	if (origin.x >= 0) {
+		origin.x = ((int)(kx*origin.x+0.5))/kx;
+	} else {
+		origin.x = -((int)(-kx*origin.x+0.5))/kx;
+	}
+	if (origin.y >= 0) {
+		origin.y = ((int)(ky*origin.y+0.5))/ky;
+	} else {
+		origin.y = -((int)(-ky*origin.y+0.5))/ky;
+	}
+	double halfwidth = (int)(0.5*box_width+0.5);
+	double halfheight = (int)(0.5*box_height+0.5);
+
 	rgb stereo_linecolor = linecolor;
 	if (scene.anaglyph)
 		if (scene.coloranaglyph)
@@ -356,9 +374,8 @@ label::gl_render( const view& scene)
 		identity.gl_load();
 
 		glTranslated( origin.x, origin.y, origin.z);
-		glScaled( 2.0/scene.view_width, 2.0/scene.view_height, 1.0);
-		// At this point, all furthur translations are in direction of label
-		//  space.
+		glScaled( 1.0/kx, 1.0/ky, 1.0);
+		// At this point, all further translations are in direction of label space.
 		if (space && (xoffset || yoffset)) {
 			// Move the origin away from the body.
 			vector space_offset = vector(xoffset, yoffset).norm() * std::fabs(space);
@@ -375,28 +392,29 @@ label::gl_render( const view& scene)
 			}
 			if (std::fabs(xoffset) > std::fabs(yoffset)) {
 				glTranslated(
-					xoffset + ((xoffset > 0) ? 0 : -box_width),
-					yoffset - box_height*0.5,
+					xoffset + ((xoffset > 0) ? 0 : -2.0*halfwidth),
+					yoffset - halfheight,
 					0);
 			}
 			else {
 				glTranslated(
-					xoffset - box_width*0.5,
-					yoffset + ((yoffset > 0) ? 0 : -box_height),
+					xoffset - halfwidth,
+					yoffset + ((yoffset > 0) ? 0 : -2.0*halfheight),
 					0);
 			}
 		}
 		else {
-			glTranslated( -box_width*0.5, -box_height*0.5, 0.0);
+			glTranslated( -halfwidth, -halfheight, 0.0);
 		}
+
 		if (opacity) {
 			// Occlude objects behind the label.
 			rgba( background[0], background[1], background[2], opacity).gl_set();
 			glBegin( GL_QUADS);
 				vector().gl_render();
-				vector( box_width, 0).gl_render();
-				vector( box_width, box_height).gl_render();
-				vector( 0, box_height).gl_render();
+				vector( 2.0*halfwidth, 0).gl_render();
+				vector( 2.0*halfwidth, 2.0*halfheight).gl_render();
+				vector( 0, 2.0*halfheight).gl_render();
 			glEnd();
 		}
 		if (box_enabled) {
@@ -404,16 +422,16 @@ label::gl_render( const view& scene)
 			stereo_linecolor.gl_set(1.0f);
 			glBegin( GL_LINE_LOOP);
 				vector().gl_render();
-				vector( box_width, 0).gl_render();
-				vector( box_width, box_height).gl_render();
-				vector( 0, box_height).gl_render();
+				vector( 2.0*halfwidth, 0).gl_render();
+				vector( 2.0*halfwidth, 2.0*halfheight).gl_render();
+				vector( 0, 2.0*halfheight).gl_render();
 			glEnd();
 		}
 
 		// Render the text itself.
 		color.gl_set(1.0f);
 		text_layout->gl_render(scene, text_pos);
-	} glMatrixMode( GL_MODELVIEW); } // Pops the matricies back off the stack
+	} glMatrixMode( GL_MODELVIEW); } // Pops the matrices back off the stack
 	list.gl_compile_end();
 	check_gl_error();
 	scene.screen_objects.insert( std::make_pair(pos, list));

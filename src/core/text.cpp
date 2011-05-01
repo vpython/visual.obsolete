@@ -178,9 +178,7 @@ void layout_texture::set_image( int width, int height, int gl_internal_format, i
 	
 	glTexImage2D( type, 0, gl_internal_format, tx_width, tx_height, 0, gl_format, gl_type, NULL );
 	check_gl_error();
-	glTexSubImage2D(type, 0, 
-					0, 0, width, height,
-					gl_format, gl_type, data);
+	glTexSubImage2D(type, 0, 0, 0, width, height, gl_format, gl_type, data);
 	check_gl_error();
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 4 );
@@ -194,8 +192,6 @@ void layout_texture::set_image( int width, int height, int gl_internal_format, i
 	coord[1] = vector(0, -height);
 	coord[2] = vector(width, -height);
 	coord[3] = vector(width, 0);
-	
-	for(int i=0; i<4; i++) coord[i] -= vector(.001, .001);  // mask artifacts when rendering origin is exactly at a pixel center
 	
 	tcoord[0^bottom_up] = vector();
 	tcoord[1^bottom_up] = vector(0, tc_y);
