@@ -184,14 +184,13 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
             
             will have fixed limits. The horizontal axis will extend from -20 to +50, 
             
-            and the vertical axis will extend from -200 to +5000. <strong>Currently, xmin and ymin must 
-            
-            be negative; xmax and ymax must be positive.</strong> If you specify xmax but not xmin, it is as though you had also specified xmin to be 0; similarly, if you specify xmin but not xmax, xmax will be 0. The same rule holds for ymax and ymin.</p>
+    and the vertical axis will extend from -200 to +5000. If you specify <span class="attribute">xmax</span> but not <span class="attribute">xmin</span>, it is as though you had also specified <span class="attribute">xmin</span> to be 0; similarly, if you specify <span class="attribute">xmin</span> but not <span class="attribute">xmax</span>, <span class="attribute">xmax</span> will be 0. The same rule holds for <span class="attribute">ymax</span> and <span class="attribute">ymin</span>.</p>
+          <p class="Normal"><strong>Offsets:</strong> If you specify <span class="attribute">xmin</span> or <span class="attribute">ymin</span> to be greater than zero, or <span class="attribute">xmax</span> or <span class="attribute">ymax</span> to be less than zero, the crossing point (origin) of the x and y axes will no longer be at (0,0), and the graphing will be offset. If you offset the origin of the graph, you must specify <span class="attribute">xmax</span> to be greater than <span class="attribute">xmin</span>, and/or <span class="attribute">ymax</span> to be greater than <span class="attribute">ymin</span>.</p>
           <p class="Normal">If you simply say <span class="attribute">gdisplay()</span>, the defaults 
             
             are <span class="attribute">x=0</span>, <span class="attribute">y=0</span>, <span class="attribute">width=800</span>, <span class="attribute">height=400</span>, 
             
-          no titles, fully autoscaled.</p>
+      no titles, fully autoscaled.</p>
           <p class="Normal"> Every gdisplay has the attribute <span class="attribute">display</span>,
              
             so you can place additional labels or manipulate  the graphing window.
@@ -208,7 +207,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 
           <p class="program"> energy = gdots(gdisplay=graph2.display, color=color.blue)</p>
           <p class="Normal"><strong><font color="#0000A0">Log-log and semilog plots</font></strong></p>
-          <p class="Normal">When creating a gdisplay, you can specify logarithmic plots by specifying <span class="attribute">logx=True</span> and/or <span class="attribute">logy=True</span>.<strong> If you specify xmin or ymin, these values must be greater than 0 and less than or equal to 1</strong>, representing logarithms of numbers between infinitely small (logarithm approaches 0) and 1; that is, numbers such as 0.1, 0.01, etc.</p>
+          <p class="Normal">When creating a gdisplay, you can specify logarithmic plots by specifying <span class="attribute">logx=True</span> and/or <span class="attribute">logy=True</span>.<strong> All values must be positive</strong>, representing logarithms of numbers between infinitely small (logarithm approaches 0) and infinitely large; that is, numbers such as 0.01, 0.1, 1, 10, 100, etc.</p>
 <p class="Normal"><strong><font color="#0000A0">Histograms (sorted, binned data)</font></strong></p>
           <p class="Normal">The purpose of <span class="attribute">ghistogram</span> is 
           
