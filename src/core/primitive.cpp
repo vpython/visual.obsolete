@@ -56,7 +56,7 @@ primitive::model_world_transform(double world_scale, const vector& object_scale)
 	return ret;
 }
 
-// For oblong objects whose center is not at "pos".
+// Oblong objects (e.g. cylinder) whose center is not at "pos" override primitive::get_center
 vector
 primitive::get_center() const
 {
