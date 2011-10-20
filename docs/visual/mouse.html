@@ -123,11 +123,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
           of the mouse cursor; <span class="attribute">scene.mouse.pos</span>. Visual 
           always chooses a point in the plane parallel to the screen and passing through <span class="attribute">display.center</span>. (See <a href="#alternative">Projecting 
             mouse information onto a given plane</a> for other options.)</p>
-        <p class="attributes"><span class="attribute">button</span> = None (no buttons 
-          pressed), 'left', 'right', 'middle', or 'wheel' (scroll wheel pressed on some 
-          Windows mouses). Example: <span class="attribute">scene.mouse.button == 'left'</span> is true if the left button is currently down.</p>
-        <p class="attributes"> <span class="attribute">pick</span> The nearest object 
-          in the scene which falls under the cursor, or None. At present curve, label, and helix cannot be picked. The picked object is <span class="attribute">scene.mouse.pick</span>.</p>
+<p class="attributes"> <span class="attribute">pick</span> The nearest object 
+        in the scene which falls under the cursor, or None. At present curve, label, and helix cannot be picked. The picked object is <span class="attribute">scene.mouse.pick</span>.</p>
         <p class="attributes"> <span class="attribute">pickpos</span> The 3D point on 
           the surface of the picked object which falls under the cursor, or None; <span class="attribute">scene.mouse.pickpos</span>.</p>
         <p class="attributes"> <span class="attribute">camera</span> The read-only current 
@@ -215,6 +212,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
       <p class="attributes"><span class="attribute">release</span> = 'left'
           following click and drop events, indicating which button was released,
           or 'right' or 'middle', or None</p>
+      <p class="attributes"><span class="attribute">button</span> = 'left', 'right', or 'middle'. After executing <span class="attribute">mm = scene.mouse.getevent(), </span>the expression <span class="attribute">mm.button == 'left'</span> is true if the left button is currently down.</p>
       <p class="Normal">Normally, dragging with right or middle button represents 
         spin or zoom, and is handled automatically by Visual, so you can check for 
         left-button drag or drop events simply by checking whether <span class="attribute">drag</span> or <span class="attribute">drop</span> is true (in Python, a nonempty string 
