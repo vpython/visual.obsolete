@@ -15,7 +15,7 @@ docfiles = index.html \
 	visual/faces.html visual/factorial.html \
 	visual/files.html visual/float.html \
 	visual/frame.html visual/graph.html visual/helix.html visual/index.html \
-	visual/keyboard.html visual/label.html visual/lights.html \
+	visual/keyboard.html visual/label.html visual/license.txt visual/lights.html \
 	visual/materials.html visual/mouse.html visual/mouse_click.html \
 	visual/mouse_drag.html visual/new_features.html visual/options.html \
 	visual/paths.html visual/points.html visual/primitives.html \
