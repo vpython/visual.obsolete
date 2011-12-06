@@ -282,3 +282,6 @@ V:   Troubleshooting
 	But before you do that, it is a good idea to read the archives of the mailing list
 	since someone else has probably worked through your problem already.
 
+	From a typescript, the following will print all VPYTHON_NOTEs:
+	env VPYTHON_DEBUG=1 python test.py
+
