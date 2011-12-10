@@ -22,6 +22,8 @@ using boost::lexical_cast;
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/radiotoolbutton.h>
 
+#include <GL/glx.h>
+
 #ifndef _WIN32
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -379,8 +381,22 @@ display::on_key_pressed( GdkEventKey* key)
 
 display::EXTENSION_FUNCTION
 display::getProcAddress(const char* name) {
-	return (EXTENSION_FUNCTION)Gdk::GL::get_proc_address( name );
+	return (EXTENSION_FUNCTION)glXGetProcAddress((const GLubyte *)name);
+	//return (EXTENSION_FUNCTION)Gdk::GL::get_proc_address( name );  // older version; fails on recent Linuxes
 }
+
+/*
+//This function retrieves the null-terminated string of the 'i'th extension. An implementation exposes a number of extensions equal to glGetInteger(GL_NUM_EXTENSIONS). The argument 'i' must be between 0 and this value - 1.
+//This entrypoint is supported only in GL 3.0 and above.
+
+int NumberOfExtensions;
+ glGetIntegerv(GL_NUM_EXTENSIONS, &NumberOfExtensions);
+ for(i=0; i<NumberOfExtensions; i++)
+ {
+   const GLubyte *ccc=glGetStringi(GL_EXTENSIONS, i);
+   //Now, do something with ccc
+ }
+*/
 
 ////////////////////////////////// gui_main implementation ////////////////////
 gui_main* gui_main::self = 0;
